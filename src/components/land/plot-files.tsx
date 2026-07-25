@@ -5,7 +5,7 @@ import { Stamp } from "@/components/ui/Stamp";
 import { StencilLabel } from "@/components/ui/StencilLabel";
 import { formatCedis } from "@/lib/format-money";
 import { routes } from "@/lib/routes";
-import { siteConfig } from "@/lib/site";
+import { getSiteContact } from "@/lib/public-contact";
 import type { PublicLandPlot } from "@/lib/public-land";
 import { cn } from "@/lib/utils";
 
@@ -141,7 +141,8 @@ function PlotCard({ plot, offset }: { plot: PublicLandPlot; offset: boolean }) {
 }
 
 /** The empty ledger page — plots never render as a blank grid. */
-function EmptyRegister() {
+async function EmptyRegister() {
+  const contact = await getSiteContact();
   return (
     <article className="shadow-doc relative grid max-w-[860px] grid-cols-[26px_1fr] border border-soil/35 bg-paper">
       <PerforatedEdge />
@@ -175,7 +176,7 @@ function EmptyRegister() {
             Tell us what you&rsquo;re looking for
           </Link>
           <a
-            href={siteConfig.phoneHref}
+            href={contact.phoneHref}
             className="shadow-doc-sm inline-block rounded-[2px] border-2 border-forest px-6 py-3 text-[14px] font-bold text-forest transition-[transform,box-shadow] duration-100 hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0_rgb(89_82_59/0.4)]"
           >
             Call us
