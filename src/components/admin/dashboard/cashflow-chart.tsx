@@ -1,107 +1,147 @@
-import { AdminCard } from "@/components/admin/ui";
-import { CASH_FLOW } from "@/static-data/admin/dashboard";
+"use client";
 
-/** Chart geometry mirrors the design's 560×160 viewBox with an 8px inset. */
-const W = 560;
-const H = 160;
-const PAD = 8;
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import { Skeleton } from "@/components/ui/skeleton";
+import { formatCedis } from "@/lib/format-money";
+import { useGetCashflowQuery } from "@/redux/reports/reports-api";
+import type { IReportWindow } from "@/types/report.types";
 
-function scale(salesIn: readonly number[], purchasesOut: readonly number[]) {
-  const all = [...salesIn, ...purchasesOut];
-  const min = Math.min(...all);
-  const rng = Math.max(...all) - min || 1;
-  const x = (i: number) => PAD + (i * (W - 2 * PAD)) / (salesIn.length - 1);
-  const y = (v: number) => PAD + (H - 2 * PAD) * (1 - (v - min) / rng);
-  return { x, y };
+import { AXIS_TICK, ChartNote, GRID_STROKE, LegendItem, WidgetCard } from "./chart-kit";
+
+const SALES = "#3E6B8C";
+const PURCHASES = "#B8860B";
+
+/** GH₵ compacted for the y-axis: "12k", "1.2k", "840". */
+const compactCedis = (v: number): string =>
+  Math.abs(v) >= 1000
+    ? `${(v / 1000).toLocaleString("en-GH", { maximumFractionDigits: 1 })}k`
+    : String(Math.round(v));
+
+interface Row {
+  label: string;
+  purchasesOutGhs: number;
+  salesInGhs: number;
 }
 
-function toPoints(series: readonly number[], x: (i: number) => number, y: (v: number) => number) {
-  return series.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
-}
-
-/** Least-squares fit over the sales series — the dashed trend line. */
-function trendPoints(series: readonly number[], x: (i: number) => number, y: (v: number) => number) {
-  let sx = 0;
-  let sy = 0;
-  let sxy = 0;
-  let sxx = 0;
-  series.forEach((v, i) => {
-    sx += i;
-    sy += v;
-    sxy += i * v;
-    sxx += i * i;
-  });
-  const n = series.length;
-  const slope = (n * sxy - sx * sy) / (n * sxx - sx * sx);
-  const intercept = (sy - slope * sx) / n;
-  return `${x(0).toFixed(1)},${y(intercept).toFixed(1)} ${x(n - 1).toFixed(1)},${y(
-    intercept + slope * (n - 1),
-  ).toFixed(1)}`;
-}
-
-function LegendSwatch({ color, label, dashed }: { color?: string; label: string; dashed?: boolean }) {
+function CashflowTooltip({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean;
+  label?: string;
+  payload?: { dataKey: string; value: number }[];
+}) {
+  if (!active || !payload?.length) return null;
+  const get = (k: string) => payload.find((p) => p.dataKey === k)?.value ?? 0;
   return (
-    <span className="inline-flex items-center gap-[5px]">
-      <span
-        aria-hidden="true"
-        className="w-2.5"
-        style={
-          dashed
-            ? { height: 0, borderTop: "2px dashed #9ba6b3" }
-            : { height: 2.5, borderRadius: 2, background: color }
-        }
-      />
-      {label}
-    </span>
+    <div className="rounded-none border-[1.5px] border-soil/30 bg-paper px-3 py-2 text-[12px] shadow-doc-sm">
+      <div className="mb-1 font-semibold text-ink">{label}</div>
+      <div className="flex items-center justify-between gap-4">
+        <LegendItem color={SALES} label="Sales in" />
+        <span className="font-semibold text-ink">{formatCedis(get("salesInGhs"))}</span>
+      </div>
+      <div className="flex items-center justify-between gap-4">
+        <LegendItem color={PURCHASES} label="Purchases out" />
+        <span className="font-semibold text-ink">
+          {formatCedis(get("purchasesOutGhs"))}
+        </span>
+      </div>
+    </div>
   );
 }
 
-/** Cash flow — last 30 days: sales received vs purchases paid + trend. */
-export function CashflowChart() {
-  const { salesIn, purchasesOut, xLabels } = CASH_FLOW;
-  const { x, y } = scale(salesIn, purchasesOut);
-  const lineIn = toPoints(salesIn, x, y);
-  const lineOut = toPoints(purchasesOut, x, y);
-  const areaIn = `M${lineIn.split(" ").join(" L")} L${W - PAD},${H - PAD} L${PAD},${H - PAD} Z`;
+/**
+ * Cashflow over the window: money in (payments received) vs money out
+ * (purchases). Money-visibility aware - staff without financial visibility get
+ * an honest "hidden" note rather than a chart of zeros.
+ */
+export function CashflowChart({ window }: { window: IReportWindow }) {
+  const { data, isLoading } = useGetCashflowQuery(window);
+  const points = data?.data.points ?? [];
+  const redacted =
+    points.length > 0 && points.every((p) => p.salesInGhs === null);
+
+  const rows: Row[] = points.map((p) => ({
+    label: p.label,
+    purchasesOutGhs: p.purchasesOutGhs ?? 0,
+    salesInGhs: p.salesInGhs ?? 0,
+  }));
+
+  const legend = (
+    <span className="flex items-center gap-3">
+      <LegendItem color={SALES} label="Sales in" />
+      <LegendItem color={PURCHASES} label="Purchases out" />
+    </span>
+  );
 
   return (
-    <AdminCard className="min-w-0 px-[18px] py-3.5">
-      <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2.5">
-        <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-soil">
-          Cash flow — last 30 days
+    <WidgetCard title="Cashflow" right={legend}>
+      {isLoading ? (
+        <Skeleton className="h-[220px] w-full rounded-none" />
+      ) : redacted ? (
+        <ChartNote>Cashflow figures are hidden for your role.</ChartNote>
+      ) : rows.length === 0 ? (
+        <ChartNote>No money moved in this period.</ChartNote>
+      ) : (
+        <div className="h-[220px] min-w-0">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={rows} margin={{ top: 6, right: 6, bottom: 0, left: -8 }}>
+              <defs>
+                <linearGradient id="salesFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={SALES} stopOpacity={0.28} />
+                  <stop offset="100%" stopColor={SALES} stopOpacity={0.02} />
+                </linearGradient>
+                <linearGradient id="purchasesFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={PURCHASES} stopOpacity={0.24} />
+                  <stop offset="100%" stopColor={PURCHASES} stopOpacity={0.02} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid stroke={GRID_STROKE} vertical={false} />
+              <XAxis
+                dataKey="label"
+                tick={{ fill: AXIS_TICK, fontSize: 11 }}
+                tickLine={false}
+                axisLine={{ stroke: GRID_STROKE }}
+                minTickGap={16}
+              />
+              <YAxis
+                tick={{ fill: AXIS_TICK, fontSize: 11 }}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={compactCedis}
+                width={44}
+              />
+              <Tooltip
+                content={<CashflowTooltip />}
+                cursor={{ stroke: GRID_STROKE }}
+              />
+              <Area
+                type="monotone"
+                dataKey="salesInGhs"
+                stroke={SALES}
+                strokeWidth={2}
+                fill="url(#salesFill)"
+              />
+              <Area
+                type="monotone"
+                dataKey="purchasesOutGhs"
+                stroke={PURCHASES}
+                strokeWidth={2}
+                fill="url(#purchasesFill)"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
         </div>
-        <div className="flex flex-wrap gap-3.5 text-[11.5px] text-soil">
-          <LegendSwatch color="#3E7A50" label="Sales received" />
-          <LegendSwatch color="#3E6B8C" label="Purchases paid" />
-          <LegendSwatch dashed label="Trend" />
-        </div>
-      </div>
-      <svg
-        viewBox={`0 0 ${W} ${H}`}
-        preserveAspectRatio="none"
-        className="block h-40 w-full"
-        role="img"
-        aria-label="Cash flow over the last 30 days: sales received versus purchases paid"
-      >
-        {[40, 80, 120].map((gy) => (
-          <line key={gy} x1="0" y1={gy} x2={W} y2={gy} stroke="#F0F2F5" strokeWidth="1" />
-        ))}
-        <path d={areaIn} fill="rgba(62,122,80,0.09)" />
-        <polyline
-          points={trendPoints(salesIn, x, y)}
-          fill="none"
-          stroke="#9ba6b3"
-          strokeWidth="1.5"
-          strokeDasharray="5 4"
-        />
-        <polyline points={lineOut} fill="none" stroke="#3E6B8C" strokeWidth="2" strokeLinejoin="round" />
-        <polyline points={lineIn} fill="none" stroke="#3E7A50" strokeWidth="2.5" strokeLinejoin="round" />
-      </svg>
-      <div className="mt-1.5 flex justify-between text-[11px] tabular-nums text-soil/70">
-        {xLabels.map((label) => (
-          <span key={label}>{label}</span>
-        ))}
-      </div>
-    </AdminCard>
+      )}
+    </WidgetCard>
   );
 }
