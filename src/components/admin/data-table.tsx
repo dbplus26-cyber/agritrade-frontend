@@ -86,6 +86,13 @@ export function ConsoleDataTable<TData>({
   globalFilter?: string;
   /** Row click / keyboard navigation target. */
   rowHref?: (row: TData) => string | undefined;
+  /**
+   * Extra classes for a TABLE ROW. Deliberately NOT applied to the mobile card:
+   * every caller passes a fixed height here (`h-12`, `h-14`) because that is
+   * what a `<tr>` wants, and clamping a card holding five stacked label/value
+   * rows to 48px made them overlap each other — the cramped, unreadable mobile
+   * list this fixes. The card owns its own vertical rhythm.
+   */
   rowClassName?: (row: TData) => string | undefined;
   emptyState?: React.ReactNode;
   className?: string;
@@ -167,6 +174,16 @@ export function ConsoleDataTable<TData>({
   }, [pageSize, table, manual]);
 
   const rows = table.getRowModel().rows;
+  // Column-id -> header label, for the mobile card variant (below).
+  const leafHeaders = table.getHeaderGroups().at(-1)?.headers ?? [];
+  const headerLabel = new Map(
+    leafHeaders.map((h) => [
+      h.column.id,
+      h.isPlaceholder
+        ? null
+        : flexRender(h.column.columnDef.header, h.getContext()),
+    ]),
+  );
   const total = serverPagination
     ? serverPagination.totalCount
     : table.getFilteredRowModel().rows.length;
@@ -179,7 +196,7 @@ export function ConsoleDataTable<TData>({
   const showPagination = total > Math.min(...PAGE_SIZE_OPTIONS);
 
   return (
-    <div className={className}>
+    <div className={cn("@container/table", className)}>
       {enableSelection && selectedRows.length > 0 && renderBulkActions ? (
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-soil/25 bg-console/5 px-4 py-2">
           <span className="text-[12.5px] font-semibold text-soil">
@@ -191,9 +208,120 @@ export function ConsoleDataTable<TData>({
         </div>
       ) : null}
 
+      {/* Narrow CONTENT (not narrow viewport): each row becomes a stacked
+          label/value card, so the table never scrolls sideways and no column is
+          hidden off-screen.
+
+          Keyed to this component's OWN container width, not the viewport. A
+          768px tablet has only ~512px of content once the 16rem sidebar is
+          open, so a viewport `md:` would render the full table into half the
+          room it was designed for — the cramped, overflowing layout this
+          replaces. Measuring the container instead means the switch is right
+          wherever the table is placed, and there is exactly ONE rule setting
+          `display` per view (a viewport fallback alongside would race it,
+          with whichever lands later in the stylesheet silently winning). */}
       <div
         className={cn(
-          "overflow-x-auto transition-opacity",
+          "flex flex-col gap-2 py-2 transition-opacity @2xl/table:hidden",
+          isFetching && "pointer-events-none opacity-60",
+        )}
+        aria-busy={isFetching || undefined}
+      >
+        {rows.length === 0
+          ? (emptyState ?? (
+              <div className="px-4 py-12 text-center text-[13px] text-soil">
+                Nothing here yet.
+              </div>
+            ))
+          : rows.map((row) => {
+              const href = rowHref?.(row.original);
+              const selectCell = row
+                .getVisibleCells()
+                .find((c) => c.column.id === "select");
+              const visible = row
+                .getVisibleCells()
+                .filter((c) => c.column.id !== "select");
+              const isData = (c: (typeof visible)[number]) =>
+                Boolean((c.column.columnDef as { accessorFn?: unknown }).accessorFn);
+              // A table puts row actions wherever the column order says; a CARD
+              // reads top to bottom, so they belong at the foot of it. Split
+              // rather than relying on call sites to declare actions last.
+              const cells = visible.filter(isData);
+              const actionCells = visible.filter((c) => !isData(c));
+              return (
+                <div
+                  key={row.id}
+                  data-state={row.getIsSelected() ? "selected" : undefined}
+                  onClick={href ? () => router.push(href) : undefined}
+                  className={cn(
+                    "rounded-[8px] border border-soil/25 bg-paper px-3 py-2 data-[state=selected]:border-console/40 data-[state=selected]:bg-console/5",
+                    href && "cursor-pointer hover:border-soil/40",
+                  )}
+                >
+                  {selectCell ? (
+                    <div className="mb-1.5 flex justify-end">
+                      {flexRender(
+                        selectCell.column.columnDef.cell,
+                        selectCell.getContext(),
+                      )}
+                    </div>
+                  ) : null}
+                  {cells.map((cell) => {
+                    const label = headerLabel.get(cell.column.id);
+                    // Drop rows with nothing in them: a stack of
+                    // "DESCRIPTION —" placeholders is pure noise on a phone,
+                    // and reserved slots that never fill are exactly the
+                    // "unintentional negative space" to avoid.
+                    const raw = cell.getValue();
+                    if (raw === null || raw === undefined || raw === "") {
+                      return null;
+                    }
+                    return (
+                      <div
+                        key={cell.id}
+                        className="flex items-start justify-between gap-3 border-b border-soil/10 py-1.5 text-[13px] last:border-b-0"
+                      >
+                        {label ? (
+                          <span className="flex-none pt-px text-[11px] font-semibold tracking-[0.05em] text-soil/70 uppercase">
+                            {label}
+                          </span>
+                        ) : null}
+                        <span
+                          className={cn(
+                            "min-w-0 [overflow-wrap:anywhere] text-ink",
+                            label ? "text-right" : "w-full",
+                          )}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </span>
+                      </div>
+                    );
+                  })}
+                  {actionCells.length > 0 ? (
+                    <div className="mt-1.5 flex flex-wrap justify-end gap-1.5 border-t border-soil/10 pt-1.5">
+                      {actionCells.map((cell) => (
+                        <span key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
+      </div>
+
+      {/* Wide container: the real table, horizontally scrollable only as a
+          last resort on genuinely wide content. */}
+      <div
+        className={cn(
+          "hidden overflow-x-auto transition-opacity @2xl/table:block",
           isFetching && "pointer-events-none opacity-60",
         )}
         aria-busy={isFetching || undefined}
