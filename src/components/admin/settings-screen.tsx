@@ -1,9 +1,9 @@
 "use client";
 
-import { useForm, Controller } from "react-hook-form";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import {
   AdminButton,
   AdminCard,
@@ -55,7 +55,7 @@ function GhsInput({
       </span>
       <Input
         inputMode="decimal"
-        className="font-adminmono h-full min-w-0 flex-1 rounded-none border-0 bg-transparent px-2.5 py-0 text-right text-[14px] tabular-nums text-ink outline-none placeholder:text-soil/55 focus-visible:ring-0"
+        className="font-adminmono h-full min-w-0 flex-1 rounded-none border-0 bg-transparent px-2.5 py-0 text-right text-[14px] tabular-nums text-ink outline-none placeholder:text-soil/55 focus-visible:ring-0 disabled:cursor-default disabled:opacity-100"
         {...props}
       />
     </div>
@@ -65,8 +65,8 @@ function GhsInput({
 const toFormValues = (s: ISystemSettings): SettingsValues => ({
   purchaseApprovalThresholdGhs: String(s.purchaseApprovalThresholdGhs),
   lowFloatThresholdGhs: String(s.lowFloatThresholdGhs),
-  onlinePaymentsEnabled: s.onlinePaymentsEnabled,
   companyContactPhone: s.companyContactPhone,
+  companyContactWhatsapp: s.companyContactWhatsapp,
   companyContactEmail: s.companyContactEmail,
   companyContactAddress: s.companyContactAddress,
 });
@@ -80,10 +80,15 @@ function SettingsForm({
 }) {
   const [updateSettings, { isLoading: saving }] = useUpdateSettingsMutation();
 
+  // The page opens READ-ONLY; the Edit button unlocks the inputs.
+  const [isEditing, setIsEditing] = useState(false);
+  const readOnly = !isEditing;
+  const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
+
   const {
     register,
-    control,
     handleSubmit,
+    reset,
     formState: { errors, isDirty },
   } = useForm<SettingsValues>({
     resolver: zodResolver(settingsSchema),
@@ -95,8 +100,8 @@ function SettingsForm({
     const next: ISystemSettings = {
       purchaseApprovalThresholdGhs: Number(values.purchaseApprovalThresholdGhs),
       lowFloatThresholdGhs: Number(values.lowFloatThresholdGhs),
-      onlinePaymentsEnabled: values.onlinePaymentsEnabled,
       companyContactPhone: values.companyContactPhone.trim(),
+      companyContactWhatsapp: values.companyContactWhatsapp.trim(),
       companyContactEmail: values.companyContactEmail.trim(),
       companyContactAddress: values.companyContactAddress.trim(),
     };
@@ -115,6 +120,7 @@ function SettingsForm({
     try {
       await updateSettings(patch).unwrap();
       notify.success("Settings updated");
+      setIsEditing(false);
     } catch (err) {
       notify.error("Couldn't save the settings", {
         description: extractApiError(err).message,
@@ -138,6 +144,7 @@ function SettingsForm({
           >
             <GhsInput
               placeholder="10,000"
+              disabled={readOnly}
               error={!!errors.purchaseApprovalThresholdGhs}
               {...register("purchaseApprovalThresholdGhs")}
             />
@@ -149,6 +156,7 @@ function SettingsForm({
           >
             <GhsInput
               placeholder="1,000"
+              disabled={readOnly}
               error={!!errors.lowFloatThresholdGhs}
               {...register("lowFloatThresholdGhs")}
             />
@@ -157,42 +165,40 @@ function SettingsForm({
       </AdminCard>
 
       <AdminCard className="px-5 py-[18px]">
-        <SectionLabel>Payments</SectionLabel>
-        <Controller
-          control={control}
-          name="onlinePaymentsEnabled"
-          render={({ field }) => (
-            <label className="flex cursor-pointer items-center justify-between gap-3">
-              <span>
-                <span className="block text-[13px] font-semibold text-ink">
-                  Online payments
-                </span>
-                <span className="block text-[12px] text-soil">
-                  {descriptions.onlinePaymentsEnabled}
-                </span>
-              </span>
-              <Switch checked={field.value} onCheckedChange={field.onChange} />
-            </label>
-          )}
-        />
-      </AdminCard>
-
-      <AdminCard className="px-5 py-[18px]">
         <SectionLabel>Company contact</SectionLabel>
         <div className="flex flex-col gap-[13px]">
           <AdminField
-            label="Phone"
+            label="Phone (calls)"
             hint={descriptions.companyContactPhone}
             error={errors.companyContactPhone?.message}
           >
             <Input
               type="tel"
               placeholder="024 000 0000"
+              disabled={readOnly}
               className={cn(
                 adminInputClass,
+                roCls,
                 errors.companyContactPhone && "border-error",
               )}
               {...register("companyContactPhone")}
+            />
+          </AdminField>
+          <AdminField
+            label="WhatsApp number"
+            hint={descriptions.companyContactWhatsapp}
+            error={errors.companyContactWhatsapp?.message}
+          >
+            <Input
+              type="tel"
+              placeholder="024 000 0000"
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                errors.companyContactWhatsapp && "border-error",
+              )}
+              {...register("companyContactWhatsapp")}
             />
           </AdminField>
           <AdminField
@@ -203,8 +209,10 @@ function SettingsForm({
             <Input
               type="email"
               placeholder="info@dbplus.com"
+              disabled={readOnly}
               className={cn(
                 adminInputClass,
+                roCls,
                 errors.companyContactEmail && "border-error",
               )}
               {...register("companyContactEmail")}
@@ -217,8 +225,10 @@ function SettingsForm({
           >
             <Input
               placeholder="Tamale, Northern Region"
+              disabled={readOnly}
               className={cn(
                 adminInputClass,
+                roCls,
                 errors.companyContactAddress && "border-error",
               )}
               {...register("companyContactAddress")}
@@ -228,13 +238,37 @@ function SettingsForm({
       </AdminCard>
 
       <div className="flex gap-2">
-        <AdminButton
-          type="submit"
-          disabled={saving || !isDirty}
-          className="h-[38px] px-[18px]"
-        >
-          {saving ? "Saving…" : "Save settings"}
-        </AdminButton>
+        {isEditing ? (
+          <>
+            <AdminButton
+              type="submit"
+              disabled={saving || !isDirty}
+              className="h-[38px] px-[18px]"
+            >
+              {saving ? "Saving…" : "Save settings"}
+            </AdminButton>
+            <AdminButton
+              type="button"
+              variant="outline"
+              className="h-[38px] px-3.5"
+              onClick={() => {
+                reset(toFormValues(settings));
+                setIsEditing(false);
+              }}
+            >
+              Cancel
+            </AdminButton>
+          </>
+        ) : (
+          <AdminButton
+            type="button"
+            variant="gold"
+            className="h-[38px] px-[18px]"
+            onClick={() => setIsEditing(true)}
+          >
+            Edit settings
+          </AdminButton>
+        )}
       </div>
     </form>
   );

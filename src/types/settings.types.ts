@@ -8,8 +8,8 @@ export interface ISystemSettings {
   companyContactAddress: string;
   companyContactEmail: string;
   companyContactPhone: string;
+  companyContactWhatsapp: string;
   lowFloatThresholdGhs: number;
-  onlinePaymentsEnabled: boolean;
   purchaseApprovalThresholdGhs: number;
 }
 

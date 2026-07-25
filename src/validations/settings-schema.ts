@@ -19,8 +19,8 @@ export const settingsSchema = z.object({
     .refine((v) => Number(v) > 0 && Number(v) <= 10_000_000, {
       message: "Enter an amount above zero",
     }),
-  onlinePaymentsEnabled: z.boolean(),
   companyContactPhone: z.string().trim().max(30),
+  companyContactWhatsapp: z.string().trim().max(30),
   companyContactEmail: z
     .email("Enter a valid email")
     .max(255)
