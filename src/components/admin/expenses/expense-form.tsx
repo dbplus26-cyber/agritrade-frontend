@@ -1,0 +1,174 @@
+"use client";
+
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { AdminButton, AdminField, adminInputClass, adminSelectClass } from "@/components/admin/ui";
+import { extractApiError } from "@/lib/extract-api-error";
+import { notify } from "@/lib/notify";
+import {
+  useCreateExpenseMutation,
+  useUpdateExpenseMutation,
+} from "@/redux/expenses/expenses-api";
+import type { IExpense } from "@/types/expense.types";
+import type { IExpenseCategory } from "@/types/registry.types";
+import { expenseSchema, type ExpenseValues } from "@/validations/expense-schema";
+
+const today = () => new Date().toISOString().slice(0, 10);
+
+/**
+ * Record or correct an operating cost. One dialog for both: an `expense` prop
+ * switches it to edit mode, so the two paths cannot drift in validation or copy.
+ */
+export function ExpenseFormDialog({
+  categories,
+  expense,
+  onOpenChange,
+  open,
+}: {
+  categories: IExpenseCategory[];
+  /** Present in edit mode. */
+  expense?: IExpense;
+  onOpenChange: (open: boolean) => void;
+  open: boolean;
+}) {
+  const [create, { isLoading: creating }] = useCreateExpenseMutation();
+  const [update, { isLoading: updating }] = useUpdateExpenseMutation();
+  const isEdit = Boolean(expense);
+
+  const {
+    formState: { errors },
+    handleSubmit,
+    register,
+    reset,
+  } = useForm<ExpenseValues>({
+    resolver: zodResolver(expenseSchema),
+    defaultValues: {
+      amountGhs: "",
+      categoryId: "",
+      description: "",
+      incurredAt: today(),
+    },
+  });
+
+  // Seed from the record each time the dialog opens, so reopening after a
+  // cancel never shows the previous edit's half-typed values.
+  useEffect(() => {
+    if (!open) return;
+    reset({
+      amountGhs: expense?.amountGhs != null ? String(expense.amountGhs) : "",
+      categoryId: expense?.category.id ?? "",
+      description: expense?.description ?? "",
+      incurredAt: expense?.incurredAt.slice(0, 10) ?? today(),
+    });
+  }, [expense, open, reset]);
+
+  const onSubmit = async (values: ExpenseValues) => {
+    const body = {
+      amountGhs: Number(values.amountGhs),
+      categoryId: values.categoryId,
+      description: values.description?.trim() || undefined,
+      incurredAt: values.incurredAt,
+    };
+    try {
+      if (expense) {
+        await update({ body, id: expense.id }).unwrap();
+        notify.success("Expense updated");
+      } else {
+        await create(body).unwrap();
+        notify.success("Expense recorded");
+      }
+      onOpenChange(false);
+    } catch (error) {
+      notify.error(extractApiError(error).message);
+    }
+  };
+
+  const busy = creating || updating;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-[480px]">
+        <DialogHeader>
+          <DialogTitle>{isEdit ? "Correct expense" : "Record expense"}</DialogTitle>
+          <DialogDescription>
+            {isEdit
+              ? "This moves a figure the profit report is computed from — the change is audited."
+              : "Rent, salaries, fumigation, repairs — anything the business pays out."}
+          </DialogDescription>
+        </DialogHeader>
+
+        <form
+          className="grid gap-3"
+          onSubmit={(e) => void handleSubmit(onSubmit)(e)}
+          noValidate
+        >
+          <AdminField label="Category" error={errors.categoryId?.message}>
+            <select
+              id="expense-category"
+              className={adminSelectClass}
+              {...register("categoryId")}
+            >
+              <option value="">Choose a category…</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </AdminField>
+
+          <AdminField label="Amount (GH₵)" error={errors.amountGhs?.message}>
+            <input
+              id="expense-amount"
+              inputMode="decimal"
+              placeholder="0.00"
+              className={adminInputClass}
+              {...register("amountGhs")}
+            />
+          </AdminField>
+
+          <AdminField label="Date incurred" error={errors.incurredAt?.message}>
+            <input
+              id="expense-date"
+              type="date"
+              max={today()}
+              className={adminInputClass}
+              {...register("incurredAt")}
+            />
+          </AdminField>
+
+          <AdminField label="Description" error={errors.description?.message} optional>
+            <input
+              id="expense-description"
+              placeholder="e.g. Warehouse rent — July"
+              className={adminInputClass}
+              {...register("description")}
+            />
+          </AdminField>
+
+          <DialogFooter className="mt-2 gap-2">
+            <AdminButton
+              type="button"
+              variant="ghost"
+              onClick={() => { onOpenChange(false); }}
+            >
+              Cancel
+            </AdminButton>
+            <AdminButton type="submit" disabled={busy}>
+              {busy ? "Saving…" : isEdit ? "Save changes" : "Record expense"}
+            </AdminButton>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}

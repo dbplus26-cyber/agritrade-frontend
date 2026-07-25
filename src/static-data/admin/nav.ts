@@ -58,6 +58,7 @@ export const adminNavGroups: AdminNavGroup[] = [
       item("commodities", "Commodities"),
       item("warehouses", "Warehouses"),
       item("agents", "Agents & Floats"),
+      item("expenses", "Expenses"),
       item("expense-categories", "Expense Categories"),
     ],
   },

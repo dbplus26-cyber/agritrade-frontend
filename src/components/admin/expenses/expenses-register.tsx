@@ -1,0 +1,284 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import type { ColumnDef } from "@tanstack/react-table";
+import {
+  AdminButton,
+  AdminCard,
+  AdminPageHeader,
+  Mono,
+  ToneBadge,
+} from "@/components/admin/ui";
+import { ConsoleDataTable } from "@/components/admin/data-table";
+import {
+  ConsoleDateField,
+  ConsoleFilterBar,
+  ConsoleLabeledSelect,
+} from "@/components/admin/filter-bar";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { Input } from "@/components/ui/input";
+import { useTableQuery } from "@/hooks/use-table-query";
+import { useMoneyVisibility } from "@/hooks/use-money-visibility";
+import { extractApiError } from "@/lib/extract-api-error";
+import { formatCedis } from "@/lib/format-money";
+import { formatDateOnly } from "@/lib/format-date";
+import { env } from "@/lib/env";
+import { useGetExpensesQuery } from "@/redux/expenses/expenses-api";
+import { useGetExpenseCategoriesQuery } from "@/redux/expense-categories/expense-categories-api";
+import type { IExpense } from "@/types/expense.types";
+import { ExpenseFormDialog } from "./expense-form";
+
+const DEFAULTS = { categoryId: "", from: "", scope: "", to: "" };
+
+/**
+ * Operating costs. Every cost the business carries lands here — rent, salaries,
+ * fumigation, repairs — alongside the per-trip costs, because the P&L subtracts
+ * all of them and a screen that showed only some would make the net-profit
+ * figure impossible to reconcile.
+ */
+export function ExpensesRegister() {
+  const showMoney = useMoneyVisibility();
+  const [creating, setCreating] = useState(false);
+  const [editing, setEditing] = useState<IExpense | null>(null);
+  const { filters, page, queryParams, search, setFilter, setPage, setSearch } =
+    useTableQuery({ defaults: DEFAULTS });
+
+  const categories = useGetExpenseCategoriesQuery({ isActive: true, limit: 100 });
+  const { data, error, isError, isFetching, isLoading, refetch } =
+    useGetExpensesQuery({
+      categoryId: String(queryParams.categoryId ?? "") || undefined,
+      from: String(queryParams.from ?? "") || undefined,
+      limit: 20,
+      page,
+      scope:
+        queryParams.scope === "shipment" || queryParams.scope === "standalone"
+          ? queryParams.scope
+          : undefined,
+      search: String(queryParams.search ?? "") || undefined,
+      to: String(queryParams.to ?? "") || undefined,
+    });
+
+  const columns = useMemo<ColumnDef<IExpense, unknown>[]>(
+    () => [
+      {
+        accessorKey: "transactionNo",
+        header: "Voucher",
+        cell: ({ row }) => <Mono>{row.original.transactionNo}</Mono>,
+        meta: { className: "px-4 text-[13px]" },
+      },
+      {
+        accessorFn: (r) => r.incurredAt,
+        id: "incurredAt",
+        header: "Date",
+        cell: ({ row }) => formatDateOnly(row.original.incurredAt),
+        meta: { className: "px-4 text-[13px] whitespace-nowrap" },
+      },
+      {
+        accessorFn: (r) => r.category.name,
+        id: "category",
+        header: "Category",
+        meta: { className: "px-4 text-[13px]" },
+      },
+      {
+        accessorFn: (r) => r.description ?? "",
+        id: "description",
+        header: "Description",
+        cell: ({ row }) => (
+          <span className="block max-w-[280px] truncate">
+            {row.original.description ?? "—"}
+          </span>
+        ),
+        meta: { className: "px-4 text-[13px]" },
+      },
+      {
+        accessorFn: (r) => r.shipment?.transactionNo ?? "",
+        id: "shipment",
+        header: "Trip",
+        cell: ({ row }) =>
+          row.original.shipment ? (
+            <ToneBadge tone="sky">{row.original.shipment.truckReg}</ToneBadge>
+          ) : (
+            <span className="text-soil/60">Operating</span>
+          ),
+        // Hiding belongs on `className`, which the table applies to BOTH th and
+        // td — `headerClassName` reaches only the header, which would hide the
+        // heading while leaving its cells in place and shift every column after
+        // it out of alignment.
+        meta: { className: "hidden px-4 text-[13px] @5xl/table:table-cell" },
+      },
+      {
+        id: "actions",
+        header: "",
+        cell: ({ row }) => (
+          <div className="flex justify-end gap-1.5">
+            <AdminButton
+              type="button"
+              variant="ghost"
+              className="h-7 px-2 text-[12px]"
+              onClick={(e) => {
+                e.stopPropagation();
+                setEditing(row.original);
+              }}
+            >
+              Edit
+            </AdminButton>
+            <a
+              href={`${env.SERVER_URI}/api/v1/admin/receipts/expense/${row.original.id}.pdf`}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => { e.stopPropagation(); }}
+              className="inline-flex h-7 items-center px-2 text-[12px] text-console hover:underline"
+            >
+              Voucher
+            </a>
+          </div>
+        ),
+        enableSorting: false,
+        meta: { className: "px-4 text-right" },
+      },
+      ...(showMoney
+        ? [
+            {
+              accessorFn: (r: IExpense) => r.amountGhs ?? 0,
+              id: "amountGhs",
+              header: "Amount",
+              cell: ({ row }: { row: { original: IExpense } }) => (
+                <Mono>{formatCedis(row.original.amountGhs)}</Mono>
+              ),
+              meta: { className: "px-4 text-right text-[13px]" },
+            } as ColumnDef<IExpense, unknown>,
+          ]
+        : []),
+    ],
+    [showMoney],
+  );
+
+  if (isLoading) return <DataTableSkeleton />;
+  if (isError)
+    return (
+      <ErrorMessage
+        description={extractApiError(error).message}
+        onRetry={() => void refetch()}
+      />
+    );
+
+  const rows = data?.data ?? [];
+  const windowTotal = data?.summary?.totalGhs;
+
+  return (
+    <div>
+      <AdminPageHeader
+        title="Expenses"
+        sub="Operating costs and per-trip spend"
+        actions={
+          <AdminButton
+            className="h-[34px] px-4 text-[13.5px]"
+            onClick={() => { setCreating(true); }}
+          >
+            + Record expense
+          </AdminButton>
+        }
+      />
+
+      <ConsoleFilterBar>
+        <label className="flex h-8 w-full max-w-[250px] items-center rounded-[2px] border-[1.5px] border-soil/30 bg-paper px-2.5 focus-within:border-console">
+          <Input
+            type="search"
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); }}
+            placeholder="Search description or voucher…"
+            aria-label="Search expenses"
+            className="h-full w-full min-w-0 rounded-none border-0 bg-transparent p-0 text-[13px] outline-none focus-visible:ring-0 md:text-[13px]"
+          />
+        </label>
+        <ConsoleLabeledSelect
+          label="Category"
+          value={filters.categoryId}
+          onChange={(v) => { setFilter("categoryId", v); }}
+          options={[
+            { label: "All categories", value: "" },
+            ...(categories.data?.data ?? []).map((c) => ({
+              label: c.name,
+              value: c.id,
+            })),
+          ]}
+        />
+        <ConsoleLabeledSelect
+          label="Kind"
+          value={filters.scope}
+          onChange={(v) => { setFilter("scope", v); }}
+          options={[
+            { label: "All spend", value: "" },
+            { label: "Operating costs", value: "standalone" },
+            { label: "Per-trip costs", value: "shipment" },
+          ]}
+        />
+        <ConsoleDateField
+          label="From"
+          value={filters.from}
+          onChange={(v) => { setFilter("from", v); }}
+        />
+        <ConsoleDateField
+          label="To"
+          value={filters.to}
+          onChange={(v) => { setFilter("to", v); }}
+        />
+      </ConsoleFilterBar>
+
+      {/* The number the screen exists to answer: what did we spend over this
+          window? Aggregated server-side across the whole filtered set, so it
+          does not change as you page. */}
+      {showMoney && windowTotal !== null && windowTotal !== undefined ? (
+        <div className="mb-3 flex items-baseline gap-2">
+          <span className="text-[11px] font-bold tracking-[0.08em] text-soil uppercase">
+            Total for this view
+          </span>
+          <Mono className="text-[16px] font-bold text-ink">
+            {formatCedis(windowTotal)}
+          </Mono>
+        </div>
+      ) : null}
+
+      <AdminCard className="overflow-hidden">
+        <ConsoleDataTable<IExpense>
+          columns={columns}
+          data={rows}
+          itemNoun="expenses"
+          isFetching={isFetching}
+          serverPagination={{
+            onPageChange: setPage,
+            onPageSizeChange: () => undefined,
+            page,
+            pageSize: 20,
+            totalCount: data?.meta.total ?? 0,
+          }}
+          emptyState={
+            <EmptyState
+              variant="plain"
+              title={search || filters.categoryId ? "No matches" : "No expenses yet"}
+              description={
+                search || filters.categoryId
+                  ? "Try a different search or filter."
+                  : "Record rent, salaries, fumigation and other running costs so the profit figure is honest."
+              }
+            />
+          }
+        />
+      </AdminCard>
+
+      <ExpenseFormDialog
+        open={creating}
+        onOpenChange={setCreating}
+        categories={categories.data?.data ?? []}
+      />
+      <ExpenseFormDialog
+        open={editing !== null}
+        onOpenChange={(open) => { if (!open) setEditing(null); }}
+        expense={editing ?? undefined}
+        categories={categories.data?.data ?? []}
+      />
+    </div>
+  );
+}
