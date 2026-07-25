@@ -1,0 +1,82 @@
+"use client";
+
+import { ToneBadge, type Tone } from "@/components/admin/ui";
+import { formatDateTime } from "@/lib/format-date";
+import {
+  formatCedis,
+  formatCedisCompact,
+  MONEY_HIDDEN,
+} from "@/lib/format-money";
+import type {
+  MilestoneTrigger,
+  SaleStatus,
+} from "@/types/admin-sale.types";
+
+/** Status → console tone + label. */
+const SALE_STATUS: Record<SaleStatus, { label: string; tone: Tone }> = {
+  CANCELLED: { label: "Cancelled", tone: "slate" },
+  COMPLETED: { label: "Completed", tone: "forest" },
+  CONFIRMED: { label: "Confirmed", tone: "sky" },
+  DRAFT: { label: "Draft", tone: "harvest" },
+  FULFILLED: { label: "Fulfilled", tone: "leaf" },
+};
+
+export function SaleStatusBadge({ status }: { status: SaleStatus }) {
+  const s = SALE_STATUS[status];
+  return <ToneBadge tone={s.tone}>{s.label}</ToneBadge>;
+}
+
+export const SALE_STATUS_FILTER_OPTIONS = [
+  { label: "All statuses", value: "all" },
+  { label: "Draft", value: "DRAFT" },
+  { label: "Confirmed", value: "CONFIRMED" },
+  { label: "Fulfilled", value: "FULFILLED" },
+  { label: "Completed", value: "COMPLETED" },
+  { label: "Cancelled", value: "CANCELLED" },
+] as const;
+
+const TRIGGER_LABEL: Record<MilestoneTrigger, string> = {
+  BEFORE_LOADING: "Before loading",
+  ON_ARRIVAL: "On arrival",
+  ON_DEMAND: "On demand",
+};
+
+export const milestoneTriggerLabel = (t: MilestoneTrigger): string =>
+  TRIGGER_LABEL[t];
+
+/** "05 Jul 2026" — the console's date rendering (shared idiom). */
+export function formatSaleDate(iso: string): string {
+  return formatDateTime(iso);
+}
+
+/**
+ * A money value or the redaction placeholder. Sales money is `number | null`;
+ * null means the API withheld it for this user (financial visibility).
+ *
+ * `compact` shortens large figures (GH₵ 344.7k) for places where the width is
+ * fixed by a grid and the number is not - a KPI tile on a 280px phone. The
+ * exact amount is always on the element's `title`, so nothing is lost, and a
+ * rounded figure is far safer than a clipped one: "GH₵ 344,680.6…" reads as a
+ * different, smaller number.
+ */
+export function Money({
+  compact = false,
+  value,
+}: {
+  compact?: boolean;
+  value: number | null;
+}) {
+  if (value === null) return <span className="text-soil/50">{MONEY_HIDDEN}</span>;
+  if (!compact) return <>{formatCedis(value)}</>;
+  return <span title={formatCedis(value)}>{formatCedisCompact(value)}</span>;
+}
+
+/** Today as a YYYY-MM-DD value for date inputs. */
+export const todayInputValue = (): string =>
+  new Date().toISOString().slice(0, 10);
+
+export const PAYMENT_METHOD_OPTIONS = [
+  { label: "Cash", value: "CASH" },
+  { label: "Mobile money", value: "MOMO" },
+  { label: "Bank transfer", value: "BANK" },
+] as const;

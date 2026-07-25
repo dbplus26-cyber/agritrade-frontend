@@ -4,211 +4,342 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
-import { AdminButton, Mono } from "@/components/admin/ui";
 import { ConsoleDataTable } from "@/components/admin/data-table";
-import { notify } from "@/lib/notify";
+import {
+  ConsoleDateField,
+  ConsoleFilterBar,
+  ConsoleLabeledSelect,
+} from "@/components/admin/filter-bar";
+import { AdminCard, Mono } from "@/components/admin/ui";
+import { Button } from "@/components/ui/button";
+import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { useTableQuery } from "@/hooks/use-table-query";
+import { extractApiError } from "@/lib/extract-api-error";
 import { cn } from "@/lib/utils";
-import { formatCedis } from "@/lib/format-money";
-import { saleRows, type SaleRow } from "@/static-data/admin/trading";
-import { RowIconButton, StatusChip } from "./bits";
+import {
+  useGetSalesQuery,
+  useGetSaleStatsQuery,
+} from "@/redux/sales/admin-sales-api";
+import type { ISale, ISaleListQuery, SaleStatus } from "@/types/admin-sale.types";
+import { columnMeta } from "@/components/admin/registry/registry-bits";
+import {
+  Money,
+  SALE_STATUS_FILTER_OPTIONS,
+  SaleStatusBadge,
+  formatSaleDate,
+} from "./sale-bits";
 
-/** Console register header cell — pinned over the data table's defaults. */
-const headClass = "h-[38px] bg-surface-alt/70 py-0 text-[10.5px] font-bold tracking-[0.09em] text-soil";
+const LIST = "/admin/sales";
+const FILTER_DEFAULTS = {
+  status: "all",
+  outstanding: "no",
+  from: "",
+  to: "",
+  size: "10",
+};
 
+const OUTSTANDING_OPTIONS = [
+  { label: "All sales", value: "no" },
+  { label: "Outstanding only", value: "yes" },
+] as const;
+
+/** A headline stat tile in the sales strip. */
+function StatTile({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <AdminCard className="px-4 py-3">
+      <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+        {label}
+      </div>
+      <div className="mt-1 text-[19px] font-bold text-ink">{children}</div>
+    </AdminCard>
+  );
+}
+
+function SalesStats() {
+  const { data } = useGetSaleStatsQuery();
+  const stats = data?.data;
+  return (
+    <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <StatTile label="In progress">{stats?.salesInProgress ?? "-"}</StatTile>
+      <StatTile label="Agreed (live)">
+        <Money value={stats?.agreedValueLiveGhs ?? null} />
+      </StatTile>
+      <StatTile label="Outstanding">
+        <span className="text-console-red">
+          <Money value={stats?.outstandingGhs ?? null} />
+        </span>
+      </StatTile>
+      <StatTile label="Debtors">{stats?.debtorSaleCount ?? "-"}</StatTile>
+    </div>
+  );
+}
+
+/** The live sales register. */
 export function SalesRegister() {
   const router = useRouter();
+  const {
+    page,
+    filters,
+    setFilter,
+    setPage,
+    resetFilters,
+    search: searchInput,
+    setSearch,
+    queryParams,
+  } = useTableQuery({ defaults: FILTER_DEFAULTS });
 
-  const columns = useMemo<ColumnDef<SaleRow, unknown>[]>(
+  const pageSize = Number(filters.size) || 10;
+  const search = (queryParams.search as string | undefined) ?? "";
+  const { status, outstanding, from, to } = filters;
+
+  const queryArgs = useMemo<ISaleListQuery>(
+    () => ({
+      page,
+      limit: pageSize,
+      ...(search ? { search } : {}),
+      ...(status !== "all" ? { status: status as SaleStatus } : {}),
+      ...(outstanding === "yes" ? { outstanding: true } : {}),
+      ...(from ? { from } : {}),
+      ...(to ? { to } : {}),
+    }),
+    [page, pageSize, search, status, outstanding, from, to],
+  );
+
+  const { data, isLoading, isError, error, refetch } =
+    useGetSalesQuery(queryArgs);
+  const sales = data?.data ?? [];
+  const totalCount = data?.meta.total ?? 0;
+  const activeFilterCount =
+    (status !== "all" ? 1 : 0) +
+    (outstanding === "yes" ? 1 : 0) +
+    (from ? 1 : 0) +
+    (to ? 1 : 0);
+
+  const columns = useMemo<ColumnDef<ISale, unknown>[]>(
     () => [
       {
-        accessorKey: "ref",
-        header: "Ref",
-        enableSorting: false,
-        meta: { className: "w-[86px] py-0 pl-4 pr-1.5 text-[13px] xl:w-[84px]", headerClassName: headClass },
-        cell: ({ row }) => (
-          <Mono className="text-[12.5px] font-semibold text-console">{row.original.ref}</Mono>
-        ),
-      },
-      {
-        accessorKey: "buyer",
+        id: "buyer",
+        accessorFn: (s) => s.buyer.name,
         header: "Buyer",
         enableSorting: false,
-        meta: { className: "px-1.5 py-0 text-[13px] text-ink", headerClassName: headClass },
-        cell: ({ row }) => <span className="block truncate">{row.original.buyer}</span>,
-      },
-      {
-        accessorKey: "goods",
-        header: "Goods",
-        enableSorting: false,
-        meta: {
-          className: "hidden px-1.5 py-0 text-[13px] text-soil xl:table-cell",
-          headerClassName: headClass,
-        },
-        cell: ({ row }) => <span className="block truncate">{row.original.goods}</span>,
-      },
-      {
-        accessorKey: "agreedCedis",
-        header: "Agreed",
-        enableSorting: false,
-        meta: {
-          className: "w-[110px] px-1.5 py-0 text-right text-[13px] xl:w-[108px]",
-          headerClassName: headClass,
-        },
+        meta: columnMeta(),
+        // A real anchor, not just a clickable row: keyboard focus, middle-click
+        // and "open in new tab" all come free from it, and none of them work on
+        // a div with an onClick. stopPropagation so the row handler doesn't
+        // navigate a second time.
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-ink">{formatCedis(row.original.agreedCedis)}</Mono>
+          <Link
+            href={`/admin/sales/${row.original.id}`}
+            className="block min-w-0 outline-none focus-visible:underline"
+            onClick={(e) => { e.stopPropagation(); }}
+          >
+            <div className="truncate font-semibold text-ink">
+              {row.original.buyer.name}
+            </div>
+            <div className="text-[12px] text-soil">
+              {formatSaleDate(row.original.createdAt)}
+            </div>
+          </Link>
         ),
       },
       {
-        accessorKey: "paidCedis",
-        header: "Paid",
+        id: "agreed",
+        header: "Agreed",
         enableSorting: false,
-        meta: {
-          className: "hidden w-[104px] px-1.5 py-0 text-right text-[13px] xl:table-cell",
-          headerClassName: headClass,
-        },
+        meta: columnMeta({ className: "text-right", wide: true }),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-soil">{formatCedis(row.original.paidCedis)}</Mono>
+          <Mono className="whitespace-nowrap text-[12.5px] text-ink">
+            <Money value={row.original.agreedTotalGhs} />
+          </Mono>
         ),
       },
       {
         id: "balance",
         header: "Balance",
         enableSorting: false,
-        accessorFn: (row) => row.agreedCedis - row.paidCedis,
-        meta: {
-          className: "w-[110px] px-1.5 py-0 text-right text-[13px] xl:w-[108px]",
-          headerClassName: headClass,
-        },
+        meta: columnMeta({ className: "text-right" }),
         cell: ({ row }) => {
-          const balance = row.original.agreedCedis - row.original.paidCedis;
+          const b = row.original.balanceGhs;
           return (
             <Mono
               className={cn(
-                "whitespace-nowrap font-semibold",
-                balance === 0 ? "text-[#2F5E3D]" : "text-console-red",
+                "whitespace-nowrap text-[12.5px] font-semibold",
+                b === null
+                  ? "text-soil/50"
+                  : b === 0
+                    ? "text-leaf"
+                    : "text-console-red",
               )}
             >
-              {balance === 0 ? "Paid in full" : formatCedis(balance)}
+              {b === 0 ? "Paid in full" : <Money value={b} />}
             </Mono>
           );
         },
       },
       {
-        accessorKey: "status",
+        id: "status",
         header: "Status",
         enableSorting: false,
-        meta: {
-          className: "w-[122px] py-0 pl-1.5 pr-4 text-[13px] xl:w-[116px] xl:pr-1.5",
-          headerClassName: headClass,
-        },
-        cell: ({ row }) => <StatusChip tone={row.original.tone}>{row.original.status}</StatusChip>,
-      },
-      {
-        id: "actions",
-        header: "Actions",
-        enableSorting: false,
-        meta: {
-          className: "hidden py-0 pl-1.5 pr-4 text-right text-[13px] xl:w-[106px] xl:table-cell",
-          headerClassName: headClass,
-        },
-        cell: ({ row }) => {
-          const s = row.original;
-          return (
-            <span className="flex justify-end gap-[3px]">
-              <RowIconButton
-                title="Record payment"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  router.push(`/admin/sales/${s.ref}?pay=1`);
-                }}
-              >
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <rect x="1.5" y="4" width="13" height="8.5" rx="1.5" stroke="currentColor" strokeWidth="1.4" />
-                  <circle cx="8" cy="8.2" r="2" stroke="currentColor" strokeWidth="1.4" />
-                </svg>
-              </RowIconButton>
-              <RowIconButton
-                title="Send payment link"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  notify.info(`Payment link sent to ${s.buyer} — expires in 48h`);
-                }}
-              >
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <path
-                    d="M6.5 9.5 9.5 6.5M5 11l-1.2 1.2a2.5 2.5 0 0 1-3.5-3.5L2.5 6.5M11 5l1.2-1.2a2.5 2.5 0 0 1 3.5 3.5L13.5 9.5"
-                    stroke="currentColor"
-                    strokeWidth="1.4"
-                    strokeLinecap="round"
-                    transform="translate(-0.5 0.5)"
-                  />
-                </svg>
-              </RowIconButton>
-              <RowIconButton
-                title="Cancel sale"
-                danger
-                onClick={(e) => {
-                  e.stopPropagation();
-                  notify.info(`Cancellation of ${s.ref} sent for owner approval`);
-                }}
-              >
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.4" />
-                  <path d="M3.8 3.8 12.2 12.2" stroke="currentColor" strokeWidth="1.4" />
-                </svg>
-              </RowIconButton>
-            </span>
-          );
-        },
+        meta: columnMeta(),
+        cell: ({ row }) => <SaleStatusBadge status={row.original.status} />,
       },
     ],
-    [router],
+    [],
+  );
+
+  const filterBar = (
+    <ConsoleFilterBar
+      search={searchInput}
+      onSearch={setSearch}
+      searchPlaceholder="Search buyer…"
+      activeCount={activeFilterCount}
+      onClear={resetFilters}
+      action={
+        <Button asChild variant="harvest" className="h-8 px-3.5 text-[13px]">
+          <Link href={`${LIST}/new`}>+ New sale</Link>
+        </Button>
+      }
+    >
+      <ConsoleLabeledSelect
+        label="Status"
+        value={status}
+        onChange={(v) => setFilter("status", v)}
+        options={SALE_STATUS_FILTER_OPTIONS}
+        active={status !== "all"}
+        className="lg:w-[160px]"
+      />
+      <ConsoleLabeledSelect
+        label="Balance"
+        value={outstanding}
+        onChange={(v) => setFilter("outstanding", v)}
+        options={OUTSTANDING_OPTIONS}
+        active={outstanding === "yes"}
+        className="lg:w-[170px]"
+      />
+      <ConsoleDateField
+        label="From"
+        value={from}
+        max={to || undefined}
+        onChange={(v) => setFilter("from", v)}
+        className="lg:w-[150px]"
+      />
+      <ConsoleDateField
+        label="To"
+        value={to}
+        min={from || undefined}
+        onChange={(v) => setFilter("to", v)}
+        className="lg:w-[150px]"
+      />
+    </ConsoleFilterBar>
   );
 
   return (
     <div>
-      <div className="mb-3.5 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">Sales</h1>
-          <div className="mt-0.5 text-[13px] text-soil">Agreements with buyers, payments and fulfilment</div>
-        </div>
-        <AdminButton className="h-[34px] whitespace-nowrap">+ New sale</AdminButton>
+      <div className="mb-4">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+          Sales
+        </h1>
+        <p className="mt-0.5 text-[13px] text-soil">
+          Agreements with buyers, payments and balances
+        </p>
       </div>
 
-      {/* Desktop / tablet table */}
-      <ConsoleDataTable<SaleRow>
-        columns={columns}
-        data={saleRows}
-        itemNoun="sales"
-        rowHref={(s) => `/admin/sales/${s.ref}`}
-        rowClassName={() => "h-11 text-[13px] hover:bg-surface-alt/50"}
-        className="hidden overflow-hidden rounded-[8px] border border-soil/25 bg-paper md:block"
-      />
+      <SalesStats />
 
-      {/* Mobile cards */}
-      <div className="flex flex-col gap-2.5 md:hidden">
-        {saleRows.map((s) => {
-          const balance = s.agreedCedis - s.paidCedis;
-          return (
-            <Link key={s.ref} href={`/admin/sales/${s.ref}`} className="rounded-[8px] border border-soil/25 bg-paper px-3.5 py-[13px]">
-              <div className="mb-1.5 flex items-center justify-between gap-2">
-                <Mono className="text-[12.5px] font-semibold text-console">{s.ref}</Mono>
-                <StatusChip tone={s.tone}>{s.status}</StatusChip>
-              </div>
-              <div className="text-[14px] font-semibold text-ink">{s.buyer}</div>
-              <div className="mt-0.5 text-[12.5px] text-soil">{s.goods}</div>
-              <div className="mt-1.5 flex justify-between">
-                <span className="text-[12px] text-soil">Balance</span>
-                <Mono
-                  className={cn("text-[14px] font-bold", balance === 0 ? "text-[#2F5E3D]" : "text-console-red")}
-                >
-                  {balance === 0 ? "Paid in full" : formatCedis(balance)}
-                </Mono>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
+      {isError && !search && activeFilterCount === 0 ? null : filterBar}
+
+      {isLoading ? (
+        <DataTableSkeleton />
+      ) : isError ? (
+        <ErrorMessage
+          description={extractApiError(error).message}
+          onRetry={() => void refetch()}
+        />
+      ) : sales.length === 0 ? (
+        <AdminCard className="overflow-hidden">
+          {search || activeFilterCount > 0 ? (
+            <EmptyState
+              variant="plain"
+              title="No matching sales"
+              description="Nothing matches this search and filter combination."
+              actionLabel="Clear search & filters"
+              onAction={() => {
+                setSearch("");
+                resetFilters();
+              }}
+            />
+          ) : (
+            <EmptyState
+              variant="plain"
+              title="No sales yet"
+              description="Draft your first sale to start tracking agreements and balances."
+              actionLabel="Draft your first sale"
+              onAction={() => router.push(`${LIST}/new`)}
+            />
+          )}
+        </AdminCard>
+      ) : (
+        <>
+          <AdminCard className="hidden overflow-hidden md:block">
+            <ConsoleDataTable<ISale>
+              columns={columns}
+              data={sales}
+              itemNoun="sales"
+              serverPagination={{
+                totalCount,
+                page,
+                pageSize,
+                onPageChange: setPage,
+                onPageSizeChange: (size) => setFilter("size", String(size)),
+              }}
+              rowHref={(s) => `${LIST}/${s.id}`}
+              rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+            />
+          </AdminCard>
+
+          {/* Mobile cards */}
+          <div className="flex flex-col gap-2.5 md:hidden">
+            {sales.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => router.push(`${LIST}/${s.id}`)}
+                className="rounded-[8px] border border-soil/25 bg-paper px-3.5 py-[13px] text-left"
+              >
+                <div className="mb-1.5 flex items-center justify-between gap-2">
+                  <span className="truncate text-[14px] font-semibold text-ink">
+                    {s.buyer.name}
+                  </span>
+                  <SaleStatusBadge status={s.status} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[12px] text-soil">Balance</span>
+                  <Mono
+                    className={cn(
+                      "text-[14px] font-bold",
+                      s.balanceGhs === 0 ? "text-leaf" : "text-console-red",
+                    )}
+                  >
+                    {s.balanceGhs === 0 ? (
+                      "Paid in full"
+                    ) : (
+                      <Money value={s.balanceGhs} />
+                    )}
+                  </Mono>
+                </div>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
