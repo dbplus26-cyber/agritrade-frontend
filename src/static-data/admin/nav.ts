@@ -60,6 +60,7 @@ export const adminNavGroups: AdminNavGroup[] = [
       item("agents", "Agents & Floats"),
       item("expenses", "Expenses"),
       item("expense-categories", "Expense Categories"),
+      item("payment-policies", "Payment Policies", { ownerOnly: true }),
     ],
   },
   {

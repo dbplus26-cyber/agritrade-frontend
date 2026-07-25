@@ -13,6 +13,7 @@ export const apiSliceTags = [
   "ExpenseCategories",
   "Expenses",
   "FloatLedger",
+  "PaymentPolicies",
   "Purchases",
   "Reconciliations",
   "Sales",

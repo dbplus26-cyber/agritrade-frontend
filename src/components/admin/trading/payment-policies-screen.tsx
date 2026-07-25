@@ -1,0 +1,360 @@
+"use client";
+
+import { useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  AdminButton,
+  AdminCard,
+  AdminField,
+  AdminPageHeader,
+  ToneBadge,
+  adminInputClass,
+  adminSelectClass,
+} from "@/components/admin/ui";
+import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { useConfirm } from "@/hooks/use-confirm";
+import { extractApiError } from "@/lib/extract-api-error";
+import { notify } from "@/lib/notify";
+import { cn } from "@/lib/utils";
+import {
+  useCreatePaymentPolicyMutation,
+  useGetPaymentPoliciesQuery,
+  useUpdatePaymentPolicyMutation,
+} from "@/redux/payment-policies/payment-policies-api";
+import type {
+  IPaymentPolicy,
+  MilestoneTrigger,
+} from "@/types/admin-sale.types";
+import { milestoneTriggerLabel } from "./sale-bits";
+
+const TRIGGER_OPTIONS: { label: string; value: MilestoneTrigger }[] = [
+  { label: "Before loading", value: "BEFORE_LOADING" },
+  { label: "On arrival", value: "ON_ARRIVAL" },
+  { label: "On demand", value: "ON_DEMAND" },
+];
+
+const policyFormSchema = z
+  .object({
+    name: z.string().trim().min(2, "Give the policy a name").max(100),
+    isDefault: z.boolean(),
+    milestones: z
+      .array(
+        z.object({
+          label: z.string().trim().min(1, "Label the milestone").max(80),
+          percent: z
+            .string()
+            .trim()
+            .refine((v) => Number(v) > 0 && Number(v) <= 100, {
+              message: "1–100",
+            }),
+          trigger: z.enum(["BEFORE_LOADING", "ON_ARRIVAL", "ON_DEMAND"]),
+        }),
+      )
+      .min(1),
+  })
+  .refine(
+    (v) =>
+      v.milestones.reduce(
+        (acc, m) => acc + Math.round(Number(m.percent) * 100),
+        0,
+      ) === 10_000,
+    { message: "Percentages must add up to 100", path: ["milestones"] },
+  );
+
+type PolicyFormValues = z.infer<typeof policyFormSchema>;
+
+/** Create a new payment policy. */
+function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
+  const [create, { isLoading }] = useCreatePaymentPolicyMutation();
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<PolicyFormValues>({
+    resolver: zodResolver(policyFormSchema),
+    defaultValues: {
+      isDefault: false,
+      milestones: [
+        { label: "Deposit", percent: "80", trigger: "BEFORE_LOADING" },
+        { label: "Balance", percent: "20", trigger: "ON_ARRIVAL" },
+      ],
+      name: "",
+    },
+  });
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "milestones",
+  });
+
+  const onSubmit = async (values: PolicyFormValues) => {
+    try {
+      await create({
+        isDefault: values.isDefault,
+        milestones: values.milestones.map((m) => ({
+          label: m.label,
+          percent: Number(m.percent),
+          trigger: m.trigger,
+        })),
+        name: values.name,
+      }).unwrap();
+      notify.success("Payment policy created");
+      onClose();
+    } catch (err) {
+      notify.error("Couldn't create the policy", {
+        description: extractApiError(err).message,
+      });
+    }
+  };
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-[480px]">
+        <DialogHeader>
+          <DialogTitle>New payment policy</DialogTitle>
+          <DialogDescription>
+            Milestone percentages must add up to 100.
+          </DialogDescription>
+        </DialogHeader>
+        <form
+          noValidate
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col gap-3"
+        >
+          <AdminField label="Name" error={errors.name?.message}>
+            <Input
+              className={cn(adminInputClass, errors.name && "border-error")}
+              placeholder="e.g. 50/50 on arrival"
+              {...register("name")}
+            />
+          </AdminField>
+
+          <div className="flex flex-col gap-2">
+            <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              Milestones
+            </span>
+            {fields.map((field, i) => (
+              <div
+                key={field.id}
+                className="grid grid-cols-[1fr_70px_130px_auto] gap-2"
+              >
+                <Input
+                  className={adminInputClass}
+                  placeholder="Label"
+                  {...register(`milestones.${i}.label`)}
+                />
+                <Input
+                  className={adminInputClass}
+                  inputMode="decimal"
+                  placeholder="%"
+                  {...register(`milestones.${i}.percent`)}
+                />
+                <select
+                  className={cn(adminSelectClass, "w-full")}
+                  {...register(`milestones.${i}.trigger`)}
+                >
+                  {TRIGGER_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+                {fields.length > 1 ? (
+                  <button
+                    type="button"
+                    onClick={() => remove(i)}
+                    className="text-[12px] text-console-red"
+                  >
+                    ✕
+                  </button>
+                ) : (
+                  <span />
+                )}
+              </div>
+            ))}
+            {errors.milestones?.message ? (
+              <p className="text-[12px] text-error">
+                {errors.milestones.message}
+              </p>
+            ) : null}
+            <AdminButton
+              type="button"
+              variant="outline"
+              className="h-8 w-fit px-3 text-[12.5px]"
+              onClick={() =>
+                append({ label: "", percent: "", trigger: "ON_ARRIVAL" })
+              }
+            >
+              + Add milestone
+            </AdminButton>
+          </div>
+
+          <label className="flex items-center gap-2 text-[13px] text-ink">
+            <input type="checkbox" {...register("isDefault")} />
+            Make this the default policy
+          </label>
+
+          <DialogFooter className="gap-2">
+            <AdminButton
+              type="button"
+              variant="outline"
+              className="h-9 px-3.5"
+              onClick={onClose}
+            >
+              Cancel
+            </AdminButton>
+            <AdminButton type="submit" disabled={isLoading} className="h-9 px-4">
+              {isLoading ? "Creating…" : "Create policy"}
+            </AdminButton>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function PolicyCard({ policy }: { policy: IPaymentPolicy }) {
+  const [update] = useUpdatePaymentPolicyMutation();
+  const { confirm, confirmationDialog } = useConfirm();
+
+  const makeDefault = async () => {
+    try {
+      await update({ id: policy.id, body: { isDefault: true } }).unwrap();
+      notify.success(`${policy.name} is now the default`);
+    } catch (err) {
+      notify.error("Couldn't set the default", {
+        description: extractApiError(err).message,
+      });
+    }
+  };
+
+  const toggleActive = async () => {
+    const ok = await confirm({
+      title: policy.isActive
+        ? `Deactivate ${policy.name}?`
+        : `Activate ${policy.name}?`,
+      description: policy.isActive
+        ? "New sales won't be able to choose this policy. Existing sales keep their snapshot."
+        : "This policy becomes selectable on new sales again.",
+      confirmText: policy.isActive ? "Deactivate" : "Activate",
+      isDestructive: policy.isActive,
+    });
+    if (!ok) return;
+    try {
+      await update({
+        id: policy.id,
+        body: { isActive: !policy.isActive },
+      }).unwrap();
+      notify.success(policy.isActive ? "Deactivated" : "Activated");
+    } catch (err) {
+      notify.error("Couldn't update the policy", {
+        description: extractApiError(err).message,
+      });
+    }
+  };
+
+  return (
+    <AdminCard className="px-5 py-4">
+      <div className="mb-2 flex flex-wrap items-center gap-2">
+        <span className="text-[15px] font-bold text-ink">{policy.name}</span>
+        {policy.isDefault ? <ToneBadge tone="forest">Default</ToneBadge> : null}
+        {policy.isActive ? null : <ToneBadge tone="slate">Inactive</ToneBadge>}
+      </div>
+      <div className="flex flex-col gap-1">
+        {policy.milestones.map((m, i) => (
+          <div
+            key={`${m.label}-${String(i)}`}
+            className="flex items-baseline justify-between text-[13px]"
+          >
+            <span className="text-ink">{m.label}</span>
+            <span className="text-soil">
+              {m.percent}% · {milestoneTriggerLabel(m.trigger)}
+            </span>
+          </div>
+        ))}
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {!policy.isDefault && policy.isActive ? (
+          <AdminButton
+            variant="outline"
+            className="h-8 px-3 text-[12.5px]"
+            onClick={() => void makeDefault()}
+          >
+            Make default
+          </AdminButton>
+        ) : null}
+        {!policy.isDefault ? (
+          <AdminButton
+            variant="ghost"
+            className="h-8 px-3 text-[12.5px]"
+            onClick={() => void toggleActive()}
+          >
+            {policy.isActive ? "Deactivate" : "Activate"}
+          </AdminButton>
+        ) : null}
+      </div>
+      {confirmationDialog}
+    </AdminCard>
+  );
+}
+
+export function PaymentPoliciesScreen() {
+  const { data, isLoading, isError, error, refetch } =
+    useGetPaymentPoliciesQuery({ limit: 100 });
+  const [createOpen, setCreateOpen] = useState(false);
+  const policies = data?.data ?? [];
+
+  return (
+    <div className="max-w-[680px]">
+      <AdminPageHeader
+        title="Payment Policies"
+        sub="The payment terms sales resolve against (sale > buyer > default)"
+        actions={
+          <AdminButton className="h-9 px-4" onClick={() => setCreateOpen(true)}>
+            + New policy
+          </AdminButton>
+        }
+      />
+
+      {isLoading ? (
+        <DataTableSkeleton />
+      ) : isError ? (
+        <ErrorMessage
+          description={extractApiError(error).message}
+          onRetry={() => void refetch()}
+        />
+      ) : policies.length === 0 ? (
+        <EmptyState
+          variant="plain"
+          title="No payment policies"
+          description="Create the first policy sales will resolve their terms against."
+          actionLabel="New policy"
+          onAction={() => setCreateOpen(true)}
+        />
+      ) : (
+        <div className="flex flex-col gap-3">
+          {policies.map((p) => (
+            <PolicyCard key={p.id} policy={p} />
+          ))}
+        </div>
+      )}
+
+      {createOpen ? (
+        <CreatePolicyDialog onClose={() => setCreateOpen(false)} />
+      ) : null}
+    </div>
+  );
+}
