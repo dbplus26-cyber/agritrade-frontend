@@ -1,6 +1,10 @@
 import { LegalDoc, type LegalSection } from "@/components/legal/legal-doc";
 import { pageMetadata } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
+import {
+  getSiteContact,
+  type ResolvedContact,
+} from "@/lib/public-contact";
 
 export const metadata = pageMetadata({
   title: "Terms of service",
@@ -9,11 +13,12 @@ export const metadata = pageMetadata({
   path: "/terms",
 });
 
-const SECTIONS: LegalSection[] = [
+function buildSections(contact: ResolvedContact): LegalSection[] {
+  return [
   {
     title: "Who we are",
     paragraphs: [
-      `${siteConfig.legalName} ("DB Plus", "we") is an agro-commodity trading company operating from ${siteConfig.address}. We buy, aggregate and deliver grains and pulses, sell documented land plots around Tamale, and run an input-credit farming scheme. These terms cover your use of this website and, in outline, how we trade — the signed paperwork for a specific transaction always takes precedence over this page.`,
+      `${siteConfig.legalName} ("DB Plus", "we") is an agro-commodity trading company operating from ${contact.address}. We buy, aggregate and deliver grains and pulses, sell documented land plots around Tamale, and run an input-credit farming scheme. These terms cover your use of this website and, in outline, how we trade — the signed paperwork for a specific transaction always takes precedence over this page.`,
     ],
   },
   {
@@ -37,7 +42,7 @@ const SECTIONS: LegalSection[] = [
   {
     title: "Payment",
     paragraphs: [
-      "Payment terms are agreed per order and stated on the invoice. Every sale carries a reference (e.g. DB-1042) — quote it when paying. Online payments through this website are processed by Hubtel; a payment is complete when the processor confirms it and we issue a receipt. Fees charged by your bank or mobile-money provider are yours.",
+      "Payment terms are agreed per order and stated on the invoice. Every sale carries a transaction number (e.g. SAL-2026-00042) — quote it when paying. Payment is made directly to us by cash, mobile money or bank transfer; a payment is complete when we have received it and issued a receipt. Fees charged by your bank or mobile-money provider are yours.",
     ],
   },
   {
@@ -67,20 +72,22 @@ const SECTIONS: LegalSection[] = [
   {
     title: "Governing law",
     paragraphs: [
-      `These terms are governed by the laws of the Republic of Ghana, and the courts of Ghana have jurisdiction over any dispute arising from them. To raise anything in this document, call ${siteConfig.phone} or write to ${siteConfig.email}.`,
+      `These terms are governed by the laws of the Republic of Ghana, and the courts of Ghana have jurisdiction over any dispute arising from them. To raise anything in this document, call ${contact.phone} or write to ${contact.email}.`,
     ],
   },
-];
+  ];
+}
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const contact = await getSiteContact();
   return (
     <LegalDoc
       eyebrow="OFFICE · TERMS OF SERVICE"
       title="The terms we trade on."
-      fileNo="DOC — TERMS OF SERVICE"
+      fileNo="DOC - TERMS OF SERVICE"
       updated="11 JUL 2026"
-      intro="Plain language, the way we do business: what a quote is, how weighing works, when risk passes, how payment happens — and where the signed paperwork for your specific transaction takes over from this page."
-      sections={SECTIONS}
+      intro="Plain language, the way we do business: what a quote is, how weighing works, when risk passes, how payment happens - and where the signed paperwork for your specific transaction takes over from this page."
+      sections={buildSections(contact)}
     />
   );
 }

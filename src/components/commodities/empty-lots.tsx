@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { routes } from "@/lib/routes";
-import { siteConfig } from "@/lib/site";
+import { getSiteContact } from "@/lib/public-contact";
 
 /**
  * The empty stock register - shown when nothing is published to the board
@@ -8,7 +8,8 @@ import { siteConfig } from "@/lib/site";
  * empty ledger page so "nothing on file" reads as a deliberate document,
  * never a broken grid.
  */
-export function EmptyLots() {
+export async function EmptyLots() {
+  const contact = await getSiteContact();
   return (
     <section className="mx-auto max-w-[1312px] px-5 py-14 lg:px-8 lg:py-[88px]">
       <article className="shadow-doc relative grid max-w-[860px] grid-cols-[26px_1fr] border border-soil/35 bg-paper">
@@ -47,7 +48,7 @@ export function EmptyLots() {
               Tell us what you need
             </Link>
             <a
-              href={siteConfig.phoneHref}
+              href={contact.phoneHref}
               className="shadow-doc-sm inline-block rounded-[2px] border-2 border-forest px-6 py-3 text-[14px] font-bold text-forest transition-[transform,box-shadow] duration-100 hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0_rgb(89_82_59/0.4)]"
             >
               Call us

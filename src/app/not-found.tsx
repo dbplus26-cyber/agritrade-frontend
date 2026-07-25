@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/button";
 import { Stamp } from "@/components/ui/Stamp";
 import { StencilLabel } from "@/components/ui/StencilLabel";
@@ -29,9 +30,12 @@ export default function NotFound() {
           There&rsquo;s no page filed at this address. It may have been moved,
           or the link was copied wrong.
         </p>
-        <Button asChild>
-          <Link href={routes.home}>Back to the front office</Link>
-        </Button>
+        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-3">
+          <Button asChild>
+            <Link href={routes.home}>Back to the front office</Link>
+          </Button>
+          <BackButton href={routes.home} label="Go back" />
+        </div>
       </div>
     </div>
   );

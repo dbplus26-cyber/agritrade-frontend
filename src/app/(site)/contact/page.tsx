@@ -2,7 +2,7 @@ import { ContactCards } from "@/components/contact/contact-cards";
 import { EnquiryForm } from "@/components/contact/enquiry-form";
 import { StencilLabel } from "@/components/ui/StencilLabel";
 import { pageMetadata } from "@/lib/seo";
-import { siteConfig } from "@/lib/site";
+import { getSiteContact } from "@/lib/public-contact";
 import { ENQUIRY_SUBJECTS, type EnquirySubject } from "@/types/enquiry.types";
 
 export const metadata = pageMetadata({
@@ -23,6 +23,7 @@ export default async function ContactPage({
 }) {
   // Service pages deep-link with ?subject=<enum value>&about=<what it's for>
   // (e.g. a plot reference). Anything off-enum falls back to the default.
+  const contact = await getSiteContact();
   const params = await searchParams;
   const rawSubject = first(params.subject);
   const subject = ENQUIRY_SUBJECTS.includes(rawSubject as EnquirySubject)
@@ -58,13 +59,13 @@ export default async function ContactPage({
         {/* Mobile gets the quick call/WhatsApp pair above the form. */}
         <div className="mb-7 grid grid-cols-2 gap-3 lg:hidden">
           <a
-            href={siteConfig.phoneHref}
+            href={contact.phoneHref}
             className="flex items-center justify-center rounded-[2px] bg-forest py-4 text-[15px] font-bold text-surface shadow-[3px_3px_0_rgb(31_33_28/0.3)]"
           >
             Call
           </a>
           <a
-            href={siteConfig.whatsappHref}
+            href={contact.whatsappHref}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center rounded-[2px] bg-leaf py-4 text-[15px] font-bold text-surface shadow-[3px_3px_0_rgb(31_33_28/0.3)]"

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { primaryNav, routes } from "@/lib/routes";
 import { siteConfig } from "@/lib/site";
+import { getSiteContact } from "@/lib/public-contact";
 
 const pageLinks = primaryNav.flatMap<{ label: string; href: string }>(
   (item) =>
@@ -11,7 +12,8 @@ const pageLinks = primaryNav.flatMap<{ label: string; href: string }>(
         : [item],
 );
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const contact = await getSiteContact();
   return (
     <footer className="texture-grain-dark bg-footer pb-24 text-surface/70 lg:pb-0">
       <div className="mx-auto max-w-[1312px] px-5 pb-8 pt-10 lg:px-8 lg:pt-12">
@@ -44,16 +46,27 @@ export function SiteFooter() {
               CONTACT
             </span>
             <a
-              href={siteConfig.phoneHref}
+              href={contact.phoneHref}
               className="w-fit transition-colors hover:text-surface"
             >
-              {siteConfig.phone} · WhatsApp same
+              {contact.phone}
+              {contact.whatsapp === contact.phone ? " · WhatsApp same" : ""}
             </a>
+            {contact.whatsapp === contact.phone ? null : (
+              <a
+                href={contact.whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-fit transition-colors hover:text-surface"
+              >
+                WhatsApp {contact.whatsapp}
+              </a>
+            )}
             <a
-              href={`mailto:${siteConfig.email}`}
+              href={`mailto:${contact.email}`}
               className="w-fit transition-colors hover:text-surface"
             >
-              {siteConfig.email}
+              {contact.email}
             </a>
             <span>
               {siteConfig.city}, Northern Region, {siteConfig.country}

@@ -19,7 +19,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { primaryNav, routes } from "@/lib/routes";
-import { siteConfig } from "@/lib/site";
+import { useSiteContact } from "@/components/providers/site-contact-provider";
 import { cn } from "@/lib/utils";
 
 /** The stencilled brand plate + wordmark, shared by header and mobile menu. */
@@ -58,6 +58,7 @@ function ActiveTag({ index, label }: { index: string; label: string }) {
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const contact = useSiteContact();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const services = primaryNav.find((item) => "children" in item);
@@ -135,10 +136,10 @@ export function SiteHeader() {
             DISPATCH LINE
           </span>
           <a
-            href={siteConfig.phoneHref}
+            href={contact.phoneHref}
             className="font-display text-[17px] font-bold tracking-[0.02em] text-forest transition-colors hover:text-harvest-deep"
           >
-            {siteConfig.phone}
+            {contact.phone}
           </a>
         </div>
       </div>
@@ -227,13 +228,13 @@ export function SiteHeader() {
             </nav>
             <div className="grid grid-cols-2 gap-3 border-t-[1.5px] border-soil/50 px-5 pb-5 pt-4">
               <a
-                href={siteConfig.phoneHref}
+                href={contact.phoneHref}
                 className="shadow-block block rounded-[2px] bg-harvest p-3.5 text-center text-[14px] font-bold text-ink"
               >
                 Call
               </a>
               <a
-                href={siteConfig.whatsappHref}
+                href={contact.whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="shadow-doc-sm block rounded-[2px] border-2 border-forest p-[11px] text-center text-[14px] font-bold text-forest"

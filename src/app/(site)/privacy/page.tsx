@@ -1,6 +1,9 @@
 import { LegalDoc, type LegalSection } from "@/components/legal/legal-doc";
 import { pageMetadata } from "@/lib/seo";
-import { siteConfig } from "@/lib/site";
+import {
+  getSiteContact,
+  type ResolvedContact,
+} from "@/lib/public-contact";
 
 export const metadata = pageMetadata({
   title: "Privacy policy",
@@ -9,7 +12,8 @@ export const metadata = pageMetadata({
   path: "/privacy",
 });
 
-const SECTIONS: LegalSection[] = [
+function buildSections(contact: ResolvedContact): LegalSection[] {
+  return [
   {
     title: "What we collect",
     paragraphs: [
@@ -30,7 +34,7 @@ const SECTIONS: LegalSection[] = [
   {
     title: "Payments",
     paragraphs: [
-      "Online payments are processed by Hubtel. When you pay, you deal with their checkout under their own privacy terms; what comes back to us is confirmation that a referenced sale was paid, which we keep as part of the sale's record.",
+      "We do not take payments through this website. Payments are made directly to us by cash, mobile money or bank transfer, and what we record is the amount, the method and the reference you quoted, kept as part of that sale's record.",
     ],
   },
   {
@@ -48,7 +52,7 @@ const SECTIONS: LegalSection[] = [
   {
     title: "Your rights",
     paragraphs: [
-      `Under Ghana's Data Protection Act, 2012 (Act 843), you may ask what we hold about you, have inaccuracies corrected, and ask us to delete details we have no legal duty to keep. Call ${siteConfig.phone} or write to ${siteConfig.email} — we answer within a reasonable time, usually the same working week.`,
+      `Under Ghana's Data Protection Act, 2012 (Act 843), you may ask what we hold about you, have inaccuracies corrected, and ask us to delete details we have no legal duty to keep. Call ${contact.phone} or write to ${contact.email} — we answer within a reasonable time, usually the same working week.`,
     ],
   },
   {
@@ -63,17 +67,19 @@ const SECTIONS: LegalSection[] = [
       "If how we handle your details changes, this page changes with it and the date at the top moves. Significant changes affecting existing customers are communicated directly.",
     ],
   },
-];
+  ];
+}
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const contact = await getSiteContact();
   return (
     <LegalDoc
       eyebrow="OFFICE · PRIVACY POLICY"
       title="What we keep, and why."
-      fileNo="DOC — PRIVACY POLICY"
+      fileNo="DOC - PRIVACY POLICY"
       updated="11 JUL 2026"
       intro="We're a trading house, not a data business. This page sets out the little we collect when you enquire or pay, what it's used for, how long it's kept, and the rights you have over it."
-      sections={SECTIONS}
+      sections={buildSections(contact)}
     />
   );
 }

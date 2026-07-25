@@ -8,6 +8,8 @@
 export const CACHE_TAGS = {
   /** Public commodity availability (/ board + /commodities lot files). */
   COMMODITIES: "commodities",
+  /** Public contact block (phone/WhatsApp/email/address), owner-editable. */
+  CONTACT: "contact",
   /** Public land listings (/land plot register). */
   LAND_PLOTS: "land-plots",
 } as const;

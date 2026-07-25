@@ -1,21 +1,24 @@
+import { SiteContactProvider } from "@/components/providers/site-contact-provider";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { StickyCallBar } from "@/components/layout/sticky-call-bar";
+import { getSiteContact } from "@/lib/public-contact";
 
 /**
- * The standard site chrome. /pay deliberately lives outside this group — the
- * design strips it to a minimal "SECURE PAYMENT" header with no nav so
- * nothing pulls attention away from the payment.
+ * The standard site chrome. The owner-editable contact block is resolved once
+ * here and shared with every client consumer through the provider (server
+ * components call getSiteContact directly; Next dedupes).
  */
-export default function SiteLayout({
+export default async function SiteLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const contact = await getSiteContact();
   return (
-    <>
+    <SiteContactProvider value={contact}>
       <SiteHeader />
       <main className="flex-1">{children}</main>
       <SiteFooter />
       <StickyCallBar />
-    </>
+    </SiteContactProvider>
   );
 }

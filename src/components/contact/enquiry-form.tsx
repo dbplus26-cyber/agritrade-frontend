@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/TurnstileWidget";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
-import { siteConfig } from "@/lib/site";
+import { useSiteContact } from "@/components/providers/site-contact-provider";
 import { cn } from "@/lib/utils";
 import { useCreateEnquiryMutation } from "@/redux/enquiries/enquiries-api";
 import { ENQUIRY_SUBJECTS, type EnquirySubject } from "@/types/enquiry.types";
@@ -48,6 +48,7 @@ export function EnquiryForm({
   defaultAbout?: string;
 }) {
   const fieldId = useId();
+  const contact = useSiteContact();
   const [reference, setReference] = useState<string | null>(null);
   // Cloudflare Turnstile: the token gates submit only when a site key is set
   // (mirrors the backend, which skips verification without its secret key).
@@ -133,7 +134,7 @@ export function EnquiryForm({
         </p>
         <div className="flex flex-wrap gap-3">
           <a
-            href={siteConfig.whatsappHref}
+            href={contact.whatsappHref}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block rounded-[2px] bg-leaf px-[22px] py-[13px] text-[14px] font-bold text-surface shadow-[3px_3px_0_rgb(31_33_28/0.3)]"

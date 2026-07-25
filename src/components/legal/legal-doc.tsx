@@ -1,5 +1,5 @@
 import { StencilLabel } from "@/components/ui/StencilLabel";
-import { siteConfig } from "@/lib/site";
+import { getSiteContact } from "@/lib/public-contact";
 
 export interface LegalSection {
   title: string;
@@ -14,7 +14,7 @@ export interface LegalSection {
  * "last updated" line, then numbered ledger sections. Shared by /terms and
  * /privacy so the two always read as siblings.
  */
-export function LegalDoc({
+export async function LegalDoc({
   eyebrow,
   title,
   fileNo,
@@ -29,6 +29,7 @@ export function LegalDoc({
   intro: string;
   sections: LegalSection[];
 }) {
+  const contact = await getSiteContact();
   return (
     <div className="texture-grain bg-surface">
       <div className="mx-auto max-w-[860px] px-5 pb-16 pt-10 lg:px-8 lg:pb-24 lg:pt-16">
@@ -91,12 +92,12 @@ export function LegalDoc({
 
         <p className="mt-6 text-[13px] leading-[1.65] text-soil">
           Questions about this document? Call{" "}
-          <a href={siteConfig.phoneHref} className="font-bold text-forest">
-            {siteConfig.phone}
+          <a href={contact.phoneHref} className="font-bold text-forest">
+            {contact.phone}
           </a>{" "}
           or write to{" "}
-          <a href={`mailto:${siteConfig.email}`} className="font-bold text-forest">
-            {siteConfig.email}
+          <a href={`mailto:${contact.email}`} className="font-bold text-forest">
+            {contact.email}
           </a>
           .
         </p>

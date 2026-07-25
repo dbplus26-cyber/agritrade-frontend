@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { StencilLabel } from "@/components/ui/StencilLabel";
 import { routes } from "@/lib/routes";
-import { siteConfig } from "@/lib/site";
+import { getSiteContact } from "@/lib/public-contact";
 
 /** The closing CTA — the phone number itself is the object. */
-export function CtaCall() {
+export async function CtaCall() {
+  const contact = await getSiteContact();
   return (
     <section className="texture-grain bg-surface">
       <div className="mx-auto grid max-w-[1312px] items-center gap-8 border-b-[1.5px] border-soil/50 px-5 py-16 lg:grid-cols-[1fr_auto] lg:gap-12 lg:px-8 lg:py-24">
@@ -15,10 +16,10 @@ export function CtaCall() {
           <p className="mb-2.5 mt-3.5 font-display text-[clamp(30px,5vw,64px)] font-bold leading-[1.05] tracking-[-0.01em] text-forest">
             Call{" "}
             <a
-              href={siteConfig.phoneHref}
+              href={contact.phoneHref}
               className="whitespace-nowrap text-harvest-deep shadow-[inset_0_-10px_0_rgb(216_156_46/0.4)] transition-colors hover:text-forest"
             >
-              {siteConfig.phone}
+              {contact.phone}
             </a>
           </p>
           <p className="text-[15px] leading-[1.6] text-soil">
