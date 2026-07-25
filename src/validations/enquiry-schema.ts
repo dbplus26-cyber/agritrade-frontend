@@ -2,12 +2,11 @@ import { z } from "zod";
 import { ENQUIRY_SUBJECTS } from "@/types/enquiry.types";
 
 /**
- * Enquiry form schema — mirrors the backend's `enquiry-validation.ts` (same
- * rules, same messages; the stub at `app/api/v1/public/enquiries/route.ts`
- * validates with this exact schema), so the client and the office always
- * agree on what a valid enquiry is. Phone stays permissive here (never block
- * a person over punctuation) — the backend is the authority and normalizes
- * to E.164, returning a per-field error for numbers it can't parse.
+ * Enquiry form schema - mirrors the backend's `enquiry-validation.ts` (same
+ * rules, same messages), so the client and the office always agree on what a
+ * valid enquiry is. Phone stays permissive here (never block a person over
+ * punctuation) - the backend is the authority and normalizes to E.164,
+ * returning a per-field error for numbers it can't parse.
  */
 export const enquirySchema = z.object({
   fullName: z.string().trim().min(1, "Please enter your name.").max(150),

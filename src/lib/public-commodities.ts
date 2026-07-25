@@ -8,20 +8,14 @@ import {
 } from "@/static-data/availability";
 
 /**
- * The live availability feed behind the plank board and the lot files.
+ * The live availability feed behind the plank board and the lot files, fetched
+ * from the real backend under the `commodities` cache tag. The backend purges
+ * the tag after every stock or register write (POST /api/revalidate), so the
+ * 1-hour ISR window is only the backstop for a lost purge.
  *
- * Data source rules:
- * - `NEXT_PUBLIC_SERVER_URI` set: fetch the real backend, cached under the
- *   `commodities` tag. The backend purges the tag after every stock or
- *   register write (POST /api/revalidate), so the 1-hour ISR window is only
- *   the backstop for a lost purge.
- * - env empty (stub mode): serve the demo list below directly - a server
- *   component cannot reliably fetch its own origin, and the shared demo data
- *   keeps the stub route handler and this fallback in perfect agreement.
- *
- * Emptiness is honest BY DESIGN: nothing published (or the API down) renders
- * the board's designed empty state - never a stand-in list that makes the
- * warehouse look stocked when the register says otherwise.
+ * Emptiness is honest BY DESIGN: nothing published (or the API down) returns
+ * null and the board renders its designed empty state - never a stand-in list
+ * that makes the warehouse look stocked when the register says otherwise.
  */
 
 /** Mirrors the backend `PublicCommodityDTO`. */
@@ -35,42 +29,10 @@ export interface PublicCommodity {
   available: boolean;
 }
 
-/** Demo feed for stub mode - matches the static board's story. */
-export const DEMO_PUBLIC_COMMODITIES: PublicCommodity[] = [
-  {
-    id: "demo-maize",
-    name: "Maize",
-    description: null,
-    photo: null,
-    variety: null,
-    qualityGrade: null,
-    available: true,
-  },
-  {
-    id: "demo-soya",
-    name: "Soya beans",
-    description: null,
-    photo: null,
-    variety: null,
-    qualityGrade: null,
-    available: true,
-  },
-  {
-    id: "demo-groundnuts",
-    name: "Groundnuts",
-    description: null,
-    photo: null,
-    variety: null,
-    qualityGrade: null,
-    available: false,
-  },
-];
-
 /** Fetches the published commodities, or null when the API is unreachable. */
 export async function fetchPublicCommodities(): Promise<
   PublicCommodity[] | null
 > {
-  if (!env.SERVER_URI) return DEMO_PUBLIC_COMMODITIES;
   try {
     const res = await fetch(`${env.SERVER_URI}/api/v1/public/commodities`, {
       next: { revalidate: 3600, tags: [CACHE_TAGS.COMMODITIES] },

@@ -1,7 +1,7 @@
 /**
- * Contact enquiries — mirrors the `/api/v1/public/enquiries` contract (the
- * Zod schema in `validations/enquiry-schema.ts` is the same shape the server
- * validates; the backend source of truth is agritrade-backend's
+ * Contact enquiries - mirrors the backend `POST /api/v1/public/enquiries`
+ * contract (the Zod schema in `validations/enquiry-schema.ts` is the same shape
+ * the server validates; the backend source of truth is agritrade-backend's
  * `validations/enquiry-validation.ts`).
  */
 export const ENQUIRY_SUBJECTS = [

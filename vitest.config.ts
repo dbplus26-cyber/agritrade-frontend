@@ -11,5 +11,8 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./test/setup.ts"],
     include: ["test/**/*.test.{ts,tsx}", "src/**/*.test.{ts,tsx}"],
+    // The API origin is required at import time (src/lib/env.ts fails fast);
+    // tests never hit the network (RTK/fetch are mocked), so any value works.
+    env: { NEXT_PUBLIC_SERVER_URI: "http://localhost:4060" },
   },
 });
