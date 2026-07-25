@@ -72,6 +72,7 @@ export const adminNavGroups: AdminNavGroup[] = [
     items: [
       item("users", "Users", { ownerOnly: true }),
       item("audit", "Audit Log", { ownerOnly: true }),
+      item("notifications", "Notifications", { ownerOnly: true }),
       // "My profile" and "Settings" deliberately absent: both live behind
       // the navbar avatar menu (dms-frontend convention), not the rail.
     ],
