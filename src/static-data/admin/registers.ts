@@ -73,42 +73,9 @@ export interface RegisterConfig {
   readOnly?: boolean;
 }
 
-export type RegisterSlug =
-  | "expenses"
-  | "plots"
-  | "land-sales"
-  | "seasons"
-  | "farmers"
-  | "grants"
-  | "repayments";
+export type RegisterSlug = "land-sales" | "plots";
 
 export const REGISTERS: Record<RegisterSlug, RegisterConfig & { rows: RegisterRow[] }> = {
-  expenses: {
-    title: "Expenses",
-    sub: "Operating costs across trucks, warehouses and agents",
-    single: "Expense",
-    add: "+ Record expense",
-    search: "Search description…",
-    filters: ["Category", "Status"],
-    newTag: { t: "Pending", tone: "harvest" },
-    headers: [
-      { l: "Ref" },
-      { l: "Date" },
-      { l: "Category", wide: true },
-      { l: "Description" },
-      { l: "Amount", align: "right", money: true },
-      { l: "Status", tag: true },
-    ],
-    figs: [4],
-    ledger: null,
-    rows: [
-      ["E-0231", "10 Jul 2026", "Transport", "Fuel — SH-0119 Tamale → Tema", "GH₵ 1,850.00", { t: "Approved", tone: "leaf" }],
-      ["E-0230", "09 Jul 2026", "Repairs", "Brake pads — GT 5482-22", "GH₵ 850.00", { t: "Pending", tone: "harvest" }],
-      ["E-0229", "08 Jul 2026", "Loading", "Loading crew — 28t maize", "GH₵ 1,120.00", { t: "Approved", tone: "leaf" }],
-      ["E-0228", "07 Jul 2026", "Warehouse", "Fumigation — Main WH", "GH₵ 2,400.00", { t: "Approved", tone: "leaf" }],
-      ["E-0227", "05 Jul 2026", "Other", "Airtime bundles — field agents", "GH₵ 300.00", { t: "Rejected", tone: "alert" }],
-    ],
-  },
   plots: {
     title: "Plots",
     sub: "Land inventory for sale",
@@ -166,112 +133,12 @@ export const REGISTERS: Record<RegisterSlug, RegisterConfig & { rows: RegisterRo
       ["LS-028", "PL-007", "Mariama Seidu", "GH₵ 58,000", "GH₵ 58,000", { t: "Paid in full", c: "#2F5E3D" }, { t: "Completed", tone: "leaf" }],
     ],
   },
-  seasons: {
-    title: "Seasons",
-    sub: "Farming seasons and grant programmes",
-    single: "Season",
-    add: "+ New season",
-    search: "Search season…",
-    filters: ["Crop", "Status"],
-    newTag: { t: "Active", tone: "leaf" },
-    headers: [
-      { l: "Season" },
-      { l: "Crop" },
-      { l: "Farmers", align: "right" },
-      { l: "Granted", align: "right", money: true },
-      { l: "Recovered", align: "right", money: true, wide: true },
-      { l: "Status", tag: true },
-    ],
-    figs: [2, 3, 4],
-    ledger: null,
-    rows: [
-      ["2026 Wet Season", "Maize", "142", "GH₵ 486,000", "GH₵ 121,500", { t: "Active", tone: "leaf" }],
-      ["2025/26 Dry Season", "Rice", "38", "GH₵ 156,000", "GH₵ 148,200", { t: "Closing", tone: "harvest" }],
-      ["2025 Wet Season", "Maize", "128", "GH₵ 402,000", "GH₵ 396,800", { t: "Closed", tone: "slate" }],
-    ],
-  },
-  farmers: {
-    avatar: true,
-    title: "Farmers",
-    sub: "Outgrower farmers in grant programmes",
-    single: "Farmer",
-    add: "+ Add farmer",
-    search: "Search farmer or community…",
-    filters: ["Community", "Season"],
-    newTag: { t: "On track", tone: "leaf" },
-    headers: [
-      { l: "Farmer" },
-      { l: "Community", wide: true },
-      { l: "Season" },
-      { l: "Granted", align: "right", money: true },
-      { l: "Repaid", align: "right", money: true },
-      { l: "Status", tag: true },
-    ],
-    figs: [3, 4],
-    ledger: {
-      title: "Repayments",
-      rows: [
-        { date: "08 Jul 2026", desc: "Produce — 500 kg maize at market rate", amount: "+GH₵ 850.00", amtColor: "#2F5E3D", after: "GH₵ 1,700.00 due" },
-        { date: "28 Jun 2026", desc: "Mobile money", amount: "+GH₵ 850.00", amtColor: "#2F5E3D", after: "GH₵ 2,550.00 due" },
-      ],
-    },
-    rows: [
-      ["Abukari Yakubu", "Kumbungu", "2026 Wet", "GH₵ 3,400", "GH₵ 1,700", { t: "On track", tone: "leaf" }],
-      ["Memunatu Iddrisu", "Tolon", "2026 Wet", "GH₵ 2,800", "GH₵ 400", { t: "Behind", tone: "harvest" }],
-      ["Sulemana Baba", "Savelugu", "2026 Wet", "GH₵ 4,100", "GH₵ 0", { t: "Overdue", tone: "alert" }],
-      ["Azara Fusheini", "Kumbungu", "2026 Wet", "GH₵ 2,200", "GH₵ 2,200", { t: "Settled", tone: "leaf" }],
-    ],
-  },
-  grants: {
-    title: "Grants",
-    sub: "Input and cash grants to farmers",
-    single: "Grant",
-    add: "+ New grant",
-    search: "Search farmer…",
-    filters: ["Type", "Season"],
-    newTag: { t: "Pending", tone: "harvest" },
-    headers: [
-      { l: "Ref" },
-      { l: "Farmer" },
-      { l: "Season", wide: true },
-      { l: "Type" },
-      { l: "Value", align: "right", money: true },
-      { l: "Status", tag: true },
-    ],
-    figs: [4],
-    ledger: null,
-    rows: [
-      ["G-0912", "Abukari Yakubu", "2026 Wet", "Inputs — seed + fertiliser", "GH₵ 1,900", { t: "Disbursed", tone: "leaf" }],
-      ["G-0913", "Abukari Yakubu", "2026 Wet", "Cash", "GH₵ 1,500", { t: "Disbursed", tone: "leaf" }],
-      ["G-0918", "Memunatu Iddrisu", "2026 Wet", "Cash", "GH₵ 2,800", { t: "Pending", tone: "harvest" }],
-      ["G-0905", "Azara Fusheini", "2026 Wet", "Inputs — seed", "GH₵ 2,200", { t: "Repaid", tone: "leaf" }],
-    ],
-  },
-  repayments: {
-    title: "Repayments",
-    sub: "Recoveries against farmer grants",
-    single: "Repayment",
-    add: "+ Record repayment",
-    search: "Search farmer…",
-    filters: ["Method", "Season"],
-    newTag: { t: "Confirmed", tone: "leaf" },
-    headers: [
-      { l: "Ref" },
-      { l: "Farmer" },
-      { l: "Date" },
-      { l: "Method", wide: true },
-      { l: "Amount", align: "right", money: true },
-      { l: "Status", tag: true },
-    ],
-    figs: [4],
-    ledger: null,
-    rows: [
-      ["R-1204", "Azara Fusheini", "08 Jul 2026", "Produce — 500 kg maize", "GH₵ 2,200.00", { t: "Confirmed", tone: "leaf" }],
-      ["R-1201", "Abukari Yakubu", "05 Jul 2026", "Mobile money", "GH₵ 850.00", { t: "Confirmed", tone: "leaf" }],
-      ["R-1198", "Abukari Yakubu", "28 Jun 2026", "Produce — 200 kg maize", "GH₵ 850.00", { t: "Confirmed", tone: "leaf" }],
-      ["R-1190", "Memunatu Iddrisu", "20 Jun 2026", "Cash at office", "GH₵ 400.00", { t: "Pending", tone: "harvest" }],
-    ],
-  },
+  // `expenses` retired from the stub registers: /admin/expenses is now a live,
+  // backend-driven module (src/app/admin/expenses + components/admin/expenses).
+  // `seasons`, `farmers`, `grants` and `repayments` retired from the stub
+  // registers: the farm module (M12) is now live and backend-driven
+  // (src/app/admin/{seasons,input-items,farmers,grants,repayments} +
+  // components/admin/farm).
   // `suppliers` and `buyers` retired from the stub registers: both are now
   // live, backend-driven modules (src/app/admin/{suppliers,buyers} +
   // components/admin/registry).
