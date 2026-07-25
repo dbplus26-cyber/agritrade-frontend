@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
+
+import { useMoneyVisibility } from "@/hooks/use-money-visibility";
 import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
@@ -31,12 +33,14 @@ const LIST = "/admin/agents";
 const FILTER_DEFAULTS = { status: "all", size: "10" };
 
 /** Signed GH₵ balance; a negative float (agent fronting cash) is flagged. */
-export function BalanceCell({ amount }: { amount: number }) {
+export function BalanceCell({ amount }: { amount: number | null }) {
   return (
     <Mono
       className={cn(
         "whitespace-nowrap text-[12.5px]",
-        amount < 0 ? "font-semibold text-error" : "text-ink",
+        amount === null && "text-soil/50",
+        amount !== null && amount < 0 && "font-semibold text-error",
+        amount !== null && amount >= 0 && "text-ink",
       )}
     >
       {formatCedis(amount)}
@@ -77,8 +81,9 @@ export function AgentsTable() {
   const totalCount = data?.meta.total ?? 0;
   const activeFilterCount = statusFilter !== "all" ? 1 : 0;
 
-  const columns = useMemo<ColumnDef<IAgentSummary, unknown>[]>(
-    () => [
+  const showMoney = useMoneyVisibility();
+  const columns = useMemo<ColumnDef<IAgentSummary, unknown>[]>(() => {
+    const all: ColumnDef<IAgentSummary, unknown>[] = [
       {
         id: "agent",
         accessorFn: (a) => `${a.firstName} ${a.lastName}`,
@@ -135,9 +140,12 @@ export function AgentsTable() {
         meta: columnMeta(),
         cell: ({ row }) => <ActiveBadge isActive={row.original.isActive} />,
       },
-    ],
-    [],
-  );
+    ];
+    // The float balance is money: drop the column entirely rather than show a
+    // column of "Hidden" (the API redacts the value regardless).
+    if (showMoney) return all;
+    return all.filter((c) => c.id !== "balance");
+  }, [showMoney]);
 
   return (
     <div>

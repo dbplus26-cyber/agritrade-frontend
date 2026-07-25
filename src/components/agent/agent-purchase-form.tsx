@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,10 +8,10 @@ import {
   useCreateMyPurchaseMutation,
   useGetAgentCommoditiesQuery,
 } from "@/redux/agent/agent-api";
+import { FilePicker } from "@/components/ui/FilePicker";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
-import { optimizeImage } from "@/lib/optimize-image";
 import { cn } from "@/lib/utils";
 import {
   agentPurchaseSchema,
@@ -41,7 +41,6 @@ export function AgentPurchaseForm() {
   const commodities = useGetAgentCommoditiesQuery();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const fileInput = useRef<HTMLInputElement | null>(null);
 
   // One idempotency key per draft, minted at mount and kept until success.
   const idempotencyKey = useMemo(
@@ -190,37 +189,17 @@ export function AgentPurchaseForm() {
 
       <div>
         <AgentLabel optional>Weigh-slip photo</AgentLabel>
-        <div className="flex items-center gap-2.5">
-          <button
-            type="button"
-            onClick={() => fileInput.current?.click()}
-            className="rounded border border-soil/35 bg-paper px-3 py-2 text-[13px] font-medium text-ink"
-          >
-            {photoFile ? "Replace photo" : "Take / choose photo"}
-          </button>
-          {photoFile ? (
-            <span className="min-w-0 flex-1 truncate text-[12px] text-soil">
-              {photoFile.name}
-            </span>
-          ) : null}
-        </div>
-        <input
-          ref={fileInput}
-          type="file"
+        {/* The slip is the evidence for the money, and in a gallery of near
+            identical photos the wrong one is easy to tap. Seeing it before the
+            submit is the only chance to catch that — after submit the purchase
+            has already debited the float. */}
+        <FilePicker
           accept="image/*"
           capture="environment"
-          className="hidden"
-          onChange={(e) => {
-            const file = e.target.files?.[0] ?? null;
-            if (!file) {
-              setPhotoFile(null);
-              return;
-            }
-            // Downscale before staging: a 12MP weigh-slip photo shrinks to a
-            // few hundred KB, which is the difference between a submit that
-            // survives a 2G village connection and one that times out.
-            void optimizeImage(file).then(setPhotoFile);
-          }}
+          hint="Optional"
+          onConfirm={(file) => { setPhotoFile(file); }}
+          stage
+          triggerLabel={photoFile ? "Replace photo" : "Take / choose photo"}
         />
       </div>
 

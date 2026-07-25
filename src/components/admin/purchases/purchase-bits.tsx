@@ -1,5 +1,6 @@
 import { ToneBadge, type Tone } from "@/components/admin/ui";
-import { formatCedis } from "@/lib/format-money";
+import { formatDateTime } from "@/lib/format-date";
+import { formatCedis, MONEY_HIDDEN } from "@/lib/format-money";
 import { PurchaseStatus } from "@/types/purchase.types";
 
 /**
@@ -57,7 +58,10 @@ export const PURCHASE_STATUS_FILTER_OPTIONS = [
 ] as const;
 
 /** GH₵ figure for table cells: compact from a million up (exact in title). */
-export function CompactCedis({ amount }: { amount: number }) {
+export function CompactCedis({ amount }: { amount: number | null }) {
+  // Null means the API redacted it for this user (financial visibility).
+  if (amount === null)
+    return <span className="text-soil/50">{MONEY_HIDDEN}</span>;
   if (Math.abs(amount) < 1_000_000) return <>{formatCedis(amount)}</>;
   return (
     <span title={formatCedis(amount)}>
@@ -70,11 +74,7 @@ export function CompactCedis({ amount }: { amount: number }) {
 
 /** "05 Jul 2026" - the console's date rendering. */
 export function formatConsoleDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+  return formatDateTime(iso);
 }
 
 /** Who the goods came from, for list rows: supplier, agent, or the source. */

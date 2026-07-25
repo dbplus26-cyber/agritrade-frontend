@@ -12,6 +12,7 @@ import {
   AdminPageHeader,
   adminInputClass,
   adminSelectClass,
+  DetailRow,
   Mono,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
@@ -33,6 +34,7 @@ import {
   useVoidPurchaseMutation,
 } from "@/redux/purchases/purchases-api";
 import { useGetWarehousesQuery } from "@/redux/warehouses/warehouses-api";
+import { useAuthRole } from "@/hooks/use-auth-role";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis, formatKg } from "@/lib/format-money";
@@ -55,32 +57,6 @@ import {
 } from "./purchase-bits";
 
 const LIST = "/admin/purchases";
-
-function DetailRow({
-  label,
-  children,
-  mono = false,
-}: {
-  label: string;
-  children: React.ReactNode;
-  mono?: boolean;
-}) {
-  return (
-    <div className="flex flex-col gap-0.5 py-2 min-[480px]:flex-row min-[480px]:items-baseline min-[480px]:justify-between">
-      <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
-        {label}
-      </span>
-      <span
-        className={cn(
-          "min-w-0 text-[13.5px] text-ink [overflow-wrap:anywhere]",
-          mono && "font-adminmono tabular-nums",
-        )}
-      >
-        {children}
-      </span>
-    </div>
-  );
-}
 
 /** Receive dialog: actual kg into which warehouse, with live variance. */
 function ReceiveDialog({
@@ -312,6 +288,7 @@ export function PurchaseDetail({ id }: { id: string }) {
   const { data, isLoading, isError, error, refetch } = useGetPurchaseQuery(id);
   const [markInTransit, transitState] = useMarkPurchaseInTransitMutation();
   const { confirm, confirmationDialog } = useConfirm();
+  const { isSuperAdmin } = useAuthRole();
   const [receiveOpen, setReceiveOpen] = useState(false);
   const [voidOpen, setVoidOpen] = useState(false);
 
@@ -329,7 +306,9 @@ export function PurchaseDetail({ id }: { id: string }) {
   const canReceive =
     p.status === PurchaseStatus.RECORDED ||
     p.status === PurchaseStatus.IN_TRANSIT;
-  const canVoid = p.status !== PurchaseStatus.VOIDED;
+  // Voiding reverses the float and stock ledgers with compensating entries -
+  // the owner's correction path (design doc 5.1), enforced by the API too.
+  const canVoid = p.status !== PurchaseStatus.VOIDED && isSuperAdmin;
 
   const onMarkInTransit = async () => {
     const ok = await confirm({

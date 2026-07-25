@@ -37,7 +37,8 @@ import {
   useTopUpAgentMutation,
 } from "@/redux/agents/agents-api";
 import { extractApiError } from "@/lib/extract-api-error";
-import { formatCedis } from "@/lib/format-money";
+import { useAuthRole } from "@/hooks/use-auth-role";
+import { formatCedis, MONEY_HIDDEN } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import {
@@ -75,7 +76,14 @@ const METHOD_OPTIONS = [
   { value: PaymentMethod.BANK, label: "Bank" },
 ] as const;
 
-function SignedAmount({ amount }: { amount: number }) {
+function SignedAmount({ amount }: { amount: number | null }) {
+  if (amount === null) {
+    return (
+      <Mono className="whitespace-nowrap text-[13px] text-soil/50">
+        {MONEY_HIDDEN}
+      </Mono>
+    );
+  }
   return (
     <Mono
       className={cn(
@@ -253,9 +261,11 @@ function ReconcileDialog({
       }).unwrap();
       const v = res.data.reconciliation.varianceGhs;
       notify.success(
-        v === 0
-          ? "Reconciled - the count matched exactly"
-          : `Reconciled with a ${formatCedis(Math.abs(v))} ${v > 0 ? "surplus" : "shortfall"} adjustment`,
+        v === null
+          ? "Reconciled"
+          : v === 0
+            ? "Reconciled - the count matched exactly"
+            : `Reconciled with a ${formatCedis(Math.abs(v))} ${v > 0 ? "surplus" : "shortfall"} adjustment`,
       );
       onClose();
     } catch (err) {
@@ -402,6 +412,7 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
   const recons = useGetAgentReconciliationsQuery({ agentUserId, limit: 5 });
   const [topUpOpen, setTopUpOpen] = useState(false);
   const [reconcileOpen, setReconcileOpen] = useState(false);
+  const { isSuperAdmin } = useAuthRole();
 
   if (detail.isLoading) return <DataTableSkeleton />;
   if (detail.isError || !detail.data)
@@ -426,16 +437,32 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
         sub={agent.region ?? agent.email}
         actions={
           <div className="flex gap-2">
-            <AdminButton
-              variant="secondary"
-              className="h-9 px-3.5"
-              onClick={() => setReconcileOpen(true)}
-            >
-              Reconcile
+            {/* Statement is a read - anyone with agent access can print it. */}
+            <AdminButton variant="secondary" className="h-9 px-3.5" asChild>
+              <Link href={`/admin/agents/${agentUserId}/statement`}>
+                Statement
+              </Link>
             </AdminButton>
-            <AdminButton className="h-9 px-4" onClick={() => setTopUpOpen(true)}>
-              Top up float
-            </AdminButton>
+            {/* Float money moves are owner actions (design doc 4: staff view
+                only). The API enforces it; hiding the buttons keeps staff from
+                being offered an action that can only 403. */}
+            {isSuperAdmin ? (
+              <>
+                <AdminButton
+                  variant="secondary"
+                  className="h-9 px-3.5"
+                  onClick={() => setReconcileOpen(true)}
+                >
+                  Reconcile
+                </AdminButton>
+                <AdminButton
+                  className="h-9 px-4"
+                  onClick={() => setTopUpOpen(true)}
+                >
+                  Top up float
+                </AdminButton>
+              </>
+            ) : null}
           </div>
         }
       />
@@ -443,7 +470,7 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
       <AdminCard
         className={cn(
           "px-5 py-4",
-          balance < 0 && "border-error/40 bg-error/[0.04]",
+          balance !== null && balance < 0 && "border-error/40 bg-error/[0.04]",
         )}
       >
         <p className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
@@ -452,12 +479,16 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
         <p
           className={cn(
             "font-adminmono mt-1 text-[26px] font-bold tabular-nums",
-            balance < 0 ? "text-error" : "text-ink",
+            balance === null
+              ? "text-soil/50"
+              : balance < 0
+                ? "text-error"
+                : "text-ink",
           )}
         >
           {formatCedis(balance)}
         </p>
-        {balance < 0 ? (
+        {balance !== null && balance < 0 ? (
           <p className="mt-0.5 text-[12px] text-error">
             Negative float - {agent.firstName} is fronting their own cash.
           </p>
@@ -520,16 +551,20 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
               <Mono
                 className={cn(
                   "text-[12.5px] font-semibold whitespace-nowrap",
-                  r.varianceGhs === 0
-                    ? "text-leaf"
-                    : r.varianceGhs > 0
-                      ? "text-harvest-deep"
-                      : "text-error",
+                  r.varianceGhs === null
+                    ? "text-soil/50"
+                    : r.varianceGhs === 0
+                      ? "text-leaf"
+                      : r.varianceGhs > 0
+                        ? "text-harvest-deep"
+                        : "text-error",
                 )}
               >
-                {r.varianceGhs === 0
-                  ? "Exact"
-                  : `${r.varianceGhs > 0 ? "+" : "-"}${formatCedis(Math.abs(r.varianceGhs))}`}
+                {r.varianceGhs === null
+                  ? MONEY_HIDDEN
+                  : r.varianceGhs === 0
+                    ? "Exact"
+                    : `${r.varianceGhs > 0 ? "+" : "-"}${formatCedis(Math.abs(r.varianceGhs))}`}
               </Mono>
             </div>
           ))}

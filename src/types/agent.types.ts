@@ -24,8 +24,11 @@ export enum PaymentMethod {
 /** One float ledger line (`toFloatTransactionDTO`); amountGhs is signed. */
 export interface IFloatTransaction {
   id: string;
+  /** Human-readable document number, e.g. "SAL-2026-00042". */
+  transactionNo: string;
   type: FloatTxType;
-  amountGhs: number;
+  /** Null when the API redacted it (financial visibility). */
+  amountGhs: number | null;
   method: PaymentMethod | null;
   reason: string | null;
   purchaseId: string | null;
@@ -45,19 +48,22 @@ export interface IAgentSummary {
   phone: string | null;
   region: string | null;
   isActive: boolean;
-  balanceGhs: number;
+  /** Null when the API redacted it (financial visibility). */
+  balanceGhs: number | null;
 }
 
 /** Mirrors `toReconciliationDTO`: the immutable sit-down count snapshot. */
 export interface IReconciliation {
   id: string;
-  openingGhs: number;
-  topUpsGhs: number;
-  purchasesGhs: number;
-  expensesGhs: number;
-  expectedGhs: number;
-  countedGhs: number;
-  varianceGhs: number;
+  // Every figure below is nullable for the same reason: the API redacts money
+  // for staff without financial visibility.
+  openingGhs: number | null;
+  topUpsGhs: number | null;
+  purchasesGhs: number | null;
+  expensesGhs: number | null;
+  expectedGhs: number | null;
+  countedGhs: number | null;
+  varianceGhs: number | null;
   adjustmentTxId: string | null;
   notes: string | null;
   performedAt: string;
@@ -96,7 +102,7 @@ export interface IFloatLedgerResponse {
   message: string;
   data: IFloatTransaction[];
   meta: IPaginationMeta;
-  summary: { balanceGhs: number };
+  summary: { balanceGhs: number | null };
 }
 
 export interface IFloatTransactionResponse {

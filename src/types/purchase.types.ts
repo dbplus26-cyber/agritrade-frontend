@@ -19,6 +19,8 @@ export enum PurchaseStatus {
 /** Mirrors `toPurchaseDTO`. Money and weights are numbers in GHS / kg. */
 export interface IPurchase {
   id: string;
+  /** Human-readable document number, e.g. "SAL-2026-00042". */
+  transactionNo: string;
   status: PurchaseStatus;
   source: PurchaseSource;
   commodity: { id: string; name: string };
@@ -35,8 +37,10 @@ export interface IPurchase {
   receivedKg: number | null;
   /** Recorded minus received weight (spillage/moisture); null until receipt. */
   varianceKg: number | null;
-  unitPriceGhs: number;
-  totalGhs: number;
+  /** Null when the API redacted it (financial visibility). */
+  unitPriceGhs: number | null;
+  /** Null when the API redacted it (financial visibility). */
+  totalGhs: number | null;
   photo: string | null;
   notes: string | null;
   idempotencyKey: string | null;

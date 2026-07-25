@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
+
+import { useMoneyVisibility } from "@/hooks/use-money-visibility";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -56,6 +58,9 @@ const SOURCE_FILTER_OPTIONS = [
 ] as const;
 
 /** The live purchases register. */
+/** Column ids stripped from the table when the caller may not see money. */
+const MONEY_COLUMNS = new Set(["total", "price"]);
+
 export function PurchasesTable() {
   const router = useRouter();
   const {
@@ -102,8 +107,9 @@ export function PurchasesTable() {
     (from ? 1 : 0) +
     (to ? 1 : 0);
 
-  const columns = useMemo<ColumnDef<IPurchase, unknown>[]>(
-    () => [
+  const showMoney = useMoneyVisibility();
+  const columns = useMemo<ColumnDef<IPurchase, unknown>[]>(() => {
+    const all: ColumnDef<IPurchase, unknown>[] = [
       {
         id: "purchase",
         accessorFn: (p) => p.commodity.name,
@@ -184,9 +190,13 @@ export function PurchasesTable() {
           </span>
         ),
       },
-    ],
-    [],
-  );
+    ];
+    // Money columns are dropped outright rather than rendered as a column of
+    // "Hidden" - the API redacts the values either way (financial visibility),
+    // this just keeps the table readable.
+    if (showMoney) return all;
+    return all.filter((c) => !MONEY_COLUMNS.has(c.id ?? ""));
+  }, [showMoney]);
 
   return (
     <div>

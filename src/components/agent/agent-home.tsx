@@ -30,11 +30,13 @@ function LedgerLine({ tx }: { tx: IFloatTransaction }) {
       <span
         className={cn(
           "font-mono text-[13px] font-semibold whitespace-nowrap tabular-nums",
-          tx.amountGhs < 0 ? "text-error" : "text-forest",
+          // An agent always sees their own money, so null cannot occur here -
+          // it is handled rather than asserted away.
+          (tx.amountGhs ?? 0) < 0 ? "text-error" : "text-forest",
         )}
       >
-        {tx.amountGhs < 0 ? "-" : "+"}
-        {formatCedis(Math.abs(tx.amountGhs))}
+        {tx.amountGhs === null ? null : tx.amountGhs < 0 ? "-" : "+"}
+        {formatCedis(tx.amountGhs === null ? null : Math.abs(tx.amountGhs))}
       </span>
     </div>
   );
