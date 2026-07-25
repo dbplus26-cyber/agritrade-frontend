@@ -139,21 +139,6 @@ export interface ISaleStatsResponse {
   data: ISaleStats;
 }
 
-export interface IDebtor {
-  saleId: string;
-  buyer: { id: string; name: string; phone: string | null };
-  status: SaleStatus;
-  agreedTotalGhs: number | null;
-  paidGhs: number | null;
-  balanceGhs: number | null;
-}
-
-export interface IDebtorListResponse {
-  message: string;
-  data: IDebtor[];
-  meta: IPaginationMeta;
-}
-
 // ── Payment policies ──────────────────────────────────────────────
 export interface IPaymentPolicy {
   id: string;

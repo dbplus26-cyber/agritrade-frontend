@@ -1,12 +1,3 @@
-/** Formats an amount in minor units (pesewas) as e.g. "GH₵ 12,500.00".
- * Money is ALWAYS integer minor units end to end (backend convention). */
-export function formatMoney(minorUnits: number, currency = "GH₵"): string {
-  return `${currency} ${(minorUnits / 100).toLocaleString("en-GH", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-}
-
 /**
  * What a money field reads as when the API redacted it (financial visibility).
  * A visible placeholder, never a blank: "nothing here" and "not for you" must

@@ -2,7 +2,6 @@ import { apiSlice } from "../api-slice";
 import { toQueryString } from "@/lib/to-query-string";
 import type {
   ICreateSaleInput,
-  IDebtorListResponse,
   IRecordPaymentInput,
   ISaleDetailResponse,
   ISaleListQuery,
@@ -38,14 +37,6 @@ export const adminSalesApi = apiSlice.injectEndpoints({
     getSaleStats: builder.query<ISaleStatsResponse, void>({
       query: () => "admin/sales/stats",
       providesTags: [{ type: "SaleStats", id: "SUMMARY" }],
-    }),
-
-    getDebtors: builder.query<
-      IDebtorListResponse,
-      { page?: number; limit?: number } | void
-    >({
-      query: (params) => `admin/sales/debtors${toQueryString(params ?? {})}`,
-      providesTags: [{ type: "Sales", id: "DEBTORS" }],
     }),
 
     createSale: builder.mutation<ISaleDetailResponse, ICreateSaleInput>({
@@ -128,7 +119,6 @@ export const {
   useGetSalesQuery,
   useGetSaleQuery,
   useGetSaleStatsQuery,
-  useGetDebtorsQuery,
   useCreateSaleMutation,
   useUpdateSaleMutation,
   useConfirmSaleMutation,
