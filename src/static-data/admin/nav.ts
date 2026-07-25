@@ -73,6 +73,16 @@ export const adminNavGroups: AdminNavGroup[] = [
     ],
   },
   {
+    label: "Farm",
+    items: [
+      item("seasons", "Seasons", { ownerOnly: true }),
+      item("farmers", "Farmers", { ownerOnly: true }),
+      item("input-items", "Input Items", { ownerOnly: true }),
+      item("grants", "Grants", { ownerOnly: true }),
+      item("repayments", "Repayments", { ownerOnly: true }),
+    ],
+  },
+  {
     label: "Directory",
     items: [item("suppliers", "Suppliers"), item("buyers", "Buyers")],
   },
