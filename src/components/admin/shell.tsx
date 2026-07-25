@@ -2,21 +2,32 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { LogOut, Settings, User as UserIcon, X } from "lucide-react";
+import { useState } from "react";
+import {
+  BookUser,
+  ChevronDown,
+  ChevronRight,
+  LayoutDashboard,
+  LogOut,
+  type LucideIcon,
+  MapPin,
+  Settings,
+  ShieldCheck,
+  Sprout,
+  Store,
+  User as UserIcon,
+} from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarInset,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
+  SidebarRail,
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
@@ -37,13 +48,15 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { usePendingApprovalsCount } from "@/hooks/use-pending-approvals";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useLogoutMutation } from "@/redux/auth/auth-api";
+import { useAuthRole } from "@/hooks/use-auth-role";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 
 
-/** Console-scoped shadcn sidebar tokens — white rail, slate lines, forest ring. */
+/** Console-scoped shadcn sidebar tokens - white rail, slate lines, forest ring. */
 const SIDEBAR_VARS = {
   "--sidebar-width": "224px",
+  "--sidebar-width-icon": "56px",
   "--sidebar": "#ffffff",
   "--sidebar-foreground": "#334155",
   "--sidebar-border": "#e2e8f0",
@@ -118,6 +131,7 @@ function UserAvatar({ size = 30 }: { size?: number }) {
 function NavbarUser() {
   const user = useCurrentUser();
   const router = useRouter();
+  const { isSuperAdmin } = useAuthRole();
   const { signOut, isLoading, confirmationDialog } = useSignOut();
 
   return (
@@ -125,8 +139,18 @@ function NavbarUser() {
       <DropdownMenu>
         <DropdownMenuTrigger
           aria-label="Account menu"
-          className="cursor-pointer rounded-full outline-none focus-visible:ring-2 focus-visible:ring-console/40"
+          className="flex cursor-pointer items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-console/40 sm:rounded-[8px] sm:pl-2"
         >
+          {user ? (
+            <span className="hidden text-right sm:block">
+              <span className="block max-w-[160px] truncate text-[13px] font-semibold leading-tight text-ink">
+                {user.firstName} {user.lastName}
+              </span>
+              <span className="block text-[11px] leading-tight text-soil">
+                {ROLE_LABEL[user.role] ?? ""}
+              </span>
+            </span>
+          ) : null}
           <UserAvatar size={32} />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-60">
@@ -152,13 +176,15 @@ function NavbarUser() {
               <UserIcon className="h-3.5 w-3.5" aria-hidden="true" />
               My profile
             </DropdownMenuItem>
-            <DropdownMenuItem
-              className="cursor-pointer gap-2 text-[13px]"
-              onClick={() => router.push(`${ADMIN_HOME}/settings`)}
-            >
-              <Settings className="h-3.5 w-3.5" aria-hidden="true" />
-              Settings
-            </DropdownMenuItem>
+            {isSuperAdmin ? (
+              <DropdownMenuItem
+                className="cursor-pointer gap-2 text-[13px]"
+                onClick={() => router.push(`${ADMIN_HOME}/settings`)}
+              >
+                <Settings className="h-3.5 w-3.5" aria-hidden="true" />
+                Settings
+              </DropdownMenuItem>
+            ) : null}
             <DropdownMenuSeparator />
             <DropdownMenuItem
               disabled={isLoading}
@@ -176,86 +202,6 @@ function NavbarUser() {
   );
 }
 
-/**
- * The navbar search. Type + Enter navigates to the current screen with
- * `?q=<term>` (screens read it as their initial filter); the X clears both
- * the box and the param. The placeholder never wraps — it truncates.
- */
-function NavbarSearch() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const [term, setTerm] = useState("");
-
-  // Initialise from the URL once on mount (window, not useSearchParams, so the
-  // statically-rendered admin pages don't pick up a CSR bailout). Deferred a
-  // tick so hydration completes before the controlled value changes.
-  useEffect(() => {
-    const q = new URLSearchParams(window.location.search).get("search");
-    if (!q) return;
-    const timer = setTimeout(() => setTerm(q), 0);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const submit = () => {
-    const q = term.trim();
-    router.push(q ? `${pathname}?search=${encodeURIComponent(q)}` : pathname);
-  };
-
-  const clear = () => {
-    setTerm("");
-    if (new URLSearchParams(window.location.search).has("search")) {
-      router.push(pathname);
-    }
-  };
-
-  return (
-    <div className="hidden h-8 w-[210px] items-center gap-2 rounded-[6px] border border-soil/25 bg-surface-alt/70 px-2.5 text-[13px] focus-within:border-console focus-within:bg-paper md:flex lg:w-[260px]">
-      <svg
-        width="13"
-        height="13"
-        viewBox="0 0 16 16"
-        fill="none"
-        aria-hidden="true"
-        className="flex-none text-soil/70"
-      >
-        <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.5" />
-        <path
-          d="M11 11l3.2 3.2"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-      </svg>
-      <input
-        type="search"
-        value={term}
-        onChange={(e) => setTerm(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") submit();
-          if (e.key === "Escape") clear();
-        }}
-        placeholder="Search purchases, agents, buyers…"
-        aria-label="Search the console"
-        className="[&::-webkit-search-cancel-button]:hidden h-full w-full min-w-0 truncate bg-transparent text-ink outline-none placeholder:truncate placeholder:whitespace-nowrap placeholder:text-soil/45"
-      />
-      {term ? (
-        <button
-          type="button"
-          onClick={clear}
-          aria-label="Clear search"
-          className="flex h-4 w-4 flex-none cursor-pointer items-center justify-center rounded-full text-soil/70 hover:bg-soil/20 hover:text-soil"
-        >
-          <X className="h-3 w-3" aria-hidden="true" />
-        </button>
-      ) : (
-        <span className="font-adminmono flex-none rounded-[4px] border border-soil/25 bg-paper px-[5px] text-[11px] text-soil/70">
-          ⌘K
-        </span>
-      )}
-    </div>
-  );
-}
-
 /** Gold count pill used on nav rows. */
 function NavBadge({ count }: { count: number }) {
   return (
@@ -265,75 +211,188 @@ function NavBadge({ count }: { count: number }) {
   );
 }
 
-/** Sign-out row anchoring the rail (the profile itself lives in the navbar menu). */
+/** Sign-out row anchoring the rail (the profile itself lives in the navbar menu).
+ * When the rail is collapsed to icons the label hides, leaving just the icon. */
 function SidebarSignOut() {
   const { signOut, isLoading, confirmationDialog } = useSignOut();
+  const { state } = useSidebar();
+  const collapsed = state === "collapsed";
   return (
     <>
       <button
         type="button"
         onClick={() => void signOut()}
         disabled={isLoading}
-        className="flex w-full cursor-pointer items-center gap-2.5 px-5 py-3.5 text-left text-[13px] font-semibold text-soil hover:bg-surface-alt/70 hover:text-console-red disabled:opacity-50"
+        title={collapsed ? "Sign out" : undefined}
+        className={cn(
+          "flex w-full cursor-pointer items-center gap-2.5 py-3.5 text-left text-[13px] font-semibold text-soil hover:bg-surface-alt/70 hover:text-console-red disabled:opacity-50",
+          collapsed ? "justify-center px-0" : "px-5",
+        )}
       >
-        <LogOut className="h-[15px] w-[15px]" aria-hidden="true" />
-        Sign out
+        <LogOut className="h-[15px] w-[15px] flex-none" aria-hidden="true" />
+        {collapsed ? null : "Sign out"}
       </button>
       {confirmationDialog}
     </>
   );
 }
 
-/** The rail itself — shadcn Sidebar pinned to the console's exact look.
+/** lucide icon per nav group, shown on each collapsible dropdown header. */
+const GROUP_ICON: Record<string, LucideIcon> = {
+  Overview: LayoutDashboard,
+  Trading: Store,
+  Land: MapPin,
+  Farm: Sprout,
+  Directory: BookUser,
+  Admin: ShieldCheck,
+};
+
+/** The rail itself - shadcn Sidebar pinned to the console's exact look, with
+ * each nav group rendered as a collapsible dropdown (dms-frontend convention).
+ * The group that owns the active screen starts open and reopens on navigation.
  * On mobile shadcn renders it as a sheet, opened from the Menu tab below. */
 function ConsoleSidebar({ activeKey }: { activeKey: string }) {
-  const { setOpenMobile } = useSidebar();
+  const { setOpen, setOpenMobile, state } = useSidebar();
+  const collapsed = state === "collapsed";
   const pendingApprovals = usePendingApprovalsCount();
+  const { isSuperAdmin } = useAuthRole();
+  // Owner-only entries are hidden from staff, who would only hit a 403; empty
+  // groups then drop out entirely so no bare heading is left behind.
+  const groups = adminNavGroups
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((i) => isSuperAdmin || !i.ownerOnly),
+    }))
+    .filter((group) => group.items.length > 0);
+
+  // The group holding the active screen - its dropdown opens by default and
+  // reopens whenever navigation lands inside it.
+  const activeGroupLabel = groups.find((group) =>
+    group.items.some((i) => i.key === activeKey),
+  )?.label;
+
+  const [expanded, setExpanded] = useState<string[]>(() =>
+    activeGroupLabel ? [activeGroupLabel] : [],
+  );
+
+  // Reopen the active group when navigation lands in a different one, using
+  // React's adjust-state-during-render pattern (no effect, no cascading render).
+  const [prevActiveGroup, setPrevActiveGroup] = useState(activeGroupLabel);
+  if (activeGroupLabel !== prevActiveGroup) {
+    setPrevActiveGroup(activeGroupLabel);
+    if (activeGroupLabel && !expanded.includes(activeGroupLabel)) {
+      setExpanded([...expanded, activeGroupLabel]);
+    }
+  }
+
+  const toggle = (label: string) =>
+    setExpanded((prev) =>
+      prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label],
+    );
+
   return (
-    <Sidebar>
-      <SidebarHeader className="gap-0 border-b border-soil/15 px-5 pb-4 pt-5">
-        <div className="text-[16px] font-extrabold tracking-[0.14em] text-console">
-          DB PLUS
-        </div>
-        <div className="mt-0.5 text-[11px] uppercase tracking-[0.06em] text-soil">
-          Agro Trading · Tamale
-        </div>
+    <Sidebar collapsible="icon">
+      <SidebarHeader className="gap-0 border-b border-soil/15 pb-4 pt-5 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-0 px-5">
+        {collapsed ? (
+          <div className="text-[15px] font-extrabold tracking-[0.06em] text-console">
+            DB
+          </div>
+        ) : (
+          <>
+            <div className="text-[16px] font-extrabold tracking-[0.14em] text-console">
+              DB PLUS
+            </div>
+            <div className="mt-0.5 text-[11px] uppercase tracking-[0.06em] text-soil">
+              Agro Trading · Tamale
+            </div>
+          </>
+        )}
       </SidebarHeader>
-      <SidebarContent className="gap-0.5 px-1 pb-6 pt-2.5 [scrollbar-width:none]">
-        {adminNavGroups.map((group) => (
-          <SidebarGroup key={group.label} className="gap-px py-0">
-            <SidebarGroupLabel className="h-auto px-2.5 pb-[5px] pt-3.5 text-[10.5px] font-semibold uppercase tracking-[0.1em] text-soil/70">
-              {group.label}
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu className="gap-px">
-                {group.items.map((item) => (
-                  <SidebarMenuItem key={item.key}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={activeKey === item.key}
-                      className="h-auto justify-between gap-2 rounded-[6px] px-2.5 py-[7px] text-[13.5px] font-normal text-soil hover:bg-soil/10 hover:text-soil data-[active=true]:bg-console data-[active=true]:font-semibold data-[active=true]:text-white"
-                    >
-                      <Link
-                        href={item.href}
-                        onClick={() => setOpenMobile(false)}
+      <SidebarContent className="px-1.5 pb-6 pt-2.5 group-data-[collapsible=icon]:px-1 [scrollbar-width:none]">
+        <SidebarMenu className="gap-0.5">
+          {groups.map((group) => {
+            const Icon = GROUP_ICON[group.label];
+            const isOpen = expanded.includes(group.label);
+            const hasActive = group.items.some((i) => i.key === activeKey);
+            return (
+              <SidebarMenuItem key={group.label}>
+                <SidebarMenuButton
+                  title={collapsed ? group.label : undefined}
+                  aria-expanded={isOpen}
+                  // Collapsed: a click expands the rail and opens this group;
+                  // expanded: it just toggles the dropdown.
+                  onClick={() => {
+                    if (collapsed) {
+                      setOpen(true);
+                      setExpanded((prev) =>
+                        prev.includes(group.label)
+                          ? prev
+                          : [...prev, group.label],
+                      );
+                    } else {
+                      toggle(group.label);
+                    }
+                  }}
+                  className={cn(
+                    "h-auto cursor-pointer justify-between gap-2 rounded-[6px] px-2.5 py-[7px] text-[13px] font-semibold text-soil hover:bg-soil/10 hover:text-soil",
+                    hasActive && (!isOpen || collapsed) && "text-console",
+                  )}
+                >
+                  <span className="flex items-center gap-2">
+                    {Icon ? (
+                      <Icon
+                        className="h-[15px] w-[15px] flex-none"
+                        aria-hidden="true"
+                      />
+                    ) : null}
+                    {collapsed ? null : (
+                      <span className="whitespace-nowrap">{group.label}</span>
+                    )}
+                  </span>
+                  {collapsed ? null : isOpen ? (
+                    <ChevronDown
+                      className="h-3.5 w-3.5 flex-none text-soil/60"
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <ChevronRight
+                      className="h-3.5 w-3.5 flex-none text-soil/60"
+                      aria-hidden="true"
+                    />
+                  )}
+                </SidebarMenuButton>
+
+                {!collapsed && isOpen ? (
+                  <div className="ml-[15px] mt-0.5 flex flex-col gap-px border-l border-soil/15 pl-2">
+                    {group.items.map((item) => (
+                      <SidebarMenuButton
+                        key={item.key}
+                        asChild
+                        isActive={activeKey === item.key}
+                        className="h-auto justify-between gap-2 rounded-[6px] px-2.5 py-[6px] text-[13px] font-normal text-soil hover:bg-soil/10 hover:text-soil data-[active=true]:bg-console data-[active=true]:font-semibold data-[active=true]:text-white"
                       >
-                        <span className="whitespace-nowrap">{item.label}</span>
-                        {item.badge === "approvals" && pendingApprovals > 0 ? (
-                          <NavBadge count={pendingApprovals} />
-                        ) : null}
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
+                        <Link
+                          href={item.href}
+                          onClick={() => setOpenMobile(false)}
+                        >
+                          <span className="whitespace-nowrap">{item.label}</span>
+                          {item.badge === "approvals" && pendingApprovals > 0 ? (
+                            <NavBadge count={pendingApprovals} />
+                          ) : null}
+                        </Link>
+                      </SidebarMenuButton>
+                    ))}
+                  </div>
+                ) : null}
+              </SidebarMenuItem>
+            );
+          })}
+        </SidebarMenu>
       </SidebarContent>
       <SidebarFooter className="border-t border-soil/15 p-0">
         <SidebarSignOut />
       </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   );
 }
@@ -344,7 +403,7 @@ const MOBILE_TABS = [
   { key: "purchases", label: "Purchases", href: `${ADMIN_HOME}/purchases`, icon: "⇄" },
 ] as const;
 
-/** Bottom tabs (mobile) — the Menu tab opens the shadcn sidebar sheet. */
+/** Bottom tabs (mobile) - the Menu tab opens the shadcn sidebar sheet. */
 function MobileTabs({ activeKey }: { activeKey: string }) {
   const { openMobile, setOpenMobile } = useSidebar();
   const pendingApprovals = usePendingApprovalsCount();
@@ -397,14 +456,13 @@ function MobileTabs({ activeKey }: { activeKey: string }) {
 
 /**
  * The console chrome (from the DB Plus Console design), built on the shadcn
- * Sidebar: 224px white rail with grouped nav + a sign-out footer, a 54px
- * breadcrumb topbar with live search, the notifications bell and the account
- * menu (top right, dms-frontend style), and — on mobile — bottom tabs whose
- * Menu tab opens the sidebar as a sheet.
+ * Sidebar: 224px white rail with collapsible grouped nav + a sign-out footer, a
+ * 54px breadcrumb topbar with the account menu (top right, dms-frontend style),
+ * and - on mobile - bottom tabs whose Menu tab opens the sidebar as a sheet.
  */
 /** Breadcrumb beside the rail trigger: DB Plus / Section / (New | Detail).
  * The section links back to its register when a sub-page is open, and the
- * trail never disappears — on tiny widths only the brand root hides. */
+ * trail never disappears - on tiny widths only the brand root hides. */
 function Crumbs() {
   const pathname = usePathname();
   const title = screenTitle(pathname);
@@ -461,19 +519,24 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
       <SidebarInset className="min-w-0 bg-transparent pb-[62px] md:pb-0">
         <header className="sticky top-0 z-40 flex h-[54px] flex-none items-center gap-3 border-b border-soil/25 bg-paper px-4 lg:px-[26px]">
-          {/* Collapse/expand the rail (sheet on mobile) — dms behaviour in the
+          {/* Collapse/expand the rail (sheet on mobile) - dms behaviour in the
               console skin, living on the topbar's left edge. */}
           <SidebarTrigger className="h-[30px] w-[30px] flex-none cursor-pointer rounded-[6px] border border-soil/25 bg-paper text-soil hover:bg-surface-alt/70 hover:text-console max-md:hidden" />
           <Crumbs />
           <div className="flex-1" />
-          <NavbarSearch />
           {/* The notifications bell returns here when the notifications feed
               ships (Step 7) - an inert bell with a badge would advertise an
               unbuilt feature. */}
           <NavbarUser />
         </header>
 
-        <main className="mx-auto w-full min-w-0 max-w-[1360px] flex-1 p-4 lg:p-[26px]">
+        {/* A named CONTAINER, not just a layout box. Everything inside the
+            console sizes itself against this element's width rather than the
+            viewport's — which matters because the sidebar eats 16rem. On a
+            768px tablet a viewport-based `md:` fires while the content area is
+            only ~512px wide, which is exactly how a table ends up rendered
+            into half the room it was designed for. */}
+        <main className="@container/main mx-auto w-full min-w-0 max-w-[1360px] flex-1 p-4 lg:p-[26px]">
           {children}
         </main>
       </SidebarInset>

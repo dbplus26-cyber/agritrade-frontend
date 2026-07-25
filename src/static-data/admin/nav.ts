@@ -11,6 +11,8 @@ export interface AdminNavItem {
   href: string;
   /** Show the pending-approvals badge on this item. */
   badge?: "approvals";
+  /** Owner-only entry (hidden from staff, who would only hit a 403). */
+  ownerOnly?: boolean;
 }
 
 export interface AdminNavGroup {
@@ -20,50 +22,43 @@ export interface AdminNavGroup {
 
 export const ADMIN_HOME = "/admin";
 
-const item = (key: string, label: string, badge?: "approvals"): AdminNavItem => ({
+const item = (
+  key: string,
+  label: string,
+  opts?: { badge?: "approvals"; ownerOnly?: boolean },
+): AdminNavItem => ({
   key,
   label,
   href: key === "dashboard" ? ADMIN_HOME : `${ADMIN_HOME}/${key}`,
-  badge,
+  badge: opts?.badge,
+  ownerOnly: opts?.ownerOnly,
 });
 
 /**
  * Only BUILT modules appear in the rail - the sidebar is the honest map of
  * what the system can do today, so an unbuilt tab never masquerades as a
- * feature. Re-enable each commented entry in the step that ships it:
- *
- *   Step 4  - sales
- *   Step 5  - shipments, expenses
- *   Step 7  - notifications (+ topbar bell)
- *   Step 8  - reports (dashboard goes live the same step)
- *   Step 9  - plots, land-sales (Land & Farm group returns)
- *   Step 10 - seasons, farmers, grants, repayments
+ * feature. Groups render as collapsible dropdowns (dms-frontend convention);
+ * Land and Farm are separate dropdowns of their own.
  */
 export const adminNavGroups: AdminNavGroup[] = [
   {
     label: "Overview",
     items: [
       item("dashboard", "Dashboard"),
-      item("approvals", "Approvals", "approvals"),
-      // item("reports", "Reports"),
+      item("approvals", "Approvals", { badge: "approvals" }),
     ],
   },
   {
     label: "Trading",
     items: [
       item("purchases", "Purchases"),
-      // item("sales", "Sales"),
-      // item("shipments", "Shipments"),
       item("stock", "Stock"),
       item("commodities", "Commodities"),
       item("warehouses", "Warehouses"),
       item("agents", "Agents & Floats"),
-      // item("expenses", "Expenses"),
       item("expense-categories", "Expense Categories"),
     ],
   },
-  // Land & Farm group returns with the land module (Step 9):
-  // { label: "Land & Farm", items: [plots, land-sales, seasons, farmers, grants, repayments] },
   {
     label: "Directory",
     items: [item("suppliers", "Suppliers"), item("buyers", "Buyers")],
@@ -71,9 +66,8 @@ export const adminNavGroups: AdminNavGroup[] = [
   {
     label: "Admin",
     items: [
-      item("users", "Users"),
-      item("audit", "Audit Log"),
-      // item("notifications", "Notifications"),
+      item("users", "Users", { ownerOnly: true }),
+      item("audit", "Audit Log", { ownerOnly: true }),
       // "My profile" and "Settings" deliberately absent: both live behind
       // the navbar avatar menu (dms-frontend convention), not the rail.
     ],
