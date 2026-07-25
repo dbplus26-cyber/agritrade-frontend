@@ -13,12 +13,11 @@ export enum FloatTxType {
   ADJUSTMENT = "ADJUSTMENT",
 }
 
-/** Mirrors the backend `PaymentMethod` enum (GATEWAY is Hubtel-only). */
+/** Mirrors the backend `PaymentMethod` enum. Every payment is recorded by hand. */
 export enum PaymentMethod {
   CASH = "CASH",
   MOMO = "MOMO",
   BANK = "BANK",
-  GATEWAY = "GATEWAY",
 }
 
 /** One float ledger line (`toFloatTransactionDTO`); amountGhs is signed. */
@@ -141,7 +140,7 @@ export interface IFloatLedgerQuery {
   to?: string;
 }
 
-/** Mirrors backend `topUpSchema` (floats move by hand - never GATEWAY). */
+/** Mirrors backend `topUpSchema`. */
 export interface ITopUpInput {
   amountGhs: number;
   method: PaymentMethod.CASH | PaymentMethod.MOMO | PaymentMethod.BANK;

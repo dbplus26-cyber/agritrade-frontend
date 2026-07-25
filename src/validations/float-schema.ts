@@ -19,7 +19,7 @@ const amountField = (label: string) =>
 const optionalText = (max: number) =>
   z.string().trim().max(max).or(z.literal("")).optional();
 
-/** Owner cash to an agent - never GATEWAY (that is Hubtel's lane). */
+/** Owner cash to an agent. */
 export const topUpSchema = z.object({
   amountGhs: amountField("top-up amount"),
   method: z.enum([PaymentMethod.CASH, PaymentMethod.MOMO, PaymentMethod.BANK]),
