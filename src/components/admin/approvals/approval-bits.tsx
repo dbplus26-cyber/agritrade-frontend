@@ -9,12 +9,16 @@ export const ACTION_LABEL: Record<ApprovalAction, string> = {
   [ApprovalAction.PURCHASE_ABOVE_THRESHOLD]: "Purchase above threshold",
   [ApprovalAction.STOCK_ADJUSTMENT]: "Stock adjustment",
   [ApprovalAction.PUBLISH_TO_WEBSITE]: "Publish to website",
+  [ApprovalAction.LOAD_BELOW_MILESTONE]: "Load below milestone",
+  [ApprovalAction.INPUT_GRANT_ABOVE_THRESHOLD]: "Input grant above threshold",
 };
 
 export const ACTION_TONE: Record<ApprovalAction, Tone> = {
   [ApprovalAction.PURCHASE_ABOVE_THRESHOLD]: "harvest",
   [ApprovalAction.STOCK_ADJUSTMENT]: "sky",
   [ApprovalAction.PUBLISH_TO_WEBSITE]: "leaf",
+  [ApprovalAction.LOAD_BELOW_MILESTONE]: "alert",
+  [ApprovalAction.INPUT_GRANT_ABOVE_THRESHOLD]: "harvest",
 };
 
 export const APPROVAL_STATUS_LABEL: Record<ApprovalStatus, string> = {
@@ -91,8 +95,26 @@ export function summaryLine(
           .join(" - ") || null,
     };
   }
-  return {
-    headline: str(s.commodityName) ?? "Publish to website",
-    detail: str(s.reason),
-  };
+  if (action === ApprovalAction.INPUT_GRANT_ABOVE_THRESHOLD) {
+    const value = num(s.valueGhs) ?? num(s.amountGhs);
+    return {
+      headline: value !== null ? formatCedis(value) : "Input grant",
+      detail:
+        [str(s.itemName), str(s.farmerName)].filter(Boolean).join(" - ") || null,
+    };
+  }
+  if (action === ApprovalAction.LOAD_BELOW_MILESTONE) {
+    return {
+      headline: str(s.buyerName) ?? "Load below milestone",
+      detail: str(s.saleReference) ?? str(s.reason),
+    };
+  }
+  if (action === ApprovalAction.PUBLISH_TO_WEBSITE) {
+    return {
+      headline: str(s.commodityName) ?? str(s.reference) ?? "Publish to website",
+      detail: str(s.reason),
+    };
+  }
+  // Unknown/future action: never crash - fall back to the action label.
+  return { headline: ACTION_LABEL[action] ?? "Approval", detail: str(s.reason) };
 }

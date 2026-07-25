@@ -76,10 +76,20 @@ type Decision = { approval: IApproval; kind: "approve" | "reject" } | null;
  * itself.
  */
 export function ApprovalsInbox() {
-  const { page, filters, setFilter, setPage, resetFilters } = useTableQuery({
+  const {
+    page,
+    filters,
+    search: searchInput,
+    setSearch,
+    setFilter,
+    setPage,
+    resetFilters,
+    queryParams,
+  } = useTableQuery({
     defaults: FILTER_DEFAULTS,
   });
   const [decision, setDecision] = useState<Decision>(null);
+  const search = (queryParams.search as string | undefined) ?? "";
 
   const queryArgs = useMemo<IApprovalListQuery>(
     () => ({
@@ -89,10 +99,11 @@ export function ApprovalsInbox() {
       ...(filters.action !== "all"
         ? { action: filters.action as ApprovalAction }
         : {}),
+      ...(search ? { search } : {}),
       ...(filters.from ? { from: filters.from } : {}),
       ...(filters.to ? { to: filters.to } : {}),
     }),
-    [page, filters],
+    [page, filters, search],
   );
 
   const { data, isLoading, isError, error, refetch } =
@@ -143,7 +154,9 @@ export function ApprovalsInbox() {
       </div>
 
       <ConsoleFilterBar
-        hideSearch
+        search={searchInput}
+        onSearch={setSearch}
+        searchPlaceholder="Search commodity, amount, note…"
         activeCount={
           (filters.action !== "all" ? 1 : 0) +
           (filters.from ? 1 : 0) +
@@ -195,7 +208,7 @@ export function ApprovalsInbox() {
         </AdminCard>
       ) : (
         <>
-          <div className="grid gap-2.5">
+          <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
             {approvals.map((approval) => (
               <ApprovalCard
                 key={approval.id}

@@ -10,6 +10,8 @@ export enum ApprovalAction {
   PURCHASE_ABOVE_THRESHOLD = "PURCHASE_ABOVE_THRESHOLD",
   STOCK_ADJUSTMENT = "STOCK_ADJUSTMENT",
   PUBLISH_TO_WEBSITE = "PUBLISH_TO_WEBSITE",
+  LOAD_BELOW_MILESTONE = "LOAD_BELOW_MILESTONE",
+  INPUT_GRANT_ABOVE_THRESHOLD = "INPUT_GRANT_ABOVE_THRESHOLD",
 }
 
 /** Mirrors the backend `ApprovalStatus` enum. */
@@ -60,6 +62,7 @@ export interface IApprovalListQuery {
   limit?: number;
   status?: ApprovalStatus;
   action?: ApprovalAction;
+  search?: string;
   from?: string;
   to?: string;
 }
