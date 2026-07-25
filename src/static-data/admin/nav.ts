@@ -46,6 +46,7 @@ export const adminNavGroups: AdminNavGroup[] = [
     items: [
       item("dashboard", "Dashboard"),
       item("approvals", "Approvals", { badge: "approvals" }),
+      item("reports", "Reports"),
     ],
   },
   {

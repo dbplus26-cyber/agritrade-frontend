@@ -28,6 +28,7 @@ export const apiSliceTags = [
   "PaymentPolicies",
   "Purchases",
   "Reconciliations",
+  "Reports",
   "Sales",
   "SaleStats",
   "Settings",
