@@ -11,6 +11,41 @@ import { cn } from "@/lib/utils";
  * console look — screens compose these, never restyle shadcn directly.
  */
 
+/**
+ * A label/value row for detail pages. On narrow screens it stacks (label on
+ * top, value below) so long values like notes or addresses never get squeezed
+ * into a shared row; from ~480px it sits side-by-side (label left, value
+ * right). `mono` sets the numeric face; `strong` enlarges/bolds the value.
+ */
+export function DetailRow({
+  label,
+  children,
+  mono = false,
+  strong = false,
+}: {
+  children: React.ReactNode;
+  label: string;
+  mono?: boolean;
+  strong?: boolean;
+}) {
+  return (
+    <div className="flex flex-col gap-0.5 py-2 min-[480px]:flex-row min-[480px]:items-baseline min-[480px]:justify-between min-[480px]:gap-3">
+      <span className="flex-none text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+        {label}
+      </span>
+      <span
+        className={cn(
+          "min-w-0 text-[13.5px] text-ink [overflow-wrap:anywhere] min-[480px]:text-right",
+          mono && "font-adminmono tabular-nums",
+          strong && "text-[15px] font-bold",
+        )}
+      >
+        {children}
+      </span>
+    </div>
+  );
+}
+
 /** The design's six status tones — used by chips, dots and timeline marks.
  * Drawn from the brand palette so chips read in-system on paper grounds. */
 export const TONES = {
@@ -34,7 +69,9 @@ export function ToneBadge({
   children: React.ReactNode;
   className?: string;
 }) {
-  const t = TONES[tone];
+  // Fall back to a neutral tone if an unknown value slips through (e.g. a new
+  // backend enum the frontend hasn't mapped yet) - never crash the page.
+  const t = TONES[tone] ?? TONES.slate;
   return (
     <Badge
       className={cn(
