@@ -17,6 +17,7 @@ export const apiSliceTags = [
   "Sales",
   "SaleStats",
   "Settings",
+  "Shipments",
   "Stock",
   "StockMovements",
   "Suppliers",

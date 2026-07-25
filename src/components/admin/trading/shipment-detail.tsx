@@ -2,280 +2,623 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { AdminButton, AdminCard, Mono } from "@/components/admin/ui";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  AdminButton,
+  AdminCard,
+  AdminField,
+  AdminPageHeader,
+  DetailRow,
+  Mono,
+  adminInputClass,
+  adminSelectClass,
+} from "@/components/admin/ui";
+import { BackButton } from "@/components/ui/BackButton";
+import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { useConfirm } from "@/hooks/use-confirm";
+import { extractApiError } from "@/lib/extract-api-error";
+import { formatKg } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
-import { formatCedis } from "@/lib/format-money";
+import { useGetExpenseCategoriesQuery } from "@/redux/expense-categories/expense-categories-api";
 import {
-  SHIPMENT_STEPS,
-  type ShipmentDetail as ShipmentDetailPayload,
-} from "@/static-data/admin/trading";
-import { ActivityTimeline, BackLink, MetaList, SectionLabel, StatusChip } from "./bits";
-import { ConsoleDialog, ConsoleDialogBanner, ConsoleDialogFooter } from "./console-dialog";
+  useAddShipmentExpenseMutation,
+  useArriveShipmentMutation,
+  useCancelShipmentMutation,
+  useCloseShipmentMutation,
+  useDeleteShipmentExpenseMutation,
+  useDispatchShipmentMutation,
+  useGetAvailableLotsQuery,
+  useGetShipmentQuery,
+  useSetAllocationsMutation,
+} from "@/redux/shipments/shipments-api";
+import type { IShipment } from "@/types/admin-shipment.types";
+import {
+  cancelShipmentSchema,
+  shipmentExpenseSchema,
+  type CancelShipmentValues,
+  type ShipmentExpenseValues,
+} from "@/validations/shipment-schema";
+import { Money } from "./sale-bits";
+import {
+  CostBasisBadge,
+  ShipmentStatusBadge,
+  formatShipmentDate,
+} from "./shipment-bits";
 
-/** Lot statement header cell — pinned to the console's exact grid sizes. */
-const lotHeadClass = "h-8 py-0 text-[10px] font-bold uppercase tracking-[0.09em] text-soil";
+const LIST = "/admin/shipments";
 
-function Stepper({ currentStep }: { currentStep: number }) {
+/** Pick lots to load. Available lots come from the shipment's origin warehouse. */
+function AllocateDialog({
+  shipment,
+  onClose,
+}: {
+  shipment: IShipment;
+  onClose: () => void;
+}) {
+  const { data, isLoading } = useGetAvailableLotsQuery(shipment.id);
+  const [save, { isLoading: saving }] = useSetAllocationsMutation();
+  const [weights, setWeights] = useState<Record<string, string>>(() =>
+    Object.fromEntries(
+      shipment.allocations.map((a) => [a.lotId, String(a.weightKg)]),
+    ),
+  );
+  const lots = data?.data.lots ?? [];
+
+  const submit = async () => {
+    const allocations = lots
+      .map((l) => ({ lotId: l.id, weightKg: Number(weights[l.id] ?? 0) }))
+      .filter((a) => a.weightKg > 0);
+    try {
+      await save({ allocations, id: shipment.id }).unwrap();
+      notify.success("Allocations saved");
+      onClose();
+    } catch (err) {
+      notify.error("Couldn't save allocations", {
+        description: extractApiError(err).message,
+      });
+    }
+  };
+
   return (
-    <div className="mt-5 flex items-start overflow-x-auto border-t border-soil/15 pt-4">
-      {SHIPMENT_STEPS.map((label, i) => {
-        const done = i < currentStep;
-        const current = i === currentStep;
-        const hasLine = i < SHIPMENT_STEPS.length - 1;
-        return (
-          <div key={label} className={cn("flex min-w-0 items-start", hasLine ? "flex-1" : "flex-none")}>
-            <div className="flex min-w-[62px] flex-col items-center gap-[5px]">
-              <span
-                className="flex h-[22px] w-[22px] items-center justify-center rounded-full text-[11px] font-bold"
-                style={{
-                  background: done ? "#1E3D2B" : current ? "#F7EED8" : "#FFFFFF",
-                  color: done ? "#FFFFFF" : current ? "#7A5407" : "#9ba6b3",
-                  border: `1.5px solid ${done ? "#1E3D2B" : current ? "#B8860B" : "#D6DBE2"}`,
-                }}
-              >
-                {done ? "✓" : i + 1}
-              </span>
-              <span
-                className="whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.07em]"
-                style={{ color: done ? "#1E3D2B" : current ? "#7A5407" : "#9ba6b3" }}
-              >
-                {label}
-              </span>
-            </div>
-            {hasLine ? (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-[520px]">
+        <DialogHeader>
+          <DialogTitle>Allocate lots</DialogTitle>
+          <DialogDescription>
+            Choose how much to load from each lot. Leave a lot at zero to skip
+            it. Stock only leaves the warehouse when you dispatch.
+          </DialogDescription>
+        </DialogHeader>
+        {isLoading ? (
+          <DataTableSkeleton />
+        ) : lots.length === 0 ? (
+          <p className="py-3 text-[13px] text-soil">
+            No stock available in this warehouse for the sale&apos;s commodities.
+          </p>
+        ) : (
+          <div className="flex max-h-[50vh] flex-col gap-2 overflow-y-auto">
+            {lots.map((l) => (
               <div
-                className="mt-2.5 h-0.5 min-w-4 flex-1"
-                style={{ background: i < currentStep ? "#1E3D2B" : "#E2E5EA" }}
-              />
-            ) : null}
+                key={l.id}
+                className="grid grid-cols-[1fr_120px] items-center gap-2 border-b border-soil/10 pb-2"
+              >
+                <div className="min-w-0">
+                  <div className="truncate text-[13.5px] font-medium text-ink">
+                    {l.commodity.name}
+                  </div>
+                  <div className="text-[12px] text-soil">
+                    {formatKg(l.remainingKg)} available ·{" "}
+                    <Money value={l.unitCostGhs} />
+                    /kg
+                  </div>
+                </div>
+                <Input
+                  inputMode="decimal"
+                  placeholder="kg"
+                  className={adminInputClass}
+                  value={weights[l.id] ?? ""}
+                  onChange={(e) =>
+                    setWeights((w) => ({ ...w, [l.id]: e.target.value }))
+                  }
+                />
+              </div>
+            ))}
           </div>
-        );
-      })}
-    </div>
+        )}
+        <DialogFooter className="gap-2">
+          <AdminButton
+            type="button"
+            variant="outline"
+            className="h-9 px-3.5"
+            onClick={onClose}
+          >
+            Cancel
+          </AdminButton>
+          <AdminButton
+            type="button"
+            disabled={saving || lots.length === 0}
+            className="h-9 px-4"
+            onClick={() => void submit()}
+          >
+            {saving ? "Saving…" : "Save allocations"}
+          </AdminButton>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
-export function ShipmentDetail({ detail }: { detail: ShipmentDetailPayload }) {
-  const { row } = detail;
-  const [warnOpen, setWarnOpen] = useState(false);
-  const [awaiting, setAwaiting] = useState(false);
+function ExpenseDialog({
+  shipment,
+  onClose,
+}: {
+  shipment: IShipment;
+  onClose: () => void;
+}) {
+  const categories = useGetExpenseCategoriesQuery({
+    isActive: true,
+    limit: 100,
+  });
+  const [add, { isLoading }] = useAddShipmentExpenseMutation();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ShipmentExpenseValues>({
+    resolver: zodResolver(shipmentExpenseSchema),
+    defaultValues: { amountGhs: "", categoryId: "", description: "" },
+  });
 
-  const gate = detail.dispatchGate;
-  const canDispatch = detail.currentStep === 1;
-
-  const tryDispatch = () => {
-    if (gate && gate.paidCedis < gate.requiredCedis) setWarnOpen(true);
-    else notify.success(`Truck for ${row.ref} dispatched`);
-  };
-
-  const requestApproval = () => {
-    setWarnOpen(false);
-    setAwaiting(true);
-    notify.info("Sent for approval — truck stays until approved");
+  const onSubmit = async (values: ShipmentExpenseValues) => {
+    try {
+      await add({
+        body: {
+          amountGhs: Number(values.amountGhs),
+          categoryId: values.categoryId,
+          ...(values.description?.trim()
+            ? { description: values.description.trim() }
+            : {}),
+        },
+        id: shipment.id,
+      }).unwrap();
+      notify.success("Expense added");
+      onClose();
+    } catch (err) {
+      notify.error("Couldn't add the expense", {
+        description: extractApiError(err).message,
+      });
+    }
   };
 
   return (
-    <div>
-      <BackLink href="/admin/shipments">Shipments</BackLink>
-
-      <AdminCard className="mb-4 rounded-[8px] px-5 py-[18px]">
-        <div className="flex flex-wrap items-start justify-between gap-3.5">
-          <div>
-            <div className="flex flex-wrap items-center gap-2.5">
-              <h1 className="text-[20px] font-bold tracking-[-0.01em] text-ink">
-                Shipment <Mono>{row.ref}</Mono> — {row.route}
-              </h1>
-              <StatusChip tone={row.tone}>{row.status}</StatusChip>
-              {awaiting ? <StatusChip tone="harvest">Awaiting approval</StatusChip> : null}
-            </div>
-            <div className="mt-1 text-[12.5px] text-soil">
-              {detail.saleRef ? (
-                <>
-                  For Sale{" "}
-                  <Link href={`/admin/sales/${detail.saleRef}`} className="font-adminmono font-semibold text-console hover:underline">
-                    {detail.saleRef}
-                  </Link>{" "}
-                  · {detail.buyer} ·{" "}
-                </>
-              ) : (
-                <>Internal transfer · </>
-              )}
-              Truck {detail.truck} · Driver: {detail.driver}
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {canDispatch ? (
-              <AdminButton className="h-[34px]" onClick={tryDispatch}>
-                Dispatch truck
-              </AdminButton>
-            ) : null}
-            <AdminButton
-              variant="secondary"
-              className="h-[34px]"
-              onClick={() => notify.info(`Waybill for ${row.ref} sent to print`)}
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-[420px]">
+        <DialogHeader>
+          <DialogTitle>Add a shipment expense</DialogTitle>
+          <DialogDescription>
+            Transport, loading and the like - it feeds this shipment&apos;s
+            profit.
+          </DialogDescription>
+        </DialogHeader>
+        <form
+          noValidate
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col gap-3"
+        >
+          <AdminField label="Category" error={errors.categoryId?.message}>
+            <select
+              className={cn(adminSelectClass, "w-full")}
+              {...register("categoryId")}
             >
-              Print waybill
-            </AdminButton>
-          </div>
-        </div>
-        <Stepper currentStep={detail.currentStep} />
-      </AdminCard>
-
-      <div className="grid items-start gap-4 lg:grid-cols-[2fr_1fr]">
-        <div className="flex min-w-0 flex-col gap-4">
-          {detail.estimatedLotRef ? (
-            <div className="flex items-start gap-2.5 rounded-[8px] border border-[#EAD9AE] bg-[#F7EED8] px-3.5 py-3 text-[13px] text-[#7A5407]">
-              <span className="font-bold">⚠</span>
-              <span>
-                Cost basis for lot <Mono className="font-bold">{detail.estimatedLotRef}</Mono> is{" "}
-                <strong>estimated</strong> — lots were not selected at loading. Figures marked with ~ will settle when
-                receipts are matched.
-              </span>
-            </div>
-          ) : null}
-
-          {/* Lot allocation */}
-          <AdminCard className="overflow-hidden rounded-[8px]">
-            <div className="border-b border-soil/15 px-5 py-3">
-              <SectionLabel>Lot allocation</SectionLabel>
-            </div>
-            <Table className="table-fixed text-[13px]">
-              <TableHeader>
-                <TableRow className="border-soil/25 bg-surface-alt/70 hover:bg-surface-alt/70">
-                  <TableHead className={cn(lotHeadClass, "w-[112px] pl-5 pr-1.5 xl:w-[118px]")}>Lot</TableHead>
-                  <TableHead className={cn(lotHeadClass, "hidden px-1.5 xl:table-cell xl:w-[102px]")}>
-                    Origin purchase
-                  </TableHead>
-                  <TableHead className={cn(lotHeadClass, "w-[92px] px-1.5 text-right xl:w-[102px]")}>
-                    Loaded
-                  </TableHead>
-                  <TableHead className={cn(lotHeadClass, "w-[142px] px-1.5 text-right")}>Origin cost</TableHead>
-                  <TableHead className={cn(lotHeadClass, "w-[116px] pl-1.5 pr-5 xl:w-[126px]")}>Basis</TableHead>
-                  <TableHead aria-hidden="true" className={cn(lotHeadClass, "p-0")} />
-                </TableRow>
-              </TableHeader>
-              <TableBody className="[&_tr:last-child]:border-b">
-                {detail.lots.map((lot) => (
-                  <TableRow key={lot.ref} className="h-[42px] border-soil/15 hover:bg-transparent">
-                    <TableCell className="py-0 pl-5 pr-1.5">
-                      <Mono className="text-[12.5px] font-semibold text-ink">{lot.ref}</Mono>
-                    </TableCell>
-                    <TableCell className="hidden px-1.5 py-0 xl:table-cell">
-                      <Mono className="text-[12.5px] text-soil">{lot.origin}</Mono>
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap px-1.5 py-0 text-right">
-                      <Mono className="text-ink">{lot.loaded}</Mono>
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap px-1.5 py-0 text-right">
-                      <Mono className={cn("font-semibold", lot.estimated ? "text-[#7A5407]" : "text-ink")}>
-                        {lot.cost}
-                      </Mono>
-                    </TableCell>
-                    <TableCell className="py-0 pl-1.5 pr-5">
-                      <span
-                        className={cn(
-                          "inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-[0.08em]",
-                          lot.estimated
-                            ? "border border-console-gold text-[#7A5407]"
-                            : "border border-transparent bg-[#E6F0E9] text-[#2F5E3D]",
-                        )}
-                      >
-                        {lot.estimated ? "Estimated" : "Actual"}
-                      </span>
-                    </TableCell>
-                    <TableCell aria-hidden="true" className="p-0" />
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <div className="flex justify-between bg-surface-alt/50 px-5 py-[11px] text-[13px]">
-              <span className="font-semibold text-soil">Total loaded</span>
-              <Mono className="font-bold">
-                {detail.totalLoadedKg.toLocaleString("en-GH")} kg · {detail.totalLoadedCost}
-              </Mono>
-            </div>
-          </AdminCard>
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <AdminCard className="rounded-[8px] px-[18px] py-3.5">
-            <SectionLabel className="mb-2.5">Load photos</SectionLabel>
-            <div className="grid grid-cols-2 gap-2">
-              {detail.photoSlots.map((label, i) => (
-                <div
-                  key={label}
-                  className={cn(
-                    "flex h-24 items-center justify-center rounded-[6px] border border-dashed border-soil/25 bg-surface-alt/70 px-2 text-center text-[11.5px] text-soil/70",
-                    i === 2 ? "col-span-full" : detail.photoSlots.length === 1 ? "col-span-full" : undefined,
-                  )}
-                >
-                  {label}
-                </div>
+              <option value="">Choose a category</option>
+              {(categories.data?.data ?? []).map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
               ))}
-            </div>
-            <div className="mt-2 text-[11.5px] text-soil">
-              Photos are captured by the agent at loading and attach to the waybill.
-            </div>
-          </AdminCard>
-          <AdminCard className="rounded-[8px] px-[18px] py-3.5">
-            <SectionLabel className="mb-2.5">Details</SectionLabel>
-            <MetaList items={detail.meta} />
-          </AdminCard>
-          <AdminCard className="rounded-[8px] px-[18px] py-3.5">
-            <SectionLabel className="mb-3">Activity</SectionLabel>
-            <ActivityTimeline items={detail.timeline} />
-          </AdminCard>
-        </div>
+            </select>
+          </AdminField>
+          <AdminField label="Amount (GHS)" error={errors.amountGhs?.message}>
+            <Input
+              inputMode="decimal"
+              className={cn(adminInputClass, errors.amountGhs && "border-error")}
+              {...register("amountGhs")}
+            />
+          </AdminField>
+          <AdminField label="Description" optional>
+            <Input className={adminInputClass} {...register("description")} />
+          </AdminField>
+          <DialogFooter className="gap-2">
+            <AdminButton
+              type="button"
+              variant="outline"
+              className="h-9 px-3.5"
+              onClick={onClose}
+            >
+              Cancel
+            </AdminButton>
+            <AdminButton type="submit" disabled={isLoading} className="h-9 px-4">
+              {isLoading ? "Adding…" : "Add expense"}
+            </AdminButton>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function CancelDialog({
+  shipment,
+  onClose,
+}: {
+  shipment: IShipment;
+  onClose: () => void;
+}) {
+  const [cancel, { isLoading }] = useCancelShipmentMutation();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<CancelShipmentValues>({
+    resolver: zodResolver(cancelShipmentSchema),
+    defaultValues: { reason: "" },
+  });
+  const onSubmit = async (values: CancelShipmentValues) => {
+    try {
+      await cancel({ id: shipment.id, reason: values.reason }).unwrap();
+      notify.success("Shipment cancelled");
+      onClose();
+    } catch (err) {
+      notify.error("Couldn't cancel the shipment", {
+        description: extractApiError(err).message,
+      });
+    }
+  };
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-[420px]">
+        <DialogHeader>
+          <DialogTitle>Cancel this shipment?</DialogTitle>
+          <DialogDescription>
+            Only possible before dispatch, while no stock has moved.
+          </DialogDescription>
+        </DialogHeader>
+        <form
+          noValidate
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col gap-3"
+        >
+          <AdminField label="Reason" error={errors.reason?.message}>
+            <Input
+              className={cn(adminInputClass, errors.reason && "border-error")}
+              {...register("reason")}
+            />
+          </AdminField>
+          <DialogFooter className="gap-2">
+            <AdminButton
+              type="button"
+              variant="outline"
+              className="h-9 px-3.5"
+              onClick={onClose}
+            >
+              Keep it
+            </AdminButton>
+            <AdminButton
+              type="submit"
+              variant="danger"
+              disabled={isLoading}
+              className="h-9 px-4"
+            >
+              {isLoading ? "Cancelling…" : "Cancel shipment"}
+            </AdminButton>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export function ShipmentDetail({ id }: { id: string }) {
+  const { data, isLoading, isError, error, refetch } = useGetShipmentQuery(id);
+  const [dispatchShipment, dispatchState] = useDispatchShipmentMutation();
+  const [arrive, arriveState] = useArriveShipmentMutation();
+  const [close, closeState] = useCloseShipmentMutation();
+  const [deleteExpense] = useDeleteShipmentExpenseMutation();
+  const { confirm, confirmationDialog } = useConfirm();
+  const [allocOpen, setAllocOpen] = useState(false);
+  const [expenseOpen, setExpenseOpen] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
+
+  if (isLoading) return <DataTableSkeleton />;
+  if (isError || !data)
+    return (
+      <ErrorMessage
+        description={extractApiError(error).message}
+        onRetry={() => void refetch()}
+      />
+    );
+
+  const s = data.data.shipment;
+  const beforeDispatch = s.status === "PLANNED" || s.status === "LOADING";
+
+  const onDispatch = async () => {
+    const ok = await confirm({
+      title: "Dispatch this shipment?",
+      description:
+        "Stock leaves the warehouse now. If loading is below the payment milestone, the owner must approve it first.",
+      confirmText: "Dispatch",
+    });
+    if (!ok) return;
+    try {
+      await dispatchShipment(s.id).unwrap();
+      notify.success("Shipment dispatched - stock has left the warehouse");
+    } catch (err) {
+      // The milestone gate returns a clear message here.
+      notify.error("Couldn't dispatch", {
+        description: extractApiError(err).message,
+      });
+    }
+  };
+
+  const onArrive = async () => {
+    try {
+      await arrive(s.id).unwrap();
+      notify.success("Marked arrived");
+    } catch (err) {
+      notify.error("Couldn't update", {
+        description: extractApiError(err).message,
+      });
+    }
+  };
+
+  const onClose = async () => {
+    try {
+      await close(s.id).unwrap();
+      notify.success("Shipment closed");
+    } catch (err) {
+      notify.error("Couldn't close", {
+        description: extractApiError(err).message,
+      });
+    }
+  };
+
+  const onRemoveExpense = async (expenseId: string) => {
+    try {
+      await deleteExpense({ expenseId, id: s.id }).unwrap();
+      notify.success("Expense removed");
+    } catch (err) {
+      notify.error("Couldn't remove the expense", {
+        description: extractApiError(err).message,
+      });
+    }
+  };
+
+  return (
+    <div className="max-w-[760px]">
+      <BackButton href={LIST} label="All shipments" className="mb-2" />
+      <AdminPageHeader
+        title={`${s.truckReg} · ${s.destination}`}
+        sub={`For ${s.sale.buyer.name} · from ${s.originWarehouse.name}`}
+        actions={
+          <span className="flex flex-wrap items-center gap-1.5">
+            <ShipmentStatusBadge status={s.status} />
+            <CostBasisBadge basis={s.costBasis} />
+          </span>
+        }
+      />
+
+      {/* Actions */}
+      <div className="mb-4 flex flex-wrap gap-2">
+        {beforeDispatch ? (
+          <>
+            <AdminButton className="h-9 px-4" onClick={() => setAllocOpen(true)}>
+              Allocate lots
+            </AdminButton>
+            <AdminButton
+              className="h-9 px-4"
+              disabled={dispatchState.isLoading}
+              onClick={() => void onDispatch()}
+            >
+              {dispatchState.isLoading ? "Dispatching…" : "Dispatch"}
+            </AdminButton>
+            <AdminButton
+              variant="outline"
+              className="h-9 px-4"
+              onClick={() => setCancelOpen(true)}
+            >
+              Cancel
+            </AdminButton>
+          </>
+        ) : null}
+        {s.status === "DISPATCHED" ? (
+          <AdminButton
+            className="h-9 px-4"
+            disabled={arriveState.isLoading}
+            onClick={() => void onArrive()}
+          >
+            {arriveState.isLoading ? "Updating…" : "Mark arrived"}
+          </AdminButton>
+        ) : null}
+        {s.status === "ARRIVED" ? (
+          <AdminButton
+            className="h-9 px-4"
+            disabled={closeState.isLoading}
+            onClick={() => void onClose()}
+          >
+            {closeState.isLoading ? "Closing…" : "Close shipment"}
+          </AdminButton>
+        ) : null}
+        {s.totalWeightKg > 0 ? (
+          <AdminButton variant="outline" className="h-9 px-4" asChild>
+            <Link href={`${LIST}/${s.id}/waybill`}>Waybill</Link>
+          </AdminButton>
+        ) : null}
       </div>
 
-      {/* Warn-then-approve dialog */}
-      {gate ? (
-        <ConsoleDialog open={warnOpen} onOpenChange={setWarnOpen} widthClass="max-w-[460px] sm:max-w-[460px]">
-          <ConsoleDialogBanner variant="warn" icon="⚠">
-            Payment milestone not met
-          </ConsoleDialogBanner>
-          <div className="px-5 py-[18px]">
-            <div className="text-[14px] leading-[1.55] text-ink">
-              Dispatching {row.ref} requires <strong>{gate.requiredPct}% payment</strong> on Sale {gate.saleRef}.
-            </div>
-            <div className="mt-3 rounded-[8px] border border-soil/25 bg-surface-alt/70 px-3.5 py-3">
-              <div className="flex justify-between py-[3px] text-[13px]">
-                <span className="text-soil">Paid so far</span>
-                <Mono className="font-semibold">{formatCedis(gate.paidCedis)}</Mono>
-              </div>
-              <div className="flex justify-between py-[3px] text-[13px]">
-                <span className="text-soil">Required ({gate.requiredPct}%)</span>
-                <Mono className="font-semibold">{formatCedis(gate.requiredCedis)}</Mono>
-              </div>
-              <div className="mt-1 flex justify-between border-t border-soil/25 pb-[3px] pt-[7px] text-[13px]">
-                <span className="font-semibold text-[#7A5407]">Shortfall</span>
-                <Mono className="font-bold text-[#7A5407]">{formatCedis(gate.requiredCedis - gate.paidCedis)}</Mono>
-              </div>
-            </div>
-            <div className="mt-3 text-[13px] text-soil">
-              Proceeding sends this dispatch to the owner for approval. The truck stays at the warehouse until it is
-              approved.
-            </div>
-          </div>
-          <ConsoleDialogFooter>
-            <AdminButton variant="secondary" className="h-[38px]" onClick={() => setWarnOpen(false)}>
-              Go back
-            </AdminButton>
-            <AdminButton variant="gold" className="h-[38px]" onClick={requestApproval}>
-              Request approval &amp; proceed
-            </AdminButton>
-          </ConsoleDialogFooter>
-        </ConsoleDialog>
+      {s.status === "CANCELLED" && s.cancelReason ? (
+        <AdminCard className="mb-4 border-error/40 bg-error/[0.04] px-4 py-3 text-[13px] text-ink">
+          Cancelled: {s.cancelReason}
+        </AdminCard>
       ) : null}
+
+      {/* Logistics + profit */}
+      <div className="mb-4 grid gap-4 md:grid-cols-2">
+        <AdminCard className="px-5 py-3">
+          <DetailRow label="Truck">{s.truckReg}</DetailRow>
+          <div className="border-t border-soil/12">
+            <DetailRow label="Driver">
+              {s.driverName}
+              {s.driverPhone ? ` · ${s.driverPhone}` : ""}
+            </DetailRow>
+          </div>
+          <div className="border-t border-soil/12">
+            <DetailRow label="Route">
+              {s.originWarehouse.name} → {s.destination}
+            </DetailRow>
+          </div>
+          <div className="border-t border-soil/12">
+            <DetailRow label="Total weight">{formatKg(s.totalWeightKg)}</DetailRow>
+          </div>
+          {s.departedAt ? (
+            <div className="border-t border-soil/12">
+              <DetailRow label="Departed">{formatShipmentDate(s.departedAt)}</DetailRow>
+            </div>
+          ) : null}
+          {s.arrivedAt ? (
+            <div className="border-t border-soil/12">
+              <DetailRow label="Arrived">{formatShipmentDate(s.arrivedAt)}</DetailRow>
+            </div>
+          ) : null}
+        </AdminCard>
+
+        <AdminCard className="px-5 py-3">
+          <div className="mb-1 flex items-center gap-2 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+            Profit <CostBasisBadge basis={s.profit.costBasis} />
+          </div>
+          <DetailRow label="Revenue">
+            <Money value={s.profit.revenueGhs} />
+          </DetailRow>
+          <div className="border-t border-soil/12">
+            <DetailRow label="Lot cost">
+              <Money value={s.profit.costGhs} />
+            </DetailRow>
+          </div>
+          <div className="border-t border-soil/12">
+            <DetailRow label="Expenses">
+              <Money value={s.profit.expensesGhs} />
+            </DetailRow>
+          </div>
+          <div className="border-t border-soil/12">
+            <DetailRow label="Profit">
+              <Mono className="font-bold text-ink">
+                <Money value={s.profit.profitGhs} />
+              </Mono>
+            </DetailRow>
+          </div>
+        </AdminCard>
+      </div>
+
+      {/* Allocations */}
+      <AdminCard className="mb-4 px-5 py-3">
+        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+          Loaded lots
+        </div>
+        {s.allocations.length === 0 ? (
+          <p className="py-2 text-[13px] text-soil">
+            No lots allocated yet. Dispatching without allocations auto-fills
+            from the oldest stock (flagged estimated).
+          </p>
+        ) : (
+          s.allocations.map((a) => (
+            <div
+              key={a.id}
+              className="flex items-baseline justify-between gap-3 border-b border-soil/10 py-2 last:border-b-0"
+            >
+              <div className="min-w-0">
+                <span className="font-medium text-ink">{a.commodity.name}</span>
+                <Mono className="ml-2 text-[12px] text-soil">
+                  {formatKg(a.weightKg)} @{" "}
+                  <Money value={a.unitCostSnapshotGhs} />
+                </Mono>
+              </div>
+              <Mono className="whitespace-nowrap text-[13px] text-ink">
+                <Money value={a.lineCostGhs} />
+              </Mono>
+            </div>
+          ))
+        )}
+      </AdminCard>
+
+      {/* Expenses */}
+      <AdminCard className="px-5 py-3">
+        <div className="mb-1 flex items-center justify-between">
+          <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+            Expenses
+          </span>
+          <AdminButton
+            variant="outline"
+            className="h-7 px-2.5 text-[12px]"
+            onClick={() => setExpenseOpen(true)}
+          >
+            + Add
+          </AdminButton>
+        </div>
+        {s.expenses.length === 0 ? (
+          <p className="py-2 text-[13px] text-soil">No expenses recorded.</p>
+        ) : (
+          s.expenses.map((e) => (
+            <div
+              key={e.id}
+              className="flex items-baseline justify-between gap-3 border-b border-soil/10 py-2 last:border-b-0"
+            >
+              <div className="min-w-0">
+                <span className="text-ink">{e.category.name}</span>
+                {e.description ? (
+                  <span className="ml-2 text-[12px] text-soil">
+                    {e.description}
+                  </span>
+                ) : null}
+              </div>
+              <div className="flex items-center gap-3">
+                <Mono className="whitespace-nowrap text-[13px] text-ink">
+                  <Money value={e.amountGhs} />
+                </Mono>
+                <button
+                  type="button"
+                  onClick={() => void onRemoveExpense(e.id)}
+                  className="text-[12px] text-console-red"
+                  aria-label="Remove expense"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </AdminCard>
+
+      {allocOpen ? (
+        <AllocateDialog shipment={s} onClose={() => setAllocOpen(false)} />
+      ) : null}
+      {expenseOpen ? (
+        <ExpenseDialog shipment={s} onClose={() => setExpenseOpen(false)} />
+      ) : null}
+      {cancelOpen ? (
+        <CancelDialog shipment={s} onClose={() => setCancelOpen(false)} />
+      ) : null}
+      {confirmationDialog}
     </div>
   );
 }
