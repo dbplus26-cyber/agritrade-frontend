@@ -107,6 +107,8 @@ export interface IRegistryListQuery {
   limit?: number;
   search?: string;
   isActive?: boolean;
+  from?: string;
+  to?: string;
 }
 
 export interface ICommodityListQuery extends IRegistryListQuery {

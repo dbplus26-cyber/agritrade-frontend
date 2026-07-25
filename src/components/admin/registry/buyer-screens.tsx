@@ -1,13 +1,17 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
-import { ConsoleFilterBar, ConsoleLabeledSelect } from "@/components/admin/filter-bar";
+import {
+  ConsoleDateField,
+  ConsoleFilterBar,
+  ConsoleLabeledSelect,
+} from "@/components/admin/filter-bar";
 import {
   AdminButton,
   AdminCard,
@@ -45,9 +49,10 @@ import {
   statusToQuery,
   type StatusFilter,
 } from "./registry-bits";
+import { RecordTimestamps } from "./supplier-screens";
 
 const LIST = "/admin/buyers";
-const FILTER_DEFAULTS = { status: "all", size: "10" };
+const FILTER_DEFAULTS = { status: "all", size: "10", from: "", to: "" };
 
 /** The live Buyers directory. */
 export function BuyerTable() {
@@ -64,6 +69,8 @@ export function BuyerTable() {
   } = useTableQuery({ defaults: FILTER_DEFAULTS });
 
   const statusFilter = filters.status as StatusFilter;
+  const from = filters.from;
+  const to = filters.to;
   const pageSize = Number(filters.size) || 10;
   const search = (queryParams.search as string | undefined) ?? "";
 
@@ -73,15 +80,18 @@ export function BuyerTable() {
       limit: pageSize,
       ...(search ? { search } : {}),
       ...statusToQuery(statusFilter),
+      ...(from ? { from } : {}),
+      ...(to ? { to } : {}),
     }),
-    [page, pageSize, search, statusFilter],
+    [page, pageSize, search, statusFilter, from, to],
   );
 
   const { data, isLoading, isFetching, isError, error, refetch } =
     useGetBuyersQuery(queryArgs);
   const buyers = data?.data ?? [];
   const totalCount = data?.meta.total ?? 0;
-  const activeFilterCount = statusFilter !== "all" ? 1 : 0;
+  const activeFilterCount =
+    (statusFilter !== "all" ? 1 : 0) + (from ? 1 : 0) + (to ? 1 : 0);
 
   const columns = useMemo<ColumnDef<IBuyer, unknown>[]>(
     () => [
@@ -182,6 +192,18 @@ export function BuyerTable() {
             active={statusFilter !== "all"}
             className="lg:w-[150px]"
           />
+          <ConsoleDateField
+            label="Added from"
+            value={from}
+            onChange={(v) => setFilter("from", v)}
+            max={to || undefined}
+          />
+          <ConsoleDateField
+            label="Added to"
+            value={to}
+            onChange={(v) => setFilter("to", v)}
+            min={from || undefined}
+          />
         </ConsoleFilterBar>
       )}
 
@@ -245,9 +267,15 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
   const [updateBuyer, updateState] = useUpdateBuyerMutation();
   const saving = createState.isLoading || updateState.isLoading;
 
+  // Edit screens open READ-ONLY; the Edit button unlocks the inputs.
+  const [isEditing, setIsEditing] = useState(!isEdit);
+  const readOnly = !isEditing;
+  const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
+
   const {
     register,
     handleSubmit,
+    reset,
     setError,
     formState: { errors },
   } = useForm<BuyerValues>({
@@ -280,6 +308,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
           },
         }).unwrap();
         notify.success("Buyer updated");
+        setIsEditing(false);
       } else {
         const res = await createBuyer({
           name: values.name,
@@ -316,7 +345,8 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
         <AdminField label="Name" error={errors.name?.message}>
           <Input
             placeholder="e.g. Accra Grain Traders"
-            className={cn(adminInputClass, errors.name && "border-error")}
+            disabled={readOnly}
+            className={cn(adminInputClass, roCls, errors.name && "border-error")}
             {...register("name")}
           />
         </AdminField>
@@ -325,14 +355,16 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
             <Input
               type="tel"
               placeholder="055 000 0000"
-              className={cn(adminInputClass, errors.phone && "border-error")}
+              disabled={readOnly}
+              className={cn(adminInputClass, roCls, errors.phone && "border-error")}
               {...register("phone")}
             />
           </AdminField>
           <AdminField label="City" optional error={errors.city?.message}>
             <Input
               placeholder="e.g. Accra"
-              className={cn(adminInputClass, errors.city && "border-error")}
+              disabled={readOnly}
+              className={cn(adminInputClass, roCls, errors.city && "border-error")}
               {...register("city")}
             />
           </AdminField>
@@ -341,7 +373,8 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
           <Input
             type="email"
             placeholder="orders@buyer.com"
-            className={cn(adminInputClass, errors.email && "border-error")}
+            disabled={readOnly}
+            className={cn(adminInputClass, roCls, errors.email && "border-error")}
             {...register("email")}
           />
         </AdminField>
@@ -349,8 +382,10 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
           <textarea
             rows={3}
             placeholder="Anything worth remembering about this buyer."
+            disabled={readOnly}
             className={cn(
               adminInputClass,
+              roCls,
               "h-auto min-h-[76px] w-full resize-y py-2",
               errors.notes && "border-error",
             )}
@@ -358,17 +393,55 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
           />
         </AdminField>
         <div className="mt-1 flex gap-2">
-          <AdminButton type="submit" disabled={saving} className="h-[38px] px-[18px]">
-            {saving ? "Saving…" : isEdit ? "Save changes" : "Create buyer"}
-          </AdminButton>
-          <AdminButton
-            type="button"
-            variant="outline"
-            className="h-[38px] px-3.5"
-            onClick={() => router.push(LIST)}
-          >
-            Cancel
-          </AdminButton>
+          {!isEdit ? (
+            <>
+              <AdminButton
+                type="submit"
+                disabled={saving}
+                className="h-[38px] px-[18px]"
+              >
+                {saving ? "Saving…" : "Create buyer"}
+              </AdminButton>
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-[38px] px-3.5"
+                onClick={() => router.push(LIST)}
+              >
+                Cancel
+              </AdminButton>
+            </>
+          ) : isEditing ? (
+            <>
+              <AdminButton
+                type="submit"
+                disabled={saving}
+                className="h-[38px] px-[18px]"
+              >
+                {saving ? "Saving…" : "Save changes"}
+              </AdminButton>
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-[38px] px-3.5"
+                onClick={() => {
+                  reset();
+                  setIsEditing(false);
+                }}
+              >
+                Cancel
+              </AdminButton>
+            </>
+          ) : (
+            <AdminButton
+              type="button"
+              variant="gold"
+              className="h-[38px] px-[18px]"
+              onClick={() => setIsEditing(true)}
+            >
+              Edit buyer
+            </AdminButton>
+          )}
         </div>
       </form>
     </AdminCard>
@@ -412,6 +485,7 @@ export function BuyerEdit({ id }: { id: string }) {
         sub="Edit the buyer and their lifecycle"
       />
       <BuyerFormFields key={buyer.updatedAt} buyer={buyer} />
+      <RecordTimestamps createdAt={buyer.createdAt} updatedAt={buyer.updatedAt} />
       <LifecycleActions
         noun="buyer"
         name={buyer.name}

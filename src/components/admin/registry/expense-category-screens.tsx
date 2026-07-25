@@ -31,6 +31,7 @@ import {
   useUpdateExpenseCategoryMutation,
 } from "@/redux/expense-categories/expense-categories-api";
 import { useTableQuery } from "@/hooks/use-table-query";
+import { useAuthRole } from "@/hooks/use-auth-role";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
@@ -67,6 +68,8 @@ export function ExpenseCategoryTable() {
     resetFilters,
     queryParams,
   } = useTableQuery({ defaults: FILTER_DEFAULTS });
+  // Only the owner edits this vocabulary (design doc 4).
+  const { isSuperAdmin } = useAuthRole();
 
   const statusFilter = filters.status as StatusFilter;
   const pageSize = Number(filters.size) || 10;
@@ -136,9 +139,11 @@ export function ExpenseCategoryTable() {
           activeCount={activeFilterCount}
           onClear={resetFilters}
           action={
-            <Button asChild variant="harvest" className="h-8 px-3.5 text-[13px]">
-              <Link href={`${LIST}/new`}>+ Add category</Link>
-            </Button>
+            isSuperAdmin ? (
+              <Button asChild variant="harvest" className="h-8 px-3.5 text-[13px]">
+                <Link href={`${LIST}/new`}>+ Add category</Link>
+              </Button>
+            ) : null
           }
         >
           <ConsoleLabeledSelect

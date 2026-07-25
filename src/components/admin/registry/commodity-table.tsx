@@ -16,6 +16,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useGetCommoditiesQuery } from "@/redux/commodities/commodities-api";
 import { useTableQuery } from "@/hooks/use-table-query";
+import { useAuthRole } from "@/hooks/use-auth-role";
 import { extractApiError } from "@/lib/extract-api-error";
 import type { ICommodity, ICommodityListQuery } from "@/types/registry.types";
 import {
@@ -50,6 +51,8 @@ export function CommodityTable() {
     resetFilters,
     queryParams,
   } = useTableQuery({ defaults: FILTER_DEFAULTS });
+  // Only the owner edits this vocabulary (design doc 4).
+  const { isSuperAdmin } = useAuthRole();
 
   const statusFilter = filters.status as StatusFilter;
   const visibilityFilter = filters.visibility;
@@ -191,13 +194,15 @@ export function CommodityTable() {
           activeCount={activeFilterCount}
           onClear={resetFilters}
           action={
-            <Button
-              asChild
-              variant="harvest"
-              className="h-8 px-3.5 text-[13px]"
-            >
-              <Link href="/admin/commodities/new">+ Add commodity</Link>
-            </Button>
+            isSuperAdmin ? (
+              <Button
+                asChild
+                variant="harvest"
+                className="h-8 px-3.5 text-[13px]"
+              >
+                <Link href="/admin/commodities/new">+ Add commodity</Link>
+              </Button>
+            ) : null
           }
         >
           <ConsoleLabeledSelect

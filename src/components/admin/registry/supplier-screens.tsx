@@ -1,13 +1,17 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
-import { ConsoleFilterBar, ConsoleLabeledSelect } from "@/components/admin/filter-bar";
+import {
+  ConsoleDateField,
+  ConsoleFilterBar,
+  ConsoleLabeledSelect,
+} from "@/components/admin/filter-bar";
 import {
   AdminButton,
   AdminCard,
@@ -63,7 +67,35 @@ import {
 } from "./registry-bits";
 
 const LIST = "/admin/suppliers";
-const FILTER_DEFAULTS = { status: "all", source: "all", size: "10" };
+const FILTER_DEFAULTS = { status: "all", source: "all", size: "10", from: "", to: "" };
+
+/** Date + time, e.g. "12 Jul 2026, 2:30 PM". */
+export const formatDateTime = (value: string): string =>
+  new Date(value).toLocaleString(undefined, {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+
+/** "Added" / "Updated" timestamp line for a directory detail view. */
+export function RecordTimestamps({
+  createdAt,
+  updatedAt,
+}: {
+  createdAt: string;
+  updatedAt: string;
+}) {
+  return (
+    <p className="mt-3 text-[12px] text-soil/80">
+      Added {formatDateTime(createdAt)}
+      {updatedAt && updatedAt !== createdAt ? (
+        <> · Updated {formatDateTime(updatedAt)}</>
+      ) : null}
+    </p>
+  );
+}
 
 const SOURCE_FILTER_OPTIONS = [
   { value: "all", label: "All sources" },
@@ -94,6 +126,8 @@ export function SupplierTable() {
 
   const statusFilter = filters.status as StatusFilter;
   const sourceFilter = filters.source;
+  const from = filters.from;
+  const to = filters.to;
   const pageSize = Number(filters.size) || 10;
   const search = (queryParams.search as string | undefined) ?? "";
 
@@ -106,8 +140,10 @@ export function SupplierTable() {
       ...(sourceFilter !== "all"
         ? { sourceType: sourceFilter as PurchaseSource }
         : {}),
+      ...(from ? { from } : {}),
+      ...(to ? { to } : {}),
     }),
-    [page, pageSize, search, statusFilter, sourceFilter],
+    [page, pageSize, search, statusFilter, sourceFilter, from, to],
   );
 
   const { data, isLoading, isFetching, isError, error, refetch } =
@@ -115,7 +151,10 @@ export function SupplierTable() {
   const suppliers = data?.data ?? [];
   const totalCount = data?.meta.total ?? 0;
   const activeFilterCount =
-    (statusFilter !== "all" ? 1 : 0) + (sourceFilter !== "all" ? 1 : 0);
+    (statusFilter !== "all" ? 1 : 0) +
+    (sourceFilter !== "all" ? 1 : 0) +
+    (from ? 1 : 0) +
+    (to ? 1 : 0);
 
   const columns = useMemo<ColumnDef<ISupplier, unknown>[]>(
     () => [
@@ -223,6 +262,18 @@ export function SupplierTable() {
             active={statusFilter !== "all"}
             className="lg:w-[150px]"
           />
+          <ConsoleDateField
+            label="Added from"
+            value={from}
+            onChange={(v) => setFilter("from", v)}
+            max={to || undefined}
+          />
+          <ConsoleDateField
+            label="Added to"
+            value={to}
+            onChange={(v) => setFilter("to", v)}
+            min={from || undefined}
+          />
         </ConsoleFilterBar>
       )}
 
@@ -286,10 +337,18 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
   const [updateSupplier, updateState] = useUpdateSupplierMutation();
   const saving = createState.isLoading || updateState.isLoading;
 
+  // Edit screens open READ-ONLY; the Edit button unlocks the inputs. Create is
+  // always editable.
+  const [isEditing, setIsEditing] = useState(!isEdit);
+  const readOnly = !isEditing;
+  // Keep disabled inputs legible as a read view rather than a greyed-out form.
+  const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
+
   const {
     register,
     control,
     handleSubmit,
+    reset,
     setError,
     formState: { errors },
   } = useForm<SupplierValues>({
@@ -322,6 +381,7 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
           },
         }).unwrap();
         notify.success("Supplier updated");
+        setIsEditing(false);
       } else {
         const res = await createSupplier({
           name: values.name,
@@ -360,7 +420,8 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
         <AdminField label="Name" error={errors.name?.message}>
           <Input
             placeholder="e.g. Ibrahim Fuseini"
-            className={cn(adminInputClass, errors.name && "border-error")}
+            disabled={readOnly}
+            className={cn(adminInputClass, roCls, errors.name && "border-error")}
             {...register("name")}
           />
         </AdminField>
@@ -369,7 +430,8 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
             <Input
               type="tel"
               placeholder="024 000 0000"
-              className={cn(adminInputClass, errors.phone && "border-error")}
+              disabled={readOnly}
+              className={cn(adminInputClass, roCls, errors.phone && "border-error")}
               {...register("phone")}
             />
           </AdminField>
@@ -380,7 +442,12 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
           >
             <Input
               placeholder="e.g. Savelugu"
-              className={cn(adminInputClass, errors.community && "border-error")}
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                errors.community && "border-error",
+              )}
               {...register("community")}
             />
           </AdminField>
@@ -393,8 +460,12 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
             control={control}
             name="sourceType"
             render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className={cn(adminSelectClass, "w-full")}>
+              <Select
+                value={field.value}
+                onValueChange={field.onChange}
+                disabled={readOnly}
+              >
+                <SelectTrigger className={cn(adminSelectClass, roCls, "w-full")}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -412,8 +483,10 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
           <textarea
             rows={3}
             placeholder="Anything worth remembering about this supplier."
+            disabled={readOnly}
             className={cn(
               adminInputClass,
+              roCls,
               "h-auto min-h-[76px] w-full resize-y py-2",
               errors.notes && "border-error",
             )}
@@ -421,17 +494,55 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
           />
         </AdminField>
         <div className="mt-1 flex gap-2">
-          <AdminButton type="submit" disabled={saving} className="h-[38px] px-[18px]">
-            {saving ? "Saving…" : isEdit ? "Save changes" : "Create supplier"}
-          </AdminButton>
-          <AdminButton
-            type="button"
-            variant="outline"
-            className="h-[38px] px-3.5"
-            onClick={() => router.push(LIST)}
-          >
-            Cancel
-          </AdminButton>
+          {!isEdit ? (
+            <>
+              <AdminButton
+                type="submit"
+                disabled={saving}
+                className="h-[38px] px-[18px]"
+              >
+                {saving ? "Saving…" : "Create supplier"}
+              </AdminButton>
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-[38px] px-3.5"
+                onClick={() => router.push(LIST)}
+              >
+                Cancel
+              </AdminButton>
+            </>
+          ) : isEditing ? (
+            <>
+              <AdminButton
+                type="submit"
+                disabled={saving}
+                className="h-[38px] px-[18px]"
+              >
+                {saving ? "Saving…" : "Save changes"}
+              </AdminButton>
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-[38px] px-3.5"
+                onClick={() => {
+                  reset();
+                  setIsEditing(false);
+                }}
+              >
+                Cancel
+              </AdminButton>
+            </>
+          ) : (
+            <AdminButton
+              type="button"
+              variant="gold"
+              className="h-[38px] px-[18px]"
+              onClick={() => setIsEditing(true)}
+            >
+              Edit supplier
+            </AdminButton>
+          )}
         </div>
       </form>
     </AdminCard>
@@ -475,6 +586,10 @@ export function SupplierEdit({ id }: { id: string }) {
         sub="Edit the supplier and their lifecycle"
       />
       <SupplierFormFields key={supplier.updatedAt} supplier={supplier} />
+      <RecordTimestamps
+        createdAt={supplier.createdAt}
+        updatedAt={supplier.updatedAt}
+      />
       <LifecycleActions
         noun="supplier"
         name={supplier.name}

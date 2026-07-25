@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { AdminButton } from "@/components/admin/ui";
+import { useAuthRole } from "@/hooks/use-auth-role";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
@@ -31,6 +32,7 @@ export function LifecycleActions({
   onDelete: () => Promise<unknown>;
 }) {
   const router = useRouter();
+  const { isSuperAdmin } = useAuthRole();
   const { confirm, confirmationDialog } = useConfirm();
 
   const toggleActive = async () => {
@@ -72,6 +74,11 @@ export function LifecycleActions({
       });
     }
   };
+
+  // The register vocabulary is the owner's to change (design doc 4); staff
+  // read it. The API refuses these writes either way - this keeps staff from
+  // being offered a button that can only fail.
+  if (!isSuperAdmin) return null;
 
   return (
     <div className="mt-4 flex flex-wrap gap-2">
