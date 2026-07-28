@@ -1,7 +1,9 @@
+import Link from "next/link";
 import { AudienceCards } from "@/components/farming-investment/audience-cards";
 import { SchemeFile } from "@/components/farming-investment/scheme-file";
 import { SeasonTimeline } from "@/components/farming-investment/season-timeline";
 import { StencilLabel } from "@/components/ui/StencilLabel";
+import { routes } from "@/lib/routes";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
@@ -39,6 +41,14 @@ export default function FarmingInvestmentPage() {
           and we treat it like one: terms in writing, weights on a certified
           scale, records kept for both sides.
         </p>
+        <div className="mt-6 flex flex-wrap gap-4 lg:mt-8">
+          <Link
+            href={routes.farmingApply}
+            className="shadow-block inline-block rounded-[2px] bg-harvest px-[26px] py-3.5 text-[14px] font-bold text-ink transition-[transform,box-shadow] duration-100 hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0_#1F211C] max-sm:w-full max-sm:text-center"
+          >
+            Apply for the programme
+          </Link>
+        </div>
         </div>
       </section>
       <AudienceCards />

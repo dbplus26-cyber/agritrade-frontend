@@ -18,7 +18,8 @@ const AUDIENCES = [
       "Repayment weighed on a certified scale, with your copy of the ticket",
       "A bad season is talked through, not punished — we work with you",
     ],
-    cta: "Register your interest",
+    cta: "Apply for the programme",
+    href: routes.farmingApply,
   },
   {
     tag: "FOR PARTNERS",
@@ -33,6 +34,7 @@ const AUDIENCES = [
       "Farming carries risk — we explain it plainly before you commit",
     ],
     cta: "Talk to us about partnering",
+    href: ENQUIRY_HREF,
   },
 ];
 
@@ -79,7 +81,7 @@ export function AudienceCards() {
             ))}
           </ul>
           <Link
-            href={ENQUIRY_HREF}
+            href={audience.href}
             className="inline-block rounded-[6px] border-[1.5px] border-forest px-6 py-[13px] text-center text-[14px] font-bold text-forest transition-colors hover:bg-forest hover:text-surface max-lg:block"
           >
             {audience.cta}
