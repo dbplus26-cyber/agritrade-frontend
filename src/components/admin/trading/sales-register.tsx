@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
+import { DateOnlyCell } from "@/components/admin/date-cell";
 import {
   ConsoleDateField,
   ConsoleFilterBar,
@@ -28,7 +29,6 @@ import {
   Money,
   SALE_STATUS_FILTER_OPTIONS,
   SaleStatusBadge,
-  formatSaleDate,
 } from "./sale-bits";
 
 const LIST = "/admin/sales";
@@ -122,6 +122,14 @@ export function SalesRegister() {
     (outstanding === "yes" ? 1 : 0) +
     (from ? 1 : 0) +
     (to ? 1 : 0);
+  // A register with nothing on file and nothing narrowing it shows ONLY the
+  // empty state - stat tiles and a filter bar over zero rows filter nothing.
+  const pristine =
+    !isLoading &&
+    !isError &&
+    sales.length === 0 &&
+    !search &&
+    activeFilterCount === 0;
 
   const columns = useMemo<ColumnDef<ISale, unknown>[]>(
     () => [
@@ -143,9 +151,6 @@ export function SalesRegister() {
           >
             <div className="truncate font-semibold text-ink">
               {row.original.buyer.name}
-            </div>
-            <div className="text-[12px] text-soil">
-              {formatSaleDate(row.original.createdAt)}
             </div>
           </Link>
         ),
@@ -183,6 +188,13 @@ export function SalesRegister() {
             </Mono>
           );
         },
+      },
+      {
+        id: "date",
+        header: "Date",
+        enableSorting: false,
+        meta: columnMeta(),
+        cell: ({ row }) => <DateOnlyCell value={row.original.createdAt} />,
       },
       {
         id: "status",
@@ -252,92 +264,97 @@ export function SalesRegister() {
         </p>
       </div>
 
-      <SalesStats />
-
-      {isError && !search && activeFilterCount === 0 ? null : filterBar}
-
-      {isLoading ? (
-        <DataTableSkeleton />
-      ) : isError ? (
-        <ErrorMessage
-          description={extractApiError(error).message}
-          onRetry={() => void refetch()}
-        />
-      ) : sales.length === 0 ? (
+      {pristine ? (
         <AdminCard className="overflow-hidden">
-          {search || activeFilterCount > 0 ? (
-            <EmptyState
-              variant="plain"
-              title="No matching sales"
-              description="Nothing matches this search and filter combination."
-              actionLabel="Clear search & filters"
-              onAction={() => {
-                setSearch("");
-                resetFilters();
-              }}
-            />
-          ) : (
-            <EmptyState
-              variant="plain"
-              title="No sales yet"
-              description="Draft your first sale to start tracking agreements and balances."
-              actionLabel="Draft your first sale"
-              onAction={() => router.push(`${LIST}/new`)}
-            />
-          )}
+          <EmptyState
+            variant="plain"
+            title="No sales yet"
+            description="Draft your first sale to start tracking agreements and balances."
+            actionLabel="Draft your first sale"
+            onAction={() => router.push(`${LIST}/new`)}
+          />
         </AdminCard>
       ) : (
         <>
-          <AdminCard className="hidden overflow-hidden md:block">
-            <ConsoleDataTable<ISale>
-              columns={columns}
-              data={sales}
-              itemNoun="sales"
-              serverPagination={{
-                totalCount,
-                page,
-                pageSize,
-                onPageChange: setPage,
-                onPageSizeChange: (size) => setFilter("size", String(size)),
-              }}
-              rowHref={(s) => `${LIST}/${s.id}`}
-              rowClassName={() => "h-12 hover:bg-surface-alt/60"}
-            />
-          </AdminCard>
+          <SalesStats />
 
-          {/* Mobile cards */}
-          <div className="flex flex-col gap-2.5 md:hidden">
-            {sales.map((s) => (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => router.push(`${LIST}/${s.id}`)}
-                className="rounded-[8px] border border-soil/25 bg-paper px-3.5 py-[13px] text-left"
-              >
-                <div className="mb-1.5 flex items-center justify-between gap-2">
-                  <span className="truncate text-[14px] font-semibold text-ink">
-                    {s.buyer.name}
-                  </span>
-                  <SaleStatusBadge status={s.status} />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[12px] text-soil">Balance</span>
-                  <Mono
-                    className={cn(
-                      "text-[14px] font-bold",
-                      s.balanceGhs === 0 ? "text-leaf" : "text-console-red",
-                    )}
+          {isError && !search && activeFilterCount === 0 ? null : filterBar}
+
+          {isLoading ? (
+            <DataTableSkeleton />
+          ) : isError ? (
+            <ErrorMessage
+              description={extractApiError(error).message}
+              onRetry={() => void refetch()}
+            />
+          ) : sales.length === 0 ? (
+            // Not pristine, so a search or filter is narrowing the register.
+            <AdminCard className="overflow-hidden">
+              <EmptyState
+                variant="plain"
+                title="No matching sales"
+                description="Nothing matches this search and filter combination."
+                actionLabel="Clear search & filters"
+                onAction={() => {
+                  setSearch("");
+                  resetFilters();
+                }}
+              />
+            </AdminCard>
+          ) : (
+            <>
+              <AdminCard className="hidden overflow-hidden md:block">
+                <ConsoleDataTable<ISale>
+                  columns={columns}
+                  data={sales}
+                  itemNoun="sales"
+                  serverPagination={{
+                    totalCount,
+                    page,
+                    pageSize,
+                    onPageChange: setPage,
+                    onPageSizeChange: (size) => setFilter("size", String(size)),
+                  }}
+                  rowHref={(s) => `${LIST}/${s.id}`}
+                  rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+                />
+              </AdminCard>
+
+              {/* Mobile cards */}
+              <div className="flex flex-col gap-2.5 md:hidden">
+                {sales.map((s) => (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => router.push(`${LIST}/${s.id}`)}
+                    className="rounded-[8px] border border-soil/25 bg-paper px-3.5 py-[13px] text-left"
                   >
-                    {s.balanceGhs === 0 ? (
-                      "Paid in full"
-                    ) : (
-                      <Money value={s.balanceGhs} />
-                    )}
-                  </Mono>
-                </div>
-              </button>
-            ))}
-          </div>
+                    <div className="mb-1.5 flex items-center justify-between gap-2">
+                      <span className="truncate text-[14px] font-semibold text-ink">
+                        {s.buyer.name}
+                      </span>
+                      <SaleStatusBadge status={s.status} />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[12px] text-soil">Balance</span>
+                      <Mono
+                        className={cn(
+                          "text-[14px] font-bold",
+                          s.balanceGhs === 0 ? "text-leaf" : "text-console-red",
+                        )}
+                      >
+                        {s.balanceGhs === 0 ? (
+                          "Paid in full"
+                        ) : (
+                          <Money value={s.balanceGhs} />
+                        )}
+                      </Mono>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </>
       )}
     </div>

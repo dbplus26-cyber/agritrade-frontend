@@ -72,10 +72,12 @@ export const adminSalesApi = apiSlice.injectEndpoints({
         method: "PATCH",
         body: paymentPolicyId ? { paymentPolicyId } : {},
       }),
+      // Confirming may put the sale into the shippable (eligible) pool.
       invalidatesTags: (_r, _e, { id }) => [
         { type: "Sales", id },
         { type: "Sales", id: "LIST" },
         { type: "SaleStats", id: "SUMMARY" },
+        { type: "EligibleSales", id: "LIST" },
       ],
     }),
 
@@ -93,6 +95,7 @@ export const adminSalesApi = apiSlice.injectEndpoints({
         { type: "Sales", id: "LIST" },
         { type: "Sales", id: "DEBTORS" },
         { type: "SaleStats", id: "SUMMARY" },
+        { type: "EligibleSales", id: "LIST" },
       ],
     }),
 
@@ -105,11 +108,13 @@ export const adminSalesApi = apiSlice.injectEndpoints({
         method: "POST",
         body,
       }),
+      // A payment can satisfy the loading milestone and make the sale shippable.
       invalidatesTags: (_r, _e, { id }) => [
         { type: "Sales", id },
         { type: "Sales", id: "LIST" },
         { type: "Sales", id: "DEBTORS" },
         { type: "SaleStats", id: "SUMMARY" },
+        { type: "EligibleSales", id: "LIST" },
       ],
     }),
   }),

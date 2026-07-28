@@ -14,17 +14,66 @@ const optionalWeight = z
     message: "Enter a weight between 0 and 1,000,000",
   });
 
-export const shipmentSchema = z.object({
-  saleId: z.string().min(1, "Choose the sale"),
-  originWarehouseId: z.string().min(1, "Choose the origin warehouse"),
-  destination: z.string().trim().min(1, "Enter the destination").max(200),
-  truckReg: z.string().trim().min(1, "Enter the truck registration").max(40),
-  driverName: z.string().trim().min(1, "Enter the driver's name").max(120),
-  driverPhone: z.string().trim().max(20).or(z.literal("")).optional(),
-  truckCapacityKg: optionalWeight,
-  expectedArrivalAt: z.string().optional(),
-  notes: z.string().trim().max(1000).or(z.literal("")).optional(),
-});
+export const shipmentSchema = z
+  .object({
+    saleIds: z.array(z.string()).min(1, "Choose at least one sale"),
+    originWarehouseId: z.string().min(1, "Choose the origin warehouse"),
+    /** A saved delivery address; "" means "enter the destination manually". */
+    deliveryAddressId: z.string().optional(),
+    /** Required only when no saved address is chosen (backend contract). */
+    destination: z.string().trim().max(200).or(z.literal("")).optional(),
+    truckReg: z.string().trim().min(1, "Enter the truck registration").max(40),
+    /** A drivers-directory record; "" means "enter details manually". */
+    driverId: z.string().optional(),
+    /** Required unless a directory driver backfills the snapshot. */
+    driverName: z.string().trim().max(120).or(z.literal("")).optional(),
+    driverPhone: z
+      .string()
+      .trim()
+      .min(6, "Enter a full phone number")
+      .max(20)
+      .or(z.literal(""))
+      .optional(),
+    driverEmail: z
+      .email("Enter a valid email")
+      .max(255)
+      .or(z.literal(""))
+      .optional(),
+    driverCompany: z.string().trim().max(150).or(z.literal("")).optional(),
+    driverCity: z.string().trim().max(120).or(z.literal("")).optional(),
+    driverLicenseNo: z.string().trim().max(50).or(z.literal("")).optional(),
+    driverIdNumber: z.string().trim().max(50).or(z.literal("")).optional(),
+    truckCapacityKg: optionalWeight,
+    expectedArrivalAt: z.string().optional(),
+    notes: z.string().trim().max(1000).or(z.literal("")).optional(),
+  })
+  .superRefine((values, ctx) => {
+    // Mirrors the backend: destination is optional only with a saved address;
+    // driverName/driverPhone are required unless a directory driver is given.
+    if (!values.deliveryAddressId && !values.destination?.trim()) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["destination"],
+        message: "Enter the destination",
+      });
+    }
+    if (!values.driverId) {
+      if (!values.driverName?.trim()) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["driverName"],
+          message: "Enter the driver's name",
+        });
+      }
+      if (!values.driverPhone?.trim()) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["driverPhone"],
+          message: "Enter the driver's phone number",
+        });
+      }
+    }
+  });
 
 export const shipmentExpenseSchema = z.object({
   categoryId: z.string().min(1, "Choose a category"),

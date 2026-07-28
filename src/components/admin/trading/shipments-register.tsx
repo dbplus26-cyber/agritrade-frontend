@@ -147,7 +147,7 @@ export function ShipmentsRegister() {
             <Link
               key={sh.id}
               href={`${LIST}/${sh.id}`}
-              className="rounded-[8px] border border-soil/25 bg-paper px-4 py-[15px] hover:border-soil/35"
+              className="shadow-doc-sm rounded-none border-[1.5px] border-soil/30 bg-paper px-4 py-[15px] hover:border-soil/45"
             >
               <div className="mb-[7px] flex items-center justify-between gap-2.5">
                 <Mono className="text-[13px] font-semibold text-console">
@@ -158,8 +158,12 @@ export function ShipmentsRegister() {
               <div className="text-[14.5px] font-semibold text-ink">
                 {sh.originWarehouse.name} → {sh.destination}
               </div>
-              <div className="mt-[3px] text-[12.5px] text-soil">
-                {sh.sale.buyer.name}
+              <div className="mt-[3px] min-w-0 text-[12.5px] text-soil line-clamp-1 whitespace-normal [overflow-wrap:anywhere]">
+                {sh.salesCount > 1
+                  ? `${String(sh.salesCount)} sales · ${sh.sales
+                      .map((sale) => sale.buyer.name)
+                      .join(", ")}`
+                  : (sh.sales[0]?.buyer.name ?? "")}
                 {sh.totalWeightKg > 0 ? ` · ${formatKg(sh.totalWeightKg)}` : ""}
               </div>
               <div className="mt-1.5 flex items-center justify-between">

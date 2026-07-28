@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   AdminButton,
@@ -11,8 +11,8 @@ import {
   AdminPageHeader,
   Mono,
   adminInputClass,
-  adminSelectClass,
 } from "@/components/admin/ui";
+import { SearchableSelect } from "@/components/admin/searchable-select";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
 import { useGetBuyersQuery } from "@/redux/buyers/buyers-api";
@@ -119,31 +119,46 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
       <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <AdminCard className="flex flex-col gap-3 px-5 py-4">
           <AdminField label="Buyer" error={errors.buyerId?.message}>
-            <select
-              className={cn(adminSelectClass, "w-full", errors.buyerId && "border-error")}
-              {...register("buyerId")}
-            >
-              <option value="">Choose the buyer</option>
-              {(buyers.data?.data ?? []).map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name}
-                </option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="buyerId"
+              render={({ field }) => (
+                <SearchableSelect
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={(buyers.data?.data ?? []).map((b) => ({
+                    value: b.id,
+                    label: b.name,
+                  }))}
+                  placeholder="Choose the buyer"
+                  className={cn(errors.buyerId && "border-error")}
+                />
+              )}
+            />
           </AdminField>
 
           <AdminField label="Payment terms" optional>
-            <select className={cn(adminSelectClass, "w-full")} {...register("paymentPolicyId")}>
-              <option value="">
-                Default (or the buyer&apos;s policy) at confirmation
-              </option>
-              {(policies.data?.data ?? []).map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                  {p.isDefault ? " (default)" : ""}
-                </option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="paymentPolicyId"
+              render={({ field }) => (
+                <SearchableSelect
+                  value={field.value ?? ""}
+                  onChange={field.onChange}
+                  options={[
+                    {
+                      value: "",
+                      label: "Default (or the buyer's policy) at confirmation",
+                    },
+                    ...(policies.data?.data ?? []).map((p) => ({
+                      value: p.id,
+                      label: `${p.name}${p.isDefault ? " (default)" : ""}`,
+                    })),
+                  ]}
+                  placeholder="Default (or the buyer's policy) at confirmation"
+                />
+              )}
+            />
           </AdminField>
         </AdminCard>
 
@@ -171,17 +186,24 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
                 label="Commodity"
                 error={errors.lines?.[index]?.commodityId?.message}
               >
-                <select
-                  className={cn(adminSelectClass, "w-full")}
-                  {...register(`lines.${index}.commodityId`)}
-                >
-                  <option value="">Choose</option>
-                  {commodityOptions.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
+                <Controller
+                  control={control}
+                  name={`lines.${index}.commodityId`}
+                  render={({ field }) => (
+                    <SearchableSelect
+                      value={field.value}
+                      onChange={field.onChange}
+                      options={commodityOptions.map((c) => ({
+                        value: c.id,
+                        label: c.name,
+                      }))}
+                      placeholder="Choose"
+                      className={cn(
+                        errors.lines?.[index]?.commodityId && "border-error",
+                      )}
+                    />
+                  )}
+                />
               </AdminField>
               <AdminField
                 label="Weight (kg)"

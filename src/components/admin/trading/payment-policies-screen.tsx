@@ -25,12 +25,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useAuthRole } from "@/hooks/use-auth-role";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import {
   useCreatePaymentPolicyMutation,
+  useDeletePaymentPolicyMutation,
   useGetPaymentPoliciesQuery,
   useUpdatePaymentPolicyMutation,
 } from "@/redux/payment-policies/payment-policies-api";
@@ -228,7 +230,10 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
 
 function PolicyCard({ policy }: { policy: IPaymentPolicy }) {
   const [update] = useUpdatePaymentPolicyMutation();
+  const [deletePolicy, deleteState] = useDeletePaymentPolicyMutation();
   const { confirm, confirmationDialog } = useConfirm();
+  // Deleting a policy is owner-only on the backend; hide it from staff.
+  const { isSuperAdmin } = useAuthRole();
 
   const makeDefault = async () => {
     try {
@@ -266,27 +271,48 @@ function PolicyCard({ policy }: { policy: IPaymentPolicy }) {
     }
   };
 
+  const onDelete = async () => {
+    const ok = await confirm({
+      title: `Delete ${policy.name}?`,
+      description:
+        "Only possible while no sale or buyer references this policy. If it has been used, deactivate it instead - existing sales keep their snapshot either way.",
+      confirmText: "Delete",
+      isDestructive: true,
+    });
+    if (!ok) return;
+    try {
+      await deletePolicy(policy.id).unwrap();
+      notify.success("Policy deleted");
+    } catch (err) {
+      // The backend refuses with a DEACTIVATE_INSTEAD-style message when the
+      // policy is referenced; surface it verbatim.
+      notify.error("Couldn't delete the policy", {
+        description: extractApiError(err).message,
+      });
+    }
+  };
+
   return (
-    <AdminCard className="px-5 py-4">
-      <div className="mb-2 flex flex-wrap items-center gap-2">
-        <span className="text-[15px] font-bold text-ink">{policy.name}</span>
+    <AdminCard className="px-4 py-3">
+      <div className="mb-1.5 flex flex-wrap items-center gap-2">
+        <span className="text-[14px] font-bold text-ink">{policy.name}</span>
         {policy.isDefault ? <ToneBadge tone="forest">Default</ToneBadge> : null}
         {policy.isActive ? null : <ToneBadge tone="slate">Inactive</ToneBadge>}
       </div>
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-0.5">
         {policy.milestones.map((m, i) => (
           <div
             key={`${m.label}-${String(i)}`}
-            className="flex items-baseline justify-between text-[13px]"
+            className="flex items-baseline justify-between gap-2 text-[12.5px]"
           >
-            <span className="text-ink">{m.label}</span>
-            <span className="text-soil">
+            <span className="truncate text-ink">{m.label}</span>
+            <span className="whitespace-nowrap text-soil">
               {m.percent}% · {milestoneTriggerLabel(m.trigger)}
             </span>
           </div>
         ))}
       </div>
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="mt-2.5 flex flex-wrap gap-2">
         {!policy.isDefault && policy.isActive ? (
           <AdminButton
             variant="outline"
@@ -303,6 +329,16 @@ function PolicyCard({ policy }: { policy: IPaymentPolicy }) {
             onClick={() => void toggleActive()}
           >
             {policy.isActive ? "Deactivate" : "Activate"}
+          </AdminButton>
+        ) : null}
+        {isSuperAdmin ? (
+          <AdminButton
+            variant="ghost"
+            className="h-8 px-3 text-[12.5px] text-console-red"
+            disabled={deleteState.isLoading}
+            onClick={() => void onDelete()}
+          >
+            Delete
           </AdminButton>
         ) : null}
       </div>
@@ -329,6 +365,13 @@ export function PaymentPoliciesScreen() {
         }
       />
 
+      {/* Policies are immutable by design: sales freeze a snapshot of their
+          terms, so there is deliberately no edit action here. */}
+      <p className="mb-3 text-[12.5px] text-soil">
+        Policies can&apos;t be edited once created - create a new policy for new
+        terms instead.
+      </p>
+
       {isLoading ? (
         <DataTableSkeleton />
       ) : isError ? (
@@ -345,7 +388,7 @@ export function PaymentPoliciesScreen() {
           onAction={() => setCreateOpen(true)}
         />
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="grid gap-3 md:grid-cols-2">
           {policies.map((p) => (
             <PolicyCard key={p.id} policy={p} />
           ))}

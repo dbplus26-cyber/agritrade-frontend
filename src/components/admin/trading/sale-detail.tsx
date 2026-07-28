@@ -9,9 +9,10 @@ import {
   AdminCard,
   AdminField,
   AdminPageHeader,
+  DetailShell,
   Mono,
+  ToneBadge,
   adminInputClass,
-  adminSelectClass,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
@@ -34,23 +35,20 @@ import {
   useCancelSaleMutation,
   useConfirmSaleMutation,
   useGetSaleQuery,
-  useRecordSalePaymentMutation,
 } from "@/redux/sales/admin-sales-api";
 import type { ISaleDetail } from "@/types/admin-sale.types";
 import {
   cancelSaleSchema,
-  recordPaymentSchema,
   type CancelSaleValues,
-  type RecordPaymentValues,
 } from "@/validations/sale-schema";
+import { PaymentDialog } from "./payment-dialog";
 import {
   Money,
-  PAYMENT_METHOD_OPTIONS,
   SaleStatusBadge,
   formatSaleDate,
   milestoneTriggerLabel,
-  todayInputValue,
 } from "./sale-bits";
+import { ShipmentStatusBadge } from "./shipment-bits";
 
 const LIST = "/admin/sales";
 
@@ -77,115 +75,6 @@ function SummaryRow({
         {children}
       </span>
     </div>
-  );
-}
-
-/** Record a manual payment against a confirmed sale. */
-function PaymentDialog({
-  sale,
-  open,
-  onClose,
-}: {
-  sale: ISaleDetail;
-  open: boolean;
-  onClose: () => void;
-}) {
-  const [record, { isLoading }] = useRecordSalePaymentMutation();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<RecordPaymentValues>({
-    resolver: zodResolver(recordPaymentSchema),
-    defaultValues: { method: "CASH", paidAt: todayInputValue() },
-  });
-
-  const onSubmit = async (values: RecordPaymentValues) => {
-    try {
-      await record({
-        id: sale.id,
-        body: {
-          amountGhs: Number(values.amountGhs),
-          method: values.method,
-          ...(values.reference?.trim()
-            ? { reference: values.reference.trim() }
-            : {}),
-          ...(values.paidAt ? { paidAt: values.paidAt } : {}),
-        },
-      }).unwrap();
-      notify.success("Payment recorded");
-      onClose();
-    } catch (err) {
-      notify.error("Couldn't record the payment", {
-        description: extractApiError(err).message,
-      });
-    }
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-[420px]">
-        <DialogHeader>
-          <DialogTitle>Record a payment</DialogTitle>
-          <DialogDescription>
-            Manual payments only (cash, mobile money, bank). Online payments are
-            recorded automatically when the buyer pays.
-          </DialogDescription>
-        </DialogHeader>
-        <form
-          noValidate
-          onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-3"
-        >
-          <AdminField label="Amount (GHS)" error={errors.amountGhs?.message}>
-            <Input
-              inputMode="decimal"
-              className={cn(adminInputClass, errors.amountGhs && "border-error")}
-              {...register("amountGhs")}
-            />
-          </AdminField>
-          <AdminField label="Method" error={errors.method?.message}>
-            <select
-              className={cn(adminSelectClass, "w-full")}
-              {...register("method")}
-            >
-              {PAYMENT_METHOD_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </AdminField>
-          <AdminField label="Reference" optional>
-            <Input
-              className={adminInputClass}
-              placeholder="MoMo / bank reference"
-              {...register("reference")}
-            />
-          </AdminField>
-          <AdminField label="Payment date" optional>
-            <Input
-              type="date"
-              className={adminInputClass}
-              {...register("paidAt")}
-            />
-          </AdminField>
-          <DialogFooter className="gap-2">
-            <AdminButton
-              type="button"
-              variant="outline"
-              className="h-9 px-3.5"
-              onClick={onClose}
-            >
-              Cancel
-            </AdminButton>
-            <AdminButton type="submit" disabled={isLoading} className="h-9 px-4">
-              {isLoading ? "Recording…" : "Record payment"}
-            </AdminButton>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
   );
 }
 
@@ -312,21 +201,57 @@ export function SaleDetail({
     }
   };
 
-  return (
-    <div className="max-w-[720px]">
-      <BackButton href={LIST} label="All sales" className="mb-2" />
-      <AdminPageHeader
-        title={sale.buyer.name}
-        sub={`Drafted ${formatSaleDate(sale.createdAt)}`}
-        actions={
-          <span className="flex flex-wrap items-center gap-1.5">
-            <SaleStatusBadge status={sale.status} />
-          </span>
-        }
-      />
+  const actions = (
+    <div className="flex flex-wrap gap-2 xl:flex-col">
+      {isDraft ? (
+        <>
+          <AdminButton
+            className="h-9 px-4"
+            disabled={confirmState.isLoading}
+            onClick={() => void onConfirm()}
+          >
+            {confirmState.isLoading ? "Confirming…" : "Confirm sale"}
+          </AdminButton>
+          <AdminButton variant="outline" className="h-9 px-4" asChild>
+            <Link href={`${LIST}/${sale.id}/edit`}>Edit draft</Link>
+          </AdminButton>
+        </>
+      ) : null}
+      {canPay ? (
+        <AdminButton className="h-9 px-4" onClick={() => setPayOpen(true)}>
+          Record payment
+        </AdminButton>
+      ) : null}
+      {sale.status === "CONFIRMED" ? (
+        <AdminButton variant="outline" className="h-9 px-4" asChild>
+          <Link href={`/admin/shipments/new?saleId=${sale.id}`}>
+            Ship goods
+          </Link>
+        </AdminButton>
+      ) : null}
+      {canCancel ? (
+        <AdminButton
+          variant="outline"
+          className="h-9 px-4"
+          onClick={() => setCancelOpen(true)}
+        >
+          Cancel sale
+        </AdminButton>
+      ) : null}
+      {sale.status !== "DRAFT" && sale.status !== "CANCELLED" ? (
+        <AdminButton variant="outline" className="h-9 px-4" asChild>
+          <Link href={`${LIST}/${sale.id}/invoice`}>
+            {sale.balanceGhs === 0 ? "Receipt" : "Invoice"}
+          </Link>
+        </AdminButton>
+      ) : null}
+    </div>
+  );
 
-      {/* Money summary */}
-      <AdminCard className="mb-4 px-5 py-3">
+  const aside = (
+    <div className="flex flex-col gap-4">
+      {/* Money summary + actions */}
+      <AdminCard className="px-5 py-3">
         <SummaryRow label="Agreed total" strong>
           <Money value={sale.agreedTotalGhs} />
         </SummaryRow>
@@ -355,62 +280,15 @@ export function SaleDetail({
             Payment terms: {sale.paymentPolicy.name}
           </div>
         ) : null}
+        <div className="mt-3 border-t border-soil/12 pt-3.5">{actions}</div>
       </AdminCard>
+    </div>
+  );
 
-      {/* Actions */}
-      <div className="mb-4 flex flex-wrap gap-2">
-        {isDraft ? (
-          <>
-            <AdminButton
-              className="h-9 px-4"
-              disabled={confirmState.isLoading}
-              onClick={() => void onConfirm()}
-            >
-              {confirmState.isLoading ? "Confirming…" : "Confirm sale"}
-            </AdminButton>
-            <AdminButton variant="outline" className="h-9 px-4" asChild>
-              <Link href={`${LIST}/${sale.id}/edit`}>Edit draft</Link>
-            </AdminButton>
-          </>
-        ) : null}
-        {canPay ? (
-          <AdminButton className="h-9 px-4" onClick={() => setPayOpen(true)}>
-            Record payment
-          </AdminButton>
-        ) : null}
-        {sale.status === "CONFIRMED" ? (
-          <AdminButton variant="outline" className="h-9 px-4" asChild>
-            <Link href={`/admin/shipments/new?saleId=${sale.id}`}>
-              Ship goods
-            </Link>
-          </AdminButton>
-        ) : null}
-        {canCancel ? (
-          <AdminButton
-            variant="outline"
-            className="h-9 px-4"
-            onClick={() => setCancelOpen(true)}
-          >
-            Cancel sale
-          </AdminButton>
-        ) : null}
-        {sale.status !== "DRAFT" && sale.status !== "CANCELLED" ? (
-          <AdminButton variant="outline" className="h-9 px-4" asChild>
-            <Link href={`${LIST}/${sale.id}/invoice`}>
-              {sale.balanceGhs === 0 ? "Receipt" : "Invoice"}
-            </Link>
-          </AdminButton>
-        ) : null}
-      </div>
-
-      {sale.status === "CANCELLED" && sale.cancelReason ? (
-        <AdminCard className="mb-4 border-error/40 bg-error/[0.04] px-4 py-3 text-[13px] text-ink">
-          Cancelled: {sale.cancelReason}
-        </AdminCard>
-      ) : null}
-
+  const main = (
+    <div className="flex flex-col gap-4">
       {/* Lines */}
-      <AdminCard className="mb-4 px-5 py-3">
+      <AdminCard className="px-5 py-3">
         <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
           Goods
         </div>
@@ -434,7 +312,7 @@ export function SaleDetail({
 
       {/* Milestone schedule (once confirmed) */}
       {sale.milestones.length > 0 ? (
-        <AdminCard className="mb-4 px-5 py-3">
+        <AdminCard className="px-5 py-3">
           <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
             Payment schedule
           </div>
@@ -454,6 +332,21 @@ export function SaleDetail({
               </Mono>
             </div>
           ))}
+          {/* The gate that decides whether this sale may board a truck - the
+              computed figure, so nobody works it out in their head. */}
+          <div className="mt-2 flex flex-wrap items-baseline justify-between gap-2 border-t-[1.5px] border-soil/25 pt-2">
+            <span className="text-[12px] font-semibold text-ink">
+              Required before loading
+            </span>
+            <span className="flex items-baseline gap-2">
+              <Mono className="text-[13px] text-ink">
+                <Money value={sale.requiredBeforeLoadingGhs} />
+              </Mono>
+              <ToneBadge tone={sale.beforeLoadingMet ? "leaf" : "alert"}>
+                {sale.beforeLoadingMet ? "Met - can ship" : "Not met"}
+              </ToneBadge>
+            </span>
+          </div>
         </AdminCard>
       ) : null}
 
@@ -484,6 +377,62 @@ export function SaleDetail({
           ))
         )}
       </AdminCard>
+
+      {/* Shipments carrying this sale */}
+      <AdminCard className="px-5 py-3">
+        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+          Shipments
+        </div>
+        {sale.shipments.length === 0 ? (
+          <p className="py-2 text-[13px] text-soil">Nothing shipped yet.</p>
+        ) : (
+          sale.shipments.map((sh) => (
+            <div
+              key={sh.id}
+              className="border-b border-soil/10 py-2 last:border-b-0"
+            >
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <Link
+                  href={`/admin/shipments/${sh.id}`}
+                  className="font-adminmono text-[13px] text-console tabular-nums hover:underline"
+                >
+                  {sh.transactionNo}
+                </Link>
+                <ShipmentStatusBadge status={sh.status} />
+              </div>
+              <div className="mt-0.5 min-w-0 text-[12.5px] text-soil [overflow-wrap:anywhere]">
+                <Mono>{sh.truckReg}</Mono> · {sh.destination} ·{" "}
+                {sh.departedAt
+                  ? `Departed ${formatSaleDate(sh.departedAt)}`
+                  : `Planned ${formatSaleDate(sh.createdAt)}`}
+              </div>
+            </div>
+          ))
+        )}
+      </AdminCard>
+    </div>
+  );
+
+  return (
+    <div className="max-w-[1120px]">
+      <BackButton href={LIST} label="All sales" className="mb-2" />
+      <AdminPageHeader
+        title={sale.buyer.name}
+        sub={`Drafted ${formatSaleDate(sale.createdAt)}`}
+        actions={
+          <span className="flex flex-wrap items-center gap-1.5">
+            <SaleStatusBadge status={sale.status} />
+          </span>
+        }
+      />
+
+      {sale.status === "CANCELLED" && sale.cancelReason ? (
+        <AdminCard className="mb-4 border-error/40 bg-error/[0.04] px-4 py-3 text-[13px] text-ink">
+          Cancelled: {sale.cancelReason}
+        </AdminCard>
+      ) : null}
+
+      <DetailShell main={main} aside={aside} />
 
       {payOpen ? (
         <PaymentDialog

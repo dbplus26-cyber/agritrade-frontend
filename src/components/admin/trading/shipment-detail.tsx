@@ -9,7 +9,9 @@ import {
   AdminCard,
   AdminField,
   AdminPageHeader,
-  DetailRow,
+  DetailGrid,
+  DetailItem,
+  DetailShell,
   Mono,
   adminInputClass,
   adminSelectClass,
@@ -17,6 +19,8 @@ import {
 import { BackButton } from "@/components/ui/BackButton";
 import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { FilePicker } from "@/components/ui/FilePicker";
+import { SignaturePad } from "@/components/ui/SignaturePad";
 import {
   Dialog,
   DialogContent,
@@ -33,15 +37,17 @@ import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import { useGetExpenseCategoriesQuery } from "@/redux/expense-categories/expense-categories-api";
 import {
+  shipmentDocumentUrl,
+  shipmentWaybillPdfUrl,
+  useAddShipmentDocumentMutation,
   useAddShipmentExpenseMutation,
   useArriveShipmentMutation,
   useCancelShipmentMutation,
   useCloseShipmentMutation,
   useDeleteShipmentExpenseMutation,
   useDispatchShipmentMutation,
-  useGetAvailableLotsQuery,
   useGetShipmentQuery,
-  useSetAllocationsMutation,
+  useRemoveShipmentDocumentMutation,
 } from "@/redux/shipments/shipments-api";
 import type { IShipment } from "@/types/admin-shipment.types";
 import {
@@ -50,7 +56,8 @@ import {
   type CancelShipmentValues,
   type ShipmentExpenseValues,
 } from "@/validations/shipment-schema";
-import { Money } from "./sale-bits";
+import { AllocateDialog } from "./allocate-dialog";
+import { Money, SaleStatusBadge } from "./sale-bits";
 import {
   CostBasisBadge,
   ShipmentStatusBadge,
@@ -59,106 +66,7 @@ import {
 
 const LIST = "/admin/shipments";
 
-/** Pick lots to load. Available lots come from the shipment's origin warehouse. */
-function AllocateDialog({
-  shipment,
-  onClose,
-}: {
-  shipment: IShipment;
-  onClose: () => void;
-}) {
-  const { data, isLoading } = useGetAvailableLotsQuery(shipment.id);
-  const [save, { isLoading: saving }] = useSetAllocationsMutation();
-  const [weights, setWeights] = useState<Record<string, string>>(() =>
-    Object.fromEntries(
-      shipment.allocations.map((a) => [a.lotId, String(a.weightKg)]),
-    ),
-  );
-  const lots = data?.data.lots ?? [];
-
-  const submit = async () => {
-    const allocations = lots
-      .map((l) => ({ lotId: l.id, weightKg: Number(weights[l.id] ?? 0) }))
-      .filter((a) => a.weightKg > 0);
-    try {
-      await save({ allocations, id: shipment.id }).unwrap();
-      notify.success("Allocations saved");
-      onClose();
-    } catch (err) {
-      notify.error("Couldn't save allocations", {
-        description: extractApiError(err).message,
-      });
-    }
-  };
-
-  return (
-    <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-[520px]">
-        <DialogHeader>
-          <DialogTitle>Allocate lots</DialogTitle>
-          <DialogDescription>
-            Choose how much to load from each lot. Leave a lot at zero to skip
-            it. Stock only leaves the warehouse when you dispatch.
-          </DialogDescription>
-        </DialogHeader>
-        {isLoading ? (
-          <DataTableSkeleton />
-        ) : lots.length === 0 ? (
-          <p className="py-3 text-[13px] text-soil">
-            No stock available in this warehouse for the sale&apos;s commodities.
-          </p>
-        ) : (
-          <div className="flex max-h-[50vh] flex-col gap-2 overflow-y-auto">
-            {lots.map((l) => (
-              <div
-                key={l.id}
-                className="grid grid-cols-[1fr_120px] items-center gap-2 border-b border-soil/10 pb-2"
-              >
-                <div className="min-w-0">
-                  <div className="truncate text-[13.5px] font-medium text-ink">
-                    {l.commodity.name}
-                  </div>
-                  <div className="text-[12px] text-soil">
-                    {formatKg(l.remainingKg)} available ·{" "}
-                    <Money value={l.unitCostGhs} />
-                    /kg
-                  </div>
-                </div>
-                <Input
-                  inputMode="decimal"
-                  placeholder="kg"
-                  className={adminInputClass}
-                  value={weights[l.id] ?? ""}
-                  onChange={(e) =>
-                    setWeights((w) => ({ ...w, [l.id]: e.target.value }))
-                  }
-                />
-              </div>
-            ))}
-          </div>
-        )}
-        <DialogFooter className="gap-2">
-          <AdminButton
-            type="button"
-            variant="outline"
-            className="h-9 px-3.5"
-            onClick={onClose}
-          >
-            Cancel
-          </AdminButton>
-          <AdminButton
-            type="button"
-            disabled={saving || lots.length === 0}
-            className="h-9 px-4"
-            onClick={() => void submit()}
-          >
-            {saving ? "Saving…" : "Save allocations"}
-          </AdminButton>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
+const Absent = () => <span className="text-soil/50">Not provided</span>;
 
 function ExpenseDialog({
   shipment,
@@ -336,10 +244,14 @@ export function ShipmentDetail({ id }: { id: string }) {
   const [arrive, arriveState] = useArriveShipmentMutation();
   const [close, closeState] = useCloseShipmentMutation();
   const [deleteExpense] = useDeleteShipmentExpenseMutation();
+  const [addDocument, addDocState] = useAddShipmentDocumentMutation();
+  const [removeDocument] = useRemoveShipmentDocumentMutation();
   const { confirm, confirmationDialog } = useConfirm();
   const [allocOpen, setAllocOpen] = useState(false);
   const [expenseOpen, setExpenseOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
+  const [docName, setDocName] = useState("Signed waybill");
+  const [signing, setSigning] = useState(false);
 
   if (isLoading) return <DataTableSkeleton />;
   if (isError || !data)
@@ -352,30 +264,65 @@ export function ShipmentDetail({ id }: { id: string }) {
 
   const s = data.data.shipment;
   const beforeDispatch = s.status === "PLANNED" || s.status === "LOADING";
+  const saleSummary =
+    s.sales.length === 1
+      ? (s.sales[0]?.buyer.name ?? "")
+      : `${String(s.salesCount)} sales`;
+  const anyDriverExtra = Boolean(
+    s.driverEmail ?? s.driverCity ?? s.driverLicenseNo ?? s.driverIdNumber,
+  );
 
   const onDispatch = async () => {
     const ok = await confirm({
       title: "Dispatch this shipment?",
       description:
-        "Stock leaves the warehouse now. If loading is below the payment milestone, the owner must approve it first.",
+        "Stock leaves the warehouse now. If loading is below a payment milestone, the owner must approve it first.",
       confirmText: "Dispatch",
     });
     if (!ok) return;
     try {
-      await dispatchShipment(s.id).unwrap();
+      await dispatchShipment({ id: s.id }).unwrap();
       notify.success("Shipment dispatched - stock has left the warehouse");
     } catch (err) {
-      // The milestone gate returns a clear message here.
-      notify.error("Couldn't dispatch", {
-        description: extractApiError(err).message,
+      const apiError = extractApiError(err);
+      if (apiError.code !== "WAYBILL_REQUIRED") {
+        // The milestone gate returns a clear message here.
+        notify.error("Couldn't dispatch", { description: apiError.message });
+        return;
+      }
+      // The signed-waybill gate: offer an explicit, logged override.
+      const proceed = await confirm({
+        title: "No signed waybill on file",
+        description:
+          "The driver and an admin should sign the waybill and the signed copy be uploaded to this shipment before it leaves. You can dispatch without it, but the trip will have no signed paper trail.",
+        confirmText: "Dispatch anyway",
+        isDestructive: true,
       });
+      if (!proceed) return;
+      try {
+        await dispatchShipment({
+          id: s.id,
+          overrideMissingWaybill: true,
+        }).unwrap();
+        notify.success("Shipment dispatched - stock has left the warehouse");
+      } catch (retryErr) {
+        notify.error("Couldn't dispatch", {
+          description: extractApiError(retryErr).message,
+        });
+      }
     }
   };
 
   const onArrive = async () => {
     try {
       await arrive(s.id).unwrap();
-      notify.success("Marked arrived");
+      // Arrival is when the buyer signs for the goods - steer the admin
+      // straight into filing that evidence.
+      setDocName("Signed delivery note");
+      notify.success("Marked arrived", {
+        description:
+          "Upload the buyer-signed delivery note under Documents so the delivery is on the record.",
+      });
     } catch (err) {
       notify.error("Couldn't update", {
         description: extractApiError(err).message,
@@ -405,133 +352,246 @@ export function ShipmentDetail({ id }: { id: string }) {
     }
   };
 
-  return (
-    <div className="max-w-[760px]">
-      <BackButton href={LIST} label="All shipments" className="mb-2" />
-      <AdminPageHeader
-        title={`${s.truckReg} · ${s.destination}`}
-        sub={`For ${s.sale.buyer.name} · from ${s.originWarehouse.name}`}
-        actions={
-          <span className="flex flex-wrap items-center gap-1.5">
-            <ShipmentStatusBadge status={s.status} />
-            <CostBasisBadge basis={s.costBasis} />
-          </span>
-        }
-      />
+  const onUploadDocument = async (file: File | null) => {
+    if (!file) return;
+    try {
+      await addDocument({
+        file,
+        id: s.id,
+        name: docName.trim() || "Signed waybill",
+      }).unwrap();
+      notify.success("Document uploaded");
+      setDocName("Signed waybill");
+    } catch (err) {
+      notify.error("Couldn't upload the document", {
+        description: extractApiError(err).message,
+      });
+      throw err; // Keeps the FilePicker preview for a retry.
+    }
+  };
 
-      {/* Actions */}
-      <div className="mb-4 flex flex-wrap gap-2">
-        {beforeDispatch ? (
-          <>
-            <AdminButton className="h-9 px-4" onClick={() => setAllocOpen(true)}>
-              Allocate lots
-            </AdminButton>
-            <AdminButton
-              className="h-9 px-4"
-              disabled={dispatchState.isLoading}
-              onClick={() => void onDispatch()}
-            >
-              {dispatchState.isLoading ? "Dispatching…" : "Dispatch"}
-            </AdminButton>
-            <AdminButton
-              variant="outline"
-              className="h-9 px-4"
-              onClick={() => setCancelOpen(true)}
-            >
-              Cancel
-            </AdminButton>
-          </>
-        ) : null}
-        {s.status === "DISPATCHED" ? (
+  const onRemoveDocument = async (documentId: string, name: string) => {
+    const ok = await confirm({
+      title: "Remove this document?",
+      description: `"${name}" will be deleted from the shipment's file. Removal is only possible before dispatch.`,
+      confirmText: "Remove",
+      isDestructive: true,
+    });
+    if (!ok) return;
+    try {
+      await removeDocument({ documentId, id: s.id }).unwrap();
+      notify.success("Document removed");
+    } catch (err) {
+      notify.error("Couldn't remove the document", {
+        description: extractApiError(err).message,
+      });
+    }
+  };
+
+  const actions = (
+    <div className="flex flex-wrap gap-2 xl:flex-col">
+      {beforeDispatch ? (
+        <>
+          <AdminButton className="h-9 px-4" onClick={() => setAllocOpen(true)}>
+            Allocate lots
+          </AdminButton>
           <AdminButton
             className="h-9 px-4"
-            disabled={arriveState.isLoading}
-            onClick={() => void onArrive()}
+            disabled={dispatchState.isLoading}
+            onClick={() => void onDispatch()}
           >
-            {arriveState.isLoading ? "Updating…" : "Mark arrived"}
+            {dispatchState.isLoading ? "Dispatching…" : "Dispatch"}
           </AdminButton>
-        ) : null}
-        {s.status === "ARRIVED" ? (
           <AdminButton
+            variant="outline"
             className="h-9 px-4"
-            disabled={closeState.isLoading}
-            onClick={() => void onClose()}
+            onClick={() => setCancelOpen(true)}
           >
-            {closeState.isLoading ? "Closing…" : "Close shipment"}
+            Cancel
           </AdminButton>
-        ) : null}
-        {s.totalWeightKg > 0 ? (
+        </>
+      ) : null}
+      {s.status === "DISPATCHED" ? (
+        <AdminButton
+          className="h-9 px-4"
+          disabled={arriveState.isLoading}
+          onClick={() => void onArrive()}
+        >
+          {arriveState.isLoading ? "Updating…" : "Mark arrived"}
+        </AdminButton>
+      ) : null}
+      {s.status === "ARRIVED" ? (
+        <AdminButton
+          className="h-9 px-4"
+          disabled={closeState.isLoading}
+          onClick={() => void onClose()}
+        >
+          {closeState.isLoading ? "Closing…" : "Close shipment"}
+        </AdminButton>
+      ) : null}
+      {/* The waybill leads the paper trail: print it FIRST, the driver and an
+          admin sign it, the signed copy is uploaded, THEN dispatch - so the
+          buttons live on every non-cancelled shipment, not just loaded ones. */}
+      {s.status !== "CANCELLED" ? (
+        <>
           <AdminButton variant="outline" className="h-9 px-4" asChild>
             <Link href={`${LIST}/${s.id}/waybill`}>Waybill</Link>
           </AdminButton>
-        ) : null}
-      </div>
-
-      {s.status === "CANCELLED" && s.cancelReason ? (
-        <AdminCard className="mb-4 border-error/40 bg-error/[0.04] px-4 py-3 text-[13px] text-ink">
-          Cancelled: {s.cancelReason}
-        </AdminCard>
+          <AdminButton variant="outline" className="h-9 px-4" asChild>
+            <a
+              href={shipmentWaybillPdfUrl(s.id)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              PDF
+            </a>
+          </AdminButton>
+        </>
       ) : null}
+    </div>
+  );
 
-      {/* Logistics + profit */}
-      <div className="mb-4 grid gap-4 md:grid-cols-2">
-        <AdminCard className="px-5 py-3">
-          <DetailRow label="Truck">{s.truckReg}</DetailRow>
-          <div className="border-t border-soil/12">
-            <DetailRow label="Driver">
-              {s.driverName}
-              {s.driverPhone ? ` · ${s.driverPhone}` : ""}
-            </DetailRow>
-          </div>
-          <div className="border-t border-soil/12">
-            <DetailRow label="Route">
-              {s.originWarehouse.name} → {s.destination}
-            </DetailRow>
-          </div>
-          <div className="border-t border-soil/12">
-            <DetailRow label="Total weight">{formatKg(s.totalWeightKg)}</DetailRow>
-          </div>
-          {s.departedAt ? (
-            <div className="border-t border-soil/12">
-              <DetailRow label="Departed">{formatShipmentDate(s.departedAt)}</DetailRow>
+  const main = (
+    <div className="flex flex-col gap-4">
+      {/* Sales on this trip. Payment terms are settled BEFORE a sale can
+          board a truck, so there is nothing to pay here - the sale page owns
+          later payments. Each sale is its own bordered sub-card so a
+          multi-sale trip reads as distinct orders, not one run-on list. */}
+      <AdminCard className="px-5 py-3">
+        <div className="mb-2 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+          Sales on this trip · {s.salesCount} sale
+          {s.salesCount === 1 ? "" : "s"}
+        </div>
+        <div className="grid gap-2.5 pb-2 md:grid-cols-2">
+          {s.sales.map((sale, index) => (
+            <div
+              key={sale.id}
+              className="rounded-[2px] border-[1.5px] border-soil/25 bg-surface-alt/40 px-3.5 py-2.5"
+            >
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <span className="font-adminmono text-[11px] text-soil/70 tabular-nums">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <Link
+                  href={`/admin/sales/${sale.id}`}
+                  className="font-adminmono text-[13px] font-semibold text-console tabular-nums hover:underline"
+                >
+                  {sale.transactionNo}
+                </Link>
+                <span className="ml-auto">
+                  <SaleStatusBadge status={sale.status} />
+                </span>
+              </div>
+              <div className="mt-1 min-w-0 text-[13px] font-semibold text-ink [overflow-wrap:anywhere]">
+                {sale.buyer.name}
+                {sale.buyer.phone ? (
+                  <span className="font-normal text-soil">
+                    {" "}
+                    · {sale.buyer.phone}
+                  </span>
+                ) : null}
+              </div>
+              <div className="mt-1.5 border-t border-soil/15 pt-1.5">
+                <Mono className="text-[12.5px] text-soil">
+                  Agreed <Money compact value={sale.agreedTotalGhs} /> · Paid{" "}
+                  <Money compact value={sale.paidGhs} /> · Balance{" "}
+                  <span
+                    className={cn(
+                      sale.balanceGhs !== null &&
+                        (sale.balanceGhs === 0
+                          ? "text-leaf"
+                          : "text-console-red"),
+                    )}
+                  >
+                    <Money compact value={sale.balanceGhs} />
+                  </span>
+                </Mono>
+              </div>
             </div>
+          ))}
+        </div>
+      </AdminCard>
+
+      {/* Logistics */}
+      <AdminCard className="px-5 py-3">
+        <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+          Logistics
+        </p>
+        <DetailGrid>
+          <DetailItem label="Waybill no" mono>
+            {s.transactionNo}
+          </DetailItem>
+          <DetailItem label="Truck">{s.truckReg}</DetailItem>
+          {s.truckCapacityKg !== null ? (
+            <DetailItem label="Truck capacity" mono>
+              {formatKg(s.truckCapacityKg)}
+            </DetailItem>
+          ) : null}
+          <DetailItem label="Route">
+            {s.originWarehouse.name} → {s.destination}
+          </DetailItem>
+          <DetailItem label="Total weight" mono>
+            {formatKg(s.totalWeightKg)}
+          </DetailItem>
+          {s.expectedArrivalAt ? (
+            <DetailItem label="Expected arrival">
+              {formatShipmentDate(s.expectedArrivalAt)}
+            </DetailItem>
+          ) : null}
+          {s.departedAt ? (
+            <DetailItem label="Departed">
+              {formatShipmentDate(s.departedAt)}
+            </DetailItem>
           ) : null}
           {s.arrivedAt ? (
-            <div className="border-t border-soil/12">
-              <DetailRow label="Arrived">{formatShipmentDate(s.arrivedAt)}</DetailRow>
-            </div>
+            <DetailItem label="Arrived">
+              {formatShipmentDate(s.arrivedAt)}
+            </DetailItem>
           ) : null}
-        </AdminCard>
+          {s.notes ? (
+            <DetailItem label="Notes" className="sm:col-span-2 xl:col-span-3">
+              {s.notes}
+            </DetailItem>
+          ) : null}
+        </DetailGrid>
+      </AdminCard>
 
-        <AdminCard className="px-5 py-3">
-          <div className="mb-1 flex items-center gap-2 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
-            Profit <CostBasisBadge basis={s.profit.costBasis} />
-          </div>
-          <DetailRow label="Revenue">
-            <Money value={s.profit.revenueGhs} />
-          </DetailRow>
-          <div className="border-t border-soil/12">
-            <DetailRow label="Lot cost">
-              <Money value={s.profit.costGhs} />
-            </DetailRow>
-          </div>
-          <div className="border-t border-soil/12">
-            <DetailRow label="Expenses">
-              <Money value={s.profit.expensesGhs} />
-            </DetailRow>
-          </div>
-          <div className="border-t border-soil/12">
-            <DetailRow label="Profit">
-              <Mono className="font-bold text-ink">
-                <Money value={s.profit.profitGhs} />
-              </Mono>
-            </DetailRow>
-          </div>
-        </AdminCard>
-      </div>
+      {/* Driver */}
+      <AdminCard className="px-5 py-3">
+        <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+          Driver
+        </p>
+        <DetailGrid>
+          <DetailItem label="Name">{s.driverName}</DetailItem>
+          {s.driverPhone ? (
+            <DetailItem label="Phone" mono>
+              {s.driverPhone}
+            </DetailItem>
+          ) : null}
+          {s.driverEmail ? (
+            <DetailItem label="Email">{s.driverEmail}</DetailItem>
+          ) : null}
+          <DetailItem label="Company">
+            {s.driverCompany ?? (anyDriverExtra ? "Solo operator" : <Absent />)}
+          </DetailItem>
+          {s.driverCity ? (
+            <DetailItem label="City">{s.driverCity}</DetailItem>
+          ) : null}
+          {s.driverLicenseNo ? (
+            <DetailItem label="Licence no" mono>
+              {s.driverLicenseNo}
+            </DetailItem>
+          ) : null}
+          {s.driverIdNumber ? (
+            <DetailItem label="ID number" mono>
+              {s.driverIdNumber}
+            </DetailItem>
+          ) : null}
+        </DetailGrid>
+      </AdminCard>
 
       {/* Allocations */}
-      <AdminCard className="mb-4 px-5 py-3">
+      <AdminCard className="px-5 py-3">
         <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
           Loaded lots
         </div>
@@ -552,6 +612,9 @@ export function ShipmentDetail({ id }: { id: string }) {
                   {formatKg(a.weightKg)} @{" "}
                   <Money value={a.unitCostSnapshotGhs} />
                 </Mono>
+                <Mono className="ml-2 text-[11.5px] text-console">
+                  {a.sale.transactionNo}
+                </Mono>
               </div>
               <Mono className="whitespace-nowrap text-[13px] text-ink">
                 <Money value={a.lineCostGhs} />
@@ -559,6 +622,100 @@ export function ShipmentDetail({ id }: { id: string }) {
             </div>
           ))
         )}
+      </AdminCard>
+
+      {/* Documents */}
+      <AdminCard className="px-5 py-3">
+        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+          Documents (private)
+        </div>
+        <p className="mb-2 text-[12px] text-soil">
+          Download the waybill, sign it with the driver, then upload the signed
+          copy before dispatch. Downloads are logged.
+        </p>
+        {s.documents.length === 0 ? (
+          <p className="py-1 text-[13px] text-soil">No documents on file.</p>
+        ) : (
+          s.documents.map((doc) => (
+            <div
+              key={doc.id}
+              className="flex items-center justify-between gap-3 border-b border-soil/10 py-2 text-[13px] last:border-b-0"
+            >
+              <a
+                href={shipmentDocumentUrl(s.id, doc.id)}
+                target="_blank"
+                rel="noreferrer"
+                className="min-w-0 text-console [overflow-wrap:anywhere] hover:underline"
+              >
+                {doc.name}
+              </a>
+              <div className="flex flex-none items-center gap-3">
+                <Mono className="text-[12px] text-soil">
+                  {formatShipmentDate(doc.createdAt)}
+                </Mono>
+                {beforeDispatch ? (
+                  <button
+                    type="button"
+                    onClick={() => void onRemoveDocument(doc.id, doc.name)}
+                    className="text-[12px] text-console-red"
+                    aria-label={`Remove ${doc.name}`}
+                  >
+                    ✕
+                  </button>
+                ) : null}
+              </div>
+            </div>
+          ))
+        )}
+        {s.status !== "CANCELLED" && s.status !== "CLOSED" ? (
+          <>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <Input
+                value={docName}
+                onChange={(e) => setDocName(e.target.value)}
+                placeholder="Document name"
+                aria-label="Document name"
+                className="h-8 min-w-[160px] flex-1 rounded border border-soil/25 bg-paper px-2.5 text-[13px]"
+              />
+              <FilePicker
+                accept="image/*,application/pdf"
+                busy={addDocState.isLoading}
+                confirmLabel="Upload"
+                hint="PDF or a photo of the signed waybill"
+                onConfirm={onUploadDocument}
+                optimize={false}
+                triggerLabel="Choose document"
+              />
+            </div>
+            <div className="mt-3 border-t border-soil/12 pt-3">
+              <button
+                type="button"
+                onClick={() => setSigning((v) => !v)}
+                className="cursor-pointer text-[12px] font-semibold text-console underline-offset-2 hover:underline"
+                aria-expanded={signing}
+              >
+                {signing ? "Hide signature pad" : "Or sign on this screen"}
+              </button>
+              {signing ? (
+                <div className="mt-2">
+                  <SignaturePad
+                    fileName={`${(docName.trim() || "signature")
+                      .toLowerCase()
+                      .replace(/\s+/g, "-")}.png`}
+                    onCapture={(file) => {
+                      setSigning(false);
+                      void onUploadDocument(file).catch(() => undefined);
+                    }}
+                  />
+                  <p className="mt-1 text-[11.5px] text-soil/70">
+                    Saves as &quot;{docName.trim() || "Signed waybill"}&quot; -
+                    hand the phone to the driver to sign right here.
+                  </p>
+                </div>
+              ) : null}
+            </div>
+          </>
+        ) : null}
       </AdminCard>
 
       {/* Expenses */}
@@ -608,6 +765,53 @@ export function ShipmentDetail({ id }: { id: string }) {
           ))
         )}
       </AdminCard>
+    </div>
+  );
+
+  const aside = (
+    <AdminCard className="px-5 py-3">
+      <div className="mb-1 flex items-center gap-2 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+        Profit <CostBasisBadge basis={s.profit.costBasis} />
+      </div>
+      <DetailGrid columns={2}>
+        <DetailItem label="Revenue" mono>
+          <Money value={s.profit.revenueGhs} />
+        </DetailItem>
+        <DetailItem label="Lot cost" mono>
+          <Money value={s.profit.costGhs} />
+        </DetailItem>
+        <DetailItem label="Expenses" mono>
+          <Money value={s.profit.expensesGhs} />
+        </DetailItem>
+        <DetailItem label="Profit" mono strong>
+          <Money value={s.profit.profitGhs} />
+        </DetailItem>
+      </DetailGrid>
+      <div className="mt-3 border-t border-soil/12 pt-3.5">{actions}</div>
+    </AdminCard>
+  );
+
+  return (
+    <div className="max-w-[1120px]">
+      <BackButton href={LIST} label="All shipments" className="mb-2" />
+      <AdminPageHeader
+        title={`${s.truckReg} · ${s.destination}`}
+        sub={`For ${saleSummary} · from ${s.originWarehouse.name}`}
+        actions={
+          <span className="flex flex-wrap items-center gap-1.5">
+            <ShipmentStatusBadge status={s.status} />
+            <CostBasisBadge basis={s.costBasis} />
+          </span>
+        }
+      />
+
+      {s.status === "CANCELLED" && s.cancelReason ? (
+        <AdminCard className="mb-4 border-error/40 bg-error/[0.04] px-4 py-3 text-[13px] text-ink">
+          Cancelled: {s.cancelReason}
+        </AdminCard>
+      ) : null}
+
+      <DetailShell main={main} aside={aside} />
 
       {allocOpen ? (
         <AllocateDialog shipment={s} onClose={() => setAllocOpen(false)} />

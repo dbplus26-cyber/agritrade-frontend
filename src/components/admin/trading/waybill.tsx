@@ -6,7 +6,10 @@ import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatKg } from "@/lib/format-money";
-import { useGetShipmentQuery } from "@/redux/shipments/shipments-api";
+import {
+  shipmentWaybillPdfUrl,
+  useGetShipmentQuery,
+} from "@/redux/shipments/shipments-api";
 import { formatShipmentDate } from "./shipment-bits";
 
 /**
@@ -38,9 +41,20 @@ export function Waybill({ id }: { id: string }) {
         >
           ← Back to shipment
         </Link>
-        <AdminButton className="h-9 px-4" onClick={() => window.print()}>
-          Print
-        </AdminButton>
+        <div className="flex flex-wrap items-center gap-2">
+          <AdminButton variant="outline" className="h-9 px-4" asChild>
+            <a
+              href={shipmentWaybillPdfUrl(s.id)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Download PDF
+            </a>
+          </AdminButton>
+          <AdminButton className="h-9 px-4" onClick={() => window.print()}>
+            Print
+          </AdminButton>
+        </div>
       </div>
 
       <div className="mx-auto max-w-[720px] rounded-[8px] border border-soil/25 bg-white p-8 text-ink print:max-w-none print:rounded-none print:border-0 print:p-0">
@@ -55,8 +69,9 @@ export function Waybill({ id }: { id: string }) {
           </div>
           <div className="text-right">
             <div className="text-[16px] font-bold">WAYBILL</div>
-            <div className="text-[12px] text-soil">
-              Ref {s.sale.transactionNo}
+            <div className="text-[12px] text-soil">Ref {s.transactionNo}</div>
+            <div className="max-w-[260px] text-[12px] text-soil [overflow-wrap:anywhere]">
+              Sales: {s.sales.map((sale) => sale.transactionNo).join(", ")}
             </div>
             <div className="text-[12px] text-soil">
               {s.departedAt
@@ -69,10 +84,22 @@ export function Waybill({ id }: { id: string }) {
         <div className="mt-4 grid grid-cols-2 gap-4 text-[13px]">
           <div>
             <div className="mb-1 text-[10.5px] font-bold tracking-[0.08em] text-soil uppercase">
-              Buyer
+              {s.sales.length === 1 ? "Buyer" : "Buyers"}
             </div>
-            <div className="font-semibold">{s.sale.buyer.name}</div>
-            {s.sale.buyer.phone ? <div>{s.sale.buyer.phone}</div> : null}
+            {s.sales.length === 1 ? (
+              <>
+                <div className="font-semibold">
+                  {s.sales[0]?.buyer.name ?? ""}
+                </div>
+                {s.sales[0]?.buyer.phone ? (
+                  <div>{s.sales[0].buyer.phone}</div>
+                ) : null}
+              </>
+            ) : (
+              <div className="font-semibold [overflow-wrap:anywhere]">
+                {s.sales.map((sale) => sale.buyer.name).join(", ")}
+              </div>
+            )}
             <div className="mt-1">Destination: {s.destination}</div>
           </div>
           <div>

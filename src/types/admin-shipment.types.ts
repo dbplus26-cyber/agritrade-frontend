@@ -5,6 +5,7 @@
 // redacted for callers without financial visibility (8.3); weights and the
 // goods manifest are operational and always present.
 import type { IPaginationMeta } from "./api";
+import type { SaleStatus } from "./admin-sale.types";
 
 export type ShipmentStatus =
   | "ARRIVED"
@@ -21,6 +22,8 @@ export interface IShipmentAllocation {
   weightKg: number;
   unitCostSnapshotGhs: number | null;
   lineCostGhs: number | null;
+  /** The sale this slice fulfils (null on legacy rows). */
+  sale: { id: string; transactionNo: string };
 }
 
 export interface IShipmentExpense {
@@ -36,22 +39,64 @@ export interface IManifestLine {
   weightKg: number;
 }
 
+/** A sale carried on a shipment. Paid/balance are non-null only on detail
+ * reads; every money field is null when redacted (financial visibility). */
+export interface IShipmentSale {
+  id: string;
+  transactionNo: string;
+  status: SaleStatus;
+  buyer: { id: string; name: string; phone: string | null };
+  agreedTotalGhs: number | null;
+  paidGhs: number | null;
+  balanceGhs: number | null;
+}
+
+/** A private shipment document (e.g. the signed waybill). */
+export interface IShipmentDocument {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+
+/** The saved delivery address snapshot carried on a shipment (null when the
+ * destination was entered as free text). */
+export interface IShipmentDeliveryAddress {
+  id: string;
+  label: string;
+  city: string;
+  area: string | null;
+  digitalAddress: string | null;
+  landmark: string | null;
+  shopName: string | null;
+  contactName: string | null;
+  contactPhone: string | null;
+  directions: string | null;
+}
+
 export interface IShipment {
   id: string;
   /** Human-readable document number, e.g. "SAL-2026-00042". */
   transactionNo: string;
   status: ShipmentStatus;
-  sale: {
-    id: string;
-    transactionNo: string;
-    buyer: { id: string; name: string; phone: string | null };
-  };
+  /** One or more sales this truck fulfils. */
+  sales: IShipmentSale[];
+  salesCount: number;
   originWarehouse: { id: string; name: string };
   destination: string;
+  /** The saved delivery address the destination came from, if any. */
+  deliveryAddress: IShipmentDeliveryAddress | null;
   truckReg: string;
   truckCapacityKg: number | null;
+  /** The drivers-directory record the snapshot came from, if any. */
+  driverId: string | null;
   driverName: string;
   driverPhone: string | null;
+  driverEmail: string | null;
+  driverCompany: string | null;
+  driverCity: string | null;
+  driverLicenseNo: string | null;
+  driverIdNumber: string | null;
+  documents: IShipmentDocument[];
   costBasis: string;
   totalWeightKg: number;
   manifest: IManifestLine[];
@@ -82,6 +127,36 @@ export interface IAvailableLot {
   unitCostGhs: number | null;
 }
 
+/** One commodity line on an eligible (shippable) sale. */
+export interface IEligibleSaleLine {
+  commodityId: string;
+  commodityName: string;
+  agreedKg: number;
+  /** Weight still to ship after past dispatches. */
+  remainingKg: number;
+}
+
+/**
+ * A sale that can go on a new truck: CONFIRMED, payment terms met, not fully
+ * shipped and not already planned onto an active shipment. Money fields are
+ * null when redacted (financial visibility).
+ */
+export interface IEligibleSale {
+  id: string;
+  transactionNo: string;
+  buyer: { id: string; name: string };
+  agreedTotalGhs: number | null;
+  paidGhs: number | null;
+  requiredBeforeLoadingGhs: number | null;
+  totalRemainingKg: number;
+  lines: IEligibleSaleLine[];
+}
+
+export interface IEligibleSalesResponse {
+  message: string;
+  data: { sales: IEligibleSale[] };
+}
+
 export interface IShipmentListResponse {
   message: string;
   data: IShipment[];
@@ -110,12 +185,24 @@ export interface IShipmentListQuery {
 }
 
 export interface ICreateShipmentInput {
-  saleId: string;
+  /** The confirmed sales this truck fulfils (1-20). */
+  saleIds: string[];
   originWarehouseId: string;
-  destination: string;
+  /** Free-text destination; optional when `deliveryAddressId` is given. */
+  destination?: string;
+  /** A saved delivery address to ship to (snapshots onto the shipment). */
+  deliveryAddressId?: string;
   truckReg: string;
-  driverName: string;
+  /** A drivers-directory record; backfills the driver snapshot server-side. */
+  driverId?: string;
+  /** Required unless `driverId` is given; overrides the directory snapshot. */
+  driverName?: string;
   driverPhone?: string;
+  driverEmail?: string;
+  driverCompany?: string;
+  driverCity?: string;
+  driverLicenseNo?: string;
+  driverIdNumber?: string;
   truckCapacityKg?: number;
   expectedArrivalAt?: string;
   notes?: string;
@@ -123,7 +210,16 @@ export interface ICreateShipmentInput {
 
 export interface IAllocationInput {
   lotId: string;
+  /** The sale this slice fulfils - required by the backend. */
+  saleId: string;
   weightKg: number;
+}
+
+export interface IDispatchShipmentInput {
+  id: string;
+  departedAt?: string;
+  /** Dispatch even though no signed waybill has been uploaded. */
+  overrideMissingWaybill?: boolean;
 }
 
 export interface IShipmentExpenseInput {
