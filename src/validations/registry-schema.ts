@@ -57,6 +57,18 @@ export const supplierSchema = z.object({
   community: optionalText(120),
   sourceType: z.enum(PurchaseSource),
   notes: optionalText(1000),
+  email: z.email("Enter a valid email").max(255).or(z.literal("")).optional(),
+  address: optionalText(300),
+  idNumber: optionalText(50),
+  bankName: optionalText(120),
+  bankAccountNumber: optionalText(50),
+  momoNumber: z
+    .string()
+    .trim()
+    .min(6, "Enter a full mobile-money number")
+    .max(30)
+    .or(z.literal(""))
+    .optional(),
 });
 export type SupplierValues = z.infer<typeof supplierSchema>;
 
@@ -66,6 +78,11 @@ export const buyerSchema = z.object({
   email: z.email("Enter a valid email").max(255).or(z.literal("")).optional(),
   city: optionalText(120),
   notes: optionalText(1000),
+  address: optionalText(300),
+  businessName: optionalText(200),
+  registrationNumber: optionalText(80),
+  contactPersonName: optionalText(150),
+  contactPersonPhone: phoneField,
 });
 export type BuyerValues = z.infer<typeof buyerSchema>;
 

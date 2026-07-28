@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
@@ -34,9 +34,12 @@ import {
   useGetBuyersQuery,
   useUpdateBuyerMutation,
 } from "@/redux/buyers/buyers-api";
+import { PhotoViewDialog } from "@/components/admin/users/user-identity";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
+import { DateTimeCell } from "@/components/admin/date-cell";
 import { notify } from "@/lib/notify";
+import { optimizeImage } from "@/lib/optimize-image";
 import { cn } from "@/lib/utils";
 import type { IBuyer, IRegistryListQuery } from "@/types/registry.types";
 import { buyerSchema, type BuyerValues } from "@/validations/registry-schema";
@@ -49,7 +52,7 @@ import {
   statusToQuery,
   type StatusFilter,
 } from "./registry-bits";
-import { RecordTimestamps } from "./supplier-screens";
+import { RecordTimestamps, RegistryAvatar } from "./supplier-screens";
 
 const LIST = "/admin/buyers";
 const FILTER_DEFAULTS = { status: "all", size: "10", from: "", to: "" };
@@ -106,9 +109,10 @@ export function BuyerTable() {
           return (
             <Link
               href={`${LIST}/${b.id}`}
-              className="outline-none focus-visible:underline"
+              className="flex min-w-0 items-center gap-2.5 outline-none focus-visible:underline"
               onClick={(e) => e.stopPropagation()}
             >
+              <RegistryAvatar name={b.name} photoUrl={b.photoUrl} />
               <span className="min-w-0">
                 <span className="block truncate font-medium text-ink">
                   {b.name}
@@ -148,6 +152,14 @@ export function BuyerTable() {
           ) : (
             <Absent />
           ),
+      },
+      {
+        id: "added",
+        accessorFn: (b) => b.createdAt,
+        header: "Added",
+        enableSorting: false,
+        meta: columnMeta({ wide: true }),
+        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",
@@ -260,6 +272,20 @@ export function BuyerTable() {
   );
 }
 
+/** "" for create, or the record's values for edit. */
+const toBuyerValues = (buyer?: IBuyer): BuyerValues => ({
+  name: buyer?.name ?? "",
+  phone: buyer?.phone ?? "",
+  email: buyer?.email ?? "",
+  city: buyer?.city ?? "",
+  notes: buyer?.notes ?? "",
+  address: buyer?.address ?? "",
+  businessName: buyer?.businessName ?? "",
+  registrationNumber: buyer?.registrationNumber ?? "",
+  contactPersonName: buyer?.contactPersonName ?? "",
+  contactPersonPhone: buyer?.contactPersonPhone ?? "",
+});
+
 function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
   const router = useRouter();
   const isEdit = buyer !== undefined;
@@ -272,22 +298,51 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
   const readOnly = !isEditing;
   const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
 
+  // Photo travels WITH the save (multipart payload + file, the profile-photo
+  // convention); `removePhoto` clears an existing one server-side.
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [removePhoto, setRemovePhoto] = useState(false);
+  const [viewPhoto, setViewPhoto] = useState(false);
+  const stagedUrl = useMemo(
+    () => (photoFile ? URL.createObjectURL(photoFile) : null),
+    [photoFile],
+  );
+  const previewUrl =
+    stagedUrl ?? (!removePhoto ? (buyer?.photoUrl ?? null) : null);
+
+  const clearPhotoState = () => {
+    setPhotoFile(null);
+    setRemovePhoto(false);
+    if (fileInput.current) fileInput.current.value = "";
+  };
+
   const {
     register,
+    control,
     handleSubmit,
     reset,
     setError,
     formState: { errors },
   } = useForm<BuyerValues>({
     resolver: zodResolver(buyerSchema),
-    defaultValues: {
-      name: buyer?.name ?? "",
-      phone: buyer?.phone ?? "",
-      email: buyer?.email ?? "",
-      city: buyer?.city ?? "",
-      notes: buyer?.notes ?? "",
-    },
+    defaultValues: toBuyerValues(buyer),
   });
+
+  // A background refetch can bump the record (another tab, a lifecycle
+  // action). Track the fresh values while reading, but never clobber an
+  // in-progress edit - which is why the parent no longer key-remounts the
+  // form on updatedAt.
+  useEffect(() => {
+    if (!isEditing) {
+      reset(toBuyerValues(buyer));
+      // Drop any staged file from the native input too, so re-picking the
+      // same photo later still fires onChange.
+      if (fileInput.current) fileInput.current.value = "";
+    }
+  }, [buyer, isEditing, reset]);
+  const watchedName = useWatch({ control, name: "name" });
+  const avatarName = watchedName || buyer?.name || "";
 
   const onSubmit = async (values: BuyerValues) => {
     const opt = (v: string | undefined) => {
@@ -305,17 +360,46 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
             email: opt(values.email),
             city: opt(values.city),
             notes: opt(values.notes),
+            address: opt(values.address),
+            businessName: opt(values.businessName),
+            registrationNumber: opt(values.registrationNumber),
+            contactPersonName: opt(values.contactPersonName),
+            contactPersonPhone: opt(values.contactPersonPhone),
+            ...(removePhoto && !photoFile ? { removePhoto: true } : {}),
           },
+          photo: photoFile ?? undefined,
         }).unwrap();
+        // Dropping back to read mode lets the sync effect adopt the fresh
+        // values and finish the photo-input cleanup.
+        setPhotoFile(null);
+        setRemovePhoto(false);
         notify.success("Buyer updated");
         setIsEditing(false);
       } else {
         const res = await createBuyer({
-          name: values.name,
-          ...(values.phone?.trim() ? { phone: values.phone.trim() } : {}),
-          ...(values.email?.trim() ? { email: values.email.trim() } : {}),
-          ...(values.city?.trim() ? { city: values.city.trim() } : {}),
-          ...(values.notes?.trim() ? { notes: values.notes.trim() } : {}),
+          body: {
+            name: values.name,
+            ...(values.phone?.trim() ? { phone: values.phone.trim() } : {}),
+            ...(values.email?.trim() ? { email: values.email.trim() } : {}),
+            ...(values.city?.trim() ? { city: values.city.trim() } : {}),
+            ...(values.notes?.trim() ? { notes: values.notes.trim() } : {}),
+            ...(values.address?.trim()
+              ? { address: values.address.trim() }
+              : {}),
+            ...(values.businessName?.trim()
+              ? { businessName: values.businessName.trim() }
+              : {}),
+            ...(values.registrationNumber?.trim()
+              ? { registrationNumber: values.registrationNumber.trim() }
+              : {}),
+            ...(values.contactPersonName?.trim()
+              ? { contactPersonName: values.contactPersonName.trim() }
+              : {}),
+            ...(values.contactPersonPhone?.trim()
+              ? { contactPersonPhone: values.contactPersonPhone.trim() }
+              : {}),
+          },
+          photo: photoFile ?? undefined,
         }).unwrap();
         notify.success("Buyer created");
         router.replace(`${LIST}/${res.data.buyer.id}`);
@@ -323,7 +407,18 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
     } catch (err) {
       const { message, fieldErrors, hasFieldErrors } = extractApiError(err);
       if (hasFieldErrors && fieldErrors) {
-        for (const field of ["name", "phone", "email", "city", "notes"] as const) {
+        for (const field of [
+          "name",
+          "phone",
+          "email",
+          "city",
+          "notes",
+          "address",
+          "businessName",
+          "registrationNumber",
+          "contactPersonName",
+          "contactPersonPhone",
+        ] as const) {
           if (fieldErrors[field])
             setError(field, { message: fieldErrors[field] });
         }
@@ -342,6 +437,74 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col gap-[13px]"
       >
+        <div className="flex items-center gap-3.5">
+          {previewUrl && readOnly ? (
+            <button
+              type="button"
+              onClick={() => setViewPhoto(true)}
+              aria-label="View photo"
+              title="View photo"
+              className="cursor-zoom-in rounded-full outline-none focus-visible:ring-2 focus-visible:ring-console/40"
+            >
+              <RegistryAvatar
+                name={avatarName}
+                photoUrl={previewUrl}
+                size={64}
+              />
+            </button>
+          ) : (
+            <RegistryAvatar name={avatarName} photoUrl={previewUrl} size={64} />
+          )}
+          {isEditing ? (
+            <div className="flex flex-wrap gap-2">
+              <AdminButton
+                type="button"
+                variant="secondary"
+                className="h-[32px] px-3 text-[12.5px]"
+                onClick={() => fileInput.current?.click()}
+              >
+                {previewUrl ? "Change photo" : "Add photo"}
+              </AdminButton>
+              {previewUrl ? (
+                <AdminButton
+                  type="button"
+                  variant="outline"
+                  className="h-[32px] px-3 text-[12.5px]"
+                  onClick={() => {
+                    setPhotoFile(null);
+                    setRemovePhoto(true);
+                    if (fileInput.current) fileInput.current.value = "";
+                  }}
+                >
+                  Remove photo
+                </AdminButton>
+              ) : null}
+            </div>
+          ) : null}
+          <input
+            ref={fileInput}
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                void optimizeImage(file).then((staged) => {
+                  setPhotoFile(staged);
+                  setRemovePhoto(false);
+                });
+              }
+            }}
+          />
+        </div>
+        {previewUrl ? (
+          <PhotoViewDialog
+            src={previewUrl}
+            name={avatarName || "Buyer photo"}
+            open={viewPhoto}
+            onOpenChange={setViewPhoto}
+          />
+        ) : null}
         <AdminField label="Name" error={errors.name?.message}>
           <Input
             placeholder="e.g. Accra Grain Traders"
@@ -378,6 +541,93 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
             {...register("email")}
           />
         </AdminField>
+        <AdminField label="Address" optional error={errors.address?.message}>
+          <Input
+            placeholder="e.g. Plot 5, Spintex Road, Accra"
+            disabled={readOnly}
+            className={cn(
+              adminInputClass,
+              roCls,
+              errors.address && "border-error",
+            )}
+            {...register("address")}
+          />
+        </AdminField>
+        <div className="mt-1 border-t border-soil/15 pt-3">
+          <p className="stencil text-[11px] uppercase tracking-[0.14em] text-soil">
+            Business
+          </p>
+        </div>
+        <div className="grid gap-[13px] sm:grid-cols-2">
+          <AdminField
+            label="Business name"
+            optional
+            error={errors.businessName?.message}
+          >
+            <Input
+              placeholder="e.g. Accra Grain Traders Ltd"
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                errors.businessName && "border-error",
+              )}
+              {...register("businessName")}
+            />
+          </AdminField>
+          <AdminField
+            label="Registration number"
+            optional
+            error={errors.registrationNumber?.message}
+          >
+            <Input
+              placeholder="e.g. CS123456789"
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                "font-adminmono",
+                errors.registrationNumber && "border-error",
+              )}
+              {...register("registrationNumber")}
+            />
+          </AdminField>
+        </div>
+        <div className="grid gap-[13px] sm:grid-cols-2">
+          <AdminField
+            label="Contact person name"
+            optional
+            error={errors.contactPersonName?.message}
+          >
+            <Input
+              placeholder="e.g. Ama Mensah"
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                errors.contactPersonName && "border-error",
+              )}
+              {...register("contactPersonName")}
+            />
+          </AdminField>
+          <AdminField
+            label="Contact person phone"
+            optional
+            error={errors.contactPersonPhone?.message}
+          >
+            <Input
+              type="tel"
+              placeholder="055 000 0000"
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                errors.contactPersonPhone && "border-error",
+              )}
+              {...register("contactPersonPhone")}
+            />
+          </AdminField>
+        </div>
         <AdminField label="Notes" optional error={errors.notes?.message}>
           <textarea
             rows={3}
@@ -426,6 +676,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
                 className="h-[38px] px-3.5"
                 onClick={() => {
                   reset();
+                  clearPhotoState();
                   setIsEditing(false);
                 }}
               >
@@ -484,7 +735,7 @@ export function BuyerEdit({ id }: { id: string }) {
         title={buyer.name}
         sub="Edit the buyer and their lifecycle"
       />
-      <BuyerFormFields key={buyer.updatedAt} buyer={buyer} />
+      <BuyerFormFields buyer={buyer} />
       <RecordTimestamps createdAt={buyer.createdAt} updatedAt={buyer.updatedAt} />
       <LifecycleActions
         noun="buyer"

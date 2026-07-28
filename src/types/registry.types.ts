@@ -46,6 +46,13 @@ export interface ISupplier {
   community: string | null;
   sourceType: PurchaseSource;
   notes: string | null;
+  photoUrl: string | null;
+  email: string | null;
+  address: string | null;
+  idNumber: string | null;
+  bankName: string | null;
+  bankAccountNumber: string | null;
+  momoNumber: string | null;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -58,6 +65,12 @@ export interface IBuyer {
   email: string | null;
   city: string | null;
   notes: string | null;
+  photoUrl: string | null;
+  address: string | null;
+  businessName: string | null;
+  registrationNumber: string | null;
+  contactPersonName: string | null;
+  contactPersonPhone: string | null;
   /** Reserved for the sales module - read-only until payment policies land. */
   paymentPolicyId: string | null;
   isActive: boolean;
@@ -148,12 +161,19 @@ export interface IUpdateWarehouseInput {
   location?: string | null;
 }
 
+/** Mirrors backend `createSupplierSchema` / `updateSupplierSchema`. */
 export interface ICreateSupplierInput {
   name: string;
   phone?: string;
   community?: string;
   sourceType?: PurchaseSource;
   notes?: string;
+  email?: string;
+  address?: string;
+  idNumber?: string;
+  bankName?: string;
+  bankAccountNumber?: string;
+  momoNumber?: string;
 }
 export interface IUpdateSupplierInput {
   name?: string;
@@ -161,14 +181,28 @@ export interface IUpdateSupplierInput {
   community?: string | null;
   sourceType?: PurchaseSource;
   notes?: string | null;
+  email?: string | null;
+  address?: string | null;
+  idNumber?: string | null;
+  bankName?: string | null;
+  bankAccountNumber?: string | null;
+  momoNumber?: string | null;
+  /** Clears the existing photo (the backend deletes the Cloudinary asset). */
+  removePhoto?: boolean;
 }
 
+/** Mirrors backend `createBuyerSchema` / `updateBuyerSchema`. */
 export interface ICreateBuyerInput {
   name: string;
   phone?: string;
   email?: string;
   city?: string;
   notes?: string;
+  address?: string;
+  businessName?: string;
+  registrationNumber?: string;
+  contactPersonName?: string;
+  contactPersonPhone?: string;
 }
 export interface IUpdateBuyerInput {
   name?: string;
@@ -176,6 +210,13 @@ export interface IUpdateBuyerInput {
   email?: string | null;
   city?: string | null;
   notes?: string | null;
+  address?: string | null;
+  businessName?: string | null;
+  registrationNumber?: string | null;
+  contactPersonName?: string | null;
+  contactPersonPhone?: string | null;
+  /** Clears the existing photo (the backend deletes the Cloudinary asset). */
+  removePhoto?: boolean;
 }
 
 export interface ICreateExpenseCategoryInput {

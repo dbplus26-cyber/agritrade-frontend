@@ -10,6 +10,18 @@ import type {
 } from "@/types/registry.types";
 import type { IMessageResponse } from "@/types/auth.types";
 
+/** JSON unless a photo rides along, then `payload` + `photo` multipart parts. */
+const withOptionalPhoto = (
+  body: ICreateBuyerInput | IUpdateBuyerInput,
+  photo?: File,
+): FormData | ICreateBuyerInput | IUpdateBuyerInput => {
+  if (!photo) return body;
+  const form = new FormData();
+  form.append("payload", JSON.stringify(body));
+  form.append("photo", photo);
+  return form;
+};
+
 /** The buyer directory, mirroring the backend `/admin/buyers` surface. */
 export const buyersApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -32,19 +44,26 @@ export const buyersApi = apiSlice.injectEndpoints({
       providesTags: (_r, _e, id) => [{ type: "Buyers", id }],
     }),
 
-    createBuyer: builder.mutation<IBuyerResponse, ICreateBuyerInput>({
-      query: (body) => ({ url: "admin/buyers", method: "POST", body }),
+    createBuyer: builder.mutation<
+      IBuyerResponse,
+      { body: ICreateBuyerInput; photo?: File }
+    >({
+      query: ({ body, photo }) => ({
+        url: "admin/buyers",
+        method: "POST",
+        body: withOptionalPhoto(body, photo),
+      }),
       invalidatesTags: [{ type: "Buyers", id: "LIST" }],
     }),
 
     updateBuyer: builder.mutation<
       IBuyerResponse,
-      { id: string; body: IUpdateBuyerInput }
+      { id: string; body: IUpdateBuyerInput; photo?: File }
     >({
-      query: ({ id, body }) => ({
+      query: ({ id, body, photo }) => ({
         url: `admin/buyers/${id}`,
         method: "PATCH",
-        body,
+        body: withOptionalPhoto(body, photo),
       }),
       invalidatesTags: (_r, _e, { id }) => [
         { type: "Buyers", id },

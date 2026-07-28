@@ -10,6 +10,18 @@ import type {
 } from "@/types/registry.types";
 import type { IMessageResponse } from "@/types/auth.types";
 
+/** JSON unless a photo rides along, then `payload` + `photo` multipart parts. */
+const withOptionalPhoto = (
+  body: ICreateSupplierInput | IUpdateSupplierInput,
+  photo?: File,
+): FormData | ICreateSupplierInput | IUpdateSupplierInput => {
+  if (!photo) return body;
+  const form = new FormData();
+  form.append("payload", JSON.stringify(body));
+  form.append("photo", photo);
+  return form;
+};
+
 /** The supplier directory, mirroring the backend `/admin/suppliers` surface. */
 export const suppliersApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -35,19 +47,26 @@ export const suppliersApi = apiSlice.injectEndpoints({
       providesTags: (_r, _e, id) => [{ type: "Suppliers", id }],
     }),
 
-    createSupplier: builder.mutation<ISupplierResponse, ICreateSupplierInput>({
-      query: (body) => ({ url: "admin/suppliers", method: "POST", body }),
+    createSupplier: builder.mutation<
+      ISupplierResponse,
+      { body: ICreateSupplierInput; photo?: File }
+    >({
+      query: ({ body, photo }) => ({
+        url: "admin/suppliers",
+        method: "POST",
+        body: withOptionalPhoto(body, photo),
+      }),
       invalidatesTags: [{ type: "Suppliers", id: "LIST" }],
     }),
 
     updateSupplier: builder.mutation<
       ISupplierResponse,
-      { id: string; body: IUpdateSupplierInput }
+      { id: string; body: IUpdateSupplierInput; photo?: File }
     >({
-      query: ({ id, body }) => ({
+      query: ({ id, body, photo }) => ({
         url: `admin/suppliers/${id}`,
         method: "PATCH",
-        body,
+        body: withOptionalPhoto(body, photo),
       }),
       invalidatesTags: (_r, _e, { id }) => [
         { type: "Suppliers", id },

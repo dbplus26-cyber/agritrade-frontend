@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
@@ -42,10 +42,15 @@ import {
   useGetSuppliersQuery,
   useUpdateSupplierMutation,
 } from "@/redux/suppliers/suppliers-api";
+import { PhotoViewDialog } from "@/components/admin/users/user-identity";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
+import { DateTimeCell } from "@/components/admin/date-cell";
+import { formatDateTime } from "@/lib/format-date";
 import { notify } from "@/lib/notify";
+import { optimizeImage } from "@/lib/optimize-image";
 import { cn } from "@/lib/utils";
+import { avatarOf } from "@/static-data/admin/registers";
 import {
   PurchaseSource,
   type ISupplier,
@@ -69,16 +74,6 @@ import {
 const LIST = "/admin/suppliers";
 const FILTER_DEFAULTS = { status: "all", source: "all", size: "10", from: "", to: "" };
 
-/** Date + time, e.g. "12 Jul 2026, 2:30 PM". */
-export const formatDateTime = (value: string): string =>
-  new Date(value).toLocaleString(undefined, {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-
 /** "Added" / "Updated" timestamp line for a directory detail view. */
 export function RecordTimestamps({
   createdAt,
@@ -94,6 +89,55 @@ export function RecordTimestamps({
         <> · Updated {formatDateTime(updatedAt)}</>
       ) : null}
     </p>
+  );
+}
+
+/**
+ * Photo-or-initials avatar for a directory row or detail card (the
+ * farmers-register `FarmerCell` idiom, photo-aware). Shared with the buyer
+ * screens.
+ */
+export function RegistryAvatar({
+  name,
+  photoUrl,
+  size = 32,
+  className,
+}: {
+  name: string;
+  photoUrl: string | null;
+  size?: number;
+  className?: string;
+}) {
+  if (photoUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- Cloudinary/objectURL avatar
+      <img
+        src={photoUrl}
+        alt=""
+        width={size}
+        height={size}
+        className={cn("shrink-0 rounded-full object-cover", className)}
+        style={{ width: size, height: size }}
+      />
+    );
+  }
+  const a = avatarOf(name);
+  return (
+    <span
+      className={cn(
+        "flex shrink-0 items-center justify-center rounded-full font-bold",
+        className,
+      )}
+      style={{
+        width: size,
+        height: size,
+        background: a.bg,
+        color: a.fg,
+        fontSize: Math.max(11, Math.round(size * 0.34)),
+      }}
+    >
+      {a.init}
+    </span>
   );
 }
 
@@ -169,9 +213,10 @@ export function SupplierTable() {
           return (
             <Link
               href={`${LIST}/${s.id}`}
-              className="outline-none focus-visible:underline"
+              className="flex min-w-0 items-center gap-2.5 outline-none focus-visible:underline"
               onClick={(e) => e.stopPropagation()}
             >
+              <RegistryAvatar name={s.name} photoUrl={s.photoUrl} />
               <span className="min-w-0">
                 <span className="block truncate font-medium text-ink">
                   {s.name}
@@ -210,6 +255,14 @@ export function SupplierTable() {
             {SOURCE_LABEL[row.original.sourceType]}
           </span>
         ),
+      },
+      {
+        id: "added",
+        accessorFn: (s) => s.createdAt,
+        header: "Added",
+        enableSorting: false,
+        meta: columnMeta({ wide: true }),
+        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",
@@ -330,6 +383,21 @@ export function SupplierTable() {
   );
 }
 
+/** "" for create, or the record's values for edit. */
+const toSupplierValues = (supplier?: ISupplier): SupplierValues => ({
+  name: supplier?.name ?? "",
+  phone: supplier?.phone ?? "",
+  community: supplier?.community ?? "",
+  sourceType: supplier?.sourceType ?? PurchaseSource.INDIVIDUAL,
+  notes: supplier?.notes ?? "",
+  email: supplier?.email ?? "",
+  address: supplier?.address ?? "",
+  idNumber: supplier?.idNumber ?? "",
+  bankName: supplier?.bankName ?? "",
+  bankAccountNumber: supplier?.bankAccountNumber ?? "",
+  momoNumber: supplier?.momoNumber ?? "",
+});
+
 function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
   const router = useRouter();
   const isEdit = supplier !== undefined;
@@ -344,6 +412,25 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
   // Keep disabled inputs legible as a read view rather than a greyed-out form.
   const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
 
+  // Photo travels WITH the save (multipart payload + file, the profile-photo
+  // convention); `removePhoto` clears an existing one server-side.
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [removePhoto, setRemovePhoto] = useState(false);
+  const [viewPhoto, setViewPhoto] = useState(false);
+  const stagedUrl = useMemo(
+    () => (photoFile ? URL.createObjectURL(photoFile) : null),
+    [photoFile],
+  );
+  const previewUrl =
+    stagedUrl ?? (!removePhoto ? (supplier?.photoUrl ?? null) : null);
+
+  const clearPhotoState = () => {
+    setPhotoFile(null);
+    setRemovePhoto(false);
+    if (fileInput.current) fileInput.current.value = "";
+  };
+
   const {
     register,
     control,
@@ -353,14 +440,23 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
     formState: { errors },
   } = useForm<SupplierValues>({
     resolver: zodResolver(supplierSchema),
-    defaultValues: {
-      name: supplier?.name ?? "",
-      phone: supplier?.phone ?? "",
-      community: supplier?.community ?? "",
-      sourceType: supplier?.sourceType ?? PurchaseSource.INDIVIDUAL,
-      notes: supplier?.notes ?? "",
-    },
+    defaultValues: toSupplierValues(supplier),
   });
+
+  // A background refetch can bump the record (another tab, a lifecycle
+  // action). Track the fresh values while reading, but never clobber an
+  // in-progress edit - which is why the parent no longer key-remounts the
+  // form on updatedAt.
+  useEffect(() => {
+    if (!isEditing) {
+      reset(toSupplierValues(supplier));
+      // Drop any staged file from the native input too, so re-picking the
+      // same photo later still fires onChange.
+      if (fileInput.current) fileInput.current.value = "";
+    }
+  }, [supplier, isEditing, reset]);
+  const watchedName = useWatch({ control, name: "name" });
+  const avatarName = watchedName || supplier?.name || "";
 
   const onSubmit = async (values: SupplierValues) => {
     const opt = (v: string | undefined) => {
@@ -378,19 +474,50 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
             community: opt(values.community),
             sourceType: values.sourceType,
             notes: opt(values.notes),
+            email: opt(values.email),
+            address: opt(values.address),
+            idNumber: opt(values.idNumber),
+            bankName: opt(values.bankName),
+            bankAccountNumber: opt(values.bankAccountNumber),
+            momoNumber: opt(values.momoNumber),
+            ...(removePhoto && !photoFile ? { removePhoto: true } : {}),
           },
+          photo: photoFile ?? undefined,
         }).unwrap();
+        // Dropping back to read mode lets the sync effect adopt the fresh
+        // values and finish the photo-input cleanup.
+        setPhotoFile(null);
+        setRemovePhoto(false);
         notify.success("Supplier updated");
         setIsEditing(false);
       } else {
         const res = await createSupplier({
-          name: values.name,
-          ...(values.phone?.trim() ? { phone: values.phone.trim() } : {}),
-          ...(values.community?.trim()
-            ? { community: values.community.trim() }
-            : {}),
-          sourceType: values.sourceType,
-          ...(values.notes?.trim() ? { notes: values.notes.trim() } : {}),
+          body: {
+            name: values.name,
+            ...(values.phone?.trim() ? { phone: values.phone.trim() } : {}),
+            ...(values.community?.trim()
+              ? { community: values.community.trim() }
+              : {}),
+            sourceType: values.sourceType,
+            ...(values.notes?.trim() ? { notes: values.notes.trim() } : {}),
+            ...(values.email?.trim() ? { email: values.email.trim() } : {}),
+            ...(values.address?.trim()
+              ? { address: values.address.trim() }
+              : {}),
+            ...(values.idNumber?.trim()
+              ? { idNumber: values.idNumber.trim() }
+              : {}),
+            ...(values.bankName?.trim()
+              ? { bankName: values.bankName.trim() }
+              : {}),
+            ...(values.bankAccountNumber?.trim()
+              ? { bankAccountNumber: values.bankAccountNumber.trim() }
+              : {}),
+            ...(values.momoNumber?.trim()
+              ? { momoNumber: values.momoNumber.trim() }
+              : {}),
+          },
+          photo: photoFile ?? undefined,
         }).unwrap();
         notify.success("Supplier created");
         router.replace(`${LIST}/${res.data.supplier.id}`);
@@ -398,7 +525,18 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
     } catch (err) {
       const { message, fieldErrors, hasFieldErrors } = extractApiError(err);
       if (hasFieldErrors && fieldErrors) {
-        for (const field of ["name", "phone", "community", "notes"] as const) {
+        for (const field of [
+          "name",
+          "phone",
+          "community",
+          "notes",
+          "email",
+          "address",
+          "idNumber",
+          "bankName",
+          "bankAccountNumber",
+          "momoNumber",
+        ] as const) {
           if (fieldErrors[field])
             setError(field, { message: fieldErrors[field] });
         }
@@ -417,6 +555,74 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col gap-[13px]"
       >
+        <div className="flex items-center gap-3.5">
+          {previewUrl && readOnly ? (
+            <button
+              type="button"
+              onClick={() => setViewPhoto(true)}
+              aria-label="View photo"
+              title="View photo"
+              className="cursor-zoom-in rounded-full outline-none focus-visible:ring-2 focus-visible:ring-console/40"
+            >
+              <RegistryAvatar
+                name={avatarName}
+                photoUrl={previewUrl}
+                size={64}
+              />
+            </button>
+          ) : (
+            <RegistryAvatar name={avatarName} photoUrl={previewUrl} size={64} />
+          )}
+          {isEditing ? (
+            <div className="flex flex-wrap gap-2">
+              <AdminButton
+                type="button"
+                variant="secondary"
+                className="h-[32px] px-3 text-[12.5px]"
+                onClick={() => fileInput.current?.click()}
+              >
+                {previewUrl ? "Change photo" : "Add photo"}
+              </AdminButton>
+              {previewUrl ? (
+                <AdminButton
+                  type="button"
+                  variant="outline"
+                  className="h-[32px] px-3 text-[12.5px]"
+                  onClick={() => {
+                    setPhotoFile(null);
+                    setRemovePhoto(true);
+                    if (fileInput.current) fileInput.current.value = "";
+                  }}
+                >
+                  Remove photo
+                </AdminButton>
+              ) : null}
+            </div>
+          ) : null}
+          <input
+            ref={fileInput}
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                void optimizeImage(file).then((staged) => {
+                  setPhotoFile(staged);
+                  setRemovePhoto(false);
+                });
+              }
+            }}
+          />
+        </div>
+        {previewUrl ? (
+          <PhotoViewDialog
+            src={previewUrl}
+            name={avatarName || "Supplier photo"}
+            open={viewPhoto}
+            onOpenChange={setViewPhoto}
+          />
+        ) : null}
         <AdminField label="Name" error={errors.name?.message}>
           <Input
             placeholder="e.g. Ibrahim Fuseini"
@@ -452,6 +658,46 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
             />
           </AdminField>
         </div>
+        <div className="grid gap-[13px] sm:grid-cols-2">
+          <AdminField label="Email" optional error={errors.email?.message}>
+            <Input
+              type="email"
+              placeholder="supplier@example.com"
+              disabled={readOnly}
+              className={cn(adminInputClass, roCls, errors.email && "border-error")}
+              {...register("email")}
+            />
+          </AdminField>
+          <AdminField
+            label="ID number"
+            optional
+            hint="Ghana Card or another official ID."
+            error={errors.idNumber?.message}
+          >
+            <Input
+              placeholder="e.g. GHA-000000000-0"
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                errors.idNumber && "border-error",
+              )}
+              {...register("idNumber")}
+            />
+          </AdminField>
+        </div>
+        <AdminField label="Address" optional error={errors.address?.message}>
+          <Input
+            placeholder="e.g. House No. 12, Savelugu"
+            disabled={readOnly}
+            className={cn(
+              adminInputClass,
+              roCls,
+              errors.address && "border-error",
+            )}
+            {...register("address")}
+          />
+        </AdminField>
         <AdminField
           label="Source type"
           hint="Individual farmer, corporate seller, or an agent-recorded source."
@@ -477,6 +723,60 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
                 </SelectContent>
               </Select>
             )}
+          />
+        </AdminField>
+        <div className="mt-1 border-t border-soil/15 pt-3">
+          <p className="stencil text-[11px] uppercase tracking-[0.14em] text-soil">
+            Payout details
+          </p>
+        </div>
+        <div className="grid gap-[13px] sm:grid-cols-2">
+          <AdminField label="Bank name" optional error={errors.bankName?.message}>
+            <Input
+              placeholder="e.g. GCB Bank"
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                errors.bankName && "border-error",
+              )}
+              {...register("bankName")}
+            />
+          </AdminField>
+          <AdminField
+            label="Bank account number"
+            optional
+            error={errors.bankAccountNumber?.message}
+          >
+            <Input
+              inputMode="numeric"
+              placeholder="e.g. 1234567890123"
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                "font-adminmono",
+                errors.bankAccountNumber && "border-error",
+              )}
+              {...register("bankAccountNumber")}
+            />
+          </AdminField>
+        </div>
+        <AdminField
+          label="Mobile money number"
+          optional
+          error={errors.momoNumber?.message}
+        >
+          <Input
+            type="tel"
+            placeholder="024 000 0000"
+            disabled={readOnly}
+            className={cn(
+              adminInputClass,
+              roCls,
+              errors.momoNumber && "border-error",
+            )}
+            {...register("momoNumber")}
           />
         </AdminField>
         <AdminField label="Notes" optional error={errors.notes?.message}>
@@ -527,6 +827,7 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
                 className="h-[38px] px-3.5"
                 onClick={() => {
                   reset();
+                  clearPhotoState();
                   setIsEditing(false);
                 }}
               >
@@ -585,7 +886,7 @@ export function SupplierEdit({ id }: { id: string }) {
         title={supplier.name}
         sub="Edit the supplier and their lifecycle"
       />
-      <SupplierFormFields key={supplier.updatedAt} supplier={supplier} />
+      <SupplierFormFields supplier={supplier} />
       <RecordTimestamps
         createdAt={supplier.createdAt}
         updatedAt={supplier.updatedAt}
