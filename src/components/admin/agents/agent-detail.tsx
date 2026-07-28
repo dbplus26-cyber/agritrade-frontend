@@ -11,10 +11,13 @@ import {
   AdminPageHeader,
   adminInputClass,
   adminSelectClass,
+  DetailShell,
   Mono,
-  ToneBadge,
+  TONES,
   type Tone,
 } from "@/components/admin/ui";
+import { DateTimeCell } from "@/components/admin/date-cell";
+import { RegistryAvatar } from "@/components/admin/registry/supplier-screens";
 import { BackButton } from "@/components/ui/BackButton";
 import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -38,6 +41,7 @@ import {
 } from "@/redux/agents/agents-api";
 import { extractApiError } from "@/lib/extract-api-error";
 import { useAuthRole } from "@/hooks/use-auth-role";
+import { formatDateTime } from "@/lib/format-date";
 import { formatCedis, MONEY_HIDDEN } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
@@ -65,10 +69,33 @@ const TX_LABEL: Record<FloatTxType, string> = {
 
 const TX_TONE: Record<FloatTxType, Tone> = {
   [FloatTxType.TOP_UP]: "leaf",
-  [FloatTxType.PURCHASE]: "harvest",
-  [FloatTxType.FIELD_EXPENSE]: "sky",
+  [FloatTxType.PURCHASE]: "sky",
+  [FloatTxType.FIELD_EXPENSE]: "harvest",
   [FloatTxType.ADJUSTMENT]: "slate",
 };
+
+/** Two-letter ledger markers, stamped in the type's tone. */
+const TX_CODE: Record<FloatTxType, string> = {
+  [FloatTxType.TOP_UP]: "TU",
+  [FloatTxType.PURCHASE]: "PU",
+  [FloatTxType.FIELD_EXPENSE]: "FE",
+  [FloatTxType.ADJUSTMENT]: "AD",
+};
+
+/** Square type marker at the head of a ledger line (label in the tooltip). */
+function TxMarker({ type }: { type: FloatTxType }) {
+  const t = TONES[TX_TONE[type]];
+  return (
+    <span
+      title={TX_LABEL[type]}
+      className="font-adminmono mt-0.5 flex h-6 w-6 flex-none items-center justify-center rounded-[2px] text-[10px] font-bold"
+      style={{ background: t.bg, color: t.fg }}
+    >
+      {TX_CODE[type]}
+      <span className="sr-only">{TX_LABEL[type]}</span>
+    </span>
+  );
+}
 
 const METHOD_OPTIONS = [
   { value: PaymentMethod.CASH, label: "Cash" },
@@ -92,39 +119,58 @@ function SignedAmount({ amount }: { amount: number | null }) {
       )}
     >
       {amount < 0 ? "-" : "+"}
-      {formatCedis(Math.abs(amount)).replace("GH₵ ", "GH₵ ")}
+      {formatCedis(Math.abs(amount))}
     </Mono>
   );
 }
 
-/** One ledger line: type chip, reason, linked record, signed amount. */
-function LedgerRow({ tx }: { tx: IFloatTransaction }) {
+/**
+ * One ledger line: type marker, reason, document number + date, signed amount
+ * and (page 1, money visible) the balance the float sat at after this entry.
+ */
+function LedgerRow({
+  tx,
+  balanceAfter,
+}: {
+  tx: IFloatTransaction;
+  balanceAfter?: number;
+}) {
   return (
-    <div className="flex items-center gap-3 border-b border-soil/12 py-2.5 last:border-b-0">
+    <div className="flex items-start gap-2.5 border-b border-soil/12 py-2.5 last:border-b-0">
+      <TxMarker type={tx.type} />
       <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <ToneBadge tone={TX_TONE[tx.type]}>{TX_LABEL[tx.type]}</ToneBadge>
-          {tx.method ? (
-            <span className="text-[11px] text-soil/70">{tx.method}</span>
+        <div className="flex items-start justify-between gap-3">
+          <p className="min-w-0 flex-1 text-[12.5px] leading-snug text-ink line-clamp-1 [overflow-wrap:anywhere]">
+            {tx.reason ??
+              (tx.purchaseId
+                ? "Paid from float for a purchase"
+                : TX_LABEL[tx.type])}
+            {tx.method ? (
+              <span className="text-soil/60"> · {tx.method}</span>
+            ) : null}
+          </p>
+          <SignedAmount amount={tx.amountGhs} />
+        </div>
+        <div className="mt-0.5 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
+          <span className="flex min-w-0 flex-wrap items-baseline gap-x-2">
+            <Mono className="text-[11px] text-soil/70">{tx.transactionNo}</Mono>
+            <DateTimeCell value={tx.occurredAt} muted />
+            {tx.purchaseId ? (
+              <Link
+                href={`/admin/purchases/${tx.purchaseId}`}
+                className="text-[11.5px] text-forest underline-offset-2 hover:underline"
+              >
+                View purchase
+              </Link>
+            ) : null}
+          </span>
+          {balanceAfter !== undefined ? (
+            <Mono className="text-[11px] whitespace-nowrap text-soil/70">
+              Bal {formatCedis(balanceAfter)}
+            </Mono>
           ) : null}
         </div>
-        <p className="mt-0.5 truncate text-[12px] text-soil">
-          {tx.reason ??
-            (tx.purchaseId ? "Paid from float for a purchase" : "")}{" "}
-          {tx.purchaseId ? (
-            <Link
-              href={`/admin/purchases/${tx.purchaseId}`}
-              className="text-forest underline-offset-2 hover:underline"
-            >
-              View purchase
-            </Link>
-          ) : null}
-        </p>
-        <p className="text-[11px] text-soil/60">
-          {formatConsoleDate(tx.occurredAt)}
-        </p>
       </div>
-      <SignedAmount amount={tx.amountGhs} />
     </div>
   );
 }
@@ -276,8 +322,8 @@ function ReconcileDialog({
   };
 
   const line = (label: string, amount: number, sign?: "+" | "-") => (
-    <div className="flex items-baseline justify-between py-1">
-      <span className="text-[12px] text-soil">{label}</span>
+    <div className="flex items-baseline justify-between gap-3 py-0.5">
+      <span className="min-w-0 text-[12px] text-soil [overflow-wrap:anywhere]">{label}</span>
       <Mono className="text-[12.5px] text-ink">
         {sign ?? ""}
         {formatCedis(Math.abs(amount))}
@@ -287,7 +333,7 @@ function ReconcileDialog({
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-[420px]">
+      <DialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[560px]">
         <DialogHeader>
           <DialogTitle>Reconcile {agentName}&apos;s float</DialogTitle>
           <DialogDescription>
@@ -429,14 +475,33 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
   const transactions = ledger.data?.data ?? [];
   const totalTx = ledger.data?.meta.total ?? 0;
 
+  // "Balance after" per ledger line, walked down from the live balance: the
+  // ledger arrives newest-first, so the top row sits at the live balance and
+  // each row below sits at the row above's balance minus that row's amount.
+  // Only exact on page 1 (later pages don't start at the live balance) and
+  // only when money is visible - redacted ledgers skip the column entirely.
+  const withBalanceAfter =
+    ledgerPage === 1 &&
+    balance !== null &&
+    transactions.every((t) => t.amountGhs !== null);
+  const ledgerRows: { balanceAfter?: number; tx: IFloatTransaction }[] = [];
+  let nextAfter = balance ?? 0;
+  for (const tx of transactions) {
+    ledgerRows.push({
+      balanceAfter: withBalanceAfter ? nextAfter : undefined,
+      tx,
+    });
+    nextAfter -= tx.amountGhs ?? 0;
+  }
+
   return (
-    <div className="max-w-[640px]">
+    <div className="max-w-[1120px]">
       <BackButton href={LIST} label="All agents" className="mb-2" />
       <AdminPageHeader
         title={name}
         sub={agent.region ?? agent.email}
         actions={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {/* Statement is a read - anyone with agent access can print it. */}
             <AdminButton variant="secondary" className="h-9 px-3.5" asChild>
               <Link href={`/admin/agents/${agentUserId}/statement`}>
@@ -467,109 +532,136 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
         }
       />
 
-      <AdminCard
-        className={cn(
-          "px-5 py-4",
-          balance !== null && balance < 0 && "border-error/40 bg-error/[0.04]",
-        )}
-      >
-        <p className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
-          Float balance
-        </p>
-        <p
-          className={cn(
-            "font-adminmono mt-1 text-[26px] font-bold tabular-nums",
-            balance === null
-              ? "text-soil/50"
-              : balance < 0
-                ? "text-error"
-                : "text-ink",
-          )}
-        >
-          {formatCedis(balance)}
-        </p>
-        {balance !== null && balance < 0 ? (
-          <p className="mt-0.5 text-[12px] text-error">
-            Negative float - {agent.firstName} is fronting their own cash.
-          </p>
-        ) : null}
-        {agent.lastReconciliation ? (
-          <p className="mt-1.5 text-[12px] text-soil">
-            Last reconciled {formatConsoleDate(agent.lastReconciliation.performedAt)}{" "}
-            ({formatCedis(agent.lastReconciliation.countedGhs)} counted)
-          </p>
-        ) : (
-          <p className="mt-1.5 text-[12px] text-soil">Never reconciled yet.</p>
-        )}
-      </AdminCard>
-
-      <AdminCard className="mt-3 px-5 py-3">
-        <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
-          Float ledger
-        </p>
-        {ledger.isLoading ? (
-          <p className="py-2 text-[13px] text-soil">Loading ledger…</p>
-        ) : transactions.length === 0 ? (
-          <p className="py-2 text-[13px] text-soil">
-            Nothing in the ledger yet - the first top-up opens it.
-          </p>
-        ) : (
-          <>
-            {transactions.map((tx) => (
-              <LedgerRow key={tx.id} tx={tx} />
-            ))}
-            <ListPagination
-              page={ledgerPage}
-              totalPages={Math.max(1, Math.ceil(totalTx / 10))}
-              onPageChange={setLedgerPage}
-              className="mt-2"
-            />
-          </>
-        )}
-      </AdminCard>
-
-      {(recons.data?.data.length ?? 0) > 0 ? (
-        <AdminCard className="mt-3 px-5 py-3">
-          <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
-            Reconciliations
-          </p>
-          {(recons.data?.data ?? []).map((r) => (
-            <div
-              key={r.id}
-              className="flex items-baseline justify-between gap-3 border-b border-soil/12 py-2 last:border-b-0"
+      <DetailShell
+        main={
+          <AdminCard className="px-5 py-3">
+            <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              Float ledger
+            </p>
+            {ledger.isLoading ? (
+              <p className="py-2 text-[13px] text-soil">Loading ledger…</p>
+            ) : transactions.length === 0 ? (
+              <p className="py-2 text-[13px] text-soil">
+                Nothing in the ledger yet - the first top-up opens it.
+              </p>
+            ) : (
+              <>
+                {ledgerRows.map(({ balanceAfter, tx }) => (
+                  <LedgerRow key={tx.id} tx={tx} balanceAfter={balanceAfter} />
+                ))}
+                <ListPagination
+                  page={ledgerPage}
+                  totalPages={Math.max(1, Math.ceil(totalTx / 10))}
+                  onPageChange={setLedgerPage}
+                  className="mt-2"
+                />
+              </>
+            )}
+          </AdminCard>
+        }
+        aside={
+          <div className="flex flex-col gap-4">
+            <AdminCard
+              className={cn(
+                "px-5 py-4",
+                balance !== null &&
+                  balance < 0 &&
+                  "border-error/40 bg-error/[0.04]",
+              )}
             >
-              <div className="min-w-0">
-                <p className="text-[13px] text-ink">
-                  {formatConsoleDate(r.performedAt)}
-                </p>
-                <p className="truncate text-[11.5px] text-soil/70">
-                  Expected {formatCedis(r.expectedGhs)} · counted{" "}
-                  {formatCedis(r.countedGhs)}
-                  {r.notes ? ` · ${r.notes}` : ""}
-                </p>
+              <div className="mb-3 flex items-center gap-3 border-b border-soil/12 pb-3">
+                <RegistryAvatar
+                  name={name}
+                  photoUrl={agent.profilePicture}
+                  size={56}
+                />
+                <div className="min-w-0">
+                  <p className="min-w-0 text-[14px] font-bold text-ink line-clamp-1 [overflow-wrap:anywhere]">
+                    {name}
+                  </p>
+                  <p className="text-[12px] text-soil">
+                    Joined {formatDateTime(agent.createdAt)}
+                  </p>
+                </div>
               </div>
-              <Mono
+              <p className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                Float balance
+              </p>
+              <p
                 className={cn(
-                  "text-[12.5px] font-semibold whitespace-nowrap",
-                  r.varianceGhs === null
+                  "font-adminmono mt-1 text-[26px] font-bold tabular-nums",
+                  balance === null
                     ? "text-soil/50"
-                    : r.varianceGhs === 0
-                      ? "text-leaf"
-                      : r.varianceGhs > 0
-                        ? "text-harvest-deep"
-                        : "text-error",
+                    : balance < 0
+                      ? "text-error"
+                      : "text-ink",
                 )}
               >
-                {r.varianceGhs === null
-                  ? MONEY_HIDDEN
-                  : r.varianceGhs === 0
-                    ? "Exact"
-                    : `${r.varianceGhs > 0 ? "+" : "-"}${formatCedis(Math.abs(r.varianceGhs))}`}
-              </Mono>
-            </div>
-          ))}
-        </AdminCard>
-      ) : null}
+                {formatCedis(balance)}
+              </p>
+              {balance !== null && balance < 0 ? (
+                <p className="mt-0.5 text-[12px] text-error">
+                  Negative float - {agent.firstName} is fronting their own cash.
+                </p>
+              ) : null}
+              {agent.lastReconciliation ? (
+                <p className="mt-1.5 text-[12px] text-soil">
+                  Last reconciled{" "}
+                  {formatConsoleDate(agent.lastReconciliation.performedAt)} (
+                  {formatCedis(agent.lastReconciliation.countedGhs)} counted)
+                </p>
+              ) : (
+                <p className="mt-1.5 text-[12px] text-soil">
+                  Never reconciled yet.
+                </p>
+              )}
+            </AdminCard>
+
+            {(recons.data?.data.length ?? 0) > 0 ? (
+              <AdminCard className="px-5 py-3">
+                <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                  Reconciliations
+                </p>
+                {(recons.data?.data ?? []).map((r) => (
+                  <div
+                    key={r.id}
+                    className="flex items-baseline justify-between gap-3 border-b border-soil/12 py-2 last:border-b-0"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-[13px] text-ink">
+                        {formatConsoleDate(r.performedAt)}
+                      </p>
+                      <p className="truncate text-[11.5px] text-soil/70">
+                        Expected {formatCedis(r.expectedGhs)} · counted{" "}
+                        {formatCedis(r.countedGhs)}
+                        {r.notes ? ` · ${r.notes}` : ""}
+                      </p>
+                    </div>
+                    <Mono
+                      className={cn(
+                        "text-[12.5px] font-semibold whitespace-nowrap",
+                        r.varianceGhs === null
+                          ? "text-soil/50"
+                          : r.varianceGhs === 0
+                            ? "text-leaf"
+                            : r.varianceGhs > 0
+                              ? "text-harvest-deep"
+                              : "text-error",
+                      )}
+                    >
+                      {r.varianceGhs === null
+                        ? MONEY_HIDDEN
+                        : r.varianceGhs === 0
+                          ? "Exact"
+                          : `${r.varianceGhs > 0 ? "+" : "-"}${formatCedis(Math.abs(r.varianceGhs))}`}
+                    </Mono>
+                  </div>
+                ))}
+              </AdminCard>
+            ) : null}
+          </div>
+        }
+      />
 
       {topUpOpen ? (
         <TopUpDialog

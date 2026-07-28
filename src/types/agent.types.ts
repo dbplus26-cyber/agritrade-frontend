@@ -41,6 +41,8 @@ export interface IAgentSummary {
   userId: string;
   /** Null until the agent's float is first opened (top-up or purchase). */
   profileId: string | null;
+  profilePicture: string | null;
+  createdAt: string;
   firstName: string;
   lastName: string;
   email: string;

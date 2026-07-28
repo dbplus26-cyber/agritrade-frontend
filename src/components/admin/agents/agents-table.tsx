@@ -28,6 +28,8 @@ import {
   statusToQuery,
   type StatusFilter,
 } from "@/components/admin/registry/registry-bits";
+import { DateTimeCell } from "@/components/admin/date-cell";
+import { RegistryAvatar } from "@/components/admin/registry/supplier-screens";
 
 const LIST = "/admin/agents";
 const FILTER_DEFAULTS = { status: "all", size: "10" };
@@ -95,9 +97,13 @@ export function AgentsTable() {
           return (
             <Link
               href={`${LIST}/${a.userId}`}
-              className="outline-none focus-visible:underline"
+              className="flex min-w-0 items-center gap-2.5 outline-none focus-visible:underline"
               onClick={(e) => e.stopPropagation()}
             >
+              <RegistryAvatar
+                name={`${a.firstName} ${a.lastName}`}
+                photoUrl={a.profilePicture}
+              />
               <span className="min-w-0">
                 <span className="block truncate font-medium text-ink">
                   {a.firstName} {a.lastName}
@@ -132,6 +138,14 @@ export function AgentsTable() {
           ) : (
             <Absent />
           ),
+      },
+      {
+        id: "added",
+        accessorFn: (a) => a.createdAt,
+        header: "Added",
+        enableSorting: false,
+        meta: columnMeta({ wide: true }),
+        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",
