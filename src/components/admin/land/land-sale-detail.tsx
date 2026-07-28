@@ -26,8 +26,10 @@ import {
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
+import { useAuthRole } from "@/hooks/use-auth-role";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
+import { formatCedis } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import {
@@ -35,6 +37,7 @@ import {
   useConfirmLandSaleMutation,
   useGetLandSaleQuery,
   useRecordLandPaymentMutation,
+  useReverseLandSalePaymentMutation,
 } from "@/redux/land/land-sales-api";
 import type { ILandSaleDetail } from "@/types/land.types";
 import {
@@ -213,6 +216,37 @@ export function LandSaleDetail({ id }: { id: string }) {
   const { data, isLoading, isError, error, refetch } = useGetLandSaleQuery(id);
   const [confirmSale, confirmState] = useConfirmLandSaleMutation();
   const { confirm, confirmationDialog } = useConfirm();
+  const { isSuperAdmin } = useAuthRole();
+  const [reversePayment] = useReverseLandSalePaymentMutation();
+
+  /**
+   * Refunding the buyer is a real-world act; this records it. The reason is
+   * the whole audit trail, so it is typed rather than picked.
+   */
+  const reverseOne = async (paymentId: string, amountGhs: null | number) => {
+    const ok = await confirm({
+      title: "Reverse this payment?",
+      description: `${
+        amountGhs === null ? "This payment" : formatCedis(amountGhs)
+      } comes back off the sale as a compensating entry - nothing is deleted. Do this once the buyer has actually been refunded.`,
+      confirmText: "Reverse payment",
+      isDestructive: true,
+      requireExactMatch: s.transactionNo,
+    });
+    if (!ok) return;
+    try {
+      await reversePayment({
+        id: s.id,
+        paymentId,
+        reason: `Refunded against ${s.transactionNo}`,
+      }).unwrap();
+      notify.success("Payment reversed");
+    } catch (err) {
+      notify.error("Couldn't reverse the payment", {
+        description: extractApiError(err).message,
+      });
+    }
+  };
   const [payOpen, setPayOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
 
@@ -346,9 +380,34 @@ export function LandSaleDetail({ id }: { id: string }) {
                       {p.reference ? ` · ${p.reference}` : ""}
                     </span>
                   </div>
-                  <Mono className="whitespace-nowrap text-[13px] font-semibold text-leaf">
-                    <Money value={p.amountGhs} />
-                  </Mono>
+                  <div className="flex flex-none items-center gap-2">
+                    <Mono
+                      className={cn(
+                        "whitespace-nowrap text-[13px] font-semibold",
+                        p.amountGhs !== null && p.amountGhs < 0
+                          ? "text-console-red"
+                          : "text-leaf",
+                      )}
+                    >
+                      <Money value={p.amountGhs} />
+                    </Mono>
+                    {/* A reversal is the only way a confirmed sale that fell
+                        through releases its plot: cancelling refuses while
+                        money sits on the ledger. Owner-only, and never
+                        offered on a reversal row itself. */}
+                    {isSuperAdmin &&
+                    p.amountGhs !== null &&
+                    p.amountGhs > 0 ? (
+                      <AdminButton
+                        type="button"
+                        variant="outline"
+                        className="h-[26px] flex-none px-2 text-[11.5px]"
+                        onClick={() => void reverseOne(p.id, p.amountGhs)}
+                      >
+                        Reverse
+                      </AdminButton>
+                    ) : null}
+                  </div>
                 </div>
               ))
             )}

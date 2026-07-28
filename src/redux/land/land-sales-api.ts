@@ -80,6 +80,28 @@ export const landSalesApi = apiSlice.injectEndpoints({
         { type: "LandPlots", id: "LIST" },
       ],
     }),
+
+    /**
+     * Owner-only. The only way a confirmed sale that fell through releases its
+     * plot: cancelling refuses while money is on the ledger, so the refund is
+     * recorded as a reversal first. Invalidates plots too - reversing can walk
+     * a SOLD plot back to RESERVED.
+     */
+    reverseLandSalePayment: builder.mutation<
+      ILandSaleResponse,
+      { id: string; paymentId: string; reason: string }
+    >({
+      query: ({ id, paymentId, reason }) => ({
+        url: `admin/land/sales/${id}/payments/${paymentId}/reverse`,
+        method: "POST",
+        body: { reason },
+      }),
+      invalidatesTags: (_r, _e, { id }) => [
+        { type: "LandSales", id },
+        { type: "LandSales", id: "LIST" },
+        { type: "LandPlots", id: "LIST" },
+      ],
+    }),
   }),
 });
 
@@ -90,4 +112,5 @@ export const {
   useConfirmLandSaleMutation,
   useCancelLandSaleMutation,
   useRecordLandPaymentMutation,
+  useReverseLandSalePaymentMutation,
 } = landSalesApi;

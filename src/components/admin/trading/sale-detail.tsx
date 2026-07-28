@@ -26,14 +26,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useAuthRole } from "@/hooks/use-auth-role";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
-import { formatKg } from "@/lib/format-money";
+import { formatCedis, formatKg } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import {
   useCancelSaleMutation,
   useConfirmSaleMutation,
+  useReverseSalePaymentMutation,
   useGetSaleQuery,
 } from "@/redux/sales/admin-sales-api";
 import type { ISaleDetail } from "@/types/admin-sale.types";
@@ -166,6 +168,38 @@ export function SaleDetail({
   const { data, isLoading, isError, error, refetch } = useGetSaleQuery(id);
   const [confirmSale, confirmState] = useConfirmSaleMutation();
   const { confirm, confirmationDialog } = useConfirm();
+  const { isSuperAdmin } = useAuthRole();
+  const [reversePayment] = useReverseSalePaymentMutation();
+
+  /**
+   * Writes a negative compensating row. Typing the sale's number back proves
+   * the reversal is aimed at the right order - the money has already left the
+   * business by the time anyone reaches for this.
+   */
+  const reverseOne = async (paymentId: string, amountGhs: null | number) => {
+    const ok = await confirm({
+      title: "Reverse this payment?",
+      description: `${
+        amountGhs === null ? "This payment" : formatCedis(amountGhs)
+      } comes back off the sale as a compensating entry - nothing is deleted. Do this once the buyer has actually been refunded.`,
+      confirmText: "Reverse payment",
+      isDestructive: true,
+      requireExactMatch: sale.transactionNo,
+    });
+    if (!ok) return;
+    try {
+      await reversePayment({
+        id: sale.id,
+        paymentId,
+        reason: `Reversed against ${sale.transactionNo}`,
+      }).unwrap();
+      notify.success("Payment reversed");
+    } catch (err) {
+      notify.error("Couldn't reverse the payment", {
+        description: extractApiError(err).message,
+      });
+    }
+  };
   const [payOpen, setPayOpen] = useState(initialPayOpen);
   const [cancelOpen, setCancelOpen] = useState(false);
 
@@ -370,9 +404,31 @@ export function SaleDetail({
                   {p.reference ? ` · ${p.reference}` : ""}
                 </span>
               </div>
-              <Mono className="whitespace-nowrap text-[13px] font-semibold text-leaf">
-                <Money value={p.amountGhs} />
-              </Mono>
+              <div className="flex flex-none items-center gap-2">
+                <Mono
+                  className={cn(
+                    "whitespace-nowrap text-[13px] font-semibold",
+                    p.amountGhs !== null && p.amountGhs < 0
+                      ? "text-console-red"
+                      : "text-leaf",
+                  )}
+                >
+                  <Money value={p.amountGhs} />
+                </Mono>
+                {/* The only way a mis-keyed payment stops being permanent:
+                    the sale cannot be edited or cancelled once money is on
+                    it. Owner-only, and never offered on a reversal row. */}
+                {isSuperAdmin && p.amountGhs !== null && p.amountGhs > 0 ? (
+                  <AdminButton
+                    type="button"
+                    variant="outline"
+                    className="h-[26px] flex-none px-2 text-[11.5px]"
+                    onClick={() => void reverseOne(p.id, p.amountGhs)}
+                  >
+                    Reverse
+                  </AdminButton>
+                ) : null}
+              </div>
             </div>
           ))
         )}

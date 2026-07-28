@@ -117,10 +117,35 @@ export const adminSalesApi = apiSlice.injectEndpoints({
         { type: "EligibleSales", id: "LIST" },
       ],
     }),
+
+    /**
+     * Owner-only. Writes a negative compensating row rather than deleting
+     * anything, so a mis-keyed payment stops being permanent. Invalidates the
+     * same set a payment does - reversing can reopen a COMPLETED sale and put
+     * it back below its loading milestone.
+     */
+    reverseSalePayment: builder.mutation<
+      ISalePaymentResponse,
+      { id: string; paymentId: string; reason: string }
+    >({
+      query: ({ id, paymentId, reason }) => ({
+        url: `admin/sales/${id}/payments/${paymentId}/reverse`,
+        method: "POST",
+        body: { reason },
+      }),
+      invalidatesTags: (_r, _e, { id }) => [
+        { type: "Sales", id },
+        { type: "Sales", id: "LIST" },
+        { type: "Sales", id: "DEBTORS" },
+        { type: "SaleStats", id: "SUMMARY" },
+        { type: "EligibleSales", id: "LIST" },
+      ],
+    }),
   }),
 });
 
 export const {
+  useReverseSalePaymentMutation,
   useGetSalesQuery,
   useGetSaleQuery,
   useGetSaleStatsQuery,
