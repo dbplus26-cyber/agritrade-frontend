@@ -27,6 +27,7 @@ export const apiSliceTags = [
   "LandSales",
   "LandSellers",
   "Notifications",
+  "PaymentAccounts",
   "Repayments",
   "Reviews",
   "Seasons",

@@ -92,6 +92,9 @@ export const adminNavGroups: AdminNavGroup[] = [
       item("buyers", "Buyers"),
       item("drivers", "Drivers"),
       item("delivery-addresses", "Delivery Addresses"),
+      // Staff read these to quote an account down the phone; only the owner
+      // can change one, which the backend enforces.
+      item("payment-accounts", "Payment Accounts"),
     ],
   },
   {
