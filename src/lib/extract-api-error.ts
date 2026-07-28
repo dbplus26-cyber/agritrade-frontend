@@ -110,7 +110,13 @@ export function extractApiError(error: unknown): NormalizedError {
         message,
         status: typeof rtkStatus === "number" ? rtkStatus : undefined,
         code: typeof data.code === "string" ? data.code : undefined,
-        errorId: typeof data.errorId === "string" ? data.errorId : undefined,
+        // The backend names the correlation id differently per environment:
+        // `errorId` in development, `requestId` in production. Reading only
+        // the first meant no id ever reached a real bug report - exactly where
+        // it is needed. Prefer errorId, fall back to requestId.
+        errorId:
+          (typeof data.errorId === "string" ? data.errorId : undefined) ??
+          (typeof data.requestId === "string" ? data.requestId : undefined),
         fieldErrors,
         hasFieldErrors: Boolean(fieldErrors),
       };

@@ -71,7 +71,6 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
     const body = {
       askingPriceGhs: Number(values.askingPriceGhs),
       locationText: values.locationText,
-      reference: values.reference,
       showPriceOnWebsite: values.showPriceOnWebsite,
       sizeText: values.sizeText,
       ...(values.use?.trim() ? { use: values.use.trim() } : {}),
@@ -87,11 +86,15 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
     };
     try {
       if (plot) {
+        // `reference` is deliberately absent from the update body. The backend's
+        // update schema has no such key, so Zod strips it silently: sending an
+        // edited reference told staff "Plot updated" while the register code
+        // stayed exactly as it was. The field is locked on edit to match.
         await updatePlot({ id: plot.id, body }).unwrap();
         notify.success("Plot updated");
         router.push(`${LIST}/${plot.id}`);
       } else {
-        const res = await createPlot(body).unwrap();
+        const res = await createPlot({ ...body, reference: values.reference }).unwrap();
         notify.success("Plot created");
         router.push(`${LIST}/${res.data.plot.id}`);
       }
@@ -105,22 +108,37 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
   const field = (
     key: keyof PlotValues,
     label: string,
-    opts?: { optional?: boolean; placeholder?: string; mode?: "decimal" },
-  ) => (
-    <AdminField
-      label={label}
-      optional={opts?.optional}
-      error={(errors[key] as { message?: string } | undefined)?.message}
-    >
-      <Input
-        inputMode={opts?.mode}
-        placeholder={opts?.placeholder}
-        disabled={readOnly}
-        className={cn(adminInputClass, roCls, errors[key] && "border-error")}
-        {...register(key)}
-      />
-    </AdminField>
-  );
+    opts?: {
+      optional?: boolean;
+      placeholder?: string;
+      mode?: "decimal";
+      /** Set at creation and never editable afterwards. */
+      locked?: boolean;
+      hint?: string;
+    },
+  ) => {
+    const disabled = readOnly || opts?.locked === true;
+    return (
+      <AdminField
+        label={label}
+        optional={opts?.optional}
+        hint={opts?.hint}
+        error={(errors[key] as { message?: string } | undefined)?.message}
+      >
+        <Input
+          inputMode={opts?.mode}
+          placeholder={opts?.placeholder}
+          disabled={disabled}
+          className={cn(
+            adminInputClass,
+            disabled && "disabled:cursor-default disabled:opacity-100",
+            errors[key] && "border-error",
+          )}
+          {...register(key)}
+        />
+      </AdminField>
+    );
+  };
 
   return (
     <div className="max-w-[640px]">
@@ -129,7 +147,13 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
 
       <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <AdminCard className="grid grid-cols-1 gap-3 px-5 py-4 sm:grid-cols-2">
-          {field("reference", "Reference", { placeholder: "TML-014" })}
+          {field("reference", "Reference", {
+            placeholder: "TML-014",
+            locked: plot !== undefined,
+            hint: plot
+              ? "Fixed once assigned - the register code stays with the plot."
+              : undefined,
+          })}
           {field("locationText", "Location / title", {
             placeholder: "Kumbungu Road, Plot 14",
           })}

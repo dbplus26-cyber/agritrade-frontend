@@ -109,8 +109,9 @@ export function PaymentDialog({
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Record a payment</ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
-            Manual payments only (cash, mobile money, bank). Online payments are
-            recorded automatically when the buyer pays.
+            Every payment is recorded by hand here - cash, mobile money or a
+            bank transfer someone has confirmed landed. There is no online
+            checkout feeding this, so nothing appears until it is entered.
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
 

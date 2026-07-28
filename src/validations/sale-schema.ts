@@ -16,10 +16,16 @@ const requiredNumber = (label: string, max: number) =>
       message: `Enter a ${label} between 0 and ${max.toLocaleString("en-GH")}`,
     });
 
+// The backend caps a sale line's price per kg at 10,000 GHS. Keep this in
+// step with it: a looser client cap just lets the form submit a value the
+// server rejects raw, so the trader gets a generic 400 instead of the field
+// error that would have told them what is wrong.
+const MAX_UNIT_PRICE_GHS = 10_000;
+
 const lineSchema = z.object({
   commodityId: z.string().min(1, "Choose the commodity"),
   weightKg: requiredNumber("weight in kg", 1_000_000),
-  unitPriceGhs: requiredNumber("price per kg", 1_000_000),
+  unitPriceGhs: requiredNumber("price per kg", MAX_UNIT_PRICE_GHS),
 });
 
 export const saleSchema = z.object({
