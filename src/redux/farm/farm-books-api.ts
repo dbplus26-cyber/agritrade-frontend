@@ -38,12 +38,14 @@ export const farmBooksApi = apiSlice.injectEndpoints({
 
     getFarmerStatement: builder.query<
       IFarmerStatementResponse,
-      { farmerId: string; seasonId?: string }
+      { farmerId: string; from?: string; seasonId?: string; to?: string }
     >({
-      query: ({ farmerId, seasonId }) =>
-        `admin/farm/farmers/${farmerId}/statement${toQueryString(
-          seasonId ? { seasonId } : {},
-        )}`,
+      query: ({ farmerId, from, seasonId, to }) =>
+        `admin/farm/farmers/${farmerId}/statement${toQueryString({
+          ...(seasonId ? { seasonId } : {}),
+          ...(from ? { from } : {}),
+          ...(to ? { to } : {}),
+        })}`,
       providesTags: [{ type: "FarmStats", id: "LIST" }],
     }),
   }),

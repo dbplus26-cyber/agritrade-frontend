@@ -103,7 +103,17 @@ export interface IFloatLedgerResponse {
   message: string;
   data: IFloatTransaction[];
   meta: IPaginationMeta;
-  summary: { balanceGhs: number | null };
+  summary: {
+    /** The agent's LIVE float, regardless of any window. */
+    balanceGhs: number | null;
+    /** Everything through `to` - the window's closing figure. */
+    closingBalanceGhs: number | null;
+    /**
+     * Everything strictly before `from`. A statement that starts mid-history
+     * and runs its total from zero is a lie, so this is what it starts from.
+     */
+    openingBalanceGhs: number | null;
+  };
 }
 
 export interface IFloatTransactionResponse {

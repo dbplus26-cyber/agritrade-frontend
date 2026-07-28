@@ -56,11 +56,14 @@ export function AgentStatement({ id }: { id: string }) {
   // The ledger arrives newest-first; a statement reads oldest-first with a
   // running balance, so reverse a copy and accumulate.
   const ledger = [...(float.data?.data ?? [])].reverse();
-  // Running balance in a single pass: each row carries the previous row's
-  // running total plus its own signed amount.
+  const opening = float.data?.summary.openingBalanceGhs ?? 0;
+  // Running balance in a single pass, STARTING from everything before the
+  // window. Beginning at zero would print a column that looks like a balance
+  // and is not one - which is the whole reason the API reports an opening
+  // figure rather than only the rows inside the period.
   const rows = ledger.reduce<{ runningAfter: number; tx: IFloatTransaction }[]>(
     (acc, tx) => {
-      const prev = acc.length > 0 ? acc[acc.length - 1].runningAfter : 0;
+      const prev = acc.length > 0 ? acc[acc.length - 1].runningAfter : opening;
       acc.push({ runningAfter: prev + (tx.amountGhs ?? 0), tx });
       return acc;
     },
@@ -132,16 +135,30 @@ export function AgentStatement({ id }: { id: string }) {
               <th className="py-2">Date</th>
               <th className="py-2">Type</th>
               <th className="py-2 text-right">Amount</th>
-              {/* Within a date window the running column starts at zero, so it
-                  reads as the period's running total, not the true balance. */}
-              <th className="py-2 text-right">{windowed ? "Running" : "Balance"}</th>
+              <th className="py-2 text-right">Balance</th>
             </tr>
           </thead>
           <tbody>
+            {/* Carried in, so the balance column is a real balance from its
+                first row rather than a period subtotal wearing the same name. */}
+            {windowed && from ? (
+              <tr className="border-b border-soil/25">
+                <td className="py-1.5 text-soil">{formatDateOnly(from)}</td>
+                <td className="py-1.5 text-soil">Balance brought forward</td>
+                <td className="py-1.5 text-right text-soil">-</td>
+                <td className="py-1.5 text-right">
+                  <Mono>
+                    <Money value={float.data?.summary.openingBalanceGhs ?? null} />
+                  </Mono>
+                </td>
+              </tr>
+            ) : null}
             {rows.length === 0 ? (
               <tr>
                 <td colSpan={4} className="py-3 text-soil">
-                  No float activity yet.
+                  {windowed
+                    ? "No float activity in this period."
+                    : "No float activity yet."}
                 </td>
               </tr>
             ) : (
@@ -173,15 +190,27 @@ export function AgentStatement({ id }: { id: string }) {
 
         <div className="mt-4 ml-auto w-full max-w-[280px]">
           {windowed ? (
-            <div className="flex justify-between border-t border-soil/40 py-1 text-[13px]">
-              <span>Net over period</span>
-              <Mono>
-                {(rows.length > 0
-                  ? rows[rows.length - 1].runningAfter
-                  : 0
-                ).toFixed(2)}
-              </Mono>
-            </div>
+            <>
+              <div className="flex justify-between border-t border-soil/40 py-1 text-[13px]">
+                <span>Net over period</span>
+                {/* The rows' own movement: the closing figure minus what was
+                    carried in, so it stays a period total even though the
+                    balance column now starts from the opening balance. */}
+                <Mono>
+                  {(
+                    (rows.length > 0
+                      ? rows[rows.length - 1].runningAfter
+                      : opening) - opening
+                  ).toFixed(2)}
+                </Mono>
+              </div>
+              <div className="flex justify-between border-t border-soil/40 py-1 text-[13px]">
+                <span>Closing on {to ? formatDateOnly(to) : "today"}</span>
+                <Money
+                  value={float.data?.summary.closingBalanceGhs ?? null}
+                />
+              </div>
+            </>
           ) : null}
           <div className="flex justify-between border-t border-ink py-1.5 text-[15px] font-bold">
             <span>{windowed ? "Current balance" : "Closing balance"}</span>

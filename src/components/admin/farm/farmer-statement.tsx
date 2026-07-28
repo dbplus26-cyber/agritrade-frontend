@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { ConsoleDateField } from "@/components/admin/filter-bar";
 import { AdminButton, Mono } from "@/components/admin/ui";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
@@ -22,8 +24,18 @@ export function FarmerStatement({
   id: string;
   seasonId?: string;
 }) {
+  // Empty means "all history", which is what the statement used to be able to
+  // print and nothing else. A window narrows it to a period the office is
+  // actually reconciling.
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
   const { data, isLoading, isError, error, refetch } =
-    useGetFarmerStatementQuery({ farmerId: id, seasonId });
+    useGetFarmerStatementQuery({
+      farmerId: id,
+      seasonId,
+      ...(from ? { from } : {}),
+      ...(to ? { to } : {}),
+    });
 
   if (isLoading) return <DataTableSkeleton />;
   if (isError || !data)
@@ -45,9 +57,35 @@ export function FarmerStatement({
         >
           ← Back to farmer
         </Link>
-        <AdminButton className="h-9 px-4" onClick={() => window.print()}>
-          Print
-        </AdminButton>
+        <div className="flex flex-wrap items-end gap-2">
+          <ConsoleDateField
+            label="From"
+            value={from}
+            onChange={setFrom}
+            max={to || undefined}
+          />
+          <ConsoleDateField
+            label="To"
+            value={to}
+            onChange={setTo}
+            min={from || undefined}
+          />
+          {from || to ? (
+            <AdminButton
+              variant="outline"
+              className="h-9 px-3"
+              onClick={() => {
+                setFrom("");
+                setTo("");
+              }}
+            >
+              All history
+            </AdminButton>
+          ) : null}
+          <AdminButton className="h-9 px-4" onClick={() => window.print()}>
+            Print
+          </AdminButton>
+        </div>
       </div>
 
       <div className="mx-auto max-w-[720px] rounded-[8px] border border-soil/25 bg-white p-8 text-ink print:max-w-none print:rounded-none print:border-0 print:p-0">
@@ -66,6 +104,13 @@ export function FarmerStatement({
             <div className="text-[12px] text-soil">
               Printed {formatFarmDate(new Date().toISOString())}
             </div>
+            {/* The period is part of the document: a statement someone keeps
+                has to say what it covers, or it cannot be reconciled later. */}
+            <div className="text-[12px] text-soil">
+              {st.window.from || st.window.to
+                ? `Period ${st.window.from ? formatFarmDate(st.window.from) : "start"} to ${st.window.to ? formatFarmDate(st.window.to) : "date"}`
+                : "All history"}
+            </div>
           </div>
         </div>
 
@@ -79,10 +124,28 @@ export function FarmerStatement({
             </tr>
           </thead>
           <tbody>
+            {/* Everything before the window, carried in. Without it the running
+                balance below would start from zero and be wrong. */}
+            {st.window.from ? (
+              <tr className="border-b border-soil/25">
+                <td className="py-1.5 text-soil">
+                  {formatFarmDate(st.window.from)}
+                </td>
+                <td className="py-1.5 text-soil">Balance brought forward</td>
+                <td className="py-1.5 text-right text-soil">-</td>
+                <td className="py-1.5 text-right">
+                  <Mono>
+                    <Money value={st.openingBalanceGhs} />
+                  </Mono>
+                </td>
+              </tr>
+            ) : null}
             {st.rows.length === 0 ? (
               <tr>
                 <td colSpan={4} className="py-3 text-soil">
-                  No grants or repayments yet.
+                  {st.window.from || st.window.to
+                    ? "Nothing moved in this period."
+                    : "No grants or repayments yet."}
                 </td>
               </tr>
             ) : (
