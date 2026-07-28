@@ -73,7 +73,7 @@ export async function Hero() {
               href={contact.phoneHref}
               className="shadow-block inline-block rounded-[2px] bg-harvest px-6 py-4 text-[15px] font-bold tracking-[0.03em] text-ink transition-[transform,box-shadow] duration-100 hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0_#1F211C] lg:px-8 lg:py-[19px] lg:text-[17px]"
             >
-              Call {contact.phone}
+              {contact.hasPhone ? `Call ${contact.phone}` : "Contact us"}
             </a>
             <a
               href={contact.whatsappHref}

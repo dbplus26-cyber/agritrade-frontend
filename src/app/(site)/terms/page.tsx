@@ -73,7 +73,17 @@ function buildSections(contact: ResolvedContact): LegalSection[] {
   {
     title: "Governing law",
     paragraphs: [
-      `These terms are governed by the laws of the Republic of Ghana, and the courts of Ghana have jurisdiction over any dispute arising from them. To raise anything in this document, call ${contact.phone} or write to ${contact.email}.`,
+      // A legal document must not name a contact route the business does not
+      // actually answer, so unpublished channels are left out of the sentence.
+      `These terms are governed by the laws of the Republic of Ghana, and the courts of Ghana have jurisdiction over any dispute arising from them. To raise anything in this document, ${
+        contact.hasPhone && contact.hasEmail
+          ? `call ${contact.phone} or write to ${contact.email}`
+          : contact.hasPhone
+            ? `call ${contact.phone}`
+            : contact.hasEmail
+              ? `write to ${contact.email}`
+              : "use the contact page on this website"
+      }.`,
     ],
   },
   ];

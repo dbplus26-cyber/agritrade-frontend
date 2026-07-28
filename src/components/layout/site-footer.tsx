@@ -49,10 +49,12 @@ export async function SiteFooter() {
               href={contact.phoneHref}
               className="w-fit transition-colors hover:text-surface"
             >
-              {contact.phone}
-              {contact.whatsapp === contact.phone ? " · WhatsApp same" : ""}
+              {contact.phoneLabel}
+              {contact.hasPhone && !contact.whatsappIsSeparate
+                ? " · WhatsApp same"
+                : ""}
             </a>
-            {contact.whatsapp === contact.phone ? null : (
+            {!contact.whatsappIsSeparate ? null : (
               <a
                 href={contact.whatsappHref}
                 target="_blank"
@@ -62,12 +64,14 @@ export async function SiteFooter() {
                 WhatsApp {contact.whatsapp}
               </a>
             )}
-            <a
-              href={`mailto:${contact.email}`}
-              className="w-fit transition-colors hover:text-surface"
-            >
-              {contact.email}
-            </a>
+            {contact.hasEmail ? (
+              <a
+                href={`mailto:${contact.email}`}
+                className="w-fit transition-colors hover:text-surface"
+              >
+                {contact.email}
+              </a>
+            ) : null}
             <span>
               {siteConfig.city}, Northern Region, {siteConfig.country}
             </span>

@@ -19,7 +19,7 @@ export async function CtaCall() {
               href={contact.phoneHref}
               className="whitespace-nowrap text-harvest-deep shadow-[inset_0_-10px_0_rgb(216_156_46/0.4)] transition-colors hover:text-forest"
             >
-              {contact.phone}
+              {contact.phoneLabel}
             </a>
           </p>
           <p className="text-[15px] leading-[1.6] text-soil">

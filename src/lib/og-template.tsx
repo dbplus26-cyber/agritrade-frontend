@@ -19,7 +19,12 @@ const HARVEST = "#D89C2E";
 const SOIL = "#59523B";
 const INK = "#1F211C";
 
-const DEFAULT_CTA = "Call +233 24 000 0000 for a same-day quote →";
+// No phone number here on purpose. This card is generated at build/edge time
+// with no access to the owner's settings, so a number baked in cannot be
+// corrected without a redeploy - and the placeholder that used to sit here
+// shipped a dead line into every WhatsApp share of the site. Keep the CTA
+// about the offer and let the landing page carry the live contact.
+const DEFAULT_CTA = "Same-day quotes from the Tamale yard →";
 
 export function brandOgImage({
   eyebrow,

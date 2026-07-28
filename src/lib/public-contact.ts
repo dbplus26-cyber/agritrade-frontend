@@ -22,10 +22,27 @@ export interface PublicContact {
 export interface ResolvedContact {
   address: string;
   email: string;
+  /**
+   * Whether the owner has actually published each channel. There is no safe
+   * placeholder for a phone number - a fabricated one sends real customers to
+   * a stranger - so the values below are empty until settings carry them, and
+   * callers must render nothing rather than an empty label.
+   */
+  hasEmail: boolean;
+  hasPhone: boolean;
+  hasWhatsapp: boolean;
   phone: string;
   phoneHref: string;
+  /**
+   * What to print where a phone number would go. Falls back to a call to
+   * action pointing at the contact page, so a site with no number published
+   * reads as "contact us" rather than an empty link.
+   */
+  phoneLabel: string;
   whatsapp: string;
   whatsappHref: string;
+  /** True only when WhatsApp is published AND differs from the phone line. */
+  whatsappIsSeparate: boolean;
 }
 
 /**
@@ -79,11 +96,18 @@ export function resolveSiteContact(api: null | PublicContact): ResolvedContact {
   return {
     address,
     email,
+    hasEmail: email.length > 0,
+    hasPhone: phone.length > 0,
+    hasWhatsapp: whatsapp.length > 0,
     phone,
     phoneHref: phoneIntl ? `tel:+${phoneIntl}` : siteConfig.phoneHref,
+    phoneLabel: phone || "Contact us",
     whatsapp,
     whatsappHref: whatsappIntl
       ? `https://wa.me/${whatsappIntl}`
       : siteConfig.whatsappHref,
+    // Only worth showing as its own channel when it is a different line;
+    // otherwise the footer used to announce "WhatsApp same" against nothing.
+    whatsappIsSeparate: whatsapp.length > 0 && whatsapp !== phone,
   };
 }

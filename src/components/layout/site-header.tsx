@@ -139,7 +139,7 @@ export function SiteHeader() {
             href={contact.phoneHref}
             className="font-display text-[17px] font-bold tracking-[0.02em] text-forest transition-colors hover:text-harvest-deep"
           >
-            {contact.phone}
+            {contact.phoneLabel}
           </a>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { StencilLabel } from "@/components/ui/StencilLabel";
 import { getSiteContact } from "@/lib/public-contact";
+import { routes } from "@/lib/routes";
 
 export interface LegalSection {
   title: string;
@@ -90,16 +91,40 @@ export async function LegalDoc({
           ))}
         </article>
 
+        {/* Only offers the channels the owner has actually published: a legal
+            page naming an address nobody reads is worse than one that does
+            not. With neither published this falls back to the contact page. */}
         <p className="mt-6 text-[13px] leading-[1.65] text-soil">
-          Questions about this document? Call{" "}
-          <a href={contact.phoneHref} className="font-bold text-forest">
-            {contact.phone}
-          </a>{" "}
-          or write to{" "}
-          <a href={`mailto:${contact.email}`} className="font-bold text-forest">
-            {contact.email}
-          </a>
-          .
+          Questions about this document?{" "}
+          {contact.hasPhone ? (
+            <>
+              Call{" "}
+              <a href={contact.phoneHref} className="font-bold text-forest">
+                {contact.phone}
+              </a>
+              {contact.hasEmail ? " or write to " : "."}
+            </>
+          ) : (
+            <>{contact.hasEmail ? "Write to " : "Reach us through the "}</>
+          )}
+          {contact.hasEmail ? (
+            <>
+              <a
+                href={`mailto:${contact.email}`}
+                className="font-bold text-forest"
+              >
+                {contact.email}
+              </a>
+              .
+            </>
+          ) : !contact.hasPhone ? (
+            <>
+              <a href={routes.contact} className="font-bold text-forest">
+                contact page
+              </a>
+              .
+            </>
+          ) : null}
         </p>
       </div>
     </div>

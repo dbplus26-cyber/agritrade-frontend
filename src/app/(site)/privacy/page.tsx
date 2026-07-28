@@ -52,7 +52,17 @@ function buildSections(contact: ResolvedContact): LegalSection[] {
   {
     title: "Your rights",
     paragraphs: [
-      `Under Ghana's Data Protection Act, 2012 (Act 843), you may ask what we hold about you, have inaccuracies corrected, and ask us to delete details we have no legal duty to keep. Call ${contact.phone} or write to ${contact.email} — we answer within a reasonable time, usually the same working week.`,
+      // Only names the channels the owner has published: a data-rights notice
+      // pointing at an unanswered address is a promise the business cannot keep.
+      `Under Ghana's Data Protection Act, 2012 (Act 843), you may ask what we hold about you, have inaccuracies corrected, and ask us to delete details we have no legal duty to keep. ${
+        contact.hasPhone && contact.hasEmail
+          ? `Call ${contact.phone} or write to ${contact.email}`
+          : contact.hasPhone
+            ? `Call ${contact.phone}`
+            : contact.hasEmail
+              ? `Write to ${contact.email}`
+              : "Use the contact page on this website"
+      } - we answer within a reasonable time, usually the same working week.`,
     ],
   },
   {
