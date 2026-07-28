@@ -42,7 +42,11 @@ import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis, formatKg } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
-import { PurchaseStatus, type IPurchase } from "@/types/purchase.types";
+import {
+  PurchaseStatus,
+  RECEIPT_VARIANCE_CODE,
+  type IPurchase,
+} from "@/types/purchase.types";
 import {
   receivePurchaseSchema,
   voidPurchaseSchema,
@@ -72,6 +76,7 @@ function ReceiveDialog({
 }) {
   const [receive, { isLoading }] = useReceivePurchaseMutation();
   const warehouses = useGetWarehousesQuery({ limit: 100, isActive: true });
+  const { confirm, confirmationDialog } = useConfirm();
 
   const {
     register,
@@ -91,111 +96,151 @@ function ReceiveDialog({
   const receivedKg = Number(watch("receivedKg")) || 0;
   const variance = purchase.weightKg - receivedKg;
 
+  const submitReceipt = (
+    values: ReceivePurchaseValues,
+    confirmVariance: boolean,
+  ) =>
+    receive({
+      id: purchase.id,
+      body: {
+        receivedKg: Number(values.receivedKg),
+        warehouseId: values.warehouseId,
+        ...(values.receivedAt ? { receivedAt: values.receivedAt } : {}),
+        ...(confirmVariance ? { confirmVariance: true } : {}),
+      },
+    }).unwrap();
+
   const onSubmit = async (values: ReceivePurchaseValues) => {
     try {
-      await receive({
-        id: purchase.id,
-        body: {
-          receivedKg: Number(values.receivedKg),
-          warehouseId: values.warehouseId,
-          ...(values.receivedAt ? { receivedAt: values.receivedAt } : {}),
-        },
-      }).unwrap();
-      notify.success("Purchase received - stock is now on hand");
-      onClose();
+      await submitReceipt(values, false);
     } catch (err) {
-      notify.error("Couldn't receive the purchase", {
-        description: extractApiError(err).message,
+      const apiError = extractApiError(err);
+      // Out-of-tolerance weights are not a dead end: the backend refuses the
+      // first attempt with RECEIPT_VARIANCE purely so a person has to look at
+      // the gap. Ask, then re-send the same receipt with the flag set -
+      // otherwise staff are stuck with stock they physically have and no way
+      // to book it in.
+      if (apiError.code !== RECEIPT_VARIANCE_CODE) {
+        notify.error("Couldn't receive the purchase", {
+          description: apiError.message,
+        });
+        return;
+      }
+      // The API's message already names both weights and the tolerance, so it
+      // is the body of the prompt - only the consequence is added here.
+      const ok = await confirm({
+        title: "Receive with a weight difference?",
+        description: `${apiError.message} Confirming books the stock at the warehouse weight and keeps the difference on the record as variance.`,
+        confirmText: "Confirm and receive",
       });
+      if (!ok) return;
+      try {
+        await submitReceipt(values, true);
+      } catch (retryErr) {
+        notify.error("Couldn't receive the purchase", {
+          description: extractApiError(retryErr).message,
+        });
+        return;
+      }
+      notify.success("Purchase received - variance recorded");
+      onClose();
+      return;
     }
+    notify.success("Purchase received - stock is now on hand");
+    onClose();
   };
 
   return (
-    <ResponsiveDialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[440px]">
-        <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle>Receive into warehouse</ResponsiveDialogTitle>
-          <ResponsiveDialogDescription>
-            The recorded weight was {formatKg(purchase.weightKg)}. Enter what
-            the warehouse scale actually says - the difference is kept as
-            variance, never silently absorbed.
-          </ResponsiveDialogDescription>
-        </ResponsiveDialogHeader>
-        <form
-          noValidate
-          onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-3"
-        >
-          <AdminField
-            label="Received weight (kg)"
-            error={errors.receivedKg?.message}
+    <>
+      <ResponsiveDialog open={open} onOpenChange={(o) => !o && onClose()}>
+        <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[440px]">
+          <ResponsiveDialogHeader>
+            <ResponsiveDialogTitle>Receive into warehouse</ResponsiveDialogTitle>
+            <ResponsiveDialogDescription>
+              The recorded weight was {formatKg(purchase.weightKg)}. Enter what
+              the warehouse scale actually says - the difference is kept as
+              variance, never silently absorbed.
+            </ResponsiveDialogDescription>
+          </ResponsiveDialogHeader>
+          <form
+            noValidate
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col gap-3"
           >
-            <Input
-              inputMode="decimal"
-              className={cn(adminInputClass, errors.receivedKg && "border-error")}
-              {...register("receivedKg")}
-            />
-          </AdminField>
-          {receivedKg > 0 && variance !== 0 ? (
-            <p
-              className={cn(
-                "text-[12.5px]",
-                variance > 0 ? "text-error" : "text-leaf",
-              )}
+            <AdminField
+              label="Received weight (kg)"
+              error={errors.receivedKg?.message}
             >
-              {variance > 0
-                ? `${formatKg(variance)} less than recorded (spillage or moisture loss).`
-                : `${formatKg(Math.abs(variance))} more than recorded.`}
-            </p>
-          ) : null}
-          <AdminField
-            label="Warehouse"
-            error={errors.warehouseId?.message}
-          >
-            <Controller
-              control={control}
-              name="warehouseId"
-              render={({ field }) => (
-                <SearchableSelect
-                  value={field.value}
-                  onChange={field.onChange}
-                  options={(warehouses.data?.data ?? []).map((w) => ({
-                    value: w.id,
-                    label: w.name,
-                  }))}
-                  placeholder="Choose the warehouse"
-                  className={cn(errors.warehouseId && "border-error")}
-                />
-              )}
-            />
-          </AdminField>
-          <AdminField label="Received date" optional>
-            <Input
-              type="date"
-              className={adminInputClass}
-              {...register("receivedAt")}
-            />
-          </AdminField>
-          <ResponsiveDialogFooter className="gap-2">
-            <AdminButton
-              type="button"
-              variant="outline"
-              className="h-9 px-3.5"
-              onClick={onClose}
+              <Input
+                inputMode="decimal"
+                className={cn(adminInputClass, errors.receivedKg && "border-error")}
+                {...register("receivedKg")}
+              />
+            </AdminField>
+            {receivedKg > 0 && variance !== 0 ? (
+              <p
+                className={cn(
+                  "text-[12.5px]",
+                  variance > 0 ? "text-error" : "text-leaf",
+                )}
+              >
+                {variance > 0
+                  ? `${formatKg(variance)} less than recorded (spillage or moisture loss).`
+                  : `${formatKg(Math.abs(variance))} more than recorded.`}
+              </p>
+            ) : null}
+            <AdminField
+              label="Warehouse"
+              error={errors.warehouseId?.message}
             >
-              Cancel
-            </AdminButton>
-            <AdminButton
-              type="submit"
-              disabled={isLoading}
-              className="h-9 px-4"
-            >
-              {isLoading ? "Receiving…" : "Receive stock"}
-            </AdminButton>
-          </ResponsiveDialogFooter>
-        </form>
-      </ResponsiveDialogContent>
-    </ResponsiveDialog>
+              <Controller
+                control={control}
+                name="warehouseId"
+                render={({ field }) => (
+                  <SearchableSelect
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={(warehouses.data?.data ?? []).map((w) => ({
+                      value: w.id,
+                      label: w.name,
+                    }))}
+                    placeholder="Choose the warehouse"
+                    className={cn(errors.warehouseId && "border-error")}
+                  />
+                )}
+              />
+            </AdminField>
+            <AdminField label="Received date" optional>
+              <Input
+                type="date"
+                className={adminInputClass}
+                {...register("receivedAt")}
+              />
+            </AdminField>
+            <ResponsiveDialogFooter className="gap-2">
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-9 px-3.5"
+                onClick={onClose}
+              >
+                Cancel
+              </AdminButton>
+              <AdminButton
+                type="submit"
+                disabled={isLoading}
+                className="h-9 px-4"
+              >
+                {isLoading ? "Receiving…" : "Receive stock"}
+              </AdminButton>
+            </ResponsiveDialogFooter>
+          </form>
+        </ResponsiveDialogContent>
+      </ResponsiveDialog>
+      {/* A sibling, not a child: the variance prompt opens over the still-open
+          receive dialog, so declining it leaves the entered weights intact. */}
+      {confirmationDialog}
+    </>
   );
 }
 

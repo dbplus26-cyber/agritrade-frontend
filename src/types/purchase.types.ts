@@ -8,6 +8,14 @@ import type { PurchaseSource } from "./registry.types";
  * `/admin/purchases` + `/agent/purchases` surfaces.
  */
 
+/**
+ * The error code the receive endpoint returns when the warehouse weight is
+ * outside the backend's variance tolerance. It is a question, not a refusal:
+ * re-submitting with `confirmVariance: true` records the receipt and keeps the
+ * gap as variance.
+ */
+export const RECEIPT_VARIANCE_CODE = "RECEIPT_VARIANCE";
+
 /** Mirrors the backend `PurchaseStatus` enum. */
 export enum PurchaseStatus {
   RECORDED = "RECORDED",
@@ -108,6 +116,13 @@ export interface IReceivePurchaseInput {
   receivedKg: number;
   warehouseId?: string;
   receivedAt?: string;
+  /**
+   * Acknowledges a warehouse weight that differs from the recorded village
+   * weight beyond the backend's tolerance. Without it the API refuses the
+   * receipt with `RECEIPT_VARIANCE` (see `RECEIPT_VARIANCE_CODE`) so the
+   * console can make someone look at the gap before it is written down.
+   */
+  confirmVariance?: boolean;
 }
 
 export interface IVoidPurchaseInput {
