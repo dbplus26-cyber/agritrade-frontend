@@ -39,7 +39,9 @@ export function AvailabilityBoard({
           </span>
         </div>
 
-        <PlankRows lines={lines} />
+        {/* The home board is a teaser: at most 4 planks. FULL BOARD below is
+            the path to the complete register on /commodities. */}
+        <PlankRows lines={lines.slice(0, 4)} />
 
         <div className="mt-5 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
           <span className="max-w-[60ch] text-[12.5px] leading-[1.6] text-surface/70">

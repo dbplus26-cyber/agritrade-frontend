@@ -6,6 +6,7 @@ import { PaperTrail } from "@/components/home/paper-trail";
 import { TrustStrip } from "@/components/home/trust-strip";
 import { WaybillSteps } from "@/components/home/waybill-steps";
 import { WhyUs } from "@/components/home/why-us";
+import { ReviewsBand } from "@/components/reviews/reviews-band";
 import {
   fetchPublicCommodities,
   toBoardLines,
@@ -41,6 +42,8 @@ export default async function HomePage() {
       </div>
       <PaperTrail />
       <WhyUs />
+      {/* Approved reviews only - renders nothing while the file is empty. */}
+      <ReviewsBand />
       <CtaCall />
     </>
   );

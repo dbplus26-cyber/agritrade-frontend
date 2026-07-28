@@ -75,8 +75,16 @@ export async function SiteFooter() {
         </div>
         <div className="flex flex-col items-start justify-between gap-3 pt-5 text-[12px] text-surface/45 sm:flex-row sm:items-center">
           <span>
-            © {new Date().getFullYear()} {siteConfig.legalName} · Photography:
-            Wikimedia Commons contributors (CC BY-SA)
+            © {new Date().getFullYear()} {siteConfig.legalName} ·{" "}
+            <span className="text-surface/70">Developed by</span>{" "}
+            <a
+              href="https://manuru.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-surface/80 transition-colors hover:text-surface hover:underline"
+            >
+              manuru
+            </a>
           </span>
           <div className="flex flex-wrap gap-5">
             <Link href={routes.terms} className="transition-colors hover:text-surface">

@@ -1,5 +1,6 @@
 import { BoardHeader } from "@/components/commodities/board-header";
 import { EmptyLots } from "@/components/commodities/empty-lots";
+import { LotCards } from "@/components/commodities/lot-cards";
 import { LotFiles } from "@/components/commodities/lot-files";
 import {
   fetchPublicCommodities,
@@ -34,10 +35,23 @@ export default async function CommoditiesPage() {
     month: "short",
     year: "numeric",
   });
+  // The hero board stays a glance, not a list: at most 3 planks (sliced here
+  // so BoardHeader remains a dumb presenter). The first 3 lots keep the rich
+  // full-bleed file treatment; the remainder files into the compact card grid
+  // (client-paginated once it grows past 9).
+  const featuredLots = lots.slice(0, 3);
+  const remainingLots = lots.slice(3);
   return (
     <div className="texture-grain bg-surface">
-      <BoardHeader updatedOn={updatedOn} lines={lines} />
-      {lots.length === 0 ? <EmptyLots /> : <LotFiles lots={lots} />}
+      <BoardHeader updatedOn={updatedOn} lines={lines.slice(0, 3)} />
+      {lots.length === 0 ? (
+        <EmptyLots />
+      ) : (
+        <>
+          <LotFiles lots={featuredLots} />
+          {remainingLots.length > 0 ? <LotCards lots={remainingLots} /> : null}
+        </>
+      )}
     </div>
   );
 }
