@@ -6,8 +6,62 @@ import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatKg } from "@/lib/format-money";
+import { useGetPayableAccountsQuery } from "@/redux/payment-accounts/payment-accounts-api";
 import { useGetSaleQuery } from "@/redux/sales/admin-sales-api";
+import { useGetSettingsQuery } from "@/redux/settings/settings-api";
+import type { IPayableAccount } from "@/types/payment-account.types";
 import { Money, formatSaleDate } from "./sale-bits";
+
+/**
+ * One payment destination as the buyer reads it. Whatever the kind, it is a
+ * heading plus label/value rows they read out at the counter, so the layout
+ * does not branch on kind - only the rows differ.
+ */
+function PayToCard({
+  account,
+  reference,
+}: {
+  account: IPayableAccount;
+  reference: string;
+}) {
+  const rows: [string, string][] = [
+    ["Account name", account.accountName],
+    [
+      account.kind === "MOMO" ? "MoMo number" : "Account number",
+      account.accountNumber,
+    ],
+  ];
+  if (account.bankName) rows.push(["Bank", account.bankName]);
+  if (account.branch) rows.push(["Branch", account.branch]);
+  if (account.provider) rows.push(["Network", account.provider]);
+  if (account.sortCode) rows.push(["Sort code", account.sortCode]);
+  if (account.swiftCode) rows.push(["SWIFT", account.swiftCode]);
+
+  const heading =
+    account.kind === "MOMO"
+      ? `Mobile money${account.provider ? ` (${account.provider})` : ""}`
+      : (account.bankName ?? "Bank transfer");
+
+  return (
+    <div className="break-inside-avoid rounded-[6px] border border-soil/30 p-3">
+      <div className="text-[11px] font-bold tracking-[0.06em] text-console uppercase">
+        {heading}
+      </div>
+      <dl className="mt-1.5 text-[12px]">
+        {rows.map(([label, value]) => (
+          <div key={label} className="flex justify-between gap-3 py-[1px]">
+            <dt className="text-soil">{label}</dt>
+            <dd className="text-right font-semibold break-all">{value}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className="mt-1.5 text-[10.5px] text-soil">
+        Quote {reference} as the reference.
+        {account.instructions ? ` ${account.instructions}` : ""}
+      </p>
+    </div>
+  );
+}
 
 /**
  * A print-friendly invoice / receipt for a sale (design doc ADR-004): live
@@ -17,6 +71,11 @@ import { Money, formatSaleDate } from "./sale-bits";
  */
 export function SaleInvoice({ id }: { id: string }) {
   const { data, isLoading, isError, error, refetch } = useGetSaleQuery(id);
+  // Both are supporting detail: the document still prints if either fails,
+  // it just prints without the contact block or the account details rather
+  // than blocking a buyer's invoice on a settings read.
+  const { data: settings } = useGetSettingsQuery();
+  const { data: payable } = useGetPayableAccountsQuery();
 
   if (isLoading) return <DataTableSkeleton />;
   if (isError || !data)
@@ -29,6 +88,10 @@ export function SaleInvoice({ id }: { id: string }) {
 
   const s = data.data.sale;
   const isReceipt = s.balanceGhs === 0;
+  const company = settings?.data.settings;
+  // A settled sale is not asking for money, so printing account numbers on it
+  // only gives the buyer a second, staler place to read them from.
+  const accounts = isReceipt ? [] : (payable?.data.accounts ?? []);
 
   return (
     <div>
@@ -51,8 +114,25 @@ export function SaleInvoice({ id }: { id: string }) {
               DB PLUS
             </div>
             <div className="text-[11px] tracking-[0.06em] text-soil uppercase">
-              Agro Trading · Tamale
+              Agro Trading
             </div>
+            {/* From the owner's settings, never hardcoded: an invoice that
+                names a stale address is a document the buyer cannot act on. */}
+            {company?.companyContactAddress ? (
+              <div className="mt-1 text-[11px] text-soil">
+                {company.companyContactAddress}
+              </div>
+            ) : null}
+            {company?.companyContactPhone ? (
+              <div className="text-[11px] text-soil">
+                {company.companyContactPhone}
+              </div>
+            ) : null}
+            {company?.companyContactEmail ? (
+              <div className="text-[11px] text-soil">
+                {company.companyContactEmail}
+              </div>
+            ) : null}
           </div>
           <div className="text-right">
             <div className="text-[16px] font-bold">
@@ -139,6 +219,31 @@ export function SaleInvoice({ id }: { id: string }) {
               </div>
             ))}
           </div>
+        ) : null}
+
+        {accounts.length > 0 ? (
+          <div className="mt-6">
+            <div className="mb-1.5 text-[10.5px] font-bold tracking-[0.08em] text-soil uppercase">
+              How to pay
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {accounts.map((account) => (
+                <PayToCard
+                  key={`${account.kind}-${account.accountNumber}`}
+                  account={account}
+                  reference={s.transactionNo}
+                />
+              ))}
+            </div>
+          </div>
+        ) : !isReceipt ? (
+          // Silence here would read as "no payment needed". Say plainly that
+          // the details are missing so staff notice before the buyer does.
+          <p className="mt-6 rounded-[6px] border border-dashed border-soil/40 p-3 text-[11.5px] text-soil print:hidden">
+            No payment accounts are published yet, so this invoice cannot tell
+            the buyer where to send the money. Add one under Directory →
+            Payment Accounts.
+          </p>
         ) : null}
 
         <p className="mt-8 text-[11px] text-soil">
