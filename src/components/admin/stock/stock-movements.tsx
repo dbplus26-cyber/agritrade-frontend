@@ -17,7 +17,7 @@ import { useGetStockMovementsQuery } from "@/redux/stock/stock-api";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
 import { columnMeta, Absent } from "@/components/admin/registry/registry-bits";
-import { formatConsoleDate } from "@/components/admin/purchases/purchase-bits";
+import { DateTimeCell } from "@/components/admin/date-cell";
 import type {
   IStockMovement,
   IStockMovementsQuery,
@@ -81,7 +81,7 @@ export function StockMovements({
         enableSorting: false,
         meta: columnMeta({ className: "py-2" }),
         // The always-visible lead cell: commodity + warehouse on top, the
-        // type chip and date beneath - the whole row on a phone.
+        // type chip beneath.
         cell: ({ row }) => (
           <div className="min-w-0">
             <div className="truncate text-[13.5px] font-semibold text-ink">
@@ -92,9 +92,6 @@ export function StockMovements({
             </div>
             <div className="mt-1 flex min-w-0 items-center gap-2">
               <MoveTypeBadge type={row.original.type} />
-              <span className="truncate text-[12px] text-soil">
-                {formatConsoleDate(row.original.occurredAt)}
-              </span>
             </div>
           </div>
         ),
@@ -105,6 +102,13 @@ export function StockMovements({
         enableSorting: false,
         meta: columnMeta({ className: "text-right" }),
         cell: ({ row }) => <SignedKg kg={row.original.deltaKg} />,
+      },
+      {
+        id: "when",
+        header: "When",
+        enableSorting: false,
+        meta: columnMeta(),
+        cell: ({ row }) => <DateTimeCell value={row.original.occurredAt} />,
       },
       {
         id: "reason",

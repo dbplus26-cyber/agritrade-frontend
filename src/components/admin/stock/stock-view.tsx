@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AdminCard, AdminField, adminInputClass } from "@/components/admin/ui";
@@ -20,7 +21,6 @@ import {
 import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
-import { FieldError } from "@/components/ui/FieldError";
 import { Input } from "@/components/ui/input";
 import { useGetCommoditiesQuery } from "@/redux/commodities/commodities-api";
 import { useGetWarehousesQuery } from "@/redux/warehouses/warehouses-api";
@@ -31,21 +31,37 @@ import {
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
-import type { IStockBalance } from "@/types/stock.types";
 import {
   adjustmentFormSchema,
   type AdjustmentFormValues,
 } from "@/validations/stock-schema";
-import { formatKg } from "./stock-bits";
+import { Kg } from "./stock-bits";
 import { StockMovements } from "./stock-movements";
 
 type Section = "balances" | "movements";
 
+/** One column group of the balances matrix - a warehouse and its balances. */
+interface MatrixWarehouse {
+  id: string;
+  name: string;
+  /** Client-side sum of the warehouse's rows (display only, never stored). */
+  subtotalKg: number;
+  byCommodity: Map<string, number>;
+}
+
+/** One row of the balances matrix, in first-appearance order. */
+interface MatrixCommodity {
+  id: string;
+  name: string;
+}
+
 /**
- * /admin/stock - the derived stock position. Balances are grouped by
- * warehouse with a per-commodity totals strip on top; the movements ledger
- * lives behind a section toggle. Corrections are REQUESTS: the adjustment
- * dialog files an approval and nothing moves until it is decided.
+ * /admin/stock - the derived stock position. Balances render as one ledger
+ * matrix (commodities as rows, warehouses as column groups on wide consoles,
+ * compact per-warehouse sections below) under a per-commodity totals strip;
+ * the movements ledger lives behind a section toggle. Corrections are
+ * REQUESTS: the adjustment dialog files an approval and nothing moves until
+ * it is decided.
  */
 export function StockView() {
   const [section, setSection] = useState<Section>("balances");
@@ -76,22 +92,46 @@ export function StockView() {
   const { data, isLoading, isError, error, refetch } =
     useGetStockBalancesQuery(balancesArgs);
 
-  const balances = data?.data ?? [];
-  const totals = data?.summary.totals ?? [];
+  const balances = useMemo(() => data?.data ?? [], [data]);
+  const totals = useMemo(() => data?.summary.totals ?? [], [data]);
 
-  /** Balances grouped per warehouse, in the order the API returned them. */
-  const byWarehouse = useMemo(() => {
-    const groups = new Map<string, { name: string; rows: IStockBalance[] }>();
+  /**
+   * The rows pivoted into a warehouse-by-commodity matrix, both axes in the
+   * order the API returned them. Subtotals are summed client-side for
+   * display; balances themselves stay server-derived.
+   */
+  const matrix = useMemo(() => {
+    const warehouses: MatrixWarehouse[] = [];
+    const commodities: MatrixCommodity[] = [];
+    const warehouseIndex = new Map<string, number>();
+    const seenCommodities = new Set<string>();
     for (const row of balances) {
-      const group = groups.get(row.warehouseId) ?? {
-        name: row.warehouseName,
-        rows: [],
-      };
-      group.rows.push(row);
-      groups.set(row.warehouseId, group);
+      let index = warehouseIndex.get(row.warehouseId);
+      if (index === undefined) {
+        index = warehouses.length;
+        warehouseIndex.set(row.warehouseId, index);
+        warehouses.push({
+          id: row.warehouseId,
+          name: row.warehouseName,
+          subtotalKg: 0,
+          byCommodity: new Map(),
+        });
+      }
+      const warehouse = warehouses[index];
+      warehouse.subtotalKg += row.balanceKg;
+      warehouse.byCommodity.set(row.commodityId, row.balanceKg);
+      if (!seenCommodities.has(row.commodityId)) {
+        seenCommodities.add(row.commodityId);
+        commodities.push({ id: row.commodityId, name: row.commodityName });
+      }
     }
-    return [...groups.entries()];
+    return { warehouses, commodities };
   }, [balances]);
+
+  const grandTotalKg = useMemo(
+    () => totals.reduce((sum, t) => sum + t.totalKg, 0),
+    [totals],
+  );
 
   const warehouseOptions = [
     { value: "all", label: "All warehouses" },
@@ -155,22 +195,49 @@ export function StockView() {
         />
       ) : (
         <>
-          {/* Per-commodity grand totals. */}
+          {/* Per-commodity grand totals with each commodity's share of the
+              total on hand - the strip reads as data, not tiles. */}
           {totals.length > 0 ? (
-            <div className="mb-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
-              {totals.map((t) => (
-                <AdminCard key={t.commodityId} className="px-3.5 py-3">
-                  <div className="truncate text-[11px] font-semibold uppercase tracking-[0.08em] text-soil">
-                    {t.commodityName}
-                  </div>
-                  <div
-                    className="font-adminmono mt-1 text-[19px] font-bold text-ink"
-                    title={`${t.totalKg.toLocaleString("en-GH")} kg`}
-                  >
-                    {formatKg(t.totalKg)}
-                  </div>
-                </AdminCard>
-              ))}
+            <div className="mb-4 grid grid-cols-2 gap-2 @lg/main:grid-cols-3 @3xl/main:grid-cols-5">
+              {totals.map((t) => {
+                const share =
+                  grandTotalKg > 0
+                    ? Math.min(100, Math.max(0, (t.totalKg / grandTotalKg) * 100))
+                    : 0;
+                const shareLabel =
+                  share > 0 && share < 1 ? "<1%" : `${Math.round(share)}%`;
+                return (
+                  <AdminCard key={t.commodityId} className="px-3 py-2.5">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <span
+                        className="min-w-0 truncate text-[10.5px] font-bold uppercase tracking-[0.08em] text-soil"
+                        title={t.commodityName}
+                      >
+                        {t.commodityName}
+                      </span>
+                      <span
+                        className="font-adminmono flex-none text-[10.5px] font-semibold tabular-nums text-soil/70"
+                        title="Share of total stock on hand"
+                      >
+                        {shareLabel}
+                      </span>
+                    </div>
+                    <Kg
+                      kg={t.totalKg}
+                      className="mt-0.5 block text-[16px] font-bold text-ink"
+                    />
+                    <div
+                      aria-hidden="true"
+                      className="mt-1.5 h-[3px] w-full bg-soil/15"
+                    >
+                      <div
+                        className="h-full bg-harvest"
+                        style={{ width: `${share}%` }}
+                      />
+                    </div>
+                  </AdminCard>
+                );
+              })}
             </div>
           ) : null}
 
@@ -223,7 +290,7 @@ export function StockView() {
               description={extractApiError(error).message}
               onRetry={() => void refetch()}
             />
-          ) : byWarehouse.length === 0 ? (
+          ) : matrix.warehouses.length === 0 ? (
             <AdminCard className="overflow-hidden">
               <EmptyState
                 title="Nothing on hand"
@@ -231,33 +298,23 @@ export function StockView() {
               />
             </AdminCard>
           ) : (
-            <div className="grid gap-3.5 lg:grid-cols-2">
-              {byWarehouse.map(([id, group]) => (
-                <AdminCard key={id} className="overflow-hidden">
-                  <div className="border-b-[1.5px] border-soil/25 bg-surface-alt/60 px-4 py-2.5 text-[12px] font-bold uppercase tracking-[0.1em] text-soil">
-                    {group.name}
-                  </div>
-                  <ul>
-                    {group.rows.map((row) => (
-                      <li
-                        key={row.commodityId}
-                        className="flex items-center justify-between gap-3 border-b border-soil/15 px-4 py-2.5 last:border-b-0"
-                      >
-                        <span className="min-w-0 truncate text-[13.5px] font-medium text-ink">
-                          {row.commodityName}
-                        </span>
-                        <span
-                          className="font-adminmono flex-none text-[13.5px] font-semibold text-ink"
-                          title={`${row.balanceKg.toLocaleString("en-GH")} kg`}
-                        >
-                          {formatKg(row.balanceKg)}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </AdminCard>
-              ))}
-            </div>
+            <AdminCard className="overflow-hidden">
+              {/* Dual render off the same matrix: a warehouse-by-commodity
+                  table when the console is wide enough for column groups,
+                  compact per-warehouse ledger sections below that. */}
+              <div className="hidden @4xl/main:block">
+                <BalancesMatrix
+                  warehouses={matrix.warehouses}
+                  commodities={matrix.commodities}
+                />
+              </div>
+              <div className="@4xl/main:hidden">
+                <WarehouseSections
+                  warehouses={matrix.warehouses}
+                  commodities={matrix.commodities}
+                />
+              </div>
+            </AdminCard>
           )}
         </>
       )}
@@ -268,6 +325,179 @@ export function StockView() {
         warehouses={warehouses.map((w) => ({ id: w.id, name: w.name }))}
         commodities={commodities.map((c) => ({ id: c.id, name: c.name }))}
       />
+    </div>
+  );
+}
+
+/** Dim marker for a (warehouse, commodity) cell holding nothing. */
+function NoStock() {
+  return (
+    <>
+      <span aria-hidden="true" className="text-soil/40">
+        &middot;
+      </span>
+      <span className="sr-only">none</span>
+    </>
+  );
+}
+
+/**
+ * Wide presentation: one ledger table, commodities as rows and warehouses as
+ * column groups, kg in mono right-aligned, a rule-topped subtotal row at the
+ * foot. Scrolls inside the card if the warehouses outgrow it.
+ */
+function BalancesMatrix({
+  warehouses,
+  commodities,
+}: {
+  warehouses: MatrixWarehouse[];
+  commodities: MatrixCommodity[];
+}) {
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse text-[13px]">
+        <thead>
+          <tr className="border-b-[1.5px] border-soil/25 bg-surface-alt/70">
+            <th
+              scope="col"
+              className="px-4 py-2.5 text-left text-[10.5px] font-bold uppercase tracking-[0.09em] text-soil"
+            >
+              Commodity
+            </th>
+            {warehouses.map((w) => (
+              <th
+                key={w.id}
+                scope="col"
+                className="px-4 py-2.5 text-right text-[10.5px] font-bold uppercase tracking-[0.09em]"
+              >
+                <Link
+                  href={`/admin/warehouses/${w.id}`}
+                  className="ml-auto block max-w-[180px] truncate text-console underline-offset-2 hover:underline"
+                  title={w.name}
+                >
+                  {w.name}
+                </Link>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {commodities.map((c) => (
+            <tr key={c.id} className="border-b border-soil/10">
+              <th
+                scope="row"
+                className="px-4 py-1.5 text-left font-medium text-ink"
+              >
+                <span className="block max-w-[240px] truncate" title={c.name}>
+                  {c.name}
+                </span>
+              </th>
+              {warehouses.map((w) => {
+                const kg = w.byCommodity.get(c.id);
+                return (
+                  <td
+                    key={w.id}
+                    className="whitespace-nowrap px-4 py-1.5 text-right"
+                  >
+                    {kg === undefined || kg === 0 ? (
+                      <NoStock />
+                    ) : (
+                      <Kg kg={kg} className="font-semibold text-ink" />
+                    )}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr className="border-t-[1.5px] border-soil/30 bg-surface-alt/40">
+            <th
+              scope="row"
+              className="px-4 py-2 text-left text-[10.5px] font-bold uppercase tracking-[0.09em] text-soil"
+            >
+              Warehouse total
+            </th>
+            {warehouses.map((w) => (
+              <td
+                key={w.id}
+                className="whitespace-nowrap px-4 py-2 text-right"
+              >
+                <Kg kg={w.subtotalKg} className="font-bold text-ink" />
+              </td>
+            ))}
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  );
+}
+
+/**
+ * Narrow presentation: compact per-warehouse sections - subtotal in the
+ * section head, dense commodity | kg rows joined by dotted ledger leaders,
+ * two-up once the section has the room.
+ */
+function WarehouseSections({
+  warehouses,
+  commodities,
+}: {
+  warehouses: MatrixWarehouse[];
+  commodities: MatrixCommodity[];
+}) {
+  return (
+    <div>
+      {warehouses.map((w, index) => (
+        <section
+          key={w.id}
+          className={cn(index > 0 && "border-t-[1.5px] border-soil/20")}
+        >
+          <div className="flex items-baseline justify-between gap-3 bg-surface-alt/60 px-4 py-2">
+            <Link
+              href={`/admin/warehouses/${w.id}`}
+              className="min-w-0 truncate text-[11px] font-bold uppercase tracking-[0.09em] text-console underline-offset-2 hover:underline"
+              title={w.name}
+            >
+              {w.name}
+            </Link>
+            <Kg
+              kg={w.subtotalKg}
+              className="flex-none text-[12px] font-bold text-ink"
+            />
+          </div>
+          <div className="px-4 py-1.5 @xl/main:columns-2 @xl/main:gap-8">
+            {commodities
+              .filter((c) => w.byCommodity.has(c.id))
+              .map((c) => {
+                const kg = w.byCommodity.get(c.id) ?? 0;
+                return (
+                  <div
+                    key={c.id}
+                    className="flex items-baseline gap-2 py-1.5 break-inside-avoid"
+                  >
+                    <span
+                      className="min-w-0 truncate text-[13px] font-medium text-ink"
+                      title={c.name}
+                    >
+                      {c.name}
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className="flex-1 border-b border-dotted border-soil/30"
+                    />
+                    <Kg
+                      kg={kg}
+                      className={cn(
+                        "flex-none text-[13px] font-semibold",
+                        kg === 0 ? "text-soil/45" : "text-ink",
+                      )}
+                    />
+                  </div>
+                );
+              })}
+          </div>
+        </section>
+      ))}
     </div>
   );
 }

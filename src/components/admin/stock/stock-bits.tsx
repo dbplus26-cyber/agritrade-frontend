@@ -1,4 +1,5 @@
 import { ToneBadge, type Tone } from "@/components/admin/ui";
+import { cn } from "@/lib/utils";
 import { StockMoveType } from "@/types/stock.types";
 
 /** Shared bits for the stock screens - movement tones, labels, kg rendering. */
@@ -25,6 +26,11 @@ export function MoveTypeBadge({ type }: { type: StockMoveType }) {
   return <ToneBadge tone={MOVE_TYPE_TONE[type]}>{MOVE_TYPE_LABEL[type]}</ToneBadge>;
 }
 
+/** Exact kg figure for `title` tooltips next to a compacted value. */
+export function kgTitle(kg: number): string {
+  return `${kg.toLocaleString("en-GH")} kg`;
+}
+
 /** kg figure for tiles and cells: compact from a million up (exact in title). */
 export function formatKg(kg: number): string {
   if (Math.abs(kg) >= 1_000_000) {
@@ -33,6 +39,18 @@ export function formatKg(kg: number): string {
     })}M kg`;
   }
   return `${kg.toLocaleString("en-GH", { maximumFractionDigits: 2 })} kg`;
+}
+
+/** Compact kg in the console's mono numerals, exact figure in the tooltip. */
+export function Kg({ kg, className }: { kg: number; className?: string }) {
+  return (
+    <span
+      className={cn("font-adminmono tabular-nums", className)}
+      title={kgTitle(kg)}
+    >
+      {formatKg(kg)}
+    </span>
+  );
 }
 
 /** Signed kg for the movements ledger: green additions, red removals. */
