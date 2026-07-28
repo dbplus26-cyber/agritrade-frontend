@@ -12,7 +12,20 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "commons.wikimedia.org" },
       { protocol: "https", hostname: "upload.wikimedia.org" },
       // Commodity photos uploaded from the console (Cloudinary).
-      { protocol: "https", hostname: "res.cloudinary.com" },
+      //
+      // The cloud name lives with the backend (it owns the upload
+      // credentials) and is never exposed to this app, so the account
+      // segment has to stay a wildcard - set it here the day it is
+      // published as a public env var. The delivery-type path is still
+      // pinned to `image/upload`, which is what actually matters: an
+      // unrestricted `res.cloudinary.com` also allows `/image/fetch/<any
+      // url>`, turning our optimizer into an open image proxy for the whole
+      // internet.
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/*/image/upload/**",
+      },
     ],
   },
 };
