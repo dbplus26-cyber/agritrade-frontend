@@ -12,10 +12,10 @@ import {
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
 import {
-  AdminButton,
   AdminCard,
   AdminField,
   AdminPageHeader,
+  EditableFormActions,
   adminInputClass,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
@@ -661,57 +661,21 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
           Active
         </label>
 
-        <div className="mt-1 flex gap-2">
-          {!isEdit ? (
-            <>
-              <AdminButton
-                type="submit"
-                disabled={saving}
-                className="h-[38px] px-[18px]"
-              >
-                {saving ? "Saving…" : "Save account"}
-              </AdminButton>
-              <AdminButton
-                type="button"
-                variant="outline"
-                className="h-[38px] px-3.5"
-                onClick={() => router.push(LIST)}
-              >
-                Cancel
-              </AdminButton>
-            </>
-          ) : isEditing ? (
-            <>
-              <AdminButton
-                type="submit"
-                disabled={saving}
-                className="h-[38px] px-[18px]"
-              >
-                {saving ? "Saving…" : "Save changes"}
-              </AdminButton>
-              <AdminButton
-                type="button"
-                variant="outline"
-                className="h-[38px] px-3.5"
-                onClick={() => {
-                  reset();
-                  setIsEditing(false);
-                }}
-              >
-                Cancel
-              </AdminButton>
-            </>
-          ) : (
-            <AdminButton
-              type="button"
-              variant="gold"
-              className="h-[38px] px-[18px]"
-              onClick={() => setIsEditing(true)}
-            >
-              Edit account
-            </AdminButton>
-          )}
-        </div>
+        <EditableFormActions
+          mode={!isEdit ? "create" : isEditing ? "editing" : "locked"}
+          saving={saving}
+          createLabel="Save account"
+          editLabel="Edit account"
+          onEdit={() => setIsEditing(true)}
+          onCancel={() => {
+            if (!isEdit) {
+              router.push(LIST);
+              return;
+            }
+            reset();
+            setIsEditing(false);
+          }}
+        />
       </form>
     </AdminCard>
   );

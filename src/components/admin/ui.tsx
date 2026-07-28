@@ -348,3 +348,82 @@ export const adminInputClass =
   "h-[42px] w-full rounded-[2px] border-[1.5px] border-soil/35 bg-[#FBFCF7] px-3.5 text-[14px] font-normal text-ink shadow-none outline-none transition-[border-color,box-shadow] placeholder:text-soil/55 focus:border-leaf focus:shadow-[0_0_0_3px_rgb(62_125_98/0.16)] focus-visible:border-leaf focus-visible:ring-0 aria-invalid:border-error";
 
 export const adminSelectClass = cn(adminInputClass, "cursor-pointer");
+
+/**
+ * The action row for a console form that opens read-only and unlocks on Edit.
+ *
+ * The `key` on each branch is load-bearing, not decoration. Without it React
+ * reuses the SAME <button> element across a branch swap: clicking "Edit"
+ * flipped that element to type="submit" before the browser ran the click's
+ * own default action, so the form submitted itself the instant you tried to
+ * unlock it - the field stayed disabled and a "saved" toast appeared over a
+ * PATCH nobody asked for. Distinct keys make React build a fresh element.
+ *
+ * `onSubmitGuard` is the second belt: a submit that arrives while the form is
+ * locked is not a save, whatever fired it.
+ */
+export function EditableFormActions({
+  mode,
+  saving,
+  createLabel,
+  editLabel,
+  onCancel,
+  onEdit,
+}: {
+  /** "create" has no read-only state; the other two toggle. */
+  mode: "create" | "editing" | "locked";
+  saving: boolean;
+  createLabel: string;
+  editLabel: string;
+  onCancel: () => void;
+  onEdit: () => void;
+}) {
+  if (mode === "create") {
+    return (
+      <div key="create" className="mt-1 flex gap-2">
+        <AdminButton type="submit" disabled={saving} className="h-[38px] px-[18px]">
+          {saving ? "Saving…" : createLabel}
+        </AdminButton>
+        <AdminButton
+          type="button"
+          variant="outline"
+          className="h-[38px] px-3.5"
+          onClick={onCancel}
+        >
+          Cancel
+        </AdminButton>
+      </div>
+    );
+  }
+
+  if (mode === "editing") {
+    return (
+      <div key="editing" className="mt-1 flex gap-2">
+        <AdminButton type="submit" disabled={saving} className="h-[38px] px-[18px]">
+          {saving ? "Saving…" : "Save changes"}
+        </AdminButton>
+        <AdminButton
+          type="button"
+          variant="outline"
+          className="h-[38px] px-3.5"
+          onClick={onCancel}
+        >
+          Cancel
+        </AdminButton>
+      </div>
+    );
+  }
+
+  return (
+    <div key="locked" className="mt-1 flex gap-2">
+      <AdminButton
+        type="button"
+        variant="gold"
+        className="h-[38px] px-[18px]"
+        onClick={onEdit}
+      >
+        {editLabel}
+      </AdminButton>
+    </div>
+  );
+}

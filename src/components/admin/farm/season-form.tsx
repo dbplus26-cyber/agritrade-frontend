@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -134,9 +134,16 @@ export function SeasonForm({ season }: { season?: ISeason }) {
           </div>
         </AdminCard>
 
+        {/* This row keeps its own markup rather than EditableFormActions
+            because it is right-aligned and puts Cancel before the primary
+            button. The key on every branch is still load-bearing: an unkeyed
+            branch lets React reuse the same <button> DOM node across the
+            swap, so clicking "Edit season" would flip that very element to
+            type="submit" before the browser ran the click's default action
+            and the form would PATCH itself while still locked. */}
         <div className="flex justify-end gap-2">
           {!season ? (
-            <>
+            <Fragment key="create">
               <AdminButton
                 type="button"
                 variant="outline"
@@ -148,9 +155,9 @@ export function SeasonForm({ season }: { season?: ISeason }) {
               <AdminButton type="submit" disabled={saving} className="h-10 px-5">
                 {saving ? "Saving…" : "Create season"}
               </AdminButton>
-            </>
+            </Fragment>
           ) : isEditing ? (
-            <>
+            <Fragment key="editing">
               <AdminButton
                 type="button"
                 variant="outline"
@@ -165,9 +172,10 @@ export function SeasonForm({ season }: { season?: ISeason }) {
               <AdminButton type="submit" disabled={saving} className="h-10 px-5">
                 {saving ? "Saving…" : "Save changes"}
               </AdminButton>
-            </>
+            </Fragment>
           ) : (
             <AdminButton
+              key="locked"
               type="button"
               variant="gold"
               className="h-10 px-5"

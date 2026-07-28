@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
@@ -237,9 +237,16 @@ function SettingsForm({
         </div>
       </AdminCard>
 
+      {/* This row keeps its own markup rather than EditableFormActions
+          because there is no create mode and Save is additionally gated on
+          isDirty. The key on every branch is load-bearing: an unkeyed branch
+          lets React reuse the same <button> DOM node across the swap, so
+          clicking "Edit settings" flipped that very element to type="submit"
+          before the browser ran the click's default action and the form
+          PATCHed itself while still locked. */}
       <div className="flex gap-2">
         {isEditing ? (
-          <>
+          <Fragment key="editing">
             <AdminButton
               type="submit"
               disabled={saving || !isDirty}
@@ -258,9 +265,10 @@ function SettingsForm({
             >
               Cancel
             </AdminButton>
-          </>
+          </Fragment>
         ) : (
           <AdminButton
+            key="locked"
             type="button"
             variant="gold"
             className="h-[38px] px-[18px]"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -59,7 +59,15 @@ const toFormValues = (farmer?: IFarmer): FarmerValues => ({
   phone: farmer?.phone ?? "",
 });
 
-export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
+export function FarmerForm({
+  farmer,
+  startEditing = false,
+}: {
+  farmer?: IFarmer;
+  /** Open an existing farmer unlocked - set when the caller already knows the
+   * user means to edit (the detail page's Edit button). */
+  startEditing?: boolean;
+}) {
   const router = useRouter();
   const [createFarmer, createState] = useCreateFarmerMutation();
   const [updateFarmer, updateState] = useUpdateFarmerMutation();
@@ -75,8 +83,10 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
   const preview = stagedUrl ?? farmer?.photoUrl ?? null;
 
   // Edit opens READ-ONLY; the Edit button unlocks the whole form. Create is
-  // always editable.
-  const [isEditing, setIsEditing] = useState(farmer === undefined);
+  // always editable, and so is an edit the caller has already asked to unlock.
+  const [isEditing, setIsEditing] = useState(
+    farmer === undefined || startEditing,
+  );
   const readOnly = !isEditing;
   // Keep disabled inputs legible as a read view rather than a greyed-out form.
   const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
@@ -384,9 +394,16 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
           </AdminField>
         </AdminCard>
 
+        {/* This row keeps its own markup rather than EditableFormActions
+            because it is right-aligned and puts Cancel before the primary
+            button. The key on every branch is still load-bearing: an unkeyed
+            branch lets React reuse the same <button> DOM node across the
+            swap, so clicking "Edit farmer" would flip that very element to
+            type="submit" before the browser ran the click's default action
+            and the form would PATCH itself while still locked. */}
         <div className="flex justify-end gap-2">
           {!farmer ? (
-            <>
+            <Fragment key="create">
               <AdminButton
                 type="button"
                 variant="outline"
@@ -398,9 +415,9 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
               <AdminButton type="submit" disabled={saving} className="h-10 px-5">
                 {saving ? "Saving…" : "Add farmer"}
               </AdminButton>
-            </>
+            </Fragment>
           ) : isEditing ? (
-            <>
+            <Fragment key="editing">
               <AdminButton
                 type="button"
                 variant="outline"
@@ -416,9 +433,10 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
               <AdminButton type="submit" disabled={saving} className="h-10 px-5">
                 {saving ? "Saving…" : "Save changes"}
               </AdminButton>
-            </>
+            </Fragment>
           ) : (
             <AdminButton
+              key="locked"
               type="button"
               variant="gold"
               className="h-10 px-5"

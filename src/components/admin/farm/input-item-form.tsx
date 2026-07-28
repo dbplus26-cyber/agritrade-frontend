@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -146,9 +146,16 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
           </AdminField>
         </AdminCard>
 
+        {/* This row keeps its own markup rather than EditableFormActions
+            because the locked branch also carries Delete and Deactivate. The
+            key on every branch is still load-bearing: an unkeyed branch lets
+            React reuse the same <button> DOM node across the swap, so
+            clicking "Edit item" would flip that very element to
+            type="submit" before the browser ran the click's default action
+            and the form would PATCH itself while still locked. */}
         <div className="flex flex-wrap justify-end gap-2">
           {item && !isEditing ? (
-            <>
+            <Fragment key="locked">
               <AdminButton
                 type="button"
                 variant="outline"
@@ -179,9 +186,9 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
               >
                 Edit item
               </AdminButton>
-            </>
+            </Fragment>
           ) : item ? (
-            <>
+            <Fragment key="editing">
               <AdminButton
                 type="button"
                 variant="outline"
@@ -196,9 +203,14 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
               <AdminButton type="submit" disabled={saving} className="h-10 px-5">
                 {saving ? "Saving…" : "Save changes"}
               </AdminButton>
-            </>
+            </Fragment>
           ) : (
-            <AdminButton type="submit" disabled={saving} className="h-10 px-5">
+            <AdminButton
+              key="create"
+              type="submit"
+              disabled={saving}
+              className="h-10 px-5"
+            >
               {saving ? "Saving…" : "Create item"}
             </AdminButton>
           )}
