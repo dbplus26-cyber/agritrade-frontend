@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -373,11 +374,19 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
           <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
             Truck &amp; destination
           </div>
-          {addressList.length > 0 ? (
-            <AdminField
-              label="Deliver to"
-              error={errors.deliveryAddressId?.message}
-            >
+          {/* Always rendered, even with an empty book. Hiding the picker when
+              nothing is saved yet makes the directory look like it does not
+              exist, so staff retype the same depot onto every waybill. */}
+          <AdminField
+            label="Deliver to"
+            hint={
+              addressList.length > 0
+                ? "Pick a saved destination, or enter this one by hand."
+                : undefined
+            }
+            error={errors.deliveryAddressId?.message}
+          >
+            {addressList.length > 0 ? (
               <select
                 className={cn(adminSelectClass, "w-full")}
                 value={deliveryAddressId}
@@ -390,8 +399,19 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
                   </option>
                 ))}
               </select>
-            </AdminField>
-          ) : null}
+            ) : (
+              <p className="text-[12.5px] text-soil">
+                No saved destinations yet - enter this one below, or{" "}
+                <Link
+                  href="/admin/delivery-addresses/new"
+                  className="font-medium text-console underline underline-offset-2"
+                >
+                  add it to the address book
+                </Link>{" "}
+                to reuse it.
+              </p>
+            )}
+          </AdminField>
           {pickedAddress ? (
             <div className="rounded-[2px] border-[1.5px] border-soil/25 bg-surface-alt/50 px-3 py-2 text-[12.5px] text-soil">
               <p className="min-w-0 font-medium text-ink [overflow-wrap:anywhere]">
@@ -483,12 +503,18 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
           <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
             Driver
           </div>
-          {driverList.length > 0 ? (
-            <AdminField
-              label="Driver"
-              hint="Pick from the directory or enter the trip's driver by hand."
-              error={errors.driverId?.message}
-            >
+          {/* Same rule as the destination: the directory stays visible even
+              when it is empty, so its existence is discoverable. */}
+          <AdminField
+            label="Driver"
+            hint={
+              driverList.length > 0
+                ? "Pick from the directory or enter the trip's driver by hand."
+                : undefined
+            }
+            error={errors.driverId?.message}
+          >
+            {driverList.length > 0 ? (
               <select
                 className={cn(adminSelectClass, "w-full")}
                 value={driverId}
@@ -501,8 +527,19 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
                   </option>
                 ))}
               </select>
-            </AdminField>
-          ) : null}
+            ) : (
+              <p className="text-[12.5px] text-soil">
+                No drivers saved yet - enter this trip&apos;s driver below, or{" "}
+                <Link
+                  href="/admin/drivers/new"
+                  className="font-medium text-console underline underline-offset-2"
+                >
+                  add them to the register
+                </Link>{" "}
+                to reuse them.
+              </p>
+            )}
+          </AdminField>
           {pickedDriver && !showDriverOverrides ? (
             <div className="flex flex-wrap items-center justify-between gap-2 rounded-[2px] border-[1.5px] border-soil/25 bg-surface-alt/50 px-3 py-2">
               <div className="min-w-0 text-[12.5px] text-soil">

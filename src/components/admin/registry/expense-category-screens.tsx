@@ -9,6 +9,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
 import { ConsoleFilterBar, ConsoleLabeledSelect } from "@/components/admin/filter-bar";
 import {
+  AdminButton,
   AdminCard,
   AdminField,
   AdminPageHeader,
@@ -22,6 +23,14 @@ import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
+import {
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogDescription,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+} from "@/components/ui/responsive-dialog";
 import {
   useActivateExpenseCategoryMutation,
   useCreateExpenseCategoryMutation,
@@ -63,7 +72,115 @@ const LIST = "/admin/expense-categories";
 const FILTER_DEFAULTS = { status: "all", size: "10" };
 
 /** The live Expense Categories register. */
+
+/**
+ * Creating a category is two short fields, so it opens over the register
+ * rather than sending the user to a page of its own and back. The edit screen
+ * stays a page: that one doubles as the category's read view.
+ */
+function CreateCategoryDialog({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) {
+  const [createCategory, { isLoading }] = useCreateExpenseCategoryMutation();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setError,
+    formState: { errors },
+  } = useForm<ExpenseCategoryValues>({
+    resolver: zodResolver(expenseCategorySchema),
+    defaultValues: { description: "", name: "" },
+  });
+
+  const close = () => {
+    reset();
+    onClose();
+  };
+
+  const onSubmit = async (values: ExpenseCategoryValues) => {
+    const description = values.description?.trim() ?? "";
+    try {
+      await createCategory({
+        name: values.name,
+        ...(description ? { description } : {}),
+      }).unwrap();
+      notify.success("Category created");
+      close();
+    } catch (err) {
+      const { message, fieldErrors, hasFieldErrors } = extractApiError(err);
+      if (hasFieldErrors && fieldErrors?.name) {
+        setError("name", { message: fieldErrors.name });
+      }
+      notify.error("Couldn't create the category", { description: message });
+    }
+  };
+
+  return (
+    <ResponsiveDialog open={open} onOpenChange={(o) => !o && close()}>
+      <ResponsiveDialogContent className="sm:max-w-[440px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>Add expense category</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
+            The heading costs are filed under. Keep the list short - it is what
+            every expense report groups by.
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
+        <form
+          noValidate
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col gap-[13px]"
+        >
+          <AdminField label="Name" error={errors.name?.message}>
+            <Input
+              autoFocus
+              placeholder="e.g. Transport"
+              className={cn(adminInputClass, errors.name && "border-error")}
+              {...register("name")}
+            />
+          </AdminField>
+          <AdminField
+            label="Description"
+            optional
+            hint="What belongs here, so two staff file the same cost the same way."
+            error={errors.description?.message}
+          >
+            <textarea
+              rows={2}
+              placeholder="e.g. Fuel, tolls and truck hire for deliveries"
+              className={cn(
+                adminInputClass,
+                "h-auto min-h-[62px] w-full resize-y py-2",
+                errors.description && "border-error",
+              )}
+              {...register("description")}
+            />
+          </AdminField>
+          <ResponsiveDialogFooter className="gap-2">
+            <AdminButton
+              type="button"
+              variant="outline"
+              className="h-9 px-3.5"
+              onClick={close}
+            >
+              Cancel
+            </AdminButton>
+            <AdminButton type="submit" disabled={isLoading} className="h-9 px-4">
+              {isLoading ? "Saving…" : "Create category"}
+            </AdminButton>
+          </ResponsiveDialogFooter>
+        </form>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
+  );
+}
+
 export function ExpenseCategoryTable() {
+  const [createOpen, setCreateOpen] = useState(false);
   const router = useRouter();
   const {
     page,
@@ -155,8 +272,12 @@ export function ExpenseCategoryTable() {
           onClear={resetFilters}
           action={
             isSuperAdmin ? (
-              <Button asChild variant="harvest" className="h-8 px-3.5 text-[13px]">
-                <Link href={`${LIST}/new`}>+ Add category</Link>
+              <Button
+                variant="harvest"
+                className="h-8 px-3.5 text-[13px]"
+                onClick={() => setCreateOpen(true)}
+              >
+                + Add category
               </Button>
             ) : null
           }
@@ -198,7 +319,7 @@ export function ExpenseCategoryTable() {
               title="No expense categories yet"
               description="Add the first category expenses will be filed under - transport, loading, commission."
               actionLabel="Add your first category"
-              onAction={() => router.push(`${LIST}/new`)}
+              onAction={() => setCreateOpen(true)}
             />
           )}
         </AdminCard>
@@ -221,6 +342,10 @@ export function ExpenseCategoryTable() {
           />
         </AdminCard>
       )}
+      <CreateCategoryDialog
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+      />
     </div>
   );
 }
@@ -251,7 +376,10 @@ function ExpenseCategoryFormFields({
     formState: { errors },
   } = useForm<ExpenseCategoryValues>({
     resolver: zodResolver(expenseCategorySchema),
-    defaultValues: { name: category?.name ?? "" },
+    defaultValues: {
+      description: category?.description ?? "",
+      name: category?.name ?? "",
+    },
   });
 
   // A background refetch can bump the record (another tab, a lifecycle
@@ -259,20 +387,29 @@ function ExpenseCategoryFormFields({
   // in-progress edit - which is why the parent does not key-remount the form
   // on updatedAt.
   useEffect(() => {
-    if (!isEditing) reset({ name: category?.name ?? "" });
+    if (!isEditing)
+      reset({
+        description: category?.description ?? "",
+        name: category?.name ?? "",
+      });
   }, [category, isEditing, reset]);
 
   const onSubmit = async (values: ExpenseCategoryValues) => {
     try {
+      // Empty clears the column on an edit; on a create it is simply omitted.
+      const description = values.description?.trim() ?? "";
       if (isEdit) {
         await updateCategory({
           id: category.id,
-          body: { name: values.name },
+          body: { description: description || null, name: values.name },
         }).unwrap();
         notify.success("Category updated");
         setIsEditing(false);
       } else {
-        const res = await createCategory({ name: values.name }).unwrap();
+        const res = await createCategory({
+          name: values.name,
+          ...(description ? { description } : {}),
+        }).unwrap();
         notify.success("Category created");
         router.replace(`${LIST}/${res.data.expenseCategory.id}`);
       }
@@ -301,6 +438,25 @@ function ExpenseCategoryFormFields({
             disabled={readOnly}
             className={cn(adminInputClass, roCls, errors.name && "border-error")}
             {...register("name")}
+          />
+        </AdminField>
+        <AdminField
+          label="Description"
+          optional
+          hint="What belongs under this heading, so two staff file the same cost the same way."
+          error={errors.description?.message}
+        >
+          <textarea
+            rows={2}
+            placeholder="e.g. Fuel, tolls and truck hire for deliveries"
+            disabled={readOnly}
+            className={cn(
+              adminInputClass,
+              roCls,
+              "h-auto min-h-[62px] w-full resize-y py-2",
+              errors.description && "border-error",
+            )}
+            {...register("description")}
           />
         </AdminField>
         <EditableFormActions

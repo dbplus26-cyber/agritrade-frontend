@@ -149,7 +149,7 @@ export function SeasonDetail({ id }: { id: string }) {
             <div className="mt-3 border-t border-soil/12 pt-3.5">
               <div className="flex flex-wrap gap-2 xl:flex-col">
                 <AdminButton variant="outline" className="h-9 px-4" asChild>
-                  <Link href={`${LIST}/${s.id}/edit`}>Edit</Link>
+                  <Link href={`${LIST}/${s.id}/edit?edit=1`}>Edit</Link>
                 </AdminButton>
                 <AdminButton
                   variant="outline"

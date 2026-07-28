@@ -38,7 +38,15 @@ const toFormValues = (plot: ILandPlot): PlotValues => ({
   use: plot.use ?? "",
 });
 
-export function PlotForm({ plot }: { plot?: ILandPlot }) {
+export function PlotForm({
+  plot,
+  startEditing = false,
+}: {
+  plot?: ILandPlot;
+  /** Set by the edit route when the detail page's Edit button sent the user
+   * here, so the form opens unlocked instead of asking for a second click. */
+  startEditing?: boolean;
+}) {
   const router = useRouter();
   const [createPlot, createState] = useCreatePlotMutation();
   const [updatePlot, updateState] = useUpdatePlotMutation();
@@ -46,7 +54,7 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
 
   // Edit opens READ-ONLY; the Edit button unlocks the inputs. Create is
   // always editable.
-  const [isEditing, setIsEditing] = useState(plot === undefined);
+  const [isEditing, setIsEditing] = useState(plot === undefined || startEditing);
   const readOnly = !isEditing;
   // Keep disabled inputs legible as a read view rather than a greyed-out form.
   const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";

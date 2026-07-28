@@ -39,7 +39,15 @@ const toFormValues = (season?: ISeason): SeasonValues =>
       }
     : { endsOn: "", name: "", startsOn: "" };
 
-export function SeasonForm({ season }: { season?: ISeason }) {
+export function SeasonForm({
+  season,
+  startEditing = false,
+}: {
+  season?: ISeason;
+  /** Set by the edit route when the detail page's Edit button sent the user
+   * here, so the form opens unlocked instead of asking for a second click. */
+  startEditing?: boolean;
+}) {
   const router = useRouter();
   const [createSeason, createState] = useCreateSeasonMutation();
   const [updateSeason, updateState] = useUpdateSeasonMutation();
@@ -47,7 +55,7 @@ export function SeasonForm({ season }: { season?: ISeason }) {
 
   // Edit opens READ-ONLY; the Edit button unlocks the inputs. Create is
   // always editable.
-  const [isEditing, setIsEditing] = useState(season === undefined);
+  const [isEditing, setIsEditing] = useState(season === undefined || startEditing);
   const readOnly = !isEditing;
   // Keep disabled inputs legible as a read view rather than a greyed-out form.
   const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";

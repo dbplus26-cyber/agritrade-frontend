@@ -41,6 +41,7 @@ import {
 } from "@/redux/agents/agents-api";
 import { extractApiError } from "@/lib/extract-api-error";
 import { useAuthRole } from "@/hooks/use-auth-role";
+import { useConfirm } from "@/hooks/use-confirm";
 import { formatDateTime } from "@/lib/format-date";
 import { formatCedis, MONEY_HIDDEN } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
@@ -177,16 +178,20 @@ function LedgerRow({
 
 function TopUpDialog({
   agentUserId,
+  agentFirstName,
   agentName,
   open,
   onClose,
 }: {
   agentUserId: string;
+  /** The type-to-confirm string: short enough to key in on a phone. */
+  agentFirstName: string;
   agentName: string;
   open: boolean;
   onClose: () => void;
 }) {
   const [topUp, { isLoading }] = useTopUpAgentMutation();
+  const { confirm, confirmationDialog } = useConfirm();
   const {
     register,
     handleSubmit,
@@ -197,6 +202,20 @@ function TopUpDialog({
   });
 
   const onSubmit = async (values: TopUpValues) => {
+    // Cash leaving the business for someone else to hold. Typing the agent's
+    // name proves the money is being handed to the intended person - the one
+    // mistake here (right amount, wrong agent) is silent until reconciliation.
+    const confirmed = await confirm({
+      title: "Hand over this float?",
+      description: `${formatCedis(Number(values.amountGhs))} by ${
+        METHOD_OPTIONS.find((m) => m.value === values.method)?.label ??
+        values.method
+      } to ${agentName}. It is spendable at once; only a reconciliation can correct it.`,
+      confirmText: "Top up float",
+      requireExactMatch: agentFirstName,
+    });
+    if (!confirmed) return;
+
     try {
       await topUp({
         agentUserId,
@@ -263,6 +282,7 @@ function TopUpDialog({
           </DialogFooter>
         </form>
       </DialogContent>
+      {confirmationDialog}
     </Dialog>
   );
 }
@@ -281,6 +301,7 @@ function ReconcileDialog({
 }) {
   const preview = useGetReconciliationPreviewQuery(agentUserId);
   const [reconcile, { isLoading }] = useCreateReconciliationMutation();
+  const { confirm, confirmationDialog } = useConfirm();
   const {
     register,
     handleSubmit,
@@ -666,6 +687,7 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
       {topUpOpen ? (
         <TopUpDialog
           agentUserId={agentUserId}
+          agentFirstName={agent.firstName}
           agentName={name}
           open={topUpOpen}
           onClose={() => setTopUpOpen(false)}

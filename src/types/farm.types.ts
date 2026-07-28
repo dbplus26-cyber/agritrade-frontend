@@ -43,6 +43,8 @@ export interface IInputItem {
   id: string;
   name: string;
   unitLabel: string;
+  /** What the item actually is - "NPK 15-15-15, 50kg bag" beats a bare name. */
+  description: string | null;
   isActive: boolean;
   createdAt: string;
 }
@@ -64,8 +66,14 @@ export interface IInputItemListQuery {
 export interface ICreateInputItemInput {
   name: string;
   unitLabel: string;
+  description?: string;
 }
-export type IUpdateInputItemInput = Partial<ICreateInputItemInput>;
+export interface IUpdateInputItemInput {
+  name?: string;
+  unitLabel?: string;
+  /** null clears it; undefined leaves it untouched. */
+  description?: string | null;
+}
 
 // ── Farmers ───────────────────────────────────────────────────────
 export interface IFarmerDocument {

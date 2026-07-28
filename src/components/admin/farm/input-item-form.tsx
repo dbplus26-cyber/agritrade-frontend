@@ -53,26 +53,43 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
   } = useForm<InputItemValues>({
     resolver: zodResolver(inputItemSchema),
     defaultValues: item
-      ? { name: item.name, unitLabel: item.unitLabel }
-      : { name: "", unitLabel: "" },
+      ? {
+          description: item.description ?? "",
+          name: item.name,
+          unitLabel: item.unitLabel,
+        }
+      : { description: "", name: "", unitLabel: "" },
   });
 
   // A background refetch can bump the record (e.g. the activate/deactivate
   // actions below). Track the fresh values while reading, but never clobber
   // an in-progress edit.
   useEffect(() => {
-    if (item && !isEditing) reset({ name: item.name, unitLabel: item.unitLabel });
+    if (item && !isEditing)
+      reset({
+        description: item.description ?? "",
+        name: item.name,
+        unitLabel: item.unitLabel,
+      });
   }, [item, isEditing, reset]);
 
   const onSubmit = async (values: InputItemValues) => {
     try {
+      // Empty clears the column on an edit; on a create it is simply omitted.
+      const description = values.description?.trim() ?? "";
       if (item) {
-        await updateItem({ id: item.id, body: values }).unwrap();
+        await updateItem({
+          id: item.id,
+          body: { ...values, description: description || null },
+        }).unwrap();
         notify.success("Item updated");
         // This screen doubles as the item's read view - drop back into it.
         setIsEditing(false);
       } else {
-        await createItem(values).unwrap();
+        await createItem({
+          ...values,
+          ...(description ? { description } : {}),
+        }).unwrap();
         notify.success("Item created");
         router.push(LIST);
       }
@@ -142,6 +159,25 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
                 errors.unitLabel && "border-error",
               )}
               {...register("unitLabel")}
+            />
+          </AdminField>
+          <AdminField
+            label="Description"
+            optional
+            hint="What it actually is, so a field officer picking it knows - e.g. 'NPK 15-15-15, 50kg bag'."
+            error={errors.description?.message}
+          >
+            <textarea
+              rows={2}
+              placeholder="NPK 15-15-15, 50kg bag"
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                "h-auto min-h-[62px] w-full resize-y py-2",
+                errors.description && "border-error",
+              )}
+              {...register("description")}
             />
           </AdminField>
         </AdminCard>

@@ -81,6 +81,8 @@ export interface IBuyer {
 export interface IExpenseCategory {
   id: string;
   name: string;
+  /** What belongs under this heading, so two staff file a cost the same way. */
+  description: string | null;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -221,7 +223,10 @@ export interface IUpdateBuyerInput {
 
 export interface ICreateExpenseCategoryInput {
   name: string;
+  description?: string;
 }
 export interface IUpdateExpenseCategoryInput {
   name?: string;
+  /** null clears it; undefined leaves it untouched. */
+  description?: string | null;
 }

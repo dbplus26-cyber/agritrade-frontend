@@ -27,6 +27,7 @@ export const seasonSchema = z.object({
 export const inputItemSchema = z.object({
   name: z.string().trim().min(1, "Enter a name").max(120),
   unitLabel: z.string().trim().min(1, "Enter a unit (e.g. bag)").max(40),
+  description: z.string().trim().max(500).or(z.literal("")).optional(),
 });
 
 /** Mirrors backend `createFarmerSchema` (farm-validation.ts). */

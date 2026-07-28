@@ -22,6 +22,7 @@ import {
   adminSelectClass,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
+import { useConfirm } from "@/hooks/use-confirm";
 import { useCreateUserMutation } from "@/redux/users/users-api";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
@@ -55,6 +56,7 @@ function generatePassword(): string {
 export function UserForm() {
   const router = useRouter();
   const [createUser, { isLoading }] = useCreateUserMutation();
+  const { confirm, confirmationDialog } = useConfirm();
 
   const {
     register,
@@ -78,6 +80,29 @@ export function UserForm() {
   });
 
   const onSubmit = async (values: CreateUserValues) => {
+    // Read the account's reach back in plain words - the two switches are
+    // easy to leave on by accident and they decide who sees the money.
+    const extras = [
+      values.canApprove ? "can approve requests" : null,
+      values.financialVisibility ? "can see money" : null,
+    ].filter(Boolean);
+    // An owner account, approval rights or the money columns are a privilege
+    // grant, so the email is typed back. A plain staff account with neither
+    // switch on is one deliberate click - no friction where none is earned.
+    const privileged =
+      values.role === UserRole.SUPER_ADMIN ||
+      values.canApprove ||
+      values.financialVisibility;
+    const confirmed = await confirm({
+      title: "Create this account?",
+      description: `${values.firstName} ${values.lastName} (${values.email}) - ${
+        ROLE_LABEL[values.role]
+      }${extras.length > 0 ? `, ${extras.join(" and ")}` : ""}. They can sign in as soon as you hand over the password.`,
+      confirmText: "Create user",
+      ...(privileged ? { requireExactMatch: values.email } : {}),
+    });
+    if (!confirmed) return;
+
     try {
       const res = await createUser({
         firstName: values.firstName,
@@ -278,6 +303,7 @@ export function UserForm() {
           </div>
         </form>
       </AdminCard>
+      {confirmationDialog}
     </div>
   );
 }

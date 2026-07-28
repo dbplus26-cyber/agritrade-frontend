@@ -88,5 +88,6 @@ export type BuyerValues = z.infer<typeof buyerSchema>;
 
 export const expenseCategorySchema = z.object({
   name: z.string().trim().min(2, "Enter the category name").max(100),
+  description: z.string().trim().max(500).or(z.literal("")).optional(),
 });
 export type ExpenseCategoryValues = z.infer<typeof expenseCategorySchema>;

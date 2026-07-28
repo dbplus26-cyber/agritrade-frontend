@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AdminButton, adminSelectClass } from "@/components/admin/ui";
+import { useConfirm } from "@/hooks/use-confirm";
 import { useChangeUserRoleMutation } from "@/redux/users/users-api";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
@@ -40,6 +41,7 @@ export function RoleChangeDialog({
 }) {
   const [changeRole, { isLoading }] = useChangeUserRoleMutation();
   const [role, setRole] = useState<UserRole>(user.role);
+  const { confirm, confirmationDialog } = useConfirm();
 
   const close = (next: boolean) => {
     onOpenChange(next);
@@ -47,6 +49,17 @@ export function RoleChangeDialog({
   };
 
   const apply = async () => {
+    // A role change hands out (or takes away) reach over money and stock, so
+    // the email is typed back: on a list of similar names it is the one field
+    // that proves the right account is being changed.
+    const confirmed = await confirm({
+      title: `Change ${user.firstName}'s role?`,
+      description: `From ${ROLE_LABEL[user.role]} to ${ROLE_LABEL[role]}. ${user.firstName} is signed out everywhere and their access changes at the next sign-in.`,
+      confirmText: "Change role",
+      requireExactMatch: user.email,
+    });
+    if (!confirmed) return;
+
     try {
       await changeRole({ id: user.id, role }).unwrap();
       notify.success(`Role changed to ${ROLE_LABEL[role]}`);
@@ -107,6 +120,7 @@ export function RoleChangeDialog({
           </AdminButton>
         </ResponsiveDialogFooter>
       </ResponsiveDialogContent>
+      {confirmationDialog}
     </ResponsiveDialog>
   );
 }

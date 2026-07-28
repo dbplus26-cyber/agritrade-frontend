@@ -16,6 +16,7 @@ import {
   useApproveApprovalMutation,
   useRejectApprovalMutation,
 } from "@/redux/approvals/approvals-api";
+import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
@@ -47,6 +48,7 @@ export function DecideDialog({
   decision: Decision;
   onClose: () => void;
 }) {
+  const { confirm, confirmationDialog } = useConfirm();
   const [approve, { isLoading: approving }] = useApproveApprovalMutation();
   const [reject, { isLoading: rejecting }] = useRejectApprovalMutation();
   const isReject = decision?.kind === "reject";
@@ -68,6 +70,21 @@ export function DecideDialog({
 
   const onSubmit = handleSubmit(async (values) => {
     if (!decision) return;
+
+    // Approving does not record an opinion - it APPLIES the thing: real stock
+    // is minted or written off, real money is committed. Typing the action
+    // back proves the decider read which request they are on, which is the
+    // mistake an inbox of near-identical rows invites.
+    if (!isReject) {
+      const confirmed = await confirm({
+        title: "Apply this request?",
+        description: `${summaryLine(decision.approval.action, decision.approval.summary) ?? decision.approval.action} - approving applies it immediately. Type the action to confirm.`,
+        confirmText: "Approve and apply",
+        requireExactMatch: decision.approval.action,
+      });
+      if (!confirmed) return;
+    }
+
     const note = values.note.trim() || undefined;
     try {
       if (isReject) {
@@ -167,6 +184,7 @@ export function DecideDialog({
           </ResponsiveDialogFooter>
         </form>
       </ResponsiveDialogContent>
+      {confirmationDialog}
     </ResponsiveDialog>
   );
 }
