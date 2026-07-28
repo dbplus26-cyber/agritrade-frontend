@@ -96,6 +96,11 @@ export interface ILandSale {
   plot: { id: string; reference: string; locationText: string };
   buyer: { id: string; name: string; phone: string | null };
   agreedPriceGhs: number | null;
+  /**
+   * On a CANCELLED sale, what the business kept after any refund. Null on a
+   * live sale - nothing has been forfeited yet.
+   */
+  forfeitedGhs: number | null;
   paidGhs: number | null;
   balanceGhs: number | null;
   marginGhs: number | null;

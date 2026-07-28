@@ -48,14 +48,19 @@ export const landSalesApi = apiSlice.injectEndpoints({
       ],
     }),
 
+    /**
+     * Cancelling settles the deposit too: `refundGhs` is how much goes back,
+     * and whatever is left is forfeited. Omitted only when the sale has no
+     * money on it - the API refuses to guess otherwise.
+     */
     cancelLandSale: builder.mutation<
       ILandSaleResponse,
-      { id: string; reason: string }
+      { id: string; reason: string; refundGhs?: number }
     >({
-      query: ({ id, reason }) => ({
+      query: ({ id, reason, refundGhs }) => ({
         url: `admin/land/sales/${id}/cancel`,
         method: "PATCH",
-        body: { reason },
+        body: { reason, ...(refundGhs === undefined ? {} : { refundGhs }) },
       }),
       invalidatesTags: (_r, _e, { id }) => [
         { type: "LandSales", id },

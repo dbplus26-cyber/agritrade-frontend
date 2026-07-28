@@ -162,17 +162,49 @@ function CancelDialog({
   onClose: () => void;
 }) {
   const [cancel, { isLoading }] = useCancelLandSaleMutation();
+  // Money already received. Null means the figure is redacted for this user,
+  // in which case they cannot responsibly split it - only refund all or keep
+  // all, both of which the API resolves from the ledger itself.
+  const paid = sale.paidGhs;
+  const hasMoney = paid !== null && paid > 0;
+
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<CancelLandSaleValues>({
     resolver: zodResolver(cancelLandSaleSchema),
-    defaultValues: { reason: "" },
+    defaultValues: { reason: "", refundGhs: "", settlement: "FORFEIT" },
   });
+  const settlement = watch("settlement");
+
   const onSubmit = async (values: CancelLandSaleValues) => {
+    // Resolve the choice to the number the API wants, so "keep the deposit"
+    // and "refund it" never depend on the operator retyping a figure.
+    const refundGhs = !hasMoney
+      ? undefined
+      : values.settlement === "FORFEIT"
+        ? 0
+        : values.settlement === "REFUND"
+          ? paid
+          : Number(values.refundGhs);
+
+    if (
+      hasMoney &&
+      values.settlement === "PARTIAL" &&
+      (!Number.isFinite(refundGhs) || refundGhs! < 0 || refundGhs! > paid)
+    ) {
+      notify.error("Enter a refund between nothing and the amount received");
+      return;
+    }
+
     try {
-      await cancel({ id: sale.id, reason: values.reason }).unwrap();
+      await cancel({
+        id: sale.id,
+        reason: values.reason,
+        ...(refundGhs === undefined ? {} : { refundGhs }),
+      }).unwrap();
       notify.success("Land sale cancelled");
       onClose();
     } catch (err) {
@@ -187,11 +219,54 @@ function CancelDialog({
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Cancel this land sale?</ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
-            Only possible while nothing has been paid. The plot returns to
-            available.
+            The plot returns to available straight away.
+            {hasMoney
+              ? " Say what happens to the money already received - it is settled in the same action."
+              : ""}
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
         <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
+          {hasMoney ? (
+            <AdminField
+              label={`Received so far: ${formatCedis(paid)}`}
+              hint="Whatever is not refunded stays with the business as a forfeited deposit."
+            >
+              <div className="flex flex-col gap-1.5">
+                {(
+                  [
+                    ["FORFEIT", "Keep it - buyer forfeits the deposit"],
+                    ["REFUND", "Refund all of it"],
+                    ["PARTIAL", "Refund part of it"],
+                  ] as const
+                ).map(([value, label]) => (
+                  <label
+                    key={value}
+                    className="flex items-center gap-2 text-[13px] text-ink"
+                  >
+                    <input type="radio" value={value} {...register("settlement")} />
+                    {label}
+                  </label>
+                ))}
+              </div>
+            </AdminField>
+          ) : null}
+          {hasMoney && settlement === "PARTIAL" ? (
+            <AdminField
+              label="Refund amount"
+              error={errors.refundGhs?.message}
+            >
+              <Input
+                inputMode="decimal"
+                placeholder="0.00"
+                className={cn(
+                  adminInputClass,
+                  "font-adminmono",
+                  errors.refundGhs && "border-error",
+                )}
+                {...register("refundGhs")}
+              />
+            </AdminField>
+          ) : null}
           <AdminField label="Reason" error={errors.reason?.message}>
             <Input
               className={cn(adminInputClass, errors.reason && "border-error")}
@@ -306,21 +381,38 @@ export function LandSaleDetail({ id }: { id: string }) {
                 <Money value={s.paidGhs} />
               </Row>
             </div>
-            <div className="border-t border-soil/12">
-              <Row label="Balance" strong>
-                <span
-                  className={cn(
-                    s.balanceGhs === 0 ? "text-leaf" : "text-console-red",
-                  )}
-                >
-                  {s.balanceGhs === 0 ? (
-                    "Paid in full"
+            {/* A cancelled sale has no balance to chase - what matters is
+                what the business kept. Showing a "balance due" on a dead deal
+                reads as an unresolved debt and would be chased as one. */}
+            {s.status === "CANCELLED" ? (
+              <div className="border-t border-soil/12">
+                <Row label="Deposit kept" strong>
+                  {s.forfeitedGhs === null ? (
+                    <span className="text-soil">Refunded in full</span>
                   ) : (
-                    <Money value={s.balanceGhs} />
+                    <span className="text-leaf">
+                      <Money value={s.forfeitedGhs} />
+                    </span>
                   )}
-                </span>
-              </Row>
-            </div>
+                </Row>
+              </div>
+            ) : (
+              <div className="border-t border-soil/12">
+                <Row label="Balance" strong>
+                  <span
+                    className={cn(
+                      s.balanceGhs === 0 ? "text-leaf" : "text-console-red",
+                    )}
+                  >
+                    {s.balanceGhs === 0 ? (
+                      "Paid in full"
+                    ) : (
+                      <Money value={s.balanceGhs} />
+                    )}
+                  </span>
+                </Row>
+              </div>
+            )}
             <div className="border-t border-soil/12">
               <Row label="Margin">
                 <Money value={s.marginGhs} />

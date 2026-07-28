@@ -44,8 +44,16 @@ export const landPaymentSchema = z.object({
   paidAt: z.string().optional(),
 });
 
+/**
+ * Cancelling settles the deposit too. `settlement` is what the operator is
+ * deciding; `refundGhs` only carries a figure when they chose to split it.
+ * The dialog resolves the other two choices to 0 or the full paid amount, so
+ * the API always receives an explicit number.
+ */
 export const cancelLandSaleSchema = z.object({
   reason: z.string().trim().min(3, "Give a reason").max(500),
+  settlement: z.enum(["FORFEIT", "REFUND", "PARTIAL"]),
+  refundGhs: z.string().trim().optional(),
 });
 
 export const landSellerSchema = z.object({
