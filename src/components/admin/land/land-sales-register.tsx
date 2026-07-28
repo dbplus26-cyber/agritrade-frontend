@@ -21,11 +21,11 @@ import { cn } from "@/lib/utils";
 import { useGetLandSalesQuery } from "@/redux/land/land-sales-api";
 import type { ILandSale, ILandSaleListQuery, LandSaleStatus } from "@/types/land.types";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
+import { DateOnlyCell } from "@/components/admin/date-cell";
 import { Money } from "@/components/admin/trading/sale-bits";
 import {
   LAND_SALE_STATUS_FILTER_OPTIONS,
   LandSaleStatusBadge,
-  formatLandDate,
 } from "./land-bits";
 
 const LIST = "/admin/land-sales";
@@ -41,10 +41,8 @@ export function LandSalesRegister() {
     resetFilters,
     search: searchInput,
     setSearch,
-    queryParams,
   } = useTableQuery({ defaults: FILTER_DEFAULTS });
 
-  const search = (queryParams.search as string | undefined) ?? "";
   const { status, from, to } = filters;
   const pageSize = Number(filters.size) || 10;
 
@@ -73,7 +71,7 @@ export function LandSalesRegister() {
         header: "Plot",
         enableSorting: false,
         meta: columnMeta(),
-        // Real anchor — keyboard, middle-click and open-in-new-tab.
+        // Real anchor - keyboard, middle-click and open-in-new-tab.
         cell: ({ row }) => (
           <Link
             href={`/admin/land-sales/${row.original.id}`}
@@ -127,6 +125,13 @@ export function LandSalesRegister() {
             </Mono>
           );
         },
+      },
+      {
+        id: "date",
+        header: "Date",
+        enableSorting: false,
+        meta: columnMeta(),
+        cell: ({ row }) => <DateOnlyCell value={row.original.createdAt} />,
       },
       {
         id: "status",

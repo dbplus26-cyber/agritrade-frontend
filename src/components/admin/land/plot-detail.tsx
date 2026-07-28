@@ -6,7 +6,9 @@ import {
   AdminButton,
   AdminCard,
   AdminPageHeader,
-  DetailRow,
+  DetailGrid,
+  DetailItem,
+  DetailShell,
   Mono,
   ToneBadge,
 } from "@/components/admin/ui";
@@ -119,8 +121,113 @@ export function PlotDetail({ id }: { id: string }) {
   const canPublish =
     !p.publishToWebsite && (p.status === "AVAILABLE" || p.status === "RESERVED");
 
+  // Cover-or-thumb photo tile. No lightbox exists in the console, so each
+  // photo is a plain anchor to the full-size Cloudinary image.
+  const photoTile = (
+    ph: (typeof p.photos)[number],
+    hero: boolean,
+  ) => (
+    <div key={ph.id} className={cn("group relative", !hero && "h-20 w-28")}>
+      <a href={ph.url} target="_blank" rel="noreferrer" className="block">
+        {/* eslint-disable-next-line @next/next/no-img-element -- Cloudinary */}
+        <img
+          src={ph.url}
+          alt={ph.alt ?? ""}
+          className={cn(
+            "w-full rounded object-cover",
+            hero ? "aspect-video" : "h-20",
+          )}
+        />
+        {hero ? (
+          <span
+            aria-hidden="true"
+            className="photo-treatment pointer-events-none absolute inset-0 rounded"
+          />
+        ) : null}
+      </a>
+      <button
+        type="button"
+        onClick={() =>
+          void run(
+            () => removePhoto({ id: p.id, photoId: ph.id }).unwrap(),
+            "Photo removed",
+          )
+        }
+        className="absolute right-1 top-1 rounded bg-black/60 px-1.5 text-[11px] text-white"
+      >
+        ✕
+      </button>
+    </div>
+  );
+
+  const aside = (
+    <AdminCard className="px-5 py-3">
+      <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+        Pricing & status
+      </p>
+      <DetailGrid columns={2}>
+        <DetailItem label="Asking price" mono strong>
+          <Money value={p.askingPriceGhs} />
+        </DetailItem>
+        <DetailItem label="Purchase cost" mono>
+          <Money value={p.purchaseCostGhs} />
+        </DetailItem>
+        <DetailItem label="Margin" mono>
+          <Money value={p.marginGhs} />
+        </DetailItem>
+        {p.use ? <DetailItem label="Use">{p.use}</DetailItem> : null}
+        <DetailItem label="Price on site">
+          {p.showPriceOnWebsite ? "Shown" : "Hidden"}
+        </DetailItem>
+      </DetailGrid>
+      <div className="mt-3 border-t border-soil/12 pt-3.5">
+        <div className="flex flex-wrap gap-2 xl:flex-col">
+          {p.status === "AVAILABLE" ? (
+            <AdminButton className="h-9 px-4" asChild>
+              <Link href={`/admin/land-sales/new?plotId=${p.id}`}>
+                Sell plot
+              </Link>
+            </AdminButton>
+          ) : null}
+          {canPublish ? (
+            <AdminButton
+              className="h-9 px-4"
+              disabled={publishState.isLoading}
+              onClick={() => void onPublish()}
+            >
+              {publishState.isLoading ? "Requesting…" : "Publish to website"}
+            </AdminButton>
+          ) : null}
+          <AdminButton variant="outline" className="h-9 px-4" asChild>
+            <Link href={`${LIST}/${p.id}/edit`}>Edit</Link>
+          </AdminButton>
+          {p.publishToWebsite ? (
+            <AdminButton
+              variant="outline"
+              className="h-9 px-4"
+              onClick={() =>
+                void run(() => unpublish(p.id).unwrap(), "Removed from website")
+              }
+            >
+              Unpublish
+            </AdminButton>
+          ) : null}
+          {p.status === "AVAILABLE" || p.status === "ARCHIVED" ? (
+            <AdminButton
+              variant="outline"
+              className="h-9 px-4"
+              onClick={() => void onArchive()}
+            >
+              {p.status === "ARCHIVED" ? "Restore" : "Archive"}
+            </AdminButton>
+          ) : null}
+        </div>
+      </div>
+    </AdminCard>
+  );
+
   return (
-    <div className="max-w-[760px]">
+    <div className="max-w-[1120px]">
       <BackButton href={LIST} label="All plots" className="mb-2" />
       <AdminPageHeader
         title={p.locationText}
@@ -133,188 +240,120 @@ export function PlotDetail({ id }: { id: string }) {
         }
       />
 
-      <div className="mb-4 flex flex-wrap gap-2">
-        <AdminButton variant="outline" className="h-9 px-4" asChild>
-          <Link href={`${LIST}/${p.id}/edit`}>Edit</Link>
-        </AdminButton>
-        {canPublish ? (
-          <AdminButton
-            className="h-9 px-4"
-            disabled={publishState.isLoading}
-            onClick={() => void onPublish()}
-          >
-            {publishState.isLoading ? "Requesting…" : "Publish to website"}
-          </AdminButton>
-        ) : null}
-        {p.publishToWebsite ? (
-          <AdminButton
-            variant="outline"
-            className="h-9 px-4"
-            onClick={() =>
-              void run(() => unpublish(p.id).unwrap(), "Removed from website")
-            }
-          >
-            Unpublish
-          </AdminButton>
-        ) : null}
-        {p.status === "AVAILABLE" || p.status === "ARCHIVED" ? (
-          <AdminButton
-            variant="outline"
-            className="h-9 px-4"
-            onClick={() => void onArchive()}
-          >
-            {p.status === "ARCHIVED" ? "Restore" : "Archive"}
-          </AdminButton>
-        ) : null}
-        {p.status === "AVAILABLE" ? (
-          <AdminButton className="h-9 px-4" asChild>
-            <Link href={`/admin/land-sales/new?plotId=${p.id}`}>Sell plot</Link>
-          </AdminButton>
-        ) : null}
-      </div>
+      <DetailShell
+        aside={aside}
+        main={
+          <div className="flex flex-col gap-4">
+            {p.description ? (
+              <AdminCard className="px-5 py-3 text-[13.5px] text-ink [overflow-wrap:anywhere]">
+                <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                  Description
+                </div>
+                {p.description}
+              </AdminCard>
+            ) : null}
 
-      <div className="mb-4 grid gap-4 md:grid-cols-2">
-        <AdminCard className="px-5 py-3">
-          <DetailRow label="Asking price">
-            <Money value={p.askingPriceGhs} />
-          </DetailRow>
-          <div className="border-t border-soil/12">
-            <DetailRow label="Purchase cost">
-              <Money value={p.purchaseCostGhs} />
-            </DetailRow>
-          </div>
-          <div className="border-t border-soil/12">
-            <DetailRow label="Margin">
-              <Money value={p.marginGhs} />
-            </DetailRow>
-          </div>
-          {p.use ? (
-            <div className="border-t border-soil/12">
-              <DetailRow label="Use">{p.use}</DetailRow>
-            </div>
-          ) : null}
-          <div className="border-t border-soil/12">
-            <DetailRow label="Price on site">
-              {p.showPriceOnWebsite ? "Shown" : "Hidden"}
-            </DetailRow>
-          </div>
-        </AdminCard>
-
-        {p.description ? (
-          <AdminCard className="px-5 py-3 text-[13.5px] text-ink">
-            <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
-              Description
-            </div>
-            {p.description}
-          </AdminCard>
-        ) : null}
-      </div>
-
-      {/* Photos */}
-      <AdminCard className="mb-4 px-5 py-4">
-        <div className="mb-2 flex items-center justify-between">
-          <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
-            Photos (public)
-          </span>
-          <FilePicker
-            accept="image/*"
-            busy={addPhotoState.isLoading}
-            confirmLabel="Add photo"
-            hint="Shown on the public listing"
-            onConfirm={onPhotoConfirm}
-            triggerLabel="+ Add photo"
-          />
-        </div>
-        {p.photos.length === 0 ? (
-          <p className="text-[13px] text-soil">No photos yet.</p>
-        ) : (
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {p.photos.map((ph) => (
-              <div key={ph.id} className="group relative">
-                {/* eslint-disable-next-line @next/next/no-img-element -- Cloudinary */}
-                <img
-                  src={ph.url}
-                  alt={ph.alt ?? ""}
-                  className="h-24 w-full rounded object-cover"
-                />
-                <button
-                  type="button"
-                  onClick={() =>
-                    void run(
-                      () => removePhoto({ id: p.id, photoId: ph.id }).unwrap(),
-                      "Photo removed",
-                    )
-                  }
-                  className="absolute right-1 top-1 rounded bg-black/60 px-1.5 text-[11px] text-white"
-                >
-                  ✕
-                </button>
+            {/* Photos: first photo as the cover, the rest as thumbs. The
+                backend caps a plot at 3 photos (PHOTO_LIMIT), so the picker
+                hides at the cap; `run` surfaces the API message if a 4th
+                slips through anyway. */}
+            <AdminCard className="px-5 py-4">
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                  Photos (public)
+                </span>
+                {p.photos.length >= 3 ? (
+                  <span className="text-[11.5px] text-soil/70">
+                    3 of 3 photos
+                  </span>
+                ) : (
+                  <FilePicker
+                    accept="image/*"
+                    busy={addPhotoState.isLoading}
+                    confirmLabel="Add photo"
+                    hint="Shown on the public listing (up to 3)"
+                    onConfirm={onPhotoConfirm}
+                    triggerLabel="+ Add photo"
+                  />
+                )}
               </div>
-            ))}
-          </div>
-        )}
-      </AdminCard>
+              {p.photos.length === 0 ? (
+                <p className="text-[13px] text-soil">No photos yet.</p>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {photoTile(p.photos[0], true)}
+                  {p.photos.length > 1 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {p.photos.slice(1).map((ph) => photoTile(ph, false))}
+                    </div>
+                  ) : null}
+                </div>
+              )}
+            </AdminCard>
 
-      {/* Private documents */}
-      <AdminCard className="px-5 py-4">
-        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
-          Ownership documents (private)
-        </div>
-        <p className="mb-2 text-[12px] text-soil">
-          Never shown on the website. Downloads are logged.
-        </p>
-        {p.documents.map((doc) => (
-          <div
-            key={doc.id}
-            className="flex items-center justify-between border-b border-soil/10 py-2 text-[13px] last:border-b-0"
-          >
-            <a
-              href={plotDocumentUrl(p.id, doc.id)}
-              target="_blank"
-              rel="noreferrer"
-              className="text-console hover:underline"
-            >
-              {doc.name}
-            </a>
-            <div className="flex items-center gap-3">
-              <Mono className="text-[12px] text-soil">
-                {formatSaleDate(doc.createdAt)}
-              </Mono>
-              <button
-                type="button"
-                onClick={() =>
-                  void run(
-                    () => removeDoc({ documentId: doc.id, id: p.id }).unwrap(),
-                    "Document removed",
-                  )
-                }
-                className="text-[12px] text-console-red"
-              >
-                ✕
-              </button>
-            </div>
+            {/* Private documents */}
+            <AdminCard className="px-5 py-4">
+              <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                Ownership documents (private)
+              </div>
+              <p className="mb-2 text-[12px] text-soil">
+                Never shown on the website. Downloads are logged.
+              </p>
+              {p.documents.map((doc) => (
+                <div
+                  key={doc.id}
+                  className="flex items-center justify-between border-b border-soil/10 py-2 text-[13px] last:border-b-0"
+                >
+                  <a
+                    href={plotDocumentUrl(p.id, doc.id)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-console hover:underline"
+                  >
+                    {doc.name}
+                  </a>
+                  <div className="flex items-center gap-3">
+                    <Mono className="text-[12px] text-soil">
+                      {formatSaleDate(doc.createdAt)}
+                    </Mono>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        void run(
+                          () => removeDoc({ documentId: doc.id, id: p.id }).unwrap(),
+                          "Document removed",
+                        )
+                      }
+                      className="text-[12px] text-console-red"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              ))}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <input
+                  value={docName}
+                  onChange={(e) => setDocName(e.target.value)}
+                  placeholder="Document name (e.g. Indenture)"
+                  className={cn(
+                    "h-8 flex-1 rounded border border-soil/25 bg-paper px-2.5 text-[13px]",
+                  )}
+                />
+                <FilePicker
+                  accept="image/*,application/pdf,.doc,.docx"
+                  busy={addDocState.isLoading}
+                  confirmLabel="Upload"
+                  hint="PDF, Word or a photo of the document"
+                  onConfirm={onDocConfirm}
+                  optimize={false}
+                  triggerLabel="Choose document"
+                />
+              </div>
+            </AdminCard>
           </div>
-        ))}
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <input
-            value={docName}
-            onChange={(e) => setDocName(e.target.value)}
-            placeholder="Document name (e.g. Indenture)"
-            className={cn(
-              "h-8 flex-1 rounded border border-soil/25 bg-paper px-2.5 text-[13px]",
-            )}
-          />
-          <FilePicker
-            accept="image/*,application/pdf,.doc,.docx"
-            busy={addDocState.isLoading}
-            confirmLabel="Upload"
-            hint="PDF, Word or a photo of the document"
-            onConfirm={onDocConfirm}
-            optimize={false}
-            triggerLabel="Choose document"
-          />
-        </div>
-      </AdminCard>
+        }
+      />
 
       {confirmationDialog}
     </div>

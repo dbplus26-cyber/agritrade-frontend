@@ -12,6 +12,7 @@ import {
   AdminCard,
   AdminField,
   AdminPageHeader,
+  DetailShell,
   ToneBadge,
   adminInputClass,
 } from "@/components/admin/ui";
@@ -622,14 +623,16 @@ function ActionsCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
  */
 function UserDetailSkeleton() {
   return (
-    <div aria-hidden="true" className="w-full xl:max-w-[820px]">
+    <div aria-hidden="true" className="w-full max-w-[1120px]">
       <Skeleton className="mb-2 h-6 w-24 rounded-[6px]" />
       <div className="mb-5">
         <Skeleton className="h-5 w-44 rounded-[4px]" />
         <Skeleton className="mt-2 h-3 w-60 rounded-[4px]" />
       </div>
 
-      <div className="flex flex-col gap-4">
+      <DetailShell
+        asideFirstOnStack={false}
+        main={
         <AdminCard className="overflow-hidden p-0">
           <Skeleton className="h-[88px] w-full rounded-none" />
           <div className="px-4 pb-6 sm:px-6">
@@ -654,20 +657,24 @@ function UserDetailSkeleton() {
             </div>
           </div>
         </AdminCard>
-
-        {Array.from({ length: 2 }, (_, i) => (
-          <AdminCard key={i} className="px-4 py-[18px] sm:px-6">
-            <Skeleton className="h-2.5 w-20 rounded-[4px]" />
-            <div className="mt-3.5 flex items-center justify-between gap-3">
-              <div className="flex-1 space-y-1.5">
-                <Skeleton className="h-3.5 w-36 rounded-[4px]" />
-                <Skeleton className="h-3 w-64 max-w-full rounded-[4px]" />
-              </div>
-              <Skeleton className="h-8 w-24 flex-none rounded-[6px]" />
-            </div>
-          </AdminCard>
-        ))}
-      </div>
+        }
+        aside={
+          <div className="flex flex-col gap-4">
+            {Array.from({ length: 2 }, (_, i) => (
+              <AdminCard key={i} className="px-4 py-[18px] sm:px-6">
+                <Skeleton className="h-2.5 w-20 rounded-[4px]" />
+                <div className="mt-3.5 flex items-center justify-between gap-3">
+                  <div className="flex-1 space-y-1.5">
+                    <Skeleton className="h-3.5 w-36 rounded-[4px]" />
+                    <Skeleton className="h-3 w-64 max-w-full rounded-[4px]" />
+                  </div>
+                  <Skeleton className="h-8 w-24 flex-none rounded-[6px]" />
+                </div>
+              </AdminCard>
+            ))}
+          </div>
+        }
+      />
     </div>
   );
 }
@@ -692,18 +699,23 @@ export function UserDetail({ id }: { id: string }) {
   const isSelf = me?.id === user.id;
 
   return (
-    <div className="w-full xl:max-w-[820px]">
+    <div className="w-full max-w-[1120px]">
       <BackButton href="/admin/users" label="All users" className="mb-2" />
       <AdminPageHeader
         title={`${user.firstName} ${user.lastName}`}
         sub={`${ROLE_TITLE[user.role] ?? user.role} · ${user.email}`}
       />
 
-      <div className="flex flex-col gap-4">
-        <IdentityCard user={user} isSelf={isSelf} />
-        <RoleCard user={user} isSelf={isSelf} />
-        <ActionsCard user={user} isSelf={isSelf} />
-      </div>
+      <DetailShell
+        asideFirstOnStack={false}
+        main={<IdentityCard user={user} isSelf={isSelf} />}
+        aside={
+          <div className="flex flex-col gap-4">
+            <RoleCard user={user} isSelf={isSelf} />
+            <ActionsCard user={user} isSelf={isSelf} />
+          </div>
+        }
+      />
     </div>
   );
 }

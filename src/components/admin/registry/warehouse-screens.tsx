@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -21,6 +21,8 @@ import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useGetStockBalancesQuery } from "@/redux/stock/stock-api";
 import {
   useActivateWarehouseMutation,
   useCreateWarehouseMutation,
@@ -33,6 +35,8 @@ import {
 import { useTableQuery } from "@/hooks/use-table-query";
 import { useAuthRole } from "@/hooks/use-auth-role";
 import { extractApiError } from "@/lib/extract-api-error";
+import { DateTimeCell } from "@/components/admin/date-cell";
+import { formatKg } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import type { IRegistryListQuery, IWarehouse } from "@/types/registry.types";
@@ -41,6 +45,7 @@ import {
   type WarehouseValues,
 } from "@/validations/registry-schema";
 import { LifecycleActions } from "./lifecycle-actions";
+import { RecordTimestamps } from "./supplier-screens";
 import {
   Absent,
   ActiveBadge,
@@ -119,6 +124,14 @@ export function WarehouseTable() {
           ) : (
             <Absent />
           ),
+      },
+      {
+        id: "added",
+        accessorFn: (w) => w.createdAt,
+        header: "Added",
+        enableSorting: false,
+        meta: columnMeta({ wide: true }),
+        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",
@@ -221,6 +234,12 @@ export function WarehouseTable() {
   );
 }
 
+/** "" for create, or the record's values for edit. */
+const toWarehouseValues = (warehouse?: IWarehouse): WarehouseValues => ({
+  name: warehouse?.name ?? "",
+  location: warehouse?.location ?? "",
+});
+
 function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
   const router = useRouter();
   const isEdit = warehouse !== undefined;
@@ -228,18 +247,31 @@ function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
   const [updateWarehouse, updateState] = useUpdateWarehouseMutation();
   const saving = createState.isLoading || updateState.isLoading;
 
+  // Detail screens open READ-ONLY; the Edit button unlocks the inputs. Create
+  // is always editable.
+  const [isEditing, setIsEditing] = useState(!isEdit);
+  const readOnly = !isEditing;
+  // Keep disabled inputs legible as a read view rather than a greyed-out form.
+  const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
+
   const {
     register,
     handleSubmit,
+    reset,
     setError,
     formState: { errors },
   } = useForm<WarehouseValues>({
     resolver: zodResolver(warehouseSchema),
-    defaultValues: {
-      name: warehouse?.name ?? "",
-      location: warehouse?.location ?? "",
-    },
+    defaultValues: toWarehouseValues(warehouse),
   });
+
+  // A background refetch can bump the record (another tab, a lifecycle
+  // action). Track the fresh values while reading, but never clobber an
+  // in-progress edit - which is why the parent no longer key-remounts the
+  // form on updatedAt.
+  useEffect(() => {
+    if (!isEditing) reset(toWarehouseValues(warehouse));
+  }, [warehouse, isEditing, reset]);
 
   const onSubmit = async (values: WarehouseValues) => {
     const location = values.location?.trim() ?? "";
@@ -250,6 +282,7 @@ function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
           body: { name: values.name, location: location || null },
         }).unwrap();
         notify.success("Warehouse updated");
+        setIsEditing(false);
       } else {
         const res = await createWarehouse({
           name: values.name,
@@ -283,32 +316,162 @@ function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
         <AdminField label="Name" error={errors.name?.message}>
           <Input
             placeholder="e.g. Main Warehouse - Tamale"
-            className={cn(adminInputClass, errors.name && "border-error")}
+            disabled={readOnly}
+            className={cn(adminInputClass, roCls, errors.name && "border-error")}
             {...register("name")}
           />
         </AdminField>
         <AdminField label="Location" optional error={errors.location?.message}>
           <Input
             placeholder="e.g. Tamale, Northern Region"
-            className={cn(adminInputClass, errors.location && "border-error")}
+            disabled={readOnly}
+            className={cn(
+              adminInputClass,
+              roCls,
+              errors.location && "border-error",
+            )}
             {...register("location")}
           />
         </AdminField>
         <div className="mt-1 flex gap-2">
-          <AdminButton type="submit" disabled={saving} className="h-[38px] px-[18px]">
-            {saving ? "Saving…" : isEdit ? "Save changes" : "Create warehouse"}
-          </AdminButton>
-          <AdminButton
-            type="button"
-            variant="outline"
-            className="h-[38px] px-3.5"
-            onClick={() => router.push(LIST)}
-          >
-            Cancel
-          </AdminButton>
+          {!isEdit ? (
+            <>
+              <AdminButton
+                type="submit"
+                disabled={saving}
+                className="h-[38px] px-[18px]"
+              >
+                {saving ? "Saving…" : "Create warehouse"}
+              </AdminButton>
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-[38px] px-3.5"
+                onClick={() => router.push(LIST)}
+              >
+                Cancel
+              </AdminButton>
+            </>
+          ) : isEditing ? (
+            <>
+              <AdminButton
+                type="submit"
+                disabled={saving}
+                className="h-[38px] px-[18px]"
+              >
+                {saving ? "Saving…" : "Save changes"}
+              </AdminButton>
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-[38px] px-3.5"
+                onClick={() => {
+                  reset();
+                  setIsEditing(false);
+                }}
+              >
+                Cancel
+              </AdminButton>
+            </>
+          ) : (
+            <AdminButton
+              type="button"
+              variant="gold"
+              className="h-[38px] px-[18px]"
+              onClick={() => setIsEditing(true)}
+            >
+              Edit warehouse
+            </AdminButton>
+          )}
         </div>
       </form>
     </AdminCard>
+  );
+}
+
+/**
+ * Current stock held in this warehouse - the same derived balances the
+ * /admin/stock view shows, filtered to one location.
+ */
+function WarehouseStockSection({ warehouseId }: { warehouseId: string }) {
+  const { data, isLoading, isError, error, refetch } = useGetStockBalancesQuery(
+    { warehouseId },
+  );
+  const rows = data?.data ?? [];
+  const totalKg = rows.reduce((sum, row) => sum + row.balanceKg, 0);
+
+  return (
+    <div className="mt-6">
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <h2 className="text-[12px] font-bold uppercase tracking-[0.1em] text-soil">
+          Commodities in this warehouse
+        </h2>
+        <Link
+          href="/admin/stock"
+          className="whitespace-nowrap text-[12.5px] font-semibold text-console underline-offset-2 hover:underline"
+        >
+          Full stock view
+        </Link>
+      </div>
+
+      {isLoading ? (
+        <AdminCard className="px-4 py-3.5">
+          <div className="flex flex-col gap-3">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="flex items-center justify-between gap-3">
+                <Skeleton className="h-3.5 w-32" />
+                <Skeleton className="h-3.5 w-16" />
+              </div>
+            ))}
+          </div>
+        </AdminCard>
+      ) : isError ? (
+        <ErrorMessage
+          description={extractApiError(error).message}
+          onRetry={() => void refetch()}
+        />
+      ) : rows.length === 0 ? (
+        <AdminCard className="overflow-hidden">
+          <EmptyState
+            variant="plain"
+            title="Nothing in stock here yet"
+            description="Stock appears here the moment a purchase is received into this warehouse."
+          />
+        </AdminCard>
+      ) : (
+        <AdminCard className="overflow-hidden">
+          <ul>
+            {rows.map((row) => (
+              <li
+                key={row.commodityId}
+                className="flex items-center justify-between gap-3 border-b border-soil/15 px-4 py-2.5"
+              >
+                <span className="min-w-0 truncate text-[13.5px] font-medium text-ink">
+                  {row.commodityName}
+                </span>
+                <span
+                  className="font-adminmono flex-none text-[13.5px] font-semibold text-ink"
+                  title={`${row.balanceKg.toLocaleString("en-GH")} kg`}
+                >
+                  {formatKg(row.balanceKg)}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <div className="flex items-center justify-between gap-3 bg-surface-alt/60 px-4 py-2.5">
+            <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-soil">
+              Total on hand
+            </span>
+            <span
+              className="font-adminmono flex-none text-[13.5px] font-bold text-ink"
+              title={`${totalKg.toLocaleString("en-GH")} kg`}
+            >
+              {formatKg(totalKg)}
+            </span>
+          </div>
+        </AdminCard>
+      )}
+    </div>
   );
 }
 
@@ -346,9 +509,14 @@ export function WarehouseEdit({ id }: { id: string }) {
       <BackButton href={LIST} label="All warehouses" className="mb-2" />
       <AdminPageHeader
         title={warehouse.name}
-        sub="Edit the warehouse and its lifecycle"
+        sub="Warehouse record and current stock"
       />
-      <WarehouseFormFields key={warehouse.updatedAt} warehouse={warehouse} />
+      <WarehouseFormFields warehouse={warehouse} />
+      <RecordTimestamps
+        createdAt={warehouse.createdAt}
+        updatedAt={warehouse.updatedAt}
+      />
+      <WarehouseStockSection warehouseId={id} />
       <LifecycleActions
         noun="warehouse"
         name={warehouse.name}

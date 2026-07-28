@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogDescription,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+} from "@/components/ui/responsive-dialog";
 import {
   Select,
   SelectContent,
@@ -59,17 +59,17 @@ export function RoleChangeDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={close}>
-      <DialogContent className="max-w-[400px] border-soil/25 p-5">
-        <DialogHeader>
-          <DialogTitle className="text-[15px] font-bold text-ink">
-            Change role — {user.firstName} {user.lastName}
-          </DialogTitle>
-          <DialogDescription className="text-[12.5px] leading-[1.55] text-soil">
+    <ResponsiveDialog open={open} onOpenChange={close}>
+      <ResponsiveDialogContent className="border-soil/25 p-5 sm:max-w-[400px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle className="text-[15px] font-bold text-ink">
+            Change role - {user.firstName} {user.lastName}
+          </ResponsiveDialogTitle>
+          <ResponsiveDialogDescription className="text-[12.5px] leading-[1.55] text-soil">
             The user is signed out everywhere and their access changes the
             moment they sign back in.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
 
         <div className="grid gap-1 py-1">
           <span className="text-[10.5px] font-bold uppercase tracking-[0.08em] text-soil/70">
@@ -89,7 +89,7 @@ export function RoleChangeDialog({
           </Select>
         </div>
 
-        <DialogFooter className="flex-row justify-end gap-2">
+        <ResponsiveDialogFooter className="flex-row justify-end gap-2">
           <AdminButton
             variant="outline"
             className="h-[34px] px-3.5 text-[13px]"
@@ -105,8 +105,8 @@ export function RoleChangeDialog({
           >
             {isLoading ? "Applying…" : "Change role"}
           </AdminButton>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </ResponsiveDialogFooter>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   );
 }

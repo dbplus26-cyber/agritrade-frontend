@@ -25,6 +25,7 @@ import type {
   LandAcquisitionStatus,
 } from "@/types/land.types";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
+import { DateOnlyCell } from "@/components/admin/date-cell";
 import { Money } from "@/components/admin/trading/sale-bits";
 import {
   LAND_ACQUISITION_STATUS_FILTER_OPTIONS,
@@ -124,6 +125,13 @@ export function LandAcquisitionsRegister() {
             </Mono>
           );
         },
+      },
+      {
+        id: "date",
+        header: "Date",
+        enableSorting: false,
+        meta: columnMeta(),
+        cell: ({ row }) => <DateOnlyCell value={row.original.createdAt} />,
       },
       {
         id: "status",

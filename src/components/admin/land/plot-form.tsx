@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,32 +25,47 @@ import { plotSchema, type PlotValues } from "@/validations/land-schema";
 
 const LIST = "/admin/plots";
 
+/** The record's values, shaped for the form. */
+const toFormValues = (plot: ILandPlot): PlotValues => ({
+  askingPriceGhs: String(plot.askingPriceGhs ?? ""),
+  description: plot.description ?? "",
+  locationText: plot.locationText,
+  purchaseCostGhs: String(plot.purchaseCostGhs ?? ""),
+  reference: plot.reference,
+  showPriceOnWebsite: plot.showPriceOnWebsite,
+  sizeAcres: plot.sizeAcres ? String(plot.sizeAcres) : "",
+  sizeText: plot.sizeText,
+  use: plot.use ?? "",
+});
+
 export function PlotForm({ plot }: { plot?: ILandPlot }) {
   const router = useRouter();
   const [createPlot, createState] = useCreatePlotMutation();
   const [updatePlot, updateState] = useUpdatePlotMutation();
   const saving = createState.isLoading || updateState.isLoading;
 
+  // Edit opens READ-ONLY; the Edit button unlocks the inputs. Create is
+  // always editable.
+  const [isEditing, setIsEditing] = useState(plot === undefined);
+  const readOnly = !isEditing;
+  // Keep disabled inputs legible as a read view rather than a greyed-out form.
+  const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
+
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<PlotValues>({
     resolver: zodResolver(plotSchema),
-    defaultValues: plot
-      ? {
-          askingPriceGhs: String(plot.askingPriceGhs ?? ""),
-          description: plot.description ?? "",
-          locationText: plot.locationText,
-          purchaseCostGhs: String(plot.purchaseCostGhs ?? ""),
-          reference: plot.reference,
-          showPriceOnWebsite: plot.showPriceOnWebsite,
-          sizeAcres: plot.sizeAcres ? String(plot.sizeAcres) : "",
-          sizeText: plot.sizeText,
-          use: plot.use ?? "",
-        }
-      : { showPriceOnWebsite: false },
+    defaultValues: plot ? toFormValues(plot) : { showPriceOnWebsite: false },
   });
+
+  // A background refetch can bump the record. Track the fresh values while
+  // reading, but never clobber an in-progress edit.
+  useEffect(() => {
+    if (plot && !isEditing) reset(toFormValues(plot));
+  }, [plot, isEditing, reset]);
 
   const onSubmit = async (values: PlotValues) => {
     const body = {
@@ -99,7 +115,8 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
       <Input
         inputMode={opts?.mode}
         placeholder={opts?.placeholder}
-        className={cn(adminInputClass, errors[key] && "border-error")}
+        disabled={readOnly}
+        className={cn(adminInputClass, roCls, errors[key] && "border-error")}
         {...register(key)}
       />
     </AdminField>
@@ -128,24 +145,64 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
 
         <AdminCard className="flex flex-col gap-3 px-5 py-4">
           {field("description", "Description", { optional: true })}
-          <label className="flex items-center gap-2 text-[13px] text-ink">
-            <input type="checkbox" {...register("showPriceOnWebsite")} />
+          <label
+            className={cn(
+              "flex items-center gap-2 text-[13px] text-ink",
+              readOnly && "cursor-default",
+            )}
+          >
+            <input
+              type="checkbox"
+              disabled={readOnly}
+              className={roCls}
+              {...register("showPriceOnWebsite")}
+            />
             Show the asking price on the public listing
           </label>
         </AdminCard>
 
         <div className="flex justify-end gap-2">
-          <AdminButton
-            type="button"
-            variant="outline"
-            className="h-10 px-4"
-            onClick={() => router.push(LIST)}
-          >
-            Cancel
-          </AdminButton>
-          <AdminButton type="submit" disabled={saving} className="h-10 px-5">
-            {saving ? "Saving…" : plot ? "Save changes" : "Create plot"}
-          </AdminButton>
+          {!plot ? (
+            <>
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-10 px-4"
+                onClick={() => router.push(LIST)}
+              >
+                Cancel
+              </AdminButton>
+              <AdminButton type="submit" disabled={saving} className="h-10 px-5">
+                {saving ? "Saving…" : "Create plot"}
+              </AdminButton>
+            </>
+          ) : isEditing ? (
+            <>
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-10 px-4"
+                onClick={() => {
+                  reset();
+                  setIsEditing(false);
+                }}
+              >
+                Cancel
+              </AdminButton>
+              <AdminButton type="submit" disabled={saving} className="h-10 px-5">
+                {saving ? "Saving…" : "Save changes"}
+              </AdminButton>
+            </>
+          ) : (
+            <AdminButton
+              type="button"
+              variant="gold"
+              className="h-10 px-5"
+              onClick={() => setIsEditing(true)}
+            >
+              Edit plot
+            </AdminButton>
+          )}
         </div>
       </form>
     </div>

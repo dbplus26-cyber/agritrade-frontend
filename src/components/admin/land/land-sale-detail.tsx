@@ -9,6 +9,7 @@ import {
   AdminField,
   AdminPageHeader,
   DetailRow,
+  DetailShell,
   Mono,
   adminInputClass,
   adminSelectClass,
@@ -17,13 +18,13 @@ import { BackButton } from "@/components/ui/BackButton";
 import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogDescription,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+} from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -104,15 +105,15 @@ function PaymentDialog({
     }
   };
   return (
-    <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-[420px]">
-        <DialogHeader>
-          <DialogTitle>Record a payment</DialogTitle>
-          <DialogDescription>
+    <ResponsiveDialog open onOpenChange={(o) => !o && onClose()}>
+      <ResponsiveDialogContent className="sm:max-w-[420px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>Record a payment</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
             Part-payments are fine. Full payment completes the sale and marks the
             plot sold.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
         <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
           <AdminField label="Amount (GHS)" error={errors.amountGhs?.message}>
             <Input
@@ -136,17 +137,17 @@ function PaymentDialog({
           <AdminField label="Payment date" optional>
             <Input type="date" className={adminInputClass} {...register("paidAt")} />
           </AdminField>
-          <DialogFooter className="gap-2">
+          <ResponsiveDialogFooter className="gap-2">
             <AdminButton type="button" variant="outline" className="h-9 px-3.5" onClick={onClose}>
               Cancel
             </AdminButton>
             <AdminButton type="submit" disabled={isLoading} className="h-9 px-4">
               {isLoading ? "Recording…" : "Record payment"}
             </AdminButton>
-          </DialogFooter>
+          </ResponsiveDialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   );
 }
 
@@ -178,15 +179,15 @@ function CancelDialog({
     }
   };
   return (
-    <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-[420px]">
-        <DialogHeader>
-          <DialogTitle>Cancel this land sale?</DialogTitle>
-          <DialogDescription>
+    <ResponsiveDialog open onOpenChange={(o) => !o && onClose()}>
+      <ResponsiveDialogContent className="sm:max-w-[420px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>Cancel this land sale?</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
             Only possible while nothing has been paid. The plot returns to
             available.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
         <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
           <AdminField label="Reason" error={errors.reason?.message}>
             <Input
@@ -194,17 +195,17 @@ function CancelDialog({
               {...register("reason")}
             />
           </AdminField>
-          <DialogFooter className="gap-2">
+          <ResponsiveDialogFooter className="gap-2">
             <AdminButton type="button" variant="outline" className="h-9 px-3.5" onClick={onClose}>
               Keep sale
             </AdminButton>
             <AdminButton type="submit" variant="danger" disabled={isLoading} className="h-9 px-4">
               {isLoading ? "Cancelling…" : "Cancel sale"}
             </AdminButton>
-          </DialogFooter>
+          </ResponsiveDialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   );
 }
 
@@ -243,8 +244,10 @@ export function LandSaleDetail({ id }: { id: string }) {
     }
   };
 
+  const canAct = s.status === "DRAFT" || s.status === "CONFIRMED";
+
   return (
-    <div className="max-w-[680px]">
+    <div className="max-w-[1120px]">
       <BackButton href={LIST} label="All land sales" className="mb-2" />
       <AdminPageHeader
         title={`${s.plot.reference} · ${s.buyer.name}`}
@@ -252,87 +255,106 @@ export function LandSaleDetail({ id }: { id: string }) {
         actions={<LandSaleStatusBadge status={s.status} />}
       />
 
-      <AdminCard className="mb-4 px-5 py-3">
-        <Row label="Agreed price" strong>
-          <Money value={s.agreedPriceGhs} />
-        </Row>
-        <div className="border-t border-soil/12">
-          <Row label="Paid">
-            <Money value={s.paidGhs} />
-          </Row>
-        </div>
-        <div className="border-t border-soil/12">
-          <Row label="Balance" strong>
-            <span className={cn(s.balanceGhs === 0 ? "text-leaf" : "text-console-red")}>
-              {s.balanceGhs === 0 ? "Paid in full" : <Money value={s.balanceGhs} />}
-            </span>
-          </Row>
-        </div>
-        <div className="border-t border-soil/12">
-          <Row label="Margin">
-            <Money value={s.marginGhs} />
-          </Row>
-        </div>
-      </AdminCard>
-
-      <div className="mb-4 flex flex-wrap gap-2">
-        {s.status === "DRAFT" ? (
-          <AdminButton
-            className="h-9 px-4"
-            disabled={confirmState.isLoading}
-            onClick={() => void onConfirm()}
-          >
-            {confirmState.isLoading ? "Confirming…" : "Confirm sale"}
-          </AdminButton>
-        ) : null}
-        {s.status === "CONFIRMED" ? (
-          <AdminButton className="h-9 px-4" onClick={() => setPayOpen(true)}>
-            Record payment
-          </AdminButton>
-        ) : null}
-        {s.status === "DRAFT" || s.status === "CONFIRMED" ? (
-          <AdminButton
-            variant="outline"
-            className="h-9 px-4"
-            onClick={() => setCancelOpen(true)}
-          >
-            Cancel sale
-          </AdminButton>
-        ) : null}
-      </div>
-
       {s.status === "CANCELLED" && s.cancelReason ? (
         <AdminCard className="mb-4 border-error/40 bg-error/[0.04] px-4 py-3 text-[13px] text-ink">
           Cancelled: {s.cancelReason}
         </AdminCard>
       ) : null}
 
-      <AdminCard className="px-5 py-3">
-        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
-          Payments
-        </div>
-        {s.payments.length === 0 ? (
-          <p className="py-2 text-[13px] text-soil">No payments recorded yet.</p>
-        ) : (
-          s.payments.map((p) => (
-            <div
-              key={p.id}
-              className="flex items-baseline justify-between gap-3 border-b border-soil/10 py-2 last:border-b-0"
-            >
-              <div className="min-w-0">
-                <span className="text-ink">{p.method}</span>
-                <span className="ml-2 text-[12px] text-soil">
-                  {formatSaleDate(p.paidAt)}
-                  {p.reference ? ` · ${p.reference}` : ""}
-                </span>
-              </div>
-              <Mono className="whitespace-nowrap text-[13px] font-semibold text-leaf">
-                <Money value={p.amountGhs} />
-              </Mono>
+      <DetailShell
+        aside={
+          <AdminCard className="px-5 py-3">
+            <Row label="Agreed price" strong>
+              <Money value={s.agreedPriceGhs} />
+            </Row>
+            <div className="border-t border-soil/12">
+              <Row label="Paid">
+                <Money value={s.paidGhs} />
+              </Row>
             </div>
-          ))
-        )}
-      </AdminCard>
+            <div className="border-t border-soil/12">
+              <Row label="Balance" strong>
+                <span
+                  className={cn(
+                    s.balanceGhs === 0 ? "text-leaf" : "text-console-red",
+                  )}
+                >
+                  {s.balanceGhs === 0 ? (
+                    "Paid in full"
+                  ) : (
+                    <Money value={s.balanceGhs} />
+                  )}
+                </span>
+              </Row>
+            </div>
+            <div className="border-t border-soil/12">
+              <Row label="Margin">
+                <Money value={s.marginGhs} />
+              </Row>
+            </div>
+            {canAct ? (
+              <div className="mt-3 border-t border-soil/12 pt-3.5">
+                <div className="flex flex-wrap gap-2 xl:flex-col">
+                  {s.status === "DRAFT" ? (
+                    <AdminButton
+                      className="h-9 px-4"
+                      disabled={confirmState.isLoading}
+                      onClick={() => void onConfirm()}
+                    >
+                      {confirmState.isLoading ? "Confirming…" : "Confirm sale"}
+                    </AdminButton>
+                  ) : null}
+                  {s.status === "CONFIRMED" ? (
+                    <AdminButton
+                      className="h-9 px-4"
+                      onClick={() => setPayOpen(true)}
+                    >
+                      Record payment
+                    </AdminButton>
+                  ) : null}
+                  <AdminButton
+                    variant="outline"
+                    className="h-9 px-4"
+                    onClick={() => setCancelOpen(true)}
+                  >
+                    Cancel sale
+                  </AdminButton>
+                </div>
+              </div>
+            ) : null}
+          </AdminCard>
+        }
+        main={
+          <AdminCard className="px-5 py-3">
+            <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              Payments
+            </div>
+            {s.payments.length === 0 ? (
+              <p className="py-2 text-[13px] text-soil">
+                No payments recorded yet.
+              </p>
+            ) : (
+              s.payments.map((p) => (
+                <div
+                  key={p.id}
+                  className="flex items-baseline justify-between gap-3 border-b border-soil/10 py-2 last:border-b-0"
+                >
+                  <div className="min-w-0">
+                    <span className="text-ink">{p.method}</span>
+                    <span className="ml-2 text-[12px] text-soil">
+                      {formatSaleDate(p.paidAt)}
+                      {p.reference ? ` · ${p.reference}` : ""}
+                    </span>
+                  </div>
+                  <Mono className="whitespace-nowrap text-[13px] font-semibold text-leaf">
+                    <Money value={p.amountGhs} />
+                  </Mono>
+                </div>
+              ))
+            )}
+          </AdminCard>
+        }
+      />
 
       {payOpen ? <PaymentDialog sale={s} onClose={() => setPayOpen(false)} /> : null}
       {cancelOpen ? <CancelDialog sale={s} onClose={() => setCancelOpen(false)} /> : null}

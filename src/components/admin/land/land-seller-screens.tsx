@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -26,6 +26,7 @@ import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
+import { DateTimeCell } from "@/components/admin/date-cell";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import {
@@ -133,6 +134,14 @@ export function LandSellerTable() {
           ),
       },
       {
+        id: "added",
+        accessorFn: (s) => s.createdAt,
+        header: "Added",
+        enableSorting: false,
+        meta: columnMeta({ wide: true }),
+        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
+      },
+      {
         id: "status",
         header: "Status",
         enableSorting: false,
@@ -231,6 +240,14 @@ export function LandSellerTable() {
   );
 }
 
+/** "" for create, or the record's values for edit. */
+const toSellerValues = (seller?: ILandSeller): LandSellerValues => ({
+  name: seller?.name ?? "",
+  phone: seller?.phone ?? "",
+  community: seller?.community ?? "",
+  notes: seller?.notes ?? "",
+});
+
 function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
   const router = useRouter();
   const isEdit = seller !== undefined;
@@ -238,20 +255,31 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
   const [updateSeller, updateState] = useUpdateLandSellerMutation();
   const saving = createState.isLoading || updateState.isLoading;
 
+  // Edit screens open READ-ONLY; the Edit button unlocks the inputs. Create is
+  // always editable.
+  const [isEditing, setIsEditing] = useState(!isEdit);
+  const readOnly = !isEditing;
+  // Keep disabled inputs legible as a read view rather than a greyed-out form.
+  const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
+
   const {
     register,
     handleSubmit,
+    reset,
     setError,
     formState: { errors },
   } = useForm<LandSellerValues>({
     resolver: zodResolver(landSellerSchema),
-    defaultValues: {
-      name: seller?.name ?? "",
-      phone: seller?.phone ?? "",
-      community: seller?.community ?? "",
-      notes: seller?.notes ?? "",
-    },
+    defaultValues: toSellerValues(seller),
   });
+
+  // A background refetch can bump the record (another tab, a lifecycle
+  // action). Track the fresh values while reading, but never clobber an
+  // in-progress edit - which is why the parent does not key-remount the form
+  // on updatedAt.
+  useEffect(() => {
+    if (!isEditing) reset(toSellerValues(seller));
+  }, [seller, isEditing, reset]);
 
   const onSubmit = async (values: LandSellerValues) => {
     const opt = (v: string | undefined) => {
@@ -271,6 +299,7 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
           },
         }).unwrap();
         notify.success("Seller updated");
+        setIsEditing(false);
       } else {
         const res = await createSeller({
           name: values.name,
@@ -308,7 +337,8 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
         <AdminField label="Name" error={errors.name?.message}>
           <Input
             placeholder="e.g. Alhaji Mahama"
-            className={cn(adminInputClass, errors.name && "border-error")}
+            disabled={readOnly}
+            className={cn(adminInputClass, roCls, errors.name && "border-error")}
             {...register("name")}
           />
         </AdminField>
@@ -317,7 +347,8 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
             <Input
               type="tel"
               placeholder="024 000 0000"
-              className={cn(adminInputClass, errors.phone && "border-error")}
+              disabled={readOnly}
+              className={cn(adminInputClass, roCls, errors.phone && "border-error")}
               {...register("phone")}
             />
           </AdminField>
@@ -328,7 +359,12 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
           >
             <Input
               placeholder="e.g. Kumbungu"
-              className={cn(adminInputClass, errors.community && "border-error")}
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                errors.community && "border-error",
+              )}
               {...register("community")}
             />
           </AdminField>
@@ -337,8 +373,10 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
           <textarea
             rows={3}
             placeholder="Anything worth remembering about this seller."
+            disabled={readOnly}
             className={cn(
               adminInputClass,
+              roCls,
               "h-auto min-h-[76px] w-full resize-y py-2",
               errors.notes && "border-error",
             )}
@@ -346,21 +384,55 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
           />
         </AdminField>
         <div className="mt-1 flex gap-2">
-          <AdminButton
-            type="submit"
-            disabled={saving}
-            className="h-[38px] px-[18px]"
-          >
-            {saving ? "Saving..." : isEdit ? "Save changes" : "Create seller"}
-          </AdminButton>
-          <AdminButton
-            type="button"
-            variant="outline"
-            className="h-[38px] px-3.5"
-            onClick={() => router.push(LIST)}
-          >
-            Cancel
-          </AdminButton>
+          {!isEdit ? (
+            <>
+              <AdminButton
+                type="submit"
+                disabled={saving}
+                className="h-[38px] px-[18px]"
+              >
+                {saving ? "Saving..." : "Create seller"}
+              </AdminButton>
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-[38px] px-3.5"
+                onClick={() => router.push(LIST)}
+              >
+                Cancel
+              </AdminButton>
+            </>
+          ) : isEditing ? (
+            <>
+              <AdminButton
+                type="submit"
+                disabled={saving}
+                className="h-[38px] px-[18px]"
+              >
+                {saving ? "Saving..." : "Save changes"}
+              </AdminButton>
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-[38px] px-3.5"
+                onClick={() => {
+                  reset();
+                  setIsEditing(false);
+                }}
+              >
+                Cancel
+              </AdminButton>
+            </>
+          ) : (
+            <AdminButton
+              type="button"
+              variant="gold"
+              className="h-[38px] px-[18px]"
+              onClick={() => setIsEditing(true)}
+            >
+              Edit seller
+            </AdminButton>
+          )}
         </div>
       </form>
     </AdminCard>
@@ -403,7 +475,7 @@ export function LandSellerEdit({ id }: { id: string }) {
         title={seller.name}
         sub="Edit the seller and their lifecycle"
       />
-      <LandSellerFormFields key={seller.updatedAt} seller={seller} />
+      <LandSellerFormFields seller={seller} />
       <LifecycleActions
         noun="seller"
         name={seller.name}

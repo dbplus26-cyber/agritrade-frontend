@@ -1,20 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { ActionBadge } from "@/components/admin/approvals/approval-bits";
+import {
+  ActionBadge,
+  approvalStamp,
+  summaryLine,
+} from "@/components/admin/approvals/approval-bits";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetApprovalsQuery } from "@/redux/approvals/approvals-api";
 import { ApprovalStatus } from "@/types/approval.types";
 
 import { WidgetCard } from "./chart-kit";
 
-/** Compact "10 Jul" date for the preview rows. */
-const shortDate = (iso: string): string =>
-  new Date(iso).toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
-
 /**
  * The four oldest pending approvals, previewed on the dashboard (design doc
- * 5.8) with a link into the full inbox. Reuses the approvals list read.
+ * 5.8) with a link into the full inbox. Each row is the inbox card's header
+ * + title zones in miniature: action badge with the arrival stamp on line
+ * one, the mono headline with requester/detail beneath.
  */
 export function ApprovalsPreview() {
   const { data, isLoading } = useGetApprovalsQuery({
@@ -34,28 +36,38 @@ export function ApprovalsPreview() {
       {isLoading ? (
         <div className="flex flex-col gap-2.5">
           {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-9 w-full rounded-none" />
+            <Skeleton key={i} className="h-12 w-full rounded-none" />
           ))}
         </div>
       ) : rows.length === 0 ? (
         <p className="text-[13px] text-soil">Nothing awaiting approval.</p>
       ) : (
         <ul className="flex flex-col">
-          {rows.map((a) => (
-            <li key={a.id}>
-              <Link
-                href="/admin/approvals"
-                className="flex items-center justify-between gap-2 border-b border-soil/10 py-2 last:border-b-0 hover:bg-surface-alt/60"
-              >
-                <span className="min-w-0">
-                  <ActionBadge action={a.action} />
-                  <span className="mt-0.5 block truncate text-[11.5px] text-soil">
-                    {a.entityType} · {shortDate(a.createdAt)}
+          {rows.map((a) => {
+            const { headline, detail } = summaryLine(a.action, a.summary);
+            return (
+              <li key={a.id}>
+                <Link
+                  href={`/admin/approvals/${a.id}`}
+                  className="block border-b border-soil/10 py-2 last:border-b-0 hover:bg-surface-alt/60"
+                >
+                  <span className="flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5">
+                    <ActionBadge action={a.action} />
+                    <span className="font-adminmono ml-auto flex-none text-[11px] tabular-nums text-soil">
+                      {approvalStamp(a.createdAt)}
+                    </span>
                   </span>
-                </span>
-              </Link>
-            </li>
-          ))}
+                  <span className="font-adminmono mt-1 block min-w-0 text-[13px] leading-tight font-bold whitespace-normal text-ink line-clamp-1 [overflow-wrap:anywhere]">
+                    {headline}
+                  </span>
+                  <span className="mt-0.5 block min-w-0 text-[11.5px] whitespace-normal text-soil line-clamp-1 [overflow-wrap:anywhere]">
+                    {[a.requestedBy?.name, detail].filter(Boolean).join(" · ") ||
+                      a.entityType}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       )}
     </WidgetCard>

@@ -23,6 +23,7 @@ import { useGetWarehousesQuery } from "@/redux/warehouses/warehouses-api";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatKg } from "@/lib/format-money";
+import { DateOnlyCell } from "@/components/admin/date-cell";
 import { PurchaseSource } from "@/types/registry.types";
 import {
   PurchaseStatus,
@@ -33,7 +34,6 @@ import { columnMeta, Absent } from "@/components/admin/registry/registry-bits";
 import {
   CompactCedis,
   ApprovalOverlayBadge,
-  formatConsoleDate,
   PURCHASE_STATUS_FILTER_OPTIONS,
   purchaseCounterparty,
   PurchaseStatusBadge,
@@ -106,6 +106,14 @@ export function PurchasesTable() {
     [status, source, commodity, warehouse].filter((v) => v !== "all").length +
     (from ? 1 : 0) +
     (to ? 1 : 0);
+  // A register with nothing on file and nothing narrowing it shows ONLY the
+  // empty state (with its create action) - a filter bar filters nothing.
+  const pristine =
+    !isLoading &&
+    !isError &&
+    purchases.length === 0 &&
+    !search &&
+    activeFilterCount === 0;
 
   const showMoney = useMoneyVisibility();
   const columns = useMemo<ColumnDef<IPurchase, unknown>[]>(() => {
@@ -132,7 +140,7 @@ export function PurchasesTable() {
                   </Mono>
                 </span>
                 <span className="block truncate text-[11.5px] text-soil/70">
-                  {purchaseCounterparty(p)} · {formatConsoleDate(p.purchasedAt)}
+                  {purchaseCounterparty(p)}
                 </span>
               </span>
             </Link>
@@ -150,6 +158,14 @@ export function PurchasesTable() {
             <CompactCedis amount={row.original.totalGhs} />
           </Mono>
         ),
+      },
+      {
+        id: "date",
+        accessorFn: (p) => p.purchasedAt,
+        header: "Date",
+        enableSorting: false,
+        meta: columnMeta(),
+        cell: ({ row }) => <DateOnlyCell value={row.original.purchasedAt} />,
       },
       {
         id: "price",
@@ -210,7 +226,7 @@ export function PurchasesTable() {
         </p>
       </div>
 
-      {isError && !search && activeFilterCount === 0 ? null : (
+      {pristine || (isError && !search && activeFilterCount === 0) ? null : (
         <ConsoleFilterBar
           search={searchInput}
           onSearch={setSearch}

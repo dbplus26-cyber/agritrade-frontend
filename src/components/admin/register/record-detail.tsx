@@ -12,7 +12,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AdminButton, AdminCard, Mono, ToneBadge } from "@/components/admin/ui";
+import {
+  AdminButton,
+  AdminCard,
+  DetailGrid,
+  DetailItem,
+  DetailShell,
+  Mono,
+  ToneBadge,
+} from "@/components/admin/ui";
 import {
   avatarOf,
   cellText,
@@ -125,8 +133,54 @@ export function RecordDetail({
     router.push(`/admin/${slug}`);
   };
 
+  const ledger = register.ledger;
+
+  const recordCard = (
+    <AdminCard className="px-5 py-3.5">
+      <div className="mb-1 text-[11px] font-bold uppercase tracking-[0.1em] text-soil">
+        Record
+      </div>
+      <DetailGrid columns={ledger ? 2 : 3}>
+        {fields.map((field) => (
+          <DetailItem key={field.label} label={field.label}>
+            <span className="font-medium tabular-nums">{field.value}</span>
+          </DetailItem>
+        ))}
+      </DetailGrid>
+    </AdminCard>
+  );
+
+  const ledgerCard = ledger ? (
+    <AdminCard className="overflow-hidden">
+      <div className="border-b border-soil/15 px-5 py-3 text-[11px] font-bold uppercase tracking-[0.1em] text-soil">
+        {ledger.title}
+      </div>
+      <div className="grid h-8 grid-cols-[96px_1fr_auto] items-center gap-3 border-b border-soil/25 bg-surface-alt/70 px-5 text-[10px] font-bold uppercase tracking-[0.09em] text-soil md:grid-cols-[96px_1fr_auto_auto]">
+        <span>Date</span>
+        <span>Description</span>
+        <span className="text-right">Amount</span>
+        <span className="hidden text-right md:block">Balance</span>
+      </div>
+      {ledger.rows.map((entry) => (
+        <div
+          key={`${entry.date}-${entry.desc}`}
+          className="grid h-[42px] grid-cols-[96px_1fr_auto] items-center gap-3 border-b border-soil/15 px-5 text-[13px] last:border-0 md:grid-cols-[96px_1fr_auto_auto]"
+        >
+          <span className="whitespace-nowrap text-soil">{entry.date}</span>
+          <span className="truncate text-ink">{entry.desc}</span>
+          <Mono className="text-right font-semibold whitespace-nowrap">
+            <span style={{ color: entry.amtColor }}>{entry.amount}</span>
+          </Mono>
+          <Mono className="hidden text-right whitespace-nowrap text-soil md:block">
+            {entry.after}
+          </Mono>
+        </div>
+      ))}
+    </AdminCard>
+  ) : null;
+
   return (
-    <div>
+    <div className="max-w-[1120px]">
       <Link
         href={`/admin/${slug}`}
         className="mb-2.5 inline-block text-[13px] font-semibold text-console hover:underline"
@@ -193,53 +247,11 @@ export function RecordDetail({
         ) : null}
       </AdminCard>
 
-      <div className="flex max-w-[720px] flex-col gap-4">
-        <AdminCard className="px-5 py-3.5">
-          <div className="mb-2.5 text-[11px] font-bold uppercase tracking-[0.1em] text-soil">
-            Record
-          </div>
-          {fields.map((field) => (
-            <div
-              key={field.label}
-              className="flex justify-between gap-3 border-b border-soil/10 py-1.5 text-[13px] last:border-0"
-            >
-              <span className="text-soil">{field.label}</span>
-              <span className="text-right font-medium tabular-nums text-ink">
-                {field.value}
-              </span>
-            </div>
-          ))}
-        </AdminCard>
-
-        {register.ledger ? (
-          <AdminCard className="overflow-hidden">
-            <div className="border-b border-soil/15 px-5 py-3 text-[11px] font-bold uppercase tracking-[0.1em] text-soil">
-              {register.ledger.title}
-            </div>
-            <div className="grid h-8 grid-cols-[96px_1fr_auto] items-center gap-3 border-b border-soil/25 bg-surface-alt/70 px-5 text-[10px] font-bold uppercase tracking-[0.09em] text-soil md:grid-cols-[96px_1fr_auto_auto]">
-              <span>Date</span>
-              <span>Description</span>
-              <span className="text-right">Amount</span>
-              <span className="hidden text-right md:block">Balance</span>
-            </div>
-            {register.ledger.rows.map((entry) => (
-              <div
-                key={`${entry.date}-${entry.desc}`}
-                className="grid h-[42px] grid-cols-[96px_1fr_auto] items-center gap-3 border-b border-soil/15 px-5 text-[13px] last:border-0 md:grid-cols-[96px_1fr_auto_auto]"
-              >
-                <span className="whitespace-nowrap text-soil">{entry.date}</span>
-                <span className="truncate text-ink">{entry.desc}</span>
-                <Mono className="text-right font-semibold whitespace-nowrap">
-                  <span style={{ color: entry.amtColor }}>{entry.amount}</span>
-                </Mono>
-                <Mono className="hidden text-right whitespace-nowrap text-soil md:block">
-                  {entry.after}
-                </Mono>
-              </div>
-            ))}
-          </AdminCard>
-        ) : null}
-      </div>
+      {ledgerCard ? (
+        <DetailShell main={ledgerCard} aside={recordCard} />
+      ) : (
+        recordCard
+      )}
 
       {deleting ? (
         <DeleteDialog

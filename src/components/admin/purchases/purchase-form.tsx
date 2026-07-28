@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SearchableSelect } from "@/components/admin/searchable-select";
 import { useGetAgentsQuery } from "@/redux/agents/agents-api";
 import { useGetCommoditiesQuery } from "@/redux/commodities/commodities-api";
 import { useCreatePurchaseMutation } from "@/redux/purchases/purchases-api";
@@ -174,24 +175,16 @@ export function PurchaseCreate() {
                 control={control}
                 name="commodityId"
                 render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger
-                      className={cn(
-                        adminSelectClass,
-                        "w-full",
-                        errors.commodityId && "border-error",
-                      )}
-                    >
-                      <SelectValue placeholder="Choose a commodity" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {(commodities.data?.data ?? []).map((c) => (
-                        <SelectItem key={c.id} value={c.id}>
-                          {c.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <SearchableSelect
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={(commodities.data?.data ?? []).map((c) => ({
+                      value: c.id,
+                      label: c.name,
+                    }))}
+                    placeholder="Choose a commodity"
+                    className={cn(errors.commodityId && "border-error")}
+                  />
                 )}
               />
             </AdminField>
@@ -207,27 +200,17 @@ export function PurchaseCreate() {
                 control={control}
                 name="agentProfileId"
                 render={({ field }) => (
-                  <Select
+                  <SearchableSelect
                     value={field.value ?? ""}
-                    onValueChange={field.onChange}
-                  >
-                    <SelectTrigger
-                      className={cn(
-                        adminSelectClass,
-                        "w-full",
-                        errors.agentProfileId && "border-error",
-                      )}
-                    >
-                      <SelectValue placeholder="Choose the agent" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {agentOptions.map((a) => (
-                        <SelectItem key={a.profileId} value={a.profileId ?? ""}>
-                          {a.firstName} {a.lastName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    onChange={field.onChange}
+                    options={agentOptions.map((a) => ({
+                      value: a.profileId ?? "",
+                      label: `${a.firstName} ${a.lastName}`,
+                    }))}
+                    placeholder="Choose the agent"
+                    emptyText="No agents with an opened float match."
+                    className={cn(errors.agentProfileId && "border-error")}
+                  />
                 )}
               />
             </AdminField>
@@ -241,22 +224,19 @@ export function PurchaseCreate() {
                 control={control}
                 name="supplierId"
                 render={({ field }) => (
-                  <Select
+                  <SearchableSelect
                     value={field.value ?? ""}
-                    onValueChange={field.onChange}
-                  >
-                    <SelectTrigger className={cn(adminSelectClass, "w-full")}>
-                      <SelectValue placeholder="Choose a supplier (optional)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {(suppliers.data?.data ?? []).map((s) => (
-                        <SelectItem key={s.id} value={s.id}>
-                          {s.name}
-                          {s.community ? ` · ${s.community}` : ""}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    onChange={field.onChange}
+                    options={[
+                      { value: "", label: "No supplier recorded" },
+                      ...(suppliers.data?.data ?? []).map((s) => ({
+                        value: s.id,
+                        label: s.name,
+                        ...(s.community ? { hint: s.community } : {}),
+                      })),
+                    ]}
+                    placeholder="Choose a supplier (optional)"
+                  />
                 )}
               />
             </AdminField>
@@ -306,21 +286,18 @@ export function PurchaseCreate() {
                 control={control}
                 name="warehouseId"
                 render={({ field }) => (
-                  <Select
+                  <SearchableSelect
                     value={field.value ?? ""}
-                    onValueChange={field.onChange}
-                  >
-                    <SelectTrigger className={cn(adminSelectClass, "w-full")}>
-                      <SelectValue placeholder="Choose later" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {(warehouses.data?.data ?? []).map((w) => (
-                        <SelectItem key={w.id} value={w.id}>
-                          {w.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    onChange={field.onChange}
+                    options={[
+                      { value: "", label: "Choose later" },
+                      ...(warehouses.data?.data ?? []).map((w) => ({
+                        value: w.id,
+                        label: w.name,
+                      })),
+                    ]}
+                    placeholder="Choose later"
+                  />
                 )}
               />
             </AdminField>

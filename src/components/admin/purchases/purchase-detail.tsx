@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   AdminButton,
@@ -11,21 +11,23 @@ import {
   AdminField,
   AdminPageHeader,
   adminInputClass,
-  adminSelectClass,
-  DetailRow,
+  DetailGrid,
+  DetailItem,
+  DetailShell,
   Mono,
 } from "@/components/admin/ui";
+import { SearchableSelect } from "@/components/admin/searchable-select";
 import { BackButton } from "@/components/ui/BackButton";
 import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogDescription,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+} from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import {
   useGetPurchaseQuery,
@@ -73,6 +75,7 @@ function ReceiveDialog({
 
   const {
     register,
+    control,
     handleSubmit,
     watch,
     formState: { errors },
@@ -108,16 +111,16 @@ function ReceiveDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-[420px]">
-        <DialogHeader>
-          <DialogTitle>Receive into warehouse</DialogTitle>
-          <DialogDescription>
+    <ResponsiveDialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[440px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>Receive into warehouse</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
             The recorded weight was {formatKg(purchase.weightKg)}. Enter what
             the warehouse scale actually says - the difference is kept as
             variance, never silently absorbed.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
@@ -149,21 +152,22 @@ function ReceiveDialog({
             label="Warehouse"
             error={errors.warehouseId?.message}
           >
-            <select
-              className={cn(
-                adminSelectClass,
-                "w-full",
-                errors.warehouseId && "border-error",
+            <Controller
+              control={control}
+              name="warehouseId"
+              render={({ field }) => (
+                <SearchableSelect
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={(warehouses.data?.data ?? []).map((w) => ({
+                    value: w.id,
+                    label: w.name,
+                  }))}
+                  placeholder="Choose the warehouse"
+                  className={cn(errors.warehouseId && "border-error")}
+                />
               )}
-              {...register("warehouseId")}
-            >
-              <option value="">Choose the warehouse</option>
-              {(warehouses.data?.data ?? []).map((w) => (
-                <option key={w.id} value={w.id}>
-                  {w.name}
-                </option>
-              ))}
-            </select>
+            />
           </AdminField>
           <AdminField label="Received date" optional>
             <Input
@@ -172,7 +176,7 @@ function ReceiveDialog({
               {...register("receivedAt")}
             />
           </AdminField>
-          <DialogFooter className="gap-2">
+          <ResponsiveDialogFooter className="gap-2">
             <AdminButton
               type="button"
               variant="outline"
@@ -188,10 +192,10 @@ function ReceiveDialog({
             >
               {isLoading ? "Receiving…" : "Receive stock"}
             </AdminButton>
-          </DialogFooter>
+          </ResponsiveDialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   );
 }
 
@@ -231,18 +235,18 @@ function VoidDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-[420px]">
-        <DialogHeader>
-          <DialogTitle>Void this purchase?</DialogTitle>
-          <DialogDescription>
+    <ResponsiveDialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <ResponsiveDialogContent className="sm:max-w-[420px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>Void this purchase?</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
             Voiding is the owner&apos;s correction path: it reverses the float
             debit{purchase.status === PurchaseStatus.RECEIVED
               ? " and takes the received stock back out"
               : ""}{" "}
             with compensating ledger entries. Nothing is deleted or rewritten.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
@@ -260,7 +264,7 @@ function VoidDialog({
               {...register("reason")}
             />
           </AdminField>
-          <DialogFooter className="gap-2">
+          <ResponsiveDialogFooter className="gap-2">
             <AdminButton
               type="button"
               variant="outline"
@@ -277,10 +281,10 @@ function VoidDialog({
             >
               {isLoading ? "Voiding…" : "Void purchase"}
             </AdminButton>
-          </DialogFooter>
+          </ResponsiveDialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   );
 }
 
@@ -328,8 +332,38 @@ export function PurchaseDetail({ id }: { id: string }) {
     }
   };
 
+  const actions =
+    canTransit || canReceive || canVoid ? (
+      <div className="flex flex-wrap gap-2 xl:flex-col">
+        {canTransit ? (
+          <AdminButton
+            variant="secondary"
+            className="h-9 px-4"
+            disabled={transitState.isLoading}
+            onClick={() => void onMarkInTransit()}
+          >
+            Mark in transit
+          </AdminButton>
+        ) : null}
+        {canReceive ? (
+          <AdminButton className="h-9 px-4" onClick={() => setReceiveOpen(true)}>
+            Receive into warehouse
+          </AdminButton>
+        ) : null}
+        {canVoid ? (
+          <AdminButton
+            variant="danger"
+            className="h-9 px-4"
+            onClick={() => setVoidOpen(true)}
+          >
+            Void purchase
+          </AdminButton>
+        ) : null}
+      </div>
+    ) : null;
+
   return (
-    <div className="max-w-[640px]">
+    <div className="max-w-[1120px]">
       <BackButton href={LIST} label="All purchases" className="mb-2" />
       <AdminPageHeader
         title={`${p.commodity.name} · ${formatKg(p.weightKg)}`}
@@ -343,7 +377,7 @@ export function PurchaseDetail({ id }: { id: string }) {
       />
 
       {p.approval && p.approval.status !== "APPROVED" ? (
-        <AdminCard className="mb-3 border-console-gold/50 bg-console-gold/8 px-4 py-3 text-[13px] leading-[1.55] text-ink">
+        <AdminCard className="mb-4 border-console-gold/50 bg-console-gold/8 px-4 py-3 text-[13px] leading-[1.55] text-ink">
           {p.approval.status === "PENDING" ? (
             <>
               This purchase is at or above the approval threshold and is
@@ -358,111 +392,155 @@ export function PurchaseDetail({ id }: { id: string }) {
           ) : (
             <>
               The approval for this purchase was <strong>rejected</strong> -
-              rejection undoes nothing by itself; voiding below reverses the
-              money and stock.
+              rejection undoes nothing by itself; voiding reverses the money
+              and stock.
             </>
           )}
         </AdminCard>
       ) : null}
 
-      <AdminCard className="px-5 py-2">
-        <DetailRow label="Total" mono>
-          <span className="font-semibold">{formatCedis(p.totalGhs)}</span>
-        </DetailRow>
-        <DetailRow label="Price per kg" mono>
-          {formatCedis(p.unitPriceGhs)}
-        </DetailRow>
-        <DetailRow label="Recorded weight" mono>
-          {formatKg(p.weightKg)}
-        </DetailRow>
-        {p.receivedKg !== null ? (
-          <>
-            <DetailRow label="Received weight" mono>
-              {formatKg(p.receivedKg)}
-            </DetailRow>
-            <DetailRow label="Variance" mono>
-              <span
-                className={cn(
-                  (p.varianceKg ?? 0) > 0 ? "text-error" : "text-ink",
-                )}
-              >
-                {(p.varianceKg ?? 0) === 0
-                  ? "None - received exactly as recorded"
-                  : `${formatKg(Math.abs(p.varianceKg ?? 0))} ${
-                      (p.varianceKg ?? 0) > 0 ? "short" : "over"
-                    }`}
-              </span>
-            </DetailRow>
-          </>
-        ) : null}
-        <DetailRow label="Warehouse">
-          {p.warehouse?.name ?? "Not yet assigned"}
-        </DetailRow>
-        {p.agent ? <DetailRow label="Paying agent">{p.agent.name}</DetailRow> : null}
-        {p.supplier ? <DetailRow label="Supplier">{p.supplier.name}</DetailRow> : null}
-        <DetailRow label="Purchased">{formatConsoleDate(p.purchasedAt)}</DetailRow>
-        {p.inTransitAt ? (
-          <DetailRow label="In transit">{formatConsoleDate(p.inTransitAt)}</DetailRow>
-        ) : null}
-        {p.receivedAt ? (
-          <DetailRow label="Received">{formatConsoleDate(p.receivedAt)}</DetailRow>
-        ) : null}
-        {p.notes ? <DetailRow label="Notes">{p.notes}</DetailRow> : null}
-        {p.voidedAt ? (
-          <>
-            <DetailRow label="Voided">{formatConsoleDate(p.voidedAt)}</DetailRow>
-            <DetailRow label="Void reason">{p.voidReason}</DetailRow>
-          </>
-        ) : null}
-      </AdminCard>
+      <DetailShell
+        main={
+          <div className="flex flex-col gap-4">
+            <AdminCard className="px-5 py-3">
+              <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                Weights & variance
+              </p>
+              <DetailGrid>
+                <DetailItem label="Recorded weight" mono>
+                  {formatKg(p.weightKg)}
+                </DetailItem>
+                {p.receivedKg !== null ? (
+                  <>
+                    <DetailItem label="Received weight" mono>
+                      {formatKg(p.receivedKg)}
+                    </DetailItem>
+                    <DetailItem label="Variance" mono>
+                      <span
+                        className={cn(
+                          (p.varianceKg ?? 0) > 0 ? "text-error" : "text-ink",
+                        )}
+                      >
+                        {(p.varianceKg ?? 0) === 0
+                          ? "None - received exactly as recorded"
+                          : `${formatKg(Math.abs(p.varianceKg ?? 0))} ${
+                              (p.varianceKg ?? 0) > 0 ? "short" : "over"
+                            }`}
+                      </span>
+                    </DetailItem>
+                  </>
+                ) : null}
+              </DetailGrid>
+            </AdminCard>
 
-      {p.photo ? (
-        <AdminCard className="mt-3 px-5 py-4">
-          <p className="mb-2 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
-            Weigh-slip
-          </p>
-          <Image
-            src={p.photo}
-            alt="Weigh-slip photo"
-            width={560}
-            height={360}
-            unoptimized
-            className="h-auto w-full max-w-[420px] rounded border border-soil/25 object-contain"
-          />
-        </AdminCard>
-      ) : null}
+            <AdminCard className="px-5 py-3">
+              <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                Money
+              </p>
+              <DetailGrid>
+                <DetailItem label="Total" mono strong>
+                  {formatCedis(p.totalGhs)}
+                </DetailItem>
+                <DetailItem label="Price per kg" mono>
+                  {formatCedis(p.unitPriceGhs)}
+                </DetailItem>
+              </DetailGrid>
+            </AdminCard>
 
-      {canTransit || canReceive || canVoid ? (
-        <div className="mt-4 flex flex-wrap gap-2">
-          {canTransit ? (
-            <AdminButton
-              variant="secondary"
-              className="h-9 px-4"
-              disabled={transitState.isLoading}
-              onClick={() => void onMarkInTransit()}
-            >
-              Mark in transit
-            </AdminButton>
-          ) : null}
-          {canReceive ? (
-            <AdminButton
-              className="h-9 px-4"
-              onClick={() => setReceiveOpen(true)}
-            >
-              Receive into warehouse
-            </AdminButton>
-          ) : null}
-          {canVoid ? (
-            <AdminButton
-              variant="danger"
-              className="h-9 px-4"
-              onClick={() => setVoidOpen(true)}
-            >
-              Void purchase
-            </AdminButton>
-          ) : null}
-        </div>
-      ) : null}
+            <AdminCard className="px-5 py-3">
+              <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                Parties & logistics
+              </p>
+              <DetailGrid>
+                <DetailItem label="Source">{SOURCE_LABEL[p.source]}</DetailItem>
+                <DetailItem label="Warehouse">
+                  {p.warehouse?.name ?? "Not yet assigned"}
+                </DetailItem>
+                {p.agent ? (
+                  <DetailItem label="Paying agent">{p.agent.name}</DetailItem>
+                ) : null}
+                {p.supplier ? (
+                  <DetailItem label="Supplier">{p.supplier.name}</DetailItem>
+                ) : null}
+              </DetailGrid>
+            </AdminCard>
+
+            <AdminCard className="px-5 py-3">
+              <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                Timeline
+              </p>
+              <DetailGrid>
+                <DetailItem label="Purchased">
+                  {formatConsoleDate(p.purchasedAt)}
+                </DetailItem>
+                {p.inTransitAt ? (
+                  <DetailItem label="In transit">
+                    {formatConsoleDate(p.inTransitAt)}
+                  </DetailItem>
+                ) : null}
+                {p.receivedAt ? (
+                  <DetailItem label="Received">
+                    {formatConsoleDate(p.receivedAt)}
+                  </DetailItem>
+                ) : null}
+                {p.voidedAt ? (
+                  <DetailItem label="Voided">
+                    {formatConsoleDate(p.voidedAt)}
+                  </DetailItem>
+                ) : null}
+                {p.voidedAt ? (
+                  <DetailItem label="Void reason">{p.voidReason}</DetailItem>
+                ) : null}
+                {p.notes ? (
+                  <DetailItem
+                    label="Notes"
+                    className="sm:col-span-2 xl:col-span-3"
+                  >
+                    {p.notes}
+                  </DetailItem>
+                ) : null}
+              </DetailGrid>
+            </AdminCard>
+          </div>
+        }
+        aside={
+          <div className="flex flex-col gap-4">
+            <AdminCard className="px-5 py-4">
+              <p className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                Purchase total
+              </p>
+              <p className="font-adminmono mt-1 text-[26px] font-bold text-ink tabular-nums">
+                {formatCedis(p.totalGhs)}
+              </p>
+              <p className="mt-1 text-[12.5px] text-soil">
+                <Mono>{formatKg(p.weightKg)}</Mono> at{" "}
+                <Mono>{formatCedis(p.unitPriceGhs)}</Mono> per kg
+              </p>
+              {actions ? (
+                <div className="mt-4 border-t border-soil/15 pt-3.5">
+                  {actions}
+                </div>
+              ) : null}
+            </AdminCard>
+
+            {p.photo ? (
+              <AdminCard className="px-5 py-4">
+                <p className="mb-2 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                  Weigh-slip
+                </p>
+                <Image
+                  src={p.photo}
+                  alt="Weigh-slip photo"
+                  width={560}
+                  height={360}
+                  unoptimized
+                  className="h-auto w-full rounded border border-soil/25 object-contain"
+                />
+              </AdminCard>
+            ) : null}
+          </div>
+        }
+      />
 
       {receiveOpen ? (
         <ReceiveDialog

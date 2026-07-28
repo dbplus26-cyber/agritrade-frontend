@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { cn } from "@/lib/utils";
 import { ConsoleDataTable } from "@/components/admin/data-table";
+import { DateTimeCell } from "@/components/admin/date-cell";
 import {
   ConsoleDateField,
   ConsoleFilterBar,
@@ -102,19 +103,7 @@ export function AuditTable() {
         header: "Time",
         enableSorting: false,
         meta: columnMeta(),
-        cell: ({ row }) => {
-          const d = new Date(row.original.createdAt);
-          return (
-            <div className="whitespace-nowrap">
-              <div className="text-ink">
-                {d.toLocaleDateString("en-GB", { day: "2-digit", month: "short" })}
-              </div>
-              <Mono className="text-[11.5px] text-soil/70">
-                {d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
-              </Mono>
-            </div>
-          );
-        },
+        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "actor",

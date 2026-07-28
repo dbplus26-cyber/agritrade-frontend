@@ -11,6 +11,7 @@ import {
   AdminCard,
   AdminField,
   AdminPageHeader,
+  DetailShell,
   ToneBadge,
   adminInputClass,
 } from "@/components/admin/ui";
@@ -729,16 +730,21 @@ function TwoFactorCard() {
 
 export function ProfileScreen() {
   return (
-    <div className="w-full xl:max-w-[820px]">
+    <div className="w-full max-w-[1120px]">
       <AdminPageHeader
         title="My profile"
         sub="Your account, security and sign-in settings"
       />
-      <div className="flex flex-col gap-4">
-        <IdentityCard />
-        <PasswordCard />
-        <TwoFactorCard />
-      </div>
+      <DetailShell
+        asideFirstOnStack={false}
+        main={<IdentityCard />}
+        aside={
+          <div className="flex flex-col gap-4">
+            <PasswordCard />
+            <TwoFactorCard />
+          </div>
+        }
+      />
     </div>
   );
 }

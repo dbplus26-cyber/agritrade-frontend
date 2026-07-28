@@ -18,6 +18,7 @@ import { useGetCommoditiesQuery } from "@/redux/commodities/commodities-api";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { useAuthRole } from "@/hooks/use-auth-role";
 import { extractApiError } from "@/lib/extract-api-error";
+import { DateTimeCell } from "@/components/admin/date-cell";
 import type { ICommodity, ICommodityListQuery } from "@/types/registry.types";
 import {
   Absent,
@@ -162,6 +163,14 @@ export function CommodityTable() {
         cell: ({ row }) => (
           <PublishedBadge published={row.original.publishToWebsite} />
         ),
+      },
+      {
+        id: "added",
+        accessorFn: (c) => c.createdAt,
+        header: "Added",
+        enableSorting: false,
+        meta: columnMeta({ wide: true }),
+        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",

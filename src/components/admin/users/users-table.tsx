@@ -23,6 +23,7 @@ import { useConfirm } from "@/hooks/use-confirm";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
+import { DateTimeCell } from "@/components/admin/date-cell";
 import { notify } from "@/lib/notify";
 import { UserRole, type IUser, type IUserListQuery } from "@/types/user.types";
 import { UserActionsDropdown } from "./user-actions";
@@ -258,6 +259,14 @@ export function UsersTable() {
             {lastActiveLabel(row.original)}
           </span>
         ),
+      },
+      {
+        id: "added",
+        accessorFn: (u) => u.createdAt,
+        header: "Added",
+        enableSorting: false,
+        meta: columnMeta({ wide: true }),
+        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",

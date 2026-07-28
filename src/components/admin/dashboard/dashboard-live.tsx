@@ -8,7 +8,6 @@ import { AdminCard, Mono } from "@/components/admin/ui";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import {
-  formatCedis,
   formatCedisCompact,
   formatKg,
   statValueCls,

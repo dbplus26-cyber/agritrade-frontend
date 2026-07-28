@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   AdminButton,
@@ -9,8 +9,8 @@ import {
   AdminField,
   AdminPageHeader,
   adminInputClass,
-  adminSelectClass,
 } from "@/components/admin/ui";
+import { SearchableSelect } from "@/components/admin/searchable-select";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -33,6 +33,7 @@ export function LandAcquisitionForm() {
 
   const {
     register,
+    control,
     handleSubmit,
     setError,
     formState: { errors },
@@ -103,22 +104,23 @@ export function LandAcquisitionForm() {
       >
         <AdminCard className="flex flex-col gap-3 px-5 py-4">
           <AdminField label="Seller" error={errors.sellerId?.message}>
-            <select
-              className={cn(
-                adminSelectClass,
-                "w-full",
-                errors.sellerId && "border-error",
+            <Controller
+              control={control}
+              name="sellerId"
+              render={({ field }) => (
+                <SearchableSelect
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={(sellers.data?.data ?? []).map((s) => ({
+                    value: s.id,
+                    label: s.name,
+                    ...(s.community ? { hint: s.community } : {}),
+                  }))}
+                  placeholder="Choose the seller"
+                  className={cn(errors.sellerId && "border-error")}
+                />
               )}
-              {...register("sellerId")}
-            >
-              <option value="">Choose the seller</option>
-              {(sellers.data?.data ?? []).map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                  {s.community ? ` · ${s.community}` : ""}
-                </option>
-              ))}
-            </select>
+            />
           </AdminField>
           <div className="grid gap-3 sm:grid-cols-2">
             <AdminField

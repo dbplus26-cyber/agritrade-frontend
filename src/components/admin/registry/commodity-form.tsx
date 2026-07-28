@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -59,6 +59,13 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
   const [updateCommodity, updateState] = useUpdateCommodityMutation();
   const saving = createState.isLoading || updateState.isLoading;
 
+  // Edit screens open READ-ONLY; the Edit button unlocks the inputs. Create is
+  // always editable.
+  const [isEditing, setIsEditing] = useState(!isEdit);
+  const readOnly = !isEditing;
+  // Keep disabled inputs legible as a read view rather than a greyed-out form.
+  const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
+
   // Photo travels WITH the save (multipart payload + file, the profile-photo
   // convention); `removePhoto` clears an existing one server-side.
   const fileInput = useRef<HTMLInputElement>(null);
@@ -70,15 +77,35 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
       ? (commodity?.photo ?? null)
       : null;
 
+  const clearPhotoState = () => {
+    setPhotoFile(null);
+    setRemovePhoto(false);
+    if (fileInput.current) fileInput.current.value = "";
+  };
+
   const {
     register,
     handleSubmit,
+    reset,
     setError,
     formState: { errors },
   } = useForm<CommodityValues>({
     resolver: zodResolver(commoditySchema),
     defaultValues: toFormValues(commodity),
   });
+
+  // A background refetch can bump the record (the publish toggle on this very
+  // page, another tab). Track the fresh values while reading, but never
+  // clobber an in-progress edit - which is why the parent does not
+  // key-remount the form on updatedAt.
+  useEffect(() => {
+    if (!isEditing) {
+      reset(toFormValues(commodity));
+      // Drop any staged file from the native input too, so re-picking the
+      // same photo later still fires onChange.
+      if (fileInput.current) fileInput.current.value = "";
+    }
+  }, [commodity, isEditing, reset]);
 
   const onSubmit = async (values: CommodityValues) => {
     // "" clears on edit (null) and is omitted on create.
@@ -110,9 +137,12 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
           body,
           photo: photoFile ?? undefined,
         }).unwrap();
+        // Dropping back to read mode lets the sync effect adopt the fresh
+        // values and finish the photo-input cleanup.
         setPhotoFile(null);
         setRemovePhoto(false);
         notify.success("Commodity updated");
+        setIsEditing(false);
       } else {
         const res = await createCommodity({
           body: {
@@ -160,7 +190,8 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
         <AdminField label="Name" error={errors.name?.message}>
           <Input
             placeholder="e.g. White Maize"
-            className={cn(adminInputClass, errors.name && "border-error")}
+            disabled={readOnly}
+            className={cn(adminInputClass, roCls, errors.name && "border-error")}
             {...register("name")}
           />
         </AdminField>
@@ -173,7 +204,12 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
           >
             <Input
               placeholder="e.g. Obatanpa"
-              className={cn(adminInputClass, errors.variety && "border-error")}
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                errors.variety && "border-error",
+              )}
               {...register("variety")}
             />
           </AdminField>
@@ -184,8 +220,10 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
           >
             <Input
               placeholder="e.g. Grade 1"
+              disabled={readOnly}
               className={cn(
                 adminInputClass,
+                roCls,
                 errors.qualityGrade && "border-error",
               )}
               {...register("qualityGrade")}
@@ -202,8 +240,10 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
             <Input
               inputMode="decimal"
               placeholder="e.g. 50"
+              disabled={readOnly}
               className={cn(
                 adminInputClass,
+                roCls,
                 "font-adminmono",
                 errors.bagWeightKg && "border-error",
               )}
@@ -219,8 +259,10 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
             <Input
               inputMode="numeric"
               placeholder="0"
+              disabled={readOnly}
               className={cn(
                 adminInputClass,
+                roCls,
                 "font-adminmono",
                 errors.sortOrder && "border-error",
               )}
@@ -236,8 +278,10 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
           <textarea
             rows={3}
             placeholder="Shown on the website's commodity card when published."
+            disabled={readOnly}
             className={cn(
               adminInputClass,
+              roCls,
               "h-auto min-h-[76px] w-full resize-y py-2",
               errors.description && "border-error",
             )}
@@ -263,30 +307,32 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
                 No photo
               </span>
             )}
-            <div className="flex flex-wrap gap-2">
-              <AdminButton
-                type="button"
-                variant="secondary"
-                className="h-[32px] px-3 text-[12.5px]"
-                onClick={() => fileInput.current?.click()}
-              >
-                {previewUrl ? "Replace photo" : "Choose photo"}
-              </AdminButton>
-              {previewUrl ? (
+            {isEditing ? (
+              <div className="flex flex-wrap gap-2">
                 <AdminButton
                   type="button"
-                  variant="outline"
+                  variant="secondary"
                   className="h-[32px] px-3 text-[12.5px]"
-                  onClick={() => {
-                    setPhotoFile(null);
-                    setRemovePhoto(true);
-                    if (fileInput.current) fileInput.current.value = "";
-                  }}
+                  onClick={() => fileInput.current?.click()}
                 >
-                  Remove
+                  {previewUrl ? "Replace photo" : "Choose photo"}
                 </AdminButton>
-              ) : null}
-            </div>
+                {previewUrl ? (
+                  <AdminButton
+                    type="button"
+                    variant="outline"
+                    className="h-[32px] px-3 text-[12.5px]"
+                    onClick={() => {
+                      setPhotoFile(null);
+                      setRemovePhoto(true);
+                      if (fileInput.current) fileInput.current.value = "";
+                    }}
+                  >
+                    Remove
+                  </AdminButton>
+                ) : null}
+              </div>
+            ) : null}
             <input
               ref={fileInput}
               type="file"
@@ -306,25 +352,56 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
         </AdminField>
 
         <div className="mt-1 flex gap-2">
-          <AdminButton
-            type="submit"
-            disabled={saving}
-            className="h-[38px] px-[18px]"
-          >
-            {saving
-              ? "Saving…"
-              : isEdit
-                ? "Save changes"
-                : "Create commodity"}
-          </AdminButton>
-          <AdminButton
-            type="button"
-            variant="outline"
-            className="h-[38px] px-3.5"
-            onClick={() => router.push(LIST)}
-          >
-            Cancel
-          </AdminButton>
+          {!isEdit ? (
+            <>
+              <AdminButton
+                type="submit"
+                disabled={saving}
+                className="h-[38px] px-[18px]"
+              >
+                {saving ? "Saving…" : "Create commodity"}
+              </AdminButton>
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-[38px] px-3.5"
+                onClick={() => router.push(LIST)}
+              >
+                Cancel
+              </AdminButton>
+            </>
+          ) : isEditing ? (
+            <>
+              <AdminButton
+                type="submit"
+                disabled={saving}
+                className="h-[38px] px-[18px]"
+              >
+                {saving ? "Saving…" : "Save changes"}
+              </AdminButton>
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-[38px] px-3.5"
+                onClick={() => {
+                  reset();
+                  clearPhotoState();
+                  setIsEditing(false);
+                }}
+              >
+                Cancel
+              </AdminButton>
+            </>
+          ) : (
+            <AdminButton
+              type="button"
+              variant="gold"
+              className="h-[38px] px-[18px]"
+              onClick={() => setIsEditing(true)}
+            >
+              Edit commodity
+            </AdminButton>
+          )}
         </div>
       </form>
     </AdminCard>
@@ -386,9 +463,7 @@ export function CommodityEdit({ id }: { id: string }) {
         title={commodity.name}
         sub="Edit the commodity, its website visibility and lifecycle"
       />
-      {/* Remount the form when a save changes the record so the fields track
-          the fresh values. */}
-      <CommodityFormFields key={commodity.updatedAt} commodity={commodity} />
+      <CommodityFormFields commodity={commodity} />
 
       <AdminCard className="mt-4 px-5 py-4">
         <label className="flex cursor-pointer items-center justify-between gap-3">

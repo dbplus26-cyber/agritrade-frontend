@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   AdminButton,
@@ -9,8 +9,8 @@ import {
   AdminField,
   AdminPageHeader,
   adminInputClass,
-  adminSelectClass,
 } from "@/components/admin/ui";
+import { SearchableSelect } from "@/components/admin/searchable-select";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -33,6 +33,7 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<LandSaleValues>({
@@ -70,30 +71,41 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
       <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <AdminCard className="flex flex-col gap-3 px-5 py-4">
           <AdminField label="Plot" error={errors.plotId?.message}>
-            <select
-              className={cn(adminSelectClass, "w-full", errors.plotId && "border-error")}
-              {...register("plotId")}
-            >
-              <option value="">Choose an available plot</option>
-              {(plots.data?.data ?? []).map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.reference} · {p.locationText}
-                </option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="plotId"
+              render={({ field }) => (
+                <SearchableSelect
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={(plots.data?.data ?? []).map((p) => ({
+                    value: p.id,
+                    label: p.reference,
+                    hint: p.locationText,
+                  }))}
+                  placeholder="Choose an available plot"
+                  className={cn(errors.plotId && "border-error")}
+                />
+              )}
+            />
           </AdminField>
           <AdminField label="Buyer" error={errors.buyerId?.message}>
-            <select
-              className={cn(adminSelectClass, "w-full", errors.buyerId && "border-error")}
-              {...register("buyerId")}
-            >
-              <option value="">Choose the buyer</option>
-              {(buyers.data?.data ?? []).map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name}
-                </option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="buyerId"
+              render={({ field }) => (
+                <SearchableSelect
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={(buyers.data?.data ?? []).map((b) => ({
+                    value: b.id,
+                    label: b.name,
+                  }))}
+                  placeholder="Choose the buyer"
+                  className={cn(errors.buyerId && "border-error")}
+                />
+              )}
+            />
           </AdminField>
           <AdminField label="Agreed price (GHS)" error={errors.agreedPriceGhs?.message}>
             <Input

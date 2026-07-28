@@ -4,13 +4,13 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogDescription,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+} from "@/components/ui/responsive-dialog";
 import { AdminButton, AdminField, adminInputClass, adminSelectClass } from "@/components/admin/ui";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
@@ -95,16 +95,18 @@ export function ExpenseFormDialog({
   const busy = creating || updating;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[480px]">
-        <DialogHeader>
-          <DialogTitle>{isEdit ? "Correct expense" : "Record expense"}</DialogTitle>
-          <DialogDescription>
+    <ResponsiveDialog open={open} onOpenChange={onOpenChange}>
+      <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[480px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>
+            {isEdit ? "Correct expense" : "Record expense"}
+          </ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
             {isEdit
               ? "This moves a figure the profit report is computed from — the change is audited."
               : "Rent, salaries, fumigation, repairs — anything the business pays out."}
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
 
         <form
           className="grid gap-3"
@@ -155,7 +157,7 @@ export function ExpenseFormDialog({
             />
           </AdminField>
 
-          <DialogFooter className="mt-2 gap-2">
+          <ResponsiveDialogFooter className="mt-2 gap-2">
             <AdminButton
               type="button"
               variant="ghost"
@@ -166,9 +168,9 @@ export function ExpenseFormDialog({
             <AdminButton type="submit" disabled={busy}>
               {busy ? "Saving…" : isEdit ? "Save changes" : "Record expense"}
             </AdminButton>
-          </DialogFooter>
+          </ResponsiveDialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   );
 }

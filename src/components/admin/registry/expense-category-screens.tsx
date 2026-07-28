@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -13,6 +13,7 @@ import {
   AdminCard,
   AdminField,
   AdminPageHeader,
+  Mono,
   adminInputClass,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
@@ -30,11 +31,16 @@ import {
   useGetExpenseCategoryQuery,
   useUpdateExpenseCategoryMutation,
 } from "@/redux/expense-categories/expense-categories-api";
+import { useGetExpensesQuery } from "@/redux/expenses/expenses-api";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { useAuthRole } from "@/hooks/use-auth-role";
+import { useMoneyVisibility } from "@/hooks/use-money-visibility";
 import { extractApiError } from "@/lib/extract-api-error";
+import { DateOnlyCell, DateTimeCell } from "@/components/admin/date-cell";
+import { formatCedis } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
+import type { IExpense } from "@/types/expense.types";
 import type {
   IExpenseCategory,
   IRegistryListQuery,
@@ -45,6 +51,7 @@ import {
 } from "@/validations/registry-schema";
 import { LifecycleActions } from "./lifecycle-actions";
 import {
+  Absent,
   ActiveBadge,
   columnMeta,
   STATUS_FILTER_OPTIONS,
@@ -108,6 +115,14 @@ export function ExpenseCategoryTable() {
             {row.original.name}
           </Link>
         ),
+      },
+      {
+        id: "added",
+        accessorFn: (c) => c.createdAt,
+        header: "Added",
+        enableSorting: false,
+        meta: columnMeta({ wide: true }),
+        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",
@@ -221,15 +236,31 @@ function ExpenseCategoryFormFields({
   const [updateCategory, updateState] = useUpdateExpenseCategoryMutation();
   const saving = createState.isLoading || updateState.isLoading;
 
+  // Edit screens open READ-ONLY; the Edit button unlocks the inputs. Create is
+  // always editable.
+  const [isEditing, setIsEditing] = useState(!isEdit);
+  const readOnly = !isEditing;
+  // Keep disabled inputs legible as a read view rather than a greyed-out form.
+  const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
+
   const {
     register,
     handleSubmit,
+    reset,
     setError,
     formState: { errors },
   } = useForm<ExpenseCategoryValues>({
     resolver: zodResolver(expenseCategorySchema),
     defaultValues: { name: category?.name ?? "" },
   });
+
+  // A background refetch can bump the record (another tab, a lifecycle
+  // action). Track the fresh values while reading, but never clobber an
+  // in-progress edit - which is why the parent does not key-remount the form
+  // on updatedAt.
+  useEffect(() => {
+    if (!isEditing) reset({ name: category?.name ?? "" });
+  }, [category, isEditing, reset]);
 
   const onSubmit = async (values: ExpenseCategoryValues) => {
     try {
@@ -239,6 +270,7 @@ function ExpenseCategoryFormFields({
           body: { name: values.name },
         }).unwrap();
         notify.success("Category updated");
+        setIsEditing(false);
       } else {
         const res = await createCategory({ name: values.name }).unwrap();
         notify.success("Category created");
@@ -266,22 +298,61 @@ function ExpenseCategoryFormFields({
         <AdminField label="Name" error={errors.name?.message}>
           <Input
             placeholder="e.g. Transport"
-            className={cn(adminInputClass, errors.name && "border-error")}
+            disabled={readOnly}
+            className={cn(adminInputClass, roCls, errors.name && "border-error")}
             {...register("name")}
           />
         </AdminField>
         <div className="mt-1 flex gap-2">
-          <AdminButton type="submit" disabled={saving} className="h-[38px] px-[18px]">
-            {saving ? "Saving…" : isEdit ? "Save changes" : "Create category"}
-          </AdminButton>
-          <AdminButton
-            type="button"
-            variant="outline"
-            className="h-[38px] px-3.5"
-            onClick={() => router.push(LIST)}
-          >
-            Cancel
-          </AdminButton>
+          {!isEdit ? (
+            <>
+              <AdminButton
+                type="submit"
+                disabled={saving}
+                className="h-[38px] px-[18px]"
+              >
+                {saving ? "Saving…" : "Create category"}
+              </AdminButton>
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-[38px] px-3.5"
+                onClick={() => router.push(LIST)}
+              >
+                Cancel
+              </AdminButton>
+            </>
+          ) : isEditing ? (
+            <>
+              <AdminButton
+                type="submit"
+                disabled={saving}
+                className="h-[38px] px-[18px]"
+              >
+                {saving ? "Saving…" : "Save changes"}
+              </AdminButton>
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-[38px] px-3.5"
+                onClick={() => {
+                  reset();
+                  setIsEditing(false);
+                }}
+              >
+                Cancel
+              </AdminButton>
+            </>
+          ) : (
+            <AdminButton
+              type="button"
+              variant="gold"
+              className="h-[38px] px-[18px]"
+              onClick={() => setIsEditing(true)}
+            >
+              Edit category
+            </AdminButton>
+          )}
         </div>
       </form>
     </AdminCard>
@@ -297,6 +368,125 @@ export function ExpenseCategoryCreate() {
         sub="A bucket expenses are filed under in reports"
       />
       <ExpenseCategoryFormFields />
+    </div>
+  );
+}
+
+/**
+ * The expenses filed under this category - proof of what the bucket actually
+ * holds, with the whole-window total the backend aggregates server-side.
+ */
+function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
+  const showMoney = useMoneyVisibility();
+  const [page, setPage] = useState(1);
+  const { data, isLoading, isFetching, isError, error, refetch } =
+    useGetExpensesQuery({ categoryId, limit: 10, page });
+
+  const columns = useMemo<ColumnDef<IExpense, unknown>[]>(
+    () => [
+      {
+        accessorKey: "transactionNo",
+        header: "Voucher",
+        enableSorting: false,
+        cell: ({ row }) => <Mono>{row.original.transactionNo}</Mono>,
+        meta: { className: "px-4 text-[13px]" },
+      },
+      {
+        accessorFn: (r) => r.incurredAt,
+        id: "incurredAt",
+        header: "Date",
+        enableSorting: false,
+        cell: ({ row }) => <DateOnlyCell value={row.original.incurredAt} />,
+        meta: { className: "px-4 text-[13px] whitespace-nowrap" },
+      },
+      {
+        accessorFn: (r) => r.description ?? "",
+        id: "description",
+        header: "Description",
+        enableSorting: false,
+        cell: ({ row }) =>
+          row.original.description ? (
+            <span
+              className="block max-w-[220px] truncate"
+              title={row.original.description}
+            >
+              {row.original.description}
+            </span>
+          ) : (
+            <Absent />
+          ),
+        meta: { className: "px-4 text-[13px]" },
+      },
+      ...(showMoney
+        ? [
+            {
+              accessorFn: (r: IExpense) => r.amountGhs ?? 0,
+              id: "amountGhs",
+              header: "Amount",
+              enableSorting: false,
+              cell: ({ row }: { row: { original: IExpense } }) => (
+                <Mono>{formatCedis(row.original.amountGhs)}</Mono>
+              ),
+              meta: { className: "px-4 text-right text-[13px]" },
+            } as ColumnDef<IExpense, unknown>,
+          ]
+        : []),
+    ],
+    [showMoney],
+  );
+
+  const rows = data?.data ?? [];
+  const windowTotal = data?.summary?.totalGhs;
+
+  return (
+    <div className="mt-5">
+      <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h2 className="text-[15px] font-bold tracking-[-0.01em] text-ink">
+          Expenses in this category
+        </h2>
+        {showMoney && windowTotal !== null && windowTotal !== undefined ? (
+          <span className="flex items-baseline gap-2">
+            <span className="text-[11px] font-bold tracking-[0.08em] text-soil uppercase">
+              Total
+            </span>
+            <Mono className="text-[14px] font-bold text-ink">
+              {formatCedis(windowTotal)}
+            </Mono>
+          </span>
+        ) : null}
+      </div>
+
+      {isLoading ? (
+        <DataTableSkeleton />
+      ) : isError ? (
+        <ErrorMessage
+          description={extractApiError(error).message}
+          onRetry={() => void refetch()}
+        />
+      ) : (
+        <AdminCard className="overflow-hidden">
+          <ConsoleDataTable<IExpense>
+            columns={columns}
+            data={rows}
+            itemNoun="expenses"
+            isFetching={isFetching}
+            serverPagination={{
+              totalCount: data?.meta.total ?? 0,
+              page,
+              pageSize: 10,
+              onPageChange: setPage,
+              onPageSizeChange: () => undefined,
+            }}
+            emptyState={
+              <EmptyState
+                variant="plain"
+                title="No expenses yet"
+                description="Nothing has been filed under this category so far."
+              />
+            }
+          />
+        </AdminCard>
+      )}
     </div>
   );
 }
@@ -325,7 +515,8 @@ export function ExpenseCategoryEdit({ id }: { id: string }) {
         title={category.name}
         sub="Edit the category and its lifecycle"
       />
-      <ExpenseCategoryFormFields key={category.updatedAt} category={category} />
+      <ExpenseCategoryFormFields category={category} />
+      <CategoryExpensesCard categoryId={id} />
       <LifecycleActions
         noun="category"
         name={category.name}

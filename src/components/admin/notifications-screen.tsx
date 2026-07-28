@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
+import { DateTimeCell } from "@/components/admin/date-cell";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
@@ -47,14 +48,6 @@ const CHANNEL_OPTIONS = [
   { label: "SMS", value: "SMS" },
   { label: "Email", value: "EMAIL" },
 ] as const;
-
-const formatWhen = (iso: string): string =>
-  new Date(iso).toLocaleString("en-GB", {
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    month: "short",
-  });
 
 const FILTER_DEFAULTS = { channel: "all", status: "all", size: "20" };
 
@@ -152,12 +145,8 @@ export function NotificationsScreen() {
         id: "when",
         header: "When",
         enableSorting: false,
-        meta: columnMeta({ wide: true, className: "text-right" }),
-        cell: ({ row }) => (
-          <span className="whitespace-nowrap text-[12px] text-soil">
-            {formatWhen(row.original.createdAt)}
-          </span>
-        ),
+        meta: columnMeta({ wide: true }),
+        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
     ],
     [],
