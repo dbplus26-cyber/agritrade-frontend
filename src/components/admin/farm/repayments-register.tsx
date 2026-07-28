@@ -19,10 +19,10 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
+import { DateOnlyCell, DateTimeCell } from "@/components/admin/date-cell";
 import { useGetRepaymentsQuery } from "@/redux/farm/repayments-api";
 import { useGetSeasonsQuery } from "@/redux/farm/seasons-api";
 import type { IRepayment, IRepaymentListQuery } from "@/types/farm.types";
-import { formatFarmDate } from "./farm-bits";
 
 const LIST = "/admin/repayments";
 const FILTER_DEFAULTS = { season: "all", from: "", to: "", size: "10" };
@@ -54,6 +54,13 @@ export function RepaymentsRegister() {
   const totalCount = data?.meta.total ?? 0;
   const activeFilterCount =
     (season !== "all" ? 1 : 0) + (from ? 1 : 0) + (to ? 1 : 0);
+  // A register with nothing on file and no filters narrowing it shows ONLY
+  // the empty state (with its create action) - a filter bar filters nothing.
+  const pristine =
+    !isLoading &&
+    !isError &&
+    repayments.length === 0 &&
+    activeFilterCount === 0;
 
   const seasonOptions = useMemo(
     () => [
@@ -66,18 +73,24 @@ export function RepaymentsRegister() {
   const columns = useMemo<ColumnDef<IRepayment, unknown>[]>(
     () => [
       {
+        id: "transactionNo",
+        header: "Receipt #",
+        enableSorting: false,
+        meta: columnMeta(),
+        cell: ({ row }) => (
+          <Mono className="whitespace-nowrap text-[12.5px] text-ink">
+            {row.original.transactionNo}
+          </Mono>
+        ),
+      },
+      {
         id: "farmer",
         header: "Farmer",
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <div className="min-w-0">
-            <div className="truncate font-semibold text-ink">
-              {row.original.farmer.name}
-            </div>
-            <div className="text-[12px] text-soil">
-              {formatFarmDate(row.original.receivedAt)}
-            </div>
+          <div className="truncate font-semibold text-ink">
+            {row.original.farmer.name}
           </div>
         ),
       },
@@ -116,6 +129,22 @@ export function RepaymentsRegister() {
         ),
       },
       {
+        id: "received",
+        header: "Received",
+        enableSorting: false,
+        meta: columnMeta(),
+        cell: ({ row }) => <DateOnlyCell value={row.original.receivedAt} />,
+      },
+      {
+        id: "added",
+        header: "Added",
+        enableSorting: false,
+        // Container-queried hiding lives on `className` (th + td together);
+        // headerClassName alone would desync the header from its cells.
+        meta: columnMeta({ className: "hidden @5xl/table:table-cell" }),
+        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
+      },
+      {
         id: "stock",
         header: "",
         enableSorting: false,
@@ -140,7 +169,7 @@ export function RepaymentsRegister() {
         </p>
       </div>
 
-      {isError && activeFilterCount === 0 ? null : (
+      {pristine || (isError && activeFilterCount === 0) ? null : (
         <ConsoleFilterBar
           activeCount={activeFilterCount}
           onClear={resetFilters}
@@ -213,7 +242,8 @@ export function RepaymentsRegister() {
               onPageChange: setPage,
               onPageSizeChange: (size) => setFilter("size", String(size)),
             }}
-            rowClassName={() => "h-12"}
+            rowHref={(r) => `${LIST}/${r.id}`}
+            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
           />
         </AdminCard>
       )}

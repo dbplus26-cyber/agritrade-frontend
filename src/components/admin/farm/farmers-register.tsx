@@ -17,6 +17,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
+import { DateTimeCell } from "@/components/admin/date-cell";
 import { useGetFarmersQuery } from "@/redux/farm/farmers-api";
 import { avatarOf } from "@/static-data/admin/registers";
 import type { IFarmer, IFarmerListQuery } from "@/types/farm.types";
@@ -103,6 +104,14 @@ export function FarmersRegister() {
             {row.original.community ?? "-"}
           </span>
         ),
+      },
+      {
+        id: "added",
+        accessorFn: (f) => f.createdAt,
+        header: "Added",
+        enableSorting: false,
+        meta: columnMeta({ wide: true }),
+        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",

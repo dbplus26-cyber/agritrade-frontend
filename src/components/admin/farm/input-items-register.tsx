@@ -10,6 +10,7 @@ import {
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
+import { DateTimeCell } from "@/components/admin/date-cell";
 import { AdminCard } from "@/components/admin/ui";
 import { Button } from "@/components/ui/button";
 import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
@@ -83,6 +84,14 @@ export function InputItemsRegister() {
         cell: ({ row }) => (
           <span className="text-[12.5px] text-soil">{row.original.unitLabel}</span>
         ),
+      },
+      {
+        id: "added",
+        accessorFn: (i) => i.createdAt,
+        header: "Added",
+        enableSorting: false,
+        meta: columnMeta({ wide: true }),
+        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",

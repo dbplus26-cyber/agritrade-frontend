@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,9 +38,17 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
   const { confirm, confirmationDialog } = useConfirm();
   const saving = createState.isLoading || updateState.isLoading;
 
+  // Edit opens READ-ONLY; the Edit button unlocks the inputs. Create is
+  // always editable.
+  const [isEditing, setIsEditing] = useState(item === undefined);
+  const readOnly = !isEditing;
+  // Keep disabled inputs legible as a read view rather than a greyed-out form.
+  const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
+
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<InputItemValues>({
     resolver: zodResolver(inputItemSchema),
@@ -48,16 +57,25 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
       : { name: "", unitLabel: "" },
   });
 
+  // A background refetch can bump the record (e.g. the activate/deactivate
+  // actions below). Track the fresh values while reading, but never clobber
+  // an in-progress edit.
+  useEffect(() => {
+    if (item && !isEditing) reset({ name: item.name, unitLabel: item.unitLabel });
+  }, [item, isEditing, reset]);
+
   const onSubmit = async (values: InputItemValues) => {
     try {
       if (item) {
         await updateItem({ id: item.id, body: values }).unwrap();
         notify.success("Item updated");
+        // This screen doubles as the item's read view - drop back into it.
+        setIsEditing(false);
       } else {
         await createItem(values).unwrap();
         notify.success("Item created");
+        router.push(LIST);
       }
-      router.push(LIST);
     } catch (err) {
       notify.error("Couldn't save the item", {
         description: extractApiError(err).message,
@@ -109,21 +127,27 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
           <AdminField label="Name" error={errors.name?.message}>
             <Input
               placeholder="NPK fertiliser"
-              className={cn(adminInputClass, errors.name && "border-error")}
+              disabled={readOnly}
+              className={cn(adminInputClass, roCls, errors.name && "border-error")}
               {...register("name")}
             />
           </AdminField>
           <AdminField label="Unit" error={errors.unitLabel?.message}>
             <Input
               placeholder="bag"
-              className={cn(adminInputClass, errors.unitLabel && "border-error")}
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                errors.unitLabel && "border-error",
+              )}
               {...register("unitLabel")}
             />
           </AdminField>
         </AdminCard>
 
         <div className="flex flex-wrap justify-end gap-2">
-          {item ? (
+          {item && !isEditing ? (
             <>
               <AdminButton
                 type="button"
@@ -147,11 +171,37 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
               >
                 {item.isActive ? "Deactivate" : "Activate"}
               </AdminButton>
+              <AdminButton
+                type="button"
+                variant="gold"
+                className="h-10 px-5"
+                onClick={() => setIsEditing(true)}
+              >
+                Edit item
+              </AdminButton>
             </>
-          ) : null}
-          <AdminButton type="submit" disabled={saving} className="h-10 px-5">
-            {saving ? "Saving…" : item ? "Save changes" : "Create item"}
-          </AdminButton>
+          ) : item ? (
+            <>
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-10 px-4"
+                onClick={() => {
+                  reset();
+                  setIsEditing(false);
+                }}
+              >
+                Cancel
+              </AdminButton>
+              <AdminButton type="submit" disabled={saving} className="h-10 px-5">
+                {saving ? "Saving…" : "Save changes"}
+              </AdminButton>
+            </>
+          ) : (
+            <AdminButton type="submit" disabled={saving} className="h-10 px-5">
+              {saving ? "Saving…" : "Create item"}
+            </AdminButton>
+          )}
         </div>
       </form>
 

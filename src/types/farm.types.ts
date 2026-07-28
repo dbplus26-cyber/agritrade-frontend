@@ -44,6 +44,7 @@ export interface IInputItem {
   name: string;
   unitLabel: string;
   isActive: boolean;
+  createdAt: string;
 }
 export interface IInputItemListResponse {
   message: string;
@@ -72,6 +73,19 @@ export interface IFarmerDocument {
   name: string;
   createdAt: string;
 }
+/** Mirrors the backend `FarmerGuarantor` rows on `toFarmerDTO`. */
+export interface IFarmerGuarantor {
+  id: string;
+  name: string;
+  phone: string | null;
+  address: string | null;
+  relationship: string | null;
+  idType: string | null;
+  idNumber: string | null;
+  occupation: string | null;
+  notes: string | null;
+  createdAt: string;
+}
 export interface IFarmer {
   id: string;
   name: string;
@@ -79,8 +93,19 @@ export interface IFarmer {
   community: string | null;
   notes: string | null;
   photoUrl: string | null;
+  /** Grant-readiness profile (backend `toFarmerDTO`). */
+  address: string | null;
+  idType: string | null;
+  idNumber: string | null;
+  dateOfBirth: string | null;
+  nextOfKinName: string | null;
+  nextOfKinPhone: string | null;
+  farmLocation: string | null;
+  farmSizeAcres: number | null;
+  momoNumber: string | null;
   isActive: boolean;
   documents: IFarmerDocument[];
+  guarantors: IFarmerGuarantor[];
   createdAt: string;
 }
 export interface IFarmerListResponse {
@@ -103,24 +128,67 @@ export interface ICreateFarmerInput {
   phone?: string;
   community?: string;
   notes?: string;
+  address?: string;
+  idType?: string;
+  idNumber?: string;
+  dateOfBirth?: string;
+  nextOfKinName?: string;
+  nextOfKinPhone?: string;
+  farmLocation?: string;
+  farmSizeAcres?: number;
+  momoNumber?: string;
 }
 export type IUpdateFarmerInput = Partial<ICreateFarmerInput>;
+
+/** Mirrors backend `createGuarantorSchema` / `updateGuarantorSchema`. */
+export interface IGuarantorInput {
+  name: string;
+  phone?: string;
+  address?: string;
+  relationship?: string;
+  idType?: string;
+  idNumber?: string;
+  occupation?: string;
+  notes?: string;
+}
 
 // ── Input grants ──────────────────────────────────────────────────
 export interface IGrantApproval {
   id: string;
   status: string;
 }
+/** Grant/repayment evidence documents share the farmer-document shape. */
+export type IGrantDocument = IFarmerDocument;
 export interface IGrant {
   id: string;
+  transactionNo: string;
   farmer: { id: string; name: string };
   season: { id: string; name: string };
   item: { id: string; name: string; unitLabel: string };
   quantity: number;
   valueGhs: number | null;
   notes: string | null;
+  agreedTerms: string | null;
+  dueDate: string | null;
+  documents: IGrantDocument[];
   grantedAt: string;
+  createdAt: string;
   approval: IGrantApproval | null;
+}
+/** `GET admin/farm/grants/:id` - the full "who took what" view. */
+export interface IGrantDetail extends Omit<IGrant, "farmer"> {
+  farmer: {
+    id: string;
+    name: string;
+    phone: string | null;
+    community: string | null;
+    photoUrl: string | null;
+  };
+  seasonBalance: {
+    investedGhs: number | null;
+    recoveredGhs: number | null;
+    outstandingGhs: number | null;
+  };
 }
 export interface IGrantListResponse {
   message: string;
@@ -131,6 +199,10 @@ export interface IGrantResponse {
   message: string;
   data: { grant: IGrant };
 }
+export interface IGrantDetailResponse {
+  message: string;
+  data: { grant: IGrantDetail };
+}
 export interface IGrantListQuery {
   page?: number;
   limit?: number;
@@ -139,6 +211,8 @@ export interface IGrantListQuery {
   from?: string;
   to?: string;
 }
+/** Mirrors backend `createGrantSchema`; sent as multipart with the required
+ * signed `agreement` file part. */
 export interface ICreateGrantInput {
   farmerId: string;
   seasonId: string;
@@ -147,11 +221,15 @@ export interface ICreateGrantInput {
   valueGhs: number;
   notes?: string;
   grantedAt?: string;
+  agreedTerms?: string;
+  dueDate?: string;
+  documentName?: string;
 }
 
 // ── Produce repayments ────────────────────────────────────────────
 export interface IRepayment {
   id: string;
+  transactionNo: string;
   farmer: { id: string; name: string };
   season: { id: string; name: string };
   commodity: { id: string; name: string };
@@ -160,7 +238,22 @@ export interface IRepayment {
   valueGhs: number | null;
   intoStock: boolean;
   notes: string | null;
+  receivedByName: string | null;
+  documents: IGrantDocument[];
   receivedAt: string;
+  createdAt: string;
+}
+/** `GET admin/farm/repayments/:id` - evidence plus who recorded it. */
+export interface IRepaymentDetail extends Omit<IRepayment, "farmer"> {
+  farmer: {
+    id: string;
+    name: string;
+    phone: string | null;
+    community: string | null;
+    photoUrl: string | null;
+  };
+  intakeWarehouse: { id: string; name: string } | null;
+  recordedBy: { id: string; name: string } | null;
 }
 export interface IRepaymentListResponse {
   message: string;
@@ -171,6 +264,10 @@ export interface IRepaymentResponse {
   message: string;
   data: { repayment: IRepayment };
 }
+export interface IRepaymentDetailResponse {
+  message: string;
+  data: { repayment: IRepaymentDetail };
+}
 export interface IRepaymentListQuery {
   page?: number;
   limit?: number;
@@ -179,6 +276,8 @@ export interface IRepaymentListQuery {
   from?: string;
   to?: string;
 }
+/** Mirrors backend `createRepaymentSchema`; sent as multipart with the
+ * required signed `receipt` file part. */
 export interface ICreateRepaymentInput {
   farmerId: string;
   seasonId: string;
@@ -188,6 +287,8 @@ export interface ICreateRepaymentInput {
   intakeWarehouseId?: string;
   notes?: string;
   receivedAt?: string;
+  receivedByName?: string;
+  documentName?: string;
 }
 
 // ── Farmer season plans ───────────────────────────────────────────
@@ -225,6 +326,13 @@ export interface ISeasonSummary {
   investedGhs: number | null;
   recoveredGhs: number | null;
   outstandingGhs: number | null;
+  /** Plans vs reality: what the season promised against what came back. */
+  expectations: {
+    expectedYieldKg: number;
+    actualYieldKg: number;
+    expectedReturnGhs: number | null;
+    actualReturnGhs: number | null;
+  };
   farmerBalances: IFarmerBalance[];
 }
 export interface ISeasonSummaryResponse {

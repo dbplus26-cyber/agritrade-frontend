@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,6 +15,7 @@ import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
+import { optimizeImage } from "@/lib/optimize-image";
 import { cn } from "@/lib/utils";
 import {
   useCreateFarmerMutation,
@@ -25,6 +26,39 @@ import { farmerSchema, type FarmerValues } from "@/validations/farm-schema";
 
 const LIST = "/admin/farmers";
 
+const ID_TYPE_SUGGESTIONS = [
+  "Ghana Card",
+  "Voter ID",
+  "Passport",
+  "Driver Licence",
+];
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+      {children}
+    </div>
+  );
+}
+
+/** "" for create, or the record's values for edit. */
+const toFormValues = (farmer?: IFarmer): FarmerValues => ({
+  address: farmer?.address ?? "",
+  community: farmer?.community ?? "",
+  dateOfBirth: farmer?.dateOfBirth ? farmer.dateOfBirth.slice(0, 10) : "",
+  farmLocation: farmer?.farmLocation ?? "",
+  farmSizeAcres:
+    farmer?.farmSizeAcres != null ? String(farmer.farmSizeAcres) : "",
+  idNumber: farmer?.idNumber ?? "",
+  idType: farmer?.idType ?? "",
+  momoNumber: farmer?.momoNumber ?? "",
+  name: farmer?.name ?? "",
+  nextOfKinName: farmer?.nextOfKinName ?? "",
+  nextOfKinPhone: farmer?.nextOfKinPhone ?? "",
+  notes: farmer?.notes ?? "",
+  phone: farmer?.phone ?? "",
+});
+
 export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
   const router = useRouter();
   const [createFarmer, createState] = useCreateFarmerMutation();
@@ -32,36 +66,74 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
   const saving = createState.isLoading || updateState.isLoading;
   const photoInput = useRef<HTMLInputElement | null>(null);
   const [photo, setPhoto] = useState<File | undefined>();
-  const [preview, setPreview] = useState<string | null>(farmer?.photoUrl ?? null);
+  // Derived preview: a staged file wins, otherwise the saved photo - so a
+  // background refetch or cancel naturally falls back to the record's photo.
+  const stagedUrl = useMemo(
+    () => (photo ? URL.createObjectURL(photo) : null),
+    [photo],
+  );
+  const preview = stagedUrl ?? farmer?.photoUrl ?? null;
+
+  // Edit opens READ-ONLY; the Edit button unlocks the whole form. Create is
+  // always editable.
+  const [isEditing, setIsEditing] = useState(farmer === undefined);
+  const readOnly = !isEditing;
+  // Keep disabled inputs legible as a read view rather than a greyed-out form.
+  const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
+
+  const clearPhotoState = () => {
+    setPhoto(undefined);
+    if (photoInput.current) photoInput.current.value = "";
+  };
 
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<FarmerValues>({
     resolver: zodResolver(farmerSchema),
-    defaultValues: farmer
-      ? {
-          community: farmer.community ?? "",
-          name: farmer.name,
-          notes: farmer.notes ?? "",
-          phone: farmer.phone ?? "",
-        }
-      : { community: "", name: "", notes: "", phone: "" },
+    defaultValues: toFormValues(farmer),
   });
+
+  // A background refetch can bump the record. Track the fresh values while
+  // reading, but never clobber an in-progress edit.
+  useEffect(() => {
+    if (farmer && !isEditing) reset(toFormValues(farmer));
+  }, [farmer, isEditing, reset]);
 
   const onPick = (file: File | undefined) => {
     if (!file) return;
-    setPhoto(file);
-    setPreview(URL.createObjectURL(file));
+    // Downscale phone-camera photos in the browser before staging them.
+    void optimizeImage(file).then(setPhoto);
   };
 
   const onSubmit = async (values: FarmerValues) => {
+    // Empty optional fields are omitted (same shaping as before the profile
+    // fields were added).
+    const trimmed = (v: string | undefined) => v?.trim() ?? "";
     const body: ICreateFarmerInput = {
       name: values.name,
-      ...(values.phone?.trim() ? { phone: values.phone.trim() } : {}),
-      ...(values.community?.trim() ? { community: values.community.trim() } : {}),
-      ...(values.notes?.trim() ? { notes: values.notes.trim() } : {}),
+      ...(trimmed(values.phone) ? { phone: trimmed(values.phone) } : {}),
+      ...(trimmed(values.community) ? { community: trimmed(values.community) } : {}),
+      ...(trimmed(values.notes) ? { notes: trimmed(values.notes) } : {}),
+      ...(trimmed(values.address) ? { address: trimmed(values.address) } : {}),
+      ...(trimmed(values.idType) ? { idType: trimmed(values.idType) } : {}),
+      ...(trimmed(values.idNumber) ? { idNumber: trimmed(values.idNumber) } : {}),
+      ...(values.dateOfBirth ? { dateOfBirth: values.dateOfBirth } : {}),
+      ...(trimmed(values.nextOfKinName)
+        ? { nextOfKinName: trimmed(values.nextOfKinName) }
+        : {}),
+      ...(trimmed(values.nextOfKinPhone)
+        ? { nextOfKinPhone: trimmed(values.nextOfKinPhone) }
+        : {}),
+      ...(trimmed(values.farmLocation)
+        ? { farmLocation: trimmed(values.farmLocation) }
+        : {}),
+      ...(trimmed(values.farmSizeAcres)
+        ? { farmSizeAcres: Number(values.farmSizeAcres) }
+        : {}),
+      ...(trimmed(values.momoNumber) ? { momoNumber: trimmed(values.momoNumber) } : {}),
     };
     try {
       if (farmer) {
@@ -87,6 +159,7 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
 
       <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <AdminCard className="flex flex-col gap-3 px-5 py-4">
+          <SectionLabel>Identity</SectionLabel>
           <div className="flex items-center gap-4">
             {preview ? (
               // eslint-disable-next-line @next/next/no-img-element -- Cloudinary/blob
@@ -100,14 +173,16 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
                 No photo
               </div>
             )}
-            <AdminButton
-              type="button"
-              variant="outline"
-              className="h-9 px-4"
-              onClick={() => photoInput.current?.click()}
-            >
-              {preview ? "Change photo" : "Add photo"}
-            </AdminButton>
+            {isEditing ? (
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-9 px-4"
+                onClick={() => photoInput.current?.click()}
+              >
+                {preview ? "Change photo" : "Add photo"}
+              </AdminButton>
+            ) : null}
             <input
               ref={photoInput}
               type="file"
@@ -121,7 +196,8 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
             <AdminField label="Name" error={errors.name?.message}>
               <Input
                 placeholder="Abukari Yakubu"
-                className={cn(adminInputClass, errors.name && "border-error")}
+                disabled={readOnly}
+                className={cn(adminInputClass, roCls, errors.name && "border-error")}
                 {...register("name")}
               />
             </AdminField>
@@ -129,35 +205,228 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
               <Input
                 inputMode="tel"
                 placeholder="024 000 0000"
-                className={cn(adminInputClass, errors.phone && "border-error")}
+                disabled={readOnly}
+                className={cn(adminInputClass, roCls, errors.phone && "border-error")}
                 {...register("phone")}
               />
             </AdminField>
-            <AdminField label="Community" optional error={errors.community?.message}>
+            <AdminField
+              label="Date of birth"
+              optional
+              error={errors.dateOfBirth?.message}
+            >
               <Input
-                placeholder="Kumbungu"
-                className={cn(adminInputClass, errors.community && "border-error")}
-                {...register("community")}
+                type="date"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.dateOfBirth && "border-error",
+                )}
+                {...register("dateOfBirth")}
+              />
+            </AdminField>
+            <AdminField label="ID type" optional error={errors.idType?.message}>
+              <Input
+                list="farmer-id-types"
+                placeholder="Ghana Card, Voter ID…"
+                disabled={readOnly}
+                className={cn(adminInputClass, roCls, errors.idType && "border-error")}
+                {...register("idType")}
+              />
+              <datalist id="farmer-id-types">
+                {ID_TYPE_SUGGESTIONS.map((t) => (
+                  <option key={t} value={t} />
+                ))}
+              </datalist>
+            </AdminField>
+            <AdminField label="ID number" optional error={errors.idNumber?.message}>
+              <Input
+                placeholder="GHA-000000000-0"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.idNumber && "border-error",
+                )}
+                {...register("idNumber")}
               />
             </AdminField>
           </div>
+        </AdminCard>
+
+        <AdminCard className="flex flex-col gap-3 px-5 py-4">
+          <SectionLabel>Location</SectionLabel>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <AdminField label="Community" optional error={errors.community?.message}>
+              <Input
+                placeholder="Kumbungu"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.community && "border-error",
+                )}
+                {...register("community")}
+              />
+            </AdminField>
+            <AdminField
+              label="Farm location"
+              optional
+              error={errors.farmLocation?.message}
+            >
+              <Input
+                placeholder="Near the Bontanga dam"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.farmLocation && "border-error",
+                )}
+                {...register("farmLocation")}
+              />
+            </AdminField>
+            <AdminField
+              label="Farm size (acres)"
+              optional
+              error={errors.farmSizeAcres?.message}
+            >
+              <Input
+                inputMode="decimal"
+                placeholder="2.5"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.farmSizeAcres && "border-error",
+                )}
+                {...register("farmSizeAcres")}
+              />
+            </AdminField>
+          </div>
+          <AdminField label="Address" optional error={errors.address?.message}>
+            <textarea
+              rows={2}
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                "h-auto min-h-[60px] w-full resize-y py-2",
+                errors.address && "border-error",
+              )}
+              {...register("address")}
+            />
+          </AdminField>
+        </AdminCard>
+
+        <AdminCard className="flex flex-col gap-3 px-5 py-4">
+          <SectionLabel>Contacts &amp; payout</SectionLabel>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <AdminField
+              label="Next of kin name"
+              optional
+              error={errors.nextOfKinName?.message}
+            >
+              <Input
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.nextOfKinName && "border-error",
+                )}
+                {...register("nextOfKinName")}
+              />
+            </AdminField>
+            <AdminField
+              label="Next of kin phone"
+              optional
+              error={errors.nextOfKinPhone?.message}
+            >
+              <Input
+                inputMode="tel"
+                placeholder="024 000 0000"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.nextOfKinPhone && "border-error",
+                )}
+                {...register("nextOfKinPhone")}
+              />
+            </AdminField>
+            <AdminField
+              label="Mobile money number"
+              optional
+              error={errors.momoNumber?.message}
+            >
+              <Input
+                inputMode="tel"
+                placeholder="024 000 0000"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.momoNumber && "border-error",
+                )}
+                {...register("momoNumber")}
+              />
+            </AdminField>
+          </div>
+        </AdminCard>
+
+        <AdminCard className="px-5 py-4">
           <AdminField label="Notes" optional error={errors.notes?.message}>
-            <Input className={adminInputClass} {...register("notes")} />
+            <Input
+              disabled={readOnly}
+              className={cn(adminInputClass, roCls)}
+              {...register("notes")}
+            />
           </AdminField>
         </AdminCard>
 
         <div className="flex justify-end gap-2">
-          <AdminButton
-            type="button"
-            variant="outline"
-            className="h-10 px-4"
-            onClick={() => router.push(LIST)}
-          >
-            Cancel
-          </AdminButton>
-          <AdminButton type="submit" disabled={saving} className="h-10 px-5">
-            {saving ? "Saving…" : farmer ? "Save changes" : "Add farmer"}
-          </AdminButton>
+          {!farmer ? (
+            <>
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-10 px-4"
+                onClick={() => router.push(LIST)}
+              >
+                Cancel
+              </AdminButton>
+              <AdminButton type="submit" disabled={saving} className="h-10 px-5">
+                {saving ? "Saving…" : "Add farmer"}
+              </AdminButton>
+            </>
+          ) : isEditing ? (
+            <>
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-10 px-4"
+                onClick={() => {
+                  reset();
+                  clearPhotoState();
+                  setIsEditing(false);
+                }}
+              >
+                Cancel
+              </AdminButton>
+              <AdminButton type="submit" disabled={saving} className="h-10 px-5">
+                {saving ? "Saving…" : "Save changes"}
+              </AdminButton>
+            </>
+          ) : (
+            <AdminButton
+              type="button"
+              variant="gold"
+              className="h-10 px-5"
+              onClick={() => setIsEditing(true)}
+            >
+              Edit farmer
+            </AdminButton>
+          )}
         </div>
       </form>
     </div>

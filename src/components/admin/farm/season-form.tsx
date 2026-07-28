@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,26 +29,44 @@ const LIST = "/admin/seasons";
 const dateInput = (iso: string | null | undefined): string =>
   iso ? iso.slice(0, 10) : "";
 
+/** The record's values, shaped for the form. */
+const toFormValues = (season?: ISeason): SeasonValues =>
+  season
+    ? {
+        endsOn: dateInput(season.endsOn),
+        name: season.name,
+        startsOn: dateInput(season.startsOn),
+      }
+    : { endsOn: "", name: "", startsOn: "" };
+
 export function SeasonForm({ season }: { season?: ISeason }) {
   const router = useRouter();
   const [createSeason, createState] = useCreateSeasonMutation();
   const [updateSeason, updateState] = useUpdateSeasonMutation();
   const saving = createState.isLoading || updateState.isLoading;
 
+  // Edit opens READ-ONLY; the Edit button unlocks the inputs. Create is
+  // always editable.
+  const [isEditing, setIsEditing] = useState(season === undefined);
+  const readOnly = !isEditing;
+  // Keep disabled inputs legible as a read view rather than a greyed-out form.
+  const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
+
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<SeasonValues>({
     resolver: zodResolver(seasonSchema),
-    defaultValues: season
-      ? {
-          endsOn: dateInput(season.endsOn),
-          name: season.name,
-          startsOn: dateInput(season.startsOn),
-        }
-      : { endsOn: "", name: "", startsOn: "" },
+    defaultValues: toFormValues(season),
   });
+
+  // A background refetch can bump the record. Track the fresh values while
+  // reading, but never clobber an in-progress edit.
+  useEffect(() => {
+    if (season && !isEditing) reset(toFormValues(season));
+  }, [season, isEditing, reset]);
 
   const onSubmit = async (values: SeasonValues) => {
     const body = {
@@ -82,7 +101,8 @@ export function SeasonForm({ season }: { season?: ISeason }) {
           <AdminField label="Name" error={errors.name?.message}>
             <Input
               placeholder="2026 Wet Season"
-              className={cn(adminInputClass, errors.name && "border-error")}
+              disabled={readOnly}
+              className={cn(adminInputClass, roCls, errors.name && "border-error")}
               {...register("name")}
             />
           </AdminField>
@@ -90,14 +110,24 @@ export function SeasonForm({ season }: { season?: ISeason }) {
             <AdminField label="Starts on" error={errors.startsOn?.message}>
               <Input
                 type="date"
-                className={cn(adminInputClass, errors.startsOn && "border-error")}
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.startsOn && "border-error",
+                )}
                 {...register("startsOn")}
               />
             </AdminField>
             <AdminField label="Ends on" optional error={errors.endsOn?.message}>
               <Input
                 type="date"
-                className={cn(adminInputClass, errors.endsOn && "border-error")}
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.endsOn && "border-error",
+                )}
                 {...register("endsOn")}
               />
             </AdminField>
@@ -105,17 +135,47 @@ export function SeasonForm({ season }: { season?: ISeason }) {
         </AdminCard>
 
         <div className="flex justify-end gap-2">
-          <AdminButton
-            type="button"
-            variant="outline"
-            className="h-10 px-4"
-            onClick={() => router.push(LIST)}
-          >
-            Cancel
-          </AdminButton>
-          <AdminButton type="submit" disabled={saving} className="h-10 px-5">
-            {saving ? "Saving…" : season ? "Save changes" : "Create season"}
-          </AdminButton>
+          {!season ? (
+            <>
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-10 px-4"
+                onClick={() => router.push(LIST)}
+              >
+                Cancel
+              </AdminButton>
+              <AdminButton type="submit" disabled={saving} className="h-10 px-5">
+                {saving ? "Saving…" : "Create season"}
+              </AdminButton>
+            </>
+          ) : isEditing ? (
+            <>
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-10 px-4"
+                onClick={() => {
+                  reset();
+                  setIsEditing(false);
+                }}
+              >
+                Cancel
+              </AdminButton>
+              <AdminButton type="submit" disabled={saving} className="h-10 px-5">
+                {saving ? "Saving…" : "Save changes"}
+              </AdminButton>
+            </>
+          ) : (
+            <AdminButton
+              type="button"
+              variant="gold"
+              className="h-10 px-5"
+              onClick={() => setIsEditing(true)}
+            >
+              Edit season
+            </AdminButton>
+          )}
         </div>
       </form>
     </div>

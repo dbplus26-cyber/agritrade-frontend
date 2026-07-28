@@ -19,10 +19,11 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
+import { DateOnlyCell, DateTimeCell } from "@/components/admin/date-cell";
 import { useGetGrantsQuery } from "@/redux/farm/grants-api";
 import { useGetSeasonsQuery } from "@/redux/farm/seasons-api";
 import type { IGrant, IGrantListQuery } from "@/types/farm.types";
-import { GrantApprovalBadge, formatFarmDate } from "./farm-bits";
+import { GrantApprovalBadge } from "./farm-bits";
 
 const LIST = "/admin/grants";
 const FILTER_DEFAULTS = { season: "all", from: "", to: "", size: "10" };
@@ -54,6 +55,10 @@ export function GrantsRegister() {
   const totalCount = data?.meta.total ?? 0;
   const activeFilterCount =
     (season !== "all" ? 1 : 0) + (from ? 1 : 0) + (to ? 1 : 0);
+  // A register with nothing on file and no filters narrowing it shows ONLY
+  // the empty state (with its create action) - a filter bar filters nothing.
+  const pristine =
+    !isLoading && !isError && grants.length === 0 && activeFilterCount === 0;
 
   const seasonOptions = useMemo(
     () => [
@@ -69,18 +74,24 @@ export function GrantsRegister() {
   const columns = useMemo<ColumnDef<IGrant, unknown>[]>(
     () => [
       {
+        id: "transactionNo",
+        header: "Grant #",
+        enableSorting: false,
+        meta: columnMeta(),
+        cell: ({ row }) => (
+          <Mono className="whitespace-nowrap text-[12.5px] text-ink">
+            {row.original.transactionNo}
+          </Mono>
+        ),
+      },
+      {
         id: "farmer",
         header: "Farmer",
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <div className="min-w-0">
-            <div className="truncate font-semibold text-ink">
-              {row.original.farmer.name}
-            </div>
-            <div className="text-[12px] text-soil">
-              {formatFarmDate(row.original.grantedAt)}
-            </div>
+          <div className="truncate font-semibold text-ink">
+            {row.original.farmer.name}
           </div>
         ),
       },
@@ -122,6 +133,22 @@ export function GrantsRegister() {
         ),
       },
       {
+        id: "granted",
+        header: "Granted",
+        enableSorting: false,
+        meta: columnMeta(),
+        cell: ({ row }) => <DateOnlyCell value={row.original.grantedAt} />,
+      },
+      {
+        id: "added",
+        header: "Added",
+        enableSorting: false,
+        // Container-queried hiding lives on `className` (th + td together);
+        // headerClassName alone would desync the header from its cells.
+        meta: columnMeta({ className: "hidden @5xl/table:table-cell" }),
+        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
+      },
+      {
         id: "flag",
         header: "",
         enableSorting: false,
@@ -145,14 +172,23 @@ export function GrantsRegister() {
         </p>
       </div>
 
-      {isError && activeFilterCount === 0 ? null : (
+      {pristine || (isError && activeFilterCount === 0) ? null : (
         <ConsoleFilterBar
           activeCount={activeFilterCount}
           onClear={resetFilters}
           action={
-            <Button asChild variant="harvest" className="h-8 px-3.5 text-[13px]">
-              <Link href={`${LIST}/new`}>+ New grant</Link>
-            </Button>
+            <span className="flex items-center gap-2">
+              <Button
+                asChild
+                variant="outline"
+                className="h-8 border-[1.5px] border-soil/35 px-3 text-[13px] text-soil shadow-none hover:bg-soil/5"
+              >
+                <Link href={`${LIST}/aging`}>Aging</Link>
+              </Button>
+              <Button asChild variant="harvest" className="h-8 px-3.5 text-[13px]">
+                <Link href={`${LIST}/new`}>+ New grant</Link>
+              </Button>
+            </span>
           }
         >
           <ConsoleLabeledSelect
@@ -216,7 +252,8 @@ export function GrantsRegister() {
               onPageChange: setPage,
               onPageSizeChange: (size) => setFilter("size", String(size)),
             }}
-            rowClassName={() => "h-12"}
+            rowHref={(g) => `${LIST}/${g.id}`}
+            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
           />
         </AdminCard>
       )}

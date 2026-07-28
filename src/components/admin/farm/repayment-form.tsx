@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   AdminButton,
@@ -9,9 +10,10 @@ import {
   AdminField,
   AdminPageHeader,
   adminInputClass,
-  adminSelectClass,
 } from "@/components/admin/ui";
+import { SearchableSelect } from "@/components/admin/searchable-select";
 import { BackButton } from "@/components/ui/BackButton";
+import { FilePicker } from "@/components/ui/FilePicker";
 import { Input } from "@/components/ui/input";
 import { formatCedis } from "@/lib/format-money";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -25,6 +27,7 @@ import { useGetWarehousesQuery } from "@/redux/warehouses/warehouses-api";
 import { repaymentSchema, type RepaymentValues } from "@/validations/farm-schema";
 
 const LIST = "/admin/repayments";
+const RECEIPT_MISSING = "Upload the signed receipt or weigh slip";
 
 /** Record a produce repayment. `farmerId` may be pre-filled from a farmer. */
 export function RepaymentForm({ farmerId }: { farmerId?: string }) {
@@ -35,10 +38,18 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
   const commodities = useGetCommoditiesQuery({ isActive: true, limit: 100 });
   const warehouses = useGetWarehousesQuery({ isActive: true, limit: 100 });
 
+  // The signed receipt rides outside the Zod schema: it is a multipart file
+  // part, staged here until the form's own submit carries it.
+  const [receipt, setReceipt] = useState<File | null>(null);
+  const [receiptError, setReceiptError] = useState<string | null>(null);
+  const [documentName, setDocumentName] = useState("");
+
   const {
     register,
+    control,
     handleSubmit,
     watch,
+    setError,
     formState: { errors },
   } = useForm<RepaymentValues>({
     resolver: zodResolver(repaymentSchema),
@@ -48,6 +59,7 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
       intakeWarehouseId: "",
       notes: "",
       ratePerKgGhs: "",
+      receivedByName: "",
       seasonId: "",
       weightKg: "",
     },
@@ -58,24 +70,49 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
   const value = weight > 0 && rate > 0 ? weight * rate : null;
 
   const onSubmit = async (values: RepaymentValues) => {
+    if (!receipt) {
+      setReceiptError(RECEIPT_MISSING);
+      return;
+    }
     try {
       await createRepayment({
-        commodityId: values.commodityId,
-        farmerId: values.farmerId,
-        ratePerKgGhs: Number(values.ratePerKgGhs),
-        seasonId: values.seasonId,
-        weightKg: Number(values.weightKg),
-        ...(values.intakeWarehouseId
-          ? { intakeWarehouseId: values.intakeWarehouseId }
-          : {}),
-        ...(values.notes?.trim() ? { notes: values.notes.trim() } : {}),
+        body: {
+          commodityId: values.commodityId,
+          farmerId: values.farmerId,
+          ratePerKgGhs: Number(values.ratePerKgGhs),
+          seasonId: values.seasonId,
+          weightKg: Number(values.weightKg),
+          ...(values.intakeWarehouseId
+            ? { intakeWarehouseId: values.intakeWarehouseId }
+            : {}),
+          ...(values.notes?.trim() ? { notes: values.notes.trim() } : {}),
+          ...(values.receivedByName?.trim()
+            ? { receivedByName: values.receivedByName.trim() }
+            : {}),
+          ...(documentName.trim() ? { documentName: documentName.trim() } : {}),
+        },
+        receipt,
       }).unwrap();
       notify.success("Repayment recorded");
       router.push(LIST);
     } catch (err) {
-      notify.error("Couldn't record the repayment", {
-        description: extractApiError(err).message,
-      });
+      const { message, fieldErrors, hasFieldErrors } = extractApiError(err);
+      if (hasFieldErrors && fieldErrors) {
+        for (const field of [
+          "farmerId",
+          "seasonId",
+          "commodityId",
+          "weightKg",
+          "ratePerKgGhs",
+          "intakeWarehouseId",
+          "notes",
+          "receivedByName",
+        ] as const) {
+          if (fieldErrors[field])
+            setError(field, { message: fieldErrors[field] });
+        }
+      }
+      notify.error("Couldn't record the repayment", { description: message });
     }
   };
 
@@ -84,48 +121,71 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
       <BackButton href={LIST} label="All repayments" className="mb-2" />
       <AdminPageHeader title="Record produce repayment" />
 
-      <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <form
+        noValidate
+        // Surface the missing file alongside RHF's own errors: on an invalid
+        // submit RHF never calls onSubmit, so the file check runs here too.
+        onSubmit={handleSubmit(onSubmit, () => {
+          if (!receipt) setReceiptError(RECEIPT_MISSING);
+        })}
+        className="flex flex-col gap-4"
+      >
         <AdminCard className="flex flex-col gap-3 px-5 py-4">
           <AdminField label="Farmer" error={errors.farmerId?.message}>
-            <select
-              className={cn(adminSelectClass, "w-full", errors.farmerId && "border-error")}
-              {...register("farmerId")}
-            >
-              <option value="">Choose the farmer</option>
-              {(farmers.data?.data ?? []).map((f) => (
-                <option key={f.id} value={f.id}>
-                  {f.name}
-                  {f.community ? ` · ${f.community}` : ""}
-                </option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="farmerId"
+              render={({ field }) => (
+                <SearchableSelect
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={(farmers.data?.data ?? []).map((f) => ({
+                    value: f.id,
+                    label: f.name,
+                    ...(f.community ? { hint: f.community } : {}),
+                  }))}
+                  placeholder="Choose the farmer"
+                  className={cn(errors.farmerId && "border-error")}
+                />
+              )}
+            />
           </AdminField>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <AdminField label="Season" error={errors.seasonId?.message}>
-              <select
-                className={cn(adminSelectClass, "w-full", errors.seasonId && "border-error")}
-                {...register("seasonId")}
-              >
-                <option value="">Choose the season</option>
-                {(seasons.data?.data ?? []).map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
+              <Controller
+                control={control}
+                name="seasonId"
+                render={({ field }) => (
+                  <SearchableSelect
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={(seasons.data?.data ?? []).map((s) => ({
+                      value: s.id,
+                      label: s.name,
+                    }))}
+                    placeholder="Choose the season"
+                    className={cn(errors.seasonId && "border-error")}
+                  />
+                )}
+              />
             </AdminField>
             <AdminField label="Commodity" error={errors.commodityId?.message}>
-              <select
-                className={cn(adminSelectClass, "w-full", errors.commodityId && "border-error")}
-                {...register("commodityId")}
-              >
-                <option value="">Choose the commodity</option>
-                {(commodities.data?.data ?? []).map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+              <Controller
+                control={control}
+                name="commodityId"
+                render={({ field }) => (
+                  <SearchableSelect
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={(commodities.data?.data ?? []).map((c) => ({
+                      value: c.id,
+                      label: c.name,
+                    }))}
+                    placeholder="Choose the commodity"
+                    className={cn(errors.commodityId && "border-error")}
+                  />
+                )}
+              />
             </AdminField>
             <AdminField label="Weight (kg)" error={errors.weightKg?.message}>
               <Input
@@ -149,22 +209,88 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
             hint="Choosing a warehouse mints a costed stock lot from this produce."
             error={errors.intakeWarehouseId?.message}
           >
-            <select
-              className={cn(adminSelectClass, "w-full")}
-              {...register("intakeWarehouseId")}
-            >
-              <option value="">Do not take into stock</option>
-              {(warehouses.data?.data ?? []).map((w) => (
-                <option key={w.id} value={w.id}>
-                  {w.name}
-                </option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="intakeWarehouseId"
+              render={({ field }) => (
+                <SearchableSelect
+                  value={field.value ?? ""}
+                  onChange={field.onChange}
+                  options={[
+                    { value: "", label: "Do not take into stock" },
+                    ...(warehouses.data?.data ?? []).map((w) => ({
+                      value: w.id,
+                      label: w.name,
+                    })),
+                  ]}
+                  placeholder="Do not take into stock"
+                />
+              )}
+            />
           </AdminField>
 
           <AdminField label="Notes" optional error={errors.notes?.message}>
             <Input className={adminInputClass} {...register("notes")} />
           </AdminField>
+        </AdminCard>
+
+        <AdminCard className="flex flex-col gap-3 px-5 py-4">
+          <div>
+            <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              Signed receipt
+            </div>
+            <p className="mt-1 text-[12px] text-soil">
+              The signed receipt or weigh slip is what settles &quot;I already
+              paid&quot; disputes - it stays on this record as the evidence.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <AdminField
+              label="Received by"
+              optional
+              hint="Who physically took delivery of the produce."
+              error={errors.receivedByName?.message}
+            >
+              <Input
+                className={cn(adminInputClass, errors.receivedByName && "border-error")}
+                {...register("receivedByName")}
+              />
+            </AdminField>
+            <AdminField label="Document name" optional>
+              <Input
+                placeholder="Repayment receipt"
+                className={adminInputClass}
+                value={documentName}
+                onChange={(e) => setDocumentName(e.target.value)}
+              />
+            </AdminField>
+          </div>
+          {/* Not an AdminField: wrapping the picker's buttons in a <label>
+              would misroute label clicks. Same stencil-label + error markup. */}
+          <div>
+            <span className="stencil mb-[7px] block text-[11px] uppercase tracking-[0.14em] text-harvest-deep">
+              Receipt file
+            </span>
+            <FilePicker
+              accept="image/*,application/pdf,.doc,.docx"
+              hint="PDF or a photo of the signed receipt / weigh slip"
+              onConfirm={(file) => {
+                setReceipt(file);
+                if (file) setReceiptError(null);
+              }}
+              optimize={false}
+              stage
+              triggerLabel="Choose receipt"
+            />
+            {receiptError ? (
+              <span
+                role="alert"
+                className="mt-1 block text-[12px] font-medium text-error"
+              >
+                {receiptError}
+              </span>
+            ) : null}
+          </div>
         </AdminCard>
 
         <div className="flex items-center justify-between rounded-[6px] border border-soil/20 bg-surface-alt/50 px-4 py-3 text-[13px]">

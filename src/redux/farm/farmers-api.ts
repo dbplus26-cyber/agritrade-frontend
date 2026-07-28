@@ -6,6 +6,7 @@ import type {
   IFarmerListQuery,
   IFarmerListResponse,
   IFarmerResponse,
+  IGuarantorInput,
   IUpdateFarmerInput,
 } from "@/types/farm.types";
 
@@ -114,6 +115,41 @@ export const farmersApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (_r, _e, { id }) => [{ type: "Farmers", id }],
     }),
+
+    addFarmerGuarantor: builder.mutation<
+      IFarmerResponse,
+      { id: string; body: IGuarantorInput }
+    >({
+      query: ({ id, body }) => ({
+        url: `admin/farm/farmers/${id}/guarantors`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: (_r, _e, { id }) => [{ type: "Farmers", id }],
+    }),
+
+    updateFarmerGuarantor: builder.mutation<
+      IFarmerResponse,
+      { id: string; guarantorId: string; body: Partial<IGuarantorInput> }
+    >({
+      query: ({ id, guarantorId, body }) => ({
+        url: `admin/farm/farmers/${id}/guarantors/${guarantorId}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: (_r, _e, { id }) => [{ type: "Farmers", id }],
+    }),
+
+    removeFarmerGuarantor: builder.mutation<
+      IFarmerResponse,
+      { id: string; guarantorId: string }
+    >({
+      query: ({ id, guarantorId }) => ({
+        url: `admin/farm/farmers/${id}/guarantors/${guarantorId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (_r, _e, { id }) => [{ type: "Farmers", id }],
+    }),
   }),
 });
 
@@ -125,4 +161,7 @@ export const {
   useSetFarmerActiveMutation,
   useAddFarmerDocumentMutation,
   useRemoveFarmerDocumentMutation,
+  useAddFarmerGuarantorMutation,
+  useUpdateFarmerGuarantorMutation,
+  useRemoveFarmerGuarantorMutation,
 } = farmersApi;

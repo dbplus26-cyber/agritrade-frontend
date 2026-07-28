@@ -6,6 +6,9 @@ import {
   AdminButton,
   AdminCard,
   AdminPageHeader,
+  DetailGrid,
+  DetailItem,
+  DetailShell,
   Mono,
 } from "@/components/admin/ui";
 import { Money } from "@/components/admin/trading/sale-bits";
@@ -15,6 +18,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
+import { formatKg } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
 import { useGetSeasonSummaryQuery } from "@/redux/farm/farm-books-api";
 import {
@@ -95,7 +99,7 @@ export function SeasonDetail({ id }: { id: string }) {
   };
 
   return (
-    <div className="max-w-[860px]">
+    <div className="max-w-[1120px]">
       <BackButton href={LIST} label="All seasons" className="mb-2" />
       <AdminPageHeader
         title={s.name}
@@ -105,32 +109,7 @@ export function SeasonDetail({ id }: { id: string }) {
         actions={<ActiveBadge active={s.isActive} />}
       />
 
-      <div className="mb-4 flex flex-wrap gap-2">
-        <AdminButton variant="outline" className="h-9 px-4" asChild>
-          <Link href={`${LIST}/${s.id}/edit`}>Edit</Link>
-        </AdminButton>
-        <AdminButton
-          variant="outline"
-          className="h-9 px-4"
-          onClick={() =>
-            void run(
-              () => setActive({ active: !s.isActive, id: s.id }).unwrap(),
-              s.isActive ? "Season deactivated" : "Season activated",
-            )
-          }
-        >
-          {s.isActive ? "Deactivate" : "Activate"}
-        </AdminButton>
-        <AdminButton
-          variant="outline"
-          className="h-9 px-4 text-console-red"
-          disabled={deleteState.isLoading}
-          onClick={() => void onDelete()}
-        >
-          Delete
-        </AdminButton>
-      </div>
-
+      {/* KPI strip - full width above the shell */}
       <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatTile label="Farmers">{stats?.farmerCount ?? "-"}</StatTile>
         <StatTile label="Invested">
@@ -148,65 +127,170 @@ export function SeasonDetail({ id }: { id: string }) {
         </StatTile>
       </div>
 
-      <AdminCard className="overflow-hidden">
-        <div className="border-b border-soil/15 px-5 py-3 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
-          Farmer balances
-        </div>
-        {summary.isLoading ? (
-          <div className="p-5">
-            <DataTableSkeleton />
-          </div>
-        ) : !stats || stats.farmerBalances.length === 0 ? (
-          <EmptyState
-            variant="plain"
-            title="No activity yet"
-            description="Grants and repayments booked to this season appear here."
-          />
-        ) : (
-          <table className="w-full border-collapse text-[13px]">
-            <thead>
-              <tr className="border-b border-soil/15 text-left text-[11px] uppercase tracking-[0.06em] text-soil">
-                <th className="px-5 py-2 font-semibold">Farmer</th>
-                <th className="px-5 py-2 text-right font-semibold">Invested</th>
-                <th className="px-5 py-2 text-right font-semibold">Recovered</th>
-                <th className="px-5 py-2 text-right font-semibold">Outstanding</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stats.farmerBalances.map((b) => (
-                <tr
-                  key={b.farmerId}
-                  className="border-b border-soil/10 last:border-b-0 hover:bg-surface-alt/60"
+      <DetailShell
+        aside={
+          <AdminCard className="px-5 py-3">
+            <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              Season
+            </p>
+            <DetailGrid columns={2}>
+              <DetailItem label="Starts">{formatFarmDate(s.startsOn)}</DetailItem>
+              <DetailItem label="Ends">
+                {s.endsOn ? (
+                  formatFarmDate(s.endsOn)
+                ) : (
+                  <span className="text-soil">Open</span>
+                )}
+              </DetailItem>
+              <DetailItem label="Status">
+                {s.isActive ? "Active" : "Inactive"}
+              </DetailItem>
+            </DetailGrid>
+            <div className="mt-3 border-t border-soil/12 pt-3.5">
+              <div className="flex flex-wrap gap-2 xl:flex-col">
+                <AdminButton variant="outline" className="h-9 px-4" asChild>
+                  <Link href={`${LIST}/${s.id}/edit`}>Edit</Link>
+                </AdminButton>
+                <AdminButton
+                  variant="outline"
+                  className="h-9 px-4"
+                  onClick={() =>
+                    void run(
+                      () => setActive({ active: !s.isActive, id: s.id }).unwrap(),
+                      s.isActive ? "Season deactivated" : "Season activated",
+                    )
+                  }
                 >
-                  <td className="px-5 py-2.5">
-                    <Link
-                      href={`/admin/farmers/${b.farmerId}/statement?seasonId=${s.id}`}
-                      className="font-semibold text-console hover:underline"
+                  {s.isActive ? "Deactivate" : "Activate"}
+                </AdminButton>
+                <AdminButton
+                  variant="outline"
+                  className="h-9 px-4 text-console-red"
+                  disabled={deleteState.isLoading}
+                  onClick={() => void onDelete()}
+                >
+                  Delete
+                </AdminButton>
+              </div>
+            </div>
+          </AdminCard>
+        }
+        main={
+          <>
+          {stats ? (
+            <AdminCard className="mb-4 px-5 py-3">
+              <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                Expected vs actual
+              </p>
+              <p className="mb-2 text-[12px] text-soil">
+                The season plans against what actually came back - the read
+                that makes next season&apos;s grant decisions better informed.
+              </p>
+              <div className="grid grid-cols-2 gap-x-8 gap-y-1 sm:grid-cols-4">
+                <div className="border-b border-soil/10 py-2">
+                  <p className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                    Expected yield
+                  </p>
+                  <Mono className="text-[14px]">
+                    {formatKg(stats.expectations.expectedYieldKg)}
+                  </Mono>
+                </div>
+                <div className="border-b border-soil/10 py-2">
+                  <p className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                    Actual yield
+                  </p>
+                  <Mono
+                    className={
+                      stats.expectations.actualYieldKg >=
+                      stats.expectations.expectedYieldKg
+                        ? "text-[14px] text-leaf"
+                        : "text-[14px]"
+                    }
+                  >
+                    {formatKg(stats.expectations.actualYieldKg)}
+                  </Mono>
+                </div>
+                <div className="border-b border-soil/10 py-2">
+                  <p className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                    Expected return
+                  </p>
+                  <Mono className="text-[14px]">
+                    <Money value={stats.expectations.expectedReturnGhs} />
+                  </Mono>
+                </div>
+                <div className="border-b border-soil/10 py-2">
+                  <p className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                    Actual return
+                  </p>
+                  <Mono className="text-[14px]">
+                    <Money value={stats.expectations.actualReturnGhs} />
+                  </Mono>
+                </div>
+              </div>
+            </AdminCard>
+          ) : null}
+          <AdminCard className="overflow-hidden">
+            <div className="border-b border-soil/15 px-5 py-3 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              Farmer balances
+            </div>
+            {summary.isLoading ? (
+              <div className="p-5">
+                <DataTableSkeleton />
+              </div>
+            ) : !stats || stats.farmerBalances.length === 0 ? (
+              <EmptyState
+                variant="plain"
+                title="No activity yet"
+                description="Grants and repayments booked to this season appear here."
+              />
+            ) : (
+              <table className="w-full border-collapse text-[13px]">
+                <thead>
+                  <tr className="border-b border-soil/15 text-left text-[11px] uppercase tracking-[0.06em] text-soil">
+                    <th className="px-5 py-2 font-semibold">Farmer</th>
+                    <th className="px-5 py-2 text-right font-semibold">Invested</th>
+                    <th className="px-5 py-2 text-right font-semibold">Recovered</th>
+                    <th className="px-5 py-2 text-right font-semibold">Outstanding</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stats.farmerBalances.map((b) => (
+                    <tr
+                      key={b.farmerId}
+                      className="border-b border-soil/10 last:border-b-0 hover:bg-surface-alt/60"
                     >
-                      {b.farmerName}
-                    </Link>
-                  </td>
-                  <td className="px-5 py-2.5 text-right">
-                    <Mono>
-                      <Money value={b.investedGhs} />
-                    </Mono>
-                  </td>
-                  <td className="px-5 py-2.5 text-right text-leaf">
-                    <Mono>
-                      <Money value={b.recoveredGhs} />
-                    </Mono>
-                  </td>
-                  <td className="px-5 py-2.5 text-right font-semibold text-console-red">
-                    <Mono>
-                      <Money value={b.outstandingGhs} />
-                    </Mono>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </AdminCard>
+                      <td className="px-5 py-2.5">
+                        <Link
+                          href={`/admin/farmers/${b.farmerId}/statement?seasonId=${s.id}`}
+                          className="font-semibold text-console hover:underline"
+                        >
+                          {b.farmerName}
+                        </Link>
+                      </td>
+                      <td className="px-5 py-2.5 text-right">
+                        <Mono>
+                          <Money value={b.investedGhs} />
+                        </Mono>
+                      </td>
+                      <td className="px-5 py-2.5 text-right text-leaf">
+                        <Mono>
+                          <Money value={b.recoveredGhs} />
+                        </Mono>
+                      </td>
+                      <td className="px-5 py-2.5 text-right font-semibold text-console-red">
+                        <Mono>
+                          <Money value={b.outstandingGhs} />
+                        </Mono>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </AdminCard>
+          </>
+        }
+      />
 
       {confirmationDialog}
     </div>

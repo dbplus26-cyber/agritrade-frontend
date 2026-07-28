@@ -1,37 +1,52 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   AdminButton,
   AdminCard,
   AdminPageHeader,
+  DetailGrid,
+  DetailItem,
+  DetailShell,
   Mono,
 } from "@/components/admin/ui";
+import { Absent } from "@/components/admin/registry/registry-bits";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { BackButton } from "@/components/ui/BackButton";
 import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { FilePicker } from "@/components/ui/FilePicker";
+import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
+import { formatDateOnly } from "@/lib/format-date";
 import { notify } from "@/lib/notify";
 import {
   farmerDocumentUrl,
   useAddFarmerDocumentMutation,
   useGetFarmerQuery,
   useRemoveFarmerDocumentMutation,
+  useRemoveFarmerGuarantorMutation,
   useSetFarmerActiveMutation,
 } from "@/redux/farm/farmers-api";
 import { useGetGrantsQuery } from "@/redux/farm/grants-api";
 import { useGetRepaymentsQuery } from "@/redux/farm/repayments-api";
 import { avatarOf } from "@/static-data/admin/registers";
+import type { IFarmerGuarantor } from "@/types/farm.types";
 import {
   ActiveBadge,
   GrantApprovalBadge,
   formatFarmDate,
 } from "./farm-bits";
+import { GuarantorDialog } from "./guarantor-dialog";
 
 const LIST = "/admin/farmers";
+
+/** "idType · idNumber"-style pair, or the shared absent placeholder. */
+function pairOrAbsent(...parts: (string | null)[]) {
+  const joined = parts.filter(Boolean).join(" · ");
+  return joined ? joined : <Absent />;
+}
 
 export function FarmerDetail({ id }: { id: string }) {
   const { data, isLoading, isError, error, refetch } = useGetFarmerQuery(id);
@@ -40,7 +55,12 @@ export function FarmerDetail({ id }: { id: string }) {
   const [setActive] = useSetFarmerActiveMutation();
   const [addDoc, addDocState] = useAddFarmerDocumentMutation();
   const [removeDoc] = useRemoveFarmerDocumentMutation();
+  const [removeGuarantor] = useRemoveFarmerGuarantorMutation();
   const [docName, setDocName] = useState("");
+  const [guarantorDialog, setGuarantorDialog] = useState<
+    IFarmerGuarantor | "new" | null
+  >(null);
+  const { confirm, confirmationDialog } = useConfirm();
 
   if (isLoading) return <DataTableSkeleton />;
   if (isError || !data)
@@ -79,21 +99,49 @@ export function FarmerDetail({ id }: { id: string }) {
     setDocName("");
   };
 
-  return (
-    <div className="max-w-[860px]">
-      <BackButton href={LIST} label="All farmers" className="mb-2" />
-      <AdminPageHeader
-        title={f.name}
-        sub={[f.community, f.phone].filter(Boolean).join(" · ") || undefined}
-        actions={<ActiveBadge active={f.isActive} />}
-      />
+  const onRemoveGuarantor = async (g: IFarmerGuarantor) => {
+    const ok = await confirm({
+      title: "Remove this guarantor?",
+      description: `${g.name} will no longer vouch for ${f.name}.`,
+      confirmText: "Remove",
+      isDestructive: true,
+    });
+    if (!ok) return;
+    await run(
+      () => removeGuarantor({ guarantorId: g.id, id: f.id }).unwrap(),
+      "Guarantor removed",
+    );
+  };
 
-      <div className="mb-4 flex flex-wrap gap-2">
-        <AdminButton variant="outline" className="h-9 px-4" asChild>
-          <Link href={`${LIST}/${f.id}/edit`}>Edit</Link>
-        </AdminButton>
+  const aside = (
+    <AdminCard className="px-5 py-5">
+      <div className="flex flex-col items-center text-center">
+        {f.photoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element -- Cloudinary
+          <img
+            src={f.photoUrl}
+            alt={f.name}
+            className="h-24 w-24 rounded-full object-cover"
+          />
+        ) : (
+          <span
+            className="flex h-24 w-24 items-center justify-center rounded-full text-[28px] font-bold"
+            style={{ background: a.bg, color: a.fg }}
+          >
+            {a.init}
+          </span>
+        )}
+        <div className="mt-3 text-[15px] font-semibold text-ink">{f.name}</div>
+        {f.phone ? (
+          <div className="text-[12.5px] text-soil">{f.phone}</div>
+        ) : null}
+      </div>
+      <div className="mt-4 flex flex-wrap justify-center gap-2 border-t border-soil/15 pt-4 xl:flex-col">
         <AdminButton className="h-9 px-4" asChild>
           <Link href={`${LIST}/${f.id}/statement`}>Statement</Link>
+        </AdminButton>
+        <AdminButton variant="outline" className="h-9 px-4" asChild>
+          <Link href={`${LIST}/${f.id}/edit`}>Edit</Link>
         </AdminButton>
         <AdminButton
           variant="outline"
@@ -108,175 +156,291 @@ export function FarmerDetail({ id }: { id: string }) {
           {f.isActive ? "Deactivate" : "Activate"}
         </AdminButton>
       </div>
+    </AdminCard>
+  );
 
-      <div className="mb-4 grid gap-4 md:grid-cols-[220px_1fr]">
-        <AdminCard className="flex flex-col items-center px-5 py-5 text-center">
-          {f.photoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element -- Cloudinary
-            <img
-              src={f.photoUrl}
-              alt={f.name}
-              className="h-24 w-24 rounded-full object-cover"
-            />
-          ) : (
-            <span
-              className="flex h-24 w-24 items-center justify-center rounded-full text-[28px] font-bold"
-              style={{ background: a.bg, color: a.fg }}
-            >
-              {a.init}
-            </span>
-          )}
-          <div className="mt-3 text-[15px] font-semibold text-ink">{f.name}</div>
-          {f.phone ? (
-            <div className="text-[12.5px] text-soil">{f.phone}</div>
-          ) : null}
-        </AdminCard>
+  return (
+    <div className="max-w-[1120px]">
+      <BackButton href={LIST} label="All farmers" className="mb-2" />
+      <AdminPageHeader
+        title={f.name}
+        sub={[f.community, f.phone].filter(Boolean).join(" · ") || undefined}
+        actions={<ActiveBadge active={f.isActive} />}
+      />
 
-        <AdminCard className="px-5 py-4 text-[13.5px] text-ink">
-          <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
-            Notes
-          </div>
-          {f.notes ? f.notes : <span className="text-soil">No notes.</span>}
-        </AdminCard>
-      </div>
+      <DetailShell
+        aside={aside}
+        main={
+          <div className="flex flex-col gap-4">
+            {/* Profile */}
+            <AdminCard className="px-5 py-4">
+              <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                Profile
+              </div>
+              <DetailGrid>
+                <DetailItem label="Phone">
+                  {f.phone ? <Mono>{f.phone}</Mono> : <Absent />}
+                </DetailItem>
+                <DetailItem label="Community">
+                  {f.community ? f.community : <Absent />}
+                </DetailItem>
+                <DetailItem label="Address">
+                  {f.address ? f.address : <Absent />}
+                </DetailItem>
+                <DetailItem label="Date of birth">
+                  {f.dateOfBirth ? formatDateOnly(f.dateOfBirth) : <Absent />}
+                </DetailItem>
+                <DetailItem label="ID">
+                  {pairOrAbsent(f.idType, f.idNumber)}
+                </DetailItem>
+                <DetailItem label="Farm location">
+                  {f.farmLocation ? f.farmLocation : <Absent />}
+                </DetailItem>
+                <DetailItem label="Farm size">
+                  {f.farmSizeAcres != null ? `${f.farmSizeAcres} acres` : <Absent />}
+                </DetailItem>
+                <DetailItem label="Next of kin">
+                  {pairOrAbsent(f.nextOfKinName, f.nextOfKinPhone)}
+                </DetailItem>
+                <DetailItem label="MoMo number">
+                  {f.momoNumber ? <Mono>{f.momoNumber}</Mono> : <Absent />}
+                </DetailItem>
+                <DetailItem label="Notes" className="sm:col-span-2 xl:col-span-3">
+                  {f.notes ? f.notes : <span className="text-soil">No notes.</span>}
+                </DetailItem>
+              </DetailGrid>
+            </AdminCard>
 
-      {/* Private documents */}
-      <AdminCard className="mb-4 px-5 py-4">
-        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
-          Agreement documents (private)
-        </div>
-        <p className="mb-2 text-[12px] text-soil">
-          Never shown publicly. Downloads are logged.
-        </p>
-        {f.documents.map((doc) => (
-          <div
-            key={doc.id}
-            className="flex items-center justify-between border-b border-soil/10 py-2 text-[13px] last:border-b-0"
-          >
-            <a
-              href={farmerDocumentUrl(f.id, doc.id)}
-              target="_blank"
-              rel="noreferrer"
-              className="text-console hover:underline"
-            >
-              {doc.name}
-            </a>
-            <div className="flex items-center gap-3">
-              <Mono className="text-[12px] text-soil">
-                {formatFarmDate(doc.createdAt)}
-              </Mono>
-              <button
-                type="button"
-                onClick={() =>
-                  void run(
-                    () => removeDoc({ documentId: doc.id, id: f.id }).unwrap(),
-                    "Document removed",
-                  )
-                }
-                className="text-[12px] text-console-red"
-              >
-                ✕
-              </button>
+            {/* Guarantors */}
+            <AdminCard className="overflow-hidden">
+              <div className="border-b border-soil/15 px-5 py-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                    Guarantors
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setGuarantorDialog("new")}
+                    className="text-[12.5px] whitespace-nowrap text-console hover:underline"
+                  >
+                    + Add guarantor
+                  </button>
+                </div>
+                <p className="mt-0.5 text-[12px] text-soil">
+                  Who vouches for this farmer before grants are released.
+                </p>
+              </div>
+              {f.guarantors.length === 0 ? (
+                <p className="px-5 py-4 text-[13px] text-soil">No guarantors yet.</p>
+              ) : (
+                <ul className="divide-y divide-soil/10">
+                  {f.guarantors.map((g) => (
+                    <li key={g.id} className="px-5 py-3 text-[13px]">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="font-semibold text-ink [overflow-wrap:anywhere]">
+                            {g.name}
+                          </div>
+                          {g.relationship || g.occupation ? (
+                            <div className="text-[12px] text-soil [overflow-wrap:anywhere]">
+                              {[g.relationship, g.occupation]
+                                .filter(Boolean)
+                                .join(" · ")}
+                            </div>
+                          ) : null}
+                          {g.phone ? (
+                            <Mono className="block text-[12px] text-ink">
+                              {g.phone}
+                            </Mono>
+                          ) : null}
+                          {g.address ? (
+                            <div className="text-[12px] text-soil [overflow-wrap:anywhere]">
+                              {g.address}
+                            </div>
+                          ) : null}
+                          {g.idType || g.idNumber ? (
+                            <div className="text-[12px] text-soil [overflow-wrap:anywhere]">
+                              {[g.idType, g.idNumber].filter(Boolean).join(" · ")}
+                            </div>
+                          ) : null}
+                          {g.notes ? (
+                            <div className="text-[12px] text-soil italic [overflow-wrap:anywhere]">
+                              {g.notes}
+                            </div>
+                          ) : null}
+                        </div>
+                        <div className="flex flex-none items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => setGuarantorDialog(g)}
+                            className="text-[12px] text-console hover:underline"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => void onRemoveGuarantor(g)}
+                            className="text-[12px] text-console-red hover:underline"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </AdminCard>
+
+            {/* Private documents */}
+            <AdminCard className="px-5 py-4">
+              <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                Agreement documents (private)
+              </div>
+              <p className="mb-2 text-[12px] text-soil">
+                Never shown publicly. Downloads are logged.
+              </p>
+              {f.documents.map((doc) => (
+                <div
+                  key={doc.id}
+                  className="flex items-center justify-between border-b border-soil/10 py-2 text-[13px] last:border-b-0"
+                >
+                  <a
+                    href={farmerDocumentUrl(f.id, doc.id)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-console hover:underline"
+                  >
+                    {doc.name}
+                  </a>
+                  <div className="flex items-center gap-3">
+                    <Mono className="text-[12px] text-soil">
+                      {formatFarmDate(doc.createdAt)}
+                    </Mono>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        void run(
+                          () => removeDoc({ documentId: doc.id, id: f.id }).unwrap(),
+                          "Document removed",
+                        )
+                      }
+                      className="text-[12px] text-console-red"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              ))}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <input
+                  value={docName}
+                  onChange={(e) => setDocName(e.target.value)}
+                  placeholder="Document name (e.g. Grant agreement)"
+                  className="h-8 flex-1 rounded border border-soil/25 bg-paper px-2.5 text-[13px]"
+                />
+                <FilePicker
+                  accept="image/*,application/pdf,.doc,.docx"
+                  busy={addDocState.isLoading}
+                  confirmLabel="Upload"
+                  hint="PDF, Word or a photo of the agreement"
+                  onConfirm={onDocConfirm}
+                  optimize={false}
+                  triggerLabel="Choose document"
+                />
+              </div>
+            </AdminCard>
+
+            {/* Grants + repayments */}
+            <div className="grid gap-4 lg:grid-cols-2">
+              <AdminCard className="overflow-hidden">
+                <div className="flex items-center justify-between border-b border-soil/15 px-5 py-3">
+                  <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                    Grants
+                  </span>
+                  <Link
+                    href={`/admin/grants/new?farmerId=${f.id}`}
+                    className="text-[12.5px] text-console hover:underline"
+                  >
+                    + New
+                  </Link>
+                </div>
+                {(grants.data?.data ?? []).length === 0 ? (
+                  <p className="px-5 py-4 text-[13px] text-soil">No grants yet.</p>
+                ) : (
+                  <ul className="divide-y divide-soil/10">
+                    {(grants.data?.data ?? []).map((g) => (
+                      <li key={g.id} className="px-5 py-2.5 text-[13px]">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-semibold text-ink">{g.item.name}</span>
+                          <Mono className="text-ink">
+                            <Money value={g.valueGhs} />
+                          </Mono>
+                        </div>
+                        <div className="mt-0.5 flex items-center justify-between text-[12px] text-soil">
+                          <span>
+                            {g.season.name} · {formatFarmDate(g.grantedAt)}
+                          </span>
+                          <GrantApprovalBadge status={g.approval?.status} />
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </AdminCard>
+
+              <AdminCard className="overflow-hidden">
+                <div className="flex items-center justify-between border-b border-soil/15 px-5 py-3">
+                  <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                    Repayments
+                  </span>
+                  <Link
+                    href={`/admin/repayments/new?farmerId=${f.id}`}
+                    className="text-[12.5px] text-console hover:underline"
+                  >
+                    + New
+                  </Link>
+                </div>
+                {(repayments.data?.data ?? []).length === 0 ? (
+                  <p className="px-5 py-4 text-[13px] text-soil">No repayments yet.</p>
+                ) : (
+                  <ul className="divide-y divide-soil/10">
+                    {(repayments.data?.data ?? []).map((r) => (
+                      <li key={r.id} className="px-5 py-2.5 text-[13px]">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-semibold text-ink">
+                            {r.commodity.name}
+                          </span>
+                          <Mono className="text-leaf">
+                            <Money value={r.valueGhs} />
+                          </Mono>
+                        </div>
+                        <div className="mt-0.5 flex items-center justify-between text-[12px] text-soil">
+                          <span>
+                            {r.weightKg} kg · {formatFarmDate(r.receivedAt)}
+                          </span>
+                          {r.intoStock ? (
+                            <span className="text-console">Into stock</span>
+                          ) : null}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </AdminCard>
             </div>
           </div>
-        ))}
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <input
-            value={docName}
-            onChange={(e) => setDocName(e.target.value)}
-            placeholder="Document name (e.g. Grant agreement)"
-            className="h-8 flex-1 rounded border border-soil/25 bg-paper px-2.5 text-[13px]"
-          />
-          <FilePicker
-            accept="image/*,application/pdf,.doc,.docx"
-            busy={addDocState.isLoading}
-            confirmLabel="Upload"
-            hint="PDF, Word or a photo of the agreement"
-            onConfirm={onDocConfirm}
-            optimize={false}
-            triggerLabel="Choose document"
-          />
-        </div>
-      </AdminCard>
+        }
+      />
 
-      {/* Grants + repayments */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        <AdminCard className="overflow-hidden">
-          <div className="flex items-center justify-between border-b border-soil/15 px-5 py-3">
-            <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
-              Grants
-            </span>
-            <Link
-              href={`/admin/grants/new?farmerId=${f.id}`}
-              className="text-[12.5px] text-console hover:underline"
-            >
-              + New
-            </Link>
-          </div>
-          {(grants.data?.data ?? []).length === 0 ? (
-            <p className="px-5 py-4 text-[13px] text-soil">No grants yet.</p>
-          ) : (
-            <ul className="divide-y divide-soil/10">
-              {(grants.data?.data ?? []).map((g) => (
-                <li key={g.id} className="px-5 py-2.5 text-[13px]">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-semibold text-ink">{g.item.name}</span>
-                    <Mono className="text-ink">
-                      <Money value={g.valueGhs} />
-                    </Mono>
-                  </div>
-                  <div className="mt-0.5 flex items-center justify-between text-[12px] text-soil">
-                    <span>
-                      {g.season.name} · {formatFarmDate(g.grantedAt)}
-                    </span>
-                    <GrantApprovalBadge status={g.approval?.status} />
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </AdminCard>
-
-        <AdminCard className="overflow-hidden">
-          <div className="flex items-center justify-between border-b border-soil/15 px-5 py-3">
-            <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
-              Repayments
-            </span>
-            <Link
-              href={`/admin/repayments/new?farmerId=${f.id}`}
-              className="text-[12.5px] text-console hover:underline"
-            >
-              + New
-            </Link>
-          </div>
-          {(repayments.data?.data ?? []).length === 0 ? (
-            <p className="px-5 py-4 text-[13px] text-soil">No repayments yet.</p>
-          ) : (
-            <ul className="divide-y divide-soil/10">
-              {(repayments.data?.data ?? []).map((r) => (
-                <li key={r.id} className="px-5 py-2.5 text-[13px]">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-semibold text-ink">
-                      {r.commodity.name}
-                    </span>
-                    <Mono className="text-leaf">
-                      <Money value={r.valueGhs} />
-                    </Mono>
-                  </div>
-                  <div className="mt-0.5 flex items-center justify-between text-[12px] text-soil">
-                    <span>
-                      {r.weightKg} kg · {formatFarmDate(r.receivedAt)}
-                    </span>
-                    {r.intoStock ? (
-                      <span className="text-console">Into stock</span>
-                    ) : null}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </AdminCard>
-      </div>
+      {confirmationDialog}
+      {guarantorDialog !== null ? (
+        <GuarantorDialog
+          farmerId={f.id}
+          guarantor={guarantorDialog === "new" ? undefined : guarantorDialog}
+          onClose={() => setGuarantorDialog(null)}
+        />
+      ) : null}
     </div>
   );
 }

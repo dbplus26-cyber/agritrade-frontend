@@ -17,9 +17,10 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
+import { DateOnlyCell, DateTimeCell } from "@/components/admin/date-cell";
 import { useGetSeasonsQuery } from "@/redux/farm/seasons-api";
 import type { ISeason, ISeasonListQuery } from "@/types/farm.types";
-import { ACTIVE_FILTER_OPTIONS, ActiveBadge, formatFarmDate } from "./farm-bits";
+import { ACTIVE_FILTER_OPTIONS, ActiveBadge } from "./farm-bits";
 
 const LIST = "/admin/seasons";
 const FILTER_DEFAULTS = { active: "all", size: "10" };
@@ -80,22 +81,22 @@ export function SeasonsRegister() {
         header: "Starts",
         enableSorting: false,
         meta: columnMeta(),
-        cell: ({ row }) => (
-          <span className="text-[12.5px] text-soil">
-            {formatFarmDate(row.original.startsOn)}
-          </span>
-        ),
+        cell: ({ row }) => <DateOnlyCell value={row.original.startsOn} />,
       },
       {
         id: "ends",
         header: "Ends",
         enableSorting: false,
         meta: columnMeta({ wide: true }),
-        cell: ({ row }) => (
-          <span className="text-[12.5px] text-soil">
-            {row.original.endsOn ? formatFarmDate(row.original.endsOn) : "-"}
-          </span>
-        ),
+        cell: ({ row }) => <DateOnlyCell value={row.original.endsOn} />,
+      },
+      {
+        id: "added",
+        accessorFn: (s) => s.createdAt,
+        header: "Added",
+        enableSorting: false,
+        meta: columnMeta({ wide: true }),
+        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",
