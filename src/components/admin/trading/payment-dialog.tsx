@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
@@ -69,6 +70,7 @@ export function PaymentDialog({
 
   // Drives whether the reference is required: a transfer must carry one.
   const method = watch("method");
+  const { confirm, confirmationDialog } = useConfirm();
 
   // Quick-fill figures; null (redacted) money hides the button entirely.
   const depositRemainderGhs =
@@ -86,6 +88,21 @@ export function PaymentDialog({
     });
 
   const onSubmit = async (values: RecordPaymentValues) => {
+    // Recording a payment is a ledger write that only an owner reversal can
+    // undo, so the amount and the sale are read back before it commits - a
+    // misplaced decimal here is the expensive mistake this screen can make.
+    const confirmed = await confirm({
+      title: "Record this payment?",
+      description: `${formatCedis(Number(values.amountGhs))} by ${
+        PAYMENT_METHOD_OPTIONS.find((o) => o.value === values.method)?.label ??
+        values.method
+      }${
+        detail ? ` against sale ${detail.transactionNo}` : ""
+      }. Once recorded, only the owner can reverse it.`,
+      confirmText: "Record payment",
+    });
+    if (!confirmed) return;
+
     try {
       await record({
         id: sale.id,
@@ -297,6 +314,7 @@ export function PaymentDialog({
           </ResponsiveDialogFooter>
         </form>
       </ResponsiveDialogContent>
+      {confirmationDialog}
     </ResponsiveDialog>
   );
 }
