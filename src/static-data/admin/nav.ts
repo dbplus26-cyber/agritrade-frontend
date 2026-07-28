@@ -56,6 +56,8 @@ export const adminNavGroups: AdminNavGroup[] = [
       item("sales", "Sales"),
       item("shipments", "Shipments"),
       item("stock", "Stock"),
+      item("transfers", "Transfers"),
+      item("stocktakes", "Stocktakes"),
       item("commodities", "Commodities"),
       item("warehouses", "Warehouses"),
       item("agents", "Agents & Floats"),
@@ -85,7 +87,20 @@ export const adminNavGroups: AdminNavGroup[] = [
   },
   {
     label: "Directory",
-    items: [item("suppliers", "Suppliers"), item("buyers", "Buyers")],
+    items: [
+      item("suppliers", "Suppliers"),
+      item("buyers", "Buyers"),
+      item("drivers", "Drivers"),
+      item("delivery-addresses", "Delivery Addresses"),
+    ],
+  },
+  {
+    label: "Website",
+    items: [
+      item("enquiries", "Enquiries"),
+      item("reviews", "Reviews"),
+      item("farm-applications", "Applications", { ownerOnly: true }),
+    ],
   },
   {
     label: "Admin",

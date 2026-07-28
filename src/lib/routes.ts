@@ -6,6 +6,8 @@ export const routes = {
   commodities: "/commodities",
   land: "/land",
   farmingInvestment: "/farming-investment",
+  farmingApply: "/farming-investment/apply",
+  reviews: "/reviews",
   terms: "/terms",
   privacy: "/privacy",
   styleGuide: "/style-guide",
@@ -24,5 +26,6 @@ export const primaryNav = [
     ],
   },
   { index: "03", label: "About", href: routes.about },
-  { index: "04", label: "Contact", href: routes.contact },
+  { index: "04", label: "Reviews", href: routes.reviews },
+  { index: "05", label: "Contact", href: routes.contact },
 ] as const;

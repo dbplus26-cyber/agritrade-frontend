@@ -12,6 +12,8 @@ export const CACHE_TAGS = {
   CONTACT: "contact",
   /** Public land listings (/land plot register). */
   LAND_PLOTS: "land-plots",
+  /** Published customer reviews (home band + /reviews page). */
+  REVIEWS: "reviews",
 } as const;
 
 export type CacheTag = (typeof CACHE_TAGS)[keyof typeof CACHE_TAGS];
