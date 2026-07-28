@@ -1,0 +1,421 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  AdminButton,
+  AdminCard,
+  AdminField,
+  AdminPageHeader,
+  DetailGrid,
+  DetailItem,
+  DetailShell,
+  Mono,
+  adminInputClass,
+  adminSelectClass,
+} from "@/components/admin/ui";
+import { BackButton } from "@/components/ui/BackButton";
+import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { Absent } from "@/components/admin/registry/registry-bits";
+import { useConfirm } from "@/hooks/use-confirm";
+import { extractApiError } from "@/lib/extract-api-error";
+import { formatDateTime } from "@/lib/format-date";
+import { notify } from "@/lib/notify";
+import { cn } from "@/lib/utils";
+import {
+  useConvertFarmApplicationMutation,
+  useDeleteFarmApplicationMutation,
+  useGetFarmApplicationQuery,
+  useUpdateFarmApplicationMutation,
+} from "@/redux/farm-applications/farm-applications-api";
+import {
+  FARM_APPLICATION_STATUSES,
+  type FarmApplicationStatus,
+  type IAdminFarmApplication,
+} from "@/types/inbox.types";
+import {
+  FARM_APPLICATION_STATUS_META,
+  FarmApplicationStatusBadge,
+} from "./inbox-bits";
+
+const LIST = "/admin/farm-applications";
+
+/** A grouped facts card: stencil section title over a DetailGrid. */
+function SectionCard({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <AdminCard className="px-5 py-4">
+      <p className="stencil text-[11px] uppercase tracking-[0.14em] text-soil">
+        {title}
+      </p>
+      <DetailGrid columns={3} className="mt-1.5">
+        {children}
+      </DetailGrid>
+    </AdminCard>
+  );
+}
+
+const orAbsent = (value: null | string) =>
+  value ? value : <Absent />;
+
+function FarmApplicationDetailBody({
+  application,
+}: {
+  application: IAdminFarmApplication;
+}) {
+  const router = useRouter();
+  const { confirm, confirmationDialog } = useConfirm();
+  const [updateApplication, { isLoading: saving }] =
+    useUpdateFarmApplicationMutation();
+  const [convertApplication, { isLoading: converting }] =
+    useConvertFarmApplicationMutation();
+  const [deleteApplication, { isLoading: deleting }] =
+    useDeleteFarmApplicationMutation();
+
+  const [status, setStatus] = useState<FarmApplicationStatus>(
+    application.status,
+  );
+  const [notes, setNotes] = useState(application.adminNotes ?? "");
+  const statusDirty = status !== application.status;
+  const notesDirty = notes.trim() !== (application.adminNotes ?? "");
+  const dirty = statusDirty || notesDirty;
+
+  const isConverted = application.status === "CONVERTED";
+
+  const onSave = async () => {
+    try {
+      await updateApplication({
+        id: application.id,
+        body: {
+          ...(statusDirty ? { status } : {}),
+          ...(notesDirty ? { adminNotes: notes.trim() || null } : {}),
+        },
+      }).unwrap();
+      notify.success("Application updated");
+    } catch (err) {
+      notify.error("Couldn't update the application", {
+        description: extractApiError(err).message,
+      });
+    }
+  };
+
+  const onConvert = async () => {
+    const confirmed = await confirm({
+      title: `Convert ${application.name} to a farmer?`,
+      description:
+        "This creates a farmer record on the register from the application details and marks the application converted.",
+      confirmText: "Convert to farmer",
+    });
+    if (!confirmed) return;
+    try {
+      const res = await convertApplication(application.id).unwrap();
+      notify.success("Application converted", {
+        description: `${res.data.farmer.name} is now on the farmer register.`,
+      });
+    } catch (err) {
+      notify.error("Couldn't convert the application", {
+        description: extractApiError(err).message,
+      });
+    }
+  };
+
+  const onDelete = async () => {
+    const confirmed = await confirm({
+      title: "Delete this application?",
+      description: `${application.reference} from ${application.name} will be removed permanently. This cannot be undone.`,
+      confirmText: "Delete application",
+      isDestructive: true,
+    });
+    if (!confirmed) return;
+    try {
+      await deleteApplication(application.id).unwrap();
+      notify.success("Application deleted");
+      router.push(LIST);
+    } catch (err) {
+      notify.error("Couldn't delete the application", {
+        description: extractApiError(err).message,
+      });
+    }
+  };
+
+  return (
+    <div>
+      <BackButton href={LIST} label="All applications" className="mb-2" />
+      <AdminPageHeader
+        title={application.name}
+        sub={`Application ${application.reference} · received ${formatDateTime(application.createdAt)}`}
+        actions={<FarmApplicationStatusBadge status={application.status} />}
+      />
+
+      <DetailShell
+        main={
+          <div className="flex flex-col gap-5">
+            <SectionCard title="Identity & contact">
+              <DetailItem label="Name" strong>
+                {application.name}
+              </DetailItem>
+              <DetailItem label="Phone" mono>
+                <a
+                  href={`tel:${application.phone}`}
+                  className="text-console hover:underline"
+                >
+                  {application.phone}
+                </a>
+              </DetailItem>
+              <DetailItem label="Email">
+                {application.email ? (
+                  <a
+                    href={`mailto:${application.email}`}
+                    className="text-console hover:underline"
+                  >
+                    {application.email}
+                  </a>
+                ) : (
+                  <Absent />
+                )}
+              </DetailItem>
+              <DetailItem label="Community">
+                {orAbsent(application.community)}
+              </DetailItem>
+              <DetailItem label="Address">
+                {orAbsent(application.address)}
+              </DetailItem>
+            </SectionCard>
+
+            <SectionCard title="Farm">
+              <DetailItem label="Location">
+                {orAbsent(application.farmLocation)}
+              </DetailItem>
+              <DetailItem label="Size" mono>
+                {application.farmSizeAcres !== null ? (
+                  `${application.farmSizeAcres} acres`
+                ) : (
+                  <Absent />
+                )}
+              </DetailItem>
+              <DetailItem label="Crops">
+                {orAbsent(application.crops)}
+              </DetailItem>
+              <DetailItem label="Previous experience">
+                {orAbsent(application.previousExperience)}
+              </DetailItem>
+            </SectionCard>
+
+            <SectionCard title="Request">
+              <DetailItem label="Items needed">
+                {orAbsent(application.itemsNeeded)}
+              </DetailItem>
+              <DetailItem label="Expected yield" mono>
+                {application.expectedYieldKg !== null ? (
+                  `${application.expectedYieldKg.toLocaleString()} kg`
+                ) : (
+                  <Absent />
+                )}
+              </DetailItem>
+            </SectionCard>
+
+            <SectionCard title="Guarantor">
+              <DetailItem label="Name">
+                {orAbsent(application.guarantorName)}
+              </DetailItem>
+              <DetailItem label="Phone" mono>
+                {application.guarantorPhone ? (
+                  <a
+                    href={`tel:${application.guarantorPhone}`}
+                    className="text-console hover:underline"
+                  >
+                    {application.guarantorPhone}
+                  </a>
+                ) : (
+                  <Absent />
+                )}
+              </DetailItem>
+            </SectionCard>
+
+            <AdminCard className="px-5 py-4">
+              <p className="stencil text-[11px] uppercase tracking-[0.14em] text-soil">
+                Message
+              </p>
+              {application.message ? (
+                <p className="mt-2.5 text-[13.5px] leading-[1.75] whitespace-pre-wrap text-ink [overflow-wrap:anywhere]">
+                  {application.message}
+                </p>
+              ) : (
+                <p className="mt-2.5 text-[13px] text-soil/70">
+                  No message included with the application.
+                </p>
+              )}
+            </AdminCard>
+          </div>
+        }
+        aside={
+          <div className="flex flex-col gap-5">
+            <AdminCard className="px-5 py-[18px]">
+              <div className="flex flex-col gap-[13px]">
+                <AdminField
+                  label="Status"
+                  hint={
+                    isConverted
+                      ? "Converted applications keep their status."
+                      : undefined
+                  }
+                >
+                  <select
+                    value={status}
+                    disabled={isConverted}
+                    onChange={(e) => {
+                      setStatus(e.target.value as FarmApplicationStatus);
+                    }}
+                    className={cn(
+                      adminSelectClass,
+                      "w-full",
+                      isConverted &&
+                        "disabled:cursor-default disabled:opacity-100",
+                    )}
+                  >
+                    {FARM_APPLICATION_STATUSES.map((s) => (
+                      <option key={s} value={s}>
+                        {FARM_APPLICATION_STATUS_META[s].label}
+                      </option>
+                    ))}
+                  </select>
+                </AdminField>
+                <AdminField
+                  label="Internal notes"
+                  optional
+                  hint="For the office only - the applicant never sees these."
+                >
+                  <textarea
+                    rows={4}
+                    maxLength={1000}
+                    value={notes}
+                    onChange={(e) => {
+                      setNotes(e.target.value);
+                    }}
+                    placeholder="Site visit findings, guarantor checks…"
+                    className={cn(
+                      adminInputClass,
+                      "h-auto min-h-[96px] w-full resize-y py-2",
+                    )}
+                  />
+                </AdminField>
+                <AdminButton
+                  type="button"
+                  disabled={!dirty || saving}
+                  onClick={() => void onSave()}
+                  className="h-[38px] px-[18px]"
+                >
+                  {saving ? "Saving…" : "Save changes"}
+                </AdminButton>
+              </div>
+            </AdminCard>
+
+            <AdminCard className="px-5 py-4">
+              {isConverted && application.convertedFarmerId ? (
+                <>
+                  <p className="text-[12.5px] text-soil">
+                    This application became a farmer record.
+                  </p>
+                  <AdminButton
+                    asChild
+                    variant="gold"
+                    className="mt-2.5 h-9 px-4"
+                  >
+                    <Link
+                      href={`/admin/farmers/${application.convertedFarmerId}`}
+                    >
+                      View farmer record
+                    </Link>
+                  </AdminButton>
+                </>
+              ) : (
+                <>
+                  <p className="text-[12.5px] text-soil">
+                    Converting creates a farmer record on the register from
+                    these details.
+                  </p>
+                  <AdminButton
+                    type="button"
+                    disabled={converting}
+                    onClick={() => void onConvert()}
+                    className="mt-2.5 h-9 px-4"
+                  >
+                    {converting ? "Converting…" : "Convert to farmer"}
+                  </AdminButton>
+                </>
+              )}
+            </AdminCard>
+
+            <AdminCard className="px-5 py-3">
+              <DetailGrid columns={2}>
+                <DetailItem label="Reference" mono>
+                  {application.reference}
+                </DetailItem>
+                <DetailItem label="Received">
+                  {formatDateTime(application.createdAt)}
+                </DetailItem>
+                <DetailItem label="Last reviewed">
+                  {application.reviewedAt ? (
+                    formatDateTime(application.reviewedAt)
+                  ) : (
+                    <Absent />
+                  )}
+                </DetailItem>
+                <DetailItem label="Submitted from">
+                  {application.ip ? <Mono>{application.ip}</Mono> : <Absent />}
+                </DetailItem>
+              </DetailGrid>
+            </AdminCard>
+
+            <AdminCard className="px-5 py-4">
+              <p className="text-[12.5px] text-soil">
+                Deleting removes the application permanently.
+              </p>
+              <AdminButton
+                type="button"
+                variant="danger"
+                disabled={deleting}
+                onClick={() => void onDelete()}
+                className="mt-2.5 h-9 px-4"
+              >
+                {deleting ? "Deleting…" : "Delete application"}
+              </AdminButton>
+            </AdminCard>
+          </div>
+        }
+      />
+      {confirmationDialog}
+    </div>
+  );
+}
+
+/** /admin/farm-applications/[id] - one application under review. */
+export function FarmApplicationDetail({ id }: { id: string }) {
+  const { data, isLoading, isError, error, refetch } =
+    useGetFarmApplicationQuery(id);
+
+  if (isLoading) return <DataTableSkeleton />;
+  if (isError || !data)
+    return (
+      <ErrorMessage
+        description={extractApiError(error).message}
+        onRetry={() => void refetch()}
+      />
+    );
+
+  const application = data.data.application;
+  // Keyed on updatedAt so a successful PATCH/convert reseeds the working copy.
+  return (
+    <FarmApplicationDetailBody
+      key={application.updatedAt}
+      application={application}
+    />
+  );
+}
