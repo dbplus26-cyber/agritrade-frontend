@@ -46,6 +46,111 @@ export function DetailRow({
   );
 }
 
+/**
+ * A single labelled fact for `DetailGrid`: stencil micro-cap label ABOVE the
+ * value so there is never a label....value gap, with a hairline under each
+ * item so the grid reads as ledger lines. `mono`/`strong` mirror DetailRow.
+ */
+export function DetailItem({
+  label,
+  children,
+  mono = false,
+  strong = false,
+  className,
+}: {
+  children: React.ReactNode;
+  label: string;
+  mono?: boolean;
+  strong?: boolean;
+  className?: string;
+}) {
+  return (
+    <div className={cn("min-w-0 border-b border-soil/10 py-2", className)}>
+      <p className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+        {label}
+      </p>
+      <div
+        className={cn(
+          "mt-0.5 min-w-0 text-[13.5px] text-ink [overflow-wrap:anywhere]",
+          mono && "font-adminmono tabular-nums",
+          strong && "text-[15px] font-bold",
+        )}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Fact grid for detail cards: 1 column on phones, 2 from `sm`, and (for
+ * cards spanning the full main column) 3 from `xl`. Children are
+ * `DetailItem`s; columns fill the card so wide screens carry no dead zone.
+ */
+export function DetailGrid({
+  columns = 3,
+  className,
+  children,
+}: {
+  /** Max column count at xl (2 keeps side-rail-width cards comfortable). */
+  columns?: 2 | 3;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className={cn(
+        "grid grid-cols-1 gap-x-8 gap-y-1 sm:grid-cols-2",
+        columns === 3 && "xl:grid-cols-3",
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
+/**
+ * Two-column detail shell: main content left, a narrower side rail (summary,
+ * actions, meta) right from `xl`; below that everything stacks, aside first
+ * so status and actions stay above the fold on phones. The rail is sticky
+ * under the 54px console topbar so actions stay in reach on long pages.
+ */
+export function DetailShell({
+  main,
+  aside,
+  asideFirstOnStack = true,
+  className,
+}: {
+  main: React.ReactNode;
+  aside: React.ReactNode;
+  /** Below xl the rail stacks above the main column (summary/actions above
+   * the fold). Pass false when the main column is the page's identity. */
+  asideFirstOnStack?: boolean;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_340px]",
+        className,
+      )}
+    >
+      <div className={cn("min-w-0 xl:order-1", asideFirstOnStack && "order-2")}>
+        {main}
+      </div>
+      <div
+        className={cn(
+          "min-w-0 self-start xl:sticky xl:top-[70px] xl:order-2",
+          asideFirstOnStack && "order-1",
+        )}
+      >
+        {aside}
+      </div>
+    </div>
+  );
+}
+
 /** The design's six status tones — used by chips, dots and timeline marks.
  * Drawn from the brand palette so chips read in-system on paper grounds. */
 export const TONES = {

@@ -1,18 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogDescription,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+} from "@/components/ui/responsive-dialog";
 import { cn } from "@/lib/utils";
 
 export interface ConfirmationDialogProps {
@@ -31,7 +30,8 @@ export interface ConfirmationDialogProps {
 /**
  * The confirm gate (dms-frontend convention, worn in this design's paperwork
  * style): title, plain-language consequence, optional type-to-confirm, and a
- * destructive variant that goes error-red.
+ * destructive variant that goes error-red. A centred card on desktop, a
+ * bottom sheet on phones - compact either way.
  */
 export function ConfirmationDialog({
   open,
@@ -56,16 +56,19 @@ export function ConfirmationDialog({
     : false;
 
   return (
-    <AlertDialog open={open} onOpenChange={handleOpenChange}>
-      <AlertDialogContent className="shadow-doc rounded-[3px] border-soil/35 bg-paper">
-        <AlertDialogHeader>
-          <AlertDialogTitle className="font-display text-forest">
+    <ResponsiveDialog open={open} onOpenChange={handleOpenChange}>
+      <ResponsiveDialogContent
+        showCloseButton={false}
+        className="sm:max-w-sm"
+      >
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle className="font-display text-forest">
             {title}
-          </AlertDialogTitle>
-          <AlertDialogDescription className="text-soil">
+          </ResponsiveDialogTitle>
+          <ResponsiveDialogDescription className="text-soil">
             {description}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
 
         {requireExactMatch ? (
           <div className="space-y-2">
@@ -84,9 +87,11 @@ export function ConfirmationDialog({
           </div>
         ) : null}
 
-        <AlertDialogFooter className="justify-end gap-2">
-          <AlertDialogCancel className="m-0">{cancelText}</AlertDialogCancel>
-          <AlertDialogAction
+        <ResponsiveDialogFooter className="justify-end gap-2">
+          <Button variant="outline" onClick={() => handleOpenChange(false)}>
+            {cancelText}
+          </Button>
+          <Button
             onClick={onConfirm}
             disabled={confirmDisabled}
             className={cn(
@@ -94,9 +99,9 @@ export function ConfirmationDialog({
             )}
           >
             {confirmText}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+          </Button>
+        </ResponsiveDialogFooter>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   );
 }

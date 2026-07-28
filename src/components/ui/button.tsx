@@ -50,6 +50,7 @@ function Button({
   variant = "default",
   size = "default",
   asChild = false,
+  type,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
@@ -62,6 +63,10 @@ function Button({
       data-slot="button"
       data-variant={variant}
       data-size={size}
+      // HTML defaults a button inside a form to type="submit", which turns
+      // any decorative button (dialog close, edit toggle) into an accidental
+      // form submit. Opt IN to submitting; never fall into it.
+      {...(asChild ? {} : { type: type ?? "button" })}
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />

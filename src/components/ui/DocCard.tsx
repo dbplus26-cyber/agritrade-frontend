@@ -42,7 +42,9 @@ export function DocCard({
             {title}
           </span>
           {fileNo ? (
-            <span className="stencil text-[11px] tracking-[0.14em] text-harvest-deep">
+            // File numbers never break mid-token - on narrow screens the
+            // title wraps instead.
+            <span className="stencil whitespace-nowrap text-[11px] tracking-[0.14em] text-harvest-deep">
               {fileNo}
             </span>
           ) : null}

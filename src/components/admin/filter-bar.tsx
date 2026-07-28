@@ -52,6 +52,11 @@ export function ConsoleLabeledSelect({
           className,
         )}
       >
+        {/* The dimension being filtered, always visible - "Fuel" alone says
+            nothing about WHICH filter it came from once picked. */}
+        <span className="stencil pointer-events-none flex-none pr-1.5 text-[9.5px] uppercase tracking-[0.14em] text-harvest-deep">
+          {label}
+        </span>
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
@@ -94,7 +99,15 @@ export function ConsoleDateField({
   className?: string;
 }) {
   return (
-    <label className={cn(boxField(Boolean(value)), "cursor-pointer", className)}>
+    <label
+      className={cn(
+        boxField(Boolean(value)),
+        // Default desktop width so a date field can never wrap into a
+        // full-width row of its own (the lg toolbar is flex-wrap).
+        "cursor-pointer lg:w-[170px] lg:flex-none",
+        className,
+      )}
+    >
       <span className="stencil pointer-events-none flex-none pl-2.5 pr-1.5 text-[9.5px] uppercase tracking-[0.14em] text-harvest-deep">
         {label}
       </span>
