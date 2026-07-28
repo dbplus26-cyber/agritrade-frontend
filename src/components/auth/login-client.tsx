@@ -1,21 +1,15 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { useHydrated } from "@/hooks/use-hydrated";
+import { userLoggedIn } from "@/redux/auth/auth-slice";
 import { AuthCard } from "./auth-card";
 import { LoginForm } from "./login-form";
 import { TwoFactorForm } from "./two-factor-form";
-
-// Hydration-safe "are we on the client yet" (see require-auth.tsx).
-const emptySubscribe = () => () => {};
-const useHydrated = () =>
-  useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false,
-  );
 
 /**
  * The console sign-in screen: either the credentials step or — when the
@@ -30,12 +24,26 @@ const useHydrated = () =>
 export function LoginClient({ redirectTo }: { redirectTo: string }) {
   const [challengeEmail, setChallengeEmail] = useState<string | null>(null);
   const router = useRouter();
+  const dispatch = useDispatch();
   const cachedUser = useCurrentUser();
   const hydrated = useHydrated();
 
   useEffect(() => {
-    if (hydrated && cachedUser) router.replace(redirectTo);
-  }, [hydrated, cachedUser, router, redirectTo]);
+    if (!hydrated || !cachedUser) return;
+    // Re-issue the proxy's `dbplus.auth.hint` cookie before leaving, through
+    // the same action that writes it on sign-in.
+    //
+    // The two halves of the persisted session expire differently: the hint
+    // cookie lasts 7 days, the stored user in localStorage never expires. Once
+    // the cookie is gone but the user isn't, redirecting on the cached user
+    // alone looped forever - the proxy bounced /admin to /login, this effect
+    // bounced straight back, and RequireAuth (the only code that revalidates
+    // and clears a stale user) never got to mount. Re-setting the hint lets
+    // the console actually load, and RequireAuth's GET /auth/me settles it: a
+    // dead session is cleared there and lands back here as a real sign-in.
+    dispatch(userLoggedIn({ user: cachedUser }));
+    router.replace(redirectTo);
+  }, [hydrated, cachedUser, dispatch, router, redirectTo]);
 
   // Pre-hydration (the persisted user lives in localStorage, invisible to the
   // server) and mid-redirect: hold the spinner, never flash the form.

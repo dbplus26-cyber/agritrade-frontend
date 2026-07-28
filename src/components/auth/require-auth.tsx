@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { useGetMeQuery, useLogoutMutation } from "@/redux/auth/auth-api";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { useHydrated } from "@/hooks/use-hydrated";
 
 /**
  * Gates the admin console on a *validated* session — the real protection
@@ -20,17 +21,6 @@ import { useCurrentUser } from "@/hooks/use-current-user";
  * first client render must match the server's loading screen or React
  * reports a hydration mismatch.
  */
-
-// Hydration-safe "are we on the client yet" — false on the server and on the
-// first client render, true right after, with no setState-in-effect.
-const emptySubscribe = () => () => {};
-const useHydrated = () =>
-  useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false,
-  );
-
 export function RequireAuth({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
