@@ -60,11 +60,15 @@ export function PaymentDialog({
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<RecordPaymentValues>({
     resolver: zodResolver(recordPaymentSchema),
     defaultValues: { method: "CASH", paidAt: todayInputValue() },
   });
+
+  // Drives whether the reference is required: a transfer must carry one.
+  const method = watch("method");
 
   // Quick-fill figures; null (redacted) money hides the button entirely.
   const depositRemainderGhs =
@@ -251,10 +255,23 @@ export function PaymentDialog({
               ))}
             </select>
           </AdminField>
-          <AdminField label="Reference" optional>
+          {/* Required for a transfer: it is what stops the same payment being
+              recorded against the order twice. Cash has nothing to quote. */}
+          <AdminField
+            label="Reference"
+            optional={method === "CASH"}
+            hint={
+              method === "CASH"
+                ? undefined
+                : "The transaction ID on the transfer. It is what stops this being recorded twice."
+            }
+            error={errors.reference?.message}
+          >
             <Input
-              className={adminInputClass}
-              placeholder="MoMo / bank reference"
+              className={cn(adminInputClass, errors.reference && "border-error")}
+              placeholder={
+                method === "MOMO" ? "MoMo transaction ID" : "Bank reference"
+              }
               {...register("reference")}
             />
           </AdminField>

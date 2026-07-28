@@ -35,12 +35,30 @@ export const saleSchema = z.object({
   notes: z.string().trim().max(1000).or(z.literal("")).optional(),
 });
 
-export const recordPaymentSchema = z.object({
-  amountGhs: requiredNumber("amount", 100_000_000),
-  method: z.enum(["CASH", "MOMO", "BANK"]),
-  reference: z.string().trim().max(120).or(z.literal("")).optional(),
-  paidAt: z.string().optional(),
-});
+/**
+ * A bank or mobile-money transfer must carry its reference. It is the only
+ * thing that distinguishes one transfer from another, so it is what the API's
+ * (saleId, reference) unique index uses to refuse the same transfer twice -
+ * the guard against a payment being banked against an order twice, which
+ * cannot be undone without an owner reversal. Cash has nothing to quote.
+ */
+export const recordPaymentSchema = z
+  .object({
+    amountGhs: requiredNumber("amount", 100_000_000),
+    method: z.enum(["CASH", "MOMO", "BANK"]),
+    reference: z.string().trim().max(120).or(z.literal("")).optional(),
+    paidAt: z.string().optional(),
+  })
+  .superRefine((value, ctx) => {
+    if (value.method !== "CASH" && !value.reference?.trim()) {
+      ctx.addIssue({
+        code: "custom",
+        message:
+          "Enter the transfer reference - it is what stops this payment being recorded twice.",
+        path: ["reference"],
+      });
+    }
+  });
 
 export const cancelSaleSchema = z.object({
   reason: z.string().trim().min(3, "Give a reason").max(500),
