@@ -1,14 +1,18 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { siteConfig } from "@/lib/site";
 
 /**
  * Shared brand template for every Open Graph card: husk field, forest band,
- * the "N" plate mark, page-specific text and a gold conversion tag — so every
+ * the company mark, page-specific text and a gold conversion tag - so every
  * share looks like a DB Plus dispatch ticket.
  *
- * Satori (behind `ImageResponse`) supports only flexbox + a CSS subset — no
- * grid — so the layout stays flex-based. The mark is drawn inline, so no
- * binary asset is read from disk.
+ * Satori (behind `ImageResponse`) supports only flexbox and a CSS subset - no
+ * grid - so the layout stays flex-based. The mark is the real logo, read off
+ * disk as base64 (the documented Node-runtime pattern for local assets in an
+ * OG route); it is the mark ONLY, because the full lockup's wordmark would be
+ * unreadable at the size it sits here and the card already says the name.
  */
 export const OG_SIZE = { width: 1200, height: 630 } as const;
 export const OG_CONTENT_TYPE = "image/png";
@@ -26,7 +30,7 @@ const INK = "#1F211C";
 // about the offer and let the landing page carry the live contact.
 const DEFAULT_CTA = "Same-day quotes from the Tamale yard →";
 
-export function brandOgImage({
+export async function brandOgImage({
   eyebrow,
   title,
   subtitle,
@@ -40,6 +44,11 @@ export function brandOgImage({
 }) {
   // Scale the headline down as it gets longer so long titles never overflow.
   const titleSize = title.length > 30 ? 62 : title.length > 18 ? 84 : 104;
+
+  const markSrc = `data:image/png;base64,${await readFile(
+    join(process.cwd(), "public", "logo-mark.png"),
+    "base64",
+  )}`;
 
   return new ImageResponse(
     (
@@ -75,24 +84,9 @@ export function brandOgImage({
           >
             {eyebrow}
           </div>
-          <div
-            style={{
-              width: 84,
-              height: 84,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              border: `6px solid ${FOREST}`,
-              borderRadius: 8,
-              color: FOREST,
-              fontSize: 34,
-              fontWeight: 700,
-              letterSpacing: 1,
-              boxShadow: "5px 5px 0 rgba(89,82,59,.35)",
-            }}
-          >
-            DB
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element -- Satori
+              renders plain <img>; next/image does not exist in an OG card. */}
+          <img src={markSrc} width={96} height={96} alt="" />
         </div>
 
         <div style={{ display: "flex", flexDirection: "column" }}>

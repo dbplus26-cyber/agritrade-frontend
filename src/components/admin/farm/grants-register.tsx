@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
 import {
-  ConsoleDateField,
+  ConsoleDateRange,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
@@ -14,12 +14,12 @@ import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { AdminCard, Mono } from "@/components/admin/ui";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { Button } from "@/components/ui/button";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
-import { DateOnlyCell, DateTimeCell } from "@/components/admin/date-cell";
+import { DateTimeCell } from "@/components/admin/date-cell";
 import { useGetGrantsQuery } from "@/redux/farm/grants-api";
 import { useGetSeasonsQuery } from "@/redux/farm/seasons-api";
 import type { IGrant, IGrantListQuery } from "@/types/farm.types";
@@ -137,7 +137,7 @@ export function GrantsRegister() {
         header: "Granted",
         enableSorting: false,
         meta: columnMeta(),
-        cell: ({ row }) => <DateOnlyCell value={row.original.grantedAt} />,
+        cell: ({ row }) => <DateTimeCell value={row.original.grantedAt} />,
       },
       {
         id: "added",
@@ -199,25 +199,18 @@ export function GrantsRegister() {
             active={season !== "all"}
             className="lg:w-[200px]"
           />
-          <ConsoleDateField
-            label="From"
-            value={from}
-            max={to || undefined}
-            onChange={(v) => setFilter("from", v)}
-            className="lg:w-[150px]"
-          />
-          <ConsoleDateField
-            label="To"
-            value={to}
-            min={from || undefined}
-            onChange={(v) => setFilter("to", v)}
-            className="lg:w-[150px]"
+          <ConsoleDateRange
+            from={from}
+            to={to}
+            onFromChange={(v) => setFilter("from", v)}
+            onToChange={(v) => setFilter("to", v)}
+            fieldClassName="lg:w-[150px]"
           />
         </ConsoleFilterBar>
       )}
 
       {isLoading ? (
-        <DataTableSkeleton />
+        <ConsoleTableSkeleton columns={6} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}

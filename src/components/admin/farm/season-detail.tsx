@@ -13,7 +13,7 @@ import {
 } from "@/components/admin/ui";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { BackButton } from "@/components/ui/BackButton";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ConsoleTableSkeleton, DetailSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useConfirm } from "@/hooks/use-confirm";
@@ -55,7 +55,7 @@ export function SeasonDetail({ id }: { id: string }) {
   const [deleteSeason, deleteState] = useDeleteSeasonMutation();
   const { confirm, confirmationDialog } = useConfirm();
 
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <DetailSkeleton facts={4} table />;
   if (isError || !data)
     return (
       <ErrorMessage
@@ -235,7 +235,7 @@ export function SeasonDetail({ id }: { id: string }) {
             </div>
             {summary.isLoading ? (
               <div className="p-5">
-                <DataTableSkeleton />
+                <ConsoleTableSkeleton bare columns={3} rows={5} />
               </div>
             ) : !stats || stats.farmerBalances.length === 0 ? (
               <EmptyState

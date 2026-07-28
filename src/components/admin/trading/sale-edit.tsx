@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { FormSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
 import { useGetSaleQuery } from "@/redux/sales/admin-sales-api";
@@ -12,7 +12,7 @@ export function SaleEdit({ id }: { id: string }) {
   const router = useRouter();
   const { data, isLoading, isError, error, refetch } = useGetSaleQuery(id);
 
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <FormSkeleton fields={6} className="max-w-[720px]" />;
   if (isError || !data)
     return (
       <ErrorMessage

@@ -8,7 +8,7 @@ import {
 } from "@/components/admin/filter-bar";
 import { AdminCard, Mono, ToneBadge } from "@/components/admin/ui";
 import { Button } from "@/components/ui/button";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { RecordCardGridSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { ListPagination } from "@/components/ui/ListPagination";
@@ -64,7 +64,8 @@ export function PlotsRegister() {
           Land plots
         </h1>
         <p className="mt-0.5 text-[13px] text-soil">
-          The plot register - documents, prices and website publishing
+          Every plot the business holds - photos, title documents and what is
+          published to the website
         </p>
       </div>
 
@@ -93,7 +94,7 @@ export function PlotsRegister() {
       )}
 
       {isLoading ? (
-        <DataTableSkeleton />
+        <RecordCardGridSkeleton cards={6} media />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}
@@ -121,7 +122,9 @@ export function PlotsRegister() {
             <Link
               key={p.id}
               href={`${LIST}/${p.id}`}
-              className="overflow-hidden rounded-[8px] border border-soil/25 bg-paper hover:border-soil/35"
+              // Squared off and 1.5px-bordered to match AdminCard, which every other
+              // surface in the console uses. These were the only rounded cards.
+              className="shadow-doc-sm overflow-hidden rounded-none border-[1.5px] border-soil/30 bg-paper transition-colors hover:border-soil/50"
             >
               {p.photos[0] ? (
                 // eslint-disable-next-line @next/next/no-img-element -- Cloudinary

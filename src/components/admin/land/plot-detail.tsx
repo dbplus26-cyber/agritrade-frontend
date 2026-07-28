@@ -13,7 +13,8 @@ import {
   ToneBadge,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { DateTimeCell } from "@/components/admin/date-cell";
+import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { FilePicker } from "@/components/ui/FilePicker";
 import { useConfirm } from "@/hooks/use-confirm";
@@ -31,7 +32,7 @@ import {
   useSetPlotArchivedMutation,
   useUnpublishPlotMutation,
 } from "@/redux/land/land-plots-api";
-import { Money, formatSaleDate } from "@/components/admin/trading/sale-bits";
+import { Money } from "@/components/admin/trading/sale-bits";
 import { PlotStatusBadge } from "./land-bits";
 
 const LIST = "/admin/plots";
@@ -48,7 +49,7 @@ export function PlotDetail({ id }: { id: string }) {
   const { confirm, confirmationDialog } = useConfirm();
   const [docName, setDocName] = useState("");
 
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <DetailSkeleton main="media" cards={2} />;
   if (isError || !data)
     return (
       <ErrorMessage
@@ -313,8 +314,10 @@ export function PlotDetail({ id }: { id: string }) {
                     {doc.name}
                   </a>
                   <div className="flex items-center gap-3">
-                    <Mono className="text-[12px] text-soil">
-                      {formatSaleDate(doc.createdAt)}
+                    {/* An upload stamp: when the title document reached the
+                        office is the fact being recorded, hour included. */}
+                    <Mono className="text-right text-[12px] text-soil">
+                      <DateTimeCell value={doc.createdAt} muted />
                     </Mono>
                     <button
                       type="button"

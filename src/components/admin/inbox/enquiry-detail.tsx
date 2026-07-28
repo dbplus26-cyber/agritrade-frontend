@@ -7,14 +7,14 @@ import {
   AdminCard,
   AdminField,
   AdminPageHeader,
-  DetailRow,
+  DetailGrid,
+  DetailItem,
   DetailShell,
-  Mono,
   adminInputClass,
   adminSelectClass,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Absent } from "@/components/admin/registry/registry-bits";
 import { useAuthRole } from "@/hooks/use-auth-role";
@@ -122,36 +122,47 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
               ) : null}
             </AdminCard>
 
+            {/* Provenance as a fact GRID, not label-left/value-right rows.
+                Spreading each pair to opposite edges of a full-width card put
+                40rem of nothing between "Reference" and its value, so nothing
+                read as a pair; DetailItem stacks the stencil label directly
+                over its value with a hairline under each, and the grid packs
+                three of them per row on a wide console. */}
             <AdminCard className="px-5 py-3">
-              <DetailRow label="Reference" mono>
-                {enquiry.reference}
-              </DetailRow>
-              <DetailRow label="Phone">
-                <a
-                  href={`tel:${enquiry.phone}`}
-                  className="font-adminmono text-console hover:underline"
-                >
-                  {enquiry.phone}
-                </a>
-              </DetailRow>
-              <DetailRow label="Email">
-                {enquiry.email ? (
+              <p className="mb-1.5 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                Sender &amp; provenance
+              </p>
+              <DetailGrid>
+                <DetailItem label="Reference" mono>
+                  {enquiry.reference}
+                </DetailItem>
+                <DetailItem label="Phone" mono>
                   <a
-                    href={`mailto:${enquiry.email}`}
+                    href={`tel:${enquiry.phone}`}
                     className="text-console hover:underline"
                   >
-                    {enquiry.email}
+                    {enquiry.phone}
                   </a>
-                ) : (
-                  <Absent />
-                )}
-              </DetailRow>
-              <DetailRow label="Received">
-                {formatDateTime(enquiry.receivedAt)}
-              </DetailRow>
-              <DetailRow label="Submitted from">
-                {enquiry.ip ? <Mono>{enquiry.ip}</Mono> : <Absent />}
-              </DetailRow>
+                </DetailItem>
+                <DetailItem label="Email">
+                  {enquiry.email ? (
+                    <a
+                      href={`mailto:${enquiry.email}`}
+                      className="text-console hover:underline"
+                    >
+                      {enquiry.email}
+                    </a>
+                  ) : (
+                    <Absent />
+                  )}
+                </DetailItem>
+                <DetailItem label="Received">
+                  {formatDateTime(enquiry.receivedAt)}
+                </DetailItem>
+                <DetailItem label="Submitted from" mono>
+                  {enquiry.ip ?? <Absent />}
+                </DetailItem>
+              </DetailGrid>
             </AdminCard>
           </div>
         }
@@ -232,7 +243,7 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
 export function EnquiryDetail({ id }: { id: string }) {
   const { data, isLoading, isError, error, refetch } = useGetEnquiryQuery(id);
 
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <DetailSkeleton facts={5} />;
   if (isError || !data)
     return (
       <ErrorMessage

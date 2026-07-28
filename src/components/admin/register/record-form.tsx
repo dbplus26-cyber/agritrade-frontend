@@ -124,7 +124,7 @@ export function RecordForm({
           : `New ${register.single.toLowerCase()}`}
       </h1>
       <p className="mb-4.5 text-[13px] text-soil">
-        {mode === "edit" ? "Changes are logged in the audit trail" : "Fill in the details below"}
+        {mode === "edit" ? "Changes are logged in the audit trail" : register.sub}
       </p>
 
       <form onSubmit={submit} noValidate>

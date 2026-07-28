@@ -1,7 +1,6 @@
 import { SiteContactProvider } from "@/components/providers/site-contact-provider";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
-import { StickyCallBar } from "@/components/layout/sticky-call-bar";
 import { getSiteContact } from "@/lib/public-contact";
 
 /**
@@ -18,7 +17,6 @@ export default async function SiteLayout({
       <SiteHeader />
       <main className="flex-1">{children}</main>
       <SiteFooter />
-      <StickyCallBar />
     </SiteContactProvider>
   );
 }

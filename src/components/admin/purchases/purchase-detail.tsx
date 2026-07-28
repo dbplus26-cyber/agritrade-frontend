@@ -18,7 +18,7 @@ import {
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
 import { BackButton } from "@/components/ui/BackButton";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import {
   ResponsiveDialog,
@@ -341,7 +341,7 @@ export function PurchaseDetail({ id }: { id: string }) {
   const [receiveOpen, setReceiveOpen] = useState(false);
   const [voidOpen, setVoidOpen] = useState(false);
 
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <DetailSkeleton facts={8} />;
   if (isError || !data)
     return (
       <ErrorMessage

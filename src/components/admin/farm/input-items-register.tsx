@@ -9,11 +9,11 @@ import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
-import { columnMeta } from "@/components/admin/registry/registry-bits";
+import { Absent, columnMeta } from "@/components/admin/registry/registry-bits";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import { AdminCard } from "@/components/admin/ui";
 import { Button } from "@/components/ui/button";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
@@ -86,6 +86,29 @@ export function InputItemsRegister() {
         ),
       },
       {
+        id: "description",
+        // An accessor (not just a cell) so the mobile card drops the row
+        // entirely when there is no description, rather than printing a
+        // "DESCRIPTION —" placeholder on every phone row.
+        accessorFn: (i) => i.description ?? "",
+        header: "What it is",
+        enableSorting: false,
+        // `wide` hides it below xl: on a narrow console the name and unit are
+        // what a register is scanned by, and prose would squeeze them out.
+        meta: columnMeta({ wide: true }),
+        cell: ({ row }) =>
+          row.original.description ? (
+            <span
+              className="block max-w-[280px] truncate text-[12.5px] text-soil"
+              title={row.original.description}
+            >
+              {row.original.description}
+            </span>
+          ) : (
+            <Absent />
+          ),
+      },
+      {
         id: "added",
         accessorFn: (i) => i.createdAt,
         header: "Added",
@@ -140,7 +163,7 @@ export function InputItemsRegister() {
       )}
 
       {isLoading ? (
-        <DataTableSkeleton />
+        <ConsoleTableSkeleton columns={5} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}

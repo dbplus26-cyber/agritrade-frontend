@@ -114,7 +114,14 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
   return (
     <div className="max-w-[720px]">
       <BackButton href={LIST} label="All sales" className="mb-2" />
-      <AdminPageHeader title={sale ? "Edit sale" : "New sale"} />
+      <AdminPageHeader
+        title={sale ? "Edit sale" : "New sale"}
+        sub={
+          sale
+            ? "Change the goods and terms while this sale is still a draft"
+            : "Agree goods, weights and a price with a buyer - it stays a draft until you confirm it"
+        }
+      />
 
       <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <AdminCard className="flex flex-col gap-3 px-5 py-4">

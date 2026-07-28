@@ -12,7 +12,7 @@ import {
 } from "@/components/admin/filter-bar";
 import { AdminCard } from "@/components/admin/ui";
 import { Button } from "@/components/ui/button";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import {
@@ -339,7 +339,7 @@ export function UsersTable() {
       )}
 
       {isLoading ? (
-        <DataTableSkeleton />
+        <ConsoleTableSkeleton columns={6} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}

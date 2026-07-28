@@ -9,7 +9,7 @@ import {
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
 import { AdminCard, Mono, ToneBadge, type Tone } from "@/components/admin/ui";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
@@ -191,7 +191,7 @@ export function NotificationsScreen() {
       )}
 
       {isLoading ? (
-        <DataTableSkeleton />
+        <ConsoleTableSkeleton columns={5} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}

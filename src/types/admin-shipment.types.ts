@@ -111,7 +111,16 @@ export interface IShipment {
   driverIdNumber: string | null;
   documents: IShipmentDocument[];
   costBasis: string;
+  /** Weight allocated from lots so far - what has been keyed in. */
   totalWeightKg: number;
+  /**
+   * Unshipped weight the sales on this truck are due to move - the figure to
+   * measure `truckCapacityKg` against, and what the backend's OVER_CAPACITY
+   * refusal uses. It cannot be derived here: a sale's `agreedKg` is its weight
+   * across ALL trucks, so a part-shipped sale would read too heavy. Null on
+   * list reads, where the server does not pay for it.
+   */
+  plannedWeightKg: number | null;
   manifest: IManifestLine[];
   allocations: IShipmentAllocation[];
   expenses: IShipmentExpense[];
@@ -219,6 +228,17 @@ export interface ICreateShipmentInput {
   truckCapacityKg?: number;
   expectedArrivalAt?: string;
   notes?: string;
+}
+
+/** Attach further confirmed sales to a shipment that has not dispatched. */
+export interface IAddShipmentSalesInput {
+  id: string;
+  saleIds: string[];
+}
+
+export interface IRemoveShipmentSaleInput {
+  id: string;
+  saleId: string;
 }
 
 export interface IAllocationInput {

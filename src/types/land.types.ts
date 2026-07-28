@@ -157,6 +157,8 @@ export interface ILandSeller {
   id: string;
   name: string;
   phone: string | null;
+  /** Optional - a company seller sends its paperwork by email. */
+  email: string | null;
   community: string | null;
   notes: string | null;
   isActive: boolean;
@@ -184,12 +186,14 @@ export interface ILandSellerListQuery {
 export interface ICreateLandSellerInput {
   name: string;
   phone?: string;
+  email?: string;
   community?: string;
   notes?: string;
 }
 export interface IUpdateLandSellerInput {
   name?: string;
   phone?: string | null;
+  email?: string | null;
   community?: string | null;
   notes?: string | null;
 }

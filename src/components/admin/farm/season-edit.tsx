@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { FormSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
 import { useGetSeasonQuery } from "@/redux/farm/seasons-api";
@@ -13,7 +13,7 @@ export function SeasonEdit({ id }: { id: string }) {
   // suspense boundary. This route is dynamic, so it does not.
   const startEditing = useSearchParams().get("edit") === "1";
   const { data, isLoading, isError, error, refetch } = useGetSeasonQuery(id);
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <FormSkeleton fields={3} />;
   if (isError || !data)
     return (
       <ErrorMessage

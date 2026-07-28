@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Menu, Phone, X } from "lucide-react";
@@ -28,11 +29,18 @@ import { cn } from "@/lib/utils";
 function BrandMark({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <Link href={routes.home} onClick={onNavigate} className="flex items-center gap-3">
-      <span className="stencil grid h-9 w-9 shrink-0 place-items-center rounded-[3px] border-[2.5px] border-forest text-[12px] tracking-[0.02em] text-forest shadow-block-sm">
-        DB
-      </span>
-      {/* Ultra-narrow screens (Galaxy Fold, ~280px) get the plate alone — the
-          wordmark would crowd the MENU button. */}
+      {/* The real company mark. Its own artwork is a circle on a transparent
+          field, so it needs no plate or border around it. */}
+      <Image
+        src="/logo-mark.png"
+        alt=""
+        width={72}
+        height={72}
+        priority
+        className="h-9 w-9 shrink-0"
+      />
+      {/* Ultra-narrow screens (Galaxy Fold, ~280px) get the mark alone - the
+          wordmark would crowd the menu button. */}
       <span className="hidden flex-col min-[360px]:flex">
         <span className="font-display text-[17px] font-bold leading-[1.1] tracking-[0.04em] text-forest lg:text-[19px]">
           DB PLUS
@@ -59,10 +67,26 @@ function ActiveTag({ index, label }: { index: string; label: string }) {
 }
 
 /**
- * One row in the mobile index. The active page wears the same gold plate as
- * the desktop nav, plus a solid rail down its leading edge so the current
- * location is readable at a glance and not by colour alone (the numeral
- * darkens with it). Rows clear 54px, well over the 44px tap floor.
+ * A quiet stencilled caption that opens a branch of the mobile index. It is a
+ * plain label - no trailing rule - so the drawer reads as a printed index page
+ * rather than a decorated app menu.
+ */
+function MenuCaption({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="stencil border-b border-soil/16 bg-surface-alt/60 px-5 pb-2 pt-[13px] text-[9.5px] leading-none tracking-[0.3em] text-soil">
+      {children}
+    </p>
+  );
+}
+
+/**
+ * One entry in the mobile index: a ledger numeral (or, for a service under its
+ * caption, a gold dash) in a fixed left column, then the name. Rows clear 56px,
+ * well over the 44px tap floor.
+ *
+ * The current page is marked by SHAPE, not colour alone - a solid rail down the
+ * leading edge plus the house gold ink-stroke under the name - and carries
+ * aria-current for assistive tech.
  */
 function MobileNavItem({
   active,
@@ -70,15 +94,13 @@ function MobileNavItem({
   index,
   label,
   onNavigate,
-  sub = false,
 }: {
   active: boolean;
   href: string;
-  index: string;
+  /** The ledger numeral; omitted for rows that sit under a caption. */
+  index?: string;
   label: string;
   onNavigate: () => void;
-  /** Service children sit one step in from their group header. */
-  sub?: boolean;
 }) {
   return (
     <Link
@@ -86,22 +108,29 @@ function MobileNavItem({
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "relative flex min-h-[54px] items-center justify-between gap-4 border-b border-dotted border-soil/35 py-3 pr-5 font-display font-bold transition-colors",
-        sub ? "pl-[27px] text-[16px]" : "pl-5 text-[17px]",
-        active ? "bg-harvest text-ink" : "text-forest active:bg-harvest/14",
+        "relative flex min-h-[56px] items-center gap-4 border-b border-soil/16 pl-5 pr-5 transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-forest",
+        active ? "bg-harvest/12" : "active:bg-soil/8",
       )}
     >
       {active ? (
-        <span aria-hidden="true" className="absolute inset-y-0 left-0 w-[3px] bg-harvest-deep" />
+        <span aria-hidden="true" className="absolute inset-y-0 left-0 w-1 bg-harvest-deep" />
       ) : null}
-      {label}
+      <span className="flex w-[26px] shrink-0 justify-start">
+        {index ? (
+          <span className="stencil text-[10px] tracking-[0.1em] text-harvest-deep">
+            {index}
+          </span>
+        ) : (
+          <span aria-hidden="true" className="mt-[1px] h-0.5 w-2.5 bg-harvest" />
+        )}
+      </span>
       <span
         className={cn(
-          "stencil shrink-0 text-[10px] tracking-[0.14em]",
-          active ? "text-[#5F4A12]" : "text-harvest-deep",
+          "font-display text-[17px] font-bold text-forest",
+          active && "shadow-[inset_0_-9px_0_rgb(216_156_46/0.55)]",
         )}
       >
-        {index}
+        {label}
       </span>
     </Link>
   );
@@ -118,6 +147,12 @@ export function SiteHeader() {
   const services = primaryNav.find((item) => "children" in item);
   const serviceLinks = services && "children" in services ? services.children : [];
   const onServicePage = serviceLinks.some((s) => pathname.startsWith(s.href));
+  // The mobile index is split into two captioned branches; everything that is
+  // neither Home nor a service reads as a page of the company file.
+  const companyLinks = primaryNav.filter(
+    (item): item is Extract<(typeof primaryNav)[number], { href: string }> =>
+      !("children" in item) && item.href !== routes.home,
+  );
 
   return (
     // Sticky so the nav stays reachable however deep the page — z-50 clears
@@ -199,13 +234,17 @@ export function SiteHeader() {
       </div>
       <div aria-hidden="true" className="ledger-rule mx-auto hidden max-w-[1312px] px-8 lg:block" />
 
-      {/* Mobile: brand + MENU sheet. */}
+      {/* Mobile: brand + the menu sheet. */}
       <div className="flex h-16 items-center justify-between border-b border-soil/16 px-5 lg:hidden">
         <BrandMark />
         <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-          <SheetTrigger className="stencil flex min-h-11 cursor-pointer items-center gap-2 rounded-[2px] border-2 border-forest px-3.5 text-[11px] tracking-[0.2em] text-forest shadow-doc-sm">
-            MENU
-            <Menu aria-hidden="true" className="size-[17px]" strokeWidth={2.4} />
+          {/* Icon only - the word "MENU" alongside it was noise. The label
+              lives on aria-label so the control still announces itself. */}
+          <SheetTrigger
+            aria-label="Open menu"
+            className="flex size-11 cursor-pointer items-center justify-center rounded-[2px] border-2 border-forest text-forest shadow-doc-sm transition-colors active:bg-harvest/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+          >
+            <Menu aria-hidden="true" className="size-[19px]" strokeWidth={2.4} />
           </SheetTrigger>
           <SheetContent
             side="right"
@@ -217,14 +256,14 @@ export function SiteHeader() {
             // The width is variant-scoped on purpose: the base SheetContent
             // sets `data-[side=right]:w-3/4`, which out-specifies a plain
             // `w-*` and silently wins.
-            className="texture-grain flex flex-col gap-0 border-l-0 bg-surface p-0 shadow-[-8px_0_28px_-14px_rgb(31_33_28/0.55)] data-[side=right]:w-[min(324px,84vw)] data-open:slide-in-from-right-full data-closed:slide-out-to-right-full"
+            className="texture-grain flex flex-col gap-0 border-l-0 bg-surface p-0 shadow-[-8px_0_28px_-14px_rgb(31_33_28/0.55)] duration-[260ms] ease-[cubic-bezier(.22,.9,.3,1)] data-[side=right]:w-[min(330px,86vw)] data-open:slide-in-from-right-full data-closed:slide-out-to-right-full"
           >
             <SheetHeader className="gap-0 border-b-[2.5px] border-forest bg-surface-alt/70 p-0">
               <div className="flex items-center justify-between gap-3 px-5 py-3">
                 <BrandMark onNavigate={closeMenu} />
                 <SheetClose
                   aria-label="Close menu"
-                  className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-[2px] border-2 border-forest text-forest shadow-doc-sm transition-colors active:bg-harvest/20"
+                  className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-[2px] border-2 border-forest text-forest shadow-doc-sm transition-colors active:bg-harvest/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
                 >
                   <X aria-hidden="true" className="size-[19px]" strokeWidth={2.4} />
                 </SheetClose>
@@ -235,104 +274,79 @@ export function SiteHeader() {
               aria-label="Primary"
               className="flex flex-1 flex-col overflow-y-auto overscroll-contain"
             >
-              <div className="flex items-center gap-3 px-5 pb-2 pt-4">
-                <span className="stencil text-[10px] tracking-[0.28em] text-harvest-deep">
-                  INDEX
-                </span>
-                <span aria-hidden="true" className="h-px flex-1 bg-soil/30" />
-              </div>
-              {primaryNav.map((item) =>
-                "children" in item ? (
-                  // The services group is a tinted block with its own ruled
-                  // header, so the three children read as one branch of the
-                  // index instead of five flat rows.
-                  <div key={item.label} className="bg-harvest/8">
-                    <div className="flex items-center gap-3 border-y border-dotted border-soil/35 px-5 py-2.5">
-                      <span className="stencil text-[10px] tracking-[0.26em] text-harvest-deep">
-                        {item.index} · SERVICES
-                      </span>
-                      <span aria-hidden="true" className="h-px flex-1 bg-soil/25" />
-                    </div>
-                    {item.children.map((service) => (
-                      <MobileNavItem
-                        key={service.href}
-                        active={pathname.startsWith(service.href)}
-                        href={service.href}
-                        // Composite numeral: a bare "03" here would sit
-                        // directly above top-level "About 03" and read as a
-                        // duplicate.
-                        index={`${item.index}·${service.index}`}
-                        label={service.label}
-                        onNavigate={closeMenu}
-                        sub
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <MobileNavItem
-                    key={item.href}
-                    active={pathname === item.href}
-                    href={item.href}
-                    index={item.index}
-                    label={item.label}
-                    onNavigate={closeMenu}
-                  />
-                ),
-              )}
+              <MobileNavItem
+                active={pathname === routes.home}
+                href={routes.home}
+                index="01"
+                label="Home"
+                onNavigate={closeMenu}
+              />
+              {/* Services carry the group numeral in their caption, so the rows
+                  themselves take a dash - two "03"s a few lines apart read as a
+                  mistake. */}
+              <MenuCaption>{services ? `${services.index} · SERVICES` : "SERVICES"}</MenuCaption>
+              {serviceLinks.map((service) => (
+                <MobileNavItem
+                  key={service.href}
+                  active={pathname.startsWith(service.href)}
+                  href={service.href}
+                  label={service.label}
+                  onNavigate={closeMenu}
+                />
+              ))}
+              <MenuCaption>THE COMPANY</MenuCaption>
+              {companyLinks.map((item) => (
+                <MobileNavItem
+                  key={item.href}
+                  active={pathname === item.href}
+                  href={item.href}
+                  index={item.index}
+                  label={item.label}
+                  onNavigate={closeMenu}
+                />
+              ))}
             </nav>
-            {/* Contact actions close the drawer, pinned to the bottom and
-                clear of the home indicator. Unpublished channels are dropped
-                rather than linked to nothing. */}
-            <div className="mt-auto border-t-[2.5px] border-forest bg-surface-alt/70 px-5 pb-[calc(18px+env(safe-area-inset-bottom,0px))] pt-3.5">
-              <span className="stencil mb-2 block text-[10px] tracking-[0.28em] text-harvest-deep">
+            {/* Contact actions close the drawer, pinned to the bottom and clear
+                of the home indicator. One obvious action first; unpublished
+                channels are dropped rather than linked to nothing. */}
+            <div className="mt-auto border-t-[2.5px] border-forest bg-surface-alt/70 px-5 pb-[calc(18px+env(safe-area-inset-bottom,0px))] pt-4">
+              <span className="stencil mb-2.5 block text-[9.5px] leading-none tracking-[0.3em] text-soil">
                 DISPATCH LINE
               </span>
               {contact.hasPhone ? (
                 <a
                   href={contact.phoneHref}
                   onClick={closeMenu}
-                  className="mb-3 block font-display text-[19px] font-bold tracking-[0.02em] text-forest"
+                  className="shadow-block mb-2.5 flex min-h-12 items-center justify-center gap-2.5 rounded-[2px] bg-harvest text-[15px] font-bold text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
                 >
-                  {contact.phone}
+                  <Phone aria-hidden="true" className="size-[17px]" strokeWidth={2.3} />
+                  Call {contact.phone}
                 </a>
               ) : null}
-              {contact.hasPhone || contact.hasWhatsapp ? (
-                <div className="grid grid-cols-2 gap-3">
-                  {contact.hasPhone ? (
-                    <a
-                      href={contact.phoneHref}
-                      onClick={closeMenu}
-                      className="shadow-block flex min-h-11 items-center justify-center gap-2 rounded-[2px] bg-harvest text-[14px] font-bold text-ink"
-                    >
-                      <Phone aria-hidden="true" className="size-4" strokeWidth={2.3} />
-                      Call
-                    </a>
-                  ) : null}
-                  {contact.hasWhatsapp ? (
-                    <a
-                      href={contact.whatsappHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={closeMenu}
-                      className={cn(
-                        "shadow-doc-sm flex min-h-11 items-center justify-center gap-2 rounded-[2px] border-2 border-forest text-[14px] font-bold text-forest",
-                        !contact.hasPhone && "col-span-2",
-                      )}
-                    >
-                      <WhatsAppIcon aria-hidden="true" className="size-[17px]" />
-                      WhatsApp
-                    </a>
-                  ) : null}
-                </div>
-              ) : (
+              {contact.hasWhatsapp ? (
+                <a
+                  href={contact.whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={closeMenu}
+                  className="shadow-doc-sm flex min-h-12 items-center justify-center gap-2.5 rounded-[2px] border-2 border-forest text-[15px] font-bold text-forest focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+                >
+                  <WhatsAppIcon aria-hidden="true" className="size-[18px]" />
+                  WhatsApp us
+                </a>
+              ) : null}
+              {!contact.hasPhone && !contact.hasWhatsapp ? (
                 <Link
                   href={routes.contact}
                   onClick={closeMenu}
-                  className="shadow-block flex min-h-11 items-center justify-center rounded-[2px] bg-harvest text-[14px] font-bold text-ink"
+                  className="shadow-block flex min-h-12 items-center justify-center rounded-[2px] bg-harvest text-[15px] font-bold text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
                 >
                   Contact us
                 </Link>
-              )}
+              ) : null}
+              <p className="mt-3.5 text-[12.5px] leading-[1.5] text-soil">
+                {contact.address}
+              </p>
             </div>
           </SheetContent>
         </Sheet>

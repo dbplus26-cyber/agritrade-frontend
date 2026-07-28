@@ -13,14 +13,20 @@ import {
   AdminCard,
   AdminField,
   AdminPageHeader,
+  DetailShell,
   EditableFormActions,
   Mono,
   adminInputClass,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/button";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import {
+  CardGridSkeleton,
+  ConsoleTableSkeleton,
+  FormSkeleton,
+} from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { ListPagination } from "@/components/ui/ListPagination";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
 import {
@@ -234,6 +240,29 @@ export function ExpenseCategoryTable() {
         ),
       },
       {
+        id: "description",
+        // An accessor (not just a cell) so the mobile card drops the row
+        // entirely when there is no description, rather than printing a
+        // "DESCRIPTION —" placeholder on every phone row.
+        accessorFn: (c) => c.description ?? "",
+        header: "What belongs here",
+        enableSorting: false,
+        // `wide` hides it below xl: on a narrow console the category name and
+        // its status are what the register is scanned by.
+        meta: columnMeta({ wide: true }),
+        cell: ({ row }) =>
+          row.original.description ? (
+            <span
+              className="block max-w-[320px] truncate text-[12.5px] text-soil"
+              title={row.original.description}
+            >
+              {row.original.description}
+            </span>
+          ) : (
+            <Absent />
+          ),
+      },
+      {
         id: "added",
         accessorFn: (c) => c.createdAt,
         header: "Added",
@@ -294,7 +323,7 @@ export function ExpenseCategoryTable() {
       )}
 
       {isLoading ? (
-        <DataTableSkeleton />
+        <ConsoleTableSkeleton columns={4} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}
@@ -496,70 +525,48 @@ export function ExpenseCategoryCreate() {
  * The expenses filed under this category - proof of what the bucket actually
  * holds, with the whole-window total the backend aggregates server-side.
  */
+function ExpenseVoucherCard({ expense }: { expense: IExpense }) {
+  const showMoney = useMoneyVisibility();
+  return (
+    <AdminCard className="flex h-full flex-col px-4 py-3">
+      <div className="flex items-baseline justify-between gap-3">
+        <Mono className="text-[12px] text-soil/80">{expense.transactionNo}</Mono>
+        {showMoney ? (
+          <Mono className="text-[14px] font-bold whitespace-nowrap text-ink">
+            {formatCedis(expense.amountGhs)}
+          </Mono>
+        ) : null}
+      </div>
+      <p className="mt-1.5 flex-1 text-[13px] leading-snug text-ink [overflow-wrap:anywhere]">
+        {expense.description ?? <Absent />}
+      </p>
+      <div className="mt-2 border-t border-soil/12 pt-1.5">
+        <DateOnlyCell value={expense.incurredAt} muted />
+      </div>
+    </AdminCard>
+  );
+}
+
+/**
+ * The expenses filed under this category - proof of what the bucket actually
+ * holds, with the whole-window total the backend aggregates server-side.
+ *
+ * A grid of vouchers rather than a table: the rows are four short facts each,
+ * so a table stacked them in one narrow column and left the right two thirds
+ * of a wide console empty. Cards tile out to three across instead.
+ */
 function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
   const showMoney = useMoneyVisibility();
   const [page, setPage] = useState(1);
   const { data, isLoading, isFetching, isError, error, refetch } =
-    useGetExpensesQuery({ categoryId, limit: 10, page });
-
-  const columns = useMemo<ColumnDef<IExpense, unknown>[]>(
-    () => [
-      {
-        accessorKey: "transactionNo",
-        header: "Voucher",
-        enableSorting: false,
-        cell: ({ row }) => <Mono>{row.original.transactionNo}</Mono>,
-        meta: { className: "px-4 text-[13px]" },
-      },
-      {
-        accessorFn: (r) => r.incurredAt,
-        id: "incurredAt",
-        header: "Date",
-        enableSorting: false,
-        cell: ({ row }) => <DateOnlyCell value={row.original.incurredAt} />,
-        meta: { className: "px-4 text-[13px] whitespace-nowrap" },
-      },
-      {
-        accessorFn: (r) => r.description ?? "",
-        id: "description",
-        header: "Description",
-        enableSorting: false,
-        cell: ({ row }) =>
-          row.original.description ? (
-            <span
-              className="block max-w-[220px] truncate"
-              title={row.original.description}
-            >
-              {row.original.description}
-            </span>
-          ) : (
-            <Absent />
-          ),
-        meta: { className: "px-4 text-[13px]" },
-      },
-      ...(showMoney
-        ? [
-            {
-              accessorFn: (r: IExpense) => r.amountGhs ?? 0,
-              id: "amountGhs",
-              header: "Amount",
-              enableSorting: false,
-              cell: ({ row }: { row: { original: IExpense } }) => (
-                <Mono>{formatCedis(row.original.amountGhs)}</Mono>
-              ),
-              meta: { className: "px-4 text-right text-[13px]" },
-            } as ColumnDef<IExpense, unknown>,
-          ]
-        : []),
-    ],
-    [showMoney],
-  );
+    useGetExpensesQuery({ categoryId, limit: 12, page });
 
   const rows = data?.data ?? [];
   const windowTotal = data?.summary?.totalGhs;
+  const totalPages = Math.max(1, Math.ceil((data?.meta.total ?? 0) / 12));
 
   return (
-    <div className="mt-5">
+    <div>
       <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h2 className="text-[15px] font-bold tracking-[-0.01em] text-ink">
           Expenses in this category
@@ -577,35 +584,43 @@ function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
       </div>
 
       {isLoading ? (
-        <DataTableSkeleton />
+        <CardGridSkeleton cards={6} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}
           onRetry={() => void refetch()}
         />
-      ) : (
+      ) : rows.length === 0 ? (
         <AdminCard className="overflow-hidden">
-          <ConsoleDataTable<IExpense>
-            columns={columns}
-            data={rows}
-            itemNoun="expenses"
-            isFetching={isFetching}
-            serverPagination={{
-              totalCount: data?.meta.total ?? 0,
-              page,
-              pageSize: 10,
-              onPageChange: setPage,
-              onPageSizeChange: () => undefined,
-            }}
-            emptyState={
-              <EmptyState
-                variant="plain"
-                title="No expenses yet"
-                description="Nothing has been filed under this category so far."
-              />
-            }
+          <EmptyState
+            variant="plain"
+            title="No expenses yet"
+            description="Nothing has been filed under this category so far."
           />
         </AdminCard>
+      ) : (
+        <>
+          {/* Container-relative columns: this grid sits in the detail shell's
+              main track, which is ~340px narrower than the page whenever the
+              side rail shows, so viewport breakpoints would over-count. */}
+          <div
+            className={cn(
+              "grid gap-2.5 transition-opacity @lg/main:grid-cols-2 @4xl/main:grid-cols-3",
+              isFetching && "pointer-events-none opacity-60",
+            )}
+            aria-busy={isFetching || undefined}
+          >
+            {rows.map((expense) => (
+              <ExpenseVoucherCard key={expense.id} expense={expense} />
+            ))}
+          </div>
+          <ListPagination
+            page={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            className="mt-3"
+          />
+        </>
       )}
     </div>
   );
@@ -618,7 +633,7 @@ export function ExpenseCategoryEdit({ id }: { id: string }) {
   const [deactivate] = useDeactivateExpenseCategoryMutation();
   const [remove] = useDeleteExpenseCategoryMutation();
 
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <FormSkeleton fields={2} />;
   if (isError || !data)
     return (
       <ErrorMessage
@@ -629,22 +644,31 @@ export function ExpenseCategoryEdit({ id }: { id: string }) {
 
   const category = data.data.expenseCategory;
   return (
-    <div className="max-w-[560px]">
+    <div className="max-w-[1180px]">
       <BackButton href={LIST} label="All categories" className="mb-2" />
       <AdminPageHeader
         title={category.name}
-        sub="Edit the category and its lifecycle"
+        sub="What this heading covers, and every cost filed under it"
       />
-      <ExpenseCategoryFormFields category={category} />
-      <CategoryExpensesCard categoryId={id} />
-      <LifecycleActions
-        noun="category"
-        name={category.name}
-        isActive={category.isActive}
-        listHref={LIST}
-        onActivate={() => activate(id).unwrap()}
-        onDeactivate={() => deactivate(id).unwrap()}
-        onDelete={() => remove(id).unwrap()}
+      {/* The record is two short fields; the spend under it is the page's
+          substance, so the record takes the rail and the vouchers take the
+          width. On a phone the rail stacks first - you came here to edit. */}
+      <DetailShell
+        main={<CategoryExpensesCard categoryId={id} />}
+        aside={
+          <div className="flex flex-col gap-4">
+            <ExpenseCategoryFormFields category={category} />
+            <LifecycleActions
+              noun="category"
+              name={category.name}
+              isActive={category.isActive}
+              listHref={LIST}
+              onActivate={() => activate(id).unwrap()}
+              onDeactivate={() => deactivate(id).unwrap()}
+              onDelete={() => remove(id).unwrap()}
+            />
+          </div>
+        }
       />
     </div>
   );

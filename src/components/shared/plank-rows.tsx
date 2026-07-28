@@ -34,7 +34,7 @@ export function PlankRows({ lines }: { lines: CommodityLine[] }) {
           style={{ transform: plank.tilt }}
         >
           <span className="min-w-0">
-            <span className="stencil block whitespace-nowrap pr-16 text-[17px] leading-none tracking-[0.08em] text-surface/85 sm:pr-24 sm:text-[24px] lg:pr-0 lg:tracking-[0.1em] lg:text-[32px]">
+            <span className="stencil block overflow-hidden text-ellipsis whitespace-nowrap pr-16 text-[17px] leading-none tracking-[0.08em] text-surface/85 sm:pr-24 sm:text-[24px] lg:pr-0 lg:tracking-[0.1em] lg:text-[32px]">
               NOTHING ON THE BOARD
             </span>
             <span className="mt-2 hidden text-[12.5px] font-medium tracking-[0.04em] text-surface/65 lg:block">
@@ -84,9 +84,12 @@ export function PlankRows({ lines }: { lines: CommodityLine[] }) {
               {/* Name stays on ONE line; the mobile tag is pinned diagonally
                   over the plank's right end instead of competing for width.
                   Desktop planks carry one line of market context, so the board
-                  reads as live intelligence rather than three static bars. */}
+                  reads as live intelligence rather than three static bars.
+                  It CLIPS rather than pushes: a long commodity name at 42px on
+                  one line otherwise widened the whole document to 3047px at a
+                  1440px viewport and put the entire page into sideways scroll. */}
               <span className="min-w-0">
-                <span className="stencil block whitespace-nowrap pr-16 text-[21px] leading-none tracking-[0.08em] text-surface sm:pr-24 sm:text-[32px] lg:pr-0 lg:tracking-[0.1em] lg:text-[42px]">
+                <span className="stencil block overflow-hidden text-ellipsis whitespace-nowrap pr-16 text-[21px] leading-none tracking-[0.08em] text-surface sm:pr-24 sm:text-[32px] lg:pr-0 lg:tracking-[0.1em] lg:text-[42px]">
                   {line.name.toUpperCase()}
                 </span>
                 <span className="mt-2 hidden text-[12.5px] font-medium tracking-[0.04em] text-surface/65 lg:block">

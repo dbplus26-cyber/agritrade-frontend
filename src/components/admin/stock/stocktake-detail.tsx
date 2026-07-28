@@ -12,7 +12,7 @@ import {
 } from "@/components/admin/ui";
 import { Absent } from "@/components/admin/registry/registry-bits";
 import { BackButton } from "@/components/ui/BackButton";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useAuthRole } from "@/hooks/use-auth-role";
 import { useConfirm } from "@/hooks/use-confirm";
@@ -135,7 +135,7 @@ export function StocktakeDetail({ id }: { id: string }) {
   const [approveStocktake, approveState] = useApproveStocktakeMutation();
   const [cancelStocktake, cancelState] = useCancelStocktakeMutation();
 
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <DetailSkeleton facts={4} table />;
   if (isError || !data)
     return (
       <ErrorMessage

@@ -66,7 +66,10 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
   return (
     <div className="max-w-[560px]">
       <BackButton href={LIST} label="All land sales" className="mb-2" />
-      <AdminPageHeader title="New land sale" />
+      <AdminPageHeader
+        title="New land sale"
+        sub="Agree a plot and price with a buyer - the plot is only reserved once you confirm the sale"
+      />
 
       <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <AdminCard className="flex flex-col gap-3 px-5 py-4">

@@ -56,11 +56,10 @@ function FileCard({
 export function BusinessLines() {
   return (
     <section className="mx-auto max-w-[1312px] px-5 pb-16 lg:px-8 lg:pb-[104px]">
-      <div className="mb-7 flex items-baseline gap-5 lg:mb-[34px]">
+      <div className="mb-7 lg:mb-[34px]">
         <StencilLabel className="text-[12px] tracking-[0.3em]">
           THREE LINES OF BUSINESS
         </StencilLabel>
-        <span aria-hidden="true" className="relative -top-[3px] flex-1 border-t-[1.5px] border-soil/50" />
       </div>
       <Reveal>
       <div className="grid items-stretch gap-6 lg:grid-cols-[1.55fr_1fr] lg:gap-[26px]">

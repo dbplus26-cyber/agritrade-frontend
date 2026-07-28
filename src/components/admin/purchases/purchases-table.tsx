@@ -9,12 +9,12 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleFilterBar,
-  ConsoleDateField,
+  ConsoleDateRange,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
 import { AdminCard, Mono } from "@/components/admin/ui";
 import { Button } from "@/components/ui/button";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useGetCommoditiesQuery } from "@/redux/commodities/commodities-api";
@@ -283,25 +283,18 @@ export function PurchasesTable() {
             active={warehouse !== "all"}
             className="lg:w-[170px]"
           />
-          <ConsoleDateField
-            label="From"
-            value={from}
-            max={to || undefined}
-            onChange={(v) => setFilter("from", v)}
-            className="lg:w-[150px]"
-          />
-          <ConsoleDateField
-            label="To"
-            value={to}
-            min={from || undefined}
-            onChange={(v) => setFilter("to", v)}
-            className="lg:w-[150px]"
+          <ConsoleDateRange
+            from={from}
+            to={to}
+            onFromChange={(v) => setFilter("from", v)}
+            onToChange={(v) => setFilter("to", v)}
+            fieldClassName="lg:w-[150px]"
           />
         </ConsoleFilterBar>
       )}
 
       {isLoading ? (
-        <DataTableSkeleton />
+        <ConsoleTableSkeleton columns={6} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}

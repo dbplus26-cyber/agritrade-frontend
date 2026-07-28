@@ -35,7 +35,6 @@ export async function LegalDoc({
     <div className="texture-grain bg-surface">
       <div className="mx-auto max-w-[860px] px-5 pb-16 pt-10 lg:px-8 lg:pb-24 lg:pt-16">
         <div className="mb-4 flex items-center gap-2.5">
-          <span aria-hidden="true" className="h-0.5 w-[22px] bg-harvest" />
           <StencilLabel className="text-[11px] tracking-[0.3em] lg:text-[12px]">
             {eyebrow}
           </StencilLabel>

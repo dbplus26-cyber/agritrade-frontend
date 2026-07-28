@@ -12,7 +12,7 @@ import {
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { AdminCard } from "@/components/admin/ui";
 import { Button } from "@/components/ui/button";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
@@ -160,7 +160,7 @@ export function FarmersRegister() {
       )}
 
       {isLoading ? (
-        <DataTableSkeleton />
+        <ConsoleTableSkeleton columns={5} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}

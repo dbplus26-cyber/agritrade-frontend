@@ -151,7 +151,14 @@ export function PlotForm({
   return (
     <div className="max-w-[640px]">
       <BackButton href={LIST} label="All plots" className="mb-2" />
-      <AdminPageHeader title={plot ? "Edit plot" : "Add plot"} />
+      <AdminPageHeader
+        title={plot ? "Edit plot" : "Add plot"}
+        sub={
+          plot
+            ? "Location, size and pricing - photos and title documents live on the plot record"
+            : "Put a plot on the register so it can be priced, published and sold"
+        }
+      />
 
       <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <AdminCard className="grid grid-cols-1 gap-3 px-5 py-4 sm:grid-cols-2">

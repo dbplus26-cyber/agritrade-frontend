@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { FormSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
 import { useGetFarmerQuery } from "@/redux/farm/farmers-api";
@@ -13,7 +13,7 @@ export function FarmerEdit({ id }: { id: string }) {
   // button) link to ?edit=1 so the form opens unlocked instead of making them
   // press "Edit farmer" a second time. A bare /edit URL still opens read-only.
   const startEditing = useSearchParams().get("edit") === "1";
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <FormSkeleton fields={8} />;
   if (isError || !data)
     return (
       <ErrorMessage

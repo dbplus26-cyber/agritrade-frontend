@@ -33,11 +33,12 @@ const dateInput = (iso: string | null | undefined): string =>
 const toFormValues = (season?: ISeason): SeasonValues =>
   season
     ? {
+        description: season.description ?? "",
         endsOn: dateInput(season.endsOn),
         name: season.name,
         startsOn: dateInput(season.startsOn),
       }
-    : { endsOn: "", name: "", startsOn: "" };
+    : { description: "", endsOn: "", name: "", startsOn: "" };
 
 export function SeasonForm({
   season,
@@ -77,6 +78,7 @@ export function SeasonForm({
   }, [season, isEditing, reset]);
 
   const onSubmit = async (values: SeasonValues) => {
+    const description = values.description?.trim() ?? "";
     const body = {
       name: values.name,
       startsOn: values.startsOn,
@@ -84,11 +86,18 @@ export function SeasonForm({
     };
     try {
       if (season) {
-        await updateSeason({ id: season.id, body }).unwrap();
+        // null clears the column on an edit; a create simply omits it.
+        await updateSeason({
+          id: season.id,
+          body: { ...body, description: description || null },
+        }).unwrap();
         notify.success("Season updated");
         router.push(`${LIST}/${season.id}`);
       } else {
-        const res = await createSeason(body).unwrap();
+        const res = await createSeason({
+          ...body,
+          ...(description ? { description } : {}),
+        }).unwrap();
         notify.success("Season created");
         router.push(`${LIST}/${res.data.season.id}`);
       }
@@ -102,7 +111,10 @@ export function SeasonForm({
   return (
     <div className="max-w-[520px]">
       <BackButton href={LIST} label="All seasons" className="mb-2" />
-      <AdminPageHeader title={season ? "Edit season" : "New season"} />
+      <AdminPageHeader
+        title={season ? "Edit season" : "New season"}
+        sub="The planting season that grants and repayments are booked against"
+      />
 
       <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <AdminCard className="flex flex-col gap-3 px-5 py-4">
@@ -112,6 +124,27 @@ export function SeasonForm({
               disabled={readOnly}
               className={cn(adminInputClass, roCls, errors.name && "border-error")}
               {...register("name")}
+            />
+          </AdminField>
+          {/* What the season covers - crops and window - for when the name
+              alone ("2026 Major") does not say enough to a field officer. */}
+          <AdminField
+            label="Description"
+            optional
+            hint="e.g. Major season maize and soya, planting from April."
+            error={errors.description?.message}
+          >
+            <textarea
+              rows={2}
+              placeholder="What this season covers"
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                "h-auto min-h-[62px] w-full resize-y py-2",
+                errors.description && "border-error",
+              )}
+              {...register("description")}
             />
           </AdminField>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

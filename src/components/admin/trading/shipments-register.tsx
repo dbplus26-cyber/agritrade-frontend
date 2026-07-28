@@ -9,7 +9,7 @@ import {
 } from "@/components/admin/filter-bar";
 import { AdminCard, Mono } from "@/components/admin/ui";
 import { Button } from "@/components/ui/button";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { RecordCardGridSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { ListPagination } from "@/components/ui/ListPagination";
@@ -73,7 +73,7 @@ export function ShipmentsRegister() {
           Shipments
         </h1>
         <p className="mt-0.5 text-[13px] text-soil">
-          Trucks moving goods from warehouses to buyers
+          Trucks loaded against confirmed sales, from warehouse to buyer
         </p>
       </div>
 
@@ -116,7 +116,7 @@ export function ShipmentsRegister() {
       )}
 
       {isLoading ? (
-        <DataTableSkeleton />
+        <RecordCardGridSkeleton cards={6} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}

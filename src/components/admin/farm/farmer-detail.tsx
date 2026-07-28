@@ -14,7 +14,7 @@ import {
 import { Absent } from "@/components/admin/registry/registry-bits";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { BackButton } from "@/components/ui/BackButton";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { FilePicker } from "@/components/ui/FilePicker";
 import { useConfirm } from "@/hooks/use-confirm";
@@ -62,7 +62,7 @@ export function FarmerDetail({ id }: { id: string }) {
   >(null);
   const { confirm, confirmationDialog } = useConfirm();
 
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <DetailSkeleton facts={8} table />;
   if (isError || !data)
     return (
       <ErrorMessage

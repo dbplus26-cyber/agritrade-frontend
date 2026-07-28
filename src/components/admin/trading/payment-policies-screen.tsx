@@ -13,7 +13,7 @@ import {
   adminInputClass,
   adminSelectClass,
 } from "@/components/admin/ui";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { CardGridSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import {
@@ -373,7 +373,7 @@ export function PaymentPoliciesScreen() {
       </p>
 
       {isLoading ? (
-        <DataTableSkeleton />
+        <CardGridSkeleton cards={4} columns={2} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}

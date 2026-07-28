@@ -25,7 +25,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { CardGridSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { ListPagination } from "@/components/ui/ListPagination";
@@ -33,7 +33,7 @@ import { useAuthRole } from "@/hooks/use-auth-role";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
-import { formatDateOnly } from "@/lib/format-date";
+import { formatDateTime } from "@/lib/format-date";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import {
@@ -144,7 +144,7 @@ function ReviewModCard({
           </span>
           <ToneBadge tone="sky">{REVIEW_ROLE_LABELS[review.role]}</ToneBadge>
           <span className="ml-auto text-[12px] whitespace-nowrap text-soil">
-            {formatDateOnly(review.createdAt)}
+            {formatDateTime(review.createdAt)}
           </span>
         </div>
         {review.transactionNo ? (
@@ -534,7 +534,7 @@ export function ReviewsScreen() {
           </ConsoleFilterBar>
 
           {isLoading ? (
-            <DataTableSkeleton />
+            <CardGridSkeleton />
           ) : isError ? (
             <ErrorMessage
               description={extractApiError(error).message}

@@ -11,7 +11,7 @@ import {
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
 import { AdminCard, Mono } from "@/components/admin/ui";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useGetAgentsQuery } from "@/redux/agents/agents-api";
@@ -193,7 +193,7 @@ export function AgentsTable() {
       )}
 
       {isLoading ? (
-        <DataTableSkeleton />
+        <ConsoleTableSkeleton columns={5} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}

@@ -20,6 +20,7 @@ const optNonNegNumber = (max: number) =>
 
 export const seasonSchema = z.object({
   name: z.string().trim().min(2, "Enter a name").max(120),
+  description: z.string().trim().max(500).or(z.literal("")).optional(),
   startsOn: z.string().min(1, "Choose a start date"),
   endsOn: z.string().or(z.literal("")).optional(),
 });

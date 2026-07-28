@@ -12,7 +12,7 @@ import {
 } from "@/components/admin/filter-bar";
 import { AdminCard, Mono } from "@/components/admin/ui";
 import { Button } from "@/components/ui/button";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 import { useGetLandSalesQuery } from "@/redux/land/land-sales-api";
 import type { ILandSale, ILandSaleListQuery, LandSaleStatus } from "@/types/land.types";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
-import { DateOnlyCell } from "@/components/admin/date-cell";
+import { DateTimeCell } from "@/components/admin/date-cell";
 import { Money } from "@/components/admin/trading/sale-bits";
 import {
   LAND_SALE_STATUS_FILTER_OPTIONS,
@@ -131,7 +131,7 @@ export function LandSalesRegister() {
         header: "Date",
         enableSorting: false,
         meta: columnMeta(),
-        cell: ({ row }) => <DateOnlyCell value={row.original.createdAt} />,
+        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",
@@ -151,7 +151,7 @@ export function LandSalesRegister() {
           Land sales
         </h1>
         <p className="mt-0.5 text-[13px] text-soil">
-          Plot agreements, part-payments and balances
+          Plots sold to buyers, their part-payments and what is still owed
         </p>
       </div>
 
@@ -194,7 +194,7 @@ export function LandSalesRegister() {
       )}
 
       {isLoading ? (
-        <DataTableSkeleton />
+        <ConsoleTableSkeleton columns={6} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}

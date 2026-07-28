@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { AdminButton } from "@/components/admin/ui";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { AdminButton, AdminPageHeader } from "@/components/admin/ui";
+import { DocumentSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
+import { formatDateOnly } from "@/lib/format-date";
 import { formatKg } from "@/lib/format-money";
 import { useGetPayableAccountsQuery } from "@/redux/payment-accounts/payment-accounts-api";
 import { useGetSaleQuery } from "@/redux/sales/admin-sales-api";
@@ -43,7 +44,7 @@ function PayToCard({
       : (account.bankName ?? "Bank transfer");
 
   return (
-    <div className="break-inside-avoid rounded-[6px] border border-soil/30 p-3">
+    <div className="break-inside-avoid border border-soil/30 p-3">
       <div className="text-[11px] font-bold tracking-[0.06em] text-console uppercase">
         {heading}
       </div>
@@ -77,7 +78,7 @@ export function SaleInvoice({ id }: { id: string }) {
   const { data: settings } = useGetSettingsQuery();
   const { data: payable } = useGetPayableAccountsQuery();
 
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <DocumentSkeleton />;
   if (isError || !data)
     return (
       <ErrorMessage
@@ -95,26 +96,39 @@ export function SaleInvoice({ id }: { id: string }) {
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between print:hidden">
+      <div className="print:hidden">
         <Link
           href={`/admin/sales/${s.id}`}
-          className="text-[13px] text-console underline-offset-2 hover:underline"
+          className="mb-2 inline-block text-[13px] text-console underline-offset-2 hover:underline"
         >
           ← Back to sale
         </Link>
-        <AdminButton className="h-9 px-4" onClick={() => window.print()}>
-          Print
-        </AdminButton>
+        <AdminPageHeader
+          title={`${isReceipt ? "Receipt" : "Invoice"} ${s.transactionNo}`}
+          sub={
+            isReceipt
+              ? `Proof that ${s.buyer.name} settled this sale in full`
+              : `What ${s.buyer.name} still owes on this sale, and where to pay it`
+          }
+          actions={
+            <AdminButton className="h-9 px-4" onClick={() => window.print()}>
+              Print
+            </AdminButton>
+          }
+        />
       </div>
 
-      <div className="mx-auto max-w-[720px] rounded-[8px] border border-soil/25 bg-white p-8 text-ink print:max-w-none print:rounded-none print:border-0 print:p-0">
+      {/* Left-aligned like every other console page - the sheet keeps its own
+          720px measure so it still reads as a piece of paper. Squared and
+          1.5px-bordered to match AdminCard. */}
+      <div className="max-w-[720px] border-[1.5px] border-soil/30 bg-white p-8 text-ink print:max-w-none print:border-0 print:p-0">
         <div className="flex items-start justify-between border-b-2 border-ink pb-3">
           <div>
             <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">
               DB PLUS
             </div>
             <div className="text-[11px] tracking-[0.06em] text-soil uppercase">
-              Agro Trading
+              Trading
             </div>
             {/* From the owner's settings, never hardcoded: an invoice that
                 names a stale address is a document the buyer cannot act on. */}
@@ -212,7 +226,10 @@ export function SaleInvoice({ id }: { id: string }) {
                 className="flex justify-between border-b border-soil/20 py-1"
               >
                 <span>
-                  {formatSaleDate(p.paidAt)} · {p.method}
+                  {/* `paidAt` is captured as a calendar date, so it carries a
+                      midnight stamp nobody entered - printing it would put a
+                      made-up time on a document the buyer keeps. */}
+                  {formatDateOnly(p.paidAt)} · {p.method}
                   {p.reference ? ` · ${p.reference}` : ""}
                 </span>
                 <Money value={p.amountGhs} />
@@ -239,7 +256,7 @@ export function SaleInvoice({ id }: { id: string }) {
         ) : !isReceipt ? (
           // Silence here would read as "no payment needed". Say plainly that
           // the details are missing so staff notice before the buyer does.
-          <p className="mt-6 rounded-[6px] border border-dashed border-soil/40 p-3 text-[11.5px] text-soil print:hidden">
+          <p className="mt-6 border border-dashed border-soil/40 p-3 text-[11.5px] text-soil print:hidden">
             No payment accounts are published yet, so this invoice cannot tell
             the buyer where to send the money. Add one under Directory →
             Payment Accounts.

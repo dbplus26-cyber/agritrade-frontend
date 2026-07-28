@@ -17,7 +17,7 @@ import {
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/button";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ConsoleTableSkeleton, DetailSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
@@ -182,7 +182,7 @@ export function WarehouseTable() {
       )}
 
       {isLoading ? (
-        <DataTableSkeleton />
+        <ConsoleTableSkeleton columns={4} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}
@@ -236,6 +236,7 @@ export function WarehouseTable() {
 
 /** "" for create, or the record's values for edit. */
 const toWarehouseValues = (warehouse?: IWarehouse): WarehouseValues => ({
+  description: warehouse?.description ?? "",
   name: warehouse?.name ?? "",
   location: warehouse?.location ?? "",
 });
@@ -275,11 +276,16 @@ function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
 
   const onSubmit = async (values: WarehouseValues) => {
     const location = values.location?.trim() ?? "";
+    const description = values.description?.trim() ?? "";
     try {
       if (isEdit) {
         await updateWarehouse({
           id: warehouse.id,
-          body: { name: values.name, location: location || null },
+          body: {
+            description: description || null,
+            location: location || null,
+            name: values.name,
+          },
         }).unwrap();
         notify.success("Warehouse updated");
         setIsEditing(false);
@@ -287,6 +293,7 @@ function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
         const res = await createWarehouse({
           name: values.name,
           ...(location ? { location } : {}),
+          ...(description ? { description } : {}),
         }).unwrap();
         notify.success("Warehouse created");
         router.replace(`${LIST}/${res.data.warehouse.id}`);
@@ -294,7 +301,7 @@ function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
     } catch (err) {
       const { message, fieldErrors, hasFieldErrors } = extractApiError(err);
       if (hasFieldErrors && fieldErrors) {
-        for (const field of ["name", "location"] as const) {
+        for (const field of ["name", "location", "description"] as const) {
           if (fieldErrors[field])
             setError(field, { message: fieldErrors[field] });
         }
@@ -331,6 +338,28 @@ function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
               errors.location && "border-error",
             )}
             {...register("location")}
+          />
+        </AdminField>
+        {/* What the shed is actually for - which commodities it holds, its
+            capacity, whether it is fumigated. Operational detail that
+            otherwise lives in one person's head. */}
+        <AdminField
+          label="Description"
+          optional
+          hint="e.g. Maize and soya, 400 tonnes, fumigated monthly."
+          error={errors.description?.message}
+        >
+          <textarea
+            rows={2}
+            placeholder="What this warehouse holds and anything staff need to know"
+            disabled={readOnly}
+            className={cn(
+              adminInputClass,
+              roCls,
+              "h-auto min-h-[62px] w-full resize-y py-2",
+              errors.description && "border-error",
+            )}
+            {...register("description")}
           />
         </AdminField>
         <EditableFormActions
@@ -458,7 +487,7 @@ export function WarehouseEdit({ id }: { id: string }) {
   const [deactivate] = useDeactivateWarehouseMutation();
   const [remove] = useDeleteWarehouseMutation();
 
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <DetailSkeleton facts={4} table />;
   if (isError || !data)
     return (
       <ErrorMessage

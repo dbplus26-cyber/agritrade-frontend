@@ -10,6 +10,8 @@ import type { IPaginationMeta } from "./api";
 export interface ISeason {
   id: string;
   name: string;
+  /** What the season covers - crops and window, when the name is not enough. */
+  description: string | null;
   startsOn: string;
   endsOn: string | null;
   isActive: boolean;
@@ -33,10 +35,15 @@ export interface ISeasonListQuery {
 }
 export interface ICreateSeasonInput {
   name: string;
+  description?: string;
   startsOn: string;
   endsOn?: string;
 }
-export type IUpdateSeasonInput = Partial<ICreateSeasonInput>;
+export interface IUpdateSeasonInput
+  extends Partial<Omit<ICreateSeasonInput, "description">> {
+  /** null clears it; undefined leaves it untouched. */
+  description?: string | null;
+}
 
 // ── Input items ───────────────────────────────────────────────────
 export interface IInputItem {

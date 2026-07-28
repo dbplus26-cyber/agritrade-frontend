@@ -16,7 +16,8 @@ import {
   adminSelectClass,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { DateOnlyCell } from "@/components/admin/date-cell";
+import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import {
   ResponsiveDialog,
@@ -48,7 +49,6 @@ import {
 import {
   Money,
   PAYMENT_METHOD_OPTIONS,
-  formatSaleDate,
   todayInputValue,
 } from "@/components/admin/trading/sale-bits";
 import { LandAcquisitionStatusBadge } from "./land-acquisition-bits";
@@ -250,7 +250,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
   const [payOpen, setPayOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
 
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <DetailSkeleton main="ledger" />;
   if (isError || !data)
     return (
       <ErrorMessage
@@ -422,8 +422,10 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
                 >
                   <div className="min-w-0">
                     <span className="text-ink">{p.method}</span>
+                    {/* Date only: `paidAt` comes from a date picker, so its
+                        time is a midnight stamp nobody chose. */}
                     <span className="ml-2 text-[12px] text-soil">
-                      {formatSaleDate(p.paidAt)}
+                      <DateOnlyCell value={p.paidAt} muted />
                       {p.reference ? ` · ${p.reference}` : ""}
                     </span>
                   </div>

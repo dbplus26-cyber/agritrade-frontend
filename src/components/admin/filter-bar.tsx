@@ -137,6 +137,66 @@ export function ConsoleDateField({
 }
 
 /**
+ * A From/To window as ONE control, so the two bounds always read as a pair.
+ *
+ * Two loose `ConsoleDateField`s dropped into the filter bar's phone panel
+ * flow into whatever cells are left, which put From at the end of one row
+ * and To at the start of the next - and on a screen with an odd number of
+ * other filters they never even lined up. This wrapper keeps them together:
+ * `col-span-2` claims a whole row of the panel's 2-col grid (and of the
+ * tablet 4-col grid), and inside it the two fields sit side by side from
+ * 360px. Below that - Galaxy Fold and the like - a 2-up pair leaves each
+ * field too narrow to show a date at all, so they stack.
+ */
+export function ConsoleDateRange({
+  from,
+  to,
+  onFromChange,
+  onToChange,
+  fromLabel = "From",
+  toLabel = "To",
+  fieldClassName,
+  className,
+}: {
+  /** YYYY-MM-DD or "". */
+  from: string;
+  to: string;
+  onFromChange: (value: string) => void;
+  onToChange: (value: string) => void;
+  /** Registers that name the dimension ("Added from"/"Added to"). */
+  fromLabel?: string;
+  toLabel?: string;
+  /** Per-field width on the desktop row (e.g. "lg:w-[150px]"). */
+  fieldClassName?: string;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "col-span-2 grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 lg:flex lg:flex-none",
+        className,
+      )}
+    >
+      {/* The bounds clamp each other so a window can never be inverted. */}
+      <ConsoleDateField
+        label={fromLabel}
+        value={from}
+        onChange={onFromChange}
+        max={to || undefined}
+        className={fieldClassName}
+      />
+      <ConsoleDateField
+        label={toLabel}
+        value={to}
+        onChange={onToChange}
+        min={from || undefined}
+        className={fieldClassName}
+      />
+    </div>
+  );
+}
+
+/**
  * The console list toolbar in the stock-register shape: one row of compact
  * boxed controls on the page ground.
  *

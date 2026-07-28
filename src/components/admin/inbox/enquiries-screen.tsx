@@ -4,13 +4,13 @@ import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
 import {
-  ConsoleDateField,
+  ConsoleDateRange,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
 import { AdminCard, AdminPageHeader, Mono } from "@/components/admin/ui";
 import { DateTimeCell } from "@/components/admin/date-cell";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
@@ -204,29 +204,22 @@ export function EnquiriesScreen() {
                 active={statusFilter !== "all"}
                 className="lg:w-[160px]"
               />
-              <ConsoleDateField
-                label="From"
-                value={filters.from}
-                onChange={(v) => {
+              <ConsoleDateRange
+                from={filters.from}
+                to={filters.to}
+                onFromChange={(v) => {
                   setFilter("from", v);
                 }}
-                max={filters.to || undefined}
-                className="lg:w-[150px]"
-              />
-              <ConsoleDateField
-                label="To"
-                value={filters.to}
-                onChange={(v) => {
+                onToChange={(v) => {
                   setFilter("to", v);
                 }}
-                min={filters.from || undefined}
-                className="lg:w-[150px]"
+                fieldClassName="lg:w-[150px]"
               />
             </ConsoleFilterBar>
           )}
 
           {isLoading ? (
-            <DataTableSkeleton />
+            <ConsoleTableSkeleton columns={5} />
           ) : isError ? (
             <ErrorMessage
               description={extractApiError(error).message}

@@ -12,7 +12,7 @@ import {
 } from "@/components/admin/filter-bar";
 import { AdminCard, Mono } from "@/components/admin/ui";
 import { Button } from "@/components/ui/button";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
@@ -25,7 +25,7 @@ import type {
   LandAcquisitionStatus,
 } from "@/types/land.types";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
-import { DateOnlyCell } from "@/components/admin/date-cell";
+import { DateTimeCell } from "@/components/admin/date-cell";
 import { Money } from "@/components/admin/trading/sale-bits";
 import {
   LAND_ACQUISITION_STATUS_FILTER_OPTIONS,
@@ -131,7 +131,7 @@ export function LandAcquisitionsRegister() {
         header: "Date",
         enableSorting: false,
         meta: columnMeta(),
-        cell: ({ row }) => <DateOnlyCell value={row.original.createdAt} />,
+        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",
@@ -207,7 +207,7 @@ export function LandAcquisitionsRegister() {
       )}
 
       {isLoading ? (
-        <DataTableSkeleton />
+        <ConsoleTableSkeleton columns={5} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}

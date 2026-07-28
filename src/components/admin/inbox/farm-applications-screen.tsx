@@ -9,7 +9,7 @@ import {
 } from "@/components/admin/filter-bar";
 import { AdminCard, AdminPageHeader, Mono } from "@/components/admin/ui";
 import { DateTimeCell } from "@/components/admin/date-cell";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
@@ -224,7 +224,7 @@ export function FarmApplicationsScreen() {
           )}
 
           {isLoading ? (
-            <DataTableSkeleton />
+            <ConsoleTableSkeleton columns={5} />
           ) : isError ? (
             <ErrorMessage
               description={extractApiError(error).message}

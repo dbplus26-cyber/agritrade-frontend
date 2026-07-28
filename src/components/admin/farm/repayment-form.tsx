@@ -119,7 +119,10 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
   return (
     <div className="max-w-[560px]">
       <BackButton href={LIST} label="All repayments" className="mb-2" />
-      <AdminPageHeader title="Record produce repayment" />
+      <AdminPageHeader
+        title="Record produce repayment"
+        sub="Produce a farmer brought back against their grant - optionally received into a warehouse"
+      />
 
       <form
         noValidate

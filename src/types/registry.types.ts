@@ -33,6 +33,8 @@ export interface ICommodity {
 export interface IWarehouse {
   id: string;
   name: string;
+  /** What the shed is for - commodities held, capacity, fumigation status. */
+  description: string | null;
   location: string | null;
   isActive: boolean;
   createdAt: string;
@@ -43,6 +45,12 @@ export interface ISupplier {
   id: string;
   name: string;
   phone: string | null;
+  /**
+   * A second line reaching the same person. Traders here routinely carry two
+   * networks, and the number on file is the one that is off when it matters.
+   */
+  altPhone: string | null;
+
   community: string | null;
   sourceType: PurchaseSource;
   notes: string | null;
@@ -62,6 +70,12 @@ export interface IBuyer {
   id: string;
   name: string;
   phone: string | null;
+  /**
+   * A second line reaching the same person. Traders here routinely carry two
+   * networks, and the number on file is the one that is off when it matters.
+   */
+  altPhone: string | null;
+
   email: string | null;
   city: string | null;
   notes: string | null;
@@ -156,15 +170,18 @@ export interface IUpdateCommodityInput {
 
 export interface ICreateWarehouseInput {
   name: string;
+  description?: string;
   location?: string;
 }
 export interface IUpdateWarehouseInput {
+  description?: string | null;
   name?: string;
   location?: string | null;
 }
 
 /** Mirrors backend `createSupplierSchema` / `updateSupplierSchema`. */
 export interface ICreateSupplierInput {
+  altPhone?: string;
   name: string;
   phone?: string;
   community?: string;
@@ -178,6 +195,7 @@ export interface ICreateSupplierInput {
   momoNumber?: string;
 }
 export interface IUpdateSupplierInput {
+  altPhone?: string | null;
   name?: string;
   phone?: string | null;
   community?: string | null;
@@ -195,6 +213,7 @@ export interface IUpdateSupplierInput {
 
 /** Mirrors backend `createBuyerSchema` / `updateBuyerSchema`. */
 export interface ICreateBuyerInput {
+  altPhone?: string;
   name: string;
   phone?: string;
   email?: string;
@@ -207,6 +226,7 @@ export interface ICreateBuyerInput {
   contactPersonPhone?: string;
 }
 export interface IUpdateBuyerInput {
+  altPhone?: string | null;
   name?: string;
   phone?: string | null;
   email?: string | null;

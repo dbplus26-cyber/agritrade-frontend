@@ -12,7 +12,7 @@ import {
 } from "@/components/admin/ui";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { BackButton } from "@/components/ui/BackButton";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatDateTime } from "@/lib/format-date";
@@ -35,7 +35,7 @@ export function RepaymentDetail({ id }: { id: string }) {
   const [addDoc, addDocState] = useAddRepaymentDocumentMutation();
   const [removeDoc] = useRemoveRepaymentDocumentMutation();
 
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <DetailSkeleton facts={6} />;
   if (isError || !data)
     return (
       <ErrorMessage

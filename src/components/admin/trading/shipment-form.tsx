@@ -241,7 +241,10 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
   return (
     <div className="max-w-[640px]">
       <BackButton href={LIST} label="All shipments" className="mb-2" />
-      <AdminPageHeader title="Plan shipment" />
+      <AdminPageHeader
+        title="Plan shipment"
+        sub="Book a truck and driver against confirmed sales - nothing leaves the warehouse until you dispatch"
+      />
 
       <form
         noValidate

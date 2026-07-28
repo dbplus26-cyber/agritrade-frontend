@@ -315,19 +315,22 @@ export function AdminField({
   hint,
   error,
   optional,
+  className,
   children,
 }: {
   label: string;
   hint?: string;
   error?: string;
   optional?: boolean;
+  /** Placement inside a form grid, e.g. `sm:col-span-2` for a wide textarea. */
+  className?: string;
   children: React.ReactNode;
 }) {
   return (
-    <Label className="block font-normal leading-normal">
+    <Label className={cn("block font-normal leading-normal", className)}>
       <span className="stencil mb-[7px] block text-[11px] uppercase tracking-[0.14em] text-harvest-deep">
         {label}
-        {optional ? <span className="text-harvest-deep/70"> — optional</span> : null}
+        {optional ? <span className="text-harvest-deep/70"> - optional</span> : null}
       </span>
       {children}
       {error ? (

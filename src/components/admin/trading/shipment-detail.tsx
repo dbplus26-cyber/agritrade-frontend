@@ -17,7 +17,8 @@ import {
   adminSelectClass,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { DateOnlyCell, DateTimeCell } from "@/components/admin/date-cell";
+import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { FilePicker } from "@/components/ui/FilePicker";
 import { SignaturePad } from "@/components/ui/SignaturePad";
@@ -29,6 +30,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogDescription,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+} from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -41,13 +50,16 @@ import {
   shipmentWaybillPdfUrl,
   useAddShipmentDocumentMutation,
   useAddShipmentExpenseMutation,
+  useAddShipmentSalesMutation,
   useArriveShipmentMutation,
   useCancelShipmentMutation,
   useCloseShipmentMutation,
   useDeleteShipmentExpenseMutation,
   useDispatchShipmentMutation,
+  useGetEligibleSalesQuery,
   useGetShipmentQuery,
   useRemoveShipmentDocumentMutation,
+  useRemoveShipmentSaleMutation,
 } from "@/redux/shipments/shipments-api";
 import type { IShipment } from "@/types/admin-shipment.types";
 import {
@@ -56,17 +68,31 @@ import {
   type CancelShipmentValues,
   type ShipmentExpenseValues,
 } from "@/validations/shipment-schema";
-import { AllocateDialog } from "./allocate-dialog";
+import { LoadMeter } from "./load-meter";
 import { Money, SaleStatusBadge } from "./sale-bits";
-import {
-  CostBasisBadge,
-  ShipmentStatusBadge,
-  formatShipmentDate,
-} from "./shipment-bits";
+import { CostBasisBadge, ShipmentStatusBadge } from "./shipment-bits";
 
 const LIST = "/admin/shipments";
 
+/** Spare room below this share of capacity is a rounding gap, not a half-empty
+ * truck worth nagging about. */
+const UNDER_FILL_SHARE = 0.05;
+
 const Absent = () => <span className="text-soil/50">Not provided</span>;
+
+/**
+ * What this truck is due to carry, straight from the server. `totalWeightKg`
+ * counts allocated lots only, so a planned-but-unallocated truck would read as
+ * empty against its capacity. Reconstructing it from `lines[]` is the trap:
+ * `agreedKg` is a sale's weight across ALL trucks, so the moment one sale
+ * spreads over two trips (design doc 5.4 allows it; only today's
+ * full-coverage dispatch rule holds it back) the meter would show a truck over
+ * capacity on a load the backend accepts - the UI contradicting the very rule
+ * it exists to explain. `plannedWeightKg` IS the figure OVER_CAPACITY is
+ * judged on, so meter and refusal cannot drift apart.
+ */
+const plannedWeightOf = (shipment: IShipment): number =>
+  shipment.plannedWeightKg ?? 0;
 
 function ExpenseDialog({
   shipment,
@@ -167,6 +193,155 @@ function ExpenseDialog({
   );
 }
 
+/**
+ * Add more confirmed sales to a truck that has not dispatched. The owner's
+ * case: a sale is planned, the truck is half empty, and sending it that way
+ * burns the trip's margin. The list is the SAME eligible pool the planner
+ * uses (confirmed, payment terms met, unshipped, not on another truck), and
+ * each row shows what the sale still needs so it can be fitted to the room
+ * left.
+ */
+function AddSalesDialog({
+  shipment,
+  onClose,
+}: {
+  shipment: IShipment;
+  onClose: () => void;
+}) {
+  const eligible = useGetEligibleSalesQuery();
+  const [addSales, { isLoading }] = useAddShipmentSalesMutation();
+  const [picked, setPicked] = useState<string[]>([]);
+  const [serverError, setServerError] = useState<string | null>(null);
+
+  const sales = eligible.data?.data.sales ?? [];
+  const plannedKg = plannedWeightOf(shipment);
+  const pickedKg = sales
+    .filter((s) => picked.includes(s.id))
+    .reduce((sum, s) => sum + s.totalRemainingKg, 0);
+
+  const toggle = (id: string) => {
+    setServerError(null);
+    setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
+  };
+
+  const onSubmit = async () => {
+    try {
+      await addSales({ id: shipment.id, saleIds: picked }).unwrap();
+      notify.success(
+        picked.length === 1 ? "Sale added to the truck" : "Sales added to the truck",
+      );
+      onClose();
+    } catch (err) {
+      // OVER_CAPACITY and the eligibility refusals name the exact sale - keep
+      // them in view so the pick can be corrected without reopening.
+      setServerError(extractApiError(err).message);
+    }
+  };
+
+  return (
+    <ResponsiveDialog open onOpenChange={(o) => !o && onClose()}>
+      <ResponsiveDialogContent className="sm:max-w-[520px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>Add sales to this truck</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
+            Only sales that are confirmed, have met their payment terms and are
+            not already on a truck can be added.
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
+
+        <LoadMeter
+          loadedKg={plannedKg + pickedKg}
+          capacityKg={shipment.truckCapacityKg}
+          loadedLabel="Planned"
+        />
+
+        {eligible.isLoading ? (
+          <p className="py-3 text-[13px] text-soil">Loading shippable sales…</p>
+        ) : eligible.isError ? (
+          <p className="py-3 text-[13px] text-error">
+            Couldn&apos;t load the shippable sales. Reload and try again.
+          </p>
+        ) : sales.length === 0 ? (
+          <p className="py-3 text-[13px] text-soil">
+            No other sale is ready to ship right now.
+          </p>
+        ) : (
+          <div className="max-h-[46dvh] overflow-y-auto rounded-[2px] border-[1.5px] border-soil/25">
+            {sales.map((s) => (
+              <label
+                key={s.id}
+                className="flex cursor-pointer items-start gap-2.5 border-b border-soil/10 px-3 py-2 last:border-b-0 hover:bg-soil/5"
+              >
+                <input
+                  type="checkbox"
+                  checked={picked.includes(s.id)}
+                  onChange={() => toggle(s.id)}
+                  className="mt-1 h-4 w-4 flex-none accent-[#155744]"
+                />
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-baseline justify-between gap-2">
+                    <Mono className="block text-[12.5px] text-console">
+                      {s.transactionNo}
+                    </Mono>
+                    <Mono className="flex-none text-[12.5px] font-bold text-ink">
+                      {formatKg(s.totalRemainingKg)}
+                    </Mono>
+                  </span>
+                  <span className="block min-w-0 text-[13px] text-ink [overflow-wrap:anywhere]">
+                    {s.buyer.name}
+                  </span>
+                  <span className="mt-0.5 block text-[12px] text-soil">
+                    {s.lines.map((l) => (
+                      <span
+                        key={l.commodityId}
+                        className="mr-2 inline-block whitespace-nowrap"
+                      >
+                        {l.commodityName} <Mono>{formatKg(l.remainingKg)}</Mono>
+                      </span>
+                    ))}
+                  </span>
+                </span>
+              </label>
+            ))}
+          </div>
+        )}
+
+        {serverError ? (
+          <p
+            role="alert"
+            className="rounded-[2px] border-[1.5px] border-error/50 bg-error/[0.06] px-3 py-2 text-[12.5px] font-medium text-error"
+          >
+            {serverError}
+          </p>
+        ) : null}
+
+        <ResponsiveDialogFooter className="gap-2">
+          <AdminButton
+            type="button"
+            variant="outline"
+            className="h-9 px-3.5"
+            onClick={onClose}
+          >
+            Cancel
+          </AdminButton>
+          <AdminButton
+            type="button"
+            disabled={isLoading || picked.length === 0}
+            className="h-9 px-4"
+            onClick={() => void onSubmit()}
+          >
+            {isLoading
+              ? "Adding…"
+              : picked.length > 1
+                ? `Add ${String(picked.length)} sales`
+                : "Add sale"}
+          </AdminButton>
+        </ResponsiveDialogFooter>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
+  );
+}
+
 function CancelDialog({
   shipment,
   onClose,
@@ -246,14 +421,15 @@ export function ShipmentDetail({ id }: { id: string }) {
   const [deleteExpense] = useDeleteShipmentExpenseMutation();
   const [addDocument, addDocState] = useAddShipmentDocumentMutation();
   const [removeDocument] = useRemoveShipmentDocumentMutation();
+  const [removeSale] = useRemoveShipmentSaleMutation();
   const { confirm, confirmationDialog } = useConfirm();
-  const [allocOpen, setAllocOpen] = useState(false);
+  const [addSalesOpen, setAddSalesOpen] = useState(false);
   const [expenseOpen, setExpenseOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
   const [docName, setDocName] = useState("Signed waybill");
   const [signing, setSigning] = useState(false);
 
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <DetailSkeleton facts={8} cards={3} />;
   if (isError || !data)
     return (
       <ErrorMessage
@@ -271,6 +447,20 @@ export function ShipmentDetail({ id }: { id: string }) {
   const anyDriverExtra = Boolean(
     s.driverEmail ?? s.driverCity ?? s.driverLicenseNo ?? s.driverIdNumber,
   );
+  // The half-empty-truck warning the owner asked for: a stated capacity the
+  // planned sales don't come close to filling means another order should ride
+  // along. It warns, never blocks - the admin may know the truck is going
+  // regardless.
+  const plannedKg = plannedWeightOf(s);
+  const roomLeftKg =
+    s.truckCapacityKg !== null ? s.truckCapacityKg - plannedKg : 0;
+  const underFilled =
+    beforeDispatch &&
+    s.truckCapacityKg !== null &&
+    // Never nag off a missing figure: without plannedWeightKg the room left
+    // computes as the whole truck and every shipment would look half empty.
+    s.plannedWeightKg !== null &&
+    roomLeftKg > s.truckCapacityKg * UNDER_FILL_SHARE;
 
   const onDispatch = async () => {
     const ok = await confirm({
@@ -370,6 +560,25 @@ export function ShipmentDetail({ id }: { id: string }) {
     }
   };
 
+  const onRemoveSale = async (saleId: string, transactionNo: string) => {
+    const ok = await confirm({
+      title: `Take ${transactionNo} off this truck?`,
+      description:
+        "The sale returns to the shippable pool and can be planned onto another truck. Nothing about the sale itself changes.",
+      confirmText: "Remove",
+      isDestructive: true,
+    });
+    if (!ok) return;
+    try {
+      await removeSale({ id: s.id, saleId }).unwrap();
+      notify.success(`${transactionNo} removed from this truck`);
+    } catch (err) {
+      notify.error("Couldn't remove the sale", {
+        description: extractApiError(err).message,
+      });
+    }
+  };
+
   const onRemoveDocument = async (documentId: string, name: string) => {
     const ok = await confirm({
       title: "Remove this document?",
@@ -392,8 +601,10 @@ export function ShipmentDetail({ id }: { id: string }) {
     <div className="flex flex-wrap gap-2 xl:flex-col">
       {beforeDispatch ? (
         <>
-          <AdminButton className="h-9 px-4" onClick={() => setAllocOpen(true)}>
-            Allocate lots
+          {/* A page, not a dialog: the lot list is long and a dialog's inner
+              scroll inside the scrolling page was unusable on a phone. */}
+          <AdminButton className="h-9 px-4" asChild>
+            <Link href={`${LIST}/${s.id}/allocate`}>Allocate lots</Link>
           </AdminButton>
           <AdminButton
             className="h-9 px-4"
@@ -458,57 +669,110 @@ export function ShipmentDetail({ id }: { id: string }) {
           later payments. Each sale is its own bordered sub-card so a
           multi-sale trip reads as distinct orders, not one run-on list. */}
       <AdminCard className="px-5 py-3">
-        <div className="mb-2 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
-          Sales on this trip · {s.salesCount} sale
-          {s.salesCount === 1 ? "" : "s"}
-        </div>
-        <div className="grid gap-2.5 pb-2 md:grid-cols-2">
-          {s.sales.map((sale, index) => (
-            <div
-              key={sale.id}
-              className="rounded-[2px] border-[1.5px] border-soil/25 bg-surface-alt/40 px-3.5 py-2.5"
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+            Sales on this trip · {s.salesCount} sale
+            {s.salesCount === 1 ? "" : "s"}
+          </span>
+          {beforeDispatch ? (
+            <AdminButton
+              variant="outline"
+              className="h-7 px-2.5 text-[12px]"
+              onClick={() => setAddSalesOpen(true)}
             >
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                <span className="font-adminmono text-[11px] text-soil/70 tabular-nums">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <Link
-                  href={`/admin/sales/${sale.id}`}
-                  className="font-adminmono text-[13px] font-semibold text-console tabular-nums hover:underline"
-                >
-                  {sale.transactionNo}
-                </Link>
-                <span className="ml-auto">
-                  <SaleStatusBadge status={sale.status} />
-                </span>
-              </div>
-              <div className="mt-1 min-w-0 text-[13px] font-semibold text-ink [overflow-wrap:anywhere]">
-                {sale.buyer.name}
-                {sale.buyer.phone ? (
-                  <span className="font-normal text-soil">
-                    {" "}
-                    · {sale.buyer.phone}
+              + Add sales
+            </AdminButton>
+          ) : null}
+        </div>
+        {/* How full the truck actually is against the capacity that was
+            booked - allocated lots alone would read empty on a truck that is
+            planned but not yet loaded. */}
+        {beforeDispatch && (s.truckCapacityKg !== null || plannedKg > 0) ? (
+          <div className="mb-2.5">
+            <LoadMeter
+              loadedKg={plannedKg}
+              capacityKg={s.truckCapacityKg}
+              loadedLabel="Planned"
+            />
+            {underFilled ? (
+              <p className="mt-1.5 text-[12.5px] font-medium text-harvest-deep">
+                This truck has {formatKg(roomLeftKg)} of room left. Add another
+                sale before it rolls, or send it part-loaded if that is the
+                plan.
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+        <div className="grid gap-2.5 pb-2 md:grid-cols-2">
+          {s.sales.map((sale, index) => {
+            // Removal only where nothing would be silently thrown away: a sale
+            // carrying allocated lots has costing decisions on it, so those get
+            // cleared deliberately in Allocate lots first (the backend refuses
+            // it either way).
+            const hasAllocations = s.allocations.some(
+              (a) => a.sale.id === sale.id,
+            );
+            const removable =
+              beforeDispatch && s.sales.length > 1 && !hasAllocations;
+            return (
+              <div
+                key={sale.id}
+                className="rounded-[2px] border-[1.5px] border-soil/25 bg-surface-alt/40 px-3.5 py-2.5"
+              >
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <span className="font-adminmono text-[11px] text-soil/70 tabular-nums">
+                    {String(index + 1).padStart(2, "0")}
                   </span>
-                ) : null}
-              </div>
-              <div className="mt-1.5 border-t border-soil/15 pt-1.5">
-                <Mono className="text-[12.5px] text-soil">
-                  Agreed <Money compact value={sale.agreedTotalGhs} /> · Paid{" "}
-                  <Money compact value={sale.paidGhs} /> · Balance{" "}
-                  <span
-                    className={cn(
-                      sale.balanceGhs !== null &&
-                        (sale.balanceGhs === 0
-                          ? "text-leaf"
-                          : "text-console-red"),
-                    )}
+                  <Link
+                    href={`/admin/sales/${sale.id}`}
+                    className="font-adminmono text-[13px] font-semibold text-console tabular-nums hover:underline"
                   >
-                    <Money compact value={sale.balanceGhs} />
+                    {sale.transactionNo}
+                  </Link>
+                  <span className="ml-auto flex items-center gap-2">
+                    <SaleStatusBadge status={sale.status} />
+                    {removable ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          void onRemoveSale(sale.id, sale.transactionNo)
+                        }
+                        className="text-[12px] text-console-red"
+                        aria-label={`Remove ${sale.transactionNo} from this shipment`}
+                      >
+                        ✕
+                      </button>
+                    ) : null}
                   </span>
-                </Mono>
+                </div>
+                <div className="mt-1 min-w-0 text-[13px] font-semibold text-ink [overflow-wrap:anywhere]">
+                  {sale.buyer.name}
+                  {sale.buyer.phone ? (
+                    <span className="font-normal text-soil">
+                      {" "}
+                      · {sale.buyer.phone}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="mt-1.5 border-t border-soil/15 pt-1.5">
+                  <Mono className="text-[12.5px] text-soil">
+                    Agreed <Money compact value={sale.agreedTotalGhs} /> · Paid{" "}
+                    <Money compact value={sale.paidGhs} /> · Balance{" "}
+                    <span
+                      className={cn(
+                        sale.balanceGhs !== null &&
+                          (sale.balanceGhs === 0
+                            ? "text-leaf"
+                            : "text-console-red"),
+                      )}
+                    >
+                      <Money compact value={sale.balanceGhs} />
+                    </span>
+                  </Mono>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </AdminCard>
 
@@ -533,19 +797,23 @@ export function ShipmentDetail({ id }: { id: string }) {
           <DetailItem label="Total weight" mono>
             {formatKg(s.totalWeightKg)}
           </DetailItem>
+          {/* Expected arrival is planned on a date picker - there is no time
+              to show. Departure and arrival are stamped by the system at the
+              moment they happen, and on a trip that runs overnight the hour
+              is the whole point, so those stack date over time. */}
           {s.expectedArrivalAt ? (
             <DetailItem label="Expected arrival">
-              {formatShipmentDate(s.expectedArrivalAt)}
+              <DateOnlyCell value={s.expectedArrivalAt} />
             </DetailItem>
           ) : null}
           {s.departedAt ? (
             <DetailItem label="Departed">
-              {formatShipmentDate(s.departedAt)}
+              <DateTimeCell value={s.departedAt} />
             </DetailItem>
           ) : null}
           {s.arrivedAt ? (
             <DetailItem label="Arrived">
-              {formatShipmentDate(s.arrivedAt)}
+              <DateTimeCell value={s.arrivedAt} />
             </DetailItem>
           ) : null}
           {s.notes ? (
@@ -650,8 +918,8 @@ export function ShipmentDetail({ id }: { id: string }) {
                 {doc.name}
               </a>
               <div className="flex flex-none items-center gap-3">
-                <Mono className="text-[12px] text-soil">
-                  {formatShipmentDate(doc.createdAt)}
+                <Mono className="text-right text-[12px] text-soil">
+                  <DateTimeCell value={doc.createdAt} muted />
                 </Mono>
                 {beforeDispatch ? (
                   <button
@@ -813,8 +1081,8 @@ export function ShipmentDetail({ id }: { id: string }) {
 
       <DetailShell main={main} aside={aside} />
 
-      {allocOpen ? (
-        <AllocateDialog shipment={s} onClose={() => setAllocOpen(false)} />
+      {addSalesOpen ? (
+        <AddSalesDialog shipment={s} onClose={() => setAddSalesOpen(false)} />
       ) : null}
       {expenseOpen ? (
         <ExpenseDialog shipment={s} onClose={() => setExpenseOpen(false)} />

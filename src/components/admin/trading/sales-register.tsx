@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
-import { DateOnlyCell } from "@/components/admin/date-cell";
+import { DateTimeCell } from "@/components/admin/date-cell";
 import {
   ConsoleDateField,
   ConsoleFilterBar,
@@ -13,7 +13,7 @@ import {
 } from "@/components/admin/filter-bar";
 import { AdminCard, Mono } from "@/components/admin/ui";
 import { Button } from "@/components/ui/button";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
@@ -194,7 +194,7 @@ export function SalesRegister() {
         header: "Date",
         enableSorting: false,
         meta: columnMeta(),
-        cell: ({ row }) => <DateOnlyCell value={row.original.createdAt} />,
+        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",
@@ -281,7 +281,7 @@ export function SalesRegister() {
           {isError && !search && activeFilterCount === 0 ? null : filterBar}
 
           {isLoading ? (
-            <DataTableSkeleton />
+            <ConsoleTableSkeleton columns={5} />
           ) : isError ? (
             <ErrorMessage
               description={extractApiError(error).message}
@@ -327,7 +327,9 @@ export function SalesRegister() {
                     key={s.id}
                     type="button"
                     onClick={() => router.push(`${LIST}/${s.id}`)}
-                    className="rounded-[8px] border border-soil/25 bg-paper px-3.5 py-[13px] text-left"
+                    // Squared and 1.5px-bordered to match AdminCard, the
+                    // surface every other console screen is filed on.
+                    className="shadow-doc-sm rounded-none border-[1.5px] border-soil/30 bg-paper px-3.5 py-[13px] text-left"
                   >
                     <div className="mb-1.5 flex items-center justify-between gap-2">
                       <span className="truncate text-[14px] font-semibold text-ink">

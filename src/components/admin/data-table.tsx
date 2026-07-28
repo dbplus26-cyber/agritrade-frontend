@@ -254,7 +254,9 @@ export function ConsoleDataTable<TData>({
                   data-state={row.getIsSelected() ? "selected" : undefined}
                   onClick={href ? () => router.push(href) : undefined}
                   className={cn(
-                    "rounded-[8px] border border-soil/25 bg-paper px-3 py-2 data-[state=selected]:border-console/40 data-[state=selected]:bg-console/5",
+                    // Squared with a 1.5px border to match AdminCard, the
+                    // surface every other console screen is filed on.
+                    "rounded-none border-[1.5px] border-soil/30 bg-paper px-3 py-2 data-[state=selected]:border-console/40 data-[state=selected]:bg-console/5",
                     href && "cursor-pointer hover:border-soil/40",
                   )}
                 >

@@ -109,7 +109,10 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
   return (
     <div className="max-w-[560px]">
       <BackButton href={LIST} label="All grants" className="mb-2" />
-      <AdminPageHeader title="New input grant" />
+      <AdminPageHeader
+        title="New input grant"
+        sub="Inputs handed to a farmer, valued in cedis and owed back at harvest"
+      />
 
       <form
         noValidate

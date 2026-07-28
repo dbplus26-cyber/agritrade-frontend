@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { primaryNav, routes } from "@/lib/routes";
 import { siteConfig } from "@/lib/site";
@@ -21,9 +22,20 @@ export async function SiteFooter() {
       <div className="mx-auto max-w-[1312px] px-5 pb-8 pt-10 lg:px-8 lg:pt-12">
         <div className="grid gap-10 border-b border-dashed border-surface/25 pb-8 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr] lg:gap-12">
           <div>
-            <span className="stencil mb-3 block text-[15px] tracking-[0.14em] text-surface">
-              {siteConfig.legalName.toUpperCase()}
-            </span>
+            {/* Mark beside the name, on the dark band. The artwork carries its
+                own dark-green field, so it reads without a plate behind it. */}
+            <div className="mb-3 flex items-center gap-2.5">
+              <Image
+                src="/logo-mark.png"
+                alt=""
+                width={72}
+                height={72}
+                className="h-9 w-9 shrink-0"
+              />
+              <span className="stencil block text-[15px] tracking-[0.14em] text-surface">
+                {siteConfig.legalName.toUpperCase()}
+              </span>
+            </div>
             <p className="max-w-[44ch] text-[13.5px] leading-[1.7]">
               Buying, aggregating and delivering maize, soya beans and
               groundnuts from Ghana&rsquo;s Northern Region.

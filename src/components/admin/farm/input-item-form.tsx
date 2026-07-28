@@ -132,10 +132,11 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
   };
 
   return (
-    <div className="max-w-[520px]">
+    <div className="max-w-[640px]">
       <BackButton href={LIST} label="All items" className="mb-2" />
       <AdminPageHeader
         title={item ? "Edit item" : "New input item"}
+        sub="An input the programme grants to farmers - what it is, and the unit it is issued in"
         actions={item ? <ActiveBadge active={item.isActive} /> : undefined}
       />
 
@@ -161,11 +162,14 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
               {...register("unitLabel")}
             />
           </AdminField>
+          {/* Free text needs the room the two short fields above do not:
+              span the whole card once the card has two columns. */}
           <AdminField
             label="Description"
             optional
             hint="What it actually is, so a field officer picking it knows - e.g. 'NPK 15-15-15, 50kg bag'."
             error={errors.description?.message}
+            className="sm:col-span-2"
           >
             <textarea
               rows={2}
@@ -174,7 +178,7 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
               className={cn(
                 adminInputClass,
                 roCls,
-                "h-auto min-h-[62px] w-full resize-y py-2",
+                "h-auto min-h-[84px] w-full resize-y py-2",
                 errors.description && "border-error",
               )}
               {...register("description")}

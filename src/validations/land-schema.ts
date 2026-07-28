@@ -59,6 +59,7 @@ export const cancelLandSaleSchema = z.object({
 export const landSellerSchema = z.object({
   name: z.string().trim().min(1, "Enter a name").max(150),
   phone: z.string().trim().max(20).or(z.literal("")).optional(),
+  email: z.email("Enter a valid email").max(255).or(z.literal("")).optional(),
   community: z.string().trim().max(120).or(z.literal("")).optional(),
   notes: z.string().trim().max(1000).or(z.literal("")).optional(),
 });

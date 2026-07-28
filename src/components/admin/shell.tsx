@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -293,19 +294,34 @@ function ConsoleSidebar({ activeKey }: { activeKey: string }) {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="gap-0 border-b border-soil/15 pb-4 pt-5 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-0 px-5">
+        {/* Collapsed to the icon rail the mark carries the brand alone, which
+            is exactly what it is for; expanded it sits beside the wordmark. */}
         {collapsed ? (
-          <div className="text-[15px] font-extrabold tracking-[0.06em] text-console">
-            DB
-          </div>
+          <Image
+            src="/logo-mark.png"
+            alt="DB Plus"
+            width={64}
+            height={64}
+            className="h-8 w-8"
+          />
         ) : (
-          <>
-            <div className="text-[16px] font-extrabold tracking-[0.14em] text-console">
-              DB PLUS
+          <div className="flex items-center gap-2.5">
+            <Image
+              src="/logo-mark.png"
+              alt=""
+              width={72}
+              height={72}
+              className="h-9 w-9 shrink-0"
+            />
+            <div className="min-w-0">
+              <div className="text-[16px] font-extrabold tracking-[0.14em] text-console">
+                DB PLUS
+              </div>
+              <div className="mt-0.5 text-[11px] uppercase tracking-[0.06em] text-soil">
+                Trading · Tamale
+              </div>
             </div>
-            <div className="mt-0.5 text-[11px] uppercase tracking-[0.06em] text-soil">
-              Agro Trading · Tamale
-            </div>
-          </>
+          </div>
         )}
       </SidebarHeader>
       <SidebarContent className="px-1.5 pb-6 pt-2.5 group-data-[collapsible=icon]:px-1 [scrollbar-width:none]">
@@ -509,6 +525,47 @@ function Crumbs() {
   );
 }
 
+/**
+ * The console's closing rule: who owns the system and who built it. Sits under
+ * the scrolling content rather than pinned, so it never competes with the work
+ * on screen. Hidden behind the mobile tab bar's clearance on small screens.
+ */
+function ConsoleFooter() {
+  return (
+    <footer className="mt-auto border-t border-soil/15 px-4 pb-[calc(env(safe-area-inset-bottom)+72px)] pt-4 md:pb-5 lg:px-[26px]">
+      <div className="mx-auto flex w-full max-w-[1360px] flex-col items-center gap-2 text-center sm:flex-row sm:justify-between sm:text-left">
+        <div className="flex items-center gap-2.5">
+          <Image
+            src="/logo-mark.png"
+            alt=""
+            width={56}
+            height={56}
+            className="h-7 w-7 shrink-0"
+          />
+          <span className="text-[11.5px] leading-tight text-soil">
+            <span className="block font-semibold text-ink">DB Plus</span>
+            Trading · Tamale
+          </span>
+        </div>
+        <p className="text-[11px] text-soil/80">
+          © {new Date().getFullYear()} DB Plus. All rights reserved.
+          <span className="ml-1">
+            Developed by{" "}
+            <a
+              href="https://manuru.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-console underline-offset-2 hover:underline"
+            >
+              manuru
+            </a>
+          </span>
+        </p>
+      </div>
+    </footer>
+  );
+}
+
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const activeKey = activeNavKey(pathname);
@@ -539,6 +596,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <main className="@container/main mx-auto w-full min-w-0 max-w-[1360px] flex-1 p-4 lg:p-[26px]">
           {children}
         </main>
+        <ConsoleFooter />
       </SidebarInset>
 
       <MobileTabs activeKey={activeKey} />

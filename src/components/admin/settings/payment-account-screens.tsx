@@ -20,7 +20,7 @@ import {
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/button";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
@@ -249,7 +249,7 @@ export function PaymentAccountTable() {
       )}
 
       {isLoading ? (
-        <DataTableSkeleton />
+        <ConsoleTableSkeleton columns={5} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}
@@ -479,7 +479,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
           error={errors.accountName?.message}
         >
           <Input
-            placeholder="e.g. DB Plus Agro Trading Ltd"
+            placeholder="e.g. DB Plus Trading Ltd"
             disabled={readOnly}
             className={cn(
               adminInputClass,
@@ -701,7 +701,7 @@ export function PaymentAccountEdit({ id }: { id: string }) {
   const [deactivate] = useDeactivatePaymentAccountMutation();
   const [remove] = useDeletePaymentAccountMutation();
 
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <FormSkeleton fields={8} />;
   if (isError || !data)
     return (
       <ErrorMessage

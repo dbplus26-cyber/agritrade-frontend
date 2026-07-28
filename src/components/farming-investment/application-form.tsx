@@ -50,14 +50,13 @@ type FieldName = (typeof FIELD_NAMES)[number];
 const isFieldName = (field: string): field is FieldName =>
   (FIELD_NAMES as readonly string[]).includes(field);
 
-/** A stencil rule that opens each section of the application document. */
+/** The stencilled caption that opens each section of the application document. */
 function SectionRule({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mt-2 flex items-center gap-3 first:mt-0">
+    <div className="mt-2 first:mt-0">
       <span className="stencil text-[11px] tracking-[0.22em] text-ink">
         {children}
       </span>
-      <span aria-hidden="true" className="h-px flex-1 bg-soil/30" />
     </div>
   );
 }
@@ -152,7 +151,7 @@ export function ApplicationForm() {
 
   if (reference) {
     return (
-      <DocCard tint="paper" className="px-6 pb-8 pt-7 sm:px-9">
+      <DocCard bleed tint="paper" className="px-5 pb-8 pt-7 sm:px-9">
         <div
           aria-hidden="true"
           className="relative mb-[22px] h-[120px] bg-[repeating-linear-gradient(180deg,transparent_0px,transparent_27px,rgb(89_82_59/0.25)_27px,rgb(89_82_59/0.25)_28px)]"
@@ -199,11 +198,11 @@ export function ApplicationForm() {
   }
 
   return (
-    <DocCard title="APPLICATION FORM" fileNo="N° FA-____">
+    <DocCard bleed title="APPLICATION FORM" fileNo="N° FA-____">
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col gap-[18px] px-6 pb-8 pt-6 sm:px-8"
+        className="flex flex-col gap-[18px] px-5 pb-8 pt-6 sm:px-8"
       >
         <SectionRule>IDENTITY</SectionRule>
         <div className="grid gap-[18px] sm:grid-cols-2 sm:gap-5">

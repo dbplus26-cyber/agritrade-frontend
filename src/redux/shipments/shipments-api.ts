@@ -2,6 +2,7 @@ import { apiSlice } from "../api-slice";
 import { env } from "@/lib/env";
 import { toQueryString } from "@/lib/to-query-string";
 import type {
+  IAddShipmentSalesInput,
   IAllocationInput,
   IAvailableLotsResponse,
   ICreateShipmentInput,
@@ -11,6 +12,7 @@ import type {
   IShipmentListQuery,
   IShipmentListResponse,
   IShipmentResponse,
+  IRemoveShipmentSaleInput,
 } from "@/types/admin-shipment.types";
 
 /** Authenticated download URL for a private shipment document (audited
@@ -70,6 +72,42 @@ export const shipmentsApi = apiSlice.injectEndpoints({
       // Planning a truck takes its sales out of the eligible pool.
       invalidatesTags: [
         { type: "Shipments", id: "LIST" },
+        { type: "EligibleSales", id: "LIST" },
+      ],
+    }),
+
+    /** Take on more orders while the truck is still planned - a half-empty
+     * truck is a trip's margin lost. Both sides move the eligible pool. */
+    addShipmentSales: builder.mutation<
+      IShipmentResponse,
+      IAddShipmentSalesInput
+    >({
+      query: ({ id, saleIds }) => ({
+        url: `admin/shipments/${id}/sales`,
+        method: "POST",
+        body: { saleIds },
+      }),
+      invalidatesTags: (_r, _e, { id }) => [
+        { type: "Shipments", id },
+        { type: "Shipments", id: "LIST" },
+        // A new sale can bring new commodities, so the lot picker changes too.
+        { type: "Shipments", id: `LOTS-${id}` },
+        { type: "EligibleSales", id: "LIST" },
+      ],
+    }),
+
+    removeShipmentSale: builder.mutation<
+      IShipmentResponse,
+      IRemoveShipmentSaleInput
+    >({
+      query: ({ id, saleId }) => ({
+        url: `admin/shipments/${id}/sales/${saleId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (_r, _e, { id }) => [
+        { type: "Shipments", id },
+        { type: "Shipments", id: "LIST" },
+        { type: "Shipments", id: `LOTS-${id}` },
         { type: "EligibleSales", id: "LIST" },
       ],
     }),
@@ -207,6 +245,8 @@ export const {
   useGetAvailableLotsQuery,
   useGetEligibleSalesQuery,
   useCreateShipmentMutation,
+  useAddShipmentSalesMutation,
+  useRemoveShipmentSaleMutation,
   useSetAllocationsMutation,
   useDispatchShipmentMutation,
   useArriveShipmentMutation,

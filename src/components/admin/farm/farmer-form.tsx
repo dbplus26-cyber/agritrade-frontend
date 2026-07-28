@@ -165,7 +165,10 @@ export function FarmerForm({
   return (
     <div className="max-w-[600px]">
       <BackButton href={LIST} label="All farmers" className="mb-2" />
-      <AdminPageHeader title={farmer ? "Edit farmer" : "Add farmer"} />
+      <AdminPageHeader
+        title={farmer ? "Edit farmer" : "Add farmer"}
+        sub="The outgrower's identity, community and guarantors - every input grant is booked against this record"
+      />
 
       <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <AdminCard className="flex flex-col gap-3 px-5 py-4">

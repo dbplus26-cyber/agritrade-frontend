@@ -37,7 +37,6 @@ export function CompanyFile() {
 
       <Reveal delay={120} className="texture-grain-dark rounded-[2px] bg-board p-6 lg:p-9">
         <div className="mb-4 flex items-center gap-2.5">
-          <span aria-hidden="true" className="h-0.5 w-[22px] bg-harvest" />
           <StencilLabel className="text-[11px] tracking-[0.3em] text-harvest lg:text-[12px]">
             SOURCING DISTRICTS
           </StencilLabel>

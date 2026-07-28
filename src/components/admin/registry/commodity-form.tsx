@@ -15,7 +15,7 @@ import {
   adminInputClass,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { FormSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import {
   useCreateCommodityMutation,
@@ -395,7 +395,7 @@ export function CommodityEdit({ id }: { id: string }) {
   const [deactivateCommodity] = useDeactivateCommodityMutation();
   const [deleteCommodity] = useDeleteCommodityMutation();
 
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <FormSkeleton fields={6} />;
   if (isError || !data)
     return (
       <ErrorMessage

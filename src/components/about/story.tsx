@@ -20,7 +20,6 @@ export function Story() {
       <div className="relative mx-auto grid max-w-[1312px] items-start gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-[72px] lg:px-8">
         <div className="relative z-[2]">
           <div className="mb-4 flex items-center gap-2.5">
-            <span aria-hidden="true" className="h-0.5 w-[22px] bg-harvest" />
             <StencilLabel className="text-[11px] tracking-[0.3em] lg:text-[12px]">
               ABOUT · THE TRADING HOUSE
             </StencilLabel>

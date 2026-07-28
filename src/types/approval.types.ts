@@ -47,6 +47,37 @@ export interface IApproval {
   decidedBy: IApprovalActor | null;
   decidedAt: string | null;
   createdAt: string;
+
+  /* The queue's display fields, folded server-side from the request-time
+     snapshot (see the backend approval.mapper). Every one is nullable
+     because a snapshot written by an older code path may not carry it -
+     and because money is redacted to null for staff without financial
+     visibility. Render nothing rather than a placeholder for a genuine
+     null; the absence is itself information. */
+
+  /** The money figure under decision. Null when non-monetary OR redacted. */
+  amount: number | null;
+  currency: string;
+  /** The threshold that was breached, null when the rule is not a limit. */
+  limit: number | null;
+  /** True when `limit` is today's setting rather than the one snapshotted. */
+  limitIsCurrent: boolean;
+  /** Signed quantity headline for non-monetary items ("+250 kg Maize"). */
+  quantityLabel: string | null;
+  quantity: number | null;
+  unit: string | null;
+  unitPrice: number | null;
+  /** Supplier, farmer or buyer, when the snapshot captured one. */
+  counterparty: string | null;
+  warehouse: string | null;
+  subject: string;
+  subjectDetail: string | null;
+  sourceModule: string;
+  /** The human document number (PUR-2026-00418), null where none exists. */
+  sourceRef: string | null;
+  sourceHref: string;
+  /** Requester and decider are the same ACCOUNT - never compare names. */
+  selfDecided: boolean;
 }
 
 export interface IApprovalListResponse {

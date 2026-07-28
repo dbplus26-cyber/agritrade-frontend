@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { PlotGallery, type PlotPhoto } from "@/components/land/plot-gallery";
 import { Reveal } from "@/components/ui/Reveal";
 import { Stamp } from "@/components/ui/Stamp";
 import { StencilLabel } from "@/components/ui/StencilLabel";
@@ -33,8 +33,28 @@ function PlotRow({ label, children }: { label: string; children: React.ReactNode
   );
 }
 
+/**
+ * A plot's photos in register order. `PublicLandPlot` (src/lib/public-land)
+ * still types the cover photo alone, so the optional `photos` array the land
+ * module carries - up to three per plot - is read structurally: the moment the
+ * public endpoint ships it, every one of them shows here with no further
+ * change. The single cover photo is the fallback.
+ */
+function plotPhotos(plot: PublicLandPlot): PlotPhoto[] {
+  const filed = (
+    plot as PublicLandPlot & {
+      photos?: { alt?: null | string; url: string }[];
+    }
+  ).photos;
+  if (filed?.length) {
+    return filed.map((photo) => ({ alt: photo.alt ?? null, url: photo.url }));
+  }
+  return plot.photo ? [{ alt: plot.photoAlt, url: plot.photo }] : [];
+}
+
 function PlotCard({ plot, offset }: { plot: PublicLandPlot; offset: boolean }) {
   const available = plot.status === "AVAILABLE";
+  const photos = plotPhotos(plot);
   const enquiryHref = `${routes.contact}?subject=${encodeURIComponent("Land / plots")}&about=${encodeURIComponent(`Plot ${plot.reference} - ${plot.name}`)}`;
   return (
     <article
@@ -45,21 +65,17 @@ function PlotCard({ plot, offset }: { plot: PublicLandPlot; offset: boolean }) {
     >
       <PerforatedEdge />
       <div>
-        <div className="relative h-[180px] border-b-[1.5px] border-soil/50 sm:h-[210px]">
-          {plot.photo ? (
-            // No scrim over the plot photo any more: a buyer is judging the
-            // land, so it renders at true colour. "Reserved" is carried by the
-            // stamp and the muted enquiry button, not by fogging the picture.
-            <Image
-              src={plot.photo}
-              alt={plot.photoAlt ?? `Plot ${plot.reference} - ${plot.name}`}
-              fill
-              sizes="(min-width: 1024px) 560px, 100vw"
-              className="object-cover"
-            />
-          ) : (
-            // No photo on file yet: the ruled ledger paper keeps the card's
-            // document framing instead of a broken image slot.
+        {photos.length > 0 ? (
+          // "Reserved" is carried by the stamp and the muted enquiry button,
+          // never by fogging the picture.
+          <PlotGallery
+            fallbackAlt={`Plot ${plot.reference} - ${plot.name}`}
+            photos={photos}
+          />
+        ) : (
+          // No photo on file yet: the ruled ledger paper keeps the card's
+          // document framing instead of a broken image slot.
+          <div className="relative h-[180px] border-b-[1.5px] border-soil/50 sm:h-[210px]">
             <div
               aria-hidden="true"
               className="absolute inset-0 bg-[repeating-linear-gradient(180deg,transparent_0px,transparent_35px,rgb(89_82_59/0.28)_35px,rgb(89_82_59/0.28)_36px)]"
@@ -68,8 +84,8 @@ function PlotCard({ plot, offset }: { plot: PublicLandPlot; offset: boolean }) {
                 PHOTO TO FOLLOW
               </span>
             </div>
-          )}
-        </div>
+          </div>
+        )}
         <div className="relative px-5 pb-6 pt-6 sm:px-7">
           <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
             <h3 className="font-display text-[20px] font-bold text-forest lg:text-[24px]">

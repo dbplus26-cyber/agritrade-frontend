@@ -43,7 +43,6 @@ export default async function ContactPage({
           level with each other. */}
       <div className="relative z-[2] mx-auto max-w-[1312px] px-5 pt-9 lg:px-8 lg:pt-[76px]">
         <div className="mb-4 flex items-center gap-2.5">
-          <span aria-hidden="true" className="h-0.5 w-[22px] bg-harvest" />
           <StencilLabel className="text-[11px] tracking-[0.3em] lg:text-[12px]">
             CONTACT · THE DISPATCH OFFICE
           </StencilLabel>

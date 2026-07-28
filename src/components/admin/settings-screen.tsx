@@ -11,7 +11,7 @@ import {
   AdminPageHeader,
   adminInputClass,
 } from "@/components/admin/ui";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { FormSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import {
   useGetSettingsQuery,
@@ -296,7 +296,7 @@ export function SettingsScreen() {
         sub="Thresholds, switches and company details the whole system reads"
       />
       {isLoading ? (
-        <DataTableSkeleton />
+        <FormSkeleton fields={10} className="max-w-none" />
       ) : isError || !data ? (
         <ErrorMessage
           description={extractApiError(error).message}

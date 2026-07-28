@@ -19,7 +19,7 @@ import {
 import { DateTimeCell } from "@/components/admin/date-cell";
 import { RegistryAvatar } from "@/components/admin/registry/supplier-screens";
 import { BackButton } from "@/components/ui/BackButton";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { DetailSkeleton, LedgerSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { ListPagination } from "@/components/ui/ListPagination";
 import {
@@ -104,74 +104,144 @@ const METHOD_OPTIONS = [
   { value: PaymentMethod.BANK, label: "Bank" },
 ] as const;
 
+/**
+ * A signed float movement. The IN/OUT word is what actually carries the
+ * direction: colour alone fails for a colour-blind reader and dies on a
+ * printout, and a leading "-" in a column of similar figures is easy to miss.
+ * A redacted amount prints the placeholder, never "null".
+ */
 function SignedAmount({ amount }: { amount: number | null }) {
   if (amount === null) {
     return (
-      <Mono className="whitespace-nowrap text-[13px] text-soil/50">
-        {MONEY_HIDDEN}
-      </Mono>
+      <div className="text-right">
+        <Mono className="block text-[13px] whitespace-nowrap text-soil/50">
+          {MONEY_HIDDEN}
+        </Mono>
+      </div>
     );
   }
+  const isDebit = amount < 0;
   return (
-    <Mono
-      className={cn(
-        "whitespace-nowrap text-[13px] font-semibold",
-        amount < 0 ? "text-error" : "text-leaf",
-      )}
-    >
-      {amount < 0 ? "-" : "+"}
-      {formatCedis(Math.abs(amount))}
-    </Mono>
+    <div className="text-right">
+      <Mono
+        className={cn(
+          "block text-[13.5px] font-semibold whitespace-nowrap",
+          isDebit ? "text-error" : "text-leaf",
+        )}
+      >
+        {isDebit ? "-" : "+"}
+        {formatCedis(Math.abs(amount))}
+      </Mono>
+      <span
+        className={cn(
+          "block text-[9.5px] font-bold tracking-[0.12em] uppercase",
+          isDebit ? "text-error/70" : "text-leaf/70",
+        )}
+      >
+        {isDebit ? "Out" : "In"}
+      </span>
+    </div>
+  );
+}
+
+/** One line of the float summary: stencil label left, figure hard right. */
+function FigureLine({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-baseline justify-between gap-3 border-b border-soil/10 py-1.5 last:border-b-0">
+      <dt className="flex-none text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+        {label}
+      </dt>
+      <dd className="font-adminmono text-[12.5px] whitespace-nowrap text-ink tabular-nums">
+        {children}
+      </dd>
+    </div>
+  );
+}
+
+/** Column headings for the ledger, so the two figure columns are named. */
+function LedgerHead({ withBalance }: { withBalance: boolean }) {
+  return (
+    <div className="grid grid-cols-[24px_minmax(0,1fr)_124px] items-baseline gap-x-3 border-b-[1.5px] border-soil/25 pb-1.5 text-[9.5px] font-bold tracking-[0.12em] text-soil/70 uppercase @md/ledger:grid-cols-[24px_minmax(0,1fr)_124px_124px]">
+      <span aria-hidden="true" />
+      <span>Entry</span>
+      <span className="text-right">Amount</span>
+      {withBalance ? (
+        <span className="hidden text-right @md/ledger:block">Balance after</span>
+      ) : null}
+    </div>
   );
 }
 
 /**
- * One ledger line: type marker, reason, document number + date, signed amount
- * and (page 1, money visible) the balance the float sat at after this entry.
+ * One ledger line, on a fixed three-track grid: type marker, the entry, then
+ * the money columns. The grid is what makes the ledger read as a ledger - the
+ * old flex row let the description push the amount around, so no two rows'
+ * figures sat on the same edge and the running balance hid in a "Bal …" scrap
+ * of body text.
+ *
+ * `balanceAfter` is undefined when the running balance is not knowable (later
+ * pages, or a redacted ledger); the column is then simply absent rather than
+ * showing an invented number.
  */
 function LedgerRow({
   tx,
   balanceAfter,
+  withBalanceColumn,
 }: {
   tx: IFloatTransaction;
   balanceAfter?: number;
+  /** True when any row on this page can show a balance (keeps tracks aligned). */
+  withBalanceColumn: boolean;
 }) {
   return (
-    <div className="flex items-start gap-2.5 border-b border-soil/12 py-2.5 last:border-b-0">
+    <div className="grid grid-cols-[24px_minmax(0,1fr)_124px] items-start gap-x-3 border-b border-soil/12 py-2.5 last:border-b-0 @md/ledger:grid-cols-[24px_minmax(0,1fr)_124px_124px]">
       <TxMarker type={tx.type} />
-      <div className="min-w-0 flex-1">
-        <div className="flex items-start justify-between gap-3">
-          <p className="min-w-0 flex-1 text-[12.5px] leading-snug text-ink line-clamp-1 [overflow-wrap:anywhere]">
-            {tx.reason ??
-              (tx.purchaseId
-                ? "Paid from float for a purchase"
-                : TX_LABEL[tx.type])}
-            {tx.method ? (
-              <span className="text-soil/60"> · {tx.method}</span>
-            ) : null}
-          </p>
-          <SignedAmount amount={tx.amountGhs} />
-        </div>
-        <div className="mt-0.5 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
-          <span className="flex min-w-0 flex-wrap items-baseline gap-x-2">
-            <Mono className="text-[11px] text-soil/70">{tx.transactionNo}</Mono>
-            <DateTimeCell value={tx.occurredAt} muted />
-            {tx.purchaseId ? (
-              <Link
-                href={`/admin/purchases/${tx.purchaseId}`}
-                className="text-[11.5px] text-forest underline-offset-2 hover:underline"
-              >
-                View purchase
-              </Link>
-            ) : null}
-          </span>
-          {balanceAfter !== undefined ? (
-            <Mono className="text-[11px] whitespace-nowrap text-soil/70">
-              Bal {formatCedis(balanceAfter)}
-            </Mono>
+      <div className="min-w-0">
+        <p className="min-w-0 text-[13px] leading-snug text-ink [overflow-wrap:anywhere]">
+          {tx.reason ??
+            (tx.purchaseId
+              ? "Paid from float for a purchase"
+              : TX_LABEL[tx.type])}
+        </p>
+        <div className="mt-0.5 flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
+          <Mono className="text-[11px] text-soil/70">{tx.transactionNo}</Mono>
+          <DateTimeCell value={tx.occurredAt} muted />
+          {tx.method ? (
+            <span className="text-[11px] text-soil/60">{tx.method}</span>
+          ) : null}
+          {tx.purchaseId ? (
+            <Link
+              href={`/admin/purchases/${tx.purchaseId}`}
+              className="text-[11.5px] text-forest underline-offset-2 hover:underline"
+            >
+              View purchase
+            </Link>
           ) : null}
         </div>
+        {/* Narrow cards have no room for a fourth track, so the balance rides
+            under the entry rather than being dropped from the page. */}
+        {balanceAfter !== undefined ? (
+          <Mono className="mt-1 block text-[11px] text-soil/70 @md/ledger:hidden">
+            Balance after {formatCedis(balanceAfter)}
+          </Mono>
+        ) : null}
       </div>
+      <SignedAmount amount={tx.amountGhs} />
+      {withBalanceColumn ? (
+        <Mono className="hidden text-right text-[13px] whitespace-nowrap text-ink @md/ledger:block">
+          {balanceAfter === undefined ? (
+            <span className="text-soil/40">—</span>
+          ) : (
+            formatCedis(balanceAfter)
+          )}
+        </Mono>
+      ) : null}
     </div>
   );
 }
@@ -481,7 +551,7 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
   const [reconcileOpen, setReconcileOpen] = useState(false);
   const { isSuperAdmin } = useAuthRole();
 
-  if (detail.isLoading) return <DataTableSkeleton />;
+  if (detail.isLoading) return <DetailSkeleton main="ledger" />;
   if (detail.isError || !detail.data)
     return (
       <ErrorMessage
@@ -553,23 +623,47 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
         }
       />
 
+      {/* The ledger card names its own container: the fourth (balance) track
+          appears on the CARD's width, not the viewport's - the card is 340px
+          narrower than the page whenever the side rail is showing. */}
       <DetailShell
         main={
-          <AdminCard className="px-5 py-3">
-            <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
-              Float ledger
-            </p>
+          <AdminCard className="@container/ledger px-5 py-3.5">
+            <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+              <p className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                Float ledger
+              </p>
+              {totalTx > 0 ? (
+                <Mono className="text-[11px] text-soil/70">
+                  {totalTx} {totalTx === 1 ? "entry" : "entries"}
+                </Mono>
+              ) : null}
+            </div>
             {ledger.isLoading ? (
-              <p className="py-2 text-[13px] text-soil">Loading ledger…</p>
+              <LedgerSkeleton rows={5} />
             ) : transactions.length === 0 ? (
               <p className="py-2 text-[13px] text-soil">
                 Nothing in the ledger yet - the first top-up opens it.
               </p>
             ) : (
               <>
+                <LedgerHead withBalance={withBalanceAfter} />
                 {ledgerRows.map(({ balanceAfter, tx }) => (
-                  <LedgerRow key={tx.id} tx={tx} balanceAfter={balanceAfter} />
+                  <LedgerRow
+                    key={tx.id}
+                    tx={tx}
+                    balanceAfter={balanceAfter}
+                    withBalanceColumn={withBalanceAfter}
+                  />
                 ))}
+                {/* Say why the column is missing rather than leaving a reader
+                    to wonder whether the balances simply stopped existing. */}
+                {!withBalanceAfter && ledgerPage > 1 ? (
+                  <p className="mt-2 text-[11.5px] text-soil/70">
+                    Running balances are shown on the first page only - they are
+                    walked back from the live float.
+                  </p>
+                ) : null}
                 <ListPagination
                   page={ledgerPage}
                   totalPages={Math.max(1, Math.ceil(totalTx / 10))}
@@ -605,8 +699,12 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
                   </p>
                 </div>
               </div>
+              {/* The figures as ONE block: the headline float, then the
+                  supporting numbers as ruled label/value lines sharing a right
+                  edge - previously these were three loose sentences and the
+                  eye had to hunt for the money in each one. */}
               <p className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
-                Float balance
+                Cash in hand
               </p>
               <p
                 className={cn(
@@ -625,17 +723,25 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
                   Negative float - {agent.firstName} is fronting their own cash.
                 </p>
               ) : null}
-              {agent.lastReconciliation ? (
-                <p className="mt-1.5 text-[12px] text-soil">
-                  Last reconciled{" "}
-                  {formatConsoleDate(agent.lastReconciliation.performedAt)} (
-                  {formatCedis(agent.lastReconciliation.countedGhs)} counted)
-                </p>
-              ) : (
-                <p className="mt-1.5 text-[12px] text-soil">
-                  Never reconciled yet.
-                </p>
-              )}
+              <dl className="mt-3 border-t border-soil/12 pt-1.5">
+                <FigureLine label="Ledger entries">
+                  <Mono>{totalTx}</Mono>
+                </FigureLine>
+                <FigureLine label="Last counted">
+                  {agent.lastReconciliation ? (
+                    <Mono>
+                      {formatCedis(agent.lastReconciliation.countedGhs)}
+                    </Mono>
+                  ) : (
+                    <span className="text-soil/50">Never</span>
+                  )}
+                </FigureLine>
+                {agent.lastReconciliation ? (
+                  <FigureLine label="Counted on">
+                    {formatConsoleDate(agent.lastReconciliation.performedAt)}
+                  </FigureLine>
+                ) : null}
+              </dl>
             </AdminCard>
 
             {(recons.data?.data.length ?? 0) > 0 ? (

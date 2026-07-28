@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { UsersTable } from "@/components/admin/users/users-table";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { RegisterSkeleton } from "@/components/admin/skeletons";
 
 export const metadata: Metadata = { title: "Users" };
 
@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: "Users" };
  * static prerender. */
 export default function UsersPage() {
   return (
-    <Suspense fallback={<DataTableSkeleton />}>
+    <Suspense fallback={<RegisterSkeleton columns={6} filters={2} />}>
       <UsersTable />
     </Suspense>
   );

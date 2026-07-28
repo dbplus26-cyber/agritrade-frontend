@@ -113,7 +113,7 @@ export function EnquiryForm({
 
   if (reference) {
     return (
-      <DocCard tint="paper" className="px-6 pb-8 pt-7 sm:px-9">
+      <DocCard bleed tint="paper" className="px-5 pb-8 pt-7 sm:px-9">
         <div
           aria-hidden="true"
           className="relative mb-[22px] h-[120px] bg-[repeating-linear-gradient(180deg,transparent_0px,transparent_27px,rgb(89_82_59/0.25)_27px,rgb(89_82_59/0.25)_28px)]"
@@ -157,11 +157,11 @@ export function EnquiryForm({
   }
 
   return (
-    <DocCard title="ENQUIRY FORM" fileNo="N° EN-____">
+    <DocCard bleed title="ENQUIRY FORM" fileNo="N° EN-____">
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col gap-[18px] px-6 pb-8 pt-6 sm:px-8"
+        className="flex flex-col gap-[18px] px-5 pb-8 pt-6 sm:px-8"
       >
         <div className="grid gap-[18px] sm:grid-cols-2 sm:gap-5">
           <div className="flex flex-col gap-[7px]">

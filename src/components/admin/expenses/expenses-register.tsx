@@ -11,13 +11,13 @@ import {
 } from "@/components/admin/ui";
 import { ConsoleDataTable } from "@/components/admin/data-table";
 import {
-  ConsoleDateField,
+  ConsoleDateRange,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { useMoneyVisibility } from "@/hooks/use-money-visibility";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -252,23 +252,17 @@ export function ExpensesRegister() {
             active={filters.scope !== ""}
             className="lg:w-[160px]"
           />
-          <ConsoleDateField
-            label="From"
-            value={filters.from}
-            onChange={(v) => { setFilter("from", v); }}
-            max={filters.to || undefined}
-          />
-          <ConsoleDateField
-            label="To"
-            value={filters.to}
-            onChange={(v) => { setFilter("to", v); }}
-            min={filters.from || undefined}
+          <ConsoleDateRange
+            from={filters.from}
+            to={filters.to}
+            onFromChange={(v) => { setFilter("from", v); }}
+            onToChange={(v) => { setFilter("to", v); }}
           />
         </ConsoleFilterBar>
       )}
 
       {isLoading ? (
-        <DataTableSkeleton />
+        <ConsoleTableSkeleton columns={5} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}

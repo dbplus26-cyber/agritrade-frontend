@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
 import {
-  ConsoleDateField,
+  ConsoleDateRange,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
@@ -23,7 +23,7 @@ import {
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/button";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
@@ -316,23 +316,19 @@ export function SupplierTable() {
             active={statusFilter !== "all"}
             className="lg:w-[150px]"
           />
-          <ConsoleDateField
-            label="Added from"
-            value={from}
-            onChange={(v) => setFilter("from", v)}
-            max={to || undefined}
-          />
-          <ConsoleDateField
-            label="Added to"
-            value={to}
-            onChange={(v) => setFilter("to", v)}
-            min={from || undefined}
+          <ConsoleDateRange
+            fromLabel="Added from"
+            toLabel="Added to"
+            from={from}
+            to={to}
+            onFromChange={(v) => setFilter("from", v)}
+            onToChange={(v) => setFilter("to", v)}
           />
         </ConsoleFilterBar>
       )}
 
       {isLoading ? (
-        <DataTableSkeleton />
+        <ConsoleTableSkeleton columns={5} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}
@@ -387,6 +383,7 @@ export function SupplierTable() {
 /** "" for create, or the record's values for edit. */
 const toSupplierValues = (supplier?: ISupplier): SupplierValues => ({
   name: supplier?.name ?? "",
+  altPhone: supplier?.altPhone ?? "",
   phone: supplier?.phone ?? "",
   community: supplier?.community ?? "",
   sourceType: supplier?.sourceType ?? PurchaseSource.INDIVIDUAL,
@@ -471,6 +468,7 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
           id: supplier.id,
           body: {
             name: values.name,
+            altPhone: opt(values.altPhone),
             phone: opt(values.phone),
             community: opt(values.community),
             sourceType: values.sourceType,
@@ -496,6 +494,9 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
           body: {
             name: values.name,
             ...(values.phone?.trim() ? { phone: values.phone.trim() } : {}),
+            ...(values.altPhone?.trim()
+              ? { altPhone: values.altPhone.trim() }
+              : {}),
             ...(values.community?.trim()
               ? { community: values.community.trim() }
               : {}),
@@ -529,6 +530,7 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
         for (const field of [
           "name",
           "phone",
+          "altPhone",
           "community",
           "notes",
           "email",
@@ -640,6 +642,26 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
               disabled={readOnly}
               className={cn(adminInputClass, roCls, errors.phone && "border-error")}
               {...register("phone")}
+            />
+          </AdminField>
+          {/* A second line reaching the SAME person. Traders here carry two
+              networks, and the number on file is the one that is off when a
+              truck is at the gate. */}
+          <AdminField
+            label="Other phone"
+            optional
+            error={errors.altPhone?.message}
+          >
+            <Input
+              type="tel"
+              placeholder="024 000 0000"
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                errors.altPhone && "border-error",
+              )}
+              {...register("altPhone")}
             />
           </AdminField>
           <AdminField
@@ -834,7 +856,7 @@ export function SupplierEdit({ id }: { id: string }) {
   const [deactivate] = useDeactivateSupplierMutation();
   const [remove] = useDeleteSupplierMutation();
 
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <FormSkeleton fields={10} />;
   if (isError || !data)
     return (
       <ErrorMessage

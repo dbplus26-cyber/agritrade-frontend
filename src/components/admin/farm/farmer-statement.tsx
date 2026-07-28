@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ConsoleDateField } from "@/components/admin/filter-bar";
-import { AdminButton, Mono } from "@/components/admin/ui";
+import { ConsoleDateRange } from "@/components/admin/filter-bar";
+import { AdminButton, AdminPageHeader, Mono } from "@/components/admin/ui";
 import { Money } from "@/components/admin/trading/sale-bits";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { DocumentSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
 import { cn } from "@/lib/utils";
@@ -37,7 +37,7 @@ export function FarmerStatement({
       ...(to ? { to } : {}),
     });
 
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <DocumentSkeleton />;
   if (isError || !data)
     return (
       <ErrorMessage
@@ -50,30 +50,35 @@ export function FarmerStatement({
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between print:hidden">
+      <div className="print:hidden">
         <Link
           href={`/admin/farmers/${id}`}
-          className="text-[13px] text-console underline-offset-2 hover:underline"
+          className="mb-2 inline-block text-[13px] text-console underline-offset-2 hover:underline"
         >
           ← Back to farmer
         </Link>
-        <div className="flex flex-wrap items-end gap-2">
-          <ConsoleDateField
-            label="From"
-            value={from}
-            onChange={setFrom}
-            max={to || undefined}
-          />
-          <ConsoleDateField
-            label="To"
-            value={to}
-            onChange={setTo}
-            min={from || undefined}
+        <AdminPageHeader
+          title={`${st.farmer.name} - statement`}
+          sub="Every grant and repayment with a running balance, ready to print and sign"
+          actions={
+            <AdminButton className="h-9 px-4" onClick={() => window.print()}>
+              Print
+            </AdminButton>
+          }
+        />
+        {/* The window is part of the DOCUMENT, not a list filter, so it sits
+            with the sheet rather than in a toolbar above the heading. */}
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <ConsoleDateRange
+            from={from}
+            to={to}
+            onFromChange={setFrom}
+            onToChange={setTo}
           />
           {from || to ? (
             <AdminButton
               variant="outline"
-              className="h-9 px-3"
+              className="h-8 px-3"
               onClick={() => {
                 setFrom("");
                 setTo("");
@@ -82,20 +87,19 @@ export function FarmerStatement({
               All history
             </AdminButton>
           ) : null}
-          <AdminButton className="h-9 px-4" onClick={() => window.print()}>
-            Print
-          </AdminButton>
         </div>
       </div>
 
-      <div className="mx-auto max-w-[720px] rounded-[8px] border border-soil/25 bg-white p-8 text-ink print:max-w-none print:rounded-none print:border-0 print:p-0">
+      {/* Left-aligned like every other console page - the sheet keeps its own
+          720px measure so it still reads as a piece of paper. */}
+      <div className="max-w-[720px] border-[1.5px] border-soil/30 bg-white p-8 text-ink print:max-w-none print:border-0 print:p-0">
         <div className="flex items-start justify-between border-b-2 border-ink pb-3">
           <div>
             <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">
               DB PLUS
             </div>
             <div className="text-[11px] tracking-[0.06em] text-soil uppercase">
-              Agro Trading · Tamale
+              Trading · Tamale
             </div>
           </div>
           <div className="text-right">

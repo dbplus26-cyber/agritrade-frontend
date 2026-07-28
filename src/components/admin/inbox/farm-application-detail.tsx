@@ -16,7 +16,7 @@ import {
   adminSelectClass,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Absent } from "@/components/admin/registry/registry-bits";
 import { useConfirm } from "@/hooks/use-confirm";
@@ -401,7 +401,7 @@ export function FarmApplicationDetail({ id }: { id: string }) {
   const { data, isLoading, isError, error, refetch } =
     useGetFarmApplicationQuery(id);
 
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <DetailSkeleton facts={8} />;
   if (isError || !data)
     return (
       <ErrorMessage

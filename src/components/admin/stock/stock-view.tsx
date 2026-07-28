@@ -18,7 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
@@ -272,19 +272,34 @@ export function StockView() {
               active={commodityId !== "all"}
               className="lg:w-[190px]"
             />
-            <label className="flex h-8 cursor-pointer select-none items-center gap-2 px-1 text-[13px] text-soil">
+            {/* Kept, but named for what it does. A warehouse/commodity pair
+                that has been fully loaded out drops to a zero balance and the
+                API omits it, so an emptied warehouse reads as "nothing on
+                hand" - indistinguishable from one that never held the goods.
+                Turning this on brings those cleared lines back, which is how
+                the office proves a store was emptied rather than mislaid.
+                "Include empty" said none of that. */}
+            <label
+              title="Show warehouse/commodity lines that have been emptied to a zero balance"
+              className={cn(
+                "flex h-8 cursor-pointer items-center gap-2 rounded-[2px] border-[1.5px] bg-paper px-2.5 text-[13px] whitespace-nowrap transition-colors select-none",
+                includeZero
+                  ? "border-console/60 text-ink"
+                  : "border-soil/30 text-soil",
+              )}
+            >
               <input
                 type="checkbox"
                 checked={includeZero}
                 onChange={(e) => setIncludeZero(e.target.checked)}
                 className="h-3.5 w-3.5 accent-[var(--color-forest)]"
               />
-              Include empty
+              Show cleared lines
             </label>
           </ConsoleFilterBar>
 
           {isLoading ? (
-            <DataTableSkeleton />
+            <ConsoleTableSkeleton columns={5} />
           ) : isError ? (
             <ErrorMessage
               description={extractApiError(error).message}

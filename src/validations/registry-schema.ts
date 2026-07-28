@@ -47,6 +47,7 @@ export type CommodityValues = z.infer<typeof commoditySchema>;
 
 export const warehouseSchema = z.object({
   name: z.string().trim().min(2, "Enter the warehouse name").max(100),
+  description: optionalText(500),
   location: optionalText(200),
 });
 export type WarehouseValues = z.infer<typeof warehouseSchema>;
@@ -54,6 +55,8 @@ export type WarehouseValues = z.infer<typeof warehouseSchema>;
 export const supplierSchema = z.object({
   name: z.string().trim().min(2, "Enter the supplier's name").max(150),
   phone: phoneField,
+  /** A second line reaching the same person - two networks is the norm here. */
+  altPhone: phoneField,
   community: optionalText(120),
   sourceType: z.enum(PurchaseSource),
   notes: optionalText(1000),
@@ -75,6 +78,8 @@ export type SupplierValues = z.infer<typeof supplierSchema>;
 export const buyerSchema = z.object({
   name: z.string().trim().min(2, "Enter the buyer's name").max(150),
   phone: phoneField,
+  /** A second line reaching the same person - two networks is the norm here. */
+  altPhone: phoneField,
   email: z.email("Enter a valid email").max(255).or(z.literal("")).optional(),
   city: optionalText(120),
   notes: optionalText(1000),

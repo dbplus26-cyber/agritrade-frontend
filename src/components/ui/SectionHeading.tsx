@@ -23,7 +23,6 @@ export function SectionHeading({
   return (
     <div className={className}>
       <div className="mb-4 flex items-center gap-2.5">
-        <span aria-hidden="true" className="h-0.5 w-[22px] bg-harvest" />
         <StencilLabel className={dark ? "text-harvest" : undefined}>
           {eyebrow}
         </StencilLabel>

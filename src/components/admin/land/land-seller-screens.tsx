@@ -20,7 +20,7 @@ import {
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/button";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
@@ -188,7 +188,7 @@ export function LandSellerTable() {
       )}
 
       {isLoading ? (
-        <DataTableSkeleton />
+        <ConsoleTableSkeleton columns={4} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}
@@ -243,6 +243,7 @@ export function LandSellerTable() {
 /** "" for create, or the record's values for edit. */
 const toSellerValues = (seller?: ILandSeller): LandSellerValues => ({
   name: seller?.name ?? "",
+  email: seller?.email ?? "",
   phone: seller?.phone ?? "",
   community: seller?.community ?? "",
   notes: seller?.notes ?? "",
@@ -293,6 +294,7 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
           id: seller.id,
           body: {
             name: values.name,
+            email: opt(values.email),
             phone: opt(values.phone),
             community: opt(values.community),
             notes: opt(values.notes),
@@ -304,6 +306,7 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
         const res = await createSeller({
           name: values.name,
           ...(values.phone?.trim() ? { phone: values.phone.trim() } : {}),
+          ...(values.email?.trim() ? { email: values.email.trim() } : {}),
           ...(values.community?.trim()
             ? { community: values.community.trim() }
             : {}),
@@ -315,7 +318,13 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
     } catch (err) {
       const { message, fieldErrors, hasFieldErrors } = extractApiError(err);
       if (hasFieldErrors && fieldErrors) {
-        for (const field of ["name", "phone", "community", "notes"] as const) {
+        for (const field of [
+          "name",
+          "phone",
+          "email",
+          "community",
+          "notes",
+        ] as const) {
           if (fieldErrors[field])
             setError(field, { message: fieldErrors[field] });
         }
@@ -350,6 +359,17 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
               disabled={readOnly}
               className={cn(adminInputClass, roCls, errors.phone && "border-error")}
               {...register("phone")}
+            />
+          </AdminField>
+          {/* Optional: most sellers here are reachable only by phone, but a
+              company seller sends its paperwork by email. */}
+          <AdminField label="Email" optional error={errors.email?.message}>
+            <Input
+              type="email"
+              placeholder="name@example.com"
+              disabled={readOnly}
+              className={cn(adminInputClass, roCls, errors.email && "border-error")}
+              {...register("email")}
             />
           </AdminField>
           <AdminField
@@ -422,7 +442,7 @@ export function LandSellerEdit({ id }: { id: string }) {
   const [deactivate] = useDeactivateLandSellerMutation();
   const [remove] = useDeleteLandSellerMutation();
 
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <FormSkeleton fields={5} />;
   if (isError || !data)
     return (
       <ErrorMessage

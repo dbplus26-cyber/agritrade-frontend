@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AdminCard, AdminPageHeader } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/button";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useGetApprovalQuery } from "@/redux/approvals/approvals-api";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -36,7 +36,7 @@ export function ApprovalDetail({ id }: { id: string }) {
   const { data, isLoading, isError, error, refetch } = useGetApprovalQuery(id);
   const [decision, setDecision] = useState<Decision>(null);
 
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <DetailSkeleton facts={4} />;
   if (isError || !data)
     return (
       <ErrorMessage

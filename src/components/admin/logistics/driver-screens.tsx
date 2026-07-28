@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
 import {
-  ConsoleDateField,
+  ConsoleDateRange,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
@@ -22,7 +22,7 @@ import {
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/button";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
@@ -207,23 +207,19 @@ export function DriverTable() {
             active={statusFilter !== "all"}
             className="lg:w-[150px]"
           />
-          <ConsoleDateField
-            label="Added from"
-            value={from}
-            onChange={(v) => setFilter("from", v)}
-            max={to || undefined}
-          />
-          <ConsoleDateField
-            label="Added to"
-            value={to}
-            onChange={(v) => setFilter("to", v)}
-            min={from || undefined}
+          <ConsoleDateRange
+            fromLabel="Added from"
+            toLabel="Added to"
+            from={from}
+            to={to}
+            onFromChange={(v) => setFilter("from", v)}
+            onToChange={(v) => setFilter("to", v)}
           />
         </ConsoleFilterBar>
       )}
 
       {isLoading ? (
-        <DataTableSkeleton />
+        <ConsoleTableSkeleton columns={5} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}
@@ -624,7 +620,7 @@ export function DriverEdit({ id }: { id: string }) {
   const [deactivate] = useDeactivateDriverMutation();
   const [remove] = useDeleteDriverMutation();
 
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <FormSkeleton fields={6} />;
   if (isError || !data)
     return (
       <ErrorMessage

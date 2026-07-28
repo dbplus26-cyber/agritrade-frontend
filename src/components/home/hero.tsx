@@ -23,16 +23,12 @@ export async function Hero() {
             than the photo column so the photo always governs the crossing. */}
         <div className="relative z-[2] pb-4 lg:pb-24 lg:pr-10 lg:pt-6">
           <div
-            className="mb-6 flex items-center gap-3.5 lg:mb-8"
+            className="mb-6 lg:mb-8"
             style={{ animation: "sack-drop .55s cubic-bezier(.2,.9,.3,1) .05s backwards" }}
           >
             <StencilLabel className="text-[11px] tracking-[0.32em] lg:text-[12px]">
               DISPATCH · TAMALE, NORTHERN REGION
             </StencilLabel>
-            <span
-              aria-hidden="true"
-              className="max-w-[170px] flex-1 border-t border-dashed border-soil/50"
-            />
           </div>
           <p
             className="mb-1.5 font-display text-[19px] font-semibold leading-[1.25] text-soil lg:text-[30px]"
@@ -65,13 +61,17 @@ export async function Hero() {
             spot, aggregated in our Tamale warehouses — delivered by the
             truckload to Accra and Kumasi.
           </p>
+          {/* Phones stack the pair full width - a half-and-half row of two
+              different-length buttons reads as ragged, and a full-width target
+              is the easier thumb tap. They sit side by side from sm, where the
+              column is wide enough to hold both without wrapping. */}
           <div
-            className="flex flex-wrap gap-4"
+            className="flex flex-col gap-3.5 sm:flex-row sm:flex-wrap sm:gap-4"
             style={{ animation: "fade-up .5s ease 1.15s backwards" }}
           >
             <a
               href={contact.phoneHref}
-              className="shadow-block inline-block rounded-[2px] bg-harvest px-6 py-4 text-[15px] font-bold tracking-[0.03em] text-ink transition-[transform,box-shadow] duration-100 hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0_#1F211C] lg:px-8 lg:py-[19px] lg:text-[17px]"
+              className="shadow-block block w-full rounded-[2px] bg-harvest px-6 py-4 text-center text-[15px] font-bold tracking-[0.03em] text-ink transition-[transform,box-shadow] duration-100 hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0_#1F211C] sm:w-auto lg:px-8 lg:py-[19px] lg:text-[17px]"
             >
               {contact.hasPhone ? `Call ${contact.phone}` : "Contact us"}
             </a>
@@ -79,7 +79,7 @@ export async function Hero() {
               href={contact.whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="shadow-doc-sm inline-block rounded-[2px] border-[2.5px] border-forest px-6 py-[13px] text-[15px] font-bold tracking-[0.03em] text-forest transition-[transform,box-shadow] duration-100 hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0_rgb(89_82_59/0.4)] lg:px-8 lg:py-4 lg:text-[17px]"
+              className="shadow-doc-sm block w-full rounded-[2px] border-[2.5px] border-forest px-6 py-[13px] text-center text-[15px] font-bold tracking-[0.03em] text-forest transition-[transform,box-shadow] duration-100 hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0_rgb(89_82_59/0.4)] sm:w-auto lg:px-8 lg:py-4 lg:text-[17px]"
             >
               WhatsApp us
             </a>

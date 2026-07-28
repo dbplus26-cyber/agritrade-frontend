@@ -25,7 +25,6 @@ export default function FarmingInvestmentPage() {
       <section className="mx-auto max-w-[1312px] px-5 pb-10 pt-10 lg:px-8 lg:pb-16 lg:pt-20">
         <div className="max-w-[900px]">
         <div className="mb-4 flex items-center gap-2.5">
-          <span aria-hidden="true" className="h-0.5 w-[22px] bg-harvest" />
           <StencilLabel className="text-[11px] tracking-[0.3em] lg:text-[12px]">
             FARMING INVESTMENT
           </StencilLabel>

@@ -5,12 +5,12 @@ import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
 import {
-  ConsoleDateField,
+  ConsoleDateRange,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
 import { AdminCard } from "@/components/admin/ui";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useGetStockMovementsQuery } from "@/redux/stock/stock-api";
@@ -171,24 +171,17 @@ export function StockMovements({
           active={filters.commodity !== "all"}
           className="lg:w-[180px]"
         />
-        <ConsoleDateField
-          label="From"
-          value={filters.from}
-          max={filters.to || undefined}
-          onChange={(v) => setFilter("from", v)}
-          className="lg:w-[150px]"
-        />
-        <ConsoleDateField
-          label="To"
-          value={filters.to}
-          min={filters.from || undefined}
-          onChange={(v) => setFilter("to", v)}
-          className="lg:w-[150px]"
+        <ConsoleDateRange
+          from={filters.from}
+          to={filters.to}
+          onFromChange={(v) => setFilter("from", v)}
+          onToChange={(v) => setFilter("to", v)}
+          fieldClassName="lg:w-[150px]"
         />
       </ConsoleFilterBar>
 
       {isLoading ? (
-        <DataTableSkeleton />
+        <ConsoleTableSkeleton columns={6} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}

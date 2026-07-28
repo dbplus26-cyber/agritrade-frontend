@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { AdminButton } from "@/components/admin/ui";
-import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
+import { AdminButton, AdminPageHeader } from "@/components/admin/ui";
+import { DocumentSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatKg } from "@/lib/format-money";
@@ -20,7 +20,7 @@ import { formatShipmentDate } from "./shipment-bits";
 export function Waybill({ id }: { id: string }) {
   const { data, isLoading, isError, error, refetch } = useGetShipmentQuery(id);
 
-  if (isLoading) return <DataTableSkeleton />;
+  if (isLoading) return <DocumentSkeleton lines={4} />;
   if (isError || !data)
     return (
       <ErrorMessage
@@ -34,37 +34,46 @@ export function Waybill({ id }: { id: string }) {
   return (
     <div>
       {/* Toolbar (never printed) */}
-      <div className="mb-4 flex items-center justify-between print:hidden">
+      <div className="print:hidden">
         <Link
           href={`/admin/shipments/${s.id}`}
-          className="text-[13px] text-console underline-offset-2 hover:underline"
+          className="mb-2 inline-block text-[13px] text-console underline-offset-2 hover:underline"
         >
           ← Back to shipment
         </Link>
-        <div className="flex flex-wrap items-center gap-2">
-          <AdminButton variant="outline" className="h-9 px-4" asChild>
-            <a
-              href={shipmentWaybillPdfUrl(s.id)}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Download PDF
-            </a>
-          </AdminButton>
-          <AdminButton className="h-9 px-4" onClick={() => window.print()}>
-            Print
-          </AdminButton>
-        </div>
+        <AdminPageHeader
+          title={`Waybill ${s.transactionNo}`}
+          sub={`What ${s.truckReg} is carrying to ${s.destination} - print it and have the driver sign`}
+          actions={
+            <>
+              <AdminButton variant="outline" className="h-9 px-4" asChild>
+                <a
+                  href={shipmentWaybillPdfUrl(s.id)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Download PDF
+                </a>
+              </AdminButton>
+              <AdminButton className="h-9 px-4" onClick={() => window.print()}>
+                Print
+              </AdminButton>
+            </>
+          }
+        />
       </div>
 
-      <div className="mx-auto max-w-[720px] rounded-[8px] border border-soil/25 bg-white p-8 text-ink print:max-w-none print:rounded-none print:border-0 print:p-0">
+      {/* Left-aligned like every other console page - the sheet keeps its own
+          720px measure so it still reads as a piece of paper. Squared and
+          1.5px-bordered to match AdminCard. */}
+      <div className="max-w-[720px] border-[1.5px] border-soil/30 bg-white p-8 text-ink print:max-w-none print:border-0 print:p-0">
         <div className="flex items-start justify-between border-b-2 border-ink pb-3">
           <div>
             <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">
               DB PLUS
             </div>
             <div className="text-[11px] tracking-[0.06em] text-soil uppercase">
-              Agro Trading · Tamale
+              Trading · Tamale
             </div>
           </div>
           <div className="text-right">
