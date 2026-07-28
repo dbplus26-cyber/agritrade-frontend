@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   DateRangeSelector,
   DEFAULT_RANGE,
@@ -8,14 +9,18 @@ import {
 import { Money } from "@/components/admin/trading/sale-bits";
 import { AdminButton, AdminCard, Mono, ToneBadge } from "@/components/admin/ui";
 import { env } from "@/lib/env";
+import { extractApiError } from "@/lib/extract-api-error";
+import { formatDateTime } from "@/lib/format-date";
 import { formatKg } from "@/lib/format-money";
 import { toQueryString } from "@/lib/to-query-string";
 import { cn } from "@/lib/utils";
 import {
   useGetAgentPerformanceQuery,
+  useGetCashflowForecastQuery,
   useGetExpenseSummaryQuery,
   useGetProfitReportQuery,
 } from "@/redux/reports/reports-api";
+import type { ForecastDays } from "@/types/ops.types";
 import type { IReportWindow } from "@/types/report.types";
 
 import { DebtorsTable } from "./debtors-table";
@@ -171,6 +176,172 @@ function AgentPerformance({
   );
 }
 
+const FORECAST_DAYS: ForecastDays[] = [30, 60, 90];
+const LIST_CAP = 6;
+
+/**
+ * "Cash coming in" - the forward look: confirmed sale balances plus farm
+ * dues falling inside the chosen window, with the biggest positions listed.
+ */
+function CashComingIn() {
+  const [days, setDays] = useState<ForecastDays>(30);
+  const { data, isLoading, isError, error } = useGetCashflowForecastQuery({
+    days,
+  });
+  const f = data?.data.forecast;
+  const saleRows = f?.saleRows ?? [];
+  const farmRows = f?.farmRows ?? [];
+
+  const kpi = (label: string, value: number | null) => (
+    <div className="min-w-0 flex-1 rounded-[6px] border border-soil/20 bg-surface-alt/50 px-3.5 py-2.5">
+      <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+        {label}
+      </div>
+      <div className="font-adminmono mt-0.5 text-[17px] font-bold text-leaf tabular-nums">
+        <Money value={value} compact />
+      </div>
+    </div>
+  );
+
+  const moreLine = (hidden: number) =>
+    hidden > 0 ? (
+      <p className="pt-1.5 text-[12px] text-soil/70">
+        + {hidden} more in this window
+      </p>
+    ) : null;
+
+  return (
+    <AdminCard className="px-5 py-4">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+          Cash coming in
+        </span>
+        <div className="flex gap-1">
+          {FORECAST_DAYS.map((d) => (
+            <button
+              key={d}
+              type="button"
+              onClick={() => setDays(d)}
+              aria-pressed={days === d}
+              className={cn(
+                "cursor-pointer rounded-[2px] border-[1.5px] px-2.5 py-1 text-[12px] font-semibold transition-colors",
+                days === d
+                  ? "border-console bg-console text-white"
+                  : "border-soil/30 bg-paper text-soil hover:border-console/60",
+              )}
+            >
+              {d}d
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {isLoading ? (
+        <p className="py-2 text-[13px] text-soil">Loading the forecast…</p>
+      ) : isError ? (
+        <p className="py-2 text-[13px] text-error">
+          {extractApiError(error).message}
+        </p>
+      ) : (
+        <>
+          <div className="mb-4 flex flex-col gap-2 min-[420px]:flex-row">
+            {kpi("Sales receivable", f?.salesReceivableGhs ?? null)}
+            {kpi("Farm dues", f?.farmDueGhs ?? null)}
+          </div>
+
+          <div className="grid grid-cols-1 gap-x-8 gap-y-4 xl:grid-cols-2">
+            <div>
+              <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.06em] text-soil/70">
+                Sale balances
+              </div>
+              {saleRows.length === 0 ? (
+                <p className="py-1.5 text-[13px] text-soil">
+                  No open sale balances in this window.
+                </p>
+              ) : (
+                <>
+                  {saleRows.slice(0, LIST_CAP).map((r) => (
+                    <div
+                      key={r.id}
+                      className="flex items-baseline justify-between gap-3 border-t border-soil/10 py-1.5 text-[13px] first:border-t-0"
+                    >
+                      <div className="min-w-0">
+                        <span
+                          className="block min-w-0 text-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere]"
+                          title={r.buyer.name}
+                        >
+                          {r.buyer.name}
+                        </span>
+                        <Link
+                          href={`/admin/sales/${r.id}`}
+                          className="font-adminmono text-[11.5px] text-console tabular-nums underline-offset-2 hover:underline"
+                        >
+                          {r.transactionNo}
+                        </Link>
+                      </div>
+                      <Mono className="flex-none text-ink">
+                        <Money value={r.balanceGhs} compact />
+                      </Mono>
+                    </div>
+                  ))}
+                  {moreLine(saleRows.length - LIST_CAP)}
+                </>
+              )}
+            </div>
+
+            <div>
+              <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.06em] text-soil/70">
+                Farm dues
+              </div>
+              {farmRows.length === 0 ? (
+                <p className="py-1.5 text-[13px] text-soil">
+                  No farm dues in this window.
+                </p>
+              ) : (
+                <>
+                  {farmRows.slice(0, LIST_CAP).map((r, i) => (
+                    <div
+                      key={`${r.farmer.id}-${r.season.id}-${i}`}
+                      className="flex items-baseline justify-between gap-3 border-t border-soil/10 py-1.5 text-[13px] first:border-t-0"
+                    >
+                      <div className="min-w-0">
+                        <span className="flex min-w-0 flex-wrap items-baseline gap-x-1.5">
+                          <Link
+                            href={`/admin/farmers/${r.farmer.id}`}
+                            className="min-w-0 text-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere] underline-offset-2 hover:underline"
+                            title={r.farmer.name}
+                          >
+                            {r.farmer.name}
+                          </Link>
+                          <span className="text-[11.5px] text-soil">
+                            {r.season.name}
+                          </span>
+                        </span>
+                        <span className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[11.5px] text-soil">
+                          Due {formatDateTime(r.dueDate)}
+                          {r.daysOverdue > 0 ? (
+                            <ToneBadge tone="alert">
+                              {r.daysOverdue}d overdue
+                            </ToneBadge>
+                          ) : null}
+                        </span>
+                      </div>
+                      <Mono className="flex-none text-ink">
+                        <Money value={r.outstandingGhs} compact />
+                      </Mono>
+                    </div>
+                  ))}
+                  {moreLine(farmRows.length - LIST_CAP)}
+                </>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </AdminCard>
+  );
+}
+
 export function ReportsLive() {
   const [window, setWindow] = useState<IReportWindow>(DEFAULT_RANGE);
   const profit = useGetProfitReportQuery(window);
@@ -236,6 +407,10 @@ export function ReportsLive() {
 
       <div className="mb-5">
         <PlTrendChart />
+      </div>
+
+      <div className="mb-5">
+        <CashComingIn />
       </div>
 
       <div className="mb-5">

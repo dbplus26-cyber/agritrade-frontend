@@ -1,6 +1,10 @@
 import { apiSlice } from "../api-slice";
 import { toQueryString } from "@/lib/to-query-string";
 import type {
+  ForecastDays,
+  ICashflowForecastResponse,
+} from "@/types/ops.types";
+import type {
   IActivityResponse,
   IAgentPerformanceResponse,
   ICashflowResponse,
@@ -70,12 +74,20 @@ export const reportsApi = apiSlice.injectEndpoints({
       query: (p) => `admin/reports/debtors${toQueryString(p ?? {})}`,
       providesTags: [{ type: "Reports", id: "DEBTORS" }],
     }),
+    getCashflowForecast: builder.query<
+      ICashflowForecastResponse,
+      { days: ForecastDays }
+    >({
+      query: (p) => `admin/reports/cashflow-forecast${toQueryString(p)}`,
+      providesTags: [{ type: "Reports", id: "CASHFLOW_FORECAST" }],
+    }),
   }),
 });
 
 export const {
   useGetActivityQuery,
   useGetAgentPerformanceQuery,
+  useGetCashflowForecastQuery,
   useGetCashflowQuery,
   useGetDashboardQuery,
   useGetDebtorsQuery,
