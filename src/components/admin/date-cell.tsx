@@ -3,9 +3,13 @@ import { formatTableDate, formatTableTime } from "@/lib/format-date";
 import { cn } from "@/lib/utils";
 
 /**
- * Date cells for the admin data tables: ONE line, in a DEDICATED date column.
- * Timestamps read "Jul 12, 2026, 2:30 PM"; business dates drop the time.
- * Dates never ride inside another column's cell - they get their own header.
+ * Date cells for the admin data tables, in a DEDICATED date column - dates
+ * never ride inside another column's cell.
+ *
+ * A timestamp stacks: the date on top, the time muted beneath it. Scanning a
+ * register is a date-first job, and a single "Jul 12, 2026, 2:30 PM" line
+ * makes every row wide enough to force the columns that carry the actual
+ * numbers into a truncation nobody wants. Business dates drop the time.
  */
 
 interface IDateCellProps {
@@ -17,13 +21,22 @@ interface IDateCellProps {
 const isInvalid = (value: string | null | undefined): value is null | undefined =>
   !value || Number.isNaN(new Date(value).getTime());
 
-/** Single-line date + time for timestamp columns (createdAt etc.). */
+/** Stacked date over time for timestamp columns (createdAt etc.). */
 export function DateTimeCell({ value, muted }: IDateCellProps) {
   if (isInvalid(value)) return <Absent />;
   return (
-    <span className={cn("whitespace-nowrap text-[12.5px]", muted && "text-soil")}>
-      {formatTableDate(value)}
-      <span className="text-soil/70">, {formatTableTime(value)}</span>
+    <span className="block leading-[1.35]">
+      <span
+        className={cn(
+          "block whitespace-nowrap text-[12.5px]",
+          muted && "text-soil",
+        )}
+      >
+        {formatTableDate(value)}
+      </span>
+      <span className="block whitespace-nowrap text-[11.5px] text-soil/70">
+        {formatTableTime(value)}
+      </span>
     </span>
   );
 }
