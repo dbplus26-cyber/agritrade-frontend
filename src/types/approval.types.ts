@@ -21,10 +21,17 @@ export enum ApprovalStatus {
   REJECTED = "REJECTED",
 }
 
+/** A resolved requester/decider - id plus display name. */
+export interface IApprovalActor {
+  id: string;
+  name: string;
+}
+
 /**
  * One approval request. `summary` is the display snapshot captured at
  * request time - its shape varies by action, so consumers must render it
- * defensively (see approval-bits).
+ * defensively (see approval-bits). `requestedBy`/`decidedBy` are resolved
+ * server-side; null only when the user no longer resolves.
  */
 export interface IApproval {
   id: string;
@@ -35,7 +42,9 @@ export interface IApproval {
   summary: unknown;
   note: string | null;
   requestedById: string;
+  requestedBy: IApprovalActor | null;
   decidedById: string | null;
+  decidedBy: IApprovalActor | null;
   decidedAt: string | null;
   createdAt: string;
 }

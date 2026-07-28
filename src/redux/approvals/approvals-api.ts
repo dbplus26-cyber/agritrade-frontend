@@ -42,6 +42,11 @@ export const approvalsApi = apiSlice.injectEndpoints({
           : [{ type: "Approvals" as const, id: "LIST" }],
     }),
 
+    getApproval: builder.query<IApprovalResponse, string>({
+      query: (id) => `admin/approvals/${id}`,
+      providesTags: (_r, _e, id) => [{ type: "Approvals", id }],
+    }),
+
     getPendingApprovalsCount: builder.query<IPendingCountResponse, void>({
       query: () => "admin/approvals/pending-count",
       providesTags: [{ type: "ApprovalsCount", id: "COUNT" }],
@@ -70,6 +75,7 @@ export const approvalsApi = apiSlice.injectEndpoints({
 
 export const {
   useGetApprovalsQuery,
+  useGetApprovalQuery,
   useGetPendingApprovalsCountQuery,
   useApproveApprovalMutation,
   useRejectApprovalMutation,

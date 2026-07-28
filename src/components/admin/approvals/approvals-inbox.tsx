@@ -2,35 +2,20 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ConsoleDateField,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
-import { AdminCard, AdminField, adminInputClass } from "@/components/admin/ui";
+import { AdminCard } from "@/components/admin/ui";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { DataTableSkeleton } from "@/components/ui/DataTableSkeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { ListPagination } from "@/components/ui/ListPagination";
-import {
-  useApproveApprovalMutation,
-  useGetApprovalsQuery,
-  useRejectApprovalMutation,
-} from "@/redux/approvals/approvals-api";
+import { useGetApprovalsQuery } from "@/redux/approvals/approvals-api";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
-import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import {
   ApprovalAction,
@@ -38,17 +23,20 @@ import {
   type IApproval,
   type IApprovalListQuery,
 } from "@/types/approval.types";
+import { Absent } from "@/components/admin/registry/registry-bits";
 import {
-  approveFormSchema,
-  rejectFormSchema,
-  type RejectFormValues,
-} from "@/validations/approval-schema";
-import { formatConsoleDate } from "@/components/admin/purchases/purchase-bits";
-import {
+  ACTION_LABEL,
   ActionBadge,
   ApprovalStatusBadge,
+  approvalStamp,
+  MetaRow,
+  MetaStrip,
+  ModuleValue,
+  stencilCls,
   summaryLine,
+  waitingFor,
 } from "./approval-bits";
+import { DecideDialog, type Decision } from "./decide-dialog";
 
 const FILTER_DEFAULTS = {
   status: ApprovalStatus.PENDING as string,
@@ -57,23 +45,24 @@ const FILTER_DEFAULTS = {
   to: "",
 };
 
+/** Every action the engine knows is filterable - derived from ACTION_LABEL
+ * so a new backend action can never be missing from the filter. */
 const ACTION_FILTER_OPTIONS = [
   { value: "all", label: "All actions" },
-  { value: ApprovalAction.PURCHASE_ABOVE_THRESHOLD, label: "Purchases" },
-  { value: ApprovalAction.STOCK_ADJUSTMENT, label: "Stock adjustments" },
-  { value: ApprovalAction.PUBLISH_TO_WEBSITE, label: "Publishing" },
-] as const;
+  ...Object.values(ApprovalAction).map((action) => ({
+    value: action as string,
+    label: ACTION_LABEL[action],
+  })),
+];
 
 const PAGE_SIZE = 10;
-
-type Decision = { approval: IApproval; kind: "approve" | "reject" } | null;
 
 /**
  * /admin/approvals - the owner's inbox, designed to be workable from a
  * phone: stacked decision cards, big touch targets, the whole story on the
- * card (what, how much, who asked, when). Approving applies the underlying
- * change in the same server transaction; rejecting never undoes anything by
- * itself.
+ * card (what, from which module, who asked, who decided, when). Approving
+ * applies the underlying change in the same server transaction; rejecting
+ * never undoes anything by itself.
  */
 export function ApprovalsInbox() {
   const {
@@ -170,7 +159,7 @@ export function ApprovalsInbox() {
           onChange={(v) => setFilter("action", v)}
           options={ACTION_FILTER_OPTIONS}
           active={filters.action !== "all"}
-          className="lg:w-[190px]"
+          className="lg:w-[210px]"
         />
         <ConsoleDateField
           label="From"
@@ -231,7 +220,14 @@ export function ApprovalsInbox() {
   );
 }
 
-/** One decision card - the whole story, workable with a thumb. */
+/**
+ * One decision card. Every card has the same five fixed zones so the grid
+ * reads as one system: header (action badge + timestamp), title block
+ * (headline + detail, min-height reserved), meta strip (From / Requested by
+ * / Decided by - always the same three rows), the decider's note when there
+ * is one, and a footer pinned to the bottom edge (decide buttons on pending,
+ * status badge + Details on decided).
+ */
 function ApprovalCard({
   approval,
   onDecide,
@@ -240,171 +236,115 @@ function ApprovalCard({
   onDecide: (kind: "approve" | "reject") => void;
 }) {
   const { headline, detail } = summaryLine(approval.action, approval.summary);
-  const isPurchase = approval.entityType === "Purchase";
   const pending = approval.status === ApprovalStatus.PENDING;
+  // The decided-at stamp, or null while the request is still pending.
+  const decidedAt = !pending ? approval.decidedAt : null;
 
   return (
-    <AdminCard className="p-4">
-      <div className="flex flex-wrap items-center gap-2">
+    <AdminCard className="flex h-full flex-col p-4">
+      {/* 1. Header: what kind of request, and when it arrived. Wraps on
+          ultra-narrow cards - the stamp drops under the badge, still right. */}
+      <div className="flex flex-wrap items-start justify-between gap-x-2 gap-y-0.5">
         <ActionBadge action={approval.action} />
-        {!pending ? <ApprovalStatusBadge status={approval.status} /> : null}
-        <span className="ml-auto whitespace-nowrap text-[12px] text-soil">
-          {formatConsoleDate(approval.createdAt)}
-        </span>
-      </div>
-
-      <div className="font-adminmono mt-2.5 text-[19px] font-bold text-ink">
-        {headline}
-      </div>
-      {detail ? (
-        <div className="mt-0.5 text-[13px] leading-[1.5] text-soil">
-          {detail}
+        <div className="ml-auto flex-none text-right">
+          <div className="font-adminmono text-[11.5px] tabular-nums text-soil">
+            {approvalStamp(approval.createdAt)}
+          </div>
+          {pending ? (
+            <div className="text-[11px] italic text-soil/70">
+              {waitingFor(approval.createdAt)}
+            </div>
+          ) : null}
         </div>
-      ) : null}
+      </div>
 
-      {isPurchase ? (
-        <Link
-          href={`/admin/purchases/${approval.entityId}`}
-          className="mt-1.5 inline-block text-[13px] font-semibold text-console underline-offset-2 hover:underline"
-        >
-          View the purchase →
-        </Link>
-      ) : null}
+      {/* 2. Title: the figure that matters, then the one-line story.
+          min-height reserves the detail line so grid rows stay level. */}
+      <div className="mt-3 min-h-[44px]">
+        <div className="font-adminmono text-[18px] leading-tight font-bold text-ink [overflow-wrap:anywhere]">
+          {headline}
+        </div>
+        {detail ? (
+          <div className="mt-0.5 text-[13px] leading-[1.5] text-soil [overflow-wrap:anywhere]">
+            {detail}
+          </div>
+        ) : null}
+      </div>
 
+      {/* 3. Meta strip: the accountability trail, identical on every card. */}
+      <MetaStrip className="mt-3">
+        <MetaRow label="From">
+          <ModuleValue
+            entityType={approval.entityType}
+            entityId={approval.entityId}
+          />
+        </MetaRow>
+        <MetaRow label="Requested by">
+          {approval.requestedBy?.name ?? "Unknown"}
+        </MetaRow>
+        <MetaRow label="Decided by">
+          {decidedAt ? (
+            <>
+              {approval.decidedBy?.name ?? "Unknown"}
+              <span className="text-soil"> · {approvalStamp(decidedAt)}</span>
+            </>
+          ) : (
+            <Absent />
+          )}
+        </MetaRow>
+      </MetaStrip>
+
+      {/* 4. Note - only when someone wrote one. */}
       {approval.note ? (
-        <div className="mt-2.5 border-l-2 border-soil/40 pl-2.5 text-[13px] italic text-soil">
-          {approval.note}
+        <div className="mt-3 border-l-2 border-soil/40 pl-2.5">
+          <div className={stencilCls}>
+            {pending ? "Note" : "Decider's note"}
+          </div>
+          <div className="text-[13px] italic text-soil [overflow-wrap:anywhere]">
+            {approval.note}
+          </div>
         </div>
       ) : null}
 
-      {pending ? (
-        <div className="mt-3.5 flex gap-2">
-          <Button
-            variant="harvest"
-            className="h-9 flex-1 sm:flex-none sm:px-6"
-            onClick={() => onDecide("approve")}
-          >
-            Approve
-          </Button>
-          <Button
-            variant="outline"
-            className="h-9 flex-1 text-console-red hover:text-console-red sm:flex-none sm:px-6"
-            onClick={() => onDecide("reject")}
-          >
-            Reject
-          </Button>
-        </div>
-      ) : approval.decidedAt ? (
-        <div className="mt-2.5 text-[12px] text-soil">
-          Decided {formatConsoleDate(approval.decidedAt)}
-        </div>
-      ) : null}
+      {/* 5. Footer, pinned to the bottom so actions align across cards. */}
+      <div className="mt-auto flex items-center gap-2 pt-3.5">
+        {pending ? (
+          <>
+            <Link
+              href={`/admin/approvals/${approval.id}`}
+              className="flex-none text-[12px] font-semibold whitespace-nowrap text-console underline-offset-2 hover:underline"
+            >
+              Details
+            </Link>
+            <div className="flex min-w-0 flex-1 justify-end gap-2">
+              <Button
+                variant="harvest"
+                className="h-9 flex-1 sm:flex-none sm:px-5"
+                onClick={() => onDecide("approve")}
+              >
+                Approve
+              </Button>
+              <Button
+                variant="outline"
+                className="h-9 flex-1 text-console-red hover:text-console-red sm:flex-none sm:px-5"
+                onClick={() => onDecide("reject")}
+              >
+                Reject
+              </Button>
+            </div>
+          </>
+        ) : (
+          <>
+            <ApprovalStatusBadge status={approval.status} />
+            <Link
+              href={`/admin/approvals/${approval.id}`}
+              className="ml-auto text-[12px] font-semibold whitespace-nowrap text-console underline-offset-2 hover:underline"
+            >
+              Details
+            </Link>
+          </>
+        )}
+      </div>
     </AdminCard>
-  );
-}
-
-/** Approve (note optional) / reject (note required) in one dialog. */
-function DecideDialog({
-  decision,
-  onClose,
-}: {
-  decision: Decision;
-  onClose: () => void;
-}) {
-  const [approve, { isLoading: approving }] = useApproveApprovalMutation();
-  const [reject, { isLoading: rejecting }] = useRejectApprovalMutation();
-  const isReject = decision?.kind === "reject";
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<RejectFormValues>({
-    resolver: zodResolver(isReject ? rejectFormSchema : approveFormSchema),
-    values: { note: "" },
-  });
-
-  const close = () => {
-    reset();
-    onClose();
-  };
-
-  const onSubmit = handleSubmit(async (values) => {
-    if (!decision) return;
-    const note = values.note.trim() || undefined;
-    try {
-      if (isReject) {
-        await reject({ id: decision.approval.id, note: values.note }).unwrap();
-        notify.success("Request rejected");
-      } else {
-        await approve({ id: decision.approval.id, note }).unwrap();
-        notify.success("Approved and applied");
-      }
-      close();
-    } catch (err) {
-      notify.error(extractApiError(err).message);
-    }
-  });
-
-  const summary = decision
-    ? summaryLine(decision.approval.action, decision.approval.summary)
-    : null;
-
-  return (
-    <Dialog open={decision !== null} onOpenChange={(o) => !o && close()}>
-      <DialogContent className="max-w-[420px]">
-        <DialogHeader>
-          <DialogTitle>
-            {isReject ? "Reject this request?" : "Approve this request?"}
-          </DialogTitle>
-          <DialogDescription>
-            {summary ? `${summary.headline}. ` : ""}
-            {isReject
-              ? "Rejection does not undo anything by itself - a flagged purchase stays recorded until you void it."
-              : "Approving applies the change immediately and is written to the audit trail."}
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={(e) => void onSubmit(e)} className="grid gap-3.5">
-          <AdminField
-            label={isReject ? "Why (required)" : "Note (optional)"}
-            error={errors.note?.message}
-          >
-            <textarea
-              rows={3}
-              placeholder={
-                isReject
-                  ? "The requester sees this - say what should happen instead"
-                  : "Any context for the audit trail"
-              }
-              className={cn(adminInputClass, "h-auto py-2 leading-[1.5]")}
-              {...register("note")}
-            />
-          </AdminField>
-          <DialogFooter className="gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="h-9"
-              onClick={close}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant={isReject ? "outline" : "harvest"}
-              className={cn("h-9", isReject && "text-console-red hover:text-console-red")}
-              disabled={approving || rejecting}
-            >
-              {approving || rejecting
-                ? "Working…"
-                : isReject
-                  ? "Reject request"
-                  : "Approve and apply"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
   );
 }

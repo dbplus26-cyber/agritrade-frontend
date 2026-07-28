@@ -1,9 +1,12 @@
+import Link from "next/link";
 import { ToneBadge, type Tone } from "@/components/admin/ui";
 import { formatCedis } from "@/lib/format-money";
+import { cn } from "@/lib/utils";
 import { ApprovalAction, ApprovalStatus } from "@/types/approval.types";
 
-/** Shared bits for the approvals inbox - action/status tones and the
- * defensive summary renderer (summary shapes vary by action). */
+/** Shared bits for the approvals inbox - action/status tones, the uniform
+ * card anatomy pieces (stamp, meta strip) and the defensive summary
+ * renderer (summary shapes vary by action). */
 
 export const ACTION_LABEL: Record<ApprovalAction, string> = {
   [ApprovalAction.PURCHASE_ABOVE_THRESHOLD]: "Purchase above threshold",
@@ -42,6 +45,167 @@ export function ApprovalStatusBadge({ status }: { status: ApprovalStatus }) {
     <ToneBadge tone={APPROVAL_STATUS_TONE[status]}>
       {APPROVAL_STATUS_LABEL[status]}
     </ToneBadge>
+  );
+}
+
+/**
+ * Which module an approval's underlying record belongs to and, when the
+ * console has a page for it, where to see the full record. Grants and stock
+ * adjustments have no per-record page, so they link to their register views;
+ * unknown entity types fall back to the raw type with no link.
+ */
+export function entityLink(
+  entityType: string,
+  entityId: string,
+): { moduleLabel: string; href: string | null; linkText: string } {
+  switch (entityType) {
+    case "Purchase":
+      return {
+        moduleLabel: "Purchases",
+        href: `/admin/purchases/${entityId}`,
+        linkText: "View the purchase",
+      };
+    case "InputGrant":
+      return {
+        moduleLabel: "Farm grants",
+        href: `/admin/grants/${entityId}`,
+        linkText: "View the grant",
+      };
+    case "Commodity":
+      return {
+        moduleLabel: "Commodities",
+        href: `/admin/commodities/${entityId}`,
+        linkText: "View the commodity",
+      };
+    case "LandPlot":
+      return {
+        moduleLabel: "Land",
+        href: `/admin/plots/${entityId}`,
+        linkText: "View the plot",
+      };
+    case "Shipment":
+      return {
+        moduleLabel: "Shipments",
+        href: `/admin/shipments/${entityId}`,
+        linkText: "View the shipment",
+      };
+    case "StockAdjustment":
+      // Adjustments have no per-id page - the stock view is where they land.
+      return {
+        moduleLabel: "Stock",
+        href: "/admin/stock",
+        linkText: "View stock",
+      };
+    default:
+      return { moduleLabel: entityType, href: null, linkText: "" };
+  }
+}
+
+/**
+ * Human age of a pending request ("3 days waiting", "2 hours waiting") so
+ * the inbox shows what has been sitting. Coarse on purpose - no seconds, no
+ * live ticking.
+ */
+export function waitingFor(createdAtIso: string): string {
+  const ms = Date.now() - new Date(createdAtIso).getTime();
+  if (!Number.isFinite(ms) || ms < 60_000) return "just arrived";
+  const minutes = Math.floor(ms / 60_000);
+  if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"} waiting`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} waiting`;
+  const days = Math.floor(hours / 24);
+  return `${days} day${days === 1 ? "" : "s"} waiting`;
+}
+
+/** The anatomy's stencil micro-label - meta rows and the note heading. */
+export const stencilCls =
+  "text-[11px] font-bold uppercase tracking-[0.08em] text-soil/80";
+
+/**
+ * Compact card timestamp, "12 Jul, 14:30". The year appears only when it is
+ * not the current one - decided requests can be old, and "12 Jul" alone
+ * would silently read as this year.
+ */
+export function approvalStamp(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    ...(d.getFullYear() === new Date().getFullYear()
+      ? {}
+      : { year: "numeric" }),
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+/**
+ * Zone 3 of the card anatomy: the bordered-top mini-table of provenance
+ * rows. Every card renders the same rows in the same order (with an absent
+ * placeholder rather than omitting one) so cards line up in the grid.
+ */
+export function MetaStrip({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={cn("border-t border-soil/15 pt-1.5", className)}>
+      {children}
+    </div>
+  );
+}
+
+/** One meta-strip row: stencil label left, 12px value right. */
+export function MetaRow({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-baseline justify-between gap-3 py-[3px]">
+      <span className={cn("flex-none", stencilCls)}>{label}</span>
+      <span className="min-w-0 text-right text-[12px] text-ink [overflow-wrap:anywhere]">
+        {children}
+      </span>
+    </div>
+  );
+}
+
+/**
+ * The meta strip's "From" value: module label plus the entity deep link.
+ * Cards use the terse "View ->"; the detail page passes `verbose` for the
+ * full "View the purchase ->" wording.
+ */
+export function ModuleValue({
+  entityType,
+  entityId,
+  verbose = false,
+}: {
+  entityType: string;
+  entityId: string;
+  verbose?: boolean;
+}) {
+  const link = entityLink(entityType, entityId);
+  return (
+    <>
+      {link.moduleLabel}
+      {link.href ? (
+        <>
+          {" · "}
+          <Link
+            href={link.href}
+            className="font-semibold whitespace-nowrap text-console underline-offset-2 hover:underline"
+          >
+            {verbose ? link.linkText : "View"} {"->"}
+          </Link>
+        </>
+      ) : null}
+    </>
   );
 }
 
@@ -104,9 +268,20 @@ export function summaryLine(
     };
   }
   if (action === ApprovalAction.LOAD_BELOW_MILESTONE) {
+    // Snapshot shape: { buyerName, requiredBeforeLoadingGhs, truckReg }.
+    const required = num(s.requiredBeforeLoadingGhs);
+    const truck = str(s.truckReg);
     return {
       headline: str(s.buyerName) ?? "Load below milestone",
-      detail: str(s.saleReference) ?? str(s.reason),
+      detail:
+        [
+          truck ? `Truck ${truck}` : null,
+          required !== null
+            ? `needs ${formatCedis(required)} before loading`
+            : null,
+        ]
+          .filter(Boolean)
+          .join(" - ") || null,
     };
   }
   if (action === ApprovalAction.PUBLISH_TO_WEBSITE) {
