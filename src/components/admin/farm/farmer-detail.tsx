@@ -141,7 +141,11 @@ export function FarmerDetail({ id }: { id: string }) {
           <Link href={`${LIST}/${f.id}/statement`}>Statement</Link>
         </AdminButton>
         <AdminButton variant="outline" className="h-9 px-4" asChild>
-          <Link href={`${LIST}/${f.id}/edit`}>Edit</Link>
+          {/* ?edit=1 opens the form already unlocked. Arriving from a detail
+              page is an explicit intent to edit, so making the user press
+              "Edit farmer" again on the form is a second click for nothing.
+              The bare /edit URL still opens read-only. */}
+          <Link href={`${LIST}/${f.id}/edit?edit=1`}>Edit</Link>
         </AdminButton>
         <AdminButton
           variant="outline"
