@@ -85,6 +85,8 @@ export function AllocateDialog({
   const filtering = search.trim().length > 0;
 
   const activeRows = rows[activeSaleId];
+  const activeSaleLines =
+    shipment.sales.find((s) => s.id === activeSaleId)?.lines ?? [];
   /** kg already weighted per commodity for the ACTIVE sale (across lots) -
    * the flag that tells the admin "this sale already has maize on board". */
   const activeCommodityKg = useMemo(() => {
@@ -192,6 +194,47 @@ export function AllocateDialog({
                 );
               })}
             </div>
+
+            {/* What the ACTIVE sale actually ordered. Without it the loader
+                is weighing lots against a document number from memory. Each
+                row counts what is already keyed in below, so "still to load"
+                walks to zero as the truck fills. */}
+            {activeSaleLines.length > 0 ? (
+              <div className="rounded-[2px] border-[1.5px] border-soil/25 bg-surface-alt/50 px-3 py-2">
+                <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                  This sale needs
+                </div>
+                <ul className="flex flex-col gap-0.5">
+                  {activeSaleLines.map((line) => {
+                    const keyedKg = activeCommodityKg[line.commodityId] ?? 0;
+                    const stillToLoad = Math.max(
+                      line.agreedKg - line.allocatedKg - keyedKg,
+                      0,
+                    );
+                    return (
+                      <li
+                        key={line.commodityId}
+                        className="flex flex-wrap items-baseline justify-between gap-x-3 text-[12.5px]"
+                      >
+                        <span className="min-w-0 text-ink [overflow-wrap:anywhere]">
+                          {line.commodityName}
+                        </span>
+                        <Mono
+                          className={cn(
+                            "text-[12px]",
+                            stillToLoad === 0 ? "text-leaf" : "text-soil",
+                          )}
+                        >
+                          {stillToLoad === 0
+                            ? `${formatKg(line.agreedKg)} · covered`
+                            : `${formatKg(stillToLoad)} of ${formatKg(line.agreedKg)} still to load`}
+                        </Mono>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ) : null}
 
             <div>
               <Input

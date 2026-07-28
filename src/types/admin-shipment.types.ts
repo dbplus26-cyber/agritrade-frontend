@@ -41,9 +41,22 @@ export interface IManifestLine {
 
 /** A sale carried on a shipment. Paid/balance are non-null only on detail
  * reads; every money field is null when redacted (financial visibility). */
+/** What one sale on this truck needs, per commodity. */
+export interface IShipmentSaleLine {
+  commodityId: string;
+  commodityName: string;
+  /** Weight the sale agreed to, across all trucks. */
+  agreedKg: number;
+  /** Weight already allocated to this sale on THIS shipment. */
+  allocatedKg: number;
+  /** agreed - allocated here, floored at zero. */
+  outstandingKg: number;
+}
+
 export interface IShipmentSale {
   id: string;
   transactionNo: string;
+  lines: IShipmentSaleLine[];
   status: SaleStatus;
   buyer: { id: string; name: string; phone: string | null };
   agreedTotalGhs: number | null;
