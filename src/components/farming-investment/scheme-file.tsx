@@ -21,9 +21,8 @@ export function SchemeFile() {
             alt="A maize farm in Walewale, northern Ghana"
             fill
             sizes="(min-width: 1024px) 600px, 100vw"
-            className="object-cover saturate-[0.72]"
+            className="object-cover"
           />
-          <div aria-hidden="true" className="photo-treatment absolute inset-0" />
           <div className="absolute -left-1.5 bottom-5 max-w-[260px] rotate-[-1.2deg] bg-forest px-3.5 py-2.5 text-[11.5px] font-semibold leading-[1.45] text-surface shadow-[2px_2px_0_rgb(31_33_28/0.3)] lg:-left-4 lg:px-[18px] lg:py-3 lg:text-[13px]">
             Input-credit maize — a scheme season in the ground.
           </div>

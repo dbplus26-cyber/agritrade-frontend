@@ -46,13 +46,13 @@ export function AudienceCards() {
         <Reveal key={audience.tag} delay={a * 120}>
         <article
           className={cn(
-            "h-full rounded-[8px] border border-t-4 border-soil/18 bg-paper p-6 sm:p-8 lg:p-10",
+            "shadow-doc h-full rounded-[2px] border border-t-4 border-soil/18 bg-paper p-6 sm:p-8 lg:p-10",
             audience.topBorder,
           )}
         >
           <span
             className={cn(
-              "mb-4 inline-block rounded-[3px] px-3 py-[7px] text-[10px] font-bold leading-none tracking-[0.24em] lg:mb-5",
+              "mb-4 inline-block rounded-[2px] px-3 py-[7px] text-[10px] font-bold leading-none tracking-[0.24em] lg:mb-5",
               audience.tagClass,
             )}
           >
@@ -82,7 +82,7 @@ export function AudienceCards() {
           </ul>
           <Link
             href={audience.href}
-            className="inline-block rounded-[6px] border-[1.5px] border-forest px-6 py-[13px] text-center text-[14px] font-bold text-forest transition-colors hover:bg-forest hover:text-surface max-lg:block"
+            className="shadow-doc-sm inline-block rounded-[2px] border-2 border-forest px-6 py-3 text-center text-[14px] font-bold text-forest transition-[transform,box-shadow] duration-100 hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0_rgb(89_82_59/0.4)] max-lg:block"
           >
             {audience.cta}
           </Link>

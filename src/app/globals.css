@@ -172,9 +172,14 @@
     font-weight: 700;
     text-transform: uppercase;
   }
-  /* Every photo gets the forest→soil treatment so imagery sits in-palette. */
+  /* Photos render CLEAN. This used to be a full forest→soil wash (0.3/0.36)
+     laid over every image, which fogged real photographs of real goods and
+     real land - exactly the thing a buyer is trying to judge. The texture
+     language lives on the page shells and dark bands instead. What is left
+     here is a faint foot fade, for the few places that print a caption over
+     the bottom of a photo. */
   .photo-treatment {
-    background: linear-gradient(rgb(21 87 68 / 0.3), rgb(89 82 59 / 0.36));
+    background: linear-gradient(to bottom, transparent 62%, rgb(31 33 28 / 0.22));
   }
 }
 

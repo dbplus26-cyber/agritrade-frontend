@@ -47,24 +47,16 @@ function PlotCard({ plot, offset }: { plot: PublicLandPlot; offset: boolean }) {
       <div>
         <div className="relative h-[180px] border-b-[1.5px] border-soil/50 sm:h-[210px]">
           {plot.photo ? (
-            <>
-              <Image
-                src={plot.photo}
-                alt={plot.photoAlt ?? `Plot ${plot.reference} - ${plot.name}`}
-                fill
-                sizes="(min-width: 1024px) 560px, 100vw"
-                className="object-cover saturate-[0.72]"
-              />
-              <div
-                aria-hidden="true"
-                className={cn(
-                  "absolute inset-0",
-                  available
-                    ? "photo-treatment"
-                    : "bg-[linear-gradient(rgb(21_87_68/0.42),rgb(89_82_59/0.5))]",
-                )}
-              />
-            </>
+            // No scrim over the plot photo any more: a buyer is judging the
+            // land, so it renders at true colour. "Reserved" is carried by the
+            // stamp and the muted enquiry button, not by fogging the picture.
+            <Image
+              src={plot.photo}
+              alt={plot.photoAlt ?? `Plot ${plot.reference} - ${plot.name}`}
+              fill
+              sizes="(min-width: 1024px) 560px, 100vw"
+              className="object-cover"
+            />
           ) : (
             // No photo on file yet: the ruled ledger paper keeps the card's
             // document framing instead of a broken image slot.

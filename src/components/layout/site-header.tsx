@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, Menu } from "lucide-react";
+import { ChevronDown, Menu, Phone, X } from "lucide-react";
+import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetHeader,
   SheetTitle,
@@ -23,9 +25,9 @@ import { useSiteContact } from "@/components/providers/site-contact-provider";
 import { cn } from "@/lib/utils";
 
 /** The stencilled brand plate + wordmark, shared by header and mobile menu. */
-function BrandMark() {
+function BrandMark({ onNavigate }: { onNavigate?: () => void }) {
   return (
-    <Link href={routes.home} className="flex items-center gap-3">
+    <Link href={routes.home} onClick={onNavigate} className="flex items-center gap-3">
       <span className="stencil grid h-9 w-9 shrink-0 place-items-center rounded-[3px] border-[2.5px] border-forest text-[12px] tracking-[0.02em] text-forest shadow-block-sm">
         DB
       </span>
@@ -56,10 +58,62 @@ function ActiveTag({ index, label }: { index: string; label: string }) {
   );
 }
 
+/**
+ * One row in the mobile index. The active page wears the same gold plate as
+ * the desktop nav, plus a solid rail down its leading edge so the current
+ * location is readable at a glance and not by colour alone (the numeral
+ * darkens with it). Rows clear 54px, well over the 44px tap floor.
+ */
+function MobileNavItem({
+  active,
+  href,
+  index,
+  label,
+  onNavigate,
+  sub = false,
+}: {
+  active: boolean;
+  href: string;
+  index: string;
+  label: string;
+  onNavigate: () => void;
+  /** Service children sit one step in from their group header. */
+  sub?: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      onClick={onNavigate}
+      aria-current={active ? "page" : undefined}
+      className={cn(
+        "relative flex min-h-[54px] items-center justify-between gap-4 border-b border-dotted border-soil/35 py-3 pr-5 font-display font-bold transition-colors",
+        sub ? "pl-[27px] text-[16px]" : "pl-5 text-[17px]",
+        active ? "bg-harvest text-ink" : "text-forest active:bg-harvest/14",
+      )}
+    >
+      {active ? (
+        <span aria-hidden="true" className="absolute inset-y-0 left-0 w-[3px] bg-harvest-deep" />
+      ) : null}
+      {label}
+      <span
+        className={cn(
+          "stencil shrink-0 text-[10px] tracking-[0.14em]",
+          active ? "text-[#5F4A12]" : "text-harvest-deep",
+        )}
+      >
+        {index}
+      </span>
+    </Link>
+  );
+}
+
 export function SiteHeader() {
   const pathname = usePathname();
   const contact = useSiteContact();
   const [menuOpen, setMenuOpen] = useState(false);
+  const closeMenu = () => {
+    setMenuOpen(false);
+  };
 
   const services = primaryNav.find((item) => "children" in item);
   const serviceLinks = services && "children" in services ? services.children : [];
@@ -155,92 +209,130 @@ export function SiteHeader() {
           </SheetTrigger>
           <SheetContent
             side="right"
-            className="w-[min(390px,100vw)] gap-0 overflow-y-auto border-l-0 bg-surface p-0"
+            showCloseButton={false}
+            // A hand's width of the page stays visible behind the drawer, so
+            // the reader keeps their place; the full-width slide reads as a
+            // sheet of paper pulled over rather than a panel popping in.
+            overlayClassName="bg-ink/45"
+            // The width is variant-scoped on purpose: the base SheetContent
+            // sets `data-[side=right]:w-3/4`, which out-specifies a plain
+            // `w-*` and silently wins.
+            className="texture-grain flex flex-col gap-0 border-l-0 bg-surface p-0 shadow-[-8px_0_28px_-14px_rgb(31_33_28/0.55)] data-[side=right]:w-[min(324px,84vw)] data-open:slide-in-from-right-full data-closed:slide-out-to-right-full"
           >
-            <SheetHeader className="border-b-[1.5px] border-soil/50 px-5 pb-3 pt-5">
-              <SheetTitle className="stencil text-left text-[10px] tracking-[0.28em] text-harvest-deep">
-                INDEX
-              </SheetTitle>
+            <SheetHeader className="gap-0 border-b-[2.5px] border-forest bg-surface-alt/70 p-0">
+              <div className="flex items-center justify-between gap-3 px-5 py-3">
+                <BrandMark onNavigate={closeMenu} />
+                <SheetClose
+                  aria-label="Close menu"
+                  className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-[2px] border-2 border-forest text-forest shadow-doc-sm transition-colors active:bg-harvest/20"
+                >
+                  <X aria-hidden="true" className="size-[19px]" strokeWidth={2.4} />
+                </SheetClose>
+              </div>
+              <SheetTitle className="sr-only">Site menu</SheetTitle>
             </SheetHeader>
-            <nav aria-label="Primary" className="flex flex-col">
+            <nav
+              aria-label="Primary"
+              className="flex flex-1 flex-col overflow-y-auto overscroll-contain"
+            >
+              <div className="flex items-center gap-3 px-5 pb-2 pt-4">
+                <span className="stencil text-[10px] tracking-[0.28em] text-harvest-deep">
+                  INDEX
+                </span>
+                <span aria-hidden="true" className="h-px flex-1 bg-soil/30" />
+              </div>
               {primaryNav.map((item) =>
                 "children" in item ? (
-                  <div
-                    key={item.label}
-                    className="border-b border-dotted border-soil/40 bg-harvest/8"
-                  >
-                    <div className="px-5 pb-1 pt-3">
+                  // The services group is a tinted block with its own ruled
+                  // header, so the three children read as one branch of the
+                  // index instead of five flat rows.
+                  <div key={item.label} className="bg-harvest/8">
+                    <div className="flex items-center gap-3 border-y border-dotted border-soil/35 px-5 py-2.5">
                       <span className="stencil text-[10px] tracking-[0.26em] text-harvest-deep">
-                        {item.index} — SERVICES
+                        {item.index} · SERVICES
                       </span>
+                      <span aria-hidden="true" className="h-px flex-1 bg-soil/25" />
                     </div>
-                    {item.children.map((service, i) => {
-                      const active = pathname.startsWith(service.href);
-                      return (
-                        <Link
-                          key={service.href}
-                          href={service.href}
-                          onClick={() => setMenuOpen(false)}
-                          aria-current={active ? "page" : undefined}
-                          className={cn(
-                            "flex items-center justify-between border-l-[3px] border-harvest py-3.5 pl-[17px] pr-5 font-display text-[17px] font-bold text-forest",
-                            i < item.children.length - 1 &&
-                              "border-b border-dotted border-soil/35",
-                            active && "bg-harvest/25",
-                          )}
-                        >
-                          {service.label}
-                          <span aria-hidden="true" className="stencil text-[15px] text-harvest-deep">
-                            {active ? "●" : "→"}
-                          </span>
-                        </Link>
-                      );
-                    })}
+                    {item.children.map((service) => (
+                      <MobileNavItem
+                        key={service.href}
+                        active={pathname.startsWith(service.href)}
+                        href={service.href}
+                        // Composite numeral: a bare "03" here would sit
+                        // directly above top-level "About 03" and read as a
+                        // duplicate.
+                        index={`${item.index}·${service.index}`}
+                        label={service.label}
+                        onNavigate={closeMenu}
+                        sub
+                      />
+                    ))}
                   </div>
-                ) : pathname === item.href ? (
-                  // The active page wears the same gold tag as the desktop nav.
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMenuOpen(false)}
-                    aria-current="page"
-                    className="flex items-center justify-between border-b border-dotted border-soil/40 bg-harvest px-5 py-[15px] font-display text-[17px] font-bold text-ink"
-                  >
-                    {item.label}
-                    <span className="stencil text-[10px] tracking-[0.14em] text-[#5F4A12]">
-                      {item.index}
-                    </span>
-                  </Link>
                 ) : (
-                  <Link
+                  <MobileNavItem
                     key={item.href}
+                    active={pathname === item.href}
                     href={item.href}
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center justify-between border-b border-dotted border-soil/40 px-5 py-[15px] font-display text-[17px] font-bold text-forest"
-                  >
-                    {item.label}
-                    <span className="stencil text-[10px] tracking-[0.14em] text-harvest-deep">
-                      {item.index}
-                    </span>
-                  </Link>
+                    index={item.index}
+                    label={item.label}
+                    onNavigate={closeMenu}
+                  />
                 ),
               )}
             </nav>
-            <div className="grid grid-cols-2 gap-3 border-t-[1.5px] border-soil/50 px-5 pb-5 pt-4">
-              <a
-                href={contact.phoneHref}
-                className="shadow-block block rounded-[2px] bg-harvest p-3.5 text-center text-[14px] font-bold text-ink"
-              >
-                Call
-              </a>
-              <a
-                href={contact.whatsappHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="shadow-doc-sm block rounded-[2px] border-2 border-forest p-[11px] text-center text-[14px] font-bold text-forest"
-              >
-                WhatsApp
-              </a>
+            {/* Contact actions close the drawer, pinned to the bottom and
+                clear of the home indicator. Unpublished channels are dropped
+                rather than linked to nothing. */}
+            <div className="mt-auto border-t-[2.5px] border-forest bg-surface-alt/70 px-5 pb-[calc(18px+env(safe-area-inset-bottom,0px))] pt-3.5">
+              <span className="stencil mb-2 block text-[10px] tracking-[0.28em] text-harvest-deep">
+                DISPATCH LINE
+              </span>
+              {contact.hasPhone ? (
+                <a
+                  href={contact.phoneHref}
+                  onClick={closeMenu}
+                  className="mb-3 block font-display text-[19px] font-bold tracking-[0.02em] text-forest"
+                >
+                  {contact.phone}
+                </a>
+              ) : null}
+              {contact.hasPhone || contact.hasWhatsapp ? (
+                <div className="grid grid-cols-2 gap-3">
+                  {contact.hasPhone ? (
+                    <a
+                      href={contact.phoneHref}
+                      onClick={closeMenu}
+                      className="shadow-block flex min-h-11 items-center justify-center gap-2 rounded-[2px] bg-harvest text-[14px] font-bold text-ink"
+                    >
+                      <Phone aria-hidden="true" className="size-4" strokeWidth={2.3} />
+                      Call
+                    </a>
+                  ) : null}
+                  {contact.hasWhatsapp ? (
+                    <a
+                      href={contact.whatsappHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={closeMenu}
+                      className={cn(
+                        "shadow-doc-sm flex min-h-11 items-center justify-center gap-2 rounded-[2px] border-2 border-forest text-[14px] font-bold text-forest",
+                        !contact.hasPhone && "col-span-2",
+                      )}
+                    >
+                      <WhatsAppIcon aria-hidden="true" className="size-[17px]" />
+                      WhatsApp
+                    </a>
+                  ) : null}
+                </div>
+              ) : (
+                <Link
+                  href={routes.contact}
+                  onClick={closeMenu}
+                  className="shadow-block flex min-h-11 items-center justify-center rounded-[2px] bg-harvest text-[14px] font-bold text-ink"
+                >
+                  Contact us
+                </Link>
+              )}
             </div>
           </SheetContent>
         </Sheet>

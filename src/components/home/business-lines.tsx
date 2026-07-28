@@ -74,13 +74,11 @@ export function BusinessLines() {
               alt="Traders at Tamale Aboabo market"
               fill
               sizes="(min-width: 1024px) 760px, 100vw"
-              className="object-cover saturate-[0.72]"
+              className="object-cover"
             />
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 bg-[linear-gradient(rgb(21_87_68/0.14),rgb(89_82_59/0.28))]"
-            />
-            <span className="stencil absolute left-4 top-4 bg-ink/55 px-[11px] py-1.5 text-[12px] tracking-[0.16em] text-surface">
+            {/* The stencil tag carries its own ink plate, so the photo needs
+                no scrim under it and renders at true colour. */}
+            <span className="stencil absolute left-4 top-4 bg-ink/70 px-[11px] py-1.5 text-[12px] tracking-[0.16em] text-surface">
               LOT FILE — GRAIN
             </span>
           </div>

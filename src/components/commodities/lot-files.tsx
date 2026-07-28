@@ -115,9 +115,8 @@ export function LotFiles({ lots }: { lots: MergedLot[] }) {
                     alt={lot.photoAlt}
                     fill
                     sizes="(min-width: 1024px) 560px, 100vw"
-                    className="object-cover saturate-[0.72]"
+                    className="object-cover"
                   />
-                  <div aria-hidden="true" className="photo-treatment absolute inset-0" />
                 </div>
               ) : null}
             </Reveal>

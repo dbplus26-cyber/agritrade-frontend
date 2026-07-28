@@ -22,9 +22,8 @@ function LotCard({ lot }: { lot: MergedLot }) {
             alt={lot.photoAlt}
             fill
             sizes="(min-width: 1024px) 416px, (min-width: 640px) 50vw, 100vw"
-            className="object-cover saturate-[0.72]"
+            className="object-cover"
           />
-          <div aria-hidden="true" className="photo-treatment absolute inset-0" />
         </div>
       ) : (
         // No photo on file: the cropped ghost stencil (the lot-files idiom)
