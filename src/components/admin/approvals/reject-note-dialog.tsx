@@ -72,7 +72,7 @@ export function RejectNoteDialog({
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
 
-        <div className="rounded-[7px] border border-[var(--ap-hair)] bg-[var(--ap-surface-alt)] px-3 py-2 text-[13px] text-[var(--ap-ink)] [overflow-wrap:anywhere]">
+        <div className="rounded-[2px] border border-[var(--ap-hair)] bg-[var(--ap-surface-alt)] px-3 py-2 text-[13px] text-[var(--ap-ink)] [overflow-wrap:anywhere]">
           {subject}
         </div>
 

@@ -2,9 +2,11 @@ import { apiSlice } from "../api-slice";
 import { toQueryString } from "@/lib/to-query-string";
 import type { IMessageResponse } from "@/types/auth.types";
 import type {
+  IAccountHistoryQuery,
   ICreatePaymentAccountInput,
   IPayableAccountsResponse,
   IPaymentAccount,
+  IPaymentAccountHistoryResponse,
   IPaymentAccountListQuery,
   IPaymentAccountResponse,
   IUpdatePaymentAccountInput,
@@ -45,6 +47,24 @@ export const paymentAccountsApi = apiSlice.injectEndpoints({
     getPaymentAccount: builder.query<IPaymentAccountResponse, string>({
       query: (id) => `admin/payment-accounts/${id}`,
       providesTags: (_r, _e, id) => [{ type: "PaymentAccounts", id }],
+    }),
+
+    /**
+     * The account's detail-page ledger: every payment row (sale, land-sale
+     * or acquisition) that named this account, newest first, with all-time
+     * in/net/out totals. Provides the shared HISTORY tag so recording or
+     * reversing a payment anywhere refreshes every account's view.
+     */
+    getPaymentAccountHistory: builder.query<
+      IPaymentAccountHistoryResponse,
+      { id: string } & IAccountHistoryQuery
+    >({
+      query: ({ id, ...params }) =>
+        `admin/payment-accounts/${id}/payments${toQueryString(params)}`,
+      providesTags: (_r, _e, { id }) => [
+        { type: "PaymentAccounts", id },
+        { type: "PaymentAccounts", id: "HISTORY" },
+      ],
     }),
 
     createPaymentAccount: builder.mutation<
@@ -119,6 +139,7 @@ export const {
   useGetPaymentAccountsQuery,
   useGetPayableAccountsQuery,
   useGetPaymentAccountQuery,
+  useGetPaymentAccountHistoryQuery,
   useCreatePaymentAccountMutation,
   useUpdatePaymentAccountMutation,
   useDeactivatePaymentAccountMutation,

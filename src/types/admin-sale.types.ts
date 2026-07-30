@@ -136,6 +136,8 @@ export interface IRecordPaymentInput {
   method: "BANK" | "CASH" | "MOMO";
   reference?: string;
   paidAt?: string;
+  /** Company account the money landed in. Required for BANK/MOMO. */
+  paymentAccountId?: string;
 }
 
 export interface ISalePaymentResponse {

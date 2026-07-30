@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { PaymentAccountField } from "@/components/admin/payment-account-field";
 import {
   AdminButton,
   AdminCard,
@@ -28,8 +29,10 @@ import {
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
+import { useAuthRole } from "@/hooks/use-auth-role";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
+import { formatCedis } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import {
@@ -38,6 +41,7 @@ import {
   useCompleteLandAcquisitionMutation,
   useGetLandAcquisitionQuery,
   useRecordAcquisitionPaymentMutation,
+  useReverseAcquisitionPaymentMutation,
 } from "@/redux/land/land-acquisitions-api";
 import type { ILandAcquisitionDetail } from "@/types/land.types";
 import {
@@ -82,11 +86,19 @@ function PaymentDialog({
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<LandPaymentValues>({
     resolver: zodResolver(landPaymentSchema),
     defaultValues: { method: "BANK", paidAt: todayInputValue() },
   });
+  // Drives whether the company account is required (BANK/MOMO), and which
+  // accounts can carry it - a method switch clears a stale choice.
+  const method = watch("method");
+  useEffect(() => {
+    setValue("paymentAccountId", "");
+  }, [method, setValue]);
   const onSubmit = async (values: LandPaymentValues) => {
     try {
       await record({
@@ -98,6 +110,9 @@ function PaymentDialog({
             ? { reference: values.reference.trim() }
             : {}),
           ...(values.paidAt ? { paidAt: values.paidAt } : {}),
+          ...(values.paymentAccountId
+            ? { paymentAccountId: values.paymentAccountId }
+            : {}),
         },
       }).unwrap();
       notify.success("Payment recorded");
@@ -141,6 +156,14 @@ function PaymentDialog({
               ))}
             </select>
           </AdminField>
+          {/* Money goes OUT here: which company account the seller was paid
+              from. Required for BANK/MOMO, optional for cash. */}
+          <PaymentAccountField
+            method={method}
+            direction="out"
+            error={errors.paymentAccountId?.message}
+            registration={register("paymentAccountId")}
+          />
           <AdminField label="Reference" optional>
             <Input className={adminInputClass} {...register("reference")} />
           </AdminField>
@@ -247,8 +270,40 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
   const [agree, agreeState] = useAgreeLandAcquisitionMutation();
   const [complete, completeState] = useCompleteLandAcquisitionMutation();
   const { confirm, confirmationDialog } = useConfirm();
+  const { isSuperAdmin } = useAuthRole();
+  const [reversePayment] = useReverseAcquisitionPaymentMutation();
   const [payOpen, setPayOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
+
+  /**
+   * The seller returning money is a real-world act; this records it as a
+   * compensating entry. The reason is the whole audit trail, mirroring the
+   * land-sale payment reversal.
+   */
+  const reverseOne = async (paymentId: string, amountGhs: null | number) => {
+    const ok = await confirm({
+      title: "Reverse this payment?",
+      description: `${
+        amountGhs === null ? "This payment" : formatCedis(amountGhs)
+      } comes back off what has been paid to the seller as a compensating entry - nothing is deleted. Do this once the seller has actually returned the money.`,
+      confirmText: "Reverse payment",
+      isDestructive: true,
+      requireExactMatch: a.transactionNo,
+    });
+    if (!ok) return;
+    try {
+      await reversePayment({
+        id: a.id,
+        paymentId,
+        reason: `Refund received against ${a.transactionNo}`,
+      }).unwrap();
+      notify.success("Payment reversed");
+    } catch (err) {
+      notify.error("Couldn't reverse the payment", {
+        description: extractApiError(err).message,
+      });
+    }
+  };
 
   if (isLoading) return <DetailSkeleton main="ledger" />;
   if (isError || !data)
@@ -429,9 +484,35 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
                       {p.reference ? ` · ${p.reference}` : ""}
                     </span>
                   </div>
-                  <Mono className="whitespace-nowrap text-[13px] font-semibold text-leaf">
-                    <Money value={p.amountGhs} />
-                  </Mono>
+                  <div className="flex flex-none items-center gap-2">
+                    {/* Signed: a reversal (money returned by the seller) is
+                        a negative row, shown red like the land-sale ledger. */}
+                    <Mono
+                      className={cn(
+                        "whitespace-nowrap text-[13px] font-semibold",
+                        p.amountGhs !== null && p.amountGhs < 0
+                          ? "text-console-red"
+                          : "text-leaf",
+                      )}
+                    >
+                      <Money value={p.amountGhs} />
+                    </Mono>
+                    {/* Owner-only compensating entry for a mis-keyed payment
+                        out to the seller. Never offered on a reversal row
+                        itself - mirroring the land-sale payments ledger. */}
+                    {isSuperAdmin &&
+                    p.amountGhs !== null &&
+                    p.amountGhs > 0 ? (
+                      <AdminButton
+                        type="button"
+                        variant="outline"
+                        className="h-[26px] flex-none px-2 text-[11.5px]"
+                        onClick={() => void reverseOne(p.id, p.amountGhs)}
+                      >
+                        Reverse
+                      </AdminButton>
+                    ) : null}
+                  </div>
                 </div>
               ))
             )}

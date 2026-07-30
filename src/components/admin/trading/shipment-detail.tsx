@@ -39,6 +39,7 @@ import {
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
+import { useAuthRole } from "@/hooks/use-auth-role";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatKg } from "@/lib/format-money";
@@ -54,14 +55,21 @@ import {
   useArriveShipmentMutation,
   useCancelShipmentMutation,
   useCloseShipmentMutation,
-  useDeleteShipmentExpenseMutation,
   useDispatchShipmentMutation,
   useGetEligibleSalesQuery,
   useGetShipmentQuery,
   useRemoveShipmentDocumentMutation,
   useRemoveShipmentSaleMutation,
+  useVoidShipmentExpenseMutation,
 } from "@/redux/shipments/shipments-api";
-import type { IShipment } from "@/types/admin-shipment.types";
+import type {
+  IShipment,
+  IShipmentExpense,
+} from "@/types/admin-shipment.types";
+import {
+  voidExpenseSchema,
+  type VoidExpenseValues,
+} from "@/validations/expense-schema";
 import {
   cancelShipmentSchema,
   shipmentExpenseSchema,
@@ -413,19 +421,113 @@ function CancelDialog({
   );
 }
 
+/**
+ * Void a shipment expense. Owner-only, and never a hard delete: the voucher
+ * keeps its number and amount, struck from the trip's profit with a written
+ * reason - mirroring the general expense void.
+ */
+function VoidExpenseDialog({
+  shipment,
+  expense,
+  onClose,
+}: {
+  shipment: IShipment;
+  expense: IShipmentExpense;
+  onClose: () => void;
+}) {
+  const [voidExpense, { isLoading }] = useVoidShipmentExpenseMutation();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<VoidExpenseValues>({
+    resolver: zodResolver(voidExpenseSchema),
+    defaultValues: { reason: "" },
+  });
+  const onSubmit = async (values: VoidExpenseValues) => {
+    try {
+      await voidExpense({
+        id: shipment.id,
+        expenseId: expense.id,
+        reason: values.reason,
+      }).unwrap();
+      notify.success("Expense voided");
+      onClose();
+    } catch (err) {
+      notify.error("Couldn't void the expense", {
+        description: extractApiError(err).message,
+      });
+    }
+  };
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-[420px]">
+        <DialogHeader>
+          <DialogTitle>Void this expense?</DialogTitle>
+          <DialogDescription>
+            {expense.category.name}
+            {expense.amountGhs !== null ? " · " : ""}
+            {expense.amountGhs !== null ? (
+              <Mono>
+                <Money value={expense.amountGhs} />
+              </Mono>
+            ) : null}
+            . The voucher is struck out with your reason, never erased, and the
+            trip&apos;s profit moves accordingly.
+          </DialogDescription>
+        </DialogHeader>
+        <form
+          noValidate
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col gap-3"
+        >
+          <AdminField label="Reason" error={errors.reason?.message}>
+            <Input
+              className={cn(adminInputClass, errors.reason && "border-error")}
+              {...register("reason")}
+            />
+          </AdminField>
+          <DialogFooter className="gap-2">
+            <AdminButton
+              type="button"
+              variant="outline"
+              className="h-9 px-3.5"
+              onClick={onClose}
+            >
+              Keep it
+            </AdminButton>
+            <AdminButton
+              type="submit"
+              variant="danger"
+              disabled={isLoading}
+              className="h-9 px-4"
+            >
+              {isLoading ? "Voiding…" : "Void expense"}
+            </AdminButton>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export function ShipmentDetail({ id }: { id: string }) {
   const { data, isLoading, isError, error, refetch } = useGetShipmentQuery(id);
   const [dispatchShipment, dispatchState] = useDispatchShipmentMutation();
   const [arrive, arriveState] = useArriveShipmentMutation();
   const [close, closeState] = useCloseShipmentMutation();
-  const [deleteExpense] = useDeleteShipmentExpenseMutation();
   const [addDocument, addDocState] = useAddShipmentDocumentMutation();
   const [removeDocument] = useRemoveShipmentDocumentMutation();
   const [removeSale] = useRemoveShipmentSaleMutation();
   const { confirm, confirmationDialog } = useConfirm();
+  const { isSuperAdmin } = useAuthRole();
   const [addSalesOpen, setAddSalesOpen] = useState(false);
   const [expenseOpen, setExpenseOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
+  /** The expense the void dialog is open for, if any. */
+  const [voidingExpense, setVoidingExpense] = useState<IShipmentExpense | null>(
+    null,
+  );
   const [docName, setDocName] = useState("Signed waybill");
   const [signing, setSigning] = useState(false);
 
@@ -526,17 +628,6 @@ export function ShipmentDetail({ id }: { id: string }) {
       notify.success("Shipment closed");
     } catch (err) {
       notify.error("Couldn't close", {
-        description: extractApiError(err).message,
-      });
-    }
-  };
-
-  const onRemoveExpense = async (expenseId: string) => {
-    try {
-      await deleteExpense({ expenseId, id: s.id }).unwrap();
-      notify.success("Expense removed");
-    } catch (err) {
-      notify.error("Couldn't remove the expense", {
         description: extractApiError(err).message,
       });
     }
@@ -1020,14 +1111,18 @@ export function ShipmentDetail({ id }: { id: string }) {
                 <Mono className="whitespace-nowrap text-[13px] text-ink">
                   <Money value={e.amountGhs} />
                 </Mono>
-                <button
-                  type="button"
-                  onClick={() => void onRemoveExpense(e.id)}
-                  className="text-[12px] text-console-red"
-                  aria-label="Remove expense"
-                >
-                  ✕
-                </button>
+                {/* Voiding is owner-only (like the general expense void):
+                    striking out a cost moves the trip's profit. */}
+                {isSuperAdmin ? (
+                  <AdminButton
+                    type="button"
+                    variant="outline"
+                    className="h-[26px] flex-none px-2 text-[11.5px]"
+                    onClick={() => setVoidingExpense(e)}
+                  >
+                    Void
+                  </AdminButton>
+                ) : null}
               </div>
             </div>
           ))
@@ -1089,6 +1184,13 @@ export function ShipmentDetail({ id }: { id: string }) {
       ) : null}
       {cancelOpen ? (
         <CancelDialog shipment={s} onClose={() => setCancelOpen(false)} />
+      ) : null}
+      {voidingExpense ? (
+        <VoidExpenseDialog
+          shipment={s}
+          expense={voidingExpense}
+          onClose={() => setVoidingExpense(null)}
+        />
       ) : null}
       {confirmationDialog}
     </div>

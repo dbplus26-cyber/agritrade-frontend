@@ -3,6 +3,7 @@
 // Where customers are told to send money (`/admin/payment-accounts`). Manual
 // bank transfer is the primary rail for large payments, so these are records
 // the owner maintains, not constants in an invoice template.
+import type { IPaginationMeta } from "./api";
 import type { IRegistryListQuery } from "./registry.types";
 
 export type PaymentAccountKind = "BANK" | "CASH" | "MOMO" | "OTHER";
@@ -90,4 +91,55 @@ export interface IPaymentAccountResponse {
 export interface IPayableAccountsResponse {
   message: string;
   data: { accounts: IPayableAccount[] };
+}
+
+// ── Account movement history ──────────────────────────────────────
+
+/** Which money ledger a movement row comes from. */
+export type AccountMovementSource =
+  | "LAND_ACQUISITION_PAYMENT"
+  | "LAND_SALE_PAYMENT"
+  | "SALE_PAYMENT";
+
+/**
+ * One payment row (from any of the three money ledgers) that named this
+ * account, mirroring the backend `AccountMovementDTO`
+ * (utils/mappers/payment-account.mapper.ts). Amounts keep their stored sign
+ * (a reversal is negative) and are null when money is hidden - the row
+ * itself stays so staff can still answer "did the transfer arrive?".
+ */
+export interface IAccountMovement {
+  id: string;
+  /** Receipt/voucher number of the payment row itself. */
+  transactionNo: string;
+  amountGhs: number | null;
+  method: "BANK" | "CASH" | "MOMO";
+  reference: string | null;
+  paidAt: string;
+  isReversal: boolean;
+  source: AccountMovementSource;
+  direction: "IN" | "OUT";
+  /** Document number of the sale / land sale / acquisition it belongs to. */
+  parentNo: string;
+  parentId: string;
+  /** Buyer (money in) or land seller (money out). */
+  counterparty: string;
+}
+
+export interface IAccountHistoryQuery {
+  page?: number;
+  limit?: number;
+}
+
+/** GET admin/payment-accounts/:accountId/payments */
+export interface IPaymentAccountHistoryResponse {
+  message: string;
+  data: IAccountMovement[];
+  meta: IPaginationMeta;
+  summary: {
+    account: IPaymentAccount;
+    inGhs: number | null;
+    netGhs: number | null;
+    outGhs: number | null;
+  };
 }

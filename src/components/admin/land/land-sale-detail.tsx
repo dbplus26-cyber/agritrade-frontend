@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { PaymentAccountField } from "@/components/admin/payment-account-field";
 import {
   AdminButton,
   AdminCard,
@@ -83,11 +84,19 @@ function PaymentDialog({
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<LandPaymentValues>({
     resolver: zodResolver(landPaymentSchema),
     defaultValues: { method: "BANK", paidAt: todayInputValue() },
   });
+  // Drives whether the company account is required (BANK/MOMO), and which
+  // accounts can carry it - a method switch clears a stale choice.
+  const method = watch("method");
+  useEffect(() => {
+    setValue("paymentAccountId", "");
+  }, [method, setValue]);
   const onSubmit = async (values: LandPaymentValues) => {
     try {
       await record({
@@ -97,6 +106,9 @@ function PaymentDialog({
           method: values.method,
           ...(values.reference?.trim() ? { reference: values.reference.trim() } : {}),
           ...(values.paidAt ? { paidAt: values.paidAt } : {}),
+          ...(values.paymentAccountId
+            ? { paymentAccountId: values.paymentAccountId }
+            : {}),
         },
       }).unwrap();
       notify.success("Payment recorded");
@@ -134,6 +146,12 @@ function PaymentDialog({
               ))}
             </select>
           </AdminField>
+          <PaymentAccountField
+            method={method}
+            direction="in"
+            error={errors.paymentAccountId?.message}
+            registration={register("paymentAccountId")}
+          />
           <AdminField label="Reference" optional>
             <Input className={adminInputClass} {...register("reference")} />
           </AdminField>

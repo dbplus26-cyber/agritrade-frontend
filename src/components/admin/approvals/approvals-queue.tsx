@@ -53,7 +53,7 @@ export function ApprovalsQueue({ table }: { table: Table<IApproval> }) {
   const rows = table.getRowModel().rows;
 
   return (
-    <div className="overflow-hidden rounded-[10px] border border-[var(--ap-hair)] bg-[var(--ap-surface)]">
+    <div className="overflow-hidden rounded-none border border-[var(--ap-hair)] bg-[var(--ap-surface)]">
       {table.getHeaderGroups().map((group) => (
         <div
           key={group.id}

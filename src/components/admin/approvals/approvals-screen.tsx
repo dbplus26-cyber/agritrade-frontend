@@ -33,7 +33,6 @@ import {
   type IApprovalListQuery,
 } from "@/types/approval.types";
 import { ACTION_LABEL } from "./approval-bits";
-import { ApprovalsCards } from "./approvals-cards";
 import { ApprovalsQueue } from "./approvals-queue";
 import {
   ageLabel,
@@ -54,7 +53,6 @@ import {
 import { RejectNoteDialog } from "./reject-note-dialog";
 
 const PAGE_SIZE = 10;
-const VIEW_KEY = "dbplus.approvals.view";
 
 /**
  * How far above its limit an approval has to be before approving it asks a
@@ -62,8 +60,6 @@ const VIEW_KEY = "dbplus.approvals.view";
  * times over is the one that wants a beat of friction.
  */
 const CONFIRM_MULTIPLE = 5;
-
-type View = "cards" | "queue";
 
 const FILTER_DEFAULTS = {
   status: ApprovalStatus.PENDING as string,
@@ -110,7 +106,6 @@ export function ApprovalsScreen() {
   const status = filters.status as ApprovalStatus;
   const isPending = status === ApprovalStatus.PENDING;
 
-  const [view, setView] = useState<View>("queue");
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const [busyId, setBusyId] = useState<null | string>(null);
@@ -130,19 +125,6 @@ export function ApprovalsScreen() {
   const { confirm, confirmationDialog } = useConfirm();
   const [approve, { isLoading: approveBusy }] = useApproveApprovalMutation();
   const [reject, { isLoading: rejectBusy }] = useRejectApprovalMutation();
-
-  // The stored preference is read after mount: localStorage does not exist on
-  // the server, and reading it during render would make the first client
-  // paint disagree with the markup Next sent.
-  useEffect(() => {
-    const stored = window.localStorage.getItem(VIEW_KEY);
-    if (stored === "cards" || stored === "queue") setView(stored);
-  }, []);
-
-  const changeView = (next: View) => {
-    setView(next);
-    window.localStorage.setItem(VIEW_KEY, next);
-  };
 
   const queryArgs = useMemo<IApprovalListQuery>(
     () => ({
@@ -169,7 +151,7 @@ export function ApprovalsScreen() {
   useEffect(() => {
     setRowSelection({});
     setExpanded({});
-  }, [status, view]);
+  }, [status]);
 
   const openReject = useCallback(
     (approval: IApproval) =>
@@ -452,7 +434,7 @@ export function ApprovalsScreen() {
         <div
           role="tablist"
           aria-label="Approval status"
-          className="flex gap-[3px] rounded-[9px] bg-[var(--ap-tabs)] p-[3px]"
+          className="flex gap-[3px] rounded-none bg-[var(--ap-tabs)] p-[3px]"
         >
           {TABS.map(([value, label]) => (
             <StatusTab
@@ -476,28 +458,6 @@ export function ApprovalsScreen() {
           ))}
         </div>
 
-        <div className="flex-1" />
-
-        <div className="flex overflow-hidden rounded-[8px] border border-[var(--ap-hair)] bg-[var(--ap-surface)]">
-          {(["queue", "cards"] as const).map((value, index) => (
-            <button
-              key={value}
-              type="button"
-              aria-pressed={view === value}
-              onClick={() => changeView(value)}
-              className={cn(
-                "cursor-pointer px-[13px] py-[7px] text-[12.5px] leading-[1.4] font-[550]",
-                "focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-[var(--ap-forest)]",
-                index > 0 && "border-l border-[var(--ap-hair)]",
-                view === value
-                  ? "bg-[var(--ap-forest)] text-white"
-                  : "text-[var(--ap-muted)]",
-              )}
-            >
-              {value === "queue" ? "Queue" : "Cards"}
-            </button>
-          ))}
-        </div>
       </div>
 
       <ConsoleFilterBar
@@ -525,7 +485,7 @@ export function ApprovalsScreen() {
       </ConsoleFilterBar>
 
       {selected.length > 0 ? (
-        <div className="mb-3 flex flex-wrap items-center gap-3.5 rounded-[9px] bg-[var(--ap-forest)] px-3.5 py-2.5 text-[13px] text-white">
+        <div className="mb-3 flex flex-wrap items-center gap-3.5 rounded-none bg-[var(--ap-forest)] px-3.5 py-2.5 text-[13px] text-white">
           <span className="font-adminmono font-semibold tabular-nums">
             {selected.length} selected
           </span>
@@ -552,7 +512,7 @@ export function ApprovalsScreen() {
       {isLoading ? (
         <QueueSkeleton />
       ) : isError ? (
-        <div className="overflow-hidden rounded-[10px] border border-[var(--ap-hair)] bg-[var(--ap-surface)]">
+        <div className="overflow-hidden rounded-none border border-[var(--ap-hair)] bg-[var(--ap-surface)]">
           <div className="flex flex-wrap items-center gap-3 bg-[var(--ap-clay-soft)] px-4 py-3.5 text-[13px] text-[var(--ap-ink)]">
             <span className="min-w-0 flex-1">
               The approvals list did not load. {extractApiError(error).message}
@@ -568,15 +528,8 @@ export function ApprovalsScreen() {
         </div>
       ) : approvals.length === 0 ? (
         <EmptyQueue status={status} />
-      ) : view === "queue" ? (
-        <ApprovalsQueue table={table} />
       ) : (
-        <ApprovalsCards
-          approvals={approvals}
-          busyId={busyId}
-          onApprove={(a) => void onApprove(a)}
-          onReject={openReject}
-        />
+        <ApprovalsQueue table={table} />
       )}
 
       <ListPagination
@@ -599,7 +552,7 @@ export function ApprovalsScreen() {
 }
 
 const ghostBarButton =
-  "cursor-pointer rounded-[6px] border border-white/35 bg-transparent px-3 py-[5px] text-[12.5px] leading-[1.4] font-[550] text-white " +
+  "cursor-pointer rounded-[2px] border border-white/35 bg-transparent px-3 py-[5px] text-[12.5px] leading-[1.4] font-[550] text-white " +
   "hover:bg-white/12 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white " +
   "disabled:cursor-not-allowed disabled:opacity-50";
 
@@ -636,7 +589,7 @@ function StatusTab({
       aria-selected={active}
       onClick={onSelect}
       className={cn(
-        "flex cursor-pointer items-center gap-[7px] rounded-[7px] px-3.5 py-[7px] text-[13px] leading-[1.4] font-[550]",
+        "flex cursor-pointer items-center gap-[7px] rounded-[2px] px-3.5 py-[7px] text-[13px] leading-[1.4] font-[550]",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ap-forest)]",
         active
           ? "bg-[var(--ap-surface)] text-[var(--ap-ink)] shadow-[0_1px_2px_rgba(0,0,0,.08)]"
@@ -646,7 +599,7 @@ function StatusTab({
       {label}
       <span
         className={cn(
-          "rounded-[20px] px-1.5 py-px font-adminmono text-[11px] leading-[1.4] tabular-nums",
+          "rounded-[2px] px-1.5 py-px font-adminmono text-[11px] leading-[1.4] tabular-nums",
           active
             ? "bg-[var(--ap-forest)] text-white"
             : "bg-[var(--ap-pill)] text-[var(--ap-ink-2)]",
@@ -750,7 +703,7 @@ const EMPTY_COPY: Record<ApprovalStatus, { body: string; title: string }> = {
 function EmptyQueue({ status }: { status: ApprovalStatus }) {
   const copy = EMPTY_COPY[status];
   return (
-    <div className="rounded-[10px] border border-[var(--ap-hair)] bg-[var(--ap-surface)] px-6 py-12 text-center">
+    <div className="rounded-none border border-[var(--ap-hair)] bg-[var(--ap-surface)] px-6 py-12 text-center">
       <p className="text-[15px] font-[550] text-[var(--ap-ink)]">{copy.title}</p>
       <p className="mt-1 text-[13px] text-[var(--ap-muted)]">{copy.body}</p>
     </div>
@@ -760,15 +713,15 @@ function EmptyQueue({ status }: { status: ApprovalStatus }) {
 /** Six rows at the real row height - a spinner would say nothing about shape. */
 function QueueSkeleton() {
   return (
-    <div className="overflow-hidden rounded-[10px] border border-[var(--ap-hair)] bg-[var(--ap-surface)]">
+    <div className="overflow-hidden rounded-none border border-[var(--ap-hair)] bg-[var(--ap-surface)]">
       {Array.from({ length: 6 }, (_, i) => (
         <div
           key={i}
           className="grid h-[62px] grid-cols-[34px_190px_1fr] items-center gap-3.5 border-b border-[var(--ap-hair-soft)] px-4 last:border-b-0"
         >
           <span />
-          <span className="block h-3.5 w-[120px] rounded-[3px] bg-[var(--ap-track)]" />
-          <span className="block h-3.5 w-[60%] rounded-[3px] bg-[var(--ap-track)]" />
+          <span className="block h-3.5 w-[120px] rounded-none bg-[var(--ap-track)]" />
+          <span className="block h-3.5 w-[60%] rounded-none bg-[var(--ap-track)]" />
         </div>
       ))}
     </div>

@@ -60,10 +60,21 @@ export const adminNavGroups: AdminNavGroup[] = [
       item("stocktakes", "Stocktakes"),
       item("commodities", "Commodities"),
       item("warehouses", "Warehouses"),
-      item("agents", "Agents & Floats"),
+      item("agents", "Agents"),
       item("expenses", "Expenses"),
       item("expense-categories", "Expense Categories"),
       item("payment-policies", "Payment Policies", { ownerOnly: true }),
+    ],
+  },
+  {
+    label: "Money out",
+    items: [
+      // Staff see only their own sends; the whole register and the company's
+      // bank position are the owner's business.
+      item("my-sends", "My sends"),
+      item("disbursements", "Money sent", { ownerOnly: true }),
+      item("floats", "Floats"),
+      item("treasury", "Company account", { ownerOnly: true }),
     ],
   },
   {

@@ -1,4 +1,5 @@
 import type { IPaginationMeta } from "./api";
+import type { UserRole } from "./user.types";
 
 /**
  * Agents, float ledgers and reconciliations, mirroring the backend
@@ -11,6 +12,8 @@ export enum FloatTxType {
   PURCHASE = "PURCHASE",
   FIELD_EXPENSE = "FIELD_EXPENSE",
   ADJUSTMENT = "ADJUSTMENT",
+  /** A Hubtel send drawn on this allocation: the hold, or its refund. */
+  DISBURSEMENT = "DISBURSEMENT",
 }
 
 /** Mirrors the backend `PaymentMethod` enum. Every payment is recorded by hand. */
@@ -32,6 +35,8 @@ export interface IFloatTransaction {
   reason: string | null;
   purchaseId: string | null;
   expenseId: string | null;
+  /** Set on DISBURSEMENT rows - links the line to the send it belongs to. */
+  disbursementId: string | null;
   idempotencyKey: string | null;
   occurredAt: string;
 }
@@ -51,6 +56,47 @@ export interface IAgentSummary {
   isActive: boolean;
   /** Null when the API redacted it (financial visibility). */
   balanceGhs: number | null;
+}
+
+/**
+ * Somebody the owner can fund - staff OR field agent. Mirrors
+ * `toFloatHolderDTO`.
+ *
+ * `accountId` is null until an allocation has actually been opened for them,
+ * and that state is shown rather than hidden: a staff member with no float
+ * yet is exactly who the owner is looking for when they come to fund one.
+ */
+export interface IFloatHolder {
+  userId: string;
+  accountId: string | null;
+  accountActive: boolean;
+  agentProfileId: string | null;
+  role: UserRole;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string | null;
+  profilePicture: string | null;
+  region: string | null;
+  isActive: boolean;
+  /** Null when the API redacted it (financial visibility). */
+  balanceGhs: number | null;
+}
+
+export interface IFloatHolderListQuery {
+  page?: number;
+  limit?: number;
+  role?: UserRole;
+  isActive?: boolean;
+  withAccountOnly?: boolean;
+  search?: string;
+}
+
+export interface IFloatHolderListResponse {
+  success: boolean;
+  message: string;
+  data: IFloatHolder[];
+  meta: IPaginationMeta;
 }
 
 /** Mirrors `toReconciliationDTO`: the immutable sit-down count snapshot. */
@@ -113,6 +159,11 @@ export interface IFloatLedgerResponse {
      * and runs its total from zero is a lie, so this is what it starts from.
      */
     openingBalanceGhs: number | null;
+    /**
+     * Whether the allocation may still be spent from. Only the /admin/floats
+     * surface sends it; the agent's own view has no use for it.
+     */
+    accountActive?: boolean;
   };
 }
 

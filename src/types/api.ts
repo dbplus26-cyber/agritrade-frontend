@@ -10,6 +10,7 @@ export const apiSliceTags = [
   "Buyers",
   "Commodities",
   "DeliveryAddresses",
+  "Disbursements",
   "Drivers",
   "EligibleSales",
   "Enquiries",
@@ -19,6 +20,7 @@ export const apiSliceTags = [
   "Farmers",
   "FarmPlans",
   "FarmStats",
+  "FloatHolders",
   "FloatLedger",
   "Grants",
   "InputItems",
@@ -44,6 +46,7 @@ export const apiSliceTags = [
   "Stocktakes",
   "Suppliers",
   "Transfers",
+  "Treasury",
   "Users",
   "Warehouses",
 ] as const;

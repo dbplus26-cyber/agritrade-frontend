@@ -109,12 +109,14 @@ export const adminSalesApi = apiSlice.injectEndpoints({
         body,
       }),
       // A payment can satisfy the loading milestone and make the sale shippable.
+      // It also lands on a company account's movement history.
       invalidatesTags: (_r, _e, { id }) => [
         { type: "Sales", id },
         { type: "Sales", id: "LIST" },
         { type: "Sales", id: "DEBTORS" },
         { type: "SaleStats", id: "SUMMARY" },
         { type: "EligibleSales", id: "LIST" },
+        { type: "PaymentAccounts", id: "HISTORY" },
       ],
     }),
 
@@ -139,6 +141,7 @@ export const adminSalesApi = apiSlice.injectEndpoints({
         { type: "Sales", id: "DEBTORS" },
         { type: "SaleStats", id: "SUMMARY" },
         { type: "EligibleSales", id: "LIST" },
+        { type: "PaymentAccounts", id: "HISTORY" },
       ],
     }),
   }),

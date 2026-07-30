@@ -41,6 +41,11 @@ export const saleSchema = z.object({
  * (saleId, reference) unique index uses to refuse the same transfer twice -
  * the guard against a payment being banked against an order twice, which
  * cannot be undone without an owner reversal. Cash has nothing to quote.
+ *
+ * The same rule extends to the company account: a BANK/MOMO movement
+ * happened ON some account, so it must name one (the backend enforces this
+ * in services/payment-account/payment-account-link.ts, ACCOUNT_REQUIRED).
+ * Cash sits in the till, so no account is demanded there.
  */
 export const recordPaymentSchema = z
   .object({
@@ -48,6 +53,7 @@ export const recordPaymentSchema = z
     method: z.enum(["CASH", "MOMO", "BANK"]),
     reference: z.string().trim().max(120).or(z.literal("")).optional(),
     paidAt: z.string().optional(),
+    paymentAccountId: z.string().optional(),
   })
   .superRefine((value, ctx) => {
     if (value.method !== "CASH" && !value.reference?.trim()) {
@@ -56,6 +62,14 @@ export const recordPaymentSchema = z
         message:
           "Enter the transfer reference - it is what stops this payment being recorded twice.",
         path: ["reference"],
+      });
+    }
+    if (value.method !== "CASH" && !value.paymentAccountId) {
+      ctx.addIssue({
+        code: "custom",
+        message:
+          "Select the company account the money landed in - it is what the bank statement is reconciled against.",
+        path: ["paymentAccountId"],
       });
     }
   });

@@ -197,15 +197,26 @@ export const shipmentsApi = apiSlice.injectEndpoints({
       invalidatesTags: (_r, _e, { id }) => [{ type: "Shipments", id }],
     }),
 
-    deleteShipmentExpense: builder.mutation<
+    /**
+     * Owner-only. A wrong voucher is voided with a reason, never
+     * hard-deleted - the row keeps its number and amount so "what happened
+     * to EXP-2026-00042" stays answerable. Voiding moves the trip's profit,
+     * and the voided cost leaves the general expenses register too.
+     */
+    voidShipmentExpense: builder.mutation<
       IShipmentResponse,
-      { id: string; expenseId: string }
+      { id: string; expenseId: string; reason: string }
     >({
-      query: ({ id, expenseId }) => ({
-        url: `admin/shipments/${id}/expenses/${expenseId}`,
-        method: "DELETE",
+      query: ({ id, expenseId, reason }) => ({
+        url: `admin/shipments/${id}/expenses/${expenseId}/void`,
+        method: "POST",
+        body: { reason },
       }),
-      invalidatesTags: (_r, _e, { id }) => [{ type: "Shipments", id }],
+      invalidatesTags: (_r, _e, { id }) => [
+        { type: "Shipments", id },
+        { type: "Expenses", id: "LIST" },
+        { type: "Reports", id: "LIST" },
+      ],
     }),
 
     addShipmentDocument: builder.mutation<
@@ -253,7 +264,7 @@ export const {
   useCloseShipmentMutation,
   useCancelShipmentMutation,
   useAddShipmentExpenseMutation,
-  useDeleteShipmentExpenseMutation,
+  useVoidShipmentExpenseMutation,
   useAddShipmentDocumentMutation,
   useRemoveShipmentDocumentMutation,
 } = shipmentsApi;

@@ -78,11 +78,13 @@ export const landSalesApi = apiSlice.injectEndpoints({
         method: "POST",
         body,
       }),
-      // Full payment completes the sale and sells the plot.
+      // Full payment completes the sale and sells the plot. The payment also
+      // lands on a company account's movement history.
       invalidatesTags: (_r, _e, { id }) => [
         { type: "LandSales", id },
         { type: "LandSales", id: "LIST" },
         { type: "LandPlots", id: "LIST" },
+        { type: "PaymentAccounts", id: "HISTORY" },
       ],
     }),
 
@@ -105,6 +107,7 @@ export const landSalesApi = apiSlice.injectEndpoints({
         { type: "LandSales", id },
         { type: "LandSales", id: "LIST" },
         { type: "LandPlots", id: "LIST" },
+        { type: "PaymentAccounts", id: "HISTORY" },
       ],
     }),
   }),

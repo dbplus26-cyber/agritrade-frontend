@@ -114,9 +114,32 @@ export const landAcquisitionsApi = apiSlice.injectEndpoints({
         method: "POST",
         body,
       }),
+      // Money out also lands on a company account's movement history.
       invalidatesTags: (_r, _e, { id }) => [
         { type: "LandAcquisitions", id },
         { type: "LandAcquisitions", id: "LIST" },
+        { type: "PaymentAccounts", id: "HISTORY" },
+      ],
+    }),
+
+    /**
+     * Owner-only compensating entry for a mis-keyed payment out to a seller.
+     * Writes a negative row rather than deleting anything, mirroring the
+     * land-sale reversal - record it once the seller has returned the money.
+     */
+    reverseAcquisitionPayment: builder.mutation<
+      ILandAcquisitionResponse,
+      { id: string; paymentId: string; reason: string }
+    >({
+      query: ({ id, paymentId, reason }) => ({
+        url: `admin/land/acquisitions/${id}/payments/${paymentId}/reverse`,
+        method: "POST",
+        body: { reason },
+      }),
+      invalidatesTags: (_r, _e, { id }) => [
+        { type: "LandAcquisitions", id },
+        { type: "LandAcquisitions", id: "LIST" },
+        { type: "PaymentAccounts", id: "HISTORY" },
       ],
     }),
   }),
@@ -130,5 +153,6 @@ export const {
   useGetLandAcquisitionQuery,
   useGetLandAcquisitionsQuery,
   useRecordAcquisitionPaymentMutation,
+  useReverseAcquisitionPaymentMutation,
   useUpdateLandAcquisitionMutation,
 } = landAcquisitionsApi;

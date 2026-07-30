@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { PaymentAccountField } from "@/components/admin/payment-account-field";
 import {
   AdminButton,
   AdminField,
@@ -68,9 +70,16 @@ export function PaymentDialog({
     defaultValues: { method: "CASH", paidAt: todayInputValue() },
   });
 
-  // Drives whether the reference is required: a transfer must carry one.
+  // Drives whether the reference and the company account are required: a
+  // transfer must carry both.
   const method = watch("method");
   const { confirm, confirmationDialog } = useConfirm();
+
+  // Switching method changes which accounts can carry the payment, so a
+  // previously chosen account must not ride along silently.
+  useEffect(() => {
+    setValue("paymentAccountId", "");
+  }, [method, setValue]);
 
   // Quick-fill figures; null (redacted) money hides the button entirely.
   const depositRemainderGhs =
@@ -136,6 +145,9 @@ export function PaymentDialog({
             ? { reference: values.reference.trim() }
             : {}),
           ...(values.paidAt ? { paidAt: values.paidAt } : {}),
+          ...(values.paymentAccountId
+            ? { paymentAccountId: values.paymentAccountId }
+            : {}),
         },
       }).unwrap();
       notify.success("Payment recorded");
@@ -362,6 +374,16 @@ export function PaymentDialog({
               />
             </AdminField>
           </div>
+
+          {/* Which company account the money landed in. Required for a
+              transfer - it is what the bank statement is reconciled against;
+              cash sits in the till. */}
+          <PaymentAccountField
+            method={method}
+            direction="in"
+            error={errors.paymentAccountId?.message}
+            registration={register("paymentAccountId")}
+          />
 
           {/* Required for a transfer: it is what stops the same payment being
               recorded against the order twice. Cash has nothing to quote. */}

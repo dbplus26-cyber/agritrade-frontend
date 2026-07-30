@@ -12,6 +12,7 @@ const TX_LABEL: Record<FloatTxType, string> = {
   [FloatTxType.PURCHASE]: "Purchase",
   [FloatTxType.FIELD_EXPENSE]: "Expense",
   [FloatTxType.ADJUSTMENT]: "Adjustment",
+  [FloatTxType.DISBURSEMENT]: "Money sent",
 };
 
 function LedgerLine({ tx }: { tx: IFloatTransaction }) {
@@ -95,6 +96,12 @@ export function AgentHome() {
           className="rounded-lg bg-forest px-4 py-3.5 text-center text-[15px] font-semibold text-paper transition-colors hover:bg-board"
         >
           Record a purchase
+        </Link>
+        <Link
+          href="/agent/sends"
+          className="rounded-lg border-[1.5px] border-forest bg-paper px-4 py-3.5 text-center text-[15px] font-semibold text-forest transition-colors hover:bg-surface-alt"
+        >
+          Send money
         </Link>
         <div className="grid grid-cols-2 gap-2.5">
           <Link

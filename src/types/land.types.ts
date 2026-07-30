@@ -150,6 +150,8 @@ export interface IRecordLandPaymentInput {
   method: "BANK" | "CASH" | "MOMO";
   reference?: string;
   paidAt?: string;
+  /** Company account the money landed in. Required for BANK/MOMO. */
+  paymentAccountId?: string;
 }
 
 // ── Land sellers (who the business buys land from) ────────────────
@@ -207,6 +209,9 @@ export type LandAcquisitionStatus =
 
 export interface ILandAcquisitionPayment {
   id: string;
+  /** Human-readable payment voucher number. */
+  transactionNo: string;
+  /** Signed: a reversal (money returned by the seller) is negative. */
   amountGhs: number | null;
   method: "BANK" | "CASH" | "MOMO";
   reference: string | null;
@@ -215,6 +220,8 @@ export interface ILandAcquisitionPayment {
 
 export interface ILandAcquisition {
   id: string;
+  /** Human-readable document number, e.g. "ACQ-2026-00004". */
+  transactionNo: string;
   reference: string;
   seller: { id: string; name: string; phone: string | null };
   locationText: string;
@@ -279,4 +286,6 @@ export interface IRecordAcquisitionPaymentInput {
   method: "BANK" | "CASH" | "MOMO";
   reference?: string;
   paidAt?: string;
+  /** Company account the seller was paid FROM. Required for BANK/MOMO. */
+  paymentAccountId?: string;
 }

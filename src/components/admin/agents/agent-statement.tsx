@@ -18,6 +18,7 @@ import type { IFloatTransaction } from "@/types/agent.types";
 
 const TX_LABEL: Record<string, string> = {
   ADJUSTMENT: "Adjustment",
+  DISBURSEMENT: "Money sent",
   FIELD_EXPENSE: "Field expense",
   PURCHASE: "Purchase",
   TOP_UP: "Top-up",

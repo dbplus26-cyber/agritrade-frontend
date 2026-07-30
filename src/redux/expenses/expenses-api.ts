@@ -1,6 +1,5 @@
 import { apiSlice } from "../api-slice";
 import { toQueryString } from "@/lib/to-query-string";
-import type { IMessageResponse } from "@/types/auth.types";
 import type {
   ICreateExpenseInput,
   IExpenseListQuery,
@@ -59,13 +58,6 @@ export const expensesApi = apiSlice.injectEndpoints({
       ],
     }),
 
-    deleteExpense: builder.mutation<IMessageResponse, string>({
-      query: (id) => ({ url: `admin/expenses/${id}`, method: "DELETE" }),
-      invalidatesTags: [
-        { type: "Expenses", id: "LIST" },
-        { type: "Reports", id: "LIST" },
-      ],
-    }),
   }),
 });
 
@@ -74,5 +66,4 @@ export const {
   useGetExpenseQuery,
   useCreateExpenseMutation,
   useUpdateExpenseMutation,
-  useDeleteExpenseMutation,
 } = expensesApi;

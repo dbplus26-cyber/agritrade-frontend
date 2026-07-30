@@ -61,11 +61,15 @@ import { formatConsoleDate } from "@/components/admin/purchases/purchase-bits";
 
 const LIST = "/admin/agents";
 
+// These three maps are exhaustive over FloatTxType on purpose: adding a
+// ledger type without a marker used to render `undefined` and then throw on
+// TONES[undefined].bg, so the compiler is made to catch it instead.
 const TX_LABEL: Record<FloatTxType, string> = {
   [FloatTxType.TOP_UP]: "Top-up",
   [FloatTxType.PURCHASE]: "Purchase",
   [FloatTxType.FIELD_EXPENSE]: "Field expense",
   [FloatTxType.ADJUSTMENT]: "Adjustment",
+  [FloatTxType.DISBURSEMENT]: "Money sent",
 };
 
 const TX_TONE: Record<FloatTxType, Tone> = {
@@ -73,6 +77,7 @@ const TX_TONE: Record<FloatTxType, Tone> = {
   [FloatTxType.PURCHASE]: "sky",
   [FloatTxType.FIELD_EXPENSE]: "harvest",
   [FloatTxType.ADJUSTMENT]: "slate",
+  [FloatTxType.DISBURSEMENT]: "forest",
 };
 
 /** Two-letter ledger markers, stamped in the type's tone. */
@@ -81,6 +86,7 @@ const TX_CODE: Record<FloatTxType, string> = {
   [FloatTxType.PURCHASE]: "PU",
   [FloatTxType.FIELD_EXPENSE]: "FE",
   [FloatTxType.ADJUSTMENT]: "AD",
+  [FloatTxType.DISBURSEMENT]: "SN",
 };
 
 /** Square type marker at the head of a ledger line (label in the tooltip). */

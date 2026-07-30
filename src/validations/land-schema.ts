@@ -37,12 +37,31 @@ export const landSaleSchema = z.object({
   notes: z.string().trim().max(1000).or(z.literal("")).optional(),
 });
 
-export const landPaymentSchema = z.object({
-  amountGhs: posNumber("amount", 100_000_000),
-  method: z.enum(["CASH", "MOMO", "BANK"]),
-  reference: z.string().trim().max(120).or(z.literal("")).optional(),
-  paidAt: z.string().optional(),
-});
+/**
+ * Shared by land-sale receipts and acquisition payments, mirroring the
+ * backend `recordLandPaymentSchema` / `recordAcquisitionPaymentSchema`. A
+ * BANK/MOMO movement must name the company account it touched (the backend
+ * enforces this in services/payment-account/payment-account-link.ts,
+ * ACCOUNT_REQUIRED); cash sits in the till, so no account is demanded there.
+ */
+export const landPaymentSchema = z
+  .object({
+    amountGhs: posNumber("amount", 100_000_000),
+    method: z.enum(["CASH", "MOMO", "BANK"]),
+    reference: z.string().trim().max(120).or(z.literal("")).optional(),
+    paidAt: z.string().optional(),
+    paymentAccountId: z.string().optional(),
+  })
+  .superRefine((value, ctx) => {
+    if (value.method !== "CASH" && !value.paymentAccountId) {
+      ctx.addIssue({
+        code: "custom",
+        message:
+          "Select the company account this payment moved on - it is what the bank statement is reconciled against.",
+        path: ["paymentAccountId"],
+      });
+    }
+  });
 
 /**
  * Cancelling settles the deposit too. `settlement` is what the operator is

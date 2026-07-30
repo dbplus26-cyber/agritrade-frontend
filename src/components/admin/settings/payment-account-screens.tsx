@@ -713,7 +713,13 @@ export function PaymentAccountEdit({ id }: { id: string }) {
   const account = data.data.account;
   return (
     <div className="max-w-[560px]">
-      <BackButton href={LIST} label="All accounts" className="mb-2" />
+      {/* Back to the account's detail page (facts + movement history), not
+          the register - editing is reached from there. */}
+      <BackButton
+        href={`${LIST}/${id}`}
+        label="Account details"
+        className="mb-2"
+      />
       <AdminPageHeader
         title={account.label}
         sub="Edit the account and whether customers are shown it"

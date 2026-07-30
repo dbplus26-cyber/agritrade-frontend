@@ -27,3 +27,14 @@ export const expenseSchema = z.object({
 });
 
 export type ExpenseValues = z.infer<typeof expenseSchema>;
+
+/**
+ * Mirrors the backend `voidExpenseSchema` (validations/expense-validation.ts).
+ * A wrong voucher is voided with a reason, never hard-deleted - the written
+ * reason IS the correction's audit trail.
+ */
+export const voidExpenseSchema = z.object({
+  reason: z.string().trim().min(3, "Give a reason").max(500),
+});
+
+export type VoidExpenseValues = z.infer<typeof voidExpenseSchema>;
