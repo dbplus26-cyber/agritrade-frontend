@@ -22,7 +22,7 @@ const STEPS = [
   {
     no: "04",
     title: "Deliver by truck",
-    body: "Full truckloads to Accra and Kumasi — waybill and weighbridge ticket travel with the load.",
+    body: "Full truckloads to Accra and Kumasi - waybill and weighbridge ticket travel with the load.",
   },
 ];
 
@@ -35,12 +35,12 @@ export function WaybillSteps() {
           className="lg:pt-4"
           eyebrow="HOW WE WORK"
           title="Nothing moves without a ticket."
-          lede="The same four entries on every load's paperwork, every season. Ask to see the waybill — buyers always can."
+          lede="The same four entries on every load's paperwork, every season. Ask to see the waybill - buyers always can."
         />
       </Reveal>
       <Reveal delay={120}>
       <DocCard
-        title="WAYBILL — STANDARD PROCESS"
+        title="WAYBILL - STANDARD PROCESS"
         fileNo="N° WB-0001"
         // Extra mobile bottom padding so the overhanging stamp never touches
         // the last step's text; header stacks on phones (too long for one row).

@@ -9,7 +9,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata = pageMetadata({
   title: "Farming investment",
   description:
-    "Inputs before the season, repaid in produce after harvest. Farmers get fertiliser and seed; partners who fund the scheme share the returns — terms in writing.",
+    "Inputs before the season, repaid in produce after harvest. Farmers get fertiliser and seed; partners who fund the scheme share the returns - terms in writing.",
   path: "/farming-investment",
   keywords: [
     "input credit scheme Ghana",
@@ -34,7 +34,7 @@ export default function FarmingInvestmentPage() {
         </h1>
         <p className="text-[14px] leading-[1.65] text-soil lg:text-[17px] lg:leading-[1.7]">
           We give farmers fertiliser and seed at the start of the season. After
-          harvest, they repay in produce at an agreed rate — no cash loan, no
+          harvest, they repay in produce at an agreed rate - no cash loan, no
           interest rate to track. Partners who fund the scheme share in the
           returns when the produce is sold. It&rsquo;s a lending relationship,
           and we treat it like one: terms in writing, weights on a certified

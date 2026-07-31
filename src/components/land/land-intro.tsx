@@ -22,7 +22,7 @@ export function LandIntro() {
       <div className="relative mx-auto grid max-w-[1312px] items-start gap-9 lg:grid-cols-[1.15fr_0.85fr] lg:gap-20 lg:px-8">
         <div className="relative z-[2]">
           <StencilLabel className="text-[11px] tracking-[0.32em] lg:text-[12px]">
-            LAND · PLOT FILES — TML
+            LAND · PLOT FILES - TML
           </StencilLabel>
           <h1 className="mb-5 mt-4 font-display text-[36px] font-bold leading-[1.05] tracking-[-0.015em] text-forest lg:mb-6 lg:text-[66px] lg:leading-[1.02]">
             Plots around Tamale,
@@ -35,7 +35,7 @@ export function LandIntro() {
           <p className="mb-3.5 max-w-[54ch] text-[14.5px] leading-[1.7] text-soil lg:text-[17px]">
             We sell plots we hold ourselves, in areas we know. Every plot comes
             with its site plan and indenture, and we walk the boundary with you
-            — pillar to pillar — before any money changes hands.
+            - pillar to pillar - before any money changes hands.
           </p>
           <p className="max-w-[54ch] text-[14.5px] leading-[1.7] text-soil lg:text-[17px]">
             Buying is simple: view, confirm the papers, agree terms, pay,

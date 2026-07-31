@@ -9,7 +9,7 @@ import {
 export const metadata = pageMetadata({
   title: "Terms of service",
   description:
-    "The terms DB Plus Trading Ltd trades on — quotes, weighing, delivery, payment, land sales and the farming investment scheme, in plain language.",
+    "The terms DB Plus Trading Ltd trades on - quotes, weighing, delivery, payment, land sales and the farming investment scheme, in plain language.",
   path: "/terms",
 });
 
@@ -18,13 +18,13 @@ function buildSections(contact: ResolvedContact): LegalSection[] {
   {
     title: "Who we are",
     paragraphs: [
-      `${siteConfig.legalName} ("DB Plus", "we") is an agro-commodity trading company operating from ${contact.address}. We buy, aggregate and deliver grains and pulses, sell documented land plots around Tamale, and run an input-credit farming scheme. These terms cover your use of this website and, in outline, how we trade — the signed paperwork for a specific transaction always takes precedence over this page.`,
+      `${siteConfig.legalName} ("DB Plus", "we") is an agro-commodity trading company operating from ${contact.address}. We buy, aggregate and deliver grains and pulses, sell documented land plots around Tamale, and run an input-credit farming scheme. These terms cover your use of this website and, in outline, how we trade - the signed paperwork for a specific transaction always takes precedence over this page.`,
     ],
   },
   {
     title: "Quotes and orders",
     paragraphs: [
-      "We do not publish prices — the market moves daily. Quotes are given by phone or in writing against a stated commodity, tonnage and destination, and are valid for the day they are given unless we say otherwise. An order exists when we have confirmed it, in writing or by an exchanged reference.",
+      "We do not publish prices - the market moves daily. Quotes are given by phone or in writing against a stated commodity, tonnage and destination, and are valid for the day they are given unless we say otherwise. An order exists when we have confirmed it, in writing or by an exchanged reference.",
     ],
   },
   {
@@ -42,25 +42,25 @@ function buildSections(contact: ResolvedContact): LegalSection[] {
   {
     title: "Payment",
     paragraphs: [
-      "Payment terms are agreed per order and stated on the invoice. Every sale carries a transaction number (e.g. SAL-2026-00042) — quote it when paying. Payment is made directly to us by cash, mobile money or bank transfer; a payment is complete when we have received it and issued a receipt. Fees charged by your bank or mobile-money provider are yours.",
+      "Payment terms are agreed per order and stated on the invoice. Every sale carries a transaction number (e.g. SAL-2026-00042) - quote it when paying. Payment is made directly to us by cash, mobile money or bank transfer; a payment is complete when we have received it and issued a receipt. Fees charged by your bank or mobile-money provider are yours.",
     ],
   },
   {
     title: "Land sales",
     paragraphs: [
-      "We sell plots we hold ourselves, papers first: the site plan and indenture are shown and checked, the boundary is walked together, and transfer is completed in your name before the sale closes. Nothing on this website is legal advice — we encourage every buyer to involve their own lawyer, and nothing stops you doing so at any stage.",
+      "We sell plots we hold ourselves, papers first: the site plan and indenture are shown and checked, the boundary is walked together, and transfer is completed in your name before the sale closes. Nothing on this website is legal advice - we encourage every buyer to involve their own lawyer, and nothing stops you doing so at any stage.",
     ],
   },
   {
     title: "Farming investment scheme",
     paragraphs: [
-      "The scheme provides inputs to registered farmers, repaid in produce after harvest, with partners funding a season and sharing returns. Farming carries real risk — weather, pests and price movements can reduce or eliminate returns, and neither repayment nor returns are guaranteed. The written scheme agreement you sign governs entirely; this website only describes the scheme in outline.",
+      "The scheme provides inputs to registered farmers, repaid in produce after harvest, with partners funding a season and sharing returns. Farming carries real risk - weather, pests and price movements can reduce or eliminate returns, and neither repayment nor returns are guaranteed. The written scheme agreement you sign governs entirely; this website only describes the scheme in outline.",
     ],
   },
   {
     title: "This website",
     paragraphs: [
-      "Website content — including the availability board — is provided for information and reflects our records at the time it was updated; it is not an offer capable of acceptance. We may change the site, and these terms, at any time; the date at the top of this page tells you when the terms last changed.",
+      "Website content - including the availability board - is provided for information and reflects our records at the time it was updated; it is not an offer capable of acceptance. We may change the site, and these terms, at any time; the date at the top of this page tells you when the terms last changed.",
       "Some photography on this site comes from Wikimedia Commons contributors and is used under the CC BY-SA licence.",
     ],
   },

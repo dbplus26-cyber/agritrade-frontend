@@ -54,7 +54,7 @@ export function LocationMap() {
         loading="lazy"
         onLoad={() => setIsLoading(false)}
         referrerPolicy="no-referrer-when-downgrade"
-        title="DB Plus warehouse location — Tamale"
+        title="DB Plus warehouse location - Tamale"
         className="transition-[filter] duration-700 ease-in-out group-hover:filter-none"
       />
 

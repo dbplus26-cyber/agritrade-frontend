@@ -20,15 +20,15 @@ function buildSections(contact: ResolvedContact): LegalSection[] {
       "We collect only what running a trading house needs:",
     ],
     points: [
-      "Enquiries — your name, phone number, optional email, the subject and your message, when you send the enquiry form or contact us directly.",
-      "Trading records — order references, weights, waybills, payment references and receipts for transactions you're part of.",
-      "Payments — the sale reference you look up on the pay page and confirmation of payments made. Card and mobile-money details are entered with the payment processor, not with us.",
+      "Enquiries - your name, phone number, optional email, the subject and your message, when you send the enquiry form or contact us directly.",
+      "Trading records - order references, weights, waybills, payment references and receipts for transactions you're part of.",
+      "Payments - the sale reference you look up on the pay page and confirmation of payments made. Card and mobile-money details are entered with the payment processor, not with us.",
     ],
   },
   {
     title: "How we use it",
     paragraphs: [
-      "To respond to your enquiry, to quote, fulfil and document transactions, to keep the business records the law requires of us, and to contact you about business you have with us — for example when a plot you asked about becomes available. We do not send marketing you haven't asked for, and we never sell your details.",
+      "To respond to your enquiry, to quote, fulfil and document transactions, to keep the business records the law requires of us, and to contact you about business you have with us - for example when a plot you asked about becomes available. We do not send marketing you haven't asked for, and we never sell your details.",
     ],
   },
   {
@@ -46,7 +46,7 @@ function buildSections(contact: ResolvedContact): LegalSection[] {
   {
     title: "Retention",
     paragraphs: [
-      "Enquiries that don't become business are kept for up to two years so we can honour \"contact me when one comes up\" requests, then deleted. Transaction records — weights, waybills, invoices, receipts — are kept for as long as Ghanaian tax and company law requires.",
+      "Enquiries that don't become business are kept for up to two years so we can honour \"contact me when one comes up\" requests, then deleted. Transaction records - weights, waybills, invoices, receipts - are kept for as long as Ghanaian tax and company law requires.",
     ],
   },
   {

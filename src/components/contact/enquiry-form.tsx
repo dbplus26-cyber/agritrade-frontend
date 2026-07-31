@@ -70,7 +70,7 @@ export function EnquiryForm({
       phone: "",
       email: "",
       subject: defaultSubject,
-      message: defaultAbout ? `Regarding ${defaultAbout} — ` : "",
+      message: defaultAbout ? `Regarding ${defaultAbout} - ` : "",
       website: "",
     },
   });
@@ -207,7 +207,7 @@ export function EnquiryForm({
         <div className="grid gap-[18px] sm:grid-cols-2 sm:gap-5">
           <div className="flex flex-col gap-[7px]">
             <label htmlFor={`${fieldId}-email`} className={labelClass}>
-              EMAIL — OPTIONAL
+              EMAIL - OPTIONAL
             </label>
             <input
               id={`${fieldId}-email`}

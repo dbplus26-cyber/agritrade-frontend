@@ -28,7 +28,7 @@ const DOCS: PaperDoc[] = [
     rows: [
       { label: "GROSS", value: "42,180 kg" },
       { label: "TARE", value: "12,140 kg" },
-      { label: "NET", value: "30,040 kg — certified" },
+      { label: "NET", value: "30,040 kg - certified" },
     ],
     stamp: "Certified",
     stampTone: "leaf",
@@ -60,7 +60,7 @@ export function PaperTrail() {
             tone="dark"
             eyebrow="THE PAPER TRAIL"
             title="What travels with every load."
-            lede="Ask for any of these at any time — buyers always can. Figures below are illustrative; the documents are not."
+            lede="Ask for any of these at any time - buyers always can. Figures below are illustrative; the documents are not."
             className="mb-9 lg:mb-12"
           />
         </Reveal>

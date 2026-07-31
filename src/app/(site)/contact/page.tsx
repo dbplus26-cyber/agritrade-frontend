@@ -8,7 +8,7 @@ import { ENQUIRY_SUBJECTS, type EnquirySubject } from "@/types/enquiry.types";
 export const metadata = pageMetadata({
   title: "Contact the dispatch office",
   description:
-    "Commodity, tonnage, destination — or a plot, or the farming scheme. Call the Tamale dispatch line or send a written enquiry; we reply within one working day.",
+    "Commodity, tonnage, destination - or a plot, or the farming scheme. Call the Tamale dispatch line or send a written enquiry; we reply within one working day.",
   path: "/contact",
   keywords: ["contact DB Plus", "Tamale dispatch office", "grain enquiry Ghana"],
 });
@@ -51,7 +51,7 @@ export default async function ContactPage({
           Tell us what you need.
         </h1>
         <p className="mb-6 max-w-[52ch] text-[14px] leading-[1.6] text-soil lg:mb-9 lg:text-[16px] lg:leading-[1.65]">
-          Commodity, tonnage, destination — or a plot, or the farming scheme.
+          Commodity, tonnage, destination - or a plot, or the farming scheme.
           Calling is always fastest; the form goes straight to the office.
         </p>
 

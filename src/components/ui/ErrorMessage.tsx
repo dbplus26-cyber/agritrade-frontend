@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
  */
 export function ErrorMessage({
   title = "That didn't go through",
-  description = "Something went wrong on our side. Try again — if it keeps failing, call the office.",
+  description = "Something went wrong on our side. Try again - if it keeps failing, call the office.",
   onRetry,
   retryLabel = "Try again",
   className,

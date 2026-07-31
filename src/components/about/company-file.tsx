@@ -11,7 +11,7 @@ export function CompanyFile() {
       <Reveal>
       <DocCard title="COMPANY FILE" fileNo="N° CF-001" className="mt-4 lg:mt-0">
         <DocRow label="TRADES">
-          Maize, soya beans and groundnuts — by the truckload, graded and
+          Maize, soya beans and groundnuts - by the truckload, graded and
           bagged
         </DocRow>
         <DocRow label="BUYS FROM">
@@ -19,7 +19,7 @@ export function CompanyFile() {
           Region
         </DocRow>
         <DocRow label="WAREHOUSES">
-          Tamale — aggregation, cleaning, bagging over certified scales
+          Tamale - aggregation, cleaning, bagging over certified scales
         </DocRow>
         <DocRow label="DELIVERS TO">
           Accra, Tema and Kumasi, waybill and weighbridge ticket with every

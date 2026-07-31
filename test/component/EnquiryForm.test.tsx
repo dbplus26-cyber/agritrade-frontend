@@ -75,8 +75,10 @@ describe("EnquiryForm", () => {
       />,
     );
     expect(screen.getByLabelText(/SUBJECT/)).toHaveValue("Land / plots");
+    // The plot reference is passed through verbatim, whatever it contains;
+    // only the separator the form itself writes is ours, and it is a hyphen.
     expect(screen.getByLabelText(/MESSAGE/)).toHaveValue(
-      "Regarding Plot TML-014 — Kumbungu Road, Plot 14 — ",
+      "Regarding Plot TML-014 — Kumbungu Road, Plot 14 - ",
     );
   });
 

@@ -17,7 +17,7 @@ import { pageMetadata } from "@/lib/seo";
 export const metadata = pageMetadata({
   title: "Design system",
   description:
-    "The DB Plus component sheet — Pale Husk v2.1 tokens, type scale, tags, the availability board, cards, form states and system states.",
+    "The DB Plus component sheet - Pale Husk v2.1 tokens, type scale, tags, the availability board, cards, form states and system states.",
   path: "/style-guide",
   index: false,
 });
@@ -30,7 +30,7 @@ const PALETTE = [
   { token: "--color-board", hex: "#0C332A", note: "Plank board / deepest band · gold tags 5.7:1" },
   { token: "--color-footer", hex: "#0B2D25", note: "Footer band · surface text 13.0:1" },
   { token: "--color-harvest", hex: "#D89C2E", note: "Ochre gold, tags + CTAs · ink on gold 6.7:1. Never large fills." },
-  { token: "--color-harvest-deep", hex: "#7A611C", note: "AA text gold on surface · 5.2:1 — eyebrows, links, labels" },
+  { token: "--color-harvest-deep", hex: "#7A611C", note: "AA text gold on surface · 5.2:1 - eyebrows, links, labels" },
   { token: "--color-soil", hex: "#59523B", note: "Olive-brown secondary text · borders @ .16–.5 alpha" },
   { token: "--color-leaf", hex: "#3E7D62", note: "Stamps, WhatsApp, focus rings" },
   { token: "--color-ink", hex: "#1F211C", note: "Body text · text on harvest buttons" },
@@ -42,7 +42,7 @@ const SPACING_RULES = [
   "Max content width 1312px shell · 20px margins on mobile",
   "Section padding: 88–104px desktop · 40–56px mobile",
   "Dark bands: max 2–3 per page (board, values/why band, footer)",
-  "Radii: 2px tags/buttons/inputs · 3–5px stamps & plates — nothing rounder",
+  "Radii: 2px tags/buttons/inputs · 3–5px stamps & plates - nothing rounder",
   "Shadows are hard offsets (3–6px, no blur); photos get the forest→soil overlay",
 ];
 
@@ -72,13 +72,13 @@ export default function StyleGuidePage() {
         <SectionHeading
           eyebrow="INTERNAL · COMPONENT SHEET"
           title="The DB Plus design system."
-          lede="Pale Husk v2.1 — every token and component the site is built from, rendered live. This page is noindexed and linked from nowhere."
+          lede="Pale Husk v2.1 - every token and component the site is built from, rendered live. This page is noindexed and linked from nowhere."
           className="mb-12"
         />
 
         <div className="flex flex-col gap-14">
           {/* Palette */}
-          <Sheet label="PALETTE — PALE HUSK v2.1">
+          <Sheet label="PALETTE - PALE HUSK v2.1">
             <div className="grid gap-x-8 gap-y-3 md:grid-cols-2">
               {PALETTE.map((swatch) => (
                 <div
@@ -107,25 +107,25 @@ export default function StyleGuidePage() {
             <Sheet label="TYPE SCALE">
               <div className="flex flex-col gap-4">
                 <div className="font-display text-[clamp(34px,4vw,52px)] font-bold leading-[1.05] text-forest">
-                  Display — Bricolage 700
+                  Display - Bricolage 700
                   <span className="ml-3 align-middle text-[12px] font-medium tracking-normal text-soil">
                     hero H1
                   </span>
                 </div>
                 <div className="font-display text-[clamp(26px,3vw,36px)] font-bold leading-[1.15] text-forest">
-                  Heading — Bricolage 700
+                  Heading - Bricolage 700
                   <span className="ml-3 align-middle text-[12px] font-medium text-soil">
                     section H2
                   </span>
                 </div>
                 <div className="font-display text-[22px] font-semibold text-forest">
-                  Subhead 22 — Bricolage 600 · card titles
+                  Subhead 22 - Bricolage 600 · card titles
                 </div>
                 <p className="text-[16px] leading-[1.65] text-ink">
-                  Body 16 — Public Sans 400, line-height 1.65.
+                  Body 16 - Public Sans 400, line-height 1.65.
                 </p>
                 <p className="text-[14px] leading-[1.6] text-soil">
-                  Small 14 — Public Sans 400, soil for secondary copy.
+                  Small 14 - Public Sans 400, soil for secondary copy.
                 </p>
                 <StencilLabel className="text-[11px] tracking-[0.28em]">
                   STENCIL UTILITY 11 · STARDOS · +.28EM TRACKING
@@ -148,13 +148,13 @@ export default function StyleGuidePage() {
                 href="#buttons"
                 className="shadow-block inline-block rounded-[2px] bg-harvest px-7 py-[15px] text-[15px] font-bold text-ink transition-[transform,box-shadow] duration-100 hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0_#1F211C]"
               >
-                Primary — harvest
+                Primary - harvest
               </a>
               <a
                 href="#buttons"
                 className="shadow-doc-sm inline-block rounded-[2px] border-[2.5px] border-forest px-[26px] py-3 text-[15px] font-bold text-forest transition-[transform,box-shadow] duration-100 hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0_rgb(89_82_59/0.4)]"
               >
-                Secondary — outline forest
+                Secondary - outline forest
               </a>
               <a
                 href="#buttons"
@@ -216,15 +216,15 @@ export default function StyleGuidePage() {
           </Sheet>
 
           {/* Document cards */}
-          <Sheet label="DOCUMENT CARDS — FILE + LEDGER ROWS">
+          <Sheet label="DOCUMENT CARDS - FILE + LEDGER ROWS">
             <div className="grid gap-8 lg:grid-cols-2">
               <DocCard title="COMPANY FILE" fileNo="N° CF-001">
-                <DocRow label="TRADES">Maize, soya beans and groundnuts — by the truckload</DocRow>
+                <DocRow label="TRADES">Maize, soya beans and groundnuts - by the truckload</DocRow>
                 <DocRow label="BUYS FROM">Eight districts of the Northern Region</DocRow>
-                <DocRow label="DELIVERS TO" last>Accra, Tema and Kumasi — waybill with every load</DocRow>
+                <DocRow label="DELIVERS TO" last>Accra, Tema and Kumasi - waybill with every load</DocRow>
                 <Stamp className="absolute -top-5 right-5 rotate-[4deg] text-[13px]">On record</Stamp>
               </DocCard>
-              <DocCard title="PLOT FILE — TML" fileNo="N° 02" tint="paper" className="h-fit">
+              <DocCard title="PLOT FILE - TML" fileNo="N° 02" tint="paper" className="h-fit">
                 <div className="px-6 py-5 sm:px-8">
                   <h3 className="mb-1 font-display text-[20px] font-bold text-forest">
                     Kumbungu Road, Plot 14
@@ -285,11 +285,11 @@ export default function StyleGuidePage() {
           </Sheet>
 
           {/* System states */}
-          <Sheet label="SYSTEM STATES — EMPTY · ERROR · SKELETONS">
+          <Sheet label="SYSTEM STATES - EMPTY · ERROR · SKELETONS">
             <div className="grid gap-8 lg:grid-cols-2">
               <EmptyState
                 title="No plots on the register"
-                description="When a documented plot is listed it will be filed here — ask the office what's coming."
+                description="When a documented plot is listed it will be filed here - ask the office what's coming."
               />
               <ErrorMessage description="Couldn't reach the server. Check your connection and try again." />
             </div>

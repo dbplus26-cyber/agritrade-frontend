@@ -10,9 +10,9 @@ import {
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "Commodities — the board",
+  title: "Commodities - the board",
   description:
-    "Maize, soya beans and groundnuts by the truckload from Tamale — graded, bagged and weighed over a certified scale. See what's in the warehouse today.",
+    "Maize, soya beans and groundnuts by the truckload from Tamale - graded, bagged and weighed over a certified scale. See what's in the warehouse today.",
   path: "/commodities",
   keywords: [
     "maize by the truckload",

@@ -5,7 +5,7 @@ import { fetchPublicLandPlots } from "@/lib/public-land";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "Land — plots around Tamale",
+  title: "Land - plots around Tamale",
   description:
     "Documented plots in and around Tamale, sold papers first: site plan and indenture checked, boundary walked pillar to pillar before any money changes hands.",
   path: "/land",
