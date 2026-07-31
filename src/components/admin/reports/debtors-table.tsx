@@ -61,7 +61,7 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
             type="button"
             onClick={() => onSearch("")}
             aria-label="Clear search"
-            className="absolute right-1.5 top-1/2 flex h-5 w-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-soil/70 hover:bg-soil/15 hover:text-soil"
+            className="absolute right-1.5 top-1/2 flex h-5 w-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-adm-faint hover:bg-soil/15 hover:text-adm-muted"
           >
             <X className="h-3.5 w-3.5" aria-hidden="true" />
           </button>
@@ -69,7 +69,7 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
       </div>
 
       {rows.length === 0 ? (
-        <p className="py-4 text-[13px] text-soil">
+        <p className="py-4 text-[13px] text-adm-muted">
           {isFetching
             ? "Loading…"
             : debounced
@@ -95,7 +95,7 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
               <col className="w-[8rem]" />
             </colgroup>
             <thead>
-              <tr className="text-left text-[11px] text-soil uppercase">
+              <tr className="text-left text-[11px] text-adm-muted uppercase">
                 <th className="py-1.5 pr-3">Buyer</th>
                 <th className="py-1.5 pr-3">Book</th>
                 <th className="py-1.5 pr-3">Ref</th>
@@ -106,13 +106,13 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
             </thead>
             <tbody>
               {rows.map((r) => (
-                <tr key={r.id} className="border-t border-soil/10 align-top">
-                  <td className="py-1.5 pr-3 text-ink">
+                <tr key={r.id} className="border-t border-adm-hairline align-top">
+                  <td className="py-1.5 pr-3 text-adm-ink">
                     <div className="line-clamp-2" title={r.buyer.name}>
                       {r.buyer.name}
                     </div>
                     {r.buyer.phone ? (
-                      <div className="font-adminmono truncate text-[11.5px] text-soil">
+                      <div className="font-adminmono truncate text-[11.5px] text-adm-muted">
                         {r.buyer.phone}
                       </div>
                     ) : null}
@@ -124,13 +124,13 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
                   </td>
                   <td className="py-1.5 pr-3">
                     <span className="block truncate" title={r.subject}>
-                      <Mono className="text-soil">{r.subject}</Mono>
+                      <Mono className="text-adm-muted">{r.subject}</Mono>
                     </span>
                   </td>
-                  <td className="py-1.5 pr-3 whitespace-nowrap text-soil">
+                  <td className="py-1.5 pr-3 whitespace-nowrap text-adm-muted">
                     <Money value={r.agreedGhs} />
                   </td>
-                  <td className="py-1.5 pr-3 whitespace-nowrap text-soil">
+                  <td className="py-1.5 pr-3 whitespace-nowrap text-adm-muted">
                     <Money value={r.paidGhs} />
                   </td>
                   <td className="py-1.5 font-semibold whitespace-nowrap text-console-red">

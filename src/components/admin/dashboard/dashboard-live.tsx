@@ -50,20 +50,20 @@ function Kpi({
 }) {
   return (
     <Link href={href}>
-      <AdminCard className="h-full px-4 py-3 transition-colors hover:border-soil/35">
-        <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+      <AdminCard className="h-full px-4 py-3 transition-colors hover:border-adm-line">
+        <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
           {label}
         </div>
         <div
           className={cn(
             "mt-1 min-w-0 font-bold",
             valueText ? statValueCls(valueText) : "text-[20px]",
-            alert ? "text-console-red" : "text-ink",
+            alert ? "text-console-red" : "text-adm-ink",
           )}
         >
           {value}
         </div>
-        {sub ? <div className="mt-0.5 text-[12px] text-soil">{sub}</div> : null}
+        {sub ? <div className="mt-0.5 text-[12px] text-adm-muted">{sub}</div> : null}
       </AdminCard>
     </Link>
   );
@@ -82,7 +82,7 @@ function AgentFloatsCard() {
       }
     >
       {agents.length === 0 ? (
-        <p className="text-[13px] text-soil">No active agents.</p>
+        <p className="text-[13px] text-adm-muted">No active agents.</p>
       ) : (
         agents.map((a) => (
           // The FIGURE is what this list is for, so it is the part that
@@ -92,10 +92,10 @@ function AgentFloatsCard() {
           // its currency symbol onto a line of its own.
           <div
             key={a.userId}
-            className="flex items-baseline justify-between gap-3 border-b border-soil/10 py-1.5 text-[13px] last:border-b-0"
+            className="flex items-baseline justify-between gap-3 border-b border-adm-hairline py-1.5 text-[13px] last:border-b-0"
           >
             <span
-              className="min-w-0 truncate text-ink"
+              className="min-w-0 truncate text-adm-ink"
               title={`${a.firstName} ${a.lastName}`}
             >
               {a.firstName} {a.lastName}
@@ -105,7 +105,7 @@ function AgentFloatsCard() {
                 "flex-none font-semibold whitespace-nowrap",
                 a.balanceGhs !== null && a.balanceGhs < 0
                   ? "text-console-red"
-                  : "text-ink",
+                  : "text-adm-ink",
               )}
             >
               <Money compact value={a.balanceGhs} />
@@ -135,19 +135,19 @@ function TrucksCard() {
       }
     >
       {trucks.length === 0 ? (
-        <p className="text-[13px] text-soil">No trucks currently moving.</p>
+        <p className="text-[13px] text-adm-muted">No trucks currently moving.</p>
       ) : (
         trucks.map((t) => (
           <Link
             key={t.id}
             href={`/admin/shipments/${t.id}`}
-            className="flex items-center justify-between gap-2 border-b border-soil/10 py-2 last:border-b-0"
+            className="flex items-center justify-between gap-2 border-b border-adm-hairline py-2 last:border-b-0"
           >
             <div className="min-w-0">
               <Mono className="text-[12.5px] font-semibold text-console">
                 {t.truckReg}
               </Mono>
-              <div className="truncate text-[12px] text-soil">
+              <div className="truncate text-[12px] text-adm-muted">
                 {t.originWarehouse.name} → {t.destination}
               </div>
             </div>
@@ -178,11 +178,11 @@ export function DashboardLive() {
     <div>
       <div className="mb-[18px] flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
         <div className="min-w-0">
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
             {greeting}
             {user ? `, ${user.firstName}` : ""}
           </h1>
-          <div className="mt-0.5 text-[13px] text-soil">
+          <div className="mt-0.5 text-[13px] text-adm-muted">
             Here is the state of the business at a glance
           </div>
         </div>

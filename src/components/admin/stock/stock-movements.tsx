@@ -121,7 +121,7 @@ export function StockMovements({
         cell: ({ row }) =>
           row.original.reason ? (
             <TextCell
-              className="text-soil"
+              className="text-adm-muted"
               value={row.original.reason}
               width="prose"
             />

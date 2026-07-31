@@ -66,13 +66,13 @@ function SummaryRow({
 }) {
   return (
     <div className="flex items-baseline justify-between gap-3 py-2">
-      <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+      <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         {label}
       </span>
       <span
         className={cn(
           "font-adminmono text-right tabular-nums",
-          strong ? "text-[15px] font-bold text-ink" : "text-[13.5px] text-ink",
+          strong ? "text-[15px] font-bold text-adm-ink" : "text-[13.5px] text-adm-ink",
         )}
       >
         {children}
@@ -130,7 +130,7 @@ function CancelDialog({
         >
           <AdminField label="Reason" error={errors.reason?.message}>
             <Input
-              className={cn(adminInputClass, errors.reason && "border-error")}
+              className={cn(adminInputClass, errors.reason && "border-console-red")}
               placeholder="Why is this sale being cancelled?"
               {...register("reason")}
             />
@@ -290,12 +290,12 @@ export function SaleDetail({
         <SummaryRow label="Agreed total" strong>
           <Money value={sale.agreedTotalGhs} />
         </SummaryRow>
-        <div className="border-t border-soil/12">
+        <div className="border-t border-adm-hairline">
           <SummaryRow label="Paid">
             <Money value={sale.paidGhs} />
           </SummaryRow>
         </div>
-        <div className="border-t border-soil/12">
+        <div className="border-t border-adm-hairline">
           <SummaryRow label="Balance" strong>
             <span
               className={cn(
@@ -311,11 +311,11 @@ export function SaleDetail({
           </SummaryRow>
         </div>
         {sale.paymentPolicy ? (
-          <div className="border-t border-soil/12 pt-2 text-[12px] text-soil">
+          <div className="border-t border-adm-hairline pt-2 text-[12px] text-adm-muted">
             Payment terms: {sale.paymentPolicy.name}
           </div>
         ) : null}
-        <div className="mt-3 border-t border-soil/12 pt-3.5">{actions}</div>
+        <div className="mt-3 border-t border-adm-hairline pt-3.5">{actions}</div>
       </AdminCard>
     </div>
   );
@@ -324,21 +324,21 @@ export function SaleDetail({
     <div className="flex flex-col gap-4">
       {/* Lines */}
       <AdminCard className="px-5 py-3">
-        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
           Goods
         </div>
         {sale.lines.map((l) => (
           <div
             key={l.id}
-            className="flex items-baseline justify-between gap-3 border-b border-soil/10 py-2 last:border-b-0"
+            className="flex items-baseline justify-between gap-3 border-b border-adm-hairline py-2 last:border-b-0"
           >
             <div className="min-w-0">
-              <span className="font-medium text-ink">{l.commodity.name}</span>
-              <Mono className="ml-2 text-[12px] text-soil">
+              <span className="font-medium text-adm-ink">{l.commodity.name}</span>
+              <Mono className="ml-2 text-[12px] text-adm-muted">
                 {formatKg(l.weightKg)} @ <Money value={l.unitPriceGhs} />
               </Mono>
             </div>
-            <Mono className="whitespace-nowrap text-[13px] text-ink">
+            <Mono className="whitespace-nowrap text-[13px] text-adm-ink">
               <Money value={l.totalGhs} />
             </Mono>
           </div>
@@ -348,33 +348,33 @@ export function SaleDetail({
       {/* Milestone schedule (once confirmed) */}
       {sale.milestones.length > 0 ? (
         <AdminCard className="px-5 py-3">
-          <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+          <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
             Payment schedule
           </div>
           {sale.milestones.map((m, i) => (
             <div
               key={`${m.label}-${String(i)}`}
-              className="flex items-baseline justify-between gap-3 border-b border-soil/10 py-2 last:border-b-0"
+              className="flex items-baseline justify-between gap-3 border-b border-adm-hairline py-2 last:border-b-0"
             >
               <div className="min-w-0">
-                <span className="text-ink">{m.label}</span>
-                <span className="ml-2 text-[12px] text-soil">
+                <span className="text-adm-ink">{m.label}</span>
+                <span className="ml-2 text-[12px] text-adm-muted">
                   {m.percent}% · {milestoneTriggerLabel(m.trigger)}
                 </span>
               </div>
-              <Mono className="whitespace-nowrap text-[13px] text-ink">
+              <Mono className="whitespace-nowrap text-[13px] text-adm-ink">
                 <Money value={m.amountGhs} />
               </Mono>
             </div>
           ))}
           {/* The gate that decides whether this sale may board a truck - the
               computed figure, so nobody works it out in their head. */}
-          <div className="mt-2 flex flex-wrap items-baseline justify-between gap-2 border-t-[1.5px] border-soil/25 pt-2">
-            <span className="text-[12px] font-semibold text-ink">
+          <div className="mt-2 flex flex-wrap items-baseline justify-between gap-2 border-t-[1.5px] border-adm-line pt-2">
+            <span className="text-[12px] font-semibold text-adm-ink">
               Required before loading
             </span>
             <span className="flex items-baseline gap-2">
-              <Mono className="text-[13px] text-ink">
+              <Mono className="text-[13px] text-adm-ink">
                 <Money value={sale.requiredBeforeLoadingGhs} />
               </Mono>
               <ToneBadge tone={sale.beforeLoadingMet ? "leaf" : "alert"}>
@@ -387,22 +387,22 @@ export function SaleDetail({
 
       {/* Payments ledger */}
       <AdminCard className="px-5 py-3">
-        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
           Payments
         </div>
         {sale.payments.length === 0 ? (
-          <p className="py-2 text-[13px] text-soil">No payments recorded yet.</p>
+          <p className="py-2 text-[13px] text-adm-muted">No payments recorded yet.</p>
         ) : (
           sale.payments.map((p) => (
             <div
               key={p.id}
-              className="flex items-baseline justify-between gap-3 border-b border-soil/10 py-2 last:border-b-0"
+              className="flex items-baseline justify-between gap-3 border-b border-adm-hairline py-2 last:border-b-0"
             >
               <div className="min-w-0">
-                <span className="text-ink">{p.method}</span>
+                <span className="text-adm-ink">{p.method}</span>
                 {/* Date only: `paidAt` comes from a date picker, so its time
                     is a midnight stamp nobody chose. */}
-                <span className="ml-2 text-[12px] text-soil">
+                <span className="ml-2 text-[12px] text-adm-muted">
                   <DateOnlyCell value={p.paidAt} muted />
                   {p.reference ? ` · ${p.reference}` : ""}
                 </span>
@@ -439,16 +439,16 @@ export function SaleDetail({
 
       {/* Shipments carrying this sale */}
       <AdminCard className="px-5 py-3">
-        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
           Shipments
         </div>
         {sale.shipments.length === 0 ? (
-          <p className="py-2 text-[13px] text-soil">Nothing shipped yet.</p>
+          <p className="py-2 text-[13px] text-adm-muted">Nothing shipped yet.</p>
         ) : (
           sale.shipments.map((sh) => (
             <div
               key={sh.id}
-              className="border-b border-soil/10 py-2 last:border-b-0"
+              className="border-b border-adm-hairline py-2 last:border-b-0"
             >
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                 <Link
@@ -459,7 +459,7 @@ export function SaleDetail({
                 </Link>
                 <ShipmentStatusBadge status={sh.status} />
               </div>
-              <div className="mt-0.5 min-w-0 text-[12.5px] text-soil [overflow-wrap:anywhere]">
+              <div className="mt-0.5 min-w-0 text-[12.5px] text-adm-muted [overflow-wrap:anywhere]">
                 <Mono>{sh.truckReg}</Mono> · {sh.destination} ·{" "}
                 {sh.departedAt
                   ? `Departed ${formatSaleDate(sh.departedAt)}`
@@ -486,7 +486,7 @@ export function SaleDetail({
       />
 
       {sale.status === "CANCELLED" && sale.cancelReason ? (
-        <AdminCard className="mb-4 border-error/40 bg-error/[0.04] px-4 py-3 text-[13px] text-ink">
+        <AdminCard className="mb-4 border-console-red/40 bg-console-red/[0.04] px-4 py-3 text-[13px] text-adm-ink">
           Cancelled: {sale.cancelReason}
         </AdminCard>
       ) : null}

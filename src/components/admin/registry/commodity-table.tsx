@@ -113,10 +113,10 @@ export function CommodityTable() {
                   </span>
                 )}
                 <span className="block min-w-0 max-w-[19rem]">
-                  <span className="block truncate font-medium text-ink">
+                  <span className="block truncate font-medium text-adm-ink">
                     {c.name}
                   </span>
-                  <span className="block truncate text-[11.5px] text-soil/70">
+                  <span className="block truncate text-[11.5px] text-adm-faint">
                     {c.variety ?? "No variety"}
                   </span>
                 </span>
@@ -133,7 +133,7 @@ export function CommodityTable() {
         meta: columnMeta({ at: "xl" }),
         cell: ({ row }) =>
           row.original.qualityGrade ? (
-            <span className="block max-w-[22rem] truncate text-soil">
+            <span className="block max-w-[22rem] truncate text-adm-muted">
               {row.original.qualityGrade}
             </span>
           ) : (
@@ -148,7 +148,7 @@ export function CommodityTable() {
         meta: columnMeta({ at: "xl" }),
         cell: ({ row }) =>
           row.original.bagWeightKg !== null ? (
-            <Mono className="whitespace-nowrap text-soil">
+            <Mono className="whitespace-nowrap text-adm-muted">
               {row.original.bagWeightKg} kg
             </Mono>
           ) : (
@@ -186,10 +186,10 @@ export function CommodityTable() {
   return (
     <div>
       <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Commodities
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           Everything the business trades - varieties, grades and website
           visibility
         </p>
@@ -206,8 +206,8 @@ export function CommodityTable() {
             isSuperAdmin ? (
               <Button
                 asChild
-                variant="harvest"
-                className="h-8 px-3.5 text-[13px]"
+                variant="default"
+                className="h-[34px] rounded-[6px] bg-console px-3.5 text-[13px] font-semibold text-white shadow-none hover:translate-x-0 hover:translate-y-0 hover:bg-console-hover hover:shadow-none"
               >
                 <Link href="/admin/commodities/new">+ Add commodity</Link>
               </Button>
@@ -278,7 +278,7 @@ export function CommodityTable() {
               onPageSizeChange: (size) => setFilter("size", String(size)),
             }}
             rowHref={(c) => `/admin/commodities/${c.id}`}
-            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+            rowClassName={() => "h-12 hover:bg-adm-sunken"}
           />
         </AdminCard>
       )}

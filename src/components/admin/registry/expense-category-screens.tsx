@@ -147,7 +147,7 @@ function CreateCategoryDialog({
             <Input
               autoFocus
               placeholder="e.g. Transport"
-              className={cn(adminInputClass, errors.name && "border-error")}
+              className={cn(adminInputClass, errors.name && "border-console-red")}
               {...register("name")}
             />
           </AdminField>
@@ -163,7 +163,7 @@ function CreateCategoryDialog({
               className={cn(
                 adminInputClass,
                 "h-auto min-h-[62px] w-full resize-y py-2",
-                errors.description && "border-error",
+                errors.description && "border-console-red",
               )}
               {...register("description")}
             />
@@ -265,10 +265,10 @@ export function ExpenseCategoryTable() {
   return (
     <div>
       <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Expense Categories
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           The vocabulary every recorded expense is filed under
         </p>
       </div>
@@ -283,8 +283,8 @@ export function ExpenseCategoryTable() {
           action={
             isSuperAdmin ? (
               <Button
-                variant="harvest"
-                className="h-8 px-3.5 text-[13px]"
+                variant="default"
+                className="h-[34px] rounded-[6px] bg-console px-3.5 text-[13px] font-semibold text-white shadow-none hover:translate-x-0 hover:translate-y-0 hover:bg-console-hover hover:shadow-none"
                 onClick={() => setCreateOpen(true)}
               >
                 + Add category
@@ -348,7 +348,7 @@ export function ExpenseCategoryTable() {
               onPageSizeChange: (size) => setFilter("size", String(size)),
             }}
             rowHref={(c) => `${LIST}/${c.id}`}
-            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+            rowClassName={() => "h-12 hover:bg-adm-sunken"}
           />
         </AdminCard>
       )}
@@ -466,7 +466,7 @@ function ExpenseCategoryFormFields({
           <Input
             placeholder="e.g. Transport"
             disabled={readOnly}
-            className={cn(adminInputClass, roCls, errors.name && "border-error")}
+            className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
             {...register("name")}
           />
         </AdminField>
@@ -484,7 +484,7 @@ function ExpenseCategoryFormFields({
               adminInputClass,
               roCls,
               "h-auto min-h-[62px] w-full resize-y py-2",
-              errors.description && "border-error",
+              errors.description && "border-console-red",
             )}
             {...register("description")}
           />
@@ -531,17 +531,17 @@ function ExpenseVoucherCard({ expense }: { expense: IExpense }) {
   return (
     <AdminCard className="flex h-full flex-col px-4 py-3">
       <div className="flex items-baseline justify-between gap-3">
-        <Mono className="text-[12px] text-soil/80">{expense.transactionNo}</Mono>
+        <Mono className="text-[12px] text-adm-muted/80">{expense.transactionNo}</Mono>
         {showMoney ? (
-          <Mono className="text-[14px] font-bold whitespace-nowrap text-ink">
+          <Mono className="text-[14px] font-bold whitespace-nowrap text-adm-ink">
             {formatCedis(expense.amountGhs)}
           </Mono>
         ) : null}
       </div>
-      <p className="mt-1.5 flex-1 text-[13px] leading-snug text-ink [overflow-wrap:anywhere]">
+      <p className="mt-1.5 flex-1 text-[13px] leading-snug text-adm-ink [overflow-wrap:anywhere]">
         {expense.description ?? <Absent />}
       </p>
-      <div className="mt-2 border-t border-soil/12 pt-1.5">
+      <div className="mt-2 border-t border-adm-hairline pt-1.5">
         <DateOnlyCell value={expense.incurredAt} muted />
       </div>
     </AdminCard>
@@ -569,15 +569,15 @@ function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
   return (
     <div>
       <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h2 className="text-[15px] font-bold tracking-[-0.01em] text-ink">
+        <h2 className="text-[15px] font-bold tracking-[-0.01em] text-adm-ink">
           Expenses in this category
         </h2>
         {showMoney && windowTotal !== null && windowTotal !== undefined ? (
           <span className="flex items-baseline gap-2">
-            <span className="text-[11px] font-bold tracking-[0.08em] text-soil uppercase">
+            <span className="text-[11px] font-bold tracking-[0.08em] text-adm-muted uppercase">
               Total
             </span>
-            <Mono className="text-[14px] font-bold text-ink">
+            <Mono className="text-[14px] font-bold text-adm-ink">
               {formatCedis(windowTotal)}
             </Mono>
           </span>

@@ -123,12 +123,12 @@ export function GuarantorDialog({
 
   return (
     <ResponsiveDialog open onOpenChange={(o) => !o && onClose()}>
-      <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto border-soil/25 p-5 sm:max-w-[640px]">
+      <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto border-adm-line p-5 sm:max-w-[640px]">
         <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle className="text-[15px] font-bold text-ink">
+          <ResponsiveDialogTitle className="text-[15px] font-bold text-adm-ink">
             {guarantor ? "Edit guarantor" : "Add guarantor"}
           </ResponsiveDialogTitle>
-          <ResponsiveDialogDescription className="text-[12.5px] leading-[1.55] text-soil">
+          <ResponsiveDialogDescription className="text-[12.5px] leading-[1.55] text-adm-muted">
             Someone who vouches for the farmer and can be reached if repayment
             stalls.
           </ResponsiveDialogDescription>
@@ -142,7 +142,7 @@ export function GuarantorDialog({
           <AdminField label="Name" error={errors.name?.message}>
             <Input
               placeholder="Fuseini Alhassan"
-              className={cn(adminInputClass, errors.name && "border-error")}
+              className={cn(adminInputClass, errors.name && "border-console-red")}
               {...register("name")}
             />
           </AdminField>
@@ -151,7 +151,7 @@ export function GuarantorDialog({
               <Input
                 inputMode="tel"
                 placeholder="024 000 0000"
-                className={cn(adminInputClass, errors.phone && "border-error")}
+                className={cn(adminInputClass, errors.phone && "border-console-red")}
                 {...register("phone")}
               />
             </AdminField>
@@ -162,14 +162,14 @@ export function GuarantorDialog({
             >
               <Input
                 placeholder="Brother, chief, neighbour…"
-                className={cn(adminInputClass, errors.relationship && "border-error")}
+                className={cn(adminInputClass, errors.relationship && "border-console-red")}
                 {...register("relationship")}
               />
             </AdminField>
             <AdminField label="Occupation" optional error={errors.occupation?.message}>
               <Input
                 placeholder="Teacher"
-                className={cn(adminInputClass, errors.occupation && "border-error")}
+                className={cn(adminInputClass, errors.occupation && "border-console-red")}
                 {...register("occupation")}
               />
             </AdminField>
@@ -177,7 +177,7 @@ export function GuarantorDialog({
               <Input
                 list="guarantor-id-types"
                 placeholder="Ghana Card, Voter ID…"
-                className={cn(adminInputClass, errors.idType && "border-error")}
+                className={cn(adminInputClass, errors.idType && "border-console-red")}
                 {...register("idType")}
               />
               <datalist id="guarantor-id-types">
@@ -189,7 +189,7 @@ export function GuarantorDialog({
             <AdminField label="ID number" optional error={errors.idNumber?.message}>
               <Input
                 placeholder="GHA-000000000-0"
-                className={cn(adminInputClass, errors.idNumber && "border-error")}
+                className={cn(adminInputClass, errors.idNumber && "border-console-red")}
                 {...register("idNumber")}
               />
             </AdminField>
@@ -200,13 +200,13 @@ export function GuarantorDialog({
               className={cn(
                 adminInputClass,
                 "h-auto min-h-[60px] w-full resize-y py-2",
-                errors.address && "border-error",
+                errors.address && "border-console-red",
               )}
               {...register("address")}
             />
           </AdminField>
           <AdminField label="Notes" optional error={errors.notes?.message}>
-            <Input className={cn(adminInputClass, errors.notes && "border-error")} {...register("notes")} />
+            <Input className={cn(adminInputClass, errors.notes && "border-console-red")} {...register("notes")} />
           </AdminField>
 
           <ResponsiveDialogFooter className="gap-2">

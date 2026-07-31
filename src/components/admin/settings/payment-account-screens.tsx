@@ -144,10 +144,10 @@ export function PaymentAccountTable() {
               className="block min-w-[9rem] max-w-[22rem] outline-none focus-visible:underline"
               onClick={(e) => e.stopPropagation()}
             >
-              <span className="block truncate font-medium text-ink">
+              <span className="block truncate font-medium text-adm-ink">
                 {a.label}
               </span>
-              <span className="block truncate text-[11.5px] text-soil/70">
+              <span className="block truncate text-[11.5px] text-adm-faint">
                 {a.accountName}
               </span>
             </Link>
@@ -161,7 +161,7 @@ export function PaymentAccountTable() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <span className="font-adminmono block truncate text-[12.5px] text-ink">
+          <span className="font-adminmono block truncate text-[12.5px] text-adm-ink">
             {row.original.accountNumber}
           </span>
         ),
@@ -178,10 +178,10 @@ export function PaymentAccountTable() {
           if (!where) return <Absent />;
           return (
             <span className="block min-w-[8rem] max-w-[20rem]">
-              <span className="block truncate text-[12.5px] text-ink">
+              <span className="block truncate text-[12.5px] text-adm-ink">
                 {where}
               </span>
-              <span className="block truncate text-[11.5px] text-soil/70">
+              <span className="block truncate text-[11.5px] text-adm-faint">
                 {KIND_LABEL[a.kind]}
                 {a.branch ? ` · ${a.branch}` : ""}
               </span>
@@ -196,9 +196,9 @@ export function PaymentAccountTable() {
         meta: columnMeta(),
         cell: ({ row }) =>
           row.original.showOnInvoice ? (
-            <span className="text-[12.5px] text-ink">Printed</span>
+            <span className="text-[12.5px] text-adm-ink">Printed</span>
           ) : (
-            <span className="text-[12.5px] text-soil/70">Internal only</span>
+            <span className="text-[12.5px] text-adm-faint">Internal only</span>
           ),
       },
       {
@@ -215,10 +215,10 @@ export function PaymentAccountTable() {
   return (
     <div>
       <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Payment accounts
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           Where customers send money. These print on invoices and statements
         </p>
       </div>
@@ -300,7 +300,7 @@ export function PaymentAccountTable() {
               onPageSizeChange: (size) => setFilter("size", String(size)),
             }}
             rowHref={(a) => `${LIST}/${a.id}`}
-            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+            rowClassName={() => "h-12 hover:bg-adm-sunken"}
           />
         </AdminCard>
       )}
@@ -489,7 +489,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.label && "border-error",
+                errors.label && "border-console-red",
               )}
               {...register("label")}
             />
@@ -500,7 +500,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.kind && "border-error",
+                errors.kind && "border-console-red",
               )}
               {...register("kind")}
             >
@@ -524,7 +524,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
             className={cn(
               adminInputClass,
               roCls,
-              errors.accountName && "border-error",
+              errors.accountName && "border-console-red",
             )}
             {...register("accountName")}
           />
@@ -542,7 +542,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
               adminInputClass,
               roCls,
               "font-adminmono",
-              errors.accountNumber && "border-error",
+              errors.accountNumber && "border-console-red",
             )}
             {...register("accountNumber")}
           />
@@ -558,7 +558,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
                   className={cn(
                     adminInputClass,
                     roCls,
-                    errors.bankName && "border-error",
+                    errors.bankName && "border-console-red",
                   )}
                   {...register("bankName")}
                 />
@@ -574,7 +574,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
                   className={cn(
                     adminInputClass,
                     roCls,
-                    errors.branch && "border-error",
+                    errors.branch && "border-console-red",
                   )}
                   {...register("branch")}
                 />
@@ -592,7 +592,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
                     adminInputClass,
                     roCls,
                     "font-adminmono",
-                    errors.sortCode && "border-error",
+                    errors.sortCode && "border-console-red",
                   )}
                   {...register("sortCode")}
                 />
@@ -609,7 +609,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
                     adminInputClass,
                     roCls,
                     "font-adminmono",
-                    errors.swiftCode && "border-error",
+                    errors.swiftCode && "border-console-red",
                   )}
                   {...register("swiftCode")}
                 />
@@ -626,7 +626,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.provider && "border-error",
+                errors.provider && "border-console-red",
               )}
               {...register("provider")}
             />
@@ -647,7 +647,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
               adminInputClass,
               roCls,
               "h-auto min-h-[64px] w-full resize-y py-2",
-              errors.instructions && "border-error",
+              errors.instructions && "border-console-red",
             )}
             {...register("instructions")}
           />
@@ -666,7 +666,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
               adminInputClass,
               roCls,
               "max-w-[120px]",
-              errors.sortOrder && "border-error",
+              errors.sortOrder && "border-console-red",
             )}
             {...register("sortOrder", { valueAsNumber: true })}
           />
@@ -674,7 +674,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
 
         <label
           className={cn(
-            "flex items-center gap-2 text-[13px] text-ink",
+            "flex items-center gap-2 text-[13px] text-adm-ink",
             readOnly && "cursor-default",
           )}
         >
@@ -688,7 +688,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
         </label>
         <label
           className={cn(
-            "flex items-center gap-2 text-[13px] text-ink",
+            "flex items-center gap-2 text-[13px] text-adm-ink",
             readOnly && "cursor-default",
           )}
         >

@@ -66,7 +66,7 @@ export function Money({
   compact?: boolean;
   value: number | null;
 }) {
-  if (value === null) return <span className="text-soil/50">{MONEY_HIDDEN}</span>;
+  if (value === null) return <span className="text-adm-faint">{MONEY_HIDDEN}</span>;
   if (!compact) return <>{formatCedis(value)}</>;
   return <span title={formatCedis(value)}>{formatCedisCompact(value)}</span>;
 }

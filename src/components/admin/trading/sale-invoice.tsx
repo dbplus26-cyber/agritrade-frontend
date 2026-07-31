@@ -44,19 +44,19 @@ function PayToCard({
       : (account.bankName ?? "Bank transfer");
 
   return (
-    <div className="break-inside-avoid border border-soil/30 p-3">
+    <div className="break-inside-avoid border border-adm-line p-3">
       <div className="text-[11px] font-bold tracking-[0.06em] text-console uppercase">
         {heading}
       </div>
       <dl className="mt-1.5 text-[12px]">
         {rows.map(([label, value]) => (
           <div key={label} className="flex justify-between gap-3 py-[1px]">
-            <dt className="text-soil">{label}</dt>
+            <dt className="text-adm-muted">{label}</dt>
             <dd className="text-right font-semibold break-all">{value}</dd>
           </div>
         ))}
       </dl>
-      <p className="mt-1.5 text-[10.5px] text-soil">
+      <p className="mt-1.5 text-[10.5px] text-adm-muted">
         Quote {reference} as the reference.
         {account.instructions ? ` ${account.instructions}` : ""}
       </p>
@@ -121,29 +121,29 @@ export function SaleInvoice({ id }: { id: string }) {
       {/* Left-aligned like every other console page - the sheet keeps its own
           720px measure so it still reads as a piece of paper. Squared and
           1.5px-bordered to match AdminCard. */}
-      <div className="max-w-[720px] border-[1.5px] border-soil/30 bg-white p-8 text-ink print:max-w-none print:border-0 print:p-0">
+      <div className="max-w-[720px] border-[1.5px] border-adm-line bg-white p-8 text-adm-ink print:max-w-none print:border-0 print:p-0">
         <div className="flex items-start justify-between border-b-2 border-ink pb-3">
           <div>
             <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">
               DB PLUS
             </div>
-            <div className="text-[11px] tracking-[0.06em] text-soil uppercase">
+            <div className="text-[11px] tracking-[0.06em] text-adm-muted uppercase">
               Trading
             </div>
             {/* From the owner's settings, never hardcoded: an invoice that
                 names a stale address is a document the buyer cannot act on. */}
             {company?.companyContactAddress ? (
-              <div className="mt-1 text-[11px] text-soil">
+              <div className="mt-1 text-[11px] text-adm-muted">
                 {company.companyContactAddress}
               </div>
             ) : null}
             {company?.companyContactPhone ? (
-              <div className="text-[11px] text-soil">
+              <div className="text-[11px] text-adm-muted">
                 {company.companyContactPhone}
               </div>
             ) : null}
             {company?.companyContactEmail ? (
-              <div className="text-[11px] text-soil">
+              <div className="text-[11px] text-adm-muted">
                 {company.companyContactEmail}
               </div>
             ) : null}
@@ -152,17 +152,17 @@ export function SaleInvoice({ id }: { id: string }) {
             <div className="text-[16px] font-bold">
               {isReceipt ? "RECEIPT" : "INVOICE"}
             </div>
-            <div className="text-[12px] text-soil">
+            <div className="text-[12px] text-adm-muted">
               Ref {s.transactionNo}
             </div>
-            <div className="text-[12px] text-soil">
+            <div className="text-[12px] text-adm-muted">
               {formatSaleDate(s.confirmedAt ?? s.createdAt)}
             </div>
           </div>
         </div>
 
         <div className="mt-4 text-[13px]">
-          <div className="mb-1 text-[10.5px] font-bold tracking-[0.08em] text-soil uppercase">
+          <div className="mb-1 text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
             Billed to
           </div>
           <div className="font-semibold">{s.buyer.name}</div>
@@ -180,7 +180,7 @@ export function SaleInvoice({ id }: { id: string }) {
           </thead>
           <tbody>
             {s.lines.map((l) => (
-              <tr key={l.id} className="border-b border-soil/30">
+              <tr key={l.id} className="border-b border-adm-line">
                 <td className="py-2">{l.commodity.name}</td>
                 <td className="py-2 text-right">{formatKg(l.weightKg)}</td>
                 <td className="py-2 text-right">
@@ -196,13 +196,13 @@ export function SaleInvoice({ id }: { id: string }) {
 
         <div className="mt-4 ml-auto w-full max-w-[280px] text-[13px]">
           <div className="flex justify-between py-1">
-            <span className="text-soil">Agreed total</span>
+            <span className="text-adm-muted">Agreed total</span>
             <span className="font-semibold">
               <Money value={s.agreedTotalGhs} />
             </span>
           </div>
           <div className="flex justify-between py-1">
-            <span className="text-soil">Paid</span>
+            <span className="text-adm-muted">Paid</span>
             <span>
               <Money value={s.paidGhs} />
             </span>
@@ -217,13 +217,13 @@ export function SaleInvoice({ id }: { id: string }) {
 
         {s.payments.length > 0 ? (
           <div className="mt-6 text-[12px]">
-            <div className="mb-1 text-[10.5px] font-bold tracking-[0.08em] text-soil uppercase">
+            <div className="mb-1 text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
               Payments received
             </div>
             {s.payments.map((p) => (
               <div
                 key={p.id}
-                className="flex justify-between border-b border-soil/20 py-1"
+                className="flex justify-between border-b border-adm-hairline py-1"
               >
                 <span>
                   {/* `paidAt` is captured as a calendar date, so it carries a
@@ -240,7 +240,7 @@ export function SaleInvoice({ id }: { id: string }) {
 
         {accounts.length > 0 ? (
           <div className="mt-6">
-            <div className="mb-1.5 text-[10.5px] font-bold tracking-[0.08em] text-soil uppercase">
+            <div className="mb-1.5 text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
               How to pay
             </div>
             <div className="grid gap-2 sm:grid-cols-2">
@@ -256,14 +256,14 @@ export function SaleInvoice({ id }: { id: string }) {
         ) : !isReceipt ? (
           // Silence here would read as "no payment needed". Say plainly that
           // the details are missing so staff notice before the buyer does.
-          <p className="mt-6 border border-dashed border-soil/40 p-3 text-[11.5px] text-soil print:hidden">
+          <p className="mt-6 border border-dashed border-adm-line p-3 text-[11.5px] text-adm-muted print:hidden">
             No payment accounts are published yet, so this invoice cannot tell
             the buyer where to send the money. Add one under Directory →
             Payment Accounts.
           </p>
         ) : null}
 
-        <p className="mt-8 text-[11px] text-soil">
+        <p className="mt-8 text-[11px] text-adm-muted">
           Thank you for trading with DB Plus.
         </p>
       </div>

@@ -108,7 +108,7 @@ export function DisbursementDetail({ id }: { id: string }) {
       />
 
       {d.needsAttention ? (
-        <div className="rounded-[3px] border border-error/40 bg-error/5 px-4 py-3 text-[13px] text-error">
+        <div className="rounded-[6px] border border-console-red/40 bg-console-red/5 px-4 py-3 text-[13px] text-console-red">
           Hubtel has not given a final answer for this payout after several
           checks. It has NOT been marked failed, because the money may well
           have gone out - confirm on the Hubtel dashboard, then record the real
@@ -149,7 +149,7 @@ export function DisbursementDetail({ id }: { id: string }) {
               ) : null}
               {d.failureReason ? (
                 <DetailRow label="Why it failed">
-                  <span className="text-error">{d.failureReason}</span>
+                  <span className="text-console-red">{d.failureReason}</span>
                 </DetailRow>
               ) : null}
             </TitledCard>
@@ -162,21 +162,21 @@ export function DisbursementDetail({ id }: { id: string }) {
                 {d.hubtelTransactionId ? (
                   <Mono>{d.hubtelTransactionId}</Mono>
                 ) : (
-                  <span className="text-soil/60">Not given</span>
+                  <span className="text-adm-faint">Not given</span>
                 )}
               </DetailRow>
               <DetailRow label="Network reference">
                 {d.externalTransactionId ? (
                   <Mono>{d.externalTransactionId}</Mono>
                 ) : (
-                  <span className="text-soil/60">Not given</span>
+                  <span className="text-adm-faint">Not given</span>
                 )}
               </DetailRow>
               <DetailRow label="Response code">
                 {d.responseCode ? (
                   <Mono>{d.responseCode}</Mono>
                 ) : (
-                  <span className="text-soil/60">None yet</span>
+                  <span className="text-adm-faint">None yet</span>
                 )}
               </DetailRow>
             </TitledCard>
@@ -199,14 +199,14 @@ export function DisbursementDetail({ id }: { id: string }) {
               {d.submittedAt ? (
                 <DateTimeCell value={d.submittedAt} />
               ) : (
-                <span className="text-soil/60">Not yet</span>
+                <span className="text-adm-faint">Not yet</span>
               )}
             </DetailRow>
             <DetailRow label="Settled">
               {d.settledAt ? (
                 <DateTimeCell value={d.settledAt} />
               ) : (
-                <span className="text-soil/60">Not yet</span>
+                <span className="text-adm-faint">Not yet</span>
               )}
             </DetailRow>
           </TitledCard>

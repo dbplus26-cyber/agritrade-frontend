@@ -20,8 +20,8 @@ import { cn } from "@/lib/utils";
  */
 const boxField = (active: boolean) =>
   cn(
-    "flex h-8 w-full min-w-0 items-center rounded-[2px] border-[1.5px] bg-paper transition-colors focus-within:border-console",
-    active ? "border-console/60" : "border-soil/30",
+    "flex h-[34px] w-full min-w-0 items-center rounded-[6px] border bg-adm-card transition-colors focus-within:border-console",
+    active ? "border-console/60" : "border-adm-line",
   );
 
 /** Dropdown filter in the console skin (aria-labelled; the value text —
@@ -53,14 +53,14 @@ export function ConsoleLabeledSelect({
           // the floats register looked like, and nothing else did. It is a
           // DEFAULT rather than each caller's job to remember: twMerge lets
           // `className` override it where a filter genuinely needs more room.
-          "h-8 w-full min-w-0 cursor-pointer rounded-[2px] border-[1.5px] bg-paper px-2.5 text-[13px] font-normal text-soil shadow-none transition-colors focus:ring-0 focus-visible:ring-0 lg:w-[150px] data-[state=open]:border-console",
-          active ? "border-console/60" : "border-soil/30",
+          "h-[34px] w-full min-w-0 cursor-pointer rounded-[6px] border bg-adm-card px-2.5 text-[13px] font-normal text-adm-body shadow-none transition-colors focus:ring-0 focus-visible:ring-0 lg:w-[150px] data-[state=open]:border-console",
+          active ? "border-console/60" : "border-adm-line",
           className,
         )}
       >
         {/* The dimension being filtered, always visible - "Fuel" alone says
             nothing about WHICH filter it came from once picked. */}
-        <span className="stencil pointer-events-none flex-none pr-1.5 text-[9.5px] uppercase tracking-[0.14em] text-harvest-deep">
+        <span className="pointer-events-none flex-none pr-1.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-adm-faint">
           {label}
         </span>
         <SelectValue />
@@ -78,7 +78,7 @@ export function ConsoleLabeledSelect({
 
 /**
  * Native date input for From/To windows, in the boxed toolbar shape with a
- * stencil prefix naming the bound.
+ * prefix naming the bound.
  *
  * Date inputs ignore the `placeholder` attribute, and mobile browsers render
  * an empty one as a blank box (desktop Chrome at least shows mm/dd/yyyy).
@@ -114,7 +114,7 @@ export function ConsoleDateField({
         className,
       )}
     >
-      <span className="stencil pointer-events-none flex-none pl-2.5 pr-1.5 text-[9.5px] uppercase tracking-[0.14em] text-harvest-deep">
+      <span className="pointer-events-none flex-none pl-2.5 pr-1.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-adm-faint">
         {label}
       </span>
       <span className="relative h-full min-w-0 flex-1">
@@ -126,13 +126,13 @@ export function ConsoleDateField({
           onChange={(e) => onChange(e.target.value)}
           className={cn(
             "peer h-full w-full cursor-pointer appearance-none bg-transparent pr-2 text-[13px] font-normal outline-none",
-            value ? "text-soil" : "text-transparent focus:text-soil",
+            value ? "text-adm-muted" : "text-transparent focus:text-adm-muted",
           )}
         />
         {!value && (
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 left-0 flex items-center text-[13px] text-soil/45 peer-focus:hidden"
+            className="pointer-events-none absolute inset-y-0 left-0 flex items-center text-[13px] text-adm-faint peer-focus:hidden"
           >
             {placeholder}
           </span>
@@ -260,14 +260,14 @@ export function ConsoleFilterBar({
         onChange={(e) => onSearch?.(e.target.value)}
         placeholder={searchPlaceholder}
         aria-label={searchPlaceholder}
-        className="[&::-webkit-search-cancel-button]:hidden h-full w-full min-w-0 rounded-none border-0 bg-transparent p-0 text-[13px] text-ink shadow-none outline-none placeholder:text-soil/45 focus-visible:ring-0 md:text-[13px]"
+        className="[&::-webkit-search-cancel-button]:hidden h-full w-full min-w-0 rounded-none border-0 bg-transparent p-0 text-[13px] text-adm-ink shadow-none outline-none placeholder:text-adm-faint focus-visible:ring-0 md:text-[13px]"
       />
       {search ? (
         <button
           type="button"
           onClick={() => onSearch?.("")}
           aria-label="Clear search"
-          className="flex h-4 w-4 flex-none cursor-pointer items-center justify-center rounded-full text-soil/70 hover:bg-soil/20 hover:text-soil"
+          className="flex h-4 w-4 flex-none cursor-pointer items-center justify-center rounded-full text-adm-faint hover:bg-soil/20 hover:text-adm-muted"
         >
           <X className="h-3 w-3" aria-hidden="true" />
         </button>
@@ -318,10 +318,10 @@ export function ConsoleFilterBar({
             aria-expanded={open}
             aria-controls="console-filters"
             className={cn(
-              "stencil inline-flex h-8 cursor-pointer items-center gap-2 whitespace-nowrap rounded-[2px] border-[1.5px] bg-paper px-2.5 text-[10.5px] uppercase tracking-[0.14em] transition-colors",
+              "inline-flex h-8 cursor-pointer items-center gap-2 whitespace-nowrap rounded-[6px] border-[1.5px] bg-adm-card px-2.5 text-[10.5px] uppercase tracking-[0.14em] transition-colors",
               open
                 ? "border-console text-console"
-                : "border-soil/30 text-soil hover:text-console",
+                : "border-adm-line text-adm-muted hover:text-console",
             )}
           >
             <span

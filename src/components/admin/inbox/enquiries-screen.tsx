@@ -114,10 +114,10 @@ export function EnquiriesScreen() {
         meta: columnMeta(),
         cell: ({ row }) => (
           <span className="block min-w-[8rem] max-w-[20rem]">
-            <span className="block truncate font-medium text-ink">
+            <span className="block truncate font-medium text-adm-ink">
               {row.original.fullName}
             </span>
-            <Mono className="block text-[11px] text-soil/70">
+            <Mono className="block text-[11px] text-adm-faint">
               {row.original.reference}
             </Mono>
           </span>
@@ -130,7 +130,7 @@ export function EnquiriesScreen() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-soil">
+          <Mono className="whitespace-nowrap text-[12.5px] text-adm-muted">
             {row.original.phone}
           </Mono>
         ),
@@ -142,7 +142,7 @@ export function EnquiriesScreen() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <span className="block max-w-[20rem] truncate text-soil">
+          <span className="block max-w-[20rem] truncate text-adm-muted">
             {row.original.subject}
           </span>
         ),
@@ -242,7 +242,7 @@ export function EnquiriesScreen() {
                   },
                 }}
                 rowHref={(e) => `${LIST}/${e.id}`}
-                rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+                rowClassName={() => "h-12 hover:bg-adm-sunken"}
                 emptyState={
                   // The pristine empty inbox renders outside the table above -
                   // reaching this means a search or filter is narrowing the view.

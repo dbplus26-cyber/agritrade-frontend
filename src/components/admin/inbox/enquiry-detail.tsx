@@ -107,14 +107,14 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
           <div className="flex flex-col gap-5">
             {/* The message itself, filed as a document. */}
             <AdminCard className="px-5 py-[18px]">
-              <p className="stencil text-[11px] uppercase tracking-[0.14em] text-harvest-deep">
+              <p className="text-[11px] uppercase tracking-[0.14em] text-adm-muted">
                 {enquiry.subject}
               </p>
-              <p className="mt-3 text-[14px] leading-[1.75] whitespace-pre-wrap text-ink [overflow-wrap:anywhere]">
+              <p className="mt-3 text-[14px] leading-[1.75] whitespace-pre-wrap text-adm-ink [overflow-wrap:anywhere]">
                 {enquiry.message}
               </p>
               {replyHref ? (
-                <div className="mt-4 border-t border-soil/15 pt-3.5">
+                <div className="mt-4 border-t border-adm-hairline pt-3.5">
                   <AdminButton asChild variant="gold" className="h-9 px-4">
                     <a href={replyHref}>Reply by email</a>
                   </AdminButton>
@@ -125,11 +125,11 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
             {/* Provenance as a fact GRID, not label-left/value-right rows.
                 Spreading each pair to opposite edges of a full-width card put
                 40rem of nothing between "Reference" and its value, so nothing
-                read as a pair; DetailItem stacks the stencil label directly
+                read as a pair; DetailItem stacks the label directly
                 over its value with a hairline under each, and the grid packs
                 three of them per row on a wide console. */}
             <AdminCard className="px-5 py-3">
-              <p className="mb-1.5 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              <p className="mb-1.5 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Sender &amp; provenance
               </p>
               <DetailGrid>
@@ -217,7 +217,7 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
 
             {isSuperAdmin ? (
               <AdminCard className="px-5 py-4">
-                <p className="text-[12.5px] text-soil">
+                <p className="text-[12.5px] text-adm-muted">
                   Deleting removes the enquiry permanently.
                 </p>
                 <AdminButton

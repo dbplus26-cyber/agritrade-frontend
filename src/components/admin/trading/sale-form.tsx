@@ -138,7 +138,7 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
                     label: b.name,
                   }))}
                   placeholder="Choose the buyer"
-                  className={cn(errors.buyerId && "border-error")}
+                  className={cn(errors.buyerId && "border-console-red")}
                 />
               )}
             />
@@ -171,7 +171,7 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
 
         <AdminCard className="flex flex-col gap-3 px-5 py-4">
           <div className="flex items-center justify-between">
-            <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+            <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
               Goods
             </span>
             <AdminButton
@@ -187,7 +187,7 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
           {fields.map((field, index) => (
             <div
               key={field.id}
-              className="grid grid-cols-1 gap-2 border-b border-soil/10 pb-3 last:border-b-0 sm:grid-cols-[1fr_100px_110px_auto]"
+              className="grid grid-cols-1 gap-2 border-b border-adm-hairline pb-3 last:border-b-0 sm:grid-cols-[1fr_100px_110px_auto]"
             >
               <AdminField
                 label="Commodity"
@@ -206,7 +206,7 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
                       }))}
                       placeholder="Choose"
                       className={cn(
-                        errors.lines?.[index]?.commodityId && "border-error",
+                        errors.lines?.[index]?.commodityId && "border-console-red",
                       )}
                     />
                   )}
@@ -248,8 +248,8 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
           ))}
 
           <div className="flex items-baseline justify-between pt-1">
-            <span className="text-[12px] text-soil">Agreed total</span>
-            <Mono className="text-[16px] font-bold text-ink">
+            <span className="text-[12px] text-adm-muted">Agreed total</span>
+            <Mono className="text-[16px] font-bold text-adm-ink">
               {formatCedis(agreedTotal)}
             </Mono>
           </div>

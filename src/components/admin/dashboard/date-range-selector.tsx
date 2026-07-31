@@ -122,7 +122,7 @@ export function DateRangeSelector({
             aria-label="From date"
             className="h-9 w-full text-[13px] sm:w-[148px]"
           />
-          <span className="text-[12px] text-soil">to</span>
+          <span className="text-[12px] text-adm-muted">to</span>
           <Input
             type="date"
             value={customTo}

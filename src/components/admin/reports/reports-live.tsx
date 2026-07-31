@@ -42,13 +42,13 @@ function ReportKpi({
 }) {
   return (
     <AdminCard className="px-4 py-3">
-      <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+      <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         {label}
       </div>
       <div
         className={cn(
           "mt-1 text-[18px] font-bold",
-          accent ? "text-leaf" : "text-ink",
+          accent ? "text-leaf" : "text-adm-ink",
         )}
       >
         {value}
@@ -68,16 +68,16 @@ function PlStatement({ window }: { window: IReportWindow }) {
     "flex items-baseline justify-between gap-3 py-1.5 text-[13.5px] [&>span:first-child]:min-w-0 [&>span:first-child]:line-clamp-2 [&>*:last-child]:flex-none [&>*:last-child]:whitespace-nowrap";
   return (
     <AdminCard className="px-5 py-4">
-      <div className="mb-2 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+      <div className="mb-2 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         Profit &amp; loss
       </div>
       <div className={rowClass}>
-        <span className="text-ink">Revenue</span>
-        <Mono className="text-ink">
+        <span className="text-adm-ink">Revenue</span>
+        <Mono className="text-adm-ink">
           <Money value={s?.revenueGhs ?? null} />
         </Mono>
       </div>
-      <div className={cn(rowClass, "text-soil")}>
+      <div className={cn(rowClass, "text-adm-muted")}>
         <span className="flex items-center gap-1.5">
           Cost of goods sold
           {s?.hasEstimated ? <ToneBadge tone="harvest">Est.</ToneBadge> : null}
@@ -89,7 +89,7 @@ function PlStatement({ window }: { window: IReportWindow }) {
       <div
         className={cn(
           rowClass,
-          "border-t border-soil/15 font-semibold text-ink",
+          "border-t border-adm-hairline font-semibold text-adm-ink",
         )}
       >
         <span>Gross profit</span>
@@ -98,7 +98,7 @@ function PlStatement({ window }: { window: IReportWindow }) {
         </Mono>
       </div>
       {cats.map((c) => (
-        <div key={c.categoryId} className={cn(rowClass, "pl-3 text-soil")}>
+        <div key={c.categoryId} className={cn(rowClass, "pl-3 text-adm-muted")}>
           <span>{c.categoryName}</span>
           <Mono>
             <Money value={c.amountGhs} />
@@ -108,7 +108,7 @@ function PlStatement({ window }: { window: IReportWindow }) {
       <div
         className={cn(
           rowClass,
-          "border-t border-soil/15 text-[15px] font-bold text-leaf",
+          "border-t border-adm-hairline text-[15px] font-bold text-leaf",
         )}
       >
         <span>Net profit</span>
@@ -132,7 +132,7 @@ function AgentPerformance({
   return (
     <AdminCard className="px-5 py-4">
       <div className="mb-2 flex items-center justify-between">
-        <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+        <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
           Agent performance
         </span>
         <a href={exportHref} className="text-[12px] text-console hover:underline">
@@ -140,7 +140,7 @@ function AgentPerformance({
         </a>
       </div>
       {rows.length === 0 ? (
-        <p className="text-[13px] text-soil">No agent purchases in this period.</p>
+        <p className="text-[13px] text-adm-muted">No agent purchases in this period.</p>
       ) : (
         <div className="overflow-x-auto">
           {/* Declared widths so the figures are never the columns that give
@@ -155,7 +155,7 @@ function AgentPerformance({
               <col className="w-[9rem]" />
             </colgroup>
             <thead>
-              <tr className="text-left text-[11px] text-soil uppercase">
+              <tr className="text-left text-[11px] text-adm-muted uppercase">
                 <th className="py-1.5 pr-3">Agent</th>
                 <th className="py-1.5 pr-3">Buys</th>
                 <th className="py-1.5 pr-3">Weight</th>
@@ -165,22 +165,22 @@ function AgentPerformance({
             </thead>
             <tbody>
               {rows.map((r) => (
-                <tr key={r.agentName} className="border-t border-soil/10 align-top">
-                  <td className="py-1.5 pr-3 text-ink">
+                <tr key={r.agentName} className="border-t border-adm-hairline align-top">
+                  <td className="py-1.5 pr-3 text-adm-ink">
                     <span className="line-clamp-2" title={r.agentName}>
                       {r.agentName}
                     </span>
                   </td>
-                  <td className="py-1.5 pr-3 whitespace-nowrap text-soil">
+                  <td className="py-1.5 pr-3 whitespace-nowrap text-adm-muted">
                     {r.purchases}
                   </td>
-                  <td className="py-1.5 pr-3 whitespace-nowrap text-soil">
+                  <td className="py-1.5 pr-3 whitespace-nowrap text-adm-muted">
                     {formatKg(r.weightKg)}
                   </td>
-                  <td className="py-1.5 pr-3 whitespace-nowrap text-soil">
+                  <td className="py-1.5 pr-3 whitespace-nowrap text-adm-muted">
                     <Money value={r.avgPriceGhs} />
                   </td>
-                  <td className="py-1.5 whitespace-nowrap text-ink">
+                  <td className="py-1.5 whitespace-nowrap text-adm-ink">
                     <Money value={r.spentGhs} />
                   </td>
                 </tr>
@@ -210,8 +210,8 @@ function CashComingIn() {
   const farmRows = f?.farmRows ?? [];
 
   const kpi = (label: string, value: number | null) => (
-    <div className="min-w-0 flex-1 rounded-[6px] border border-soil/20 bg-surface-alt/50 px-3.5 py-2.5">
-      <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+    <div className="min-w-0 flex-1 rounded-[6px] border border-adm-hairline bg-adm-sunken px-3.5 py-2.5">
+      <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         {label}
       </div>
       <div className="font-adminmono mt-0.5 text-[17px] font-bold text-leaf tabular-nums">
@@ -222,7 +222,7 @@ function CashComingIn() {
 
   const moreLine = (hidden: number) =>
     hidden > 0 ? (
-      <p className="pt-1.5 text-[12px] text-soil/70">
+      <p className="pt-1.5 text-[12px] text-adm-faint">
         + {hidden} more in this window
       </p>
     ) : null;
@@ -230,7 +230,7 @@ function CashComingIn() {
   return (
     <AdminCard className="px-5 py-4">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+        <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
           Cash coming in
         </span>
         <div className="flex gap-1">
@@ -241,10 +241,10 @@ function CashComingIn() {
               onClick={() => setDays(d)}
               aria-pressed={days === d}
               className={cn(
-                "cursor-pointer rounded-[2px] border-[1.5px] px-2.5 py-1 text-[12px] font-semibold transition-colors",
+                "cursor-pointer rounded-[6px] border-[1.5px] px-2.5 py-1 text-[12px] font-semibold transition-colors",
                 days === d
                   ? "border-console bg-console text-white"
-                  : "border-soil/30 bg-paper text-soil hover:border-console/60",
+                  : "border-adm-line bg-adm-card text-adm-muted hover:border-console/60",
               )}
             >
               {d}d
@@ -254,9 +254,9 @@ function CashComingIn() {
       </div>
 
       {isLoading ? (
-        <p className="py-2 text-[13px] text-soil">Loading the forecast…</p>
+        <p className="py-2 text-[13px] text-adm-muted">Loading the forecast…</p>
       ) : isError ? (
-        <p className="py-2 text-[13px] text-error">
+        <p className="py-2 text-[13px] text-console-red">
           {extractApiError(error).message}
         </p>
       ) : (
@@ -268,11 +268,11 @@ function CashComingIn() {
 
           <div className="grid grid-cols-1 gap-x-8 gap-y-4 xl:grid-cols-2">
             <div>
-              <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.06em] text-soil/70">
+              <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.06em] text-adm-faint">
                 Sale balances
               </div>
               {saleRows.length === 0 ? (
-                <p className="py-1.5 text-[13px] text-soil">
+                <p className="py-1.5 text-[13px] text-adm-muted">
                   No open sale balances in this window.
                 </p>
               ) : (
@@ -280,11 +280,11 @@ function CashComingIn() {
                   {saleRows.slice(0, LIST_CAP).map((r) => (
                     <div
                       key={r.id}
-                      className="flex items-baseline justify-between gap-3 border-t border-soil/10 py-1.5 text-[13px] first:border-t-0"
+                      className="flex items-baseline justify-between gap-3 border-t border-adm-hairline py-1.5 text-[13px] first:border-t-0"
                     >
                       <div className="min-w-0">
                         <span
-                          className="block min-w-0 text-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere]"
+                          className="block min-w-0 text-adm-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere]"
                           title={r.buyer.name}
                         >
                           {r.buyer.name}
@@ -296,7 +296,7 @@ function CashComingIn() {
                           {r.transactionNo}
                         </Link>
                       </div>
-                      <Mono className="flex-none text-ink">
+                      <Mono className="flex-none text-adm-ink">
                         <Money value={r.balanceGhs} compact />
                       </Mono>
                     </div>
@@ -307,11 +307,11 @@ function CashComingIn() {
             </div>
 
             <div>
-              <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.06em] text-soil/70">
+              <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.06em] text-adm-faint">
                 Farm dues
               </div>
               {farmRows.length === 0 ? (
-                <p className="py-1.5 text-[13px] text-soil">
+                <p className="py-1.5 text-[13px] text-adm-muted">
                   No farm dues in this window.
                 </p>
               ) : (
@@ -319,22 +319,22 @@ function CashComingIn() {
                   {farmRows.slice(0, LIST_CAP).map((r, i) => (
                     <div
                       key={`${r.farmer.id}-${r.season.id}-${i}`}
-                      className="flex items-baseline justify-between gap-3 border-t border-soil/10 py-1.5 text-[13px] first:border-t-0"
+                      className="flex items-baseline justify-between gap-3 border-t border-adm-hairline py-1.5 text-[13px] first:border-t-0"
                     >
                       <div className="min-w-0">
                         <span className="flex min-w-0 flex-wrap items-baseline gap-x-1.5">
                           <Link
                             href={`/admin/farmers/${r.farmer.id}`}
-                            className="min-w-0 text-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere] underline-offset-2 hover:underline"
+                            className="min-w-0 text-adm-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere] underline-offset-2 hover:underline"
                             title={r.farmer.name}
                           >
                             {r.farmer.name}
                           </Link>
-                          <span className="text-[11.5px] text-soil">
+                          <span className="text-[11.5px] text-adm-muted">
                             {r.season.name}
                           </span>
                         </span>
-                        <span className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[11.5px] text-soil">
+                        <span className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[11.5px] text-adm-muted">
                           Due {formatDateTime(r.dueDate)}
                           {r.daysOverdue > 0 ? (
                             <ToneBadge tone="alert">
@@ -343,7 +343,7 @@ function CashComingIn() {
                           ) : null}
                         </span>
                       </div>
-                      <Mono className="flex-none text-ink">
+                      <Mono className="flex-none text-adm-ink">
                         <Money value={r.outstandingGhs} compact />
                       </Mono>
                     </div>
@@ -370,10 +370,10 @@ export function ReportsLive() {
     <div>
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
             Reports
           </h1>
-          <p className="mt-0.5 text-[13px] text-soil">
+          <p className="mt-0.5 text-[13px] text-adm-muted">
             Profit, expenses, debtors and performance across the business
           </p>
         </div>

@@ -43,7 +43,7 @@ import {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mb-3.5 text-[10.5px] font-bold tracking-[0.1em] text-soil/70 uppercase">
+    <div className="mb-3.5 text-[10.5px] font-bold tracking-[0.1em] text-adm-faint uppercase">
       {children}
     </div>
   );
@@ -119,7 +119,7 @@ function IdentityCard() {
             <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
               <h2
                 title={`${user.firstName} ${user.lastName}`}
-                className="line-clamp-2 max-w-full break-words text-[17px] font-bold tracking-[-0.01em] text-ink sm:text-[20px]"
+                className="line-clamp-2 max-w-full break-words text-[17px] font-bold tracking-[-0.01em] text-adm-ink sm:text-[20px]"
               >
                 {user.firstName} {user.lastName}
               </h2>
@@ -128,7 +128,7 @@ function IdentityCard() {
               </ToneBadge>
             </div>
             <p
-              className="mt-0.5 truncate text-[13px] text-soil"
+              className="mt-0.5 truncate text-[13px] text-adm-muted"
               title={user.email}
             >
               {user.email}
@@ -152,7 +152,7 @@ function IdentityCard() {
           ) : null}
         </div>
 
-        <div className="mt-6 border-t border-soil/15 pt-5">
+        <div className="mt-6 border-t border-adm-hairline pt-5">
           {editing ? (
             <ProfileEditForm user={user} onClose={() => setEditing(false)} />
           ) : (
@@ -231,7 +231,7 @@ function ProfileEditForm({
             placeholder="e.g. Abdul"
             className={cn(
               adminInputClass,
-              errors.firstName && "border-error",
+              errors.firstName && "border-console-red",
             )}
             {...register("firstName")}
           />
@@ -241,7 +241,7 @@ function ProfileEditForm({
             placeholder="e.g. Danaa"
             className={cn(
               adminInputClass,
-              errors.lastName && "border-error",
+              errors.lastName && "border-console-red",
             )}
             {...register("lastName")}
           />
@@ -255,7 +255,7 @@ function ProfileEditForm({
         <Input
           type="email"
           placeholder="you@dbplus.com"
-          className={cn(adminInputClass, errors.email && "border-error")}
+          className={cn(adminInputClass, errors.email && "border-console-red")}
           {...register("email")}
         />
       </AdminField>
@@ -263,7 +263,7 @@ function ProfileEditForm({
         <Input
           type="tel"
           placeholder="024 000 0000"
-          className={cn(adminInputClass, errors.phone && "border-error")}
+          className={cn(adminInputClass, errors.phone && "border-console-red")}
           {...register("phone")}
         />
       </AdminField>
@@ -360,7 +360,7 @@ function PasswordCard() {
               placeholder="Enter your current password"
               className={cn(
                 adminInputClass,
-                errors.currentPassword && "border-error",
+                errors.currentPassword && "border-console-red",
               )}
               {...register("currentPassword")}
             />
@@ -372,7 +372,7 @@ function PasswordCard() {
                 placeholder="At least 8 characters"
                 className={cn(
                   adminInputClass,
-                  errors.newPassword && "border-error",
+                  errors.newPassword && "border-console-red",
                 )}
                 {...register("newPassword")}
               />
@@ -386,7 +386,7 @@ function PasswordCard() {
                 placeholder="Repeat the new password"
                 className={cn(
                   adminInputClass,
-                  errors.confirm && "border-error",
+                  errors.confirm && "border-console-red",
                 )}
                 {...register("confirm")}
               />
@@ -413,10 +413,10 @@ function PasswordCard() {
       ) : (
         <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
-            <div className="font-adminmono text-[15px] tracking-[0.2em] text-soil/70">
+            <div className="font-adminmono text-[15px] tracking-[0.2em] text-adm-faint">
               ••••••••••
             </div>
-            <div className="mt-0.5 text-[12.5px] text-soil">
+            <div className="mt-0.5 text-[12.5px] text-adm-muted">
               Changing your password signs out every other device.
             </div>
           </div>
@@ -453,14 +453,14 @@ function RecoveryCodesPanel({
   };
   return (
     <div className="mt-3 rounded-[6px] border border-console-gold/40 bg-[#FBF6EA] p-3.5">
-      <div className="text-[12.5px] font-semibold text-ink">
+      <div className="text-[12.5px] font-semibold text-adm-ink">
         Save these recovery codes now — they are shown only once.
       </div>
-      <p className="mt-1 text-[12px] leading-[1.5] text-soil">
+      <p className="mt-1 text-[12px] leading-[1.5] text-adm-muted">
         Each code signs you in once if you can&apos;t receive the email code.
         Keep them somewhere safe (not in this browser).
       </p>
-      <div className="font-adminmono mt-2.5 grid grid-cols-2 gap-x-6 gap-y-1.5 text-[13px] text-ink">
+      <div className="font-adminmono mt-2.5 grid grid-cols-2 gap-x-6 gap-y-1.5 text-[13px] text-adm-ink">
         {codes.map((code) => (
           <span key={code}>{code}</span>
         ))}
@@ -577,10 +577,10 @@ function TwoFactorCard() {
       <SectionLabel>Two-factor authentication</SectionLabel>
       <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <div className="text-[13.5px] font-semibold text-ink">
+          <div className="text-[13.5px] font-semibold text-adm-ink">
             {enabled ? "Email codes — enabled" : "Email codes — off"}
           </div>
-          <div className="mt-0.5 text-[12.5px] text-soil">
+          <div className="mt-0.5 text-[12.5px] text-adm-muted">
             {enabled
               ? `A 6-digit code is emailed to ${user?.email ?? "you"} at every sign-in.`
               : "Add a second step to sign-in: a 6-digit code emailed to you."}

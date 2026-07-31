@@ -53,12 +53,12 @@ export function ConsoleTableSkeleton({
           {Array.from({ length: Math.min(rows, 5) }, (_, row) => (
             <div
               key={row}
-              className="rounded-none border-[1.5px] border-soil/30 bg-paper px-3 py-2"
+              className="rounded-none border-[1.5px] border-adm-line bg-adm-card px-3 py-2"
             >
               {Array.from({ length: Math.min(columns, 4) }, (_, line) => (
                 <div
                   key={line}
-                  className="flex items-center justify-between gap-3 border-b border-soil/10 py-[7px] last:border-b-0"
+                  className="flex items-center justify-between gap-3 border-b border-adm-hairline py-[7px] last:border-b-0"
                 >
                   <Skeleton className="h-2.5 w-20" />
                   <Skeleton
@@ -72,7 +72,7 @@ export function ConsoleTableSkeleton({
         </div>
 
         <div className="hidden @2xl/table:block">
-          <div className="flex h-[38px] items-center gap-3 border-b border-soil/25 bg-surface-alt/70 px-3">
+          <div className="flex h-[38px] items-center gap-3 border-b border-adm-line bg-adm-sunken px-3">
             {Array.from({ length: columns }, (_, col) => (
               <Skeleton key={col} className="h-2.5 flex-1" />
             ))}
@@ -80,7 +80,7 @@ export function ConsoleTableSkeleton({
           {Array.from({ length: rows }, (_, row) => (
             <div
               key={row}
-              className="flex h-12 items-center gap-3 border-b border-soil/15 px-3"
+              className="flex h-12 items-center gap-3 border-b border-adm-hairline px-3"
             >
               {Array.from({ length: columns }, (_, col) => (
                 <div key={col} className="flex-1">
@@ -94,7 +94,7 @@ export function ConsoleTableSkeleton({
           ))}
         </div>
 
-        <div className="border-t border-soil/25 px-4 py-2.5">
+        <div className="border-t border-adm-line px-4 py-2.5">
           <Skeleton className="h-3 w-24" />
         </div>
       </div>
@@ -200,7 +200,7 @@ export function CardGridSkeleton({
           </div>
           <Skeleton className="mt-3 h-3" style={{ width: width(i, 60) }} />
           <Skeleton className="mt-1.5 h-3 w-1/2" />
-          <div className="mt-3 flex flex-col gap-1.5 border-t border-soil/15 pt-2">
+          <div className="mt-3 flex flex-col gap-1.5 border-t border-adm-hairline pt-2">
             <Skeleton className="h-2.5 w-full" />
             <Skeleton className="h-2.5 w-4/5" />
           </div>
@@ -295,7 +295,7 @@ function FactGridSkeleton({ facts = 6 }: { facts?: number }) {
   return (
     <div className="grid grid-cols-1 gap-x-8 gap-y-1 sm:grid-cols-2">
       {Array.from({ length: facts }, (_, i) => (
-        <div key={i} className="border-b border-soil/10 py-2">
+        <div key={i} className="border-b border-adm-hairline py-2">
           <Skeleton className="h-2.5 w-16" />
           <Skeleton className="mt-1.5 h-3.5" style={{ width: width(i, 45) }} />
         </div>
@@ -377,7 +377,7 @@ export function DetailSkeleton({
           <AdminCard className="px-5 py-4">
             <Skeleton className="h-2.5 w-20" />
             <Skeleton className="mt-2 h-7 w-36" />
-            <div className="mt-4 flex flex-col gap-2 border-t border-soil/12 pt-3">
+            <div className="mt-4 flex flex-col gap-2 border-t border-adm-hairline pt-3">
               <Skeleton className="h-3 w-full" />
               <Skeleton className="h-3 w-2/3" />
             </div>
@@ -403,7 +403,7 @@ export function LedgerSkeleton({ rows = 6 }: { rows?: number }) {
       {Array.from({ length: rows }, (_, i) => (
         <div
           key={i}
-          className="flex items-start gap-2.5 border-b border-soil/12 py-2.5 last:border-b-0"
+          className="flex items-start gap-2.5 border-b border-adm-hairline py-2.5 last:border-b-0"
         >
           <Skeleton className="mt-0.5 h-6 w-6 flex-none" />
           <div className="min-w-0 flex-1">
@@ -476,7 +476,7 @@ export function LotRowsSkeleton({ rows = 5 }: { rows?: number }) {
         {Array.from({ length: rows }, (_, i) => (
           <div
             key={i}
-            className="grid grid-cols-[1fr_110px] items-center gap-2 border-b border-soil/10 pb-2 last:border-b-0 last:pb-0"
+            className="grid grid-cols-[1fr_110px] items-center gap-2 border-b border-adm-hairline pb-2 last:border-b-0 last:pb-0"
           >
             <div className="min-w-0">
               <Skeleton className="h-3.5" style={{ width: width(i, 40) }} />
@@ -528,7 +528,7 @@ export function DocumentSkeleton({ lines = 6 }: { lines?: number }) {
         <Skeleton className="h-3 w-28" />
         <Skeleton className="h-9 w-24" />
       </div>
-      <div className="max-w-[720px] border-[1.5px] border-soil/30 bg-white p-8">
+      <div className="max-w-[720px] border-[1.5px] border-adm-line bg-white p-8">
         <div className="flex items-start justify-between border-b-2 border-ink/20 pb-3">
           <div>
             <Skeleton className="h-5 w-32" />
@@ -548,7 +548,7 @@ export function DocumentSkeleton({ lines = 6 }: { lines?: number }) {
         {Array.from({ length: lines }, (_, row) => (
           <div
             key={row}
-            className="flex items-center gap-4 border-b border-soil/25 py-2"
+            className="flex items-center gap-4 border-b border-adm-line py-2"
           >
             {Array.from({ length: 4 }, (_, col) => (
               <div key={col} className="flex-1">

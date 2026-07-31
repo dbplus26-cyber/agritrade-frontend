@@ -113,12 +113,12 @@ export function FarmDocumentsSection({
   return (
     <>
       {documents.length === 0 ? (
-        <p className="py-2 text-[13px] text-soil">No documents yet.</p>
+        <p className="py-2 text-[13px] text-adm-muted">No documents yet.</p>
       ) : (
         documents.map((doc) => (
           <div
             key={doc.id}
-            className="flex items-center justify-between gap-3 border-b border-soil/10 py-2 text-[13px] last:border-b-0"
+            className="flex items-center justify-between gap-3 border-b border-adm-hairline py-2 text-[13px] last:border-b-0"
           >
             <a
               href={urlOf(doc.id)}
@@ -129,7 +129,7 @@ export function FarmDocumentsSection({
               {doc.name}
             </a>
             <div className="flex flex-none items-center gap-3">
-              <Mono className="text-[12px] whitespace-nowrap text-soil">
+              <Mono className="text-[12px] whitespace-nowrap text-adm-muted">
                 {formatFarmDate(doc.createdAt)}
               </Mono>
               <button
@@ -149,7 +149,7 @@ export function FarmDocumentsSection({
           value={docName}
           onChange={(e) => setDocName(e.target.value)}
           placeholder={`Document name (default: ${defaultName})`}
-          className="h-8 min-w-0 flex-1 rounded border border-soil/25 bg-paper px-2.5 text-[13px]"
+          className="h-8 min-w-0 flex-1 rounded border border-adm-line bg-adm-card px-2.5 text-[13px]"
         />
         <FilePicker
           accept="image/*,application/pdf,.doc,.docx"
@@ -161,7 +161,7 @@ export function FarmDocumentsSection({
           triggerLabel="Choose document"
         />
       </div>
-      <div className="mt-3 border-t border-soil/12 pt-3">
+      <div className="mt-3 border-t border-adm-hairline pt-3">
         <button
           type="button"
           onClick={() => setSigning((v) => !v)}
@@ -181,7 +181,7 @@ export function FarmDocumentsSection({
                 void onDocConfirm(file).catch(() => undefined);
               }}
             />
-            <p className="mt-1 text-[11.5px] text-soil/70">
+            <p className="mt-1 text-[11.5px] text-adm-faint">
               Saves as &quot;{docName.trim() || defaultName}&quot; - hand the
               phone over to sign right here.
             </p>

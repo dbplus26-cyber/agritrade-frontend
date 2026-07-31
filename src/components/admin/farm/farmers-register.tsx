@@ -43,9 +43,9 @@ function FarmerCell({ farmer }: { farmer: IFarmer }) {
         {a.init}
       </span>
       <div className="min-w-0 max-w-[21rem]">
-        <div className="max-w-[20rem] truncate font-semibold text-ink">{farmer.name}</div>
+        <div className="max-w-[20rem] truncate font-semibold text-adm-ink">{farmer.name}</div>
         {farmer.phone ? (
-          <div className="text-[12px] text-soil">{farmer.phone}</div>
+          <div className="text-[12px] text-adm-muted">{farmer.phone}</div>
         ) : null}
       </div>
     </Link>
@@ -100,7 +100,7 @@ export function FarmersRegister() {
         enableSorting: false,
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
-          <span className="text-[12.5px] text-soil">
+          <span className="text-[12.5px] text-adm-muted">
             {row.original.community ?? "-"}
           </span>
         ),
@@ -127,10 +127,10 @@ export function FarmersRegister() {
   return (
     <div>
       <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Farmers
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           Outgrower farmers in the input-grant programmes
         </p>
       </div>
@@ -204,7 +204,7 @@ export function FarmersRegister() {
               onPageSizeChange: (size) => setFilter("size", String(size)),
             }}
             rowHref={(f) => `${LIST}/${f.id}`}
-            rowClassName={() => "h-14 hover:bg-surface-alt/60"}
+            rowClassName={() => "h-14 hover:bg-adm-sunken"}
           />
         </AdminCard>
       )}

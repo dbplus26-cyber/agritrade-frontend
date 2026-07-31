@@ -121,10 +121,10 @@ export function BuyerTable() {
             >
               <RegistryAvatar name={b.name} photoUrl={b.photoUrl} />
               <span className="block min-w-0 max-w-[20rem]">
-                <span className="block truncate font-medium text-ink">
+                <span className="block truncate font-medium text-adm-ink">
                   {b.name}
                 </span>
-                <span className="block truncate text-[11.5px] text-soil/70">
+                <span className="block truncate text-[11.5px] text-adm-faint">
                   {b.city ?? "No city"}
                 </span>
               </span>
@@ -140,7 +140,7 @@ export function BuyerTable() {
         meta: columnMeta(),
         cell: ({ row }) =>
           row.original.phone ? (
-            <span className="font-adminmono whitespace-nowrap text-[12.5px] text-soil">
+            <span className="font-adminmono whitespace-nowrap text-[12.5px] text-adm-muted">
               {row.original.phone}
             </span>
           ) : (
@@ -155,7 +155,7 @@ export function BuyerTable() {
         meta: columnMeta({ wide: true }),
         cell: ({ row }) =>
           row.original.email ? (
-            <span className="block max-w-[17rem] truncate text-soil">{row.original.email}</span>
+            <span className="block max-w-[17rem] truncate text-adm-muted">{row.original.email}</span>
           ) : (
             <Absent />
           ),
@@ -182,10 +182,10 @@ export function BuyerTable() {
   return (
     <div>
       <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Buyers
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           Traders and companies the business sells to
         </p>
       </div>
@@ -267,7 +267,7 @@ export function BuyerTable() {
               onPageSizeChange: (size) => setFilter("size", String(size)),
             }}
             rowHref={(b) => `${LIST}/${b.id}`}
-            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+            rowClassName={() => "h-12 hover:bg-adm-sunken"}
           />
         </AdminCard>
       )}
@@ -547,7 +547,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
           <Input
             placeholder="e.g. Accra Grain Traders"
             disabled={readOnly}
-            className={cn(adminInputClass, roCls, errors.name && "border-error")}
+            className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
             {...register("name")}
           />
         </AdminField>
@@ -557,7 +557,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
               type="tel"
               placeholder="055 000 0000"
               disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.phone && "border-error")}
+              className={cn(adminInputClass, roCls, errors.phone && "border-console-red")}
               {...register("phone")}
             />
           </AdminField>
@@ -576,7 +576,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.altPhone && "border-error",
+                errors.altPhone && "border-console-red",
               )}
               {...register("altPhone")}
             />
@@ -585,7 +585,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
             <Input
               placeholder="e.g. Accra"
               disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.city && "border-error")}
+              className={cn(adminInputClass, roCls, errors.city && "border-console-red")}
               {...register("city")}
             />
           </AdminField>
@@ -595,7 +595,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
             type="email"
             placeholder="orders@buyer.com"
             disabled={readOnly}
-            className={cn(adminInputClass, roCls, errors.email && "border-error")}
+            className={cn(adminInputClass, roCls, errors.email && "border-console-red")}
             {...register("email")}
           />
         </AdminField>
@@ -606,13 +606,13 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
             className={cn(
               adminInputClass,
               roCls,
-              errors.address && "border-error",
+              errors.address && "border-console-red",
             )}
             {...register("address")}
           />
         </AdminField>
-        <div className="mt-1 border-t border-soil/15 pt-3">
-          <p className="stencil text-[11px] uppercase tracking-[0.14em] text-soil">
+        <div className="mt-1 border-t border-adm-hairline pt-3">
+          <p className="text-[11px] uppercase tracking-[0.14em] text-adm-muted">
             Business
           </p>
         </div>
@@ -628,7 +628,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.businessName && "border-error",
+                errors.businessName && "border-console-red",
               )}
               {...register("businessName")}
             />
@@ -645,7 +645,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
                 adminInputClass,
                 roCls,
                 "font-adminmono",
-                errors.registrationNumber && "border-error",
+                errors.registrationNumber && "border-console-red",
               )}
               {...register("registrationNumber")}
             />
@@ -663,7 +663,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.contactPersonName && "border-error",
+                errors.contactPersonName && "border-console-red",
               )}
               {...register("contactPersonName")}
             />
@@ -680,7 +680,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.contactPersonPhone && "border-error",
+                errors.contactPersonPhone && "border-console-red",
               )}
               {...register("contactPersonPhone")}
             />
@@ -695,7 +695,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
               adminInputClass,
               roCls,
               "h-auto min-h-[104px] w-full resize-y py-2",
-              errors.notes && "border-error",
+              errors.notes && "border-console-red",
             )}
             {...register("notes")}
           />

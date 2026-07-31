@@ -48,13 +48,13 @@ export function ActivityFeed() {
           ))}
         </div>
       ) : rows.length === 0 ? (
-        <p className="text-[13px] text-soil">No activity yet.</p>
+        <p className="text-[13px] text-adm-muted">No activity yet.</p>
       ) : (
         <ul className="flex flex-col">
           {rows.map((row) => (
             <li
               key={row.id}
-              className="flex items-start gap-2.5 border-b border-soil/10 py-2 last:border-b-0"
+              className="flex items-start gap-2.5 border-b border-adm-hairline py-2 last:border-b-0"
             >
               <span
                 aria-hidden="true"
@@ -62,11 +62,11 @@ export function ActivityFeed() {
                 style={{ background: TONES[toneForAction(row.action)].dot }}
               />
               <div className="min-w-0 flex-1">
-                <div className="truncate text-[13px] text-ink">
+                <div className="truncate text-[13px] text-adm-ink">
                   {humanizeAction(row.action)}
-                  <span className="text-soil/70"> · {row.entity}</span>
+                  <span className="text-adm-faint"> · {row.entity}</span>
                 </div>
-                <div className="truncate text-[11.5px] text-soil">
+                <div className="truncate text-[11.5px] text-adm-muted">
                   {row.actorName} · {shortWhen(row.at)}
                 </div>
               </div>

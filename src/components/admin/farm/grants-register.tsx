@@ -80,7 +80,7 @@ export function GrantsRegister() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-ink">
+          <Mono className="whitespace-nowrap text-[12.5px] text-adm-ink">
             {row.original.transactionNo}
           </Mono>
         ),
@@ -120,7 +120,7 @@ export function GrantsRegister() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-ink">
+          <Mono className="whitespace-nowrap text-[12.5px] text-adm-ink">
             <Money value={row.original.valueGhs} />
           </Mono>
         ),
@@ -157,10 +157,10 @@ export function GrantsRegister() {
   return (
     <div>
       <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Input grants
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           Inputs given to farmers, carrying the cash value owed
         </p>
       </div>
@@ -174,7 +174,7 @@ export function GrantsRegister() {
               <Button
                 asChild
                 variant="outline"
-                className="h-8 border-[1.5px] border-soil/35 px-3 text-[13px] text-soil shadow-none hover:bg-soil/5"
+                className="h-8 border-[1.5px] border-adm-line px-3 text-[13px] text-adm-muted shadow-none hover:bg-soil/5"
               >
                 <Link href={`${LIST}/aging`}>Aging</Link>
               </Button>
@@ -239,7 +239,7 @@ export function GrantsRegister() {
               onPageSizeChange: (size) => setFilter("size", String(size)),
             }}
             rowHref={(g) => `${LIST}/${g.id}`}
-            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+            rowClassName={() => "h-12 hover:bg-adm-sunken"}
           />
         </AdminCard>
       )}

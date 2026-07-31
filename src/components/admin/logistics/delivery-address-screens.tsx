@@ -154,7 +154,7 @@ export function DeliveryAddressTable() {
         cell: ({ row }) =>
           row.original.shopName ? (
             <TextCell
-              className="text-soil"
+              className="text-adm-muted"
               value={row.original.shopName}
               width="label"
             />
@@ -184,10 +184,10 @@ export function DeliveryAddressTable() {
   return (
     <div>
       <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Delivery addresses
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           Saved destinations shipments deliver to, with the receiving contact
         </p>
       </div>
@@ -269,7 +269,7 @@ export function DeliveryAddressTable() {
               onPageSizeChange: (size) => setFilter("size", String(size)),
             }}
             rowHref={(a) => `${LIST}/${a.id}`}
-            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+            rowClassName={() => "h-12 hover:bg-adm-sunken"}
           />
         </AdminCard>
       )}
@@ -437,7 +437,7 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
           <Input
             placeholder="e.g. Makola Market - Adjei Bros"
             disabled={readOnly}
-            className={cn(adminInputClass, roCls, errors.label && "border-error")}
+            className={cn(adminInputClass, roCls, errors.label && "border-console-red")}
             {...register("label")}
           />
         </AdminField>
@@ -446,7 +446,7 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
             <Input
               placeholder="e.g. Accra"
               disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.city && "border-error")}
+              className={cn(adminInputClass, roCls, errors.city && "border-console-red")}
               {...register("city")}
             />
           </AdminField>
@@ -454,7 +454,7 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
             <Input
               placeholder="e.g. Okaishie"
               disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.area && "border-error")}
+              className={cn(adminInputClass, roCls, errors.area && "border-console-red")}
               {...register("area")}
             />
           </AdminField>
@@ -473,7 +473,7 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
                 adminInputClass,
                 roCls,
                 "font-adminmono",
-                errors.digitalAddress && "border-error",
+                errors.digitalAddress && "border-console-red",
               )}
               {...register("digitalAddress")}
             />
@@ -485,7 +485,7 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.landmark && "border-error",
+                errors.landmark && "border-console-red",
               )}
               {...register("landmark")}
             />
@@ -498,7 +498,7 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
             className={cn(
               adminInputClass,
               roCls,
-              errors.shopName && "border-error",
+              errors.shopName && "border-console-red",
             )}
             {...register("shopName")}
           />
@@ -515,7 +515,7 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.contactName && "border-error",
+                errors.contactName && "border-console-red",
               )}
               {...register("contactName")}
             />
@@ -532,7 +532,7 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.contactPhone && "border-error",
+                errors.contactPhone && "border-console-red",
               )}
               {...register("contactPhone")}
             />
@@ -552,7 +552,7 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
               adminInputClass,
               roCls,
               "h-auto min-h-[104px] w-full resize-y py-2",
-              errors.directions && "border-error",
+              errors.directions && "border-console-red",
             )}
             {...register("directions")}
           />

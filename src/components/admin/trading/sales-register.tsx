@@ -55,10 +55,10 @@ function StatTile({
 }) {
   return (
     <AdminCard className="px-4 py-3">
-      <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+      <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         {label}
       </div>
-      <div className="mt-1 text-[19px] font-bold text-ink">{children}</div>
+      <div className="mt-1 text-[19px] font-bold text-adm-ink">{children}</div>
     </AdminCard>
   );
 }
@@ -149,7 +149,7 @@ export function SalesRegister() {
             className="block min-w-[9rem] max-w-[22rem] outline-none focus-visible:underline"
             onClick={(e) => { e.stopPropagation(); }}
           >
-            <div className="max-w-[20rem] truncate font-semibold text-ink">
+            <div className="max-w-[20rem] truncate font-semibold text-adm-ink">
               {row.original.buyer.name}
             </div>
           </Link>
@@ -161,7 +161,7 @@ export function SalesRegister() {
         enableSorting: false,
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-ink">
+          <Mono className="whitespace-nowrap text-[12.5px] text-adm-ink">
             <Money value={row.original.agreedTotalGhs} />
           </Mono>
         ),
@@ -178,7 +178,7 @@ export function SalesRegister() {
               className={cn(
                 "whitespace-nowrap text-[12.5px] font-semibold",
                 b === null
-                  ? "text-soil/50"
+                  ? "text-adm-faint"
                   : b === 0
                     ? "text-leaf"
                     : "text-console-red",
@@ -256,10 +256,10 @@ export function SalesRegister() {
   return (
     <div>
       <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Sales
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           Agreements with buyers, payments and balances
         </p>
       </div>
@@ -316,7 +316,7 @@ export function SalesRegister() {
                     onPageSizeChange: (size) => setFilter("size", String(size)),
                   }}
                   rowHref={(s) => `${LIST}/${s.id}`}
-                  rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+                  rowClassName={() => "h-12 hover:bg-adm-sunken"}
                 />
               </AdminCard>
 
@@ -329,16 +329,16 @@ export function SalesRegister() {
                     onClick={() => router.push(`${LIST}/${s.id}`)}
                     // Squared and 1.5px-bordered to match AdminCard, the
                     // surface every other console screen is filed on.
-                    className="shadow-doc-sm rounded-none border-[1.5px] border-soil/30 bg-paper px-3.5 py-[13px] text-left"
+                    className="shadow-[0_1px_2px_rgba(16,24,40,0.05)] rounded-none border-[1.5px] border-adm-line bg-adm-card px-3.5 py-[13px] text-left"
                   >
                     <div className="mb-1.5 flex items-center justify-between gap-2">
-                      <span className="block max-w-[22rem] truncate text-[14px] font-semibold text-ink">
+                      <span className="block max-w-[22rem] truncate text-[14px] font-semibold text-adm-ink">
                         {s.buyer.name}
                       </span>
                       <SaleStatusBadge status={s.status} />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[12px] text-soil">Balance</span>
+                      <span className="text-[12px] text-adm-muted">Balance</span>
                       <Mono
                         className={cn(
                           "text-[14px] font-bold",

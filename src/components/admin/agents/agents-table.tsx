@@ -40,9 +40,9 @@ export function BalanceCell({ amount }: { amount: number | null }) {
     <Mono
       className={cn(
         "whitespace-nowrap text-[12.5px]",
-        amount === null && "text-soil/50",
-        amount !== null && amount < 0 && "font-semibold text-error",
-        amount !== null && amount >= 0 && "text-ink",
+        amount === null && "text-adm-faint",
+        amount !== null && amount < 0 && "font-semibold text-console-red",
+        amount !== null && amount >= 0 && "text-adm-ink",
       )}
     >
       {formatCedis(amount)}
@@ -105,10 +105,10 @@ export function AgentsTable() {
                 photoUrl={a.profilePicture}
               />
               <span className="block min-w-0 max-w-[20rem]">
-                <span className="block truncate font-medium text-ink">
+                <span className="block truncate font-medium text-adm-ink">
                   {a.firstName} {a.lastName}
                 </span>
-                <span className="block truncate text-[11.5px] text-soil/70">
+                <span className="block truncate text-[11.5px] text-adm-faint">
                   {a.region ?? a.email}
                 </span>
               </span>
@@ -132,7 +132,7 @@ export function AgentsTable() {
         meta: columnMeta({ wide: true }),
         cell: ({ row }) =>
           row.original.phone ? (
-            <Mono className="whitespace-nowrap text-[12.5px] text-soil">
+            <Mono className="whitespace-nowrap text-[12.5px] text-adm-muted">
               {row.original.phone}
             </Mono>
           ) : (
@@ -164,10 +164,10 @@ export function AgentsTable() {
   return (
     <div>
       <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Agents &amp; Floats
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           Field buyers and the cash in their hands - balances derive from the
           ledger, never a stored number
         </p>
@@ -226,7 +226,7 @@ export function AgentsTable() {
               onPageSizeChange: (size) => setFilter("size", String(size)),
             }}
             rowHref={(a) => `${LIST}/${a.userId}`}
-            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+            rowClassName={() => "h-12 hover:bg-adm-sunken"}
           />
         </AdminCard>
       )}

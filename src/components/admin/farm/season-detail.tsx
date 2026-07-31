@@ -39,10 +39,10 @@ function StatTile({
 }) {
   return (
     <AdminCard className="px-4 py-3">
-      <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+      <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         {label}
       </div>
-      <div className="mt-1 text-[19px] font-bold text-ink">{children}</div>
+      <div className="mt-1 text-[19px] font-bold text-adm-ink">{children}</div>
     </AdminCard>
   );
 }
@@ -130,7 +130,7 @@ export function SeasonDetail({ id }: { id: string }) {
       <DetailShell
         aside={
           <AdminCard className="px-5 py-3">
-            <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+            <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
               Season
             </p>
             <DetailGrid columns={2}>
@@ -139,14 +139,14 @@ export function SeasonDetail({ id }: { id: string }) {
                 {s.endsOn ? (
                   formatFarmDate(s.endsOn)
                 ) : (
-                  <span className="text-soil">Open</span>
+                  <span className="text-adm-muted">Open</span>
                 )}
               </DetailItem>
               <DetailItem label="Status">
                 {s.isActive ? "Active" : "Inactive"}
               </DetailItem>
             </DetailGrid>
-            <div className="mt-3 border-t border-soil/12 pt-3.5">
+            <div className="mt-3 border-t border-adm-hairline pt-3.5">
               <div className="flex flex-wrap gap-2 xl:flex-col">
                 <AdminButton variant="outline" className="h-9 px-4" asChild>
                   <Link href={`${LIST}/${s.id}/edit?edit=1`}>Edit</Link>
@@ -179,24 +179,24 @@ export function SeasonDetail({ id }: { id: string }) {
           <>
           {stats ? (
             <AdminCard className="mb-4 px-5 py-3">
-              <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Expected vs actual
               </p>
-              <p className="mb-2 text-[12px] text-soil">
+              <p className="mb-2 text-[12px] text-adm-muted">
                 The season plans against what actually came back - the read
                 that makes next season&apos;s grant decisions better informed.
               </p>
               <div className="grid grid-cols-2 gap-x-8 gap-y-1 sm:grid-cols-4">
-                <div className="border-b border-soil/10 py-2">
-                  <p className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                <div className="border-b border-adm-hairline py-2">
+                  <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                     Expected yield
                   </p>
                   <Mono className="text-[14px]">
                     {formatKg(stats.expectations.expectedYieldKg)}
                   </Mono>
                 </div>
-                <div className="border-b border-soil/10 py-2">
-                  <p className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                <div className="border-b border-adm-hairline py-2">
+                  <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                     Actual yield
                   </p>
                   <Mono
@@ -210,16 +210,16 @@ export function SeasonDetail({ id }: { id: string }) {
                     {formatKg(stats.expectations.actualYieldKg)}
                   </Mono>
                 </div>
-                <div className="border-b border-soil/10 py-2">
-                  <p className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                <div className="border-b border-adm-hairline py-2">
+                  <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                     Expected return
                   </p>
                   <Mono className="text-[14px]">
                     <Money value={stats.expectations.expectedReturnGhs} />
                   </Mono>
                 </div>
-                <div className="border-b border-soil/10 py-2">
-                  <p className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                <div className="border-b border-adm-hairline py-2">
+                  <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                     Actual return
                   </p>
                   <Mono className="text-[14px]">
@@ -230,7 +230,7 @@ export function SeasonDetail({ id }: { id: string }) {
             </AdminCard>
           ) : null}
           <AdminCard className="overflow-hidden">
-            <div className="border-b border-soil/15 px-5 py-3 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+            <div className="border-b border-adm-hairline px-5 py-3 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
               Farmer balances
             </div>
             {summary.isLoading ? (
@@ -246,7 +246,7 @@ export function SeasonDetail({ id }: { id: string }) {
             ) : (
               <table className="w-full border-collapse text-[13px]">
                 <thead>
-                  <tr className="border-b border-soil/15 text-left text-[11px] uppercase tracking-[0.06em] text-soil">
+                  <tr className="border-b border-adm-hairline text-left text-[11px] uppercase tracking-[0.06em] text-adm-muted">
                     <th className="px-5 py-2 font-semibold">Farmer</th>
                     <th className="px-5 py-2 text-right font-semibold">Invested</th>
                     <th className="px-5 py-2 text-right font-semibold">Recovered</th>
@@ -257,7 +257,7 @@ export function SeasonDetail({ id }: { id: string }) {
                   {stats.farmerBalances.map((b) => (
                     <tr
                       key={b.farmerId}
-                      className="border-b border-soil/10 last:border-b-0 hover:bg-surface-alt/60"
+                      className="border-b border-adm-hairline last:border-b-0 hover:bg-adm-sunken"
                     >
                       <td className="px-5 py-2.5">
                         <Link

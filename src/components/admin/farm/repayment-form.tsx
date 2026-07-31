@@ -148,7 +148,7 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
                     ...(f.community ? { hint: f.community } : {}),
                   }))}
                   placeholder="Choose the farmer"
-                  className={cn(errors.farmerId && "border-error")}
+                  className={cn(errors.farmerId && "border-console-red")}
                 />
               )}
             />
@@ -167,7 +167,7 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
                       label: s.name,
                     }))}
                     placeholder="Choose the season"
-                    className={cn(errors.seasonId && "border-error")}
+                    className={cn(errors.seasonId && "border-console-red")}
                   />
                 )}
               />
@@ -185,7 +185,7 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
                       label: c.name,
                     }))}
                     placeholder="Choose the commodity"
-                    className={cn(errors.commodityId && "border-error")}
+                    className={cn(errors.commodityId && "border-console-red")}
                   />
                 )}
               />
@@ -193,14 +193,14 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
             <AdminField label="Weight (kg)" error={errors.weightKg?.message}>
               <Input
                 inputMode="decimal"
-                className={cn(adminInputClass, errors.weightKg && "border-error")}
+                className={cn(adminInputClass, errors.weightKg && "border-console-red")}
                 {...register("weightKg")}
               />
             </AdminField>
             <AdminField label="Rate per kg (GHS)" error={errors.ratePerKgGhs?.message}>
               <Input
                 inputMode="decimal"
-                className={cn(adminInputClass, errors.ratePerKgGhs && "border-error")}
+                className={cn(adminInputClass, errors.ratePerKgGhs && "border-console-red")}
                 {...register("ratePerKgGhs")}
               />
             </AdminField>
@@ -239,10 +239,10 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
 
         <AdminCard className="flex flex-col gap-3 px-5 py-4">
           <div>
-            <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+            <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
               Signed receipt
             </div>
-            <p className="mt-1 text-[12px] text-soil">
+            <p className="mt-1 text-[12px] text-adm-muted">
               The signed receipt or weigh slip is what settles &quot;I already
               paid&quot; disputes - it stays on this record as the evidence.
             </p>
@@ -255,7 +255,7 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
               error={errors.receivedByName?.message}
             >
               <Input
-                className={cn(adminInputClass, errors.receivedByName && "border-error")}
+                className={cn(adminInputClass, errors.receivedByName && "border-console-red")}
                 {...register("receivedByName")}
               />
             </AdminField>
@@ -271,7 +271,7 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
           {/* Not an AdminField: wrapping the picker's buttons in a <label>
               would misroute label clicks. Same stencil-label + error markup. */}
           <div>
-            <span className="stencil mb-[7px] block text-[11px] uppercase tracking-[0.14em] text-harvest-deep">
+            <span className="mb-[7px] block text-[11px] uppercase tracking-[0.14em] text-adm-muted">
               Receipt file
             </span>
             <FilePicker
@@ -288,7 +288,7 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
             {receiptError ? (
               <span
                 role="alert"
-                className="mt-1 block text-[12px] font-medium text-error"
+                className="mt-1 block text-[12px] font-medium text-console-red"
               >
                 {receiptError}
               </span>
@@ -296,8 +296,8 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
           </div>
         </AdminCard>
 
-        <div className="flex items-center justify-between rounded-[6px] border border-soil/20 bg-surface-alt/50 px-4 py-3 text-[13px]">
-          <span className="font-semibold text-soil">Value credited</span>
+        <div className="flex items-center justify-between rounded-[6px] border border-adm-hairline bg-adm-sunken px-4 py-3 text-[13px]">
+          <span className="font-semibold text-adm-muted">Value credited</span>
           <span className="text-[16px] font-bold text-leaf">
             {value === null ? "-" : formatCedis(value)}
           </span>

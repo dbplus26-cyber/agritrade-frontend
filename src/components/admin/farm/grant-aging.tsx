@@ -27,18 +27,18 @@ const BUCKETS: {
   cardClass: string;
   valueClass: string;
 }[] = [
-  { key: "current", label: "Current", cardClass: "", valueClass: "text-ink" },
+  { key: "current", label: "Current", cardClass: "", valueClass: "text-adm-ink" },
   {
     key: "1-30",
     label: "1-30 days",
     cardClass: "bg-harvest/10",
-    valueClass: "text-ink",
+    valueClass: "text-adm-ink",
   },
   {
     key: "31-60",
     label: "31-60 days",
     cardClass: "bg-harvest/25",
-    valueClass: "text-ink",
+    valueClass: "text-adm-ink",
   },
   {
     key: "61-90",
@@ -82,13 +82,13 @@ export function GrantAging() {
             <Link
               href={`/admin/farmers/${row.original.farmer.id}`}
               onClick={(e) => e.stopPropagation()}
-              className="block max-w-[20rem] truncate font-semibold text-ink underline-offset-2 hover:underline"
+              className="block max-w-[20rem] truncate font-semibold text-adm-ink underline-offset-2 hover:underline"
               title={row.original.farmer.name}
             >
               {row.original.farmer.name}
             </Link>
             {row.original.farmer.phone ? (
-              <div className="truncate text-[12px] text-soil">
+              <div className="truncate text-[12px] text-adm-muted">
                 {row.original.farmer.phone}
               </div>
             ) : null}
@@ -102,7 +102,7 @@ export function GrantAging() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <span className="text-[12.5px] text-soil">
+          <span className="text-[12.5px] text-adm-muted">
             {row.original.season.name}
           </span>
         ),
@@ -114,7 +114,7 @@ export function GrantAging() {
         enableSorting: false,
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-soil">
+          <Mono className="whitespace-nowrap text-[12.5px] text-adm-muted">
             <Money value={row.original.investedGhs} compact />
           </Mono>
         ),
@@ -126,7 +126,7 @@ export function GrantAging() {
         enableSorting: false,
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-soil">
+          <Mono className="whitespace-nowrap text-[12.5px] text-adm-muted">
             <Money value={row.original.recoveredGhs} compact />
           </Mono>
         ),
@@ -138,7 +138,7 @@ export function GrantAging() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] font-semibold text-ink">
+          <Mono className="whitespace-nowrap text-[12.5px] font-semibold text-adm-ink">
             <Money value={row.original.outstandingGhs} compact />
           </Mono>
         ),
@@ -169,10 +169,10 @@ export function GrantAging() {
     <div>
       <BackButton href="/admin/grants" label="All grants" className="mb-2" />
       <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Grant aging
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           Outstanding farm investment by how overdue it is - most overdue first
         </p>
       </div>
@@ -189,7 +189,7 @@ export function GrantAging() {
           <div className="mb-4 grid grid-cols-2 gap-2 @lg/main:grid-cols-3 @3xl/main:grid-cols-5">
             {BUCKETS.map((b) => (
               <AdminCard key={b.key} className={cn("px-3 py-2.5", b.cardClass)}>
-                <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                   {b.label}
                 </div>
                 <div
@@ -219,7 +219,7 @@ export function GrantAging() {
                 data={rows}
                 itemNoun="balances"
                 pageSize={20}
-                rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+                rowClassName={() => "h-12 hover:bg-adm-sunken"}
               />
             </AdminCard>
           )}

@@ -61,7 +61,7 @@ export const PURCHASE_STATUS_FILTER_OPTIONS = [
 export function CompactCedis({ amount }: { amount: number | null }) {
   // Null means the API redacted it for this user (financial visibility).
   if (amount === null)
-    return <span className="text-soil/50">{MONEY_HIDDEN}</span>;
+    return <span className="text-adm-faint">{MONEY_HIDDEN}</span>;
   if (Math.abs(amount) < 1_000_000) return <>{formatCedis(amount)}</>;
   return (
     <span title={formatCedis(amount)}>

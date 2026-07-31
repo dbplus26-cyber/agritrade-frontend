@@ -125,10 +125,10 @@ export function DriverTable() {
             >
               <RegistryAvatar name={d.name} photoUrl={d.photoUrl} />
               <span className="block min-w-0 max-w-[20rem]">
-                <span className="block truncate font-medium text-ink">
+                <span className="block truncate font-medium text-adm-ink">
                   {d.name}
                 </span>
-                <span className="block truncate text-[11.5px] text-soil/70">
+                <span className="block truncate text-[11.5px] text-adm-faint">
                   {d.company ?? "Independent"}
                 </span>
               </span>
@@ -143,7 +143,7 @@ export function DriverTable() {
         enableSorting: false,
         meta: columnMeta({ at: "lg" }),
         cell: ({ row }) => (
-          <span className="font-adminmono whitespace-nowrap text-[12.5px] text-soil">
+          <span className="font-adminmono whitespace-nowrap text-[12.5px] text-adm-muted">
             {row.original.phone}
           </span>
         ),
@@ -156,7 +156,7 @@ export function DriverTable() {
         meta: columnMeta({ at: "xl" }),
         cell: ({ row }) =>
           row.original.city ? (
-            <TextCell className="text-soil" value={row.original.city} width="label" />
+            <TextCell className="text-adm-muted" value={row.original.city} width="label" />
           ) : (
             <Absent />
           ),
@@ -183,10 +183,10 @@ export function DriverTable() {
   return (
     <div>
       <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Drivers
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           The trucking directory shipments pull their driver details from
         </p>
       </div>
@@ -268,7 +268,7 @@ export function DriverTable() {
               onPageSizeChange: (size) => setFilter("size", String(size)),
             }}
             rowHref={(d) => `${LIST}/${d.id}`}
-            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+            rowClassName={() => "h-12 hover:bg-adm-sunken"}
           />
         </AdminCard>
       )}
@@ -511,7 +511,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
           <Input
             placeholder="e.g. Yakubu Andani"
             disabled={readOnly}
-            className={cn(adminInputClass, roCls, errors.name && "border-error")}
+            className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
             {...register("name")}
           />
         </AdminField>
@@ -521,7 +521,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
               type="tel"
               placeholder="024 000 0000"
               disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.phone && "border-error")}
+              className={cn(adminInputClass, roCls, errors.phone && "border-console-red")}
               {...register("phone")}
             />
           </AdminField>
@@ -530,7 +530,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
               type="email"
               placeholder="driver@example.com"
               disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.email && "border-error")}
+              className={cn(adminInputClass, roCls, errors.email && "border-console-red")}
               {...register("email")}
             />
           </AdminField>
@@ -548,7 +548,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.company && "border-error",
+                errors.company && "border-console-red",
               )}
               {...register("company")}
             />
@@ -557,7 +557,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
             <Input
               placeholder="e.g. Tamale"
               disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.city && "border-error")}
+              className={cn(adminInputClass, roCls, errors.city && "border-console-red")}
               {...register("city")}
             />
           </AdminField>
@@ -574,7 +574,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.licenseNo && "border-error",
+                errors.licenseNo && "border-console-red",
               )}
               {...register("licenseNo")}
             />
@@ -591,7 +591,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.idNumber && "border-error",
+                errors.idNumber && "border-console-red",
               )}
               {...register("idNumber")}
             />
@@ -606,7 +606,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
               adminInputClass,
               roCls,
               "h-auto min-h-[104px] w-full resize-y py-2",
-              errors.notes && "border-error",
+              errors.notes && "border-console-red",
             )}
             {...register("notes")}
           />

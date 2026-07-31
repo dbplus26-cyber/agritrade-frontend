@@ -153,7 +153,7 @@ export function PhotoManager({
               type="button"
               onClick={dropPreview}
               disabled={isSaving}
-              className="inline-flex cursor-pointer items-center gap-1 rounded-[6px] border border-soil/25 bg-paper px-2.5 py-1.5 text-[12px] font-semibold text-soil transition-colors hover:border-console-red hover:text-console-red disabled:opacity-50"
+              className="inline-flex cursor-pointer items-center gap-1 rounded-[6px] border border-adm-line bg-adm-card px-2.5 py-1.5 text-[12px] font-semibold text-adm-muted transition-colors hover:border-console-red hover:text-console-red disabled:opacity-50"
             >
               <X className="h-3.5 w-3.5" aria-hidden="true" />
               Decline
@@ -167,7 +167,7 @@ export function PhotoManager({
               type="button"
               onClick={() => fileInput.current?.click()}
               disabled={isSaving}
-              className="inline-flex cursor-pointer items-center gap-1.5 rounded-[6px] border border-soil/25 bg-paper px-2.5 py-1.5 text-[12px] font-semibold text-soil transition-colors hover:border-console hover:text-console disabled:opacity-50"
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-[6px] border border-adm-line bg-adm-card px-2.5 py-1.5 text-[12px] font-semibold text-adm-muted transition-colors hover:border-console hover:text-console disabled:opacity-50"
             >
               <Camera className="h-3.5 w-3.5" aria-hidden="true" />
               {user.profilePicture ? "Change" : "Add photo"}
@@ -179,13 +179,13 @@ export function PhotoManager({
                 disabled={isSaving}
                 aria-label="Remove photo"
                 title="Remove photo"
-                className="flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-[6px] border border-soil/25 bg-paper text-soil/70 transition-colors hover:border-console-red hover:text-console-red disabled:opacity-50"
+                className="flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-[6px] border border-adm-line bg-adm-card text-adm-faint transition-colors hover:border-console-red hover:text-console-red disabled:opacity-50"
               >
                 <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
               </button>
             ) : null}
           </div>
-          <span className="text-[11px] text-soil/70">JPG or PNG</span>
+          <span className="text-[11px] text-adm-faint">JPG or PNG</span>
         </>
       )}
 

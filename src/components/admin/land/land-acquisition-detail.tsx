@@ -140,7 +140,7 @@ function PaymentDialog({
           <AdminField label="Amount (GHS)" error={errors.amountGhs?.message}>
             <Input
               inputMode="decimal"
-              className={cn(adminInputClass, errors.amountGhs && "border-error")}
+              className={cn(adminInputClass, errors.amountGhs && "border-console-red")}
               {...register("amountGhs")}
             />
           </AdminField>
@@ -236,7 +236,7 @@ function CancelDialog({
         >
           <AdminField label="Reason" error={errors.reason?.message}>
             <Input
-              className={cn(adminInputClass, errors.reason && "border-error")}
+              className={cn(adminInputClass, errors.reason && "border-console-red")}
               {...register("reason")}
             />
           </AdminField>
@@ -358,7 +358,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
 
   const actions =
     a.status === "NEGOTIATING" || canPay || a.status === "AGREED" || canCancel ? (
-      <div className="mt-3 border-t border-soil/12 pt-3.5">
+      <div className="mt-3 border-t border-adm-hairline pt-3.5">
         <div className="flex flex-wrap gap-2 xl:flex-col">
           {a.status === "NEGOTIATING" ? (
             <AdminButton
@@ -407,7 +407,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
       />
 
       {a.status === "COMPLETED" && a.plot ? (
-        <AdminCard className="mb-4 border-leaf/40 bg-leaf/[0.05] px-4 py-3 text-[13px] text-ink">
+        <AdminCard className="mb-4 border-leaf/40 bg-leaf/[0.05] px-4 py-3 text-[13px] text-adm-ink">
           This acquisition produced plot{" "}
           <Link
             href={`/admin/plots/${a.plot.id}`}
@@ -420,7 +420,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
       ) : null}
 
       {a.status === "CANCELLED" && a.cancelReason ? (
-        <AdminCard className="mb-4 border-error/40 bg-error/[0.04] px-4 py-3 text-[13px] text-ink">
+        <AdminCard className="mb-4 border-console-red/40 bg-console-red/[0.04] px-4 py-3 text-[13px] text-adm-ink">
           Cancelled: {a.cancelReason}
         </AdminCard>
       ) : null}
@@ -431,12 +431,12 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
             <Row label="Agreed cost" strong>
               <Money value={a.agreedCostGhs} />
             </Row>
-            <div className="border-t border-soil/12">
+            <div className="border-t border-adm-hairline">
               <Row label="Paid to seller">
                 <Money value={a.paidGhs} />
               </Row>
             </div>
-            <div className="border-t border-soil/12">
+            <div className="border-t border-adm-hairline">
               <Row label="Balance owed" strong>
                 <span
                   className={cn(
@@ -451,7 +451,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
                 </span>
               </Row>
             </div>
-            <div className="border-t border-soil/12">
+            <div className="border-t border-adm-hairline">
               <Row label="Size">
                 {a.sizeText}
                 {a.sizeAcres ? ` · ${String(a.sizeAcres)} ac` : ""}
@@ -462,24 +462,24 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
         }
         main={
           <AdminCard className="px-5 py-3">
-            <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+            <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
               Payments to seller
             </div>
             {a.payments.length === 0 ? (
-              <p className="py-2 text-[13px] text-soil">
+              <p className="py-2 text-[13px] text-adm-muted">
                 No payments recorded yet.
               </p>
             ) : (
               a.payments.map((p) => (
                 <div
                   key={p.id}
-                  className="flex items-baseline justify-between gap-3 border-b border-soil/10 py-2 last:border-b-0"
+                  className="flex items-baseline justify-between gap-3 border-b border-adm-hairline py-2 last:border-b-0"
                 >
                   <div className="min-w-0">
-                    <span className="text-ink">{p.method}</span>
+                    <span className="text-adm-ink">{p.method}</span>
                     {/* Date only: `paidAt` comes from a date picker, so its
                         time is a midnight stamp nobody chose. */}
-                    <span className="ml-2 text-[12px] text-soil">
+                    <span className="ml-2 text-[12px] text-adm-muted">
                       <DateOnlyCell value={p.paidAt} muted />
                       {p.reference ? ` · ${p.reference}` : ""}
                     </span>

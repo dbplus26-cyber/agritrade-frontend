@@ -221,14 +221,14 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
       />
 
       {!beforeDispatch ? (
-        <AdminCard className="px-5 py-4 text-[13px] text-ink">
+        <AdminCard className="px-5 py-4 text-[13px] text-adm-ink">
           This shipment has already {shipment.status.toLowerCase()} - its lot
           allocations are part of the record and can no longer be changed.
         </AdminCard>
       ) : isLoading ? (
         <LotRowsSkeleton />
       ) : lots.length === 0 ? (
-        <AdminCard className="px-5 py-4 text-[13px] text-soil">
+        <AdminCard className="px-5 py-4 text-[13px] text-adm-muted">
           No stock is available in {shipment.originWarehouse.name} for these
           sales&apos; commodities. Receive a purchase into this warehouse, or
           dispatch and let the oldest-stock fallback fill the truck (it will be
@@ -236,7 +236,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
         </AdminCard>
       ) : (
         <div className="flex flex-col gap-4">
-          <p className="text-[12.5px] text-soil">
+          <p className="text-[12.5px] text-adm-muted">
             Pick a sale, then weight the lots that fulfil it. Dispatch needs
             every sale fully allocated; stock only leaves the warehouse when you
             dispatch.
@@ -259,17 +259,17 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                   aria-selected={active}
                   onClick={() => setActiveSaleId(s.id)}
                   className={cn(
-                    "flex-none rounded-[2px] border-[1.5px] px-2.5 py-1.5 text-left outline-none focus-visible:ring-2 focus-visible:ring-console/40",
+                    "flex-none rounded-[6px] border-[1.5px] px-2.5 py-1.5 text-left outline-none focus-visible:ring-2 focus-visible:ring-console/40",
                     active
                       ? "border-forest bg-forest text-white"
-                      : "border-soil/35 bg-[#FBFCF7] text-ink hover:bg-soil/5",
+                      : "border-adm-line bg-[#FBFCF7] text-adm-ink hover:bg-soil/5",
                   )}
                 >
                   <Mono className="block text-[11.5px]">{s.transactionNo}</Mono>
                   <span
                     className={cn(
                       "block max-w-[140px] text-[11px]",
-                      active ? "text-white/80" : "text-soil/80",
+                      active ? "text-white/80" : "text-adm-muted/80",
                       "min-w-0 line-clamp-1 whitespace-normal [overflow-wrap:anywhere]",
                     )}
                   >
@@ -278,7 +278,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                   <Mono
                     className={cn(
                       "block text-[11px]",
-                      active ? "text-white/90" : "text-soil",
+                      active ? "text-white/90" : "text-adm-muted",
                     )}
                   >
                     {subtotal > 0 ? formatKg(subtotal) : "Nothing yet"}
@@ -294,7 +294,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
               to zero as the truck fills. */}
           {activeSaleLines.length > 0 ? (
             <AdminCard className="px-4 py-2.5">
-              <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 This sale needs
               </div>
               <ul className="flex flex-col gap-0.5">
@@ -310,17 +310,17 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                       key={line.commodityId}
                       className="flex flex-wrap items-baseline justify-between gap-x-3 text-[12.5px]"
                     >
-                      <span className="min-w-0 text-ink [overflow-wrap:anywhere]">
+                      <span className="min-w-0 text-adm-ink [overflow-wrap:anywhere]">
                         {line.commodityName}
                       </span>
                       <Mono
                         className={cn(
                           "text-[12px]",
                           overKeyed > 0
-                            ? "font-semibold text-error"
+                            ? "font-semibold text-console-red"
                             : stillToLoad === 0
                               ? "text-leaf"
-                              : "text-soil",
+                              : "text-adm-muted",
                         )}
                       >
                         {overKeyed > 0
@@ -339,10 +339,10 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
           {/* Auto-allocate. It only fills the INPUTS - nothing is saved until
               the admin reviews the weights and presses save. */}
           <AdminCard className="px-4 py-3">
-            <div className="mb-1.5 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+            <div className="mb-1.5 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
               Auto-allocate
             </div>
-            <p className="mb-2 text-[12.5px] text-soil">
+            <p className="mb-2 text-[12.5px] text-adm-muted">
               Fills the weights from the lots you choose to favour. Which lot is
               picked changes this trip&apos;s profit, so review before saving -
               every weight stays editable.
@@ -364,7 +364,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
               >
                 Costliest lots first
               </AdminButton>
-              <label className="flex items-center gap-1.5 text-[12.5px] text-soil">
+              <label className="flex items-center gap-1.5 text-[12.5px] text-adm-muted">
                 <span className="sr-only sm:not-sr-only">Apply to</span>
                 <select
                   aria-label="Which sales to auto-allocate"
@@ -390,7 +390,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
             {fillNote ? (
               <p
                 role="status"
-                className="mt-2 rounded-[2px] border-[1.5px] border-soil/25 bg-surface-alt/50 px-3 py-2 text-[12.5px] text-ink"
+                className="mt-2 rounded-[6px] border-[1.5px] border-adm-line bg-adm-sunken px-3 py-2 text-[12.5px] text-adm-ink"
               >
                 {fillNote}
               </p>
@@ -406,14 +406,14 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
               className={cn(adminInputClass, "h-10")}
             />
             {filtering ? (
-              <p className="mt-1 text-[12px] text-soil">
+              <p className="mt-1 text-[12px] text-adm-muted">
                 {visibleLots.length} of {lots.length} lots
               </p>
             ) : null}
           </div>
 
           {visibleLots.length === 0 ? (
-            <p className="py-3 text-[13px] text-soil">
+            <p className="py-3 text-[13px] text-adm-muted">
               No lots match this search.
             </p>
           ) : (
@@ -433,12 +433,12 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                 return (
                   <div
                     key={l.id}
-                    className="flex flex-col gap-1 border-b border-soil/10 pb-2 last:border-b-0 last:pb-0"
+                    className="flex flex-col gap-1 border-b border-adm-hairline pb-2 last:border-b-0 last:pb-0"
                   >
                     <div className="grid grid-cols-[1fr_110px] items-center gap-2">
                       <div className="min-w-0">
                         <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5">
-                          <span className="min-w-0 text-[13.5px] font-medium text-ink [overflow-wrap:anywhere]">
+                          <span className="min-w-0 text-[13.5px] font-medium text-adm-ink [overflow-wrap:anywhere]">
                             {l.commodity.name}
                           </span>
                           {onThisSaleKg > 0 ? (
@@ -447,13 +447,13 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                             </span>
                           ) : null}
                         </div>
-                        <div className="text-[12px] text-soil">
+                        <div className="text-[12px] text-adm-muted">
                           {formatKg(l.remainingKg)} available ·{" "}
                           <Money value={l.unitCostGhs} />
                           /kg
                         </div>
                         {otherSalesKg > 0 ? (
-                          <div className="text-[11.5px] text-soil/80">
+                          <div className="text-[11.5px] text-adm-muted/80">
                             {formatKg(otherSalesKg)} weighted for other sales
                           </div>
                         ) : null}
@@ -462,7 +462,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                         inputMode="decimal"
                         placeholder="kg"
                         aria-label={`Kilograms of ${l.commodity.name} for this sale`}
-                        className={cn(adminInputClass, overLot && "border-error")}
+                        className={cn(adminInputClass, overLot && "border-console-red")}
                         value={weight}
                         onChange={(e) =>
                           setWeight(activeSaleId, l.id, e.target.value)
@@ -472,7 +472,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                     {overLot ? (
                       <p
                         role="alert"
-                        className="text-[12px] font-medium text-error"
+                        className="text-[12px] font-medium text-console-red"
                       >
                         This lot carries {formatKg(lotTotalKg)} across the sales
                         but only {formatKg(l.remainingKg)} is available.
@@ -487,7 +487,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
           {serverError ? (
             <p
               role="alert"
-              className="rounded-[2px] border-[1.5px] border-error/50 bg-error/[0.06] px-3 py-2 text-[12.5px] font-medium text-error"
+              className="rounded-[6px] border-[1.5px] border-console-red/50 bg-console-red/[0.06] px-3 py-2 text-[12.5px] font-medium text-console-red"
             >
               {serverError}
             </p>
@@ -496,7 +496,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
           {/* Sticky so the running total and Save stay reachable on a phone
               without scrolling back past every lot. Lifted clear of the
               shell's fixed bottom tab bar (62px, mobile only). */}
-          <div className="sticky bottom-[62px] z-20 -mx-4 border-t-[1.5px] border-soil/30 bg-paper/95 px-4 py-3 backdrop-blur-sm md:bottom-0 md:mx-0 md:px-0">
+          <div className="sticky bottom-[62px] z-20 -mx-4 border-t-[1.5px] border-adm-line bg-adm-card/95 px-4 py-3 backdrop-blur-sm md:bottom-0 md:mx-0 md:px-0">
             <LoadMeter
               loadedKg={totalKg}
               capacityKg={shipment.truckCapacityKg}

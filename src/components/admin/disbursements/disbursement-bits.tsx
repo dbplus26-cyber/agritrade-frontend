@@ -173,7 +173,7 @@ export function TitledCard({
 }) {
   return (
     <AdminCard className={cn("px-5 py-3", className)}>
-      <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+      <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         {title}
       </div>
       {children}

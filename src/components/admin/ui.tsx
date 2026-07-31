@@ -30,12 +30,12 @@ export function DetailRow({
 }) {
   return (
     <div className="flex flex-col gap-0.5 py-2 min-[480px]:flex-row min-[480px]:items-baseline min-[480px]:justify-between min-[480px]:gap-3">
-      <span className="flex-none text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+      <span className="flex-none text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         {label}
       </span>
       <span
         className={cn(
-          "min-w-0 text-[13.5px] text-ink [overflow-wrap:anywhere] min-[480px]:text-right",
+          "min-w-0 text-[13.5px] text-adm-ink [overflow-wrap:anywhere] min-[480px]:text-right",
           mono && "font-adminmono tabular-nums",
           strong && "text-[15px] font-bold",
         )}
@@ -47,7 +47,7 @@ export function DetailRow({
 }
 
 /**
- * A single labelled fact for `DetailGrid`: stencil micro-cap label ABOVE the
+ * A single labelled fact for `DetailGrid`: micro-cap label ABOVE the
  * value so there is never a label....value gap, with a hairline under each
  * item so the grid reads as ledger lines. `mono`/`strong` mirror DetailRow.
  */
@@ -65,13 +65,13 @@ export function DetailItem({
   className?: string;
 }) {
   return (
-    <div className={cn("min-w-0 border-b border-soil/10 py-2", className)}>
-      <p className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+    <div className={cn("min-w-0 border-b border-adm-hairline py-2", className)}>
+      <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         {label}
       </p>
       <div
         className={cn(
-          "mt-0.5 min-w-0 text-[13.5px] text-ink [overflow-wrap:anywhere]",
+          "mt-0.5 min-w-0 text-[13.5px] text-adm-ink [overflow-wrap:anywhere]",
           mono && "font-adminmono tabular-nums",
           strong && "text-[15px] font-bold",
         )}
@@ -169,12 +169,12 @@ export function DetailShell({
 /** The design's six status tones — used by chips, dots and timeline marks.
  * Drawn from the brand palette so chips read in-system on paper grounds. */
 export const TONES = {
-  sky: { fg: "#33587A", bg: "#E7EDEA", dot: "#3E6B8C" },
-  leaf: { fg: "#2F5E3D", bg: "#E3EBDD", dot: "#3E7D62" },
-  harvest: { fg: "#7A611C", bg: "#F5ECD6", dot: "#D89C2E" },
-  alert: { fg: "#9B3A22", bg: "#F6E7E0", dot: "#9B3A22" },
-  slate: { fg: "#59523B", bg: "#E6EAE0", dot: "#A49B7E" },
-  forest: { fg: "#155744", bg: "#E1E9E0", dot: "#155744" },
+  sky: { fg: "#3E6B8C", bg: "#EAF1F6", dot: "#3E6B8C" },
+  leaf: { fg: "#2F5E3D", bg: "#E8F2EA", dot: "#2F5E3D" },
+  harvest: { fg: "#7A5407", bg: "#F7EED8", dot: "#B8860B" },
+  alert: { fg: "#8E2E24", bg: "#F8E9E7", dot: "#B03A2E" },
+  slate: { fg: "#4C5765", bg: "#ECEFF3", dot: "#9BA6B3" },
+  forest: { fg: "#1E3D2B", bg: "#E8F2EA", dot: "#1E3D2B" },
 } as const;
 
 export type Tone = keyof typeof TONES;
@@ -195,14 +195,14 @@ export function ToneBadge({
   return (
     <Badge
       className={cn(
-        "gap-1.5 rounded-[2px] border-transparent px-2 py-0.5 text-[11.5px] font-semibold whitespace-nowrap",
+        "gap-1.5 rounded-full border-transparent px-2.5 py-0.5 text-[10px] font-bold tracking-[0.08em] uppercase whitespace-nowrap",
         className,
       )}
       style={{ color: t.fg, background: t.bg }}
     >
       <span
         aria-hidden="true"
-        className="h-1.5 w-1.5 flex-none rounded-full"
+        className="h-[5px] w-[5px] flex-none rounded-full"
         style={{ background: t.dot }}
       />
       {children}
@@ -210,8 +210,14 @@ export function ToneBadge({
   );
 }
 
-/** Console card — shadcn Card worn as the site's filed document: paper
- * sheet, soil border, hard offset shadow (screens own padding). */
+/**
+ * Console card: a white sheet with a hairline border and the faintest lift.
+ *
+ * It used to be the public site's filed document - tinted paper, 1.5px soil
+ * border, hard offset shadow, squared corners. A page carrying six of those
+ * reads as six slabs shouting at each other; the console is read for hours and
+ * wants surfaces that sit quietly under the data. Screens own their padding.
+ */
 export function AdminCard({
   className,
   children,
@@ -222,7 +228,7 @@ export function AdminCard({
   return (
     <Card
       className={cn(
-        "shadow-doc-sm block gap-0 rounded-none border-[1.5px] border-soil/30 bg-paper py-0",
+        "block gap-0 rounded-[8px] border border-adm-line bg-adm-card py-0 shadow-[0_1px_2px_rgba(16,24,40,0.05)]",
         className,
       )}
     >
@@ -261,11 +267,11 @@ export function AdminPageHeader({
           the heading and its description were folding inside a third of a
           page whose tables and cards below them ran the full width. */}
       <div className="min-w-0 flex-1">
-        <h1 className="line-clamp-2 text-[19px] leading-[1.3] font-bold text-forest">
+        <h1 className="line-clamp-2 text-[19px] leading-[1.3] font-bold text-adm-ink">
           {title}
         </h1>
         {sub ? (
-          <p className="mt-0.5 line-clamp-2 text-[13px] text-soil" title={sub}>
+          <p className="mt-0.5 line-clamp-2 text-[13px] text-adm-muted" title={sub}>
             {sub}
           </p>
         ) : null}
@@ -315,13 +321,18 @@ export function AdminButton({
               : "default"
       }
       className={cn(
-        "h-9 gap-1.5 px-4 text-[13.5px]",
-        // Bordered but quiet: transparent until hovered — the Cancel shape.
-        variant === "outline" &&
-          "border-[1.5px] border-soil/35 text-soil shadow-none hover:translate-x-0 hover:translate-y-0 hover:bg-soil/5 hover:text-ink hover:shadow-none",
+        // Meridian controls: 34px, 6px radius, no offset shadow anywhere. The
+        // console's buttons used to shift on hover like a stamped plate, which
+        // is charming once and tiring on the fortieth click of a working day.
+        "h-[34px] gap-1.5 rounded-[6px] px-3.5 text-[13.5px] font-semibold shadow-none transition-colors hover:translate-x-0 hover:translate-y-0 hover:shadow-none",
+        variant === "primary" &&
+          "bg-console text-white hover:bg-console-hover",
+        (variant === "secondary" || variant === "outline") &&
+          "border border-adm-line bg-adm-card text-adm-body hover:bg-adm-sunken hover:text-adm-ink",
+        variant === "ghost" && "text-adm-body hover:bg-adm-sunken hover:text-adm-ink",
         variant === "danger" &&
-          "bg-console-red text-white shadow-[2.5px_2.5px_0_rgb(31_33_28/0.3)] hover:translate-x-px hover:translate-y-px hover:bg-console-red-deep hover:shadow-[1px_1px_0_rgb(31_33_28/0.3)]",
-        variant === "gold" && "bg-console text-white hover:bg-console-deep",
+          "bg-console-red text-white hover:bg-console-red-deep",
+        variant === "gold" && "bg-console-gold text-white hover:bg-console-gold-deep",
         className,
       )}
       {...props}
@@ -330,7 +341,7 @@ export function AdminButton({
 }
 
 /** Field label + control wrapper for console forms (shadcn Label inside),
- * in the document idiom of the site's enquiry form: a stencil micro-cap
+ * in the document idiom of the site's enquiry form: a micro-cap
  * label over the paper field, error/hint filed beneath. */
 export function AdminField({
   label,
@@ -350,17 +361,20 @@ export function AdminField({
 }) {
   return (
     <Label className={cn("block font-normal leading-normal", className)}>
-      <span className="stencil mb-[7px] block text-[11px] uppercase tracking-[0.14em] text-harvest-deep">
+      {/* Meridian's eyebrow: small, semibold, wide-tracked, and in the
+          neutral - a stencilled gold micro-cap belongs on the printed site,
+          not over every field of a working form. */}
+      <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.06em] text-adm-muted">
         {label}
-        {optional ? <span className="text-harvest-deep/70"> - optional</span> : null}
+        {optional ? <span className="text-adm-faint"> - optional</span> : null}
       </span>
       {children}
       {error ? (
-        <span role="alert" className="mt-1 block text-[12px] font-medium text-error">
+        <span role="alert" className="mt-1 block text-[12px] font-medium text-console-red">
           {error}
         </span>
       ) : hint ? (
-        <span className="mt-1 block text-[12.5px] font-normal text-soil">{hint}</span>
+        <span className="mt-1 block text-[12.5px] font-normal text-adm-muted">{hint}</span>
       ) : null}
     </Label>
   );
@@ -369,8 +383,13 @@ export function AdminField({
 /** The one form-control skin (the enquiry form's document field): paper
  * fill, 2px corners, 1.5px soil border, leaf focus glow, error border when
  * invalid. Layer onto shadcn Input/native selects so every field matches. */
+/**
+ * The console control: 36px tall, 6px radius, hairline border, white ground.
+ * Meridian sizes controls for density - the 42px squared field on tinted paper
+ * was a public-site form control standing in a working tool.
+ */
 export const adminInputClass =
-  "h-[42px] w-full rounded-[2px] border-[1.5px] border-soil/35 bg-[#FBFCF7] px-3.5 text-[14px] font-normal text-ink shadow-none outline-none transition-[border-color,box-shadow] placeholder:text-soil/55 focus:border-leaf focus:shadow-[0_0_0_3px_rgb(62_125_98/0.16)] focus-visible:border-leaf focus-visible:ring-0 aria-invalid:border-error";
+  "h-[36px] w-full rounded-[6px] border border-adm-line bg-adm-card px-3 text-[13.5px] font-normal text-adm-ink shadow-none outline-none transition-[border-color,box-shadow] placeholder:text-adm-faint focus:border-console focus:shadow-[0_0_0_3px_rgba(30,61,43,0.12)] focus-visible:border-console focus-visible:ring-0 aria-invalid:border-console-red";
 
 export const adminSelectClass = cn(adminInputClass, "cursor-pointer");
 

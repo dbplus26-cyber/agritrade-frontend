@@ -79,7 +79,7 @@ export function RepaymentsRegister() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-ink">
+          <Mono className="whitespace-nowrap text-[12.5px] text-adm-ink">
             {row.original.transactionNo}
           </Mono>
         ),
@@ -154,10 +154,10 @@ export function RepaymentsRegister() {
   return (
     <div>
       <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Produce repayments
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           Produce received against farmer grants, optionally taken into stock
         </p>
       </div>
@@ -229,7 +229,7 @@ export function RepaymentsRegister() {
               onPageSizeChange: (size) => setFilter("size", String(size)),
             }}
             rowHref={(r) => `${LIST}/${r.id}`}
-            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+            rowClassName={() => "h-12 hover:bg-adm-sunken"}
           />
         </AdminCard>
       )}

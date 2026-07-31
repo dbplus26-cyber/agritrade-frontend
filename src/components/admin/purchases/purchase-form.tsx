@@ -183,7 +183,7 @@ export function PurchaseCreate() {
                       label: c.name,
                     }))}
                     placeholder="Choose a commodity"
-                    className={cn(errors.commodityId && "border-error")}
+                    className={cn(errors.commodityId && "border-console-red")}
                   />
                 )}
               />
@@ -209,7 +209,7 @@ export function PurchaseCreate() {
                     }))}
                     placeholder="Choose the agent"
                     emptyText="No agents with an opened float match."
-                    className={cn(errors.agentProfileId && "border-error")}
+                    className={cn(errors.agentProfileId && "border-console-red")}
                   />
                 )}
               />
@@ -247,7 +247,7 @@ export function PurchaseCreate() {
               <Input
                 inputMode="decimal"
                 placeholder="e.g. 1200"
-                className={cn(adminInputClass, errors.weightKg && "border-error")}
+                className={cn(adminInputClass, errors.weightKg && "border-console-red")}
                 {...register("weightKg")}
               />
             </AdminField>
@@ -260,7 +260,7 @@ export function PurchaseCreate() {
                 placeholder="e.g. 4.20"
                 className={cn(
                   adminInputClass,
-                  errors.unitPriceGhs && "border-error",
+                  errors.unitPriceGhs && "border-console-red",
                 )}
                 {...register("unitPriceGhs")}
               />
@@ -268,10 +268,10 @@ export function PurchaseCreate() {
           </div>
 
           <div className="ledger-rule flex items-baseline justify-between px-0.5 py-1.5">
-            <span className="text-[11px] font-bold tracking-[0.09em] text-soil uppercase">
+            <span className="text-[11px] font-bold tracking-[0.09em] text-adm-muted uppercase">
               Total
             </span>
-            <Mono className="text-[15px] font-semibold text-ink">
+            <Mono className="text-[15px] font-semibold text-adm-ink">
               {formatCedis(totalPreview)}
             </Mono>
           </div>
@@ -309,7 +309,7 @@ export function PurchaseCreate() {
                 type="date"
                 className={cn(
                   adminInputClass,
-                  errors.purchasedAt && "border-error",
+                  errors.purchasedAt && "border-console-red",
                 )}
                 {...register("purchasedAt")}
               />
@@ -323,7 +323,7 @@ export function PurchaseCreate() {
               className={cn(
                 adminInputClass,
                 "h-auto min-h-[60px] w-full resize-y py-2",
-                errors.notes && "border-error",
+                errors.notes && "border-console-red",
               )}
               {...register("notes")}
             />
@@ -342,10 +342,10 @@ export function PurchaseCreate() {
                   width={56}
                   height={56}
                   unoptimized
-                  className="h-14 w-14 rounded border border-soil/25 object-cover"
+                  className="h-14 w-14 rounded border border-adm-line object-cover"
                 />
               ) : (
-                <div className="flex h-14 w-14 items-center justify-center rounded border border-dashed border-soil/35 text-[10px] text-soil/60">
+                <div className="flex h-14 w-14 items-center justify-center rounded border border-dashed border-adm-line text-[10px] text-adm-faint">
                   No photo
                 </div>
               )}

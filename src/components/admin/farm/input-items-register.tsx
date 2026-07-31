@@ -85,7 +85,7 @@ export function InputItemsRegister() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <span className="text-[12.5px] text-soil">{row.original.unitLabel}</span>
+          <span className="text-[12.5px] text-adm-muted">{row.original.unitLabel}</span>
         ),
       },
       {
@@ -110,10 +110,10 @@ export function InputItemsRegister() {
   return (
     <div>
       <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Input items
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           The catalogue of inputs granted to farmers (seed, fertiliser, cash)
         </p>
       </div>
@@ -185,7 +185,7 @@ export function InputItemsRegister() {
               onPageSizeChange: (size) => setFilter("size", String(size)),
             }}
             rowHref={(i) => `${LIST}/${i.id}/edit`}
-            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+            rowClassName={() => "h-12 hover:bg-adm-sunken"}
           />
         </AdminCard>
       )}

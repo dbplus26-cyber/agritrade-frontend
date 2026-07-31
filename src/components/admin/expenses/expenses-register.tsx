@@ -113,7 +113,7 @@ export function ExpensesRegister() {
           row.original.shipment ? (
             <ToneBadge tone="sky">{row.original.shipment.truckReg}</ToneBadge>
           ) : (
-            <span className="text-soil/60">Operating</span>
+            <span className="text-adm-faint">Operating</span>
           ),
         // Hiding belongs on `className`, which the table applies to BOTH th and
         // td — `headerClassName` reaches only the header, which would hide the
@@ -275,10 +275,10 @@ export function ExpensesRegister() {
               does not change as you page. */}
           {showMoney && windowTotal !== null && windowTotal !== undefined ? (
             <div className="mb-3 flex items-baseline gap-2">
-              <span className="text-[11px] font-bold tracking-[0.08em] text-soil uppercase">
+              <span className="text-[11px] font-bold tracking-[0.08em] text-adm-muted uppercase">
                 Total for this view
               </span>
-              <Mono className="text-[16px] font-bold text-ink">
+              <Mono className="text-[16px] font-bold text-adm-ink">
                 {formatCedis(windowTotal)}
               </Mono>
             </div>

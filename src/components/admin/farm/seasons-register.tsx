@@ -69,7 +69,7 @@ export function SeasonsRegister() {
         cell: ({ row }) => (
           <Link
             href={`/admin/seasons/${row.original.id}`}
-            className="block font-semibold text-ink outline-none focus-visible:underline"
+            className="block font-semibold text-adm-ink outline-none focus-visible:underline"
             onClick={(e) => { e.stopPropagation(); }}
           >
             {row.original.name}
@@ -112,10 +112,10 @@ export function SeasonsRegister() {
   return (
     <div>
       <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Seasons
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           Farming seasons that grants and repayments are booked against
         </p>
       </div>
@@ -189,7 +189,7 @@ export function SeasonsRegister() {
               onPageSizeChange: (size) => setFilter("size", String(size)),
             }}
             rowHref={(s) => `${LIST}/${s.id}`}
-            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+            rowClassName={() => "h-12 hover:bg-adm-sunken"}
           />
         </AdminCard>
       )}

@@ -230,7 +230,7 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
             placeholder="e.g. White Maize"
             disabled={readOnly}
             maxLength={COMMODITY_NAME_MAX}
-            className={cn(adminInputClass, roCls, errors.name && "border-error")}
+            className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
             {...register("name")}
           />
         </AdminField>
@@ -247,7 +247,7 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.variety && "border-error",
+                errors.variety && "border-console-red",
               )}
               {...register("variety")}
             />
@@ -263,7 +263,7 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.qualityGrade && "border-error",
+                errors.qualityGrade && "border-console-red",
               )}
               {...register("qualityGrade")}
             />
@@ -284,7 +284,7 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
                 adminInputClass,
                 roCls,
                 "font-adminmono",
-                errors.bagWeightKg && "border-error",
+                errors.bagWeightKg && "border-console-red",
               )}
               {...register("bagWeightKg")}
             />
@@ -303,7 +303,7 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
                 adminInputClass,
                 roCls,
                 "font-adminmono",
-                errors.sortOrder && "border-error",
+                errors.sortOrder && "border-console-red",
               )}
               {...register("sortOrder")}
             />
@@ -323,7 +323,7 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
               adminInputClass,
               roCls,
               "h-auto min-h-[104px] w-full resize-y py-2",
-              errors.description && "border-error",
+              errors.description && "border-console-red",
             )}
             {...register("description")}
           />
@@ -340,10 +340,10 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
               <img
                 src={previewUrl}
                 alt="Commodity photo"
-                className="h-14 w-14 flex-none rounded-[4px] border border-soil/25 object-cover"
+                className="h-14 w-14 flex-none rounded-[4px] border border-adm-line object-cover"
               />
             ) : (
-              <span className="flex h-14 w-14 flex-none items-center justify-center rounded-[4px] border border-dashed border-soil/35 text-[10px] text-soil/60">
+              <span className="flex h-14 w-14 flex-none items-center justify-center rounded-[4px] border border-dashed border-adm-line text-[10px] text-adm-faint">
                 No photo
               </span>
             )}
@@ -472,10 +472,10 @@ export function CommodityEdit({ id }: { id: string }) {
       <AdminCard className="mt-4 px-5 py-4">
         <label className="flex cursor-pointer items-center justify-between gap-3">
           <span>
-            <span className="block text-[13px] font-semibold text-ink">
+            <span className="block text-[13px] font-semibold text-adm-ink">
               Show on website
             </span>
-            <span className="block text-[12px] text-soil">
+            <span className="block text-[12px] text-adm-muted">
               The site lists it as available while stock is on hand - never
               quantities. Inactive commodities cannot be published.
             </span>

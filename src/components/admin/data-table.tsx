@@ -148,7 +148,7 @@ export function ConsoleDataTable<TData>({
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all rows on this page"
-          className="cursor-pointer border-soil/35"
+          className="cursor-pointer border-adm-strong"
         />
       ),
       cell: ({ row }) => (
@@ -157,7 +157,7 @@ export function ConsoleDataTable<TData>({
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           onClick={(e) => e.stopPropagation()}
           aria-label="Select row"
-          className="cursor-pointer border-soil/35"
+          className="cursor-pointer border-adm-strong"
         />
       ),
       enableSorting: false,
@@ -219,7 +219,7 @@ export function ConsoleDataTable<TData>({
     return (
       <div className={cn("@container/table min-w-0", className)}>
         {emptyState ?? (
-          <div className="px-4 py-12 text-center text-[13px] text-soil">
+          <div className="px-4 py-12 text-center text-[13px] text-adm-muted">
             Nothing here yet.
           </div>
         )}
@@ -230,8 +230,8 @@ export function ConsoleDataTable<TData>({
   return (
     <div className={cn("@container/table min-w-0", className)}>
       {enableSelection && selectedRows.length > 0 && renderBulkActions ? (
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-soil/25 bg-console/5 px-4 py-2">
-          <span className="text-[12.5px] font-semibold text-soil">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-adm-line bg-adm-sunken px-4 py-2">
+          <span className="text-[12.5px] font-semibold text-adm-body">
             {selectedRows.length} selected
           </span>
           <div className="flex items-center gap-2">
@@ -261,7 +261,7 @@ export function ConsoleDataTable<TData>({
       >
         {rows.length === 0
           ? (emptyState ?? (
-              <div className="px-4 py-12 text-center text-[13px] text-soil">
+              <div className="px-4 py-12 text-center text-[13px] text-adm-muted">
                 Nothing here yet.
               </div>
             ))
@@ -288,8 +288,8 @@ export function ConsoleDataTable<TData>({
                   className={cn(
                     // Squared with a 1.5px border to match AdminCard, the
                     // surface every other console screen is filed on.
-                    "rounded-none border-[1.5px] border-soil/30 bg-paper px-3 py-2 data-[state=selected]:border-console/40 data-[state=selected]:bg-console/5",
-                    href && "cursor-pointer hover:border-soil/40",
+                    "rounded-[8px] border border-adm-line bg-adm-card px-3.5 py-2.5 shadow-[0_1px_2px_rgba(16,24,40,0.05)] data-[state=selected]:border-console/40 data-[state=selected]:bg-console/5",
+                    href && "cursor-pointer hover:border-adm-strong",
                   )}
                 >
                   {selectCell ? (
@@ -313,10 +313,10 @@ export function ConsoleDataTable<TData>({
                     return (
                       <div
                         key={cell.id}
-                        className="flex items-start justify-between gap-3 border-b border-soil/10 py-1.5 text-[13px] last:border-b-0"
+                        className="flex items-start justify-between gap-3 border-b border-adm-hairline py-1.5 text-[13px] last:border-b-0"
                       >
                         {label ? (
-                          <span className="flex-none pt-px text-[11px] font-semibold tracking-[0.05em] text-soil/70 uppercase">
+                          <span className="flex-none pt-px text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                             {label}
                           </span>
                         ) : null}
@@ -327,7 +327,7 @@ export function ConsoleDataTable<TData>({
                             content ran straight off the side of the card. */}
                         <span
                           className={cn(
-                            "block min-w-0 [overflow-wrap:anywhere] text-ink",
+                            "block min-w-0 [overflow-wrap:anywhere] text-adm-body",
                             label ? "text-right" : "w-full",
                           )}
                         >
@@ -340,7 +340,7 @@ export function ConsoleDataTable<TData>({
                     );
                   })}
                   {actionCells.length > 0 ? (
-                    <div className="mt-1.5 flex flex-wrap justify-end gap-1.5 border-t border-soil/10 pt-1.5">
+                    <div className="mt-1.5 flex flex-wrap justify-end gap-1.5 border-t border-adm-hairline pt-1.5">
                       {actionCells.map((cell) => (
                         <span key={cell.id}>
                           {flexRender(
@@ -370,7 +370,7 @@ export function ConsoleDataTable<TData>({
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow
               key={headerGroup.id}
-              className="border-soil/25 hover:bg-transparent"
+              className="border-adm-line bg-adm-sunken hover:bg-adm-sunken"
             >
               {headerGroup.headers.map((header) => {
                 const meta = header.column.columnDef.meta;
@@ -380,7 +380,7 @@ export function ConsoleDataTable<TData>({
                   <TableHead
                     key={header.id}
                     className={cn(
-                      "h-auto px-3 py-2.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-soil/70",
+                      "h-[38px] px-3 text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted",
                       sortable && "cursor-pointer select-none",
                       meta?.className,
                       meta?.headerClassName,
@@ -407,7 +407,7 @@ export function ConsoleDataTable<TData>({
             <TableRow className="hover:bg-transparent">
               <TableCell colSpan={allColumns.length} className="p-0">
                 {emptyState ?? (
-                  <div className="px-4 py-12 text-center text-[13px] text-soil">
+                  <div className="px-4 py-12 text-center text-[13px] text-adm-muted">
                     Nothing here yet.
                   </div>
                 )}
@@ -422,8 +422,8 @@ export function ConsoleDataTable<TData>({
                   data-state={row.getIsSelected() ? "selected" : undefined}
                   onClick={href ? () => router.push(href) : undefined}
                   className={cn(
-                    "border-soil/15 data-[state=selected]:bg-console/5",
-                    href && "cursor-pointer hover:bg-surface-alt/70",
+                    "border-adm-hairline data-[state=selected]:bg-console/5",
+                    href && "cursor-pointer hover:bg-adm-hover",
                     rowClassName?.(row.original),
                   )}
                 >
@@ -437,7 +437,7 @@ export function ConsoleDataTable<TData>({
                         // height, and the table stops being scannable. Cells
                         // that want a single line clamp themselves; this is
                         // the backstop for the ones that do not.
-                        "px-3 py-3 text-[13.5px] text-ink [&_p]:line-clamp-2",
+                        "px-3 py-2.5 text-[13px] text-adm-body [&_p]:line-clamp-2",
                         cell.column.columnDef.meta?.className,
                       )}
                     >
@@ -474,7 +474,7 @@ export function ConsoleDataTable<TData>({
           }
         />
       ) : total > 0 ? (
-        <div className="border-t border-soil/25 px-4 py-2.5 text-[12.5px] text-soil">
+        <div className="border-t border-adm-line px-4 py-2.5 text-[12.5px] text-adm-muted">
           {total} {itemNoun}
         </div>
       ) : null}

@@ -66,23 +66,23 @@ export function Waybill({ id }: { id: string }) {
       {/* Left-aligned like every other console page - the sheet keeps its own
           720px measure so it still reads as a piece of paper. Squared and
           1.5px-bordered to match AdminCard. */}
-      <div className="max-w-[720px] border-[1.5px] border-soil/30 bg-white p-8 text-ink print:max-w-none print:border-0 print:p-0">
+      <div className="max-w-[720px] border-[1.5px] border-adm-line bg-white p-8 text-adm-ink print:max-w-none print:border-0 print:p-0">
         <div className="flex items-start justify-between border-b-2 border-ink pb-3">
           <div>
             <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">
               DB PLUS
             </div>
-            <div className="text-[11px] tracking-[0.06em] text-soil uppercase">
+            <div className="text-[11px] tracking-[0.06em] text-adm-muted uppercase">
               Trading · Tamale
             </div>
           </div>
           <div className="text-right">
             <div className="text-[16px] font-bold">WAYBILL</div>
-            <div className="text-[12px] text-soil">Ref {s.transactionNo}</div>
-            <div className="max-w-[260px] text-[12px] text-soil [overflow-wrap:anywhere]">
+            <div className="text-[12px] text-adm-muted">Ref {s.transactionNo}</div>
+            <div className="max-w-[260px] text-[12px] text-adm-muted [overflow-wrap:anywhere]">
               Sales: {s.sales.map((sale) => sale.transactionNo).join(", ")}
             </div>
-            <div className="text-[12px] text-soil">
+            <div className="text-[12px] text-adm-muted">
               {s.departedAt
                 ? formatShipmentDate(s.departedAt)
                 : formatShipmentDate(s.createdAt)}
@@ -92,7 +92,7 @@ export function Waybill({ id }: { id: string }) {
 
         <div className="mt-4 grid grid-cols-2 gap-4 text-[13px]">
           <div>
-            <div className="mb-1 text-[10.5px] font-bold tracking-[0.08em] text-soil uppercase">
+            <div className="mb-1 text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
               {s.sales.length === 1 ? "Buyer" : "Buyers"}
             </div>
             {s.sales.length === 1 ? (
@@ -112,7 +112,7 @@ export function Waybill({ id }: { id: string }) {
             <div className="mt-1">Destination: {s.destination}</div>
           </div>
           <div>
-            <div className="mb-1 text-[10.5px] font-bold tracking-[0.08em] text-soil uppercase">
+            <div className="mb-1 text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
               Transport
             </div>
             <div>From: {s.originWarehouse.name}</div>
@@ -133,7 +133,7 @@ export function Waybill({ id }: { id: string }) {
           </thead>
           <tbody>
             {s.manifest.map((m) => (
-              <tr key={m.commodity} className="border-b border-soil/30">
+              <tr key={m.commodity} className="border-b border-adm-line">
                 <td className="py-2">{m.commodity}</td>
                 <td className="py-2 text-right">{formatKg(m.weightKg)}</td>
               </tr>

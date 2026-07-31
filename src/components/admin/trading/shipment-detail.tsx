@@ -86,7 +86,7 @@ const LIST = "/admin/shipments";
  * truck worth nagging about. */
 const UNDER_FILL_SHARE = 0.05;
 
-const Absent = () => <span className="text-soil/50">Not provided</span>;
+const Absent = () => <span className="text-adm-faint">Not provided</span>;
 
 /**
  * What this truck is due to carry, straight from the server. `totalWeightKg`
@@ -175,7 +175,7 @@ function ExpenseDialog({
           <AdminField label="Amount (GHS)" error={errors.amountGhs?.message}>
             <Input
               inputMode="decimal"
-              className={cn(adminInputClass, errors.amountGhs && "border-error")}
+              className={cn(adminInputClass, errors.amountGhs && "border-console-red")}
               {...register("amountGhs")}
             />
           </AdminField>
@@ -264,21 +264,21 @@ function AddSalesDialog({
         />
 
         {eligible.isLoading ? (
-          <p className="py-3 text-[13px] text-soil">Loading shippable sales…</p>
+          <p className="py-3 text-[13px] text-adm-muted">Loading shippable sales…</p>
         ) : eligible.isError ? (
-          <p className="py-3 text-[13px] text-error">
+          <p className="py-3 text-[13px] text-console-red">
             Couldn&apos;t load the shippable sales. Reload and try again.
           </p>
         ) : sales.length === 0 ? (
-          <p className="py-3 text-[13px] text-soil">
+          <p className="py-3 text-[13px] text-adm-muted">
             No other sale is ready to ship right now.
           </p>
         ) : (
-          <div className="max-h-[46dvh] overflow-y-auto rounded-[2px] border-[1.5px] border-soil/25">
+          <div className="max-h-[46dvh] overflow-y-auto rounded-[6px] border-[1.5px] border-adm-line">
             {sales.map((s) => (
               <label
                 key={s.id}
-                className="flex cursor-pointer items-start gap-2.5 border-b border-soil/10 px-3 py-2 last:border-b-0 hover:bg-soil/5"
+                className="flex cursor-pointer items-start gap-2.5 border-b border-adm-hairline px-3 py-2 last:border-b-0 hover:bg-soil/5"
               >
                 <input
                   type="checkbox"
@@ -291,14 +291,14 @@ function AddSalesDialog({
                     <Mono className="block text-[12.5px] text-console">
                       {s.transactionNo}
                     </Mono>
-                    <Mono className="flex-none text-[12.5px] font-bold text-ink">
+                    <Mono className="flex-none text-[12.5px] font-bold text-adm-ink">
                       {formatKg(s.totalRemainingKg)}
                     </Mono>
                   </span>
-                  <span className="block min-w-0 text-[13px] text-ink [overflow-wrap:anywhere]">
+                  <span className="block min-w-0 text-[13px] text-adm-ink [overflow-wrap:anywhere]">
                     {s.buyer.name}
                   </span>
-                  <span className="mt-0.5 block text-[12px] text-soil">
+                  <span className="mt-0.5 block text-[12px] text-adm-muted">
                     {s.lines.map((l) => (
                       <span
                         key={l.commodityId}
@@ -317,7 +317,7 @@ function AddSalesDialog({
         {serverError ? (
           <p
             role="alert"
-            className="rounded-[2px] border-[1.5px] border-error/50 bg-error/[0.06] px-3 py-2 text-[12.5px] font-medium text-error"
+            className="rounded-[6px] border-[1.5px] border-console-red/50 bg-console-red/[0.06] px-3 py-2 text-[12.5px] font-medium text-console-red"
           >
             {serverError}
           </p>
@@ -393,7 +393,7 @@ function CancelDialog({
         >
           <AdminField label="Reason" error={errors.reason?.message}>
             <Input
-              className={cn(adminInputClass, errors.reason && "border-error")}
+              className={cn(adminInputClass, errors.reason && "border-console-red")}
               {...register("reason")}
             />
           </AdminField>
@@ -483,7 +483,7 @@ function VoidExpenseDialog({
         >
           <AdminField label="Reason" error={errors.reason?.message}>
             <Input
-              className={cn(adminInputClass, errors.reason && "border-error")}
+              className={cn(adminInputClass, errors.reason && "border-console-red")}
               {...register("reason")}
             />
           </AdminField>
@@ -766,7 +766,7 @@ export function ShipmentDetail({ id }: { id: string }) {
           multi-sale trip reads as distinct orders, not one run-on list. */}
       <AdminCard className="px-5 py-3">
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-          <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+          <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
             Sales on this trip · {s.salesCount} sale
             {s.salesCount === 1 ? "" : "s"}
           </span>
@@ -791,7 +791,7 @@ export function ShipmentDetail({ id }: { id: string }) {
               loadedLabel="Planned"
             />
             {underFilled ? (
-              <p className="mt-1.5 text-[12.5px] font-medium text-harvest-deep">
+              <p className="mt-1.5 text-[12.5px] font-medium text-adm-muted">
                 This truck has {formatKg(roomLeftKg)} of room left. Add another
                 sale before it rolls, or send it part-loaded if that is the
                 plan.
@@ -813,10 +813,10 @@ export function ShipmentDetail({ id }: { id: string }) {
             return (
               <div
                 key={sale.id}
-                className="rounded-[2px] border-[1.5px] border-soil/25 bg-surface-alt/40 px-3.5 py-2.5"
+                className="rounded-[6px] border-[1.5px] border-adm-line bg-adm-sunken px-3.5 py-2.5"
               >
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                  <span className="font-adminmono text-[11px] text-soil/70 tabular-nums">
+                  <span className="font-adminmono text-[11px] text-adm-faint tabular-nums">
                     {String(index + 1).padStart(2, "0")}
                   </span>
                   <Link
@@ -841,17 +841,17 @@ export function ShipmentDetail({ id }: { id: string }) {
                     ) : null}
                   </span>
                 </div>
-                <div className="mt-1 min-w-0 text-[13px] font-semibold text-ink [overflow-wrap:anywhere]">
+                <div className="mt-1 min-w-0 text-[13px] font-semibold text-adm-ink [overflow-wrap:anywhere]">
                   {sale.buyer.name}
                   {sale.buyer.phone ? (
-                    <span className="font-normal text-soil">
+                    <span className="font-normal text-adm-muted">
                       {" "}
                       · {sale.buyer.phone}
                     </span>
                   ) : null}
                 </div>
-                <div className="mt-1.5 border-t border-soil/15 pt-1.5">
-                  <Mono className="text-[12.5px] text-soil">
+                <div className="mt-1.5 border-t border-adm-hairline pt-1.5">
+                  <Mono className="text-[12.5px] text-adm-muted">
                     Agreed <Money compact value={sale.agreedTotalGhs} /> · Paid{" "}
                     <Money compact value={sale.paidGhs} /> · Balance{" "}
                     <span
@@ -874,7 +874,7 @@ export function ShipmentDetail({ id }: { id: string }) {
 
       {/* Logistics */}
       <AdminCard className="px-5 py-3">
-        <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+        <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
           Logistics
         </p>
         <DetailGrid>
@@ -922,7 +922,7 @@ export function ShipmentDetail({ id }: { id: string }) {
 
       {/* Driver */}
       <AdminCard className="px-5 py-3">
-        <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+        <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
           Driver
         </p>
         <DetailGrid>
@@ -958,11 +958,11 @@ export function ShipmentDetail({ id }: { id: string }) {
 
       {/* Allocations */}
       <AdminCard className="px-5 py-3">
-        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
           Loaded lots
         </div>
         {s.allocations.length === 0 ? (
-          <p className="py-2 text-[13px] text-soil">
+          <p className="py-2 text-[13px] text-adm-muted">
             No lots allocated yet. Dispatching without allocations auto-fills
             from the oldest stock (flagged estimated).
           </p>
@@ -970,11 +970,11 @@ export function ShipmentDetail({ id }: { id: string }) {
           s.allocations.map((a) => (
             <div
               key={a.id}
-              className="flex items-baseline justify-between gap-3 border-b border-soil/10 py-2 last:border-b-0"
+              className="flex items-baseline justify-between gap-3 border-b border-adm-hairline py-2 last:border-b-0"
             >
               <div className="min-w-0">
-                <span className="font-medium text-ink">{a.commodity.name}</span>
-                <Mono className="ml-2 text-[12px] text-soil">
+                <span className="font-medium text-adm-ink">{a.commodity.name}</span>
+                <Mono className="ml-2 text-[12px] text-adm-muted">
                   {formatKg(a.weightKg)} @{" "}
                   <Money value={a.unitCostSnapshotGhs} />
                 </Mono>
@@ -982,7 +982,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                   {a.sale.transactionNo}
                 </Mono>
               </div>
-              <Mono className="whitespace-nowrap text-[13px] text-ink">
+              <Mono className="whitespace-nowrap text-[13px] text-adm-ink">
                 <Money value={a.lineCostGhs} />
               </Mono>
             </div>
@@ -992,20 +992,20 @@ export function ShipmentDetail({ id }: { id: string }) {
 
       {/* Documents */}
       <AdminCard className="px-5 py-3">
-        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
           Documents (private)
         </div>
-        <p className="mb-2 text-[12px] text-soil">
+        <p className="mb-2 text-[12px] text-adm-muted">
           Download the waybill, sign it with the driver, then upload the signed
           copy before dispatch. Downloads are logged.
         </p>
         {s.documents.length === 0 ? (
-          <p className="py-1 text-[13px] text-soil">No documents on file.</p>
+          <p className="py-1 text-[13px] text-adm-muted">No documents on file.</p>
         ) : (
           s.documents.map((doc) => (
             <div
               key={doc.id}
-              className="flex items-center justify-between gap-3 border-b border-soil/10 py-2 text-[13px] last:border-b-0"
+              className="flex items-center justify-between gap-3 border-b border-adm-hairline py-2 text-[13px] last:border-b-0"
             >
               <a
                 href={shipmentDocumentUrl(s.id, doc.id)}
@@ -1016,7 +1016,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                 {doc.name}
               </a>
               <div className="flex flex-none items-center gap-3">
-                <Mono className="text-right text-[12px] text-soil">
+                <Mono className="text-right text-[12px] text-adm-muted">
                   <DateTimeCell value={doc.createdAt} muted />
                 </Mono>
                 {beforeDispatch ? (
@@ -1041,7 +1041,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                 onChange={(e) => setDocName(e.target.value)}
                 placeholder="Document name"
                 aria-label="Document name"
-                className="h-8 min-w-[160px] flex-1 rounded border border-soil/25 bg-paper px-2.5 text-[13px]"
+                className="h-8 min-w-[160px] flex-1 rounded border border-adm-line bg-adm-card px-2.5 text-[13px]"
               />
               <FilePicker
                 accept="image/*,application/pdf"
@@ -1053,7 +1053,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                 triggerLabel="Choose document"
               />
             </div>
-            <div className="mt-3 border-t border-soil/12 pt-3">
+            <div className="mt-3 border-t border-adm-hairline pt-3">
               <button
                 type="button"
                 onClick={() => setSigning((v) => !v)}
@@ -1073,7 +1073,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                       void onUploadDocument(file).catch(() => undefined);
                     }}
                   />
-                  <p className="mt-1 text-[11.5px] text-soil/70">
+                  <p className="mt-1 text-[11.5px] text-adm-faint">
                     Saves as &quot;{docName.trim() || "Signed waybill"}&quot; -
                     hand the phone to the driver to sign right here.
                   </p>
@@ -1087,7 +1087,7 @@ export function ShipmentDetail({ id }: { id: string }) {
       {/* Expenses */}
       <AdminCard className="px-5 py-3">
         <div className="mb-1 flex items-center justify-between">
-          <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+          <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
             Expenses
           </span>
           <AdminButton
@@ -1099,12 +1099,12 @@ export function ShipmentDetail({ id }: { id: string }) {
           </AdminButton>
         </div>
         {s.expenses.length === 0 ? (
-          <p className="py-2 text-[13px] text-soil">No expenses recorded.</p>
+          <p className="py-2 text-[13px] text-adm-muted">No expenses recorded.</p>
         ) : (
           s.expenses.map((e) => (
             <div
               key={e.id}
-              className="flex items-baseline justify-between gap-3 border-b border-soil/10 py-2 last:border-b-0"
+              className="flex items-baseline justify-between gap-3 border-b border-adm-hairline py-2 last:border-b-0"
             >
               {/* The category leads; its note follows on a quieter second
                   line, clamped to two. Run inline and unclamped, a full-length
@@ -1112,12 +1112,12 @@ export function ShipmentDetail({ id }: { id: string }) {
                   buried the amounts the list exists to show. The full text
                   stays one hover away. */}
               <div className="min-w-0">
-                <span className="block truncate text-ink">
+                <span className="block truncate text-adm-ink">
                   {e.category.name}
                 </span>
                 {e.description ? (
                   <span
-                    className="mt-0.5 line-clamp-2 text-[12px] text-soil"
+                    className="mt-0.5 line-clamp-2 text-[12px] text-adm-muted"
                     title={e.description}
                   >
                     {e.description}
@@ -1125,7 +1125,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                 ) : null}
               </div>
               <div className="flex items-center gap-3">
-                <Mono className="whitespace-nowrap text-[13px] text-ink">
+                <Mono className="whitespace-nowrap text-[13px] text-adm-ink">
                   <Money value={e.amountGhs} />
                 </Mono>
                 {/* Voiding is owner-only (like the general expense void):
@@ -1150,7 +1150,7 @@ export function ShipmentDetail({ id }: { id: string }) {
 
   const aside = (
     <AdminCard className="px-5 py-3">
-      <div className="mb-1 flex items-center gap-2 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+      <div className="mb-1 flex items-center gap-2 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         Profit <CostBasisBadge basis={s.profit.costBasis} />
       </div>
       <DetailGrid columns={2}>
@@ -1167,7 +1167,7 @@ export function ShipmentDetail({ id }: { id: string }) {
           <Money value={s.profit.profitGhs} />
         </DetailItem>
       </DetailGrid>
-      <div className="mt-3 border-t border-soil/12 pt-3.5">{actions}</div>
+      <div className="mt-3 border-t border-adm-hairline pt-3.5">{actions}</div>
     </AdminCard>
   );
 
@@ -1186,7 +1186,7 @@ export function ShipmentDetail({ id }: { id: string }) {
       />
 
       {s.status === "CANCELLED" && s.cancelReason ? (
-        <AdminCard className="mb-4 border-error/40 bg-error/[0.04] px-4 py-3 text-[13px] text-ink">
+        <AdminCard className="mb-4 border-console-red/40 bg-console-red/[0.04] px-4 py-3 text-[13px] text-adm-ink">
           Cancelled: {s.cancelReason}
         </AdminCard>
       ) : null}

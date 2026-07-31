@@ -179,7 +179,7 @@ export function PaymentDialog({
             the screen. Money may be redacted (null): `Money` prints the
             placeholder, never the word "null". */}
         {detailQuery.isLoading ? (
-          <div className="border-[1.5px] border-soil/25 bg-surface-alt/50 px-3.5 py-3">
+          <div className="border-[1.5px] border-adm-line bg-adm-sunken px-3.5 py-3">
             <div className="flex items-end justify-between gap-4">
               <div className="flex-1">
                 <Skeleton className="h-3.5 w-28" />
@@ -190,24 +190,24 @@ export function PaymentDialog({
             <Skeleton className="mt-3 h-3 w-2/3" />
           </div>
         ) : detail ? (
-          <div className="border-[1.5px] border-soil/25 bg-surface-alt/50">
+          <div className="border-[1.5px] border-adm-line bg-adm-sunken">
             <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2 px-3.5 py-3">
               <div className="min-w-0">
                 <Mono className="block text-[13px] font-semibold text-console">
                   {detail.transactionNo}
                 </Mono>
-                <span className="block truncate text-[12.5px] text-soil">
+                <span className="block truncate text-[12.5px] text-adm-muted">
                   {detail.buyer.name}
                 </span>
               </div>
               <div className="text-right">
-                <span className="stencil block text-[9.5px] tracking-[0.14em] text-harvest-deep uppercase">
+                <span className="block text-[9.5px] tracking-[0.14em] text-adm-muted uppercase">
                   {detail.fullyPaid ? "Settled" : "Balance"}
                 </span>
                 <Mono
                   className={cn(
                     "block text-[20px] leading-tight font-bold",
-                    detail.balanceGhs === 0 ? "text-leaf" : "text-ink",
+                    detail.balanceGhs === 0 ? "text-leaf" : "text-adm-ink",
                   )}
                 >
                   <Money value={detail.balanceGhs} />
@@ -217,11 +217,11 @@ export function PaymentDialog({
 
             {/* The schedule and the dispatch gate: supporting detail, so it
                 sits under a rule rather than competing with the balance. */}
-            <div className="flex flex-col gap-1 border-t border-soil/15 px-3.5 py-2.5 text-[12.5px]">
+            <div className="flex flex-col gap-1 border-t border-adm-hairline px-3.5 py-2.5 text-[12.5px]">
               {detail.paidGhs !== null ? (
                 <p className="flex items-baseline justify-between gap-3">
-                  <span className="text-soil">Paid so far</span>
-                  <Mono className="text-ink">
+                  <span className="text-adm-muted">Paid so far</span>
+                  <Mono className="text-adm-ink">
                     <Money value={detail.paidGhs} />
                   </Mono>
                 </p>
@@ -233,14 +233,14 @@ export function PaymentDialog({
                       key={`${m.label}-${i}`}
                       className="flex items-baseline justify-between gap-3"
                     >
-                      <span className="min-w-0 text-soil [overflow-wrap:anywhere]">
+                      <span className="min-w-0 text-adm-muted [overflow-wrap:anywhere]">
                         {m.label}{" "}
-                        <span className="whitespace-nowrap text-soil/70">
+                        <span className="whitespace-nowrap text-adm-faint">
                           · {m.percent}% · {milestoneTriggerLabel(m.trigger)}
                         </span>
                       </span>
                       {m.amountGhs !== null ? (
-                        <Mono className="flex-none text-ink">
+                        <Mono className="flex-none text-adm-ink">
                           <Money compact value={m.amountGhs} />
                         </Mono>
                       ) : null}
@@ -248,7 +248,7 @@ export function PaymentDialog({
                   ))}
                 </ul>
               ) : (
-                <p className="text-soil">No payment schedule on this sale.</p>
+                <p className="text-adm-muted">No payment schedule on this sale.</p>
               )}
               {detail.requiredBeforeLoadingGhs !== null ? (
                 <p
@@ -271,7 +271,7 @@ export function PaymentDialog({
             </div>
           </div>
         ) : detailQuery.isError ? (
-          <p className="text-[12.5px] text-soil">
+          <p className="text-[12.5px] text-adm-muted">
             Couldn&apos;t load the payment schedule - you can still record the
             payment.
           </p>
@@ -289,7 +289,7 @@ export function PaymentDialog({
             <div className="relative">
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-[15px] font-semibold text-soil/70"
+                className="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-[15px] font-semibold text-adm-faint"
               >
                 GH₵
               </span>
@@ -299,7 +299,7 @@ export function PaymentDialog({
                 className={cn(
                   adminInputClass,
                   "font-adminmono h-[54px] pl-[54px] text-[20px] font-bold tabular-nums",
-                  errors.amountGhs && "border-error",
+                  errors.amountGhs && "border-console-red",
                 )}
                 {...register("amountGhs")}
               />
@@ -321,12 +321,12 @@ export function PaymentDialog({
                   key={f.key}
                   type="button"
                   onClick={() => fillAmount(f.amount)}
-                  className="flex w-full cursor-pointer flex-col items-start gap-0.5 rounded-[2px] border-[1.5px] border-soil/30 bg-paper px-3 py-2 text-left transition-colors outline-none hover:border-console hover:bg-console/[0.04] focus-visible:border-console focus-visible:ring-3 focus-visible:ring-leaf/30"
+                  className="flex w-full cursor-pointer flex-col items-start gap-0.5 rounded-[6px] border-[1.5px] border-adm-line bg-adm-card px-3 py-2 text-left transition-colors outline-none hover:border-console hover:bg-console/[0.04] focus-visible:border-console focus-visible:ring-3 focus-visible:ring-leaf/30"
                 >
-                  <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                  <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                     {f.label}
                   </span>
-                  <Mono className="text-[15px] font-bold text-ink">
+                  <Mono className="text-[15px] font-bold text-adm-ink">
                     {formatCedis(f.amount)}
                   </Mono>
                 </button>
@@ -345,7 +345,7 @@ export function PaymentDialog({
               error={errors.method?.message}
               // items-stretch/gap-0 undo the shadcn Label base (`flex
               // items-center gap-2`), which would otherwise centre the
-              // stencil label over its control once this cell is a column.
+              // label over its control once this cell is a column.
               className="flex flex-col items-stretch justify-end gap-0"
             >
               <select
@@ -364,7 +364,7 @@ export function PaymentDialog({
               optional
               // items-stretch/gap-0 undo the shadcn Label base (`flex
               // items-center gap-2`), which would otherwise centre the
-              // stencil label over its control once this cell is a column.
+              // label over its control once this cell is a column.
               className="flex flex-col items-stretch justify-end gap-0"
             >
               <Input
@@ -398,7 +398,7 @@ export function PaymentDialog({
             error={errors.reference?.message}
           >
             <Input
-              className={cn(adminInputClass, errors.reference && "border-error")}
+              className={cn(adminInputClass, errors.reference && "border-console-red")}
               placeholder={
                 method === "MOMO" ? "MoMo transaction ID" : "Bank reference"
               }

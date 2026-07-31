@@ -146,10 +146,10 @@ export function StockView() {
     <div>
       <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
             Stock
           </h1>
-          <p className="mt-0.5 text-[13px] text-soil">
+          <p className="mt-0.5 text-[13px] text-adm-muted">
             On hand by warehouse - always the sum of the ledger, never a
             stored number
           </p>
@@ -177,10 +177,10 @@ export function StockView() {
             onClick={() => setSection(key)}
             aria-pressed={section === key}
             className={cn(
-              "cursor-pointer rounded-[2px] border-[1.5px] px-3.5 py-1.5 text-[13px] font-semibold transition-colors",
+              "cursor-pointer rounded-[6px] border-[1.5px] px-3.5 py-1.5 text-[13px] font-semibold transition-colors",
               section === key
                 ? "border-console bg-console text-white"
-                : "border-soil/30 bg-paper text-soil hover:border-console/60",
+                : "border-adm-line bg-adm-card text-adm-muted hover:border-console/60",
             )}
           >
             {label}
@@ -210,13 +210,13 @@ export function StockView() {
                   <AdminCard key={t.commodityId} className="px-3 py-2.5">
                     <div className="flex items-baseline justify-between gap-2">
                       <span
-                        className="min-w-0 truncate text-[10.5px] font-bold uppercase tracking-[0.08em] text-soil"
+                        className="min-w-0 truncate text-[10.5px] font-bold uppercase tracking-[0.08em] text-adm-muted"
                         title={t.commodityName}
                       >
                         {t.commodityName}
                       </span>
                       <span
-                        className="font-adminmono flex-none text-[10.5px] font-semibold tabular-nums text-soil/70"
+                        className="font-adminmono flex-none text-[10.5px] font-semibold tabular-nums text-adm-faint"
                         title="Share of total stock on hand"
                       >
                         {shareLabel}
@@ -224,7 +224,7 @@ export function StockView() {
                     </div>
                     <Kg
                       kg={t.totalKg}
-                      className="mt-0.5 block text-[16px] font-bold text-ink"
+                      className="mt-0.5 block text-[16px] font-bold text-adm-ink"
                     />
                     <div
                       aria-hidden="true"
@@ -282,10 +282,10 @@ export function StockView() {
             <label
               title="Show warehouse/commodity lines that have been emptied to a zero balance"
               className={cn(
-                "flex h-8 cursor-pointer items-center gap-2 rounded-[2px] border-[1.5px] bg-paper px-2.5 text-[13px] whitespace-nowrap transition-colors select-none",
+                "flex h-8 cursor-pointer items-center gap-2 rounded-[6px] border-[1.5px] bg-adm-card px-2.5 text-[13px] whitespace-nowrap transition-colors select-none",
                 includeZero
-                  ? "border-console/60 text-ink"
-                  : "border-soil/30 text-soil",
+                  ? "border-console/60 text-adm-ink"
+                  : "border-adm-line text-adm-muted",
               )}
             >
               <input
@@ -348,7 +348,7 @@ export function StockView() {
 function NoStock() {
   return (
     <>
-      <span aria-hidden="true" className="text-soil/40">
+      <span aria-hidden="true" className="text-adm-faint">
         &middot;
       </span>
       <span className="sr-only">none</span>
@@ -372,10 +372,10 @@ function BalancesMatrix({
     <div className="overflow-x-auto">
       <table className="w-full border-collapse text-[13px]">
         <thead>
-          <tr className="border-b-[1.5px] border-soil/25 bg-surface-alt/70">
+          <tr className="border-b-[1.5px] border-adm-line bg-adm-sunken">
             <th
               scope="col"
-              className="px-4 py-2.5 text-left text-[10.5px] font-bold uppercase tracking-[0.09em] text-soil"
+              className="px-4 py-2.5 text-left text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted"
             >
               Commodity
             </th>
@@ -398,10 +398,10 @@ function BalancesMatrix({
         </thead>
         <tbody>
           {commodities.map((c) => (
-            <tr key={c.id} className="border-b border-soil/10">
+            <tr key={c.id} className="border-b border-adm-hairline">
               <th
                 scope="row"
-                className="px-4 py-1.5 text-left font-medium text-ink"
+                className="px-4 py-1.5 text-left font-medium text-adm-ink"
               >
                 <span className="block max-w-[240px] truncate" title={c.name}>
                   {c.name}
@@ -417,7 +417,7 @@ function BalancesMatrix({
                     {kg === undefined || kg === 0 ? (
                       <NoStock />
                     ) : (
-                      <Kg kg={kg} className="font-semibold text-ink" />
+                      <Kg kg={kg} className="font-semibold text-adm-ink" />
                     )}
                   </td>
                 );
@@ -426,10 +426,10 @@ function BalancesMatrix({
           ))}
         </tbody>
         <tfoot>
-          <tr className="border-t-[1.5px] border-soil/30 bg-surface-alt/40">
+          <tr className="border-t-[1.5px] border-adm-line bg-adm-sunken">
             <th
               scope="row"
-              className="px-4 py-2 text-left text-[10.5px] font-bold uppercase tracking-[0.09em] text-soil"
+              className="px-4 py-2 text-left text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted"
             >
               Warehouse total
             </th>
@@ -438,7 +438,7 @@ function BalancesMatrix({
                 key={w.id}
                 className="whitespace-nowrap px-4 py-2 text-right"
               >
-                <Kg kg={w.subtotalKg} className="font-bold text-ink" />
+                <Kg kg={w.subtotalKg} className="font-bold text-adm-ink" />
               </td>
             ))}
           </tr>
@@ -465,9 +465,9 @@ function WarehouseSections({
       {warehouses.map((w, index) => (
         <section
           key={w.id}
-          className={cn(index > 0 && "border-t-[1.5px] border-soil/20")}
+          className={cn(index > 0 && "border-t-[1.5px] border-adm-hairline")}
         >
-          <div className="flex items-baseline justify-between gap-3 bg-surface-alt/60 px-4 py-2">
+          <div className="flex items-baseline justify-between gap-3 bg-adm-sunken px-4 py-2">
             <Link
               href={`/admin/warehouses/${w.id}`}
               className="min-w-0 truncate text-[11px] font-bold uppercase tracking-[0.09em] text-console underline-offset-2 hover:underline"
@@ -477,7 +477,7 @@ function WarehouseSections({
             </Link>
             <Kg
               kg={w.subtotalKg}
-              className="flex-none text-[12px] font-bold text-ink"
+              className="flex-none text-[12px] font-bold text-adm-ink"
             />
           </div>
           <div className="px-4 py-1.5 @xl/main:columns-2 @xl/main:gap-8">
@@ -491,20 +491,20 @@ function WarehouseSections({
                     className="flex items-baseline gap-2 py-1.5 break-inside-avoid"
                   >
                     <span
-                      className="min-w-0 truncate text-[13px] font-medium text-ink"
+                      className="min-w-0 truncate text-[13px] font-medium text-adm-ink"
                       title={c.name}
                     >
                       {c.name}
                     </span>
                     <span
                       aria-hidden="true"
-                      className="flex-1 border-b border-dotted border-soil/30"
+                      className="flex-1 border-b border-dotted border-adm-line"
                     />
                     <Kg
                       kg={kg}
                       className={cn(
                         "flex-none text-[13px] font-semibold",
-                        kg === 0 ? "text-soil/45" : "text-ink",
+                        kg === 0 ? "text-adm-faint" : "text-adm-ink",
                       )}
                     />
                   </div>
@@ -614,7 +614,7 @@ function AdjustmentDialog({
 
           <div className="grid grid-cols-[auto_1fr] items-end gap-2.5">
             <div>
-              <span className="mb-1 block text-[11.5px] font-semibold uppercase tracking-[0.08em] text-soil">
+              <span className="mb-1 block text-[11.5px] font-semibold uppercase tracking-[0.08em] text-adm-muted">
                 Direction
               </span>
               <div className="flex gap-1">
@@ -632,12 +632,12 @@ function AdjustmentDialog({
                       setValue("direction", value, { shouldValidate: true })
                     }
                     className={cn(
-                      "cursor-pointer rounded-[2px] border-[1.5px] px-3 py-[7px] text-[13px] font-semibold transition-colors",
+                      "cursor-pointer rounded-[6px] border-[1.5px] px-3 py-[7px] text-[13px] font-semibold transition-colors",
                       direction === value
                         ? value === "REMOVE"
                           ? "border-console-red bg-console-red text-white"
                           : "border-console bg-console text-white"
-                        : "border-soil/30 bg-paper text-soil",
+                        : "border-adm-line bg-adm-card text-adm-muted",
                     )}
                   >
                     {label}

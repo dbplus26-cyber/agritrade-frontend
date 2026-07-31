@@ -88,9 +88,9 @@ export function PhotoViewDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[420px] gap-3 border-soil/25 p-4">
+      <DialogContent className="max-w-[420px] gap-3 border-adm-line p-4">
         <DialogHeader>
-          <DialogTitle className="text-[14px] font-semibold text-ink">
+          <DialogTitle className="text-[14px] font-semibold text-adm-ink">
             {name}
           </DialogTitle>
         </DialogHeader>
@@ -119,10 +119,10 @@ function Fact({
         <Icon className="h-3.5 w-3.5" aria-hidden />
       </span>
       <div className="min-w-0">
-        <dt className="text-[10.5px] font-bold uppercase tracking-[0.1em] text-soil/70">
+        <dt className="text-[10.5px] font-bold uppercase tracking-[0.1em] text-adm-faint">
           {label}
         </dt>
-        <dd className="mt-0.5 truncate text-[13.5px] font-medium text-ink">
+        <dd className="mt-0.5 truncate text-[13.5px] font-medium text-adm-ink">
           {children}
         </dd>
       </div>

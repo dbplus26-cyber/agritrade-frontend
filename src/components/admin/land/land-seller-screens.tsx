@@ -114,10 +114,10 @@ export function LandSellerTable() {
               onClick={(e) => e.stopPropagation()}
             >
               <span className="block min-w-0 max-w-[20rem]">
-                <span className="block truncate font-medium text-ink">
+                <span className="block truncate font-medium text-adm-ink">
                   {s.name}
                 </span>
-                <span className="block truncate text-[11.5px] text-soil/70">
+                <span className="block truncate text-[11.5px] text-adm-faint">
                   {s.community ?? "No community"}
                 </span>
               </span>
@@ -133,7 +133,7 @@ export function LandSellerTable() {
         meta: columnMeta({ wide: true }),
         cell: ({ row }) =>
           row.original.phone ? (
-            <span className="font-adminmono whitespace-nowrap text-[12.5px] text-soil">
+            <span className="font-adminmono whitespace-nowrap text-[12.5px] text-adm-muted">
               {row.original.phone}
             </span>
           ) : (
@@ -162,10 +162,10 @@ export function LandSellerTable() {
   return (
     <div>
       <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Land sellers
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           People and companies the business buys land from
         </p>
       </div>
@@ -239,7 +239,7 @@ export function LandSellerTable() {
               onPageSizeChange: (size) => setFilter("size", String(size)),
             }}
             rowHref={(s) => `${LIST}/${s.id}`}
-            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+            rowClassName={() => "h-12 hover:bg-adm-sunken"}
           />
         </AdminCard>
       )}
@@ -377,7 +377,7 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
           <Input
             placeholder="e.g. Alhaji Mahama"
             disabled={readOnly}
-            className={cn(adminInputClass, roCls, errors.name && "border-error")}
+            className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
             {...register("name")}
           />
         </AdminField>
@@ -387,7 +387,7 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
               type="tel"
               placeholder="024 000 0000"
               disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.phone && "border-error")}
+              className={cn(adminInputClass, roCls, errors.phone && "border-console-red")}
               {...register("phone")}
             />
           </AdminField>
@@ -398,7 +398,7 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
               type="email"
               placeholder="name@example.com"
               disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.email && "border-error")}
+              className={cn(adminInputClass, roCls, errors.email && "border-console-red")}
               {...register("email")}
             />
           </AdminField>
@@ -413,7 +413,7 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.community && "border-error",
+                errors.community && "border-console-red",
               )}
               {...register("community")}
             />
@@ -428,7 +428,7 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
               adminInputClass,
               roCls,
               "h-auto min-h-[104px] w-full resize-y py-2",
-              errors.notes && "border-error",
+              errors.notes && "border-console-red",
             )}
             {...register("notes")}
           />

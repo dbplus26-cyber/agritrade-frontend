@@ -69,10 +69,10 @@ export function ShipmentsRegister() {
   return (
     <div>
       <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Shipments
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           Trucks loaded against confirmed sales, from warehouse to buyer
         </p>
       </div>
@@ -147,7 +147,7 @@ export function ShipmentsRegister() {
             <Link
               key={sh.id}
               href={`${LIST}/${sh.id}`}
-              className="shadow-doc-sm rounded-none border-[1.5px] border-soil/30 bg-paper px-4 py-[15px] hover:border-soil/45"
+              className="shadow-[0_1px_2px_rgba(16,24,40,0.05)] rounded-none border-[1.5px] border-adm-line bg-adm-card px-4 py-[15px] hover:border-adm-line"
             >
               {/* The badge sits beside the TITLE and pins to its top edge.
                   It used to ride on the truck-registration line, vertically
@@ -160,7 +160,7 @@ export function ShipmentsRegister() {
                   <Mono className="block text-[13px] font-semibold text-console">
                     {sh.truckReg}
                   </Mono>
-                  <div className="mt-[3px] line-clamp-2 text-[14.5px] font-semibold text-ink">
+                  <div className="mt-[3px] line-clamp-2 text-[14.5px] font-semibold text-adm-ink">
                     {sh.originWarehouse.name} → {sh.destination}
                   </div>
                 </div>
@@ -168,7 +168,7 @@ export function ShipmentsRegister() {
                   <ShipmentStatusBadge status={sh.status} />
                 </span>
               </div>
-              <div className="mt-[3px] line-clamp-2 min-w-0 text-[12.5px] text-soil">
+              <div className="mt-[3px] line-clamp-2 min-w-0 text-[12.5px] text-adm-muted">
                 {sh.salesCount > 1
                   ? `${String(sh.salesCount)} sales · ${sh.sales
                       .map((sale) => sale.buyer.name)
@@ -177,7 +177,7 @@ export function ShipmentsRegister() {
                 {sh.totalWeightKg > 0 ? ` · ${formatKg(sh.totalWeightKg)}` : ""}
               </div>
               <div className="mt-1.5 flex items-center justify-between">
-                <span className="text-[12px] text-soil/70">
+                <span className="text-[12px] text-adm-faint">
                   {sh.departedAt
                     ? `Departed ${formatShipmentDate(sh.departedAt)}`
                     : `Planned ${formatShipmentDate(sh.createdAt)}`}

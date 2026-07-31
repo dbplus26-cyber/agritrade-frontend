@@ -112,7 +112,7 @@ export function WarehouseTable() {
         cell: ({ row }) => (
           <Link
             href={`${LIST}/${row.original.id}`}
-            className="block max-w-[20rem] truncate font-medium text-ink outline-none focus-visible:underline"
+            className="block max-w-[20rem] truncate font-medium text-adm-ink outline-none focus-visible:underline"
             onClick={(e) => e.stopPropagation()}
           >
             {row.original.name}
@@ -127,7 +127,7 @@ export function WarehouseTable() {
         meta: columnMeta(),
         cell: ({ row }) =>
           row.original.location ? (
-            <span className="block max-w-[17rem] truncate text-soil">{row.original.location}</span>
+            <span className="block max-w-[17rem] truncate text-adm-muted">{row.original.location}</span>
           ) : (
             <Absent />
           ),
@@ -154,10 +154,10 @@ export function WarehouseTable() {
   return (
     <div>
       <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Warehouses
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           Where goods are received into and loaded out of
         </p>
       </div>
@@ -233,7 +233,7 @@ export function WarehouseTable() {
               onPageSizeChange: (size) => setFilter("size", String(size)),
             }}
             rowHref={(w) => `${LIST}/${w.id}`}
-            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+            rowClassName={() => "h-12 hover:bg-adm-sunken"}
           />
         </AdminCard>
       )}
@@ -352,7 +352,7 @@ function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
           <Input
             placeholder="e.g. Main Warehouse - Tamale"
             disabled={readOnly}
-            className={cn(adminInputClass, roCls, errors.name && "border-error")}
+            className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
             {...register("name")}
           />
         </AdminField>
@@ -363,7 +363,7 @@ function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
             className={cn(
               adminInputClass,
               roCls,
-              errors.location && "border-error",
+              errors.location && "border-console-red",
             )}
             {...register("location")}
           />
@@ -385,7 +385,7 @@ function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
               adminInputClass,
               roCls,
               "h-auto min-h-[62px] w-full resize-y py-2",
-              errors.description && "border-error",
+              errors.description && "border-console-red",
             )}
             {...register("description")}
           />
@@ -424,7 +424,7 @@ function WarehouseStockSection({ warehouseId }: { warehouseId: string }) {
   return (
     <div className="mt-6">
       <div className="mb-2 flex items-center justify-between gap-3">
-        <h2 className="text-[12px] font-bold uppercase tracking-[0.1em] text-soil">
+        <h2 className="text-[12px] font-bold uppercase tracking-[0.1em] text-adm-muted">
           Commodities in this warehouse
         </h2>
         <Link
@@ -465,13 +465,13 @@ function WarehouseStockSection({ warehouseId }: { warehouseId: string }) {
             {rows.map((row) => (
               <li
                 key={row.commodityId}
-                className="flex items-center justify-between gap-3 border-b border-soil/15 px-4 py-2.5"
+                className="flex items-center justify-between gap-3 border-b border-adm-hairline px-4 py-2.5"
               >
-                <span className="min-w-0 truncate text-[13.5px] font-medium text-ink">
+                <span className="min-w-0 truncate text-[13.5px] font-medium text-adm-ink">
                   {row.commodityName}
                 </span>
                 <span
-                  className="font-adminmono flex-none text-[13.5px] font-semibold text-ink"
+                  className="font-adminmono flex-none text-[13.5px] font-semibold text-adm-ink"
                   title={`${row.balanceKg.toLocaleString("en-GH")} kg`}
                 >
                   {formatKg(row.balanceKg)}
@@ -479,12 +479,12 @@ function WarehouseStockSection({ warehouseId }: { warehouseId: string }) {
               </li>
             ))}
           </ul>
-          <div className="flex items-center justify-between gap-3 bg-surface-alt/60 px-4 py-2.5">
-            <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-soil">
+          <div className="flex items-center justify-between gap-3 bg-adm-sunken px-4 py-2.5">
+            <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-adm-muted">
               Total on hand
             </span>
             <span
-              className="font-adminmono flex-none text-[13.5px] font-bold text-ink"
+              className="font-adminmono flex-none text-[13.5px] font-bold text-adm-ink"
               title={`${totalKg.toLocaleString("en-GH")} kg`}
             >
               {formatKg(totalKg)}

@@ -63,7 +63,7 @@ export function CardHeader({
     // items-start, not centre: when the right-hand side wraps to two or three
     // lines, centring drags the heading down to float in the middle of them.
     <div className="mb-3 flex items-start justify-between gap-3">
-      <span className="flex-none pt-px text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+      <span className="flex-none pt-px text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         {title}
       </span>
       {right ? <span className="min-w-0 text-right">{right}</span> : null}
@@ -108,7 +108,7 @@ export function LegendItem({
     // `min-width: auto`, meaning it refuses to shrink below its content - so
     // `truncate` on the label had nothing to clamp against and a long
     // commodity name ran straight out past the card's edge.
-    <span className={cn("flex min-w-0 items-center gap-1.5 text-[11.5px] text-soil", className)}>
+    <span className={cn("flex min-w-0 items-center gap-1.5 text-[11.5px] text-adm-muted", className)}>
       <span
         aria-hidden="true"
         className="h-2 w-2 flex-none rounded-full"
@@ -118,7 +118,7 @@ export function LegendItem({
         {label}
       </span>
       {value !== undefined ? (
-        <span className="font-semibold text-ink">{value}</span>
+        <span className="font-semibold text-adm-ink">{value}</span>
       ) : null}
     </span>
   );
@@ -127,7 +127,7 @@ export function LegendItem({
 /** Small centred empty/hidden note inside a chart card. */
 export function ChartNote({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-[180px] items-center justify-center text-center text-[13px] text-soil">
+    <div className="flex h-[180px] items-center justify-center text-center text-[13px] text-adm-muted">
       {children}
     </div>
   );

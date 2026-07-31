@@ -59,10 +59,10 @@ const SIDEBAR_VARS = {
   "--sidebar-width": "224px",
   "--sidebar-width-icon": "56px",
   "--sidebar": "#ffffff",
-  "--sidebar-foreground": "#334155",
-  "--sidebar-border": "#e2e8f0",
-  "--sidebar-accent": "#f1f5f9",
-  "--sidebar-accent-foreground": "#334155",
+  "--sidebar-foreground": "#39424f",
+  "--sidebar-border": "#eceff3",
+  "--sidebar-accent": "#f5f7f9",
+  "--sidebar-accent-foreground": "#161c24",
   "--sidebar-primary": "#1E3D2B",
   "--sidebar-primary-foreground": "#ffffff",
   "--sidebar-ring": "#1E3D2B",
@@ -144,10 +144,10 @@ function NavbarUser() {
         >
           {user ? (
             <span className="hidden text-right sm:block">
-              <span className="block max-w-[160px] truncate text-[13px] font-semibold leading-tight text-ink">
+              <span className="block max-w-[160px] truncate text-[13px] font-semibold leading-tight text-adm-ink">
                 {user.firstName} {user.lastName}
               </span>
-              <span className="block text-[11px] leading-tight text-soil">
+              <span className="block text-[11px] leading-tight text-adm-muted">
                 {ROLE_LABEL[user.role] ?? ""}
               </span>
             </span>
@@ -155,16 +155,16 @@ function NavbarUser() {
           <UserAvatar size={32} />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-60">
-          <div className="flex items-center gap-2.5 border-b border-dotted border-soil/40 px-3.5 py-3">
+          <div className="flex items-center gap-2.5 border-b border-adm-hairline px-3.5 py-3">
             <UserAvatar size={38} />
             <div className="min-w-0 flex-1">
-              <div className="truncate text-[13px] font-semibold text-ink">
+              <div className="truncate text-[13px] font-semibold text-adm-ink">
                 {user ? `${user.firstName} ${user.lastName}` : "Signed in"}
               </div>
-              <div className="truncate text-[11.5px] text-soil">
+              <div className="truncate text-[11.5px] text-adm-muted">
                 {user?.email ?? ""}
               </div>
-              <div className="text-[11px] text-soil/70">
+              <div className="text-[11px] text-adm-faint">
                 {(user && ROLE_LABEL[user.role]) ?? ""}
               </div>
             </div>
@@ -226,7 +226,7 @@ function SidebarSignOut() {
         disabled={isLoading}
         title={collapsed ? "Sign out" : undefined}
         className={cn(
-          "flex w-full cursor-pointer items-center gap-2.5 py-3.5 text-left text-[13px] font-semibold text-soil hover:bg-surface-alt/70 hover:text-console-red disabled:opacity-50",
+          "flex w-full cursor-pointer items-center gap-2.5 py-3.5 text-left text-[13px] font-semibold text-adm-body hover:bg-adm-sunken hover:text-console-red disabled:opacity-50",
           collapsed ? "justify-center px-0" : "px-5",
         )}
       >
@@ -293,7 +293,7 @@ function ConsoleSidebar({ activeKey }: { activeKey: string }) {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="gap-0 border-b border-soil/15 pb-4 pt-5 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-0 px-5">
+      <SidebarHeader className="gap-0 border-b border-adm-hairline pb-4 pt-5 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-0 px-5">
         {/* Collapsed to the icon rail the mark carries the brand alone, which
             is exactly what it is for; expanded it sits beside the wordmark. */}
         {collapsed ? (
@@ -317,7 +317,7 @@ function ConsoleSidebar({ activeKey }: { activeKey: string }) {
               <div className="text-[16px] font-extrabold tracking-[0.14em] text-console">
                 DB PLUS
               </div>
-              <div className="mt-0.5 text-[11px] uppercase tracking-[0.06em] text-soil">
+              <div className="mt-0.5 text-[11px] uppercase tracking-[0.06em] text-adm-faint">
                 Trading · Tamale
               </div>
             </div>
@@ -350,7 +350,7 @@ function ConsoleSidebar({ activeKey }: { activeKey: string }) {
                     }
                   }}
                   className={cn(
-                    "h-auto cursor-pointer justify-between gap-2 rounded-[6px] px-2.5 py-[7px] text-[13px] font-semibold text-soil hover:bg-soil/10 hover:text-soil",
+                    "h-auto cursor-pointer justify-between gap-2 rounded-[6px] px-2.5 py-[7px] text-[13.5px] font-medium text-adm-body hover:bg-adm-sunken hover:text-adm-ink",
                     hasActive && (!isOpen || collapsed) && "text-console",
                   )}
                 >
@@ -367,25 +367,25 @@ function ConsoleSidebar({ activeKey }: { activeKey: string }) {
                   </span>
                   {collapsed ? null : isOpen ? (
                     <ChevronDown
-                      className="h-3.5 w-3.5 flex-none text-soil/60"
+                      className="h-3.5 w-3.5 flex-none text-adm-faint"
                       aria-hidden="true"
                     />
                   ) : (
                     <ChevronRight
-                      className="h-3.5 w-3.5 flex-none text-soil/60"
+                      className="h-3.5 w-3.5 flex-none text-adm-faint"
                       aria-hidden="true"
                     />
                   )}
                 </SidebarMenuButton>
 
                 {!collapsed && isOpen ? (
-                  <div className="ml-[15px] mt-0.5 flex flex-col gap-px border-l border-soil/15 pl-2">
+                  <div className="ml-[15px] mt-0.5 flex flex-col gap-px border-l border-adm-hairline pl-2">
                     {group.items.map((item) => (
                       <SidebarMenuButton
                         key={item.key}
                         asChild
                         isActive={activeKey === item.key}
-                        className="h-auto justify-between gap-2 rounded-[6px] px-2.5 py-[6px] text-[13px] font-normal text-soil hover:bg-soil/10 hover:text-soil data-[active=true]:bg-console data-[active=true]:font-semibold data-[active=true]:text-white"
+                        className="h-auto justify-between gap-2 rounded-[6px] px-2.5 py-[6px] text-[13px] font-normal text-adm-body hover:bg-adm-sunken hover:text-adm-ink data-[active=true]:bg-console data-[active=true]:font-semibold data-[active=true]:text-white"
                       >
                         <Link
                           href={item.href}
@@ -405,7 +405,7 @@ function ConsoleSidebar({ activeKey }: { activeKey: string }) {
           })}
         </SidebarMenu>
       </SidebarContent>
-      <SidebarFooter className="border-t border-soil/15 p-0">
+      <SidebarFooter className="border-t border-adm-hairline p-0">
         <SidebarSignOut />
       </SidebarFooter>
       <SidebarRail />
@@ -426,7 +426,7 @@ function MobileTabs({ activeKey }: { activeKey: string }) {
   return (
     <nav
       aria-label="Console quick navigation"
-      className="fixed inset-x-0 bottom-0 z-[60] grid h-[62px] grid-cols-4 border-t border-soil/25 bg-paper pb-[env(safe-area-inset-bottom)] md:hidden"
+      className="fixed inset-x-0 bottom-0 z-[60] grid h-[62px] grid-cols-4 border-t border-adm-line bg-adm-card pb-[env(safe-area-inset-bottom)] md:hidden"
     >
       {MOBILE_TABS.map((tab) => {
         const active = activeKey === tab.key && !openMobile;
@@ -438,7 +438,7 @@ function MobileTabs({ activeKey }: { activeKey: string }) {
             aria-current={active ? "page" : undefined}
             className={cn(
               "relative flex flex-col items-center justify-center gap-[3px]",
-              active ? "text-console" : "text-soil/70",
+              active ? "text-console" : "text-adm-muted",
             )}
           >
             <span aria-hidden="true" className="text-[18px] leading-none">
@@ -458,7 +458,7 @@ function MobileTabs({ activeKey }: { activeKey: string }) {
         onClick={() => setOpenMobile(true)}
         className={cn(
           "flex cursor-pointer flex-col items-center justify-center gap-[3px]",
-          openMobile ? "text-console" : "text-soil/70",
+          openMobile ? "text-console" : "text-adm-muted",
         )}
       >
         <span aria-hidden="true" className="text-[18px] leading-none">
@@ -493,22 +493,22 @@ function Crumbs() {
   return (
     <nav
       aria-label="Breadcrumb"
-      className="flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-[13px] text-soil"
+      className="flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-[13px] text-adm-muted"
     >
-      <span className="text-soil/70 max-sm:hidden">DB Plus</span>
-      <span className="text-soil/45 max-sm:hidden">/</span>
+      <span className="text-adm-faint max-sm:hidden">DB Plus</span>
+      <span className="text-adm-strong max-sm:hidden">/</span>
       {sub && section ? (
         <>
           <Link
             href={`${ADMIN_HOME}/${section}`}
-            className="text-soil transition-colors hover:text-console"
+            className="text-adm-muted transition-colors hover:text-console"
           >
             {title}
           </Link>
-          <span className="text-soil/45">/</span>
+          <span className="text-adm-faint">/</span>
           <span
             aria-current="page"
-            className="overflow-hidden text-ellipsis font-semibold text-ink"
+            className="overflow-hidden text-ellipsis font-semibold text-adm-ink"
           >
             {sub}
           </span>
@@ -516,7 +516,7 @@ function Crumbs() {
       ) : (
         <span
           aria-current="page"
-          className="overflow-hidden text-ellipsis font-semibold text-ink"
+          className="overflow-hidden text-ellipsis font-semibold text-adm-ink"
         >
           {title}
         </span>
@@ -532,7 +532,7 @@ function Crumbs() {
  */
 function ConsoleFooter() {
   return (
-    <footer className="mt-auto border-t border-soil/15 px-4 pb-[calc(env(safe-area-inset-bottom)+72px)] pt-4 md:pb-5 lg:px-[26px]">
+    <footer className="mt-auto border-t border-adm-hairline px-4 pb-[calc(env(safe-area-inset-bottom)+72px)] pt-4 md:pb-5 lg:px-[26px]">
       <div className="mx-auto flex w-full max-w-[1360px] flex-col items-center gap-2 text-center sm:flex-row sm:justify-between sm:text-left">
         <div className="flex items-center gap-2.5">
           <Image
@@ -542,12 +542,12 @@ function ConsoleFooter() {
             height={56}
             className="h-7 w-7 shrink-0"
           />
-          <span className="text-[11.5px] leading-tight text-soil">
-            <span className="block font-semibold text-ink">DB Plus</span>
+          <span className="text-[11.5px] leading-tight text-adm-muted">
+            <span className="block font-semibold text-adm-ink">DB Plus</span>
             Trading · Tamale
           </span>
         </div>
-        <p className="text-[11px] text-soil/80">
+        <p className="text-[11px] text-adm-muted/80">
           © {new Date().getFullYear()} DB Plus. All rights reserved.
           <span className="ml-1">
             Developed by{" "}
@@ -575,10 +575,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <ConsoleSidebar activeKey={activeKey} />
 
       <SidebarInset className="min-w-0 bg-transparent pb-[62px] md:pb-0">
-        <header className="sticky top-0 z-40 flex h-[54px] flex-none items-center gap-3 border-b border-soil/25 bg-paper px-4 lg:px-[26px]">
+        <header className="sticky top-0 z-40 flex h-[54px] flex-none items-center gap-3 border-b border-adm-line bg-adm-card px-4 lg:px-[26px]">
           {/* Collapse/expand the rail (sheet on mobile) - dms behaviour in the
               console skin, living on the topbar's left edge. */}
-          <SidebarTrigger className="h-[30px] w-[30px] flex-none cursor-pointer rounded-[6px] border border-soil/25 bg-paper text-soil hover:bg-surface-alt/70 hover:text-console max-md:hidden" />
+          <SidebarTrigger className="h-[30px] w-[30px] flex-none cursor-pointer rounded-[6px] border border-adm-line bg-adm-card text-adm-muted hover:bg-adm-sunken hover:text-adm-ink max-md:hidden" />
           <Crumbs />
           <div className="flex-1" />
           {/* The notifications bell returns here when the notifications feed

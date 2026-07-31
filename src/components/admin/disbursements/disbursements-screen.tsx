@@ -107,10 +107,10 @@ export function DisbursementsScreen() {
         meta: columnMeta(),
         cell: ({ row }) => (
           <span className="block min-w-0 text-left">
-            <span className="block truncate font-medium text-ink">
+            <span className="block truncate font-medium text-adm-ink">
               {row.original.recipientName}
             </span>
-            <span className="font-adminmono block truncate text-[11.5px] text-soil/70">
+            <span className="font-adminmono block truncate text-[11.5px] text-adm-faint">
               {recipientLine(row.original)}
             </span>
           </span>
@@ -242,7 +242,7 @@ export function DisbursementsScreen() {
             isFetching={isFetching}
         isFiltered={activeFilterCount > 0 || Boolean(queryParams.search)}
             itemNoun="payouts"
-            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+            rowClassName={() => "h-12 hover:bg-adm-sunken"}
             rowHref={(row) => `${LIST}/${row.id}`}
             serverPagination={{
               onPageChange: setPage,

@@ -49,7 +49,7 @@ export function TransferDetail({ id }: { id: string }) {
       aside={
         <>
           <RailCard title="Moved">
-            <p className="font-adminmono text-[20px] font-bold text-ink tabular-nums">
+            <p className="font-adminmono text-[20px] font-bold text-adm-ink tabular-nums">
               {formatKg(t.weightKg)}
             </p>
           </RailCard>
@@ -81,14 +81,14 @@ export function TransferDetail({ id }: { id: string }) {
       {/* A transfer is two ledger entries; the stock screen is where they are
           read as such, so the page points at it rather than restating them. */}
       <AdminCard className="px-5 py-3">
-        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
           On the ledger
         </div>
-        <p className="text-[13px] text-soil">
+        <p className="text-[13px] text-adm-muted">
           This move wrote a transfer-out against{" "}
-          <span className="text-ink">{t.fromWarehouse.name}</span> and a
+          <span className="text-adm-ink">{t.fromWarehouse.name}</span> and a
           matching transfer-in against{" "}
-          <span className="text-ink">{t.toWarehouse.name}</span>.{" "}
+          <span className="text-adm-ink">{t.toWarehouse.name}</span>.{" "}
           <Link
             className="text-console hover:underline"
             href="/admin/stock?tab=movements"

@@ -67,7 +67,7 @@ export function RailCard({
   return (
     <AdminCard className={cn("px-4 py-3", className)}>
       {title ? (
-        <div className="mb-1.5 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+        <div className="mb-1.5 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
           {title}
         </div>
       ) : null}

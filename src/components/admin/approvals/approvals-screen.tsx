@@ -552,7 +552,7 @@ export function ApprovalsScreen() {
 }
 
 const ghostBarButton =
-  "cursor-pointer rounded-[2px] border border-white/35 bg-transparent px-3 py-[5px] text-[12.5px] leading-[1.4] font-[550] text-white " +
+  "cursor-pointer rounded-[6px] border border-white/35 bg-transparent px-3 py-[5px] text-[12.5px] leading-[1.4] font-[550] text-white " +
   "hover:bg-white/12 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white " +
   "disabled:cursor-not-allowed disabled:opacity-50";
 
@@ -589,7 +589,7 @@ function StatusTab({
       aria-selected={active}
       onClick={onSelect}
       className={cn(
-        "flex cursor-pointer items-center gap-[7px] rounded-[2px] px-3.5 py-[7px] text-[13px] leading-[1.4] font-[550]",
+        "flex cursor-pointer items-center gap-[7px] rounded-[6px] px-3.5 py-[7px] text-[13px] leading-[1.4] font-[550]",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ap-forest)]",
         active
           ? "bg-[var(--ap-surface)] text-[var(--ap-ink)] shadow-[0_1px_2px_rgba(0,0,0,.08)]"
@@ -599,7 +599,7 @@ function StatusTab({
       {label}
       <span
         className={cn(
-          "rounded-[2px] px-1.5 py-px font-adminmono text-[11px] leading-[1.4] tabular-nums",
+          "rounded-[6px] px-1.5 py-px font-adminmono text-[11px] leading-[1.4] tabular-nums",
           active
             ? "bg-[var(--ap-forest)] text-white"
             : "bg-[var(--ap-pill)] text-[var(--ap-ink-2)]",

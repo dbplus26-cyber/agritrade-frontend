@@ -86,7 +86,7 @@ export function TitleCell({
 }) {
   const titleNode = href ? (
     <Link
-      className={cn(TITLE_CLAMP, "block truncate font-medium text-ink hover:underline")}
+      className={cn(TITLE_CLAMP, "block truncate font-medium text-adm-ink hover:underline")}
       href={href}
       onClick={(e) => e.stopPropagation()}
       title={title}
@@ -95,7 +95,7 @@ export function TitleCell({
     </Link>
   ) : (
     <span
-      className={cn(TITLE_CLAMP, "block truncate font-medium text-ink")}
+      className={cn(TITLE_CLAMP, "block truncate font-medium text-adm-ink")}
       title={title}
     >
       {title}
@@ -107,7 +107,7 @@ export function TitleCell({
       {titleNode}
       {meta ? (
         <span
-          className="block truncate text-[11.5px] text-soil/70"
+          className="block truncate text-[11.5px] text-adm-faint"
           title={meta}
         >
           {meta}
@@ -136,7 +136,7 @@ export function TextCell({
   width?: CellWidth;
 }) {
   if (!value) {
-    return <span className="text-soil/50">{fallback}</span>;
+    return <span className="text-adm-faint">{fallback}</span>;
   }
   return (
     <span

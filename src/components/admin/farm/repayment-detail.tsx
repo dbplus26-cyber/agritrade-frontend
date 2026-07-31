@@ -28,7 +28,7 @@ import { FarmDocumentsSection } from "./farm-bits";
 
 const LIST = "/admin/repayments";
 
-const NotRecorded = () => <span className="text-soil">Not recorded</span>;
+const NotRecorded = () => <span className="text-adm-muted">Not recorded</span>;
 
 export function RepaymentDetail({ id }: { id: string }) {
   const { data, isLoading, isError, error, refetch } = useGetRepaymentQuery(id);
@@ -63,7 +63,7 @@ export function RepaymentDetail({ id }: { id: string }) {
           <div className="flex flex-col gap-4">
             {/* Who repaid what */}
             <AdminCard className="px-5 py-4">
-              <div className="mb-2 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              <div className="mb-2 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Who repaid what
               </div>
               <Link
@@ -86,12 +86,12 @@ export function RepaymentDetail({ id }: { id: string }) {
                   </span>
                 )}
                 <div className="min-w-0">
-                  <div className="truncate text-[14px] font-semibold text-ink hover:underline">
+                  <div className="truncate text-[14px] font-semibold text-adm-ink hover:underline">
                     {r.farmer.name}
                   </div>
                   {[r.farmer.phone, r.farmer.community].filter(Boolean).length >
                   0 ? (
-                    <div className="truncate text-[12px] text-soil">
+                    <div className="truncate text-[12px] text-adm-muted">
                       {[r.farmer.phone, r.farmer.community]
                         .filter(Boolean)
                         .join(" · ")}
@@ -99,7 +99,7 @@ export function RepaymentDetail({ id }: { id: string }) {
                   ) : null}
                 </div>
               </Link>
-              <DetailGrid className="mt-3 border-t border-soil/10 pt-1">
+              <DetailGrid className="mt-3 border-t border-adm-hairline pt-1">
                 <DetailItem label="Commodity">{r.commodity.name}</DetailItem>
                 <DetailItem label="Weight" mono>
                   {formatKg(r.weightKg)}
@@ -131,7 +131,7 @@ export function RepaymentDetail({ id }: { id: string }) {
                       ) : null}
                     </span>
                   ) : (
-                    <span className="text-soil">Not taken into stock</span>
+                    <span className="text-adm-muted">Not taken into stock</span>
                   )}
                 </DetailItem>
                 {r.notes ? (
@@ -147,10 +147,10 @@ export function RepaymentDetail({ id }: { id: string }) {
 
             {/* Evidence */}
             <AdminCard className="px-5 py-4">
-              <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Evidence
               </div>
-              <p className="mt-1 mb-1 text-[12px] text-soil">
+              <p className="mt-1 mb-1 text-[12px] text-adm-muted">
                 The signed receipt or weigh slip is what settles &quot;I already
                 paid&quot; disputes. Never shown publicly; downloads are logged.
               </p>
@@ -169,13 +169,13 @@ export function RepaymentDetail({ id }: { id: string }) {
         }
         aside={
           <AdminCard className="px-5 py-4">
-            <p className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+            <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
               Value credited
             </p>
             <p className="font-adminmono mt-1 text-[26px] font-bold text-leaf tabular-nums">
               <Money value={r.valueGhs} />
             </p>
-            <p className="mt-1 text-[12.5px] text-soil">
+            <p className="mt-1 text-[12.5px] text-adm-muted">
               <Mono>{formatKg(r.weightKg)}</Mono> of {r.commodity.name} at{" "}
               <Mono>
                 <Money value={r.ratePerKgGhs} />

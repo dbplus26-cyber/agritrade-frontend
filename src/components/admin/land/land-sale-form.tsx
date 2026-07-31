@@ -87,7 +87,7 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
                     hint: p.locationText,
                   }))}
                   placeholder="Choose an available plot"
-                  className={cn(errors.plotId && "border-error")}
+                  className={cn(errors.plotId && "border-console-red")}
                 />
               )}
             />
@@ -105,7 +105,7 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
                     label: b.name,
                   }))}
                   placeholder="Choose the buyer"
-                  className={cn(errors.buyerId && "border-error")}
+                  className={cn(errors.buyerId && "border-console-red")}
                 />
               )}
             />
@@ -113,7 +113,7 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
           <AdminField label="Agreed price (GHS)" error={errors.agreedPriceGhs?.message}>
             <Input
               inputMode="decimal"
-              className={cn(adminInputClass, errors.agreedPriceGhs && "border-error")}
+              className={cn(adminInputClass, errors.agreedPriceGhs && "border-console-red")}
               {...register("agreedPriceGhs")}
             />
           </AdminField>

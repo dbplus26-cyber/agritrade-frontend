@@ -54,7 +54,7 @@ function BodyCell({
         >
           {av.init}
         </span>
-        <span className="block max-w-[20rem] truncate font-medium text-ink">{text}</span>
+        <span className="block max-w-[20rem] truncate font-medium text-adm-ink">{text}</span>
       </span>
     );
   }
@@ -107,7 +107,7 @@ export function RegisterTable({
           h.wide ? "hidden xl:table-cell" : "table-cell",
         ),
         headerClassName:
-          "h-[38px] whitespace-nowrap bg-surface-alt/70 py-0 text-[10.5px] font-bold uppercase tracking-[0.09em] text-soil",
+          "h-[38px] whitespace-nowrap bg-adm-sunken py-0 text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted",
       },
       cell: ({ row }) =>
         i === 0 ? (
@@ -129,10 +129,10 @@ export function RegisterTable({
     <div>
       <div className="mb-3.5 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
             {register.title}
           </h1>
-          <p className="mt-0.5 text-[13px] text-soil">{register.sub}</p>
+          <p className="mt-0.5 text-[13px] text-adm-muted">{register.sub}</p>
         </div>
         {register.add ? (
           <Button asChild variant="harvest" className="h-[34px] px-4 text-[13.5px]">
@@ -142,7 +142,7 @@ export function RegisterTable({
       </div>
 
       <div className="mb-3 flex flex-wrap items-center gap-2">
-        <label className="flex h-8 w-full max-w-[250px] items-center gap-1.5 rounded-[2px] border-[1.5px] border-soil/30 bg-paper px-2.5 transition-colors focus-within:border-console">
+        <label className="flex h-8 w-full max-w-[250px] items-center gap-1.5 rounded-[6px] border-[1.5px] border-adm-line bg-adm-card px-2.5 transition-colors focus-within:border-console">
           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <circle cx="7" cy="7" r="5" stroke="#a49b7e" strokeWidth="1.5" />
             <path d="M11 11l3.2 3.2" stroke="#a49b7e" strokeWidth="1.5" strokeLinecap="round" />
@@ -153,7 +153,7 @@ export function RegisterTable({
             onChange={(e) => setQuery(e.target.value)}
             placeholder={register.search}
             aria-label={register.search}
-            className="h-full w-full min-w-0 rounded-none border-0 bg-transparent p-0 text-[13px] text-ink outline-none placeholder:text-soil/45 focus-visible:ring-0 md:text-[13px]"
+            className="h-full w-full min-w-0 rounded-none border-0 bg-transparent p-0 text-[13px] text-adm-ink outline-none placeholder:text-adm-faint focus-visible:ring-0 md:text-[13px]"
           />
         </label>
         {register.filters.map((filter) => (
@@ -161,7 +161,7 @@ export function RegisterTable({
           <Select key={filter} defaultValue={filter}>
             <SelectTrigger
               aria-label={`Filter by ${filter.toLowerCase()}`}
-              className={cn(adminSelectClass, "h-8 w-auto text-[13px] text-soil")}
+              className={cn(adminSelectClass, "h-8 w-auto text-[13px] text-adm-muted")}
             >
               {/* Static children keep the label server-rendered (Radix only
                   mirrors item text after hydration). */}
@@ -181,7 +181,7 @@ export function RegisterTable({
           itemNoun="records"
           globalFilter={query}
           rowHref={(row) => `/admin/${slug}/${encodeURIComponent(cellText(row[0]))}`}
-          rowClassName={() => "h-11 hover:bg-surface-alt/60"}
+          rowClassName={() => "h-11 hover:bg-adm-sunken"}
           emptyState={
             <EmptyState
               variant="plain"

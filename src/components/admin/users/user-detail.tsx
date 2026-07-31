@@ -43,7 +43,7 @@ import { RoleChangeDialog } from "./role-dialog";
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mb-3.5 text-[10.5px] font-bold tracking-[0.1em] text-soil/70 uppercase">
+    <div className="mb-3.5 text-[10.5px] font-bold tracking-[0.1em] text-adm-faint uppercase">
       {children}
     </div>
   );
@@ -121,7 +121,7 @@ function IdentityCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
             <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
               <h2
                 title={`${user.firstName} ${user.lastName}`}
-                className="line-clamp-2 max-w-full break-words text-[17px] font-bold tracking-[-0.01em] text-ink sm:text-[20px]"
+                className="line-clamp-2 max-w-full break-words text-[17px] font-bold tracking-[-0.01em] text-adm-ink sm:text-[20px]"
               >
                 {user.firstName} {user.lastName}
               </h2>
@@ -130,13 +130,13 @@ function IdentityCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
               </ToneBadge>
               <StatusBadge user={user} />
               {isSelf ? (
-                <span className="text-[11px] font-semibold text-soil/70">
+                <span className="text-[11px] font-semibold text-adm-faint">
                   (you)
                 </span>
               ) : null}
             </div>
             <p
-              className="mt-0.5 truncate text-[13px] text-soil"
+              className="mt-0.5 truncate text-[13px] text-adm-muted"
               title={user.email}
             >
               {user.email}
@@ -159,7 +159,7 @@ function IdentityCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
           ) : null}
         </div>
 
-        <div className="mt-6 border-t border-soil/15 pt-5">
+        <div className="mt-6 border-t border-adm-hairline pt-5">
           {editing ? (
             <EditDetailsForm
               user={user}
@@ -170,13 +170,13 @@ function IdentityCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
             <>
               <IdentityFacts user={user} />
 
-              <div className="mt-5 border-t border-soil/15 pt-4">
+              <div className="mt-5 border-t border-adm-hairline pt-4">
                 <dl className="grid grid-cols-1 gap-x-8 gap-y-3 sm:grid-cols-2">
                   <div>
-                    <dt className="text-[10.5px] font-bold uppercase tracking-[0.1em] text-soil/70">
+                    <dt className="text-[10.5px] font-bold uppercase tracking-[0.1em] text-adm-faint">
                       Can approve
                     </dt>
-                    <dd className="mt-1 text-[13.5px] font-medium text-ink">
+                    <dd className="mt-1 text-[13.5px] font-medium text-adm-ink">
                       {user.canApprove ? (
                         <span className="text-console">Yes — may decide approvals</span>
                       ) : (
@@ -185,10 +185,10 @@ function IdentityCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-[10.5px] font-bold uppercase tracking-[0.1em] text-soil/70">
+                    <dt className="text-[10.5px] font-bold uppercase tracking-[0.1em] text-adm-faint">
                       Financial visibility
                     </dt>
-                    <dd className="mt-1 text-[13.5px] font-medium text-ink">
+                    <dd className="mt-1 text-[13.5px] font-medium text-adm-ink">
                       {user.financialVisibility ? (
                         <span className="text-console">Full — sees money columns</span>
                       ) : (
@@ -277,7 +277,7 @@ function EditDetailsForm({
             placeholder="e.g. Amina"
             className={cn(
               adminInputClass,
-              errors.firstName && "border-error",
+              errors.firstName && "border-console-red",
             )}
             {...register("firstName")}
           />
@@ -287,7 +287,7 @@ function EditDetailsForm({
             placeholder="e.g. Abdulai"
             className={cn(
               adminInputClass,
-              errors.lastName && "border-error",
+              errors.lastName && "border-console-red",
             )}
             {...register("lastName")}
           />
@@ -301,7 +301,7 @@ function EditDetailsForm({
         <Input
           type="email"
           placeholder="them@dbplus.com"
-          className={cn(adminInputClass, errors.email && "border-error")}
+          className={cn(adminInputClass, errors.email && "border-console-red")}
           {...register("email")}
         />
       </AdminField>
@@ -309,23 +309,23 @@ function EditDetailsForm({
         <Input
           type="tel"
           placeholder="024 000 0000"
-          className={cn(adminInputClass, errors.phone && "border-error")}
+          className={cn(adminInputClass, errors.phone && "border-console-red")}
           {...register("phone")}
         />
       </AdminField>
 
       {isSelf ? null : (
-      <div className="grid gap-3 rounded-[6px] border border-soil/25 bg-surface-alt/50 p-3.5">
+      <div className="grid gap-3 rounded-[6px] border border-adm-line bg-adm-sunken p-3.5">
         <Controller
           control={control}
           name="canApprove"
           render={({ field }) => (
             <label className="flex cursor-pointer items-center justify-between gap-3">
               <span>
-                <span className="block text-[13px] font-semibold text-ink">
+                <span className="block text-[13px] font-semibold text-adm-ink">
                   Can approve
                 </span>
-                <span className="block text-[12px] text-soil">
+                <span className="block text-[12px] text-adm-muted">
                   May decide pending approval requests.
                 </span>
               </span>
@@ -342,10 +342,10 @@ function EditDetailsForm({
           render={({ field }) => (
             <label className="flex cursor-pointer items-center justify-between gap-3">
               <span>
-                <span className="block text-[13px] font-semibold text-ink">
+                <span className="block text-[13px] font-semibold text-adm-ink">
                   Financial visibility
                 </span>
-                <span className="block text-[12px] text-soil">
+                <span className="block text-[12px] text-adm-muted">
                   May see prices, totals and profit.
                 </span>
               </span>
@@ -393,10 +393,10 @@ function RoleCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
         <SectionLabel>Role</SectionLabel>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-[13.5px] font-semibold text-ink">
+            <div className="text-[13.5px] font-semibold text-adm-ink">
               {ROLE_TITLE[user.role] ?? user.role}
             </div>
-            <div className="mt-0.5 text-[12.5px] text-soil">
+            <div className="mt-0.5 text-[12.5px] text-adm-muted">
               {isSelf
                 ? "You cannot change your own role."
                 : "Changing the role signs the user out everywhere."}
@@ -583,19 +583,19 @@ function ActionsCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
 
   return (
     <AdminCard className="overflow-hidden">
-      <div className="px-6 pt-3.5 pb-1 text-[10.5px] font-bold tracking-[0.1em] text-soil/70 uppercase">
+      <div className="px-6 pt-3.5 pb-1 text-[10.5px] font-bold tracking-[0.1em] text-adm-faint uppercase">
         Account actions
       </div>
       {visible.map((row) => (
         <div
           key={row.key}
-          className="flex flex-col items-start gap-2.5 border-t border-soil/15 px-4 py-3 first:border-t-0 sm:flex-row sm:items-center sm:gap-3 sm:px-6"
+          className="flex flex-col items-start gap-2.5 border-t border-adm-hairline px-4 py-3 first:border-t-0 sm:flex-row sm:items-center sm:gap-3 sm:px-6"
         >
           <div className="min-w-0 flex-1">
-            <div className="text-[13.5px] font-semibold text-ink">
+            <div className="text-[13.5px] font-semibold text-adm-ink">
               {row.title}
             </div>
-            <div className="mt-px text-[12.5px] text-soil">{row.sub}</div>
+            <div className="mt-px text-[12.5px] text-adm-muted">{row.sub}</div>
           </div>
           <AdminButton
             variant={row.destructive ? "danger" : "secondary"}
@@ -644,7 +644,7 @@ function UserDetailSkeleton() {
               </div>
               <Skeleton className="h-8 w-28 flex-none rounded-[6px] sm:mb-2" />
             </div>
-            <div className="mt-6 grid grid-cols-1 gap-x-8 gap-y-4 border-t border-soil/15 pt-5 sm:grid-cols-2">
+            <div className="mt-6 grid grid-cols-1 gap-x-8 gap-y-4 border-t border-adm-hairline pt-5 sm:grid-cols-2">
               {Array.from({ length: 6 }, (_, i) => (
                 <div key={i} className="flex items-start gap-2.5">
                   <Skeleton className="h-7 w-7 flex-none rounded-[6px]" />

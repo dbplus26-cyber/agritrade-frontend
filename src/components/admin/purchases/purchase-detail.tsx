@@ -173,7 +173,7 @@ function ReceiveDialog({
             >
               <Input
                 inputMode="decimal"
-                className={cn(adminInputClass, errors.receivedKg && "border-error")}
+                className={cn(adminInputClass, errors.receivedKg && "border-console-red")}
                 {...register("receivedKg")}
               />
             </AdminField>
@@ -181,7 +181,7 @@ function ReceiveDialog({
               <p
                 className={cn(
                   "text-[12.5px]",
-                  variance > 0 ? "text-error" : "text-leaf",
+                  variance > 0 ? "text-console-red" : "text-leaf",
                 )}
               >
                 {variance > 0
@@ -205,7 +205,7 @@ function ReceiveDialog({
                       label: w.name,
                     }))}
                     placeholder="Choose the warehouse"
-                    className={cn(errors.warehouseId && "border-error")}
+                    className={cn(errors.warehouseId && "border-console-red")}
                   />
                 )}
               />
@@ -304,7 +304,7 @@ function VoidDialog({
               className={cn(
                 adminInputClass,
                 "h-auto min-h-[60px] w-full resize-y py-2",
-                errors.reason && "border-error",
+                errors.reason && "border-console-red",
               )}
               {...register("reason")}
             />
@@ -422,7 +422,7 @@ export function PurchaseDetail({ id }: { id: string }) {
       />
 
       {p.approval && p.approval.status !== "APPROVED" ? (
-        <AdminCard className="mb-4 border-console-gold/50 bg-console-gold/8 px-4 py-3 text-[13px] leading-[1.55] text-ink">
+        <AdminCard className="mb-4 border-console-gold/50 bg-console-gold/8 px-4 py-3 text-[13px] leading-[1.55] text-adm-ink">
           {p.approval.status === "PENDING" ? (
             <>
               This purchase is at or above the approval threshold and is
@@ -448,7 +448,7 @@ export function PurchaseDetail({ id }: { id: string }) {
         main={
           <div className="flex flex-col gap-4">
             <AdminCard className="px-5 py-3">
-              <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Weights & variance
               </p>
               <DetailGrid>
@@ -463,7 +463,7 @@ export function PurchaseDetail({ id }: { id: string }) {
                     <DetailItem label="Variance" mono>
                       <span
                         className={cn(
-                          (p.varianceKg ?? 0) > 0 ? "text-error" : "text-ink",
+                          (p.varianceKg ?? 0) > 0 ? "text-console-red" : "text-adm-ink",
                         )}
                       >
                         {(p.varianceKg ?? 0) === 0
@@ -479,7 +479,7 @@ export function PurchaseDetail({ id }: { id: string }) {
             </AdminCard>
 
             <AdminCard className="px-5 py-3">
-              <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Money
               </p>
               <DetailGrid>
@@ -493,7 +493,7 @@ export function PurchaseDetail({ id }: { id: string }) {
             </AdminCard>
 
             <AdminCard className="px-5 py-3">
-              <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Parties & logistics
               </p>
               <DetailGrid>
@@ -511,7 +511,7 @@ export function PurchaseDetail({ id }: { id: string }) {
             </AdminCard>
 
             <AdminCard className="px-5 py-3">
-              <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Timeline
               </p>
               <DetailGrid>
@@ -551,18 +551,18 @@ export function PurchaseDetail({ id }: { id: string }) {
         aside={
           <div className="flex flex-col gap-4">
             <AdminCard className="px-5 py-4">
-              <p className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Purchase total
               </p>
-              <p className="font-adminmono mt-1 text-[26px] font-bold text-ink tabular-nums">
+              <p className="font-adminmono mt-1 text-[26px] font-bold text-adm-ink tabular-nums">
                 {formatCedis(p.totalGhs)}
               </p>
-              <p className="mt-1 text-[12.5px] text-soil">
+              <p className="mt-1 text-[12.5px] text-adm-muted">
                 <Mono>{formatKg(p.weightKg)}</Mono> at{" "}
                 <Mono>{formatCedis(p.unitPriceGhs)}</Mono> per kg
               </p>
               {actions ? (
-                <div className="mt-4 border-t border-soil/15 pt-3.5">
+                <div className="mt-4 border-t border-adm-hairline pt-3.5">
                   {actions}
                 </div>
               ) : null}
@@ -570,7 +570,7 @@ export function PurchaseDetail({ id }: { id: string }) {
 
             {p.photo ? (
               <AdminCard className="px-5 py-4">
-                <p className="mb-2 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                <p className="mb-2 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                   Weigh-slip
                 </p>
                 <Image
@@ -579,7 +579,7 @@ export function PurchaseDetail({ id }: { id: string }) {
                   width={560}
                   height={360}
                   unoptimized
-                  className="h-auto w-full rounded border border-soil/25 object-contain"
+                  className="h-auto w-full rounded border border-adm-line object-contain"
                 />
               </AdminCard>
             ) : null}

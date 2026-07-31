@@ -92,25 +92,25 @@ export function FarmerStatement({
 
       {/* Left-aligned like every other console page - the sheet keeps its own
           720px measure so it still reads as a piece of paper. */}
-      <div className="max-w-[720px] border-[1.5px] border-soil/30 bg-white p-8 text-ink print:max-w-none print:border-0 print:p-0">
+      <div className="max-w-[720px] border-[1.5px] border-adm-line bg-white p-8 text-adm-ink print:max-w-none print:border-0 print:p-0">
         <div className="flex items-start justify-between border-b-2 border-ink pb-3">
           <div>
             <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">
               DB PLUS
             </div>
-            <div className="text-[11px] tracking-[0.06em] text-soil uppercase">
+            <div className="text-[11px] tracking-[0.06em] text-adm-muted uppercase">
               Trading · Tamale
             </div>
           </div>
           <div className="text-right">
             <div className="text-[16px] font-bold">FARMER STATEMENT</div>
-            <div className="text-[12px] text-soil">{st.farmer.name}</div>
-            <div className="text-[12px] text-soil">
+            <div className="text-[12px] text-adm-muted">{st.farmer.name}</div>
+            <div className="text-[12px] text-adm-muted">
               Printed {formatFarmDate(new Date().toISOString())}
             </div>
             {/* The period is part of the document: a statement someone keeps
                 has to say what it covers, or it cannot be reconciled later. */}
-            <div className="text-[12px] text-soil">
+            <div className="text-[12px] text-adm-muted">
               {st.window.from || st.window.to
                 ? `Period ${st.window.from ? formatFarmDate(st.window.from) : "start"} to ${st.window.to ? formatFarmDate(st.window.to) : "date"}`
                 : "All history"}
@@ -131,12 +131,12 @@ export function FarmerStatement({
             {/* Everything before the window, carried in. Without it the running
                 balance below would start from zero and be wrong. */}
             {st.window.from ? (
-              <tr className="border-b border-soil/25">
-                <td className="py-1.5 text-soil">
+              <tr className="border-b border-adm-line">
+                <td className="py-1.5 text-adm-muted">
                   {formatFarmDate(st.window.from)}
                 </td>
-                <td className="py-1.5 text-soil">Balance brought forward</td>
-                <td className="py-1.5 text-right text-soil">-</td>
+                <td className="py-1.5 text-adm-muted">Balance brought forward</td>
+                <td className="py-1.5 text-right text-adm-muted">-</td>
                 <td className="py-1.5 text-right">
                   <Mono>
                     <Money value={st.openingBalanceGhs} />
@@ -146,7 +146,7 @@ export function FarmerStatement({
             ) : null}
             {st.rows.length === 0 ? (
               <tr>
-                <td colSpan={4} className="py-3 text-soil">
+                <td colSpan={4} className="py-3 text-adm-muted">
                   {st.window.from || st.window.to
                     ? "Nothing moved in this period."
                     : "No grants or repayments yet."}
@@ -154,11 +154,11 @@ export function FarmerStatement({
               </tr>
             ) : (
               st.rows.map((r, i) => (
-                <tr key={i} className="border-b border-soil/25">
+                <tr key={i} className="border-b border-adm-line">
                   <td className="py-1.5">{formatFarmDate(r.at)}</td>
                   <td className="py-1.5">
                     {r.detail}
-                    <span className="text-soil"> · {r.season}</span>
+                    <span className="text-adm-muted"> · {r.season}</span>
                   </td>
                   <td
                     className={cn(

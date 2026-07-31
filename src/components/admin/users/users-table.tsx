@@ -192,10 +192,10 @@ export function UsersTable() {
                   </span>
                 )}
                 <span className="block min-w-0 max-w-[19rem]">
-                  <span className="block truncate font-medium text-ink">
+                  <span className="block truncate font-medium text-adm-ink">
                     {u.firstName} {u.lastName}
                   </span>
-                  <span className="block truncate text-[11.5px] text-soil/70">
+                  <span className="block truncate text-[11.5px] text-adm-faint">
                     {u.email}
                   </span>
                 </span>
@@ -211,7 +211,7 @@ export function UsersTable() {
         enableSorting: false,
         meta: columnMeta({ at: "lg" }),
         cell: ({ row }) => (
-          <span className="whitespace-nowrap text-soil">
+          <span className="whitespace-nowrap text-adm-muted">
             {ROLE_LABEL[row.original.role]}
           </span>
         ),
@@ -223,7 +223,7 @@ export function UsersTable() {
         enableSorting: false,
         meta: columnMeta({ at: "xl" }),
         cell: ({ row }) => (
-          <span className="whitespace-nowrap text-soil">
+          <span className="whitespace-nowrap text-adm-muted">
             {row.original.phone ?? "—"}
           </span>
         ),
@@ -235,7 +235,7 @@ export function UsersTable() {
         enableSorting: false,
         meta: columnMeta({ at: "xl" }),
         cell: ({ row }) => (
-          <span className="whitespace-nowrap text-soil">
+          <span className="whitespace-nowrap text-adm-muted">
             {visibilityLabel(row.original)}
           </span>
         ),
@@ -247,7 +247,7 @@ export function UsersTable() {
         enableSorting: false,
         meta: columnMeta({ at: "xl" }),
         cell: ({ row }) => (
-          <span className="whitespace-nowrap text-soil">
+          <span className="whitespace-nowrap text-adm-muted">
             {lastActiveLabel(row.original)}
           </span>
         ),
@@ -287,10 +287,10 @@ export function UsersTable() {
   return (
     <div>
       <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Users
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           Staff accounts and permissions
         </p>
       </div>
@@ -387,7 +387,7 @@ export function UsersTable() {
               </button>
             )}
             rowHref={(u) => `/admin/users/${u.id}`}
-            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+            rowClassName={() => "h-12 hover:bg-adm-sunken"}
           />
         </AdminCard>
       )}

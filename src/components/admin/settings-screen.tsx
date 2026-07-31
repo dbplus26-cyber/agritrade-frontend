@@ -32,7 +32,7 @@ import {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mb-3.5 text-[10.5px] font-bold tracking-[0.1em] text-soil/70 uppercase">
+    <div className="mb-3.5 text-[10.5px] font-bold tracking-[0.1em] text-adm-faint uppercase">
       {children}
     </div>
   );
@@ -46,16 +46,16 @@ function GhsInput({
   return (
     <div
       className={cn(
-        "flex h-[42px] items-center overflow-hidden rounded-[2px] border-[1.5px] bg-[#FBFCF7] transition-[border-color,box-shadow] focus-within:border-leaf focus-within:shadow-[0_0_0_3px_rgb(62_125_98/0.16)]",
-        error ? "border-error" : "border-soil/35",
+        "flex h-[42px] items-center overflow-hidden rounded-[6px] border-[1.5px] bg-[#FBFCF7] transition-[border-color,box-shadow] focus-within:border-leaf focus-within:shadow-[0_0_0_3px_rgb(62_125_98/0.16)]",
+        error ? "border-console-red" : "border-adm-line",
       )}
     >
-      <span className="flex h-full items-center border-r border-soil/25 bg-surface-alt px-2.5 text-[13px] text-soil">
+      <span className="flex h-full items-center border-r border-adm-line bg-adm-sunken px-2.5 text-[13px] text-adm-muted">
         GH₵
       </span>
       <Input
         inputMode="decimal"
-        className="font-adminmono h-full min-w-0 flex-1 rounded-none border-0 bg-transparent px-2.5 py-0 text-right text-[14px] tabular-nums text-ink outline-none placeholder:text-soil/55 focus-visible:ring-0 disabled:cursor-default disabled:opacity-100"
+        className="font-adminmono h-full min-w-0 flex-1 rounded-none border-0 bg-transparent px-2.5 py-0 text-right text-[14px] tabular-nums text-adm-ink outline-none placeholder:text-adm-faint focus-visible:ring-0 disabled:cursor-default disabled:opacity-100"
         {...props}
       />
     </div>
@@ -179,7 +179,7 @@ function SettingsForm({
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.companyContactPhone && "border-error",
+                errors.companyContactPhone && "border-console-red",
               )}
               {...register("companyContactPhone")}
             />
@@ -196,7 +196,7 @@ function SettingsForm({
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.companyContactWhatsapp && "border-error",
+                errors.companyContactWhatsapp && "border-console-red",
               )}
               {...register("companyContactWhatsapp")}
             />
@@ -213,7 +213,7 @@ function SettingsForm({
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.companyContactEmail && "border-error",
+                errors.companyContactEmail && "border-console-red",
               )}
               {...register("companyContactEmail")}
             />
@@ -229,7 +229,7 @@ function SettingsForm({
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.companyContactAddress && "border-error",
+                errors.companyContactAddress && "border-console-red",
               )}
               {...register("companyContactAddress")}
             />

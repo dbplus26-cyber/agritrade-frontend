@@ -94,11 +94,11 @@ export function NotificationsScreen() {
         meta: columnMeta(),
         cell: ({ row }) => (
           <div className="min-w-0 max-w-[21rem]">
-            <div className="font-medium text-ink">
+            <div className="font-medium text-adm-ink">
               {EVENT_LABEL[row.original.event] ?? row.original.event}
             </div>
             {row.original.preview ? (
-              <div className="truncate text-[12px] text-soil">
+              <div className="truncate text-[12px] text-adm-muted">
                 {row.original.preview}
               </div>
             ) : null}
@@ -111,7 +111,7 @@ export function NotificationsScreen() {
         enableSorting: false,
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
-          <Mono className="text-[12.5px] text-soil">
+          <Mono className="text-[12.5px] text-adm-muted">
             {row.original.recipient}
           </Mono>
         ),
@@ -155,10 +155,10 @@ export function NotificationsScreen() {
   return (
     <div>
       <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Notifications
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           Every SMS and email the system has sent, with its delivery status
         </p>
       </div>
@@ -226,7 +226,7 @@ export function NotificationsScreen() {
               onPageChange: setPage,
               onPageSizeChange: (size) => setFilter("size", String(size)),
             }}
-            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+            rowClassName={() => "h-12 hover:bg-adm-sunken"}
           />
         </AdminCard>
       )}

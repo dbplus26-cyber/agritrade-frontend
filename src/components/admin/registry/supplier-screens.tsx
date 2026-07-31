@@ -90,7 +90,7 @@ export function RecordTimestamps({
   updatedAt: string;
 }) {
   return (
-    <p className="mt-3 text-[12px] text-soil/80">
+    <p className="mt-3 text-[12px] text-adm-muted/80">
       Added {formatDateTime(createdAt)}
       {updatedAt && updatedAt !== createdAt ? (
         <> · Updated {formatDateTime(updatedAt)}</>
@@ -225,10 +225,10 @@ export function SupplierTable() {
             >
               <RegistryAvatar name={s.name} photoUrl={s.photoUrl} />
               <span className="block min-w-0 max-w-[20rem]">
-                <span className="block truncate font-medium text-ink">
+                <span className="block truncate font-medium text-adm-ink">
                   {s.name}
                 </span>
-                <span className="block truncate text-[11.5px] text-soil/70">
+                <span className="block truncate text-[11.5px] text-adm-faint">
                   {s.community ?? "No community"}
                 </span>
               </span>
@@ -244,7 +244,7 @@ export function SupplierTable() {
         meta: columnMeta(),
         cell: ({ row }) =>
           row.original.phone ? (
-            <span className="font-adminmono whitespace-nowrap text-[12.5px] text-soil">
+            <span className="font-adminmono whitespace-nowrap text-[12.5px] text-adm-muted">
               {row.original.phone}
             </span>
           ) : (
@@ -258,7 +258,7 @@ export function SupplierTable() {
         enableSorting: false,
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
-          <span className="block max-w-[22rem] truncate text-soil">
+          <span className="block max-w-[22rem] truncate text-adm-muted">
             {SOURCE_LABEL[row.original.sourceType]}
           </span>
         ),
@@ -285,10 +285,10 @@ export function SupplierTable() {
   return (
     <div>
       <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Suppliers
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           Who the business buys from at the farm gate and beyond
         </p>
       </div>
@@ -378,7 +378,7 @@ export function SupplierTable() {
               onPageSizeChange: (size) => setFilter("size", String(size)),
             }}
             rowHref={(s) => `${LIST}/${s.id}`}
-            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+            rowClassName={() => "h-12 hover:bg-adm-sunken"}
           />
         </AdminCard>
       )}
@@ -665,7 +665,7 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
           <Input
             placeholder="e.g. Ibrahim Fuseini"
             disabled={readOnly}
-            className={cn(adminInputClass, roCls, errors.name && "border-error")}
+            className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
             {...register("name")}
           />
         </AdminField>
@@ -675,7 +675,7 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
               type="tel"
               placeholder="024 000 0000"
               disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.phone && "border-error")}
+              className={cn(adminInputClass, roCls, errors.phone && "border-console-red")}
               {...register("phone")}
             />
           </AdminField>
@@ -694,7 +694,7 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.altPhone && "border-error",
+                errors.altPhone && "border-console-red",
               )}
               {...register("altPhone")}
             />
@@ -710,7 +710,7 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.community && "border-error",
+                errors.community && "border-console-red",
               )}
               {...register("community")}
             />
@@ -722,7 +722,7 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
               type="email"
               placeholder="supplier@example.com"
               disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.email && "border-error")}
+              className={cn(adminInputClass, roCls, errors.email && "border-console-red")}
               {...register("email")}
             />
           </AdminField>
@@ -738,7 +738,7 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.idNumber && "border-error",
+                errors.idNumber && "border-console-red",
               )}
               {...register("idNumber")}
             />
@@ -751,7 +751,7 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
             className={cn(
               adminInputClass,
               roCls,
-              errors.address && "border-error",
+              errors.address && "border-console-red",
             )}
             {...register("address")}
           />
@@ -783,8 +783,8 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
             )}
           />
         </AdminField>
-        <div className="mt-1 border-t border-soil/15 pt-3">
-          <p className="stencil text-[11px] uppercase tracking-[0.14em] text-soil">
+        <div className="mt-1 border-t border-adm-hairline pt-3">
+          <p className="text-[11px] uppercase tracking-[0.14em] text-adm-muted">
             Payout details
           </p>
         </div>
@@ -796,7 +796,7 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.bankName && "border-error",
+                errors.bankName && "border-console-red",
               )}
               {...register("bankName")}
             />
@@ -814,7 +814,7 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
                 adminInputClass,
                 roCls,
                 "font-adminmono",
-                errors.bankAccountNumber && "border-error",
+                errors.bankAccountNumber && "border-console-red",
               )}
               {...register("bankAccountNumber")}
             />
@@ -832,7 +832,7 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
             className={cn(
               adminInputClass,
               roCls,
-              errors.momoNumber && "border-error",
+              errors.momoNumber && "border-console-red",
             )}
             {...register("momoNumber")}
           />
@@ -846,7 +846,7 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
               adminInputClass,
               roCls,
               "h-auto min-h-[104px] w-full resize-y py-2",
-              errors.notes && "border-error",
+              errors.notes && "border-console-red",
             )}
             {...register("notes")}
           />

@@ -155,7 +155,7 @@ export function SeasonForm({
             <Input
               placeholder="2026 Wet Season"
               disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.name && "border-error")}
+              className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
               {...register("name")}
             />
           </AdminField>
@@ -175,7 +175,7 @@ export function SeasonForm({
                 adminInputClass,
                 roCls,
                 "h-auto min-h-[62px] w-full resize-y py-2",
-                errors.description && "border-error",
+                errors.description && "border-console-red",
               )}
               {...register("description")}
             />
@@ -188,7 +188,7 @@ export function SeasonForm({
                 className={cn(
                   adminInputClass,
                   roCls,
-                  errors.startsOn && "border-error",
+                  errors.startsOn && "border-console-red",
                 )}
                 {...register("startsOn")}
               />
@@ -200,7 +200,7 @@ export function SeasonForm({
                 className={cn(
                   adminInputClass,
                   roCls,
-                  errors.endsOn && "border-error",
+                  errors.endsOn && "border-console-red",
                 )}
                 {...register("endsOn")}
               />

@@ -138,14 +138,14 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
         >
           <AdminField label="Name" error={errors.name?.message}>
             <Input
-              className={cn(adminInputClass, errors.name && "border-error")}
+              className={cn(adminInputClass, errors.name && "border-console-red")}
               placeholder="e.g. 50/50 on arrival"
               {...register("name")}
             />
           </AdminField>
 
           <div className="flex flex-col gap-2">
-            <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+            <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
               Milestones
             </span>
             {fields.map((field, i) => (
@@ -188,7 +188,7 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
               </div>
             ))}
             {errors.milestones?.message ? (
-              <p className="text-[12px] text-error">
+              <p className="text-[12px] text-console-red">
                 {errors.milestones.message}
               </p>
             ) : null}
@@ -204,7 +204,7 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
             </AdminButton>
           </div>
 
-          <label className="flex items-center gap-2 text-[13px] text-ink">
+          <label className="flex items-center gap-2 text-[13px] text-adm-ink">
             <input type="checkbox" {...register("isDefault")} />
             Make this the default policy
           </label>
@@ -297,7 +297,7 @@ function PolicyCard({ policy }: { policy: IPaymentPolicy }) {
       {/* The tag pins to the top of the title, not its vertical middle - a
           policy name here routinely runs to three lines. */}
       <div className="mb-2 flex items-start justify-between gap-2">
-        <span className="line-clamp-2 text-[14px] font-bold text-ink">
+        <span className="line-clamp-2 text-[14px] font-bold text-adm-ink">
           {policy.name}
         </span>
         <span className="flex flex-none gap-1.5">
@@ -314,7 +314,7 @@ function PolicyCard({ policy }: { policy: IPaymentPolicy }) {
           Previously the share and its trigger shared one truncating line and
           the percentage - the single number that matters - was the part being
           cut off ("80% ·…"). */}
-      <div className="flex flex-col divide-y divide-soil/10 border-y border-soil/10">
+      <div className="flex flex-col divide-y divide-soil/10 border-y border-adm-hairline">
         {policy.milestones.map((m, i) => (
           <div
             key={`${m.label}-${String(i)}`}
@@ -324,10 +324,10 @@ function PolicyCard({ policy }: { policy: IPaymentPolicy }) {
               {m.percent}%
             </span>
             <span className="min-w-0">
-              <span className="block truncate text-[12.5px] text-ink">
+              <span className="block truncate text-[12.5px] text-adm-ink">
                 {m.label}
               </span>
-              <span className="block truncate text-[11.5px] text-soil">
+              <span className="block truncate text-[11.5px] text-adm-muted">
                 {milestoneTriggerLabel(m.trigger)}
               </span>
             </span>
@@ -389,7 +389,7 @@ export function PaymentPoliciesScreen() {
 
       {/* Policies are immutable by design: sales freeze a snapshot of their
           terms, so there is deliberately no edit action here. */}
-      <p className="mb-3 text-[12.5px] text-soil">
+      <p className="mb-3 text-[12.5px] text-adm-muted">
         Policies can&apos;t be edited once created - create a new policy for new
         terms instead.
       </p>

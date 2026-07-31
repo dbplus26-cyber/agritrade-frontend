@@ -77,12 +77,12 @@ export function SearchableSelect({
           <span
             className={cn(
               "min-w-0 flex-1 line-clamp-1 whitespace-normal [overflow-wrap:anywhere]",
-              !selected && "text-soil/55",
+              !selected && "text-adm-faint",
             )}
           >
             {selected ? selected.label : placeholder}
           </span>
-          <ChevronDownIcon aria-hidden className="size-4 flex-none text-soil/70" />
+          <ChevronDownIcon aria-hidden className="size-4 flex-none text-adm-faint" />
         </button>
       </PopoverTrigger>
       <PopoverContent
@@ -91,12 +91,12 @@ export function SearchableSelect({
         collisionPadding={8}
         // z-[80]: above dialogs (z-50), the shell's bottom tab bar (z-[60])
         // and responsive bottom sheets (z-[70]).
-        className="z-[80] w-[var(--radix-popover-trigger-width)] min-w-[min(92vw,240px)] max-w-[min(92vw,26rem)] rounded-[2px] border-[1.5px] border-soil/35 bg-paper p-0 shadow-doc ring-0"
+        className="z-[80] w-[var(--radix-popover-trigger-width)] min-w-[min(92vw,240px)] max-w-[min(92vw,26rem)] rounded-[6px] border-[1.5px] border-adm-line bg-adm-card p-0 shadow-[0_1px_2px_rgba(16,24,40,0.05)] ring-0"
       >
-        <Command className="rounded-[2px]! bg-transparent p-0">
+        <Command className="rounded-[6px]! bg-transparent p-0">
           <CommandInput autoFocus placeholder="Type to search..." />
           <CommandList id={listId} className="max-h-[min(40dvh,18rem)]">
-            <CommandEmpty className="py-5 text-center text-[13px] text-soil">
+            <CommandEmpty className="py-5 text-center text-[13px] text-adm-muted">
               {emptyText}
             </CommandEmpty>
             {options.map((o) => (
@@ -110,13 +110,13 @@ export function SearchableSelect({
                   onChange(o.value);
                   setOpen(false);
                 }}
-                className="rounded-[2px] text-[13.5px]"
+                className="rounded-[6px] text-[13.5px]"
               >
-                <span className="min-w-0 flex-1 text-ink [overflow-wrap:anywhere]">
+                <span className="min-w-0 flex-1 text-adm-ink [overflow-wrap:anywhere]">
                   {o.label}
                 </span>
                 {o.hint ? (
-                  <span className="ml-auto flex-none pl-2 text-right text-[12px] text-soil/80">
+                  <span className="ml-auto flex-none pl-2 text-right text-[12px] text-adm-muted/80">
                     {o.hint}
                   </span>
                 ) : null}

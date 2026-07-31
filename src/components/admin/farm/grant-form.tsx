@@ -138,7 +138,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
                     ...(f.community ? { hint: f.community } : {}),
                   }))}
                   placeholder="Choose the farmer"
-                  className={cn(errors.farmerId && "border-error")}
+                  className={cn(errors.farmerId && "border-console-red")}
                 />
               )}
             />
@@ -157,7 +157,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
                       label: s.name,
                     }))}
                     placeholder="Choose the season"
-                    className={cn(errors.seasonId && "border-error")}
+                    className={cn(errors.seasonId && "border-console-red")}
                   />
                 )}
               />
@@ -176,7 +176,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
                       hint: i.unitLabel,
                     }))}
                     placeholder="Choose the item"
-                    className={cn(errors.itemId && "border-error")}
+                    className={cn(errors.itemId && "border-console-red")}
                   />
                 )}
               />
@@ -184,14 +184,14 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
             <AdminField label="Quantity" error={errors.quantity?.message}>
               <Input
                 inputMode="decimal"
-                className={cn(adminInputClass, errors.quantity && "border-error")}
+                className={cn(adminInputClass, errors.quantity && "border-console-red")}
                 {...register("quantity")}
               />
             </AdminField>
             <AdminField label="Value (GHS)" error={errors.valueGhs?.message}>
               <Input
                 inputMode="decimal"
-                className={cn(adminInputClass, errors.valueGhs && "border-error")}
+                className={cn(adminInputClass, errors.valueGhs && "border-console-red")}
                 {...register("valueGhs")}
               />
             </AdminField>
@@ -203,10 +203,10 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
 
         <AdminCard className="flex flex-col gap-3 px-5 py-4">
           <div>
-            <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+            <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
               Signed agreement
             </div>
-            <p className="mt-1 text-[12px] text-soil">
+            <p className="mt-1 text-[12px] text-adm-muted">
               The agreement the farmer signed becomes the binding record behind
               this grant - what was taken, and what was agreed in return.
             </p>
@@ -222,7 +222,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
               className={cn(
                 adminInputClass,
                 "h-auto min-h-[60px] w-full resize-y py-2",
-                errors.agreedTerms && "border-error",
+                errors.agreedTerms && "border-console-red",
               )}
               {...register("agreedTerms")}
             />
@@ -231,7 +231,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
             <AdminField label="Due date" optional error={errors.dueDate?.message}>
               <Input
                 type="date"
-                className={cn(adminInputClass, errors.dueDate && "border-error")}
+                className={cn(adminInputClass, errors.dueDate && "border-console-red")}
                 {...register("dueDate")}
               />
             </AdminField>
@@ -247,7 +247,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
           {/* Not an AdminField: wrapping the picker's buttons in a <label>
               would misroute label clicks. Same stencil-label + error markup. */}
           <div>
-            <span className="stencil mb-[7px] block text-[11px] uppercase tracking-[0.14em] text-harvest-deep">
+            <span className="mb-[7px] block text-[11px] uppercase tracking-[0.14em] text-adm-muted">
               Agreement file
             </span>
             <FilePicker
@@ -264,7 +264,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
             {agreementError ? (
               <span
                 role="alert"
-                className="mt-1 block text-[12px] font-medium text-error"
+                className="mt-1 block text-[12px] font-medium text-console-red"
               >
                 {agreementError}
               </span>
@@ -272,7 +272,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
           </div>
         </AdminCard>
 
-        <p className="text-[12px] text-soil">
+        <p className="text-[12px] text-adm-muted">
           A grant at or above the owner-set threshold records immediately but is
           flagged for approval.
         </p>

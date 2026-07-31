@@ -25,7 +25,7 @@ import { FarmDocumentsSection, GrantApprovalBadge } from "./farm-bits";
 
 const LIST = "/admin/grants";
 
-const NotRecorded = () => <span className="text-soil">Not recorded</span>;
+const NotRecorded = () => <span className="text-adm-muted">Not recorded</span>;
 
 export function GrantDetail({ id }: { id: string }) {
   const { data, isLoading, isError, error, refetch } = useGetGrantQuery(id);
@@ -58,7 +58,7 @@ export function GrantDetail({ id }: { id: string }) {
           <div className="flex flex-col gap-4">
             {/* Who took what */}
             <AdminCard className="px-5 py-4">
-              <div className="mb-2 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              <div className="mb-2 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Who took what
               </div>
               <Link
@@ -81,12 +81,12 @@ export function GrantDetail({ id }: { id: string }) {
                   </span>
                 )}
                 <div className="min-w-0">
-                  <div className="truncate text-[14px] font-semibold text-ink hover:underline">
+                  <div className="truncate text-[14px] font-semibold text-adm-ink hover:underline">
                     {g.farmer.name}
                   </div>
                   {[g.farmer.phone, g.farmer.community].filter(Boolean).length >
                   0 ? (
-                    <div className="truncate text-[12px] text-soil">
+                    <div className="truncate text-[12px] text-adm-muted">
                       {[g.farmer.phone, g.farmer.community]
                         .filter(Boolean)
                         .join(" · ")}
@@ -94,7 +94,7 @@ export function GrantDetail({ id }: { id: string }) {
                   ) : null}
                 </div>
               </Link>
-              <DetailGrid className="mt-3 border-t border-soil/10 pt-1">
+              <DetailGrid className="mt-3 border-t border-adm-hairline pt-1">
                 <DetailItem label="Item">
                   {g.item.name} · {g.quantity} {g.item.unitLabel}
                 </DetailItem>
@@ -121,10 +121,10 @@ export function GrantDetail({ id }: { id: string }) {
 
             {/* Agreement */}
             <AdminCard className="px-5 py-4">
-              <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Agreement
               </div>
-              <p className="mt-1 mb-1 text-[12px] text-soil">
+              <p className="mt-1 mb-1 text-[12px] text-adm-muted">
                 The signed agreement is the binding record behind this grant.
                 Never shown publicly; downloads are logged.
               </p>
@@ -136,7 +136,7 @@ export function GrantDetail({ id }: { id: string }) {
                   {g.dueDate ? formatDateOnly(g.dueDate) : <NotRecorded />}
                 </DetailItem>
               </DetailGrid>
-              <div className="mt-2 border-t border-soil/10 pt-1">
+              <div className="mt-2 border-t border-adm-hairline pt-1">
                 <FarmDocumentsSection
                   documents={g.documents}
                   urlOf={(documentId) => grantDocumentUrl(g.id, documentId)}
@@ -157,23 +157,23 @@ export function GrantDetail({ id }: { id: string }) {
           <div className="flex flex-col gap-4">
             {/* Grant value */}
             <AdminCard className="px-5 py-4">
-              <p className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Grant value
               </p>
-              <p className="font-adminmono mt-1 text-[26px] font-bold text-ink tabular-nums">
+              <p className="font-adminmono mt-1 text-[26px] font-bold text-adm-ink tabular-nums">
                 <Money value={g.valueGhs} />
               </p>
-              <p className="mt-1 text-[12.5px] text-soil">
+              <p className="mt-1 text-[12.5px] text-adm-muted">
                 Granted {formatDateTime(g.grantedAt)}
               </p>
             </AdminCard>
 
             {/* Season position */}
             <AdminCard className="px-5 py-4">
-              <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Season position
               </div>
-              <p className="mt-1 mb-1 text-[12px] text-soil">
+              <p className="mt-1 mb-1 text-[12px] text-adm-muted">
                 {g.farmer.name}&apos;s running balance for {g.season.name}.
               </p>
               <DetailGrid columns={2}>

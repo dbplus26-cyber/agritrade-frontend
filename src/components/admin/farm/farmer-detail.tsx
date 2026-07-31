@@ -131,12 +131,12 @@ export function FarmerDetail({ id }: { id: string }) {
             {a.init}
           </span>
         )}
-        <div className="mt-3 text-[15px] font-semibold text-ink">{f.name}</div>
+        <div className="mt-3 text-[15px] font-semibold text-adm-ink">{f.name}</div>
         {f.phone ? (
-          <div className="text-[12.5px] text-soil">{f.phone}</div>
+          <div className="text-[12.5px] text-adm-muted">{f.phone}</div>
         ) : null}
       </div>
-      <div className="mt-4 flex flex-wrap justify-center gap-2 border-t border-soil/15 pt-4 xl:flex-col">
+      <div className="mt-4 flex flex-wrap justify-center gap-2 border-t border-adm-hairline pt-4 xl:flex-col">
         <AdminButton className="h-9 px-4" asChild>
           <Link href={`${LIST}/${f.id}/statement`}>Statement</Link>
         </AdminButton>
@@ -178,7 +178,7 @@ export function FarmerDetail({ id }: { id: string }) {
           <div className="flex flex-col gap-4">
             {/* Profile */}
             <AdminCard className="px-5 py-4">
-              <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Profile
               </div>
               <DetailGrid>
@@ -210,16 +210,16 @@ export function FarmerDetail({ id }: { id: string }) {
                   {f.momoNumber ? <Mono>{f.momoNumber}</Mono> : <Absent />}
                 </DetailItem>
                 <DetailItem label="Notes" className="sm:col-span-2 xl:col-span-3">
-                  {f.notes ? f.notes : <span className="text-soil">No notes.</span>}
+                  {f.notes ? f.notes : <span className="text-adm-muted">No notes.</span>}
                 </DetailItem>
               </DetailGrid>
             </AdminCard>
 
             {/* Guarantors */}
             <AdminCard className="overflow-hidden">
-              <div className="border-b border-soil/15 px-5 py-3">
+              <div className="border-b border-adm-hairline px-5 py-3">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                  <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                     Guarantors
                   </span>
                   <button
@@ -230,45 +230,45 @@ export function FarmerDetail({ id }: { id: string }) {
                     + Add guarantor
                   </button>
                 </div>
-                <p className="mt-0.5 text-[12px] text-soil">
+                <p className="mt-0.5 text-[12px] text-adm-muted">
                   Who vouches for this farmer before grants are released.
                 </p>
               </div>
               {f.guarantors.length === 0 ? (
-                <p className="px-5 py-4 text-[13px] text-soil">No guarantors yet.</p>
+                <p className="px-5 py-4 text-[13px] text-adm-muted">No guarantors yet.</p>
               ) : (
                 <ul className="divide-y divide-soil/10">
                   {f.guarantors.map((g) => (
                     <li key={g.id} className="px-5 py-3 text-[13px]">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <div className="font-semibold text-ink [overflow-wrap:anywhere]">
+                          <div className="font-semibold text-adm-ink [overflow-wrap:anywhere]">
                             {g.name}
                           </div>
                           {g.relationship || g.occupation ? (
-                            <div className="text-[12px] text-soil [overflow-wrap:anywhere]">
+                            <div className="text-[12px] text-adm-muted [overflow-wrap:anywhere]">
                               {[g.relationship, g.occupation]
                                 .filter(Boolean)
                                 .join(" · ")}
                             </div>
                           ) : null}
                           {g.phone ? (
-                            <Mono className="block text-[12px] text-ink">
+                            <Mono className="block text-[12px] text-adm-ink">
                               {g.phone}
                             </Mono>
                           ) : null}
                           {g.address ? (
-                            <div className="text-[12px] text-soil [overflow-wrap:anywhere]">
+                            <div className="text-[12px] text-adm-muted [overflow-wrap:anywhere]">
                               {g.address}
                             </div>
                           ) : null}
                           {g.idType || g.idNumber ? (
-                            <div className="text-[12px] text-soil [overflow-wrap:anywhere]">
+                            <div className="text-[12px] text-adm-muted [overflow-wrap:anywhere]">
                               {[g.idType, g.idNumber].filter(Boolean).join(" · ")}
                             </div>
                           ) : null}
                           {g.notes ? (
-                            <div className="text-[12px] text-soil italic [overflow-wrap:anywhere]">
+                            <div className="text-[12px] text-adm-muted italic [overflow-wrap:anywhere]">
                               {g.notes}
                             </div>
                           ) : null}
@@ -298,16 +298,16 @@ export function FarmerDetail({ id }: { id: string }) {
 
             {/* Private documents */}
             <AdminCard className="px-5 py-4">
-              <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Agreement documents (private)
               </div>
-              <p className="mb-2 text-[12px] text-soil">
+              <p className="mb-2 text-[12px] text-adm-muted">
                 Never shown publicly. Downloads are logged.
               </p>
               {f.documents.map((doc) => (
                 <div
                   key={doc.id}
-                  className="flex items-center justify-between border-b border-soil/10 py-2 text-[13px] last:border-b-0"
+                  className="flex items-center justify-between border-b border-adm-hairline py-2 text-[13px] last:border-b-0"
                 >
                   <a
                     href={farmerDocumentUrl(f.id, doc.id)}
@@ -318,7 +318,7 @@ export function FarmerDetail({ id }: { id: string }) {
                     {doc.name}
                   </a>
                   <div className="flex items-center gap-3">
-                    <Mono className="text-[12px] text-soil">
+                    <Mono className="text-[12px] text-adm-muted">
                       {formatFarmDate(doc.createdAt)}
                     </Mono>
                     <button
@@ -341,7 +341,7 @@ export function FarmerDetail({ id }: { id: string }) {
                   value={docName}
                   onChange={(e) => setDocName(e.target.value)}
                   placeholder="Document name (e.g. Grant agreement)"
-                  className="h-8 flex-1 rounded border border-soil/25 bg-paper px-2.5 text-[13px]"
+                  className="h-8 flex-1 rounded border border-adm-line bg-adm-card px-2.5 text-[13px]"
                 />
                 <FilePicker
                   accept="image/*,application/pdf,.doc,.docx"
@@ -358,8 +358,8 @@ export function FarmerDetail({ id }: { id: string }) {
             {/* Grants + repayments */}
             <div className="grid gap-4 lg:grid-cols-2">
               <AdminCard className="overflow-hidden">
-                <div className="flex items-center justify-between border-b border-soil/15 px-5 py-3">
-                  <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                <div className="flex items-center justify-between border-b border-adm-hairline px-5 py-3">
+                  <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                     Grants
                   </span>
                   <Link
@@ -370,18 +370,18 @@ export function FarmerDetail({ id }: { id: string }) {
                   </Link>
                 </div>
                 {(grants.data?.data ?? []).length === 0 ? (
-                  <p className="px-5 py-4 text-[13px] text-soil">No grants yet.</p>
+                  <p className="px-5 py-4 text-[13px] text-adm-muted">No grants yet.</p>
                 ) : (
                   <ul className="divide-y divide-soil/10">
                     {(grants.data?.data ?? []).map((g) => (
                       <li key={g.id} className="px-5 py-2.5 text-[13px]">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="font-semibold text-ink">{g.item.name}</span>
-                          <Mono className="text-ink">
+                          <span className="font-semibold text-adm-ink">{g.item.name}</span>
+                          <Mono className="text-adm-ink">
                             <Money value={g.valueGhs} />
                           </Mono>
                         </div>
-                        <div className="mt-0.5 flex items-center justify-between text-[12px] text-soil">
+                        <div className="mt-0.5 flex items-center justify-between text-[12px] text-adm-muted">
                           <span>
                             {g.season.name} · {formatFarmDate(g.grantedAt)}
                           </span>
@@ -394,8 +394,8 @@ export function FarmerDetail({ id }: { id: string }) {
               </AdminCard>
 
               <AdminCard className="overflow-hidden">
-                <div className="flex items-center justify-between border-b border-soil/15 px-5 py-3">
-                  <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                <div className="flex items-center justify-between border-b border-adm-hairline px-5 py-3">
+                  <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                     Repayments
                   </span>
                   <Link
@@ -406,20 +406,20 @@ export function FarmerDetail({ id }: { id: string }) {
                   </Link>
                 </div>
                 {(repayments.data?.data ?? []).length === 0 ? (
-                  <p className="px-5 py-4 text-[13px] text-soil">No repayments yet.</p>
+                  <p className="px-5 py-4 text-[13px] text-adm-muted">No repayments yet.</p>
                 ) : (
                   <ul className="divide-y divide-soil/10">
                     {(repayments.data?.data ?? []).map((r) => (
                       <li key={r.id} className="px-5 py-2.5 text-[13px]">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="font-semibold text-ink">
+                          <span className="font-semibold text-adm-ink">
                             {r.commodity.name}
                           </span>
                           <Mono className="text-leaf">
                             <Money value={r.valueGhs} />
                           </Mono>
                         </div>
-                        <div className="mt-0.5 flex items-center justify-between text-[12px] text-soil">
+                        <div className="mt-0.5 flex items-center justify-between text-[12px] text-adm-muted">
                           <span>
                             {r.weightKg} kg · {formatFarmDate(r.receivedAt)}
                           </span>

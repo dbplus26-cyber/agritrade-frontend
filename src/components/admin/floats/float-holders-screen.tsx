@@ -223,7 +223,7 @@ export function FloatHoldersScreen() {
         isFetching={isFetching}
         isFiltered={activeFilterCount > 0 || Boolean(queryParams.search)}
         itemNoun="people"
-        rowClassName={() => "h-14 hover:bg-surface-alt/60"}
+        rowClassName={() => "h-14 hover:bg-adm-sunken"}
         serverPagination={{
           onPageChange: setPage,
           onPageSizeChange: (size) => setFilter("size", String(size)),
@@ -245,7 +245,7 @@ export function FloatHoldersScreen() {
  */
 function HolderState({ holder }: { holder: IFloatHolder }) {
   if (!holder.accountId) {
-    return <span className="text-soil/60">Not funded yet</span>;
+    return <span className="text-adm-faint">Not funded yet</span>;
   }
   if (!holder.accountActive) {
     return <ToneBadge tone="alert">Suspended</ToneBadge>;

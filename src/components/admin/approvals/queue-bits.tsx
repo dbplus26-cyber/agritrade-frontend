@@ -110,7 +110,7 @@ export function RuleBadge({ action }: { action: ApprovalAction }) {
   const rule = RULE[action];
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-[2px] px-[9px] py-[3px] text-[11.5px] leading-[1.4] font-[550] whitespace-nowrap"
+      className="inline-flex items-center gap-1.5 rounded-[6px] px-[9px] py-[3px] text-[11.5px] leading-[1.4] font-[550] whitespace-nowrap"
       style={{ backgroundColor: rule.bg, color: rule.fg }}
     >
       <span
@@ -299,7 +299,7 @@ export function auditTrail(a: IApproval): string {
 
 /** Button styling from spec 10 - base, primary and danger share one shape. */
 export const apButton =
-  "inline-flex items-center justify-center rounded-[2px] border px-[13px] py-1.5 text-[12.5px] leading-[1.4] font-[550] whitespace-nowrap cursor-pointer " +
+  "inline-flex items-center justify-center rounded-[6px] border px-[13px] py-1.5 text-[12.5px] leading-[1.4] font-[550] whitespace-nowrap cursor-pointer " +
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ap-forest)] " +
   "disabled:cursor-not-allowed disabled:opacity-50";
 
@@ -339,7 +339,7 @@ export function NoteBlock({ note }: { note: string }) {
 /** Shown when one account both raised and signed off the same request. */
 export function SelfDecidedChip() {
   return (
-    <span className="rounded-[2px] bg-[var(--ap-chip)] px-[7px] py-0.5 text-[11px] leading-[1.4] font-semibold text-[var(--ap-muted)]">
+    <span className="rounded-[6px] bg-[var(--ap-chip)] px-[7px] py-0.5 text-[11px] leading-[1.4] font-semibold text-[var(--ap-muted)]">
       Self approved
     </span>
   );

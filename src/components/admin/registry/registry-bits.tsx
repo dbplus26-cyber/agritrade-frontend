@@ -63,7 +63,7 @@ export const columnMeta = (opts?: {
     opts?.className,
   ),
   headerClassName:
-    "h-[38px] whitespace-nowrap bg-surface-alt/70 py-0 text-[10.5px] font-bold uppercase tracking-[0.09em] text-soil",
+    "h-[38px] whitespace-nowrap bg-adm-sunken py-0 text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted",
 });
 
 export const STATUS_FILTER_OPTIONS = [
@@ -85,5 +85,5 @@ export const statusToQuery = (
 
 /** "—" placeholder the console uses for absent optional values. */
 export function Absent() {
-  return <span className="text-soil/45">—</span>;
+  return <span className="text-adm-faint">—</span>;
 }

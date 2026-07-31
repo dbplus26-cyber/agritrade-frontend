@@ -91,7 +91,7 @@ export function StocktakesScreen() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-ink">
+          <Mono className="whitespace-nowrap text-[12.5px] text-adm-ink">
             {row.original.transactionNo}
           </Mono>
         ),
@@ -104,7 +104,7 @@ export function StocktakesScreen() {
         meta: columnMeta(),
         cell: ({ row }) => (
           <span
-            className="block min-w-0 max-w-[240px] text-[13px] font-medium text-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere]"
+            className="block min-w-0 max-w-[240px] text-[13px] font-medium text-adm-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere]"
             title={row.original.warehouse.name}
           >
             {row.original.warehouse.name}
@@ -128,7 +128,7 @@ export function StocktakesScreen() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <Mono className="text-[12.5px] text-ink">
+          <Mono className="text-[12.5px] text-adm-ink">
             {row.original.lines.length}
           </Mono>
         ),
@@ -148,10 +148,10 @@ export function StocktakesScreen() {
   return (
     <div>
       <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Stocktakes
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           Physical counts checked against the book - approved differences post
           as adjustments
         </p>
@@ -167,8 +167,8 @@ export function StocktakesScreen() {
           action={
             <Button
               asChild
-              variant="harvest"
-              className="h-8 px-3.5 text-[13px]"
+              variant="default"
+              className="h-[34px] rounded-[6px] bg-console px-3.5 text-[13px] font-semibold text-white shadow-none hover:translate-x-0 hover:translate-y-0 hover:bg-console-hover hover:shadow-none"
             >
               <Link href={`${LIST}/new`}>+ New stocktake</Link>
             </Button>
@@ -237,7 +237,7 @@ export function StocktakesScreen() {
               onPageSizeChange: (size) => setFilter("size", String(size)),
             }}
             rowHref={(s) => `${LIST}/${s.id}`}
-            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+            rowClassName={() => "h-12 hover:bg-adm-sunken"}
           />
         </AdminCard>
       )}

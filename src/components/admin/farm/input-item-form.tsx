@@ -175,7 +175,7 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
             <Input
               placeholder="NPK fertiliser"
               disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.name && "border-error")}
+              className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
               {...register("name")}
             />
           </AdminField>
@@ -186,7 +186,7 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.unitLabel && "border-error",
+                errors.unitLabel && "border-console-red",
               )}
               {...register("unitLabel")}
             />
@@ -208,7 +208,7 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
                 adminInputClass,
                 roCls,
                 "h-auto min-h-[84px] w-full resize-y py-2",
-                errors.description && "border-error",
+                errors.description && "border-console-red",
               )}
               {...register("description")}
             />

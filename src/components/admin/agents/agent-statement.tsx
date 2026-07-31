@@ -42,7 +42,7 @@ function Figure({
     <Mono
       className={cn(
         "block whitespace-nowrap text-right",
-        value === null && "text-soil/50",
+        value === null && "text-adm-faint",
         className,
       )}
     >
@@ -170,25 +170,25 @@ export function AgentStatement({ id }: { id: string }) {
 
       {/* Left-aligned like every other console page - the sheet keeps its own
           720px measure so it still reads as a piece of paper. */}
-      <div className="max-w-[720px] rounded-[8px] border border-soil/25 bg-white p-8 text-ink print:max-w-none print:rounded-none print:border-0 print:p-0">
+      <div className="max-w-[720px] rounded-[8px] border border-adm-line bg-white p-8 text-adm-ink print:max-w-none print:rounded-none print:border-0 print:p-0">
         <div className="flex items-start justify-between gap-4 border-b-2 border-ink pb-3">
           <div>
             <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">
               DB PLUS
             </div>
-            <div className="text-[11px] tracking-[0.06em] text-soil uppercase">
+            <div className="text-[11px] tracking-[0.06em] text-adm-muted uppercase">
               Trading · Tamale
             </div>
           </div>
           <div className="text-right">
             <div className="text-[16px] font-bold">FLOAT STATEMENT</div>
-            <div className="text-[12px] text-soil">
+            <div className="text-[12px] text-adm-muted">
               {a.firstName} {a.lastName}
             </div>
-            <div className="text-[12px] text-soil">
+            <div className="text-[12px] text-adm-muted">
               Printed {formatDate(new Date().toISOString())}
             </div>
-            <div className="text-[12px] text-soil">
+            <div className="text-[12px] text-adm-muted">
               {windowed
                 ? `Period ${from ? formatDateOnly(from) : "start"} to ${to ? formatDateOnly(to) : "today"}`
                 : "All history"}
@@ -207,7 +207,7 @@ export function AgentStatement({ id }: { id: string }) {
               <col className="w-[124px]" />
             </colgroup>
             <thead>
-              <tr className="border-y border-ink align-bottom text-left text-[10.5px] font-bold tracking-[0.08em] text-soil uppercase">
+              <tr className="border-y border-ink align-bottom text-left text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
                 <th className="py-2">Date</th>
                 <th className="py-2">Detail</th>
                 <th className="py-2 text-right">In / out</th>
@@ -218,14 +218,14 @@ export function AgentStatement({ id }: { id: string }) {
               {/* Carried in, so the balance column is a real balance from its
                   first row rather than a period subtotal wearing the name. */}
               {windowed && from ? (
-                <tr className="border-b border-soil/25">
-                  <td className="py-1.5 align-top whitespace-nowrap text-soil">
+                <tr className="border-b border-adm-line">
+                  <td className="py-1.5 align-top whitespace-nowrap text-adm-muted">
                     {formatDateOnly(from)}
                   </td>
-                  <td className="py-1.5 align-top text-soil">
+                  <td className="py-1.5 align-top text-adm-muted">
                     Balance brought forward
                   </td>
-                  <td className="py-1.5 text-right align-top text-soil">-</td>
+                  <td className="py-1.5 text-right align-top text-adm-muted">-</td>
                   <td className="py-1.5 align-top">
                     <Figure value={opening} className="font-semibold" />
                   </td>
@@ -233,7 +233,7 @@ export function AgentStatement({ id }: { id: string }) {
               ) : null}
               {rows.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="py-3 text-soil">
+                  <td colSpan={4} className="py-3 text-adm-muted">
                     {windowed
                       ? "No float activity in this period."
                       : "No float activity yet."}
@@ -248,7 +248,7 @@ export function AgentStatement({ id }: { id: string }) {
                   // colourless and a leading "-" is easy to miss.
                   const isDebit = amount !== null && amount < 0;
                   return (
-                    <tr key={tx.id} className="border-b border-soil/25">
+                    <tr key={tx.id} className="border-b border-adm-line">
                       <td className="py-1.5 align-top whitespace-nowrap">
                         {formatDateOnly(tx.occurredAt)}
                       </td>
@@ -257,7 +257,7 @@ export function AgentStatement({ id }: { id: string }) {
                           {TX_LABEL[tx.type] ?? tx.type}
                         </span>
                         {tx.reason ? (
-                          <span className="text-soil"> · {tx.reason}</span>
+                          <span className="text-adm-muted"> · {tx.reason}</span>
                         ) : null}
                       </td>
                       <td className="py-1.5 align-top">
@@ -270,7 +270,7 @@ export function AgentStatement({ id }: { id: string }) {
                           )}
                         />
                         {amount !== null ? (
-                          <span className="block text-right text-[10px] font-bold tracking-[0.1em] text-soil/70 uppercase">
+                          <span className="block text-right text-[10px] font-bold tracking-[0.1em] text-adm-faint uppercase">
                             {isDebit ? "Out" : "In"}
                           </span>
                         ) : null}
@@ -288,7 +288,7 @@ export function AgentStatement({ id }: { id: string }) {
 
         {/* Never let a truncated ledger pass as the whole story. */}
         {(float.data.meta.total ?? 0) > rows.length ? (
-          <p className="mt-3 text-[11.5px] text-soil">
+          <p className="mt-3 text-[11.5px] text-adm-muted">
             Showing the {PAGE_LIMIT} most recent entries of{" "}
             {float.data.meta.total}. Narrow the period above to print the rest.
           </p>
@@ -298,8 +298,8 @@ export function AgentStatement({ id }: { id: string }) {
         <div className="mt-5 ml-auto w-full max-w-[340px]">
           {windowed ? (
             <>
-              <div className="flex items-baseline justify-between gap-4 border-t border-soil/40 py-1.5 text-[12.5px]">
-                <span className="text-soil">
+              <div className="flex items-baseline justify-between gap-4 border-t border-adm-line py-1.5 text-[12.5px]">
+                <span className="text-adm-muted">
                   Opening{from ? ` on ${formatDateOnly(from)}` : ""}
                 </span>
                 <Figure value={opening} />
@@ -307,8 +307,8 @@ export function AgentStatement({ id }: { id: string }) {
               {/* The rows' own movement: the closing figure minus what was
                   carried in, so it stays a period total even though the
                   balance column now starts from the opening balance. */}
-              <div className="flex items-baseline justify-between gap-4 border-t border-soil/40 py-1.5 text-[12.5px]">
-                <span className="text-soil">Net over period</span>
+              <div className="flex items-baseline justify-between gap-4 border-t border-adm-line py-1.5 text-[12.5px]">
+                <span className="text-adm-muted">Net over period</span>
                 <Figure
                   value={netOverPeriod}
                   className={cn(
@@ -321,8 +321,8 @@ export function AgentStatement({ id }: { id: string }) {
                   )}
                 />
               </div>
-              <div className="flex items-baseline justify-between gap-4 border-t border-soil/40 py-1.5 text-[12.5px]">
-                <span className="text-soil">
+              <div className="flex items-baseline justify-between gap-4 border-t border-adm-line py-1.5 text-[12.5px]">
+                <span className="text-adm-muted">
                   Closing on {to ? formatDateOnly(to) : "today"}
                 </span>
                 <Figure value={closing} />

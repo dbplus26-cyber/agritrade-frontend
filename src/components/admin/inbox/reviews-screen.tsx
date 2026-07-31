@@ -120,7 +120,7 @@ function ReviewModCard({
 
       <blockquote
         className={cn(
-          "mt-3 min-w-0 text-[13.5px] leading-[1.7] text-ink [overflow-wrap:anywhere]",
+          "mt-3 min-w-0 text-[13.5px] leading-[1.7] text-adm-ink [overflow-wrap:anywhere]",
           clampable && !expanded && "line-clamp-4",
         )}
       >
@@ -139,17 +139,17 @@ function ReviewModCard({
       ) : null}
 
       <div className="mt-auto pt-3">
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 border-t border-dotted border-soil/40 pt-3">
-          <span className="min-w-0 text-[13.5px] font-bold text-forest [overflow-wrap:anywhere]">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 border-t border-dotted border-adm-line pt-3">
+          <span className="min-w-0 text-[13.5px] font-bold text-adm-ink [overflow-wrap:anywhere]">
             {review.authorName}
           </span>
           <ToneBadge tone="sky">{REVIEW_ROLE_LABELS[review.role]}</ToneBadge>
-          <span className="ml-auto text-[12px] whitespace-nowrap text-soil">
+          <span className="ml-auto text-[12px] whitespace-nowrap text-adm-muted">
             {formatDateTime(review.createdAt)}
           </span>
         </div>
         {review.transactionNo ? (
-          <Mono className="mt-1.5 block text-[11.5px] text-soil/80">
+          <Mono className="mt-1.5 block text-[11.5px] text-adm-muted/80">
             {review.transactionNo}
           </Mono>
         ) : null}
@@ -190,7 +190,7 @@ function ReviewModCard({
                 onClick={() => {
                   onDelete(review);
                 }}
-                className="ml-auto h-8 px-2.5 text-[12.5px] text-error hover:text-error"
+                className="ml-auto h-8 px-2.5 text-[12.5px] text-console-red hover:text-console-red"
               >
                 Delete
               </AdminButton>
@@ -270,7 +270,7 @@ function AddReviewDialog({
               placeholder="e.g. Amina Alhassan"
               className={cn(
                 adminInputClass,
-                errors.authorName && "border-error",
+                errors.authorName && "border-console-red",
               )}
               {...register("authorName")}
             />
@@ -314,8 +314,8 @@ function AddReviewDialog({
                       <span
                         aria-hidden="true"
                         className={cn(
-                          "block px-0.5 text-[26px] leading-none transition-colors peer-focus-visible:rounded-[2px] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-leaf",
-                          star <= field.value ? "text-harvest" : "text-soil/30",
+                          "block px-0.5 text-[26px] leading-none transition-colors peer-focus-visible:rounded-[6px] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-leaf",
+                          star <= field.value ? "text-harvest" : "text-adm-faint",
                         )}
                       >
                         ★
@@ -334,7 +334,7 @@ function AddReviewDialog({
               className={cn(
                 adminInputClass,
                 "h-auto min-h-[112px] w-full resize-y py-2",
-                errors.text && "border-error",
+                errors.text && "border-console-red",
               )}
               {...register("text")}
             />
@@ -495,10 +495,10 @@ export function ReviewsScreen() {
                 }}
                 aria-pressed={filters.status === value}
                 className={cn(
-                  "cursor-pointer rounded-[2px] border-[1.5px] px-3.5 py-1.5 text-[13px] font-semibold transition-colors",
+                  "cursor-pointer rounded-[6px] border-[1.5px] px-3.5 py-1.5 text-[13px] font-semibold transition-colors",
                   filters.status === value
                     ? "border-console bg-console text-white"
-                    : "border-soil/30 bg-paper text-soil hover:border-console/60",
+                    : "border-adm-line bg-adm-card text-adm-muted hover:border-console/60",
                 )}
               >
                 {REVIEW_STATUS_META[value].label}

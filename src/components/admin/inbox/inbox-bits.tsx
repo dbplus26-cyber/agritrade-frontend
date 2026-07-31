@@ -65,10 +65,10 @@ export function InboxStatTile({
 }) {
   return (
     <AdminCard className="px-4 py-3">
-      <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+      <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         {label}
       </div>
-      <div className="mt-1 text-[19px] font-bold text-ink">
+      <div className="mt-1 text-[19px] font-bold text-adm-ink">
         {value === undefined ? <Absent /> : <Mono>{value}</Mono>}
       </div>
     </AdminCard>
@@ -88,7 +88,7 @@ export function StarRow({ rating }: { rating: number }) {
         <span
           key={star}
           aria-hidden="true"
-          className={star <= clamped ? "text-harvest" : "text-soil/30"}
+          className={star <= clamped ? "text-harvest" : "text-adm-faint"}
         >
           ★
         </span>

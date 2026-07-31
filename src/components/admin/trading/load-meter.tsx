@@ -33,19 +33,19 @@ export function LoadMeter({
   return (
     <div
       className={cn(
-        "rounded-[2px] border-[1.5px] px-3 py-2",
+        "rounded-[6px] border-[1.5px] px-3 py-2",
         over
-          ? "border-error/60 bg-error/[0.05]"
-          : "border-soil/25 bg-surface-alt/50",
+          ? "border-console-red/60 bg-console-red/[0.05]"
+          : "border-adm-line bg-adm-sunken",
         className,
       )}
     >
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 text-[12px]">
-        <span className="font-bold tracking-[0.09em] text-soil uppercase text-[10.5px]">
+        <span className="font-bold tracking-[0.09em] text-adm-muted uppercase text-[10.5px]">
           Truck load
         </span>
         <Mono
-          className={cn("text-[12.5px]", over ? "text-error" : "text-ink")}
+          className={cn("text-[12.5px]", over ? "text-console-red" : "text-adm-ink")}
         >
           {loadedLabel} {formatKg(loadedKg)}
           {hasCapacity ? <> / {formatKg(capacityKg)}</> : null}
@@ -70,7 +70,7 @@ export function LoadMeter({
             />
           </div>
           {over ? (
-            <p role="alert" className="mt-1 text-[12px] font-medium text-error">
+            <p role="alert" className="mt-1 text-[12px] font-medium text-console-red">
               Over capacity by {formatKg(loadedKg - capacityKg)} - lighten the
               load or raise the truck capacity.
             </p>

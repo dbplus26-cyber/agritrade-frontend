@@ -34,16 +34,42 @@
   --font-mono: ui-monospace, monospace;
   --font-heading: var(--font-archivo);
 
-  /* Console (admin) — one design system with the public site: the console
-     tokens alias the brand palette so both sides read as the same product.
+  /* Console (admin) - the "Meridian" console system from the Claude Design
+     project, not the public site's husk palette.
+     
+     The two sides are deliberately different objects. The public site is
+     printed paper: husk grounds, hard offset shadows, squared corners. The
+     console is a working tool read for hours at a time, and dressing it as
+     paperwork made it loud - every card a tinted slab with a drop shadow,
+     every corner squared, every rule the colour of soil. Meridian is a
+     near-neutral cool slate: white cards on a warm off-white page, hairline
+     borders, soft radii, and ONE accent doing the pointing. The accent stays
+     the house green so the console is still recognisably DB Plus.
+     
      Hanken Grotesk carries the UI, JetBrains Mono carries every number. */
-  --color-console: var(--color-forest);
-  --color-console-deep: var(--color-board);
-  --color-console-gold: var(--color-harvest-deep);
-  --color-console-gold-deep: #5f4a12;
-  --color-console-red: var(--color-error);
-  --color-console-red-deep: #7c2e1b;
-  --color-console-page: var(--color-surface);
+  --color-console: #1e3d2b;
+  --color-console-deep: #16301f;
+  --color-console-hover: #3e7a50;
+  --color-console-gold: #b8860b;
+  --color-console-gold-deep: #7a5407;
+  --color-console-red: #b03a2e;
+  --color-console-red-deep: #8e2e24;
+  --color-console-blue: #3e6b8c;
+
+  /* Meridian neutrals. `adm` keeps them clearly console-only, so a public
+     component can never reach for a console grey by accident. */
+  --color-adm-page: #fafaf8;
+  --color-adm-card: #ffffff;
+  --color-adm-sunken: #f5f7f9;
+  --color-adm-hover: #fbfcfd;
+  --color-adm-line: #e1e6ec;
+  --color-adm-hairline: #eceff3;
+  --color-adm-strong: #cfd6df;
+  --color-adm-ink: #161c24;
+  --color-adm-body: #39424f;
+  --color-adm-muted: #6a7686;
+  --color-adm-faint: #9ba6b3;
+  --color-console-page: var(--color-adm-page);
   /* Explicit family fallbacks so portaled overlays (Radix dialogs render on
      <body>, outside the admin layout's next/font variable scope) keep the
      console fonts — the @font-face family names are global and stable. */

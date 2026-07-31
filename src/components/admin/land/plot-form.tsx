@@ -140,7 +140,7 @@ export function PlotForm({
           className={cn(
             adminInputClass,
             disabled && "disabled:cursor-default disabled:opacity-100",
-            errors[key] && "border-error",
+            errors[key] && "border-console-red",
           )}
           {...register(key)}
         />
@@ -186,7 +186,7 @@ export function PlotForm({
           {field("description", "Description", { optional: true })}
           <label
             className={cn(
-              "flex items-center gap-2 text-[13px] text-ink",
+              "flex items-center gap-2 text-[13px] text-adm-ink",
               readOnly && "cursor-default",
             )}
           >

@@ -50,7 +50,7 @@ const columnMeta = (opts?: { wide?: boolean }) => ({
     opts?.wide ? "hidden xl:table-cell" : "table-cell",
   ),
   headerClassName:
-    "h-[38px] whitespace-nowrap bg-surface-alt/70 py-0 text-[10.5px] font-bold uppercase tracking-[0.09em] text-soil",
+    "h-[38px] whitespace-nowrap bg-adm-sunken py-0 text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted",
 });
 
 /**
@@ -113,14 +113,14 @@ export function AuditTable() {
         cell: ({ row }) => {
           const actor = row.original.actor;
           if (!actor) {
-            return <span className="text-soil/70">System</span>;
+            return <span className="text-adm-faint">System</span>;
           }
           return (
             <div className="min-w-0 max-w-[20rem]">
-              <div className="max-w-[20rem] truncate font-medium text-ink">
+              <div className="max-w-[20rem] truncate font-medium text-adm-ink">
                 {actor.name}
               </div>
-              <div className="max-w-[20rem] truncate text-[11.5px] text-soil/70">
+              <div className="max-w-[20rem] truncate text-[11.5px] text-adm-faint">
                 {actor.email}
               </div>
             </div>
@@ -145,10 +145,10 @@ export function AuditTable() {
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
           <div className="whitespace-nowrap">
-            <span className="text-soil">{row.original.entity}</span>
+            <span className="text-adm-muted">{row.original.entity}</span>
             {row.original.entityId ? (
               <Mono
-                className="ml-1.5 text-[11px] text-soil/70"
+                className="ml-1.5 text-[11px] text-adm-faint"
                 // Full id on hover; the cell shows a short handle.
               >
                 <span title={row.original.entityId}>
@@ -165,7 +165,7 @@ export function AuditTable() {
         enableSorting: false,
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12px] text-soil">
+          <Mono className="whitespace-nowrap text-[12px] text-adm-muted">
             {row.original.ip ?? "—"}
           </Mono>
         ),
@@ -177,10 +177,10 @@ export function AuditTable() {
   return (
     <div>
       <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Audit Log
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           Every change, by whom, from where
         </p>
       </div>

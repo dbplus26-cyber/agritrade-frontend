@@ -36,13 +36,13 @@ function Tile({
       {/* The label owns its own line. Sharing a row with the trend badge made
           them collide at 280px ("PURCHASE▲33.8%"), and the badge reads better
           beside the figure it describes anyway. */}
-      <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+      <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         {label}
       </div>
       <div className="mt-1 flex items-baseline justify-between gap-1.5">
         <Mono
           className={cn(
-            "min-w-0 font-bold text-ink",
+            "min-w-0 font-bold text-adm-ink",
             valueText ? statValueCls(valueText) : "text-[18px]",
           )}
         >
@@ -54,7 +54,7 @@ function Tile({
           </span>
         ) : null}
       </div>
-      {sub ? <div className="mt-0.5 text-[12px] text-soil">{sub}</div> : null}
+      {sub ? <div className="mt-0.5 text-[12px] text-adm-muted">{sub}</div> : null}
     </AdminCard>
   );
 }
@@ -70,7 +70,7 @@ export function PeriodSummary({ window }: { window: IReportWindow }) {
 
   return (
     <div>
-      <div className="mb-2 text-[11px] font-semibold tracking-[0.04em] text-soil/80 uppercase">
+      <div className="mb-2 text-[11px] font-semibold tracking-[0.04em] text-adm-muted/80 uppercase">
         In selected period
       </div>
       {isLoading || !s ? (

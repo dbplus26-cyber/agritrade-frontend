@@ -110,10 +110,10 @@ export function FarmApplicationsScreen() {
         meta: columnMeta(),
         cell: ({ row }) => (
           <span className="block min-w-[8rem] max-w-[20rem]">
-            <span className="block truncate font-medium text-ink">
+            <span className="block truncate font-medium text-adm-ink">
               {row.original.name}
             </span>
-            <Mono className="block text-[11px] text-soil/70">
+            <Mono className="block text-[11px] text-adm-faint">
               {row.original.reference}
             </Mono>
           </span>
@@ -126,7 +126,7 @@ export function FarmApplicationsScreen() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-soil">
+          <Mono className="whitespace-nowrap text-[12.5px] text-adm-muted">
             {row.original.phone}
           </Mono>
         ),
@@ -139,7 +139,7 @@ export function FarmApplicationsScreen() {
         meta: columnMeta({ wide: true }),
         cell: ({ row }) =>
           row.original.community ? (
-            <span className="block max-w-[160px] truncate text-soil">
+            <span className="block max-w-[160px] truncate text-adm-muted">
               {row.original.community}
             </span>
           ) : (
@@ -154,7 +154,7 @@ export function FarmApplicationsScreen() {
         meta: columnMeta(),
         cell: ({ row }) =>
           row.original.farmSizeAcres !== null ? (
-            <Mono className="whitespace-nowrap text-[12.5px] text-soil">
+            <Mono className="whitespace-nowrap text-[12.5px] text-adm-muted">
               {row.original.farmSizeAcres} acres
             </Mono>
           ) : (
@@ -247,7 +247,7 @@ export function FarmApplicationsScreen() {
                   },
                 }}
                 rowHref={(a) => `${LIST}/${a.id}`}
-                rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+                rowClassName={() => "h-12 hover:bg-adm-sunken"}
                 emptyState={
                   // The pristine empty inbox renders outside the table above -
                   // reaching this means a search or filter is narrowing the view.

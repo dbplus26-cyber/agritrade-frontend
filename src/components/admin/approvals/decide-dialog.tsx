@@ -122,13 +122,13 @@ export function DecideDialog({
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
         {approval && summary && link ? (
-          <div className="rounded-[2px] border-[1.5px] border-soil/20 bg-surface-alt/50 px-3 py-2.5">
+          <div className="rounded-[6px] border-[1.5px] border-adm-hairline bg-adm-sunken px-3 py-2.5">
             {/* The inbox card's title block + meta strip, in miniature. */}
-            <div className="font-adminmono text-[15px] leading-tight font-bold text-ink [overflow-wrap:anywhere]">
+            <div className="font-adminmono text-[15px] leading-tight font-bold text-adm-ink [overflow-wrap:anywhere]">
               {summary.headline}
             </div>
             {summary.detail ? (
-              <div className="mt-0.5 text-[12.5px] text-soil [overflow-wrap:anywhere]">
+              <div className="mt-0.5 text-[12.5px] text-adm-muted [overflow-wrap:anywhere]">
                 {summary.detail}
               </div>
             ) : null}
@@ -136,7 +136,7 @@ export function DecideDialog({
               <MetaRow label="From">{link.moduleLabel}</MetaRow>
               <MetaRow label="Requested by">
                 {approval.requestedBy?.name ?? "Unknown"}
-                <span className="text-soil">
+                <span className="text-adm-muted">
                   {" "}
                   · {approvalStamp(approval.createdAt)}
                 </span>

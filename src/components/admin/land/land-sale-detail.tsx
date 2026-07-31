@@ -133,7 +133,7 @@ function PaymentDialog({
           <AdminField label="Amount (GHS)" error={errors.amountGhs?.message}>
             <Input
               inputMode="decimal"
-              className={cn(adminInputClass, errors.amountGhs && "border-error")}
+              className={cn(adminInputClass, errors.amountGhs && "border-console-red")}
               {...register("amountGhs")}
             />
           </AdminField>
@@ -259,7 +259,7 @@ function CancelDialog({
                 ).map(([value, label]) => (
                   <label
                     key={value}
-                    className="flex items-center gap-2 text-[13px] text-ink"
+                    className="flex items-center gap-2 text-[13px] text-adm-ink"
                   >
                     <input type="radio" value={value} {...register("settlement")} />
                     {label}
@@ -279,7 +279,7 @@ function CancelDialog({
                 className={cn(
                   adminInputClass,
                   "font-adminmono",
-                  errors.refundGhs && "border-error",
+                  errors.refundGhs && "border-console-red",
                 )}
                 {...register("refundGhs")}
               />
@@ -287,7 +287,7 @@ function CancelDialog({
           ) : null}
           <AdminField label="Reason" error={errors.reason?.message}>
             <Input
-              className={cn(adminInputClass, errors.reason && "border-error")}
+              className={cn(adminInputClass, errors.reason && "border-console-red")}
               {...register("reason")}
             />
           </AdminField>
@@ -383,7 +383,7 @@ export function LandSaleDetail({ id }: { id: string }) {
       />
 
       {s.status === "CANCELLED" && s.cancelReason ? (
-        <AdminCard className="mb-4 border-error/40 bg-error/[0.04] px-4 py-3 text-[13px] text-ink">
+        <AdminCard className="mb-4 border-console-red/40 bg-console-red/[0.04] px-4 py-3 text-[13px] text-adm-ink">
           Cancelled: {s.cancelReason}
         </AdminCard>
       ) : null}
@@ -394,7 +394,7 @@ export function LandSaleDetail({ id }: { id: string }) {
             <Row label="Agreed price" strong>
               <Money value={s.agreedPriceGhs} />
             </Row>
-            <div className="border-t border-soil/12">
+            <div className="border-t border-adm-hairline">
               <Row label="Paid">
                 <Money value={s.paidGhs} />
               </Row>
@@ -403,10 +403,10 @@ export function LandSaleDetail({ id }: { id: string }) {
                 what the business kept. Showing a "balance due" on a dead deal
                 reads as an unresolved debt and would be chased as one. */}
             {s.status === "CANCELLED" ? (
-              <div className="border-t border-soil/12">
+              <div className="border-t border-adm-hairline">
                 <Row label="Deposit kept" strong>
                   {s.forfeitedGhs === null ? (
-                    <span className="text-soil">Refunded in full</span>
+                    <span className="text-adm-muted">Refunded in full</span>
                   ) : (
                     <span className="text-leaf">
                       <Money value={s.forfeitedGhs} />
@@ -415,7 +415,7 @@ export function LandSaleDetail({ id }: { id: string }) {
                 </Row>
               </div>
             ) : (
-              <div className="border-t border-soil/12">
+              <div className="border-t border-adm-hairline">
                 <Row label="Balance" strong>
                   <span
                     className={cn(
@@ -431,13 +431,13 @@ export function LandSaleDetail({ id }: { id: string }) {
                 </Row>
               </div>
             )}
-            <div className="border-t border-soil/12">
+            <div className="border-t border-adm-hairline">
               <Row label="Margin">
                 <Money value={s.marginGhs} />
               </Row>
             </div>
             {canAct ? (
-              <div className="mt-3 border-t border-soil/12 pt-3.5">
+              <div className="mt-3 border-t border-adm-hairline pt-3.5">
                 <div className="flex flex-wrap gap-2 xl:flex-col">
                   {s.status === "DRAFT" ? (
                     <AdminButton
@@ -470,24 +470,24 @@ export function LandSaleDetail({ id }: { id: string }) {
         }
         main={
           <AdminCard className="px-5 py-3">
-            <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+            <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
               Payments
             </div>
             {s.payments.length === 0 ? (
-              <p className="py-2 text-[13px] text-soil">
+              <p className="py-2 text-[13px] text-adm-muted">
                 No payments recorded yet.
               </p>
             ) : (
               s.payments.map((p) => (
                 <div
                   key={p.id}
-                  className="flex items-baseline justify-between gap-3 border-b border-soil/10 py-2 last:border-b-0"
+                  className="flex items-baseline justify-between gap-3 border-b border-adm-hairline py-2 last:border-b-0"
                 >
                   <div className="min-w-0">
-                    <span className="text-ink">{p.method}</span>
+                    <span className="text-adm-ink">{p.method}</span>
                     {/* Date only: `paidAt` comes from a date picker, so its
                         time is a midnight stamp nobody chose. */}
-                    <span className="ml-2 text-[12px] text-soil">
+                    <span className="ml-2 text-[12px] text-adm-muted">
                       <DateOnlyCell value={p.paidAt} muted />
                       {p.reference ? ` · ${p.reference}` : ""}
                     </span>

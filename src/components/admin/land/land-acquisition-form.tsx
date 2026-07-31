@@ -117,7 +117,7 @@ export function LandAcquisitionForm() {
                     ...(s.community ? { hint: s.community } : {}),
                   }))}
                   placeholder="Choose the seller"
-                  className={cn(errors.sellerId && "border-error")}
+                  className={cn(errors.sellerId && "border-console-red")}
                 />
               )}
             />
@@ -132,7 +132,7 @@ export function LandAcquisitionForm() {
                 placeholder="e.g. TML-021"
                 className={cn(
                   adminInputClass,
-                  errors.reference && "border-error",
+                  errors.reference && "border-console-red",
                 )}
                 {...register("reference")}
               />
@@ -145,7 +145,7 @@ export function LandAcquisitionForm() {
                 inputMode="decimal"
                 className={cn(
                   adminInputClass,
-                  errors.agreedCostGhs && "border-error",
+                  errors.agreedCostGhs && "border-console-red",
                 )}
                 {...register("agreedCostGhs")}
               />
@@ -156,7 +156,7 @@ export function LandAcquisitionForm() {
               placeholder="e.g. Kumbungu Road, Plot 21"
               className={cn(
                 adminInputClass,
-                errors.locationText && "border-error",
+                errors.locationText && "border-console-red",
               )}
               {...register("locationText")}
             />
@@ -167,7 +167,7 @@ export function LandAcquisitionForm() {
                 placeholder='e.g. 100 x 100 ft'
                 className={cn(
                   adminInputClass,
-                  errors.sizeText && "border-error",
+                  errors.sizeText && "border-console-red",
                 )}
                 {...register("sizeText")}
               />
@@ -177,7 +177,7 @@ export function LandAcquisitionForm() {
                 inputMode="decimal"
                 className={cn(
                   adminInputClass,
-                  errors.sizeAcres && "border-error",
+                  errors.sizeAcres && "border-console-red",
                 )}
                 {...register("sizeAcres")}
               />

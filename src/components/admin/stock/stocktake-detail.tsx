@@ -37,7 +37,7 @@ const LIST = "/admin/stocktakes";
 function Delta({ deltaKg }: { deltaKg: number | null }) {
   if (deltaKg === null) return <Absent />;
   if (deltaKg === 0)
-    return <Mono className="text-[13px] text-soil">0 kg</Mono>;
+    return <Mono className="text-[13px] text-adm-muted">0 kg</Mono>;
   return <SignedKg kg={deltaKg} />;
 }
 
@@ -45,7 +45,7 @@ function Delta({ deltaKg }: { deltaKg: number | null }) {
 function LinesCard({ lines }: { lines: IStocktakeLine[] }) {
   return (
     <AdminCard className="overflow-hidden">
-      <div className="border-b border-soil/15 px-4 py-3 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase sm:px-5">
+      <div className="border-b border-adm-hairline px-4 py-3 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase sm:px-5">
         Count lines
       </div>
       <div className="@container/lines">
@@ -53,7 +53,7 @@ function LinesCard({ lines }: { lines: IStocktakeLine[] }) {
         <div className="hidden overflow-x-auto @xl/lines:block">
           <table className="w-full text-[13px]">
             <thead>
-              <tr className="bg-surface-alt/70 text-left text-[10.5px] font-bold uppercase tracking-[0.09em] text-soil">
+              <tr className="bg-adm-sunken text-left text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted">
                 <th className="px-5 py-2.5">Commodity</th>
                 <th className="px-5 py-2.5 text-right">Counted</th>
                 <th className="px-5 py-2.5 text-right">Book</th>
@@ -62,8 +62,8 @@ function LinesCard({ lines }: { lines: IStocktakeLine[] }) {
             </thead>
             <tbody>
               {lines.map((l) => (
-                <tr key={l.commodity.id} className="border-t border-soil/10">
-                  <td className="px-5 py-2 font-medium text-ink">
+                <tr key={l.commodity.id} className="border-t border-adm-hairline">
+                  <td className="px-5 py-2 font-medium text-adm-ink">
                     <span
                       className="block min-w-0 max-w-[260px] line-clamp-1 whitespace-normal [overflow-wrap:anywhere]"
                       title={l.commodity.name}
@@ -72,13 +72,13 @@ function LinesCard({ lines }: { lines: IStocktakeLine[] }) {
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-5 py-2 text-right">
-                    <Kg kg={l.countedKg} className="font-semibold text-ink" />
+                    <Kg kg={l.countedKg} className="font-semibold text-adm-ink" />
                   </td>
                   <td className="whitespace-nowrap px-5 py-2 text-right">
                     {l.derivedKg === null ? (
                       <Absent />
                     ) : (
-                      <Kg kg={l.derivedKg} className="text-soil" />
+                      <Kg kg={l.derivedKg} className="text-adm-muted" />
                     )}
                   </td>
                   <td className="whitespace-nowrap px-5 py-2 text-right">
@@ -94,24 +94,24 @@ function LinesCard({ lines }: { lines: IStocktakeLine[] }) {
           {lines.map((l) => (
             <div
               key={l.commodity.id}
-              className="border-b border-soil/10 py-2.5 last:border-b-0"
+              className="border-b border-adm-hairline py-2.5 last:border-b-0"
             >
               <div className="flex items-baseline justify-between gap-3">
                 <span
-                  className="min-w-0 text-[13.5px] font-medium text-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere]"
+                  className="min-w-0 text-[13.5px] font-medium text-adm-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere]"
                   title={l.commodity.name}
                 >
                   {l.commodity.name}
                 </span>
                 <Kg
                   kg={l.countedKg}
-                  className="flex-none text-[13px] font-semibold text-ink"
+                  className="flex-none text-[13px] font-semibold text-adm-ink"
                 />
               </div>
               {l.derivedKg !== null ? (
                 <div className="mt-0.5 flex items-baseline justify-between gap-3 text-[12.5px]">
-                  <span className="text-soil">
-                    Book <Kg kg={l.derivedKg} className="text-soil" />
+                  <span className="text-adm-muted">
+                    Book <Kg kg={l.derivedKg} className="text-adm-muted" />
                   </span>
                   <Delta deltaKg={l.deltaKg} />
                 </div>
@@ -239,7 +239,7 @@ export function StocktakeDetail({ id }: { id: string }) {
           main={<LinesCard lines={st.lines} />}
           aside={
             <AdminCard className="px-5 py-4">
-              <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Sheet
               </div>
               <div className="mt-1 divide-y divide-soil/10">
@@ -305,7 +305,7 @@ export function StocktakeDetail({ id }: { id: string }) {
                       {approveState.isLoading ? "Approving…" : "Approve"}
                     </AdminButton>
                   ) : (
-                    <p className="text-[12.5px] text-soil">
+                    <p className="text-[12.5px] text-adm-muted">
                       Waiting for the owner to approve or cancel this sheet.
                     </p>
                   )}
@@ -319,7 +319,7 @@ export function StocktakeDetail({ id }: { id: string }) {
                   </AdminButton>
                 </div>
               ) : (
-                <p className="mt-4 text-[12.5px] text-soil">
+                <p className="mt-4 text-[12.5px] text-adm-muted">
                   {st.status === StocktakeStatus.APPROVED
                     ? `Approved ${st.decidedAt ? formatDateTime(st.decidedAt) : ""} - every difference posted as a stock adjustment.`
                     : `Cancelled ${st.decidedAt ? formatDateTime(st.decidedAt) : ""} - nothing posted from this sheet.`}

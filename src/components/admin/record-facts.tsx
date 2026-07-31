@@ -63,7 +63,7 @@ export function RecordFacts({
           mono={f.mono}
         >
           {isEmpty(f.value) ? (
-            <span className="text-soil/50">Not recorded</span>
+            <span className="text-adm-faint">Not recorded</span>
           ) : (
             f.value
           )}

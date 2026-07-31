@@ -66,11 +66,11 @@ export function ApprovalDetail({ id }: { id: string }) {
             <ApprovalStatusBadge status={approval.status} />
           </div>
           <div className="ml-auto flex-none text-right">
-            <div className="font-adminmono text-[11.5px] tabular-nums text-soil">
+            <div className="font-adminmono text-[11.5px] tabular-nums text-adm-muted">
               {approvalStamp(approval.createdAt)}
             </div>
             {pending ? (
-              <div className="text-[11px] italic text-soil/70">
+              <div className="text-[11px] italic text-adm-faint">
                 {waitingFor(approval.createdAt)}
               </div>
             ) : null}
@@ -79,11 +79,11 @@ export function ApprovalDetail({ id }: { id: string }) {
 
         {/* 2. Title: the figure being signed off, then the one-line story. */}
         <div className="mt-3.5">
-          <div className="font-adminmono text-[19px] leading-tight font-bold text-ink [overflow-wrap:anywhere]">
+          <div className="font-adminmono text-[19px] leading-tight font-bold text-adm-ink [overflow-wrap:anywhere]">
             {headline}
           </div>
           {detail ? (
-            <div className="mt-0.5 text-[13px] leading-[1.5] text-soil [overflow-wrap:anywhere]">
+            <div className="mt-0.5 text-[13px] leading-[1.5] text-adm-muted [overflow-wrap:anywhere]">
               {detail}
             </div>
           ) : null}
@@ -105,7 +105,7 @@ export function ApprovalDetail({ id }: { id: string }) {
             {decidedAt ? (
               <>
                 {approval.decidedBy?.name ?? "Unknown"}
-                <span className="text-soil"> · {approvalStamp(decidedAt)}</span>
+                <span className="text-adm-muted"> · {approvalStamp(decidedAt)}</span>
               </>
             ) : (
               <Absent />
@@ -115,11 +115,11 @@ export function ApprovalDetail({ id }: { id: string }) {
 
         {/* 4. Note - only when someone wrote one. */}
         {approval.note ? (
-          <div className="mt-3.5 border-l-2 border-soil/40 pl-2.5">
+          <div className="mt-3.5 border-l-2 border-adm-line pl-2.5">
             <div className={stencilCls}>
               {pending ? "Note" : "Decider's note"}
             </div>
-            <div className="text-[13px] italic text-soil [overflow-wrap:anywhere]">
+            <div className="text-[13px] italic text-adm-muted [overflow-wrap:anywhere]">
               {approval.note}
             </div>
           </div>

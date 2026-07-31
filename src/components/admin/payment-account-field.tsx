@@ -77,7 +77,7 @@ export function PaymentAccountField({
     >
       <select
         disabled={isLoading}
-        className={cn(adminSelectClass, "w-full", error && "border-error")}
+        className={cn(adminSelectClass, "w-full", error && "border-console-red")}
         {...registration}
       >
         <option value="">

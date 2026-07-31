@@ -36,7 +36,7 @@ const ID_TYPE_SUGGESTIONS = [
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+    <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
       {children}
     </div>
   );
@@ -238,7 +238,7 @@ export function FarmerForm({
                 className="h-16 w-16 rounded-full object-cover"
               />
             ) : (
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-surface-alt text-[11px] text-soil/60">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-adm-sunken text-[11px] text-adm-faint">
                 No photo
               </div>
             )}
@@ -266,7 +266,7 @@ export function FarmerForm({
               <Input
                 placeholder="Abukari Yakubu"
                 disabled={readOnly}
-                className={cn(adminInputClass, roCls, errors.name && "border-error")}
+                className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
                 {...register("name")}
               />
             </AdminField>
@@ -275,7 +275,7 @@ export function FarmerForm({
                 inputMode="tel"
                 placeholder="024 000 0000"
                 disabled={readOnly}
-                className={cn(adminInputClass, roCls, errors.phone && "border-error")}
+                className={cn(adminInputClass, roCls, errors.phone && "border-console-red")}
                 {...register("phone")}
               />
             </AdminField>
@@ -290,7 +290,7 @@ export function FarmerForm({
                 className={cn(
                   adminInputClass,
                   roCls,
-                  errors.dateOfBirth && "border-error",
+                  errors.dateOfBirth && "border-console-red",
                 )}
                 {...register("dateOfBirth")}
               />
@@ -300,7 +300,7 @@ export function FarmerForm({
                 list="farmer-id-types"
                 placeholder="Ghana Card, Voter ID…"
                 disabled={readOnly}
-                className={cn(adminInputClass, roCls, errors.idType && "border-error")}
+                className={cn(adminInputClass, roCls, errors.idType && "border-console-red")}
                 {...register("idType")}
               />
               <datalist id="farmer-id-types">
@@ -316,7 +316,7 @@ export function FarmerForm({
                 className={cn(
                   adminInputClass,
                   roCls,
-                  errors.idNumber && "border-error",
+                  errors.idNumber && "border-console-red",
                 )}
                 {...register("idNumber")}
               />
@@ -334,7 +334,7 @@ export function FarmerForm({
                 className={cn(
                   adminInputClass,
                   roCls,
-                  errors.community && "border-error",
+                  errors.community && "border-console-red",
                 )}
                 {...register("community")}
               />
@@ -350,7 +350,7 @@ export function FarmerForm({
                 className={cn(
                   adminInputClass,
                   roCls,
-                  errors.farmLocation && "border-error",
+                  errors.farmLocation && "border-console-red",
                 )}
                 {...register("farmLocation")}
               />
@@ -367,7 +367,7 @@ export function FarmerForm({
                 className={cn(
                   adminInputClass,
                   roCls,
-                  errors.farmSizeAcres && "border-error",
+                  errors.farmSizeAcres && "border-console-red",
                 )}
                 {...register("farmSizeAcres")}
               />
@@ -381,7 +381,7 @@ export function FarmerForm({
                 adminInputClass,
                 roCls,
                 "h-auto min-h-[60px] w-full resize-y py-2",
-                errors.address && "border-error",
+                errors.address && "border-console-red",
               )}
               {...register("address")}
             />
@@ -401,7 +401,7 @@ export function FarmerForm({
                 className={cn(
                   adminInputClass,
                   roCls,
-                  errors.nextOfKinName && "border-error",
+                  errors.nextOfKinName && "border-console-red",
                 )}
                 {...register("nextOfKinName")}
               />
@@ -418,7 +418,7 @@ export function FarmerForm({
                 className={cn(
                   adminInputClass,
                   roCls,
-                  errors.nextOfKinPhone && "border-error",
+                  errors.nextOfKinPhone && "border-console-red",
                 )}
                 {...register("nextOfKinPhone")}
               />
@@ -435,7 +435,7 @@ export function FarmerForm({
                 className={cn(
                   adminInputClass,
                   roCls,
-                  errors.momoNumber && "border-error",
+                  errors.momoNumber && "border-console-red",
                 )}
                 {...register("momoNumber")}
               />

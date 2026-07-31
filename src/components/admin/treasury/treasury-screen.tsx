@@ -212,7 +212,7 @@ export function TreasuryScreen() {
             data={rows}
             isFetching={transfers.isFetching}
             itemNoun="transfers"
-            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+            rowClassName={() => "h-12 hover:bg-adm-sunken"}
             serverPagination={{
               onPageChange: setPage,
               onPageSizeChange: (size) => setFilter("size", String(size)),
@@ -262,23 +262,23 @@ function BalanceCard({
           <p
             className={cn(
               "font-adminmono text-[26px] font-bold tabular-nums",
-              warn && account.amountGhs === 0 ? "text-console-red" : "text-ink",
+              warn && account.amountGhs === 0 ? "text-console-red" : "text-adm-ink",
             )}
           >
             {formatCedis(account.amountGhs)}
           </p>
         )}
-        <p className="mt-1 text-[12.5px] text-soil">{hint}</p>
+        <p className="mt-1 text-[12.5px] text-adm-muted">{hint}</p>
       </div>
       {account?.accountNumber ? (
-        <div className="border-t border-soil/12">
+        <div className="border-t border-adm-hairline">
           <DetailRow label="Account">
             <Mono>{account.accountNumber}</Mono>
           </DetailRow>
         </div>
       ) : null}
       {account?.fetchedAt ? (
-        <div className="border-t border-soil/12">
+        <div className="border-t border-adm-hairline">
           <DetailRow label="As of">
             <DateTimeCell value={account.fetchedAt} />
           </DetailRow>
@@ -366,7 +366,7 @@ function TransferDialog({
               {...form.register("description")}
             />
           </AdminField>
-          <p className="text-[12.5px] text-soil">
+          <p className="text-[12.5px] text-adm-muted">
             Hubtel usually settles this in under a minute. Until it confirms,
             the transfer shows as &ldquo;with Hubtel&rdquo; rather than done -
             the money is not counted before it has actually moved.

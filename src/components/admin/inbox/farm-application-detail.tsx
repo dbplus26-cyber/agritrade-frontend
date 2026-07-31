@@ -42,7 +42,7 @@ import {
 
 const LIST = "/admin/farm-applications";
 
-/** A grouped facts card: stencil section title over a DetailGrid. */
+/** A grouped facts card: section title over a DetailGrid. */
 function SectionCard({
   title,
   children,
@@ -52,7 +52,7 @@ function SectionCard({
 }) {
   return (
     <AdminCard className="px-5 py-4">
-      <p className="stencil text-[11px] uppercase tracking-[0.14em] text-soil">
+      <p className="text-[11px] uppercase tracking-[0.14em] text-adm-muted">
         {title}
       </p>
       {/* auto-fit with a real floor, not a fixed 3 columns. A rigid
@@ -245,15 +245,15 @@ function FarmApplicationDetailBody({
             </SectionCard>
 
             <AdminCard className="px-5 py-4">
-              <p className="stencil text-[11px] uppercase tracking-[0.14em] text-soil">
+              <p className="text-[11px] uppercase tracking-[0.14em] text-adm-muted">
                 Message
               </p>
               {application.message ? (
-                <p className="mt-2.5 text-[13.5px] leading-[1.75] whitespace-pre-wrap text-ink [overflow-wrap:anywhere]">
+                <p className="mt-2.5 text-[13.5px] leading-[1.75] whitespace-pre-wrap text-adm-ink [overflow-wrap:anywhere]">
                   {application.message}
                 </p>
               ) : (
-                <p className="mt-2.5 text-[13px] text-soil/70">
+                <p className="mt-2.5 text-[13px] text-adm-faint">
                   No message included with the application.
                 </p>
               )}
@@ -325,7 +325,7 @@ function FarmApplicationDetailBody({
             <AdminCard className="px-5 py-4">
               {isConverted && application.convertedFarmerId ? (
                 <>
-                  <p className="text-[12.5px] text-soil">
+                  <p className="text-[12.5px] text-adm-muted">
                     This application became a farmer record.
                   </p>
                   <AdminButton
@@ -342,7 +342,7 @@ function FarmApplicationDetailBody({
                 </>
               ) : (
                 <>
-                  <p className="text-[12.5px] text-soil">
+                  <p className="text-[12.5px] text-adm-muted">
                     Converting creates a farmer record on the register from
                     these details.
                   </p>
@@ -380,7 +380,7 @@ function FarmApplicationDetailBody({
             </AdminCard>
 
             <AdminCard className="px-5 py-4">
-              <p className="text-[12.5px] text-soil">
+              <p className="text-[12.5px] text-adm-muted">
                 Deleting removes the application permanently.
               </p>
               <AdminButton

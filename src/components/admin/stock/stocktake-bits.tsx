@@ -184,10 +184,10 @@ export function StocktakeCountSheet({
   const countRow = (commodityId: string, name: string, removable: boolean) => (
     <div
       key={commodityId}
-      className="flex items-center gap-3 border-b border-soil/10 py-2 last:border-b-0"
+      className="flex items-center gap-3 border-b border-adm-hairline py-2 last:border-b-0"
     >
       <span
-        className="min-w-0 flex-1 text-[13.5px] font-medium text-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere]"
+        className="min-w-0 flex-1 text-[13.5px] font-medium text-adm-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere]"
         title={name}
       >
         {name}
@@ -213,22 +213,22 @@ export function StocktakeCountSheet({
           "h-9 w-[110px] flex-none px-2.5 text-right font-adminmono tabular-nums min-[400px]:w-[130px]",
         )}
       />
-      <span className="w-6 flex-none text-[12px] text-soil">kg</span>
+      <span className="w-6 flex-none text-[12px] text-adm-muted">kg</span>
     </div>
   );
 
   return (
     <div className="flex flex-col gap-4">
       <AdminCard className="px-4 py-3 sm:px-5 sm:py-4">
-        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
           Count sheet
         </div>
-        <p className="mb-2 text-[12px] text-soil">
+        <p className="mb-2 text-[12px] text-adm-muted">
           Enter what was physically counted. Leave a line blank to skip it -
           book balances are compared only when the sheet is submitted.
         </p>
         {balanceRows.length === 0 && extraIds.length === 0 ? (
-          <p className="py-2 text-[13px] text-soil">
+          <p className="py-2 text-[13px] text-adm-muted">
             This warehouse has no ledger lines yet - add the commodities found
             below.
           </p>
@@ -239,7 +239,7 @@ export function StocktakeCountSheet({
         )}
 
         {addableOptions.length > 0 ? (
-          <div className="mt-3 border-t border-soil/15 pt-3">
+          <div className="mt-3 border-t border-adm-hairline pt-3">
             <AdminField
               label="Add a commodity"
               optional
@@ -280,7 +280,7 @@ export function StocktakeCountSheet({
       {formError ? (
         <p
           role="alert"
-          className="rounded-[2px] border border-error/40 bg-error/5 px-3 py-2 text-[12.5px] font-medium text-error"
+          className="rounded-[6px] border border-console-red/40 bg-console-red/5 px-3 py-2 text-[12.5px] font-medium text-console-red"
         >
           {formError}
         </p>

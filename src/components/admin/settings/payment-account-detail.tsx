@@ -76,12 +76,12 @@ function FlowTile({ label, value }: { label: string; value: number | null }) {
   const text = formatCedisCompact(value);
   return (
     <AdminCard className="min-w-0 px-3 py-2.5">
-      <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+      <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         {label}
       </div>
       <div className="mt-1">
         <Mono
-          className={cn("min-w-0 font-bold text-ink", statValueCls(text))}
+          className={cn("min-w-0 font-bold text-adm-ink", statValueCls(text))}
         >
           <Money compact value={value} />
         </Mono>
@@ -121,7 +121,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         enableSorting: false,
         cell: ({ row }) => (
           <span className="flex min-w-0 flex-wrap items-center justify-end gap-1.5 @2xl/table:justify-start">
-            <Mono className="text-[12.5px] text-ink">
+            <Mono className="text-[12.5px] text-adm-ink">
               {row.original.transactionNo}
             </Mono>
             {row.original.isReversal ? (
@@ -148,7 +148,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         header: "Counterparty",
         enableSorting: false,
         cell: ({ row }) => (
-          <span className="block max-w-[19rem] truncate text-ink">
+          <span className="block max-w-[19rem] truncate text-adm-ink">
             {row.original.counterparty}
           </span>
         ),
@@ -179,7 +179,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         header: "Method",
         enableSorting: false,
         cell: ({ row }) => (
-          <span className="text-[12.5px] text-ink">{row.original.method}</span>
+          <span className="text-[12.5px] text-adm-ink">{row.original.method}</span>
         ),
         meta: { className: "px-4 text-[13px]" },
       },
@@ -190,7 +190,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         enableSorting: false,
         cell: ({ row }) =>
           row.original.reference ? (
-            <Mono className="block max-w-[19rem] truncate text-[12px] text-soil">
+            <Mono className="block max-w-[19rem] truncate text-[12px] text-adm-muted">
               {row.original.reference}
             </Mono>
           ) : (
@@ -213,7 +213,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
               className={cn(
                 "whitespace-nowrap text-[13px] font-semibold",
                 delta === null
-                  ? "text-soil"
+                  ? "text-adm-muted"
                   : delta < 0
                     ? "text-console-red"
                     : "text-leaf",
@@ -305,7 +305,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
       </AdminCard>
 
       {/* The history: every payment row that named this account. */}
-      <div className="mb-1.5 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+      <div className="mb-1.5 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         Movements
       </div>
       <AdminCard className="overflow-hidden">

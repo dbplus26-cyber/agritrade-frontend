@@ -40,7 +40,7 @@ export function ApprovalsPreview() {
           ))}
         </div>
       ) : rows.length === 0 ? (
-        <p className="text-[13px] text-soil">Nothing awaiting approval.</p>
+        <p className="text-[13px] text-adm-muted">Nothing awaiting approval.</p>
       ) : (
         <ul className="flex flex-col">
           {rows.map((a) => {
@@ -49,18 +49,18 @@ export function ApprovalsPreview() {
               <li key={a.id}>
                 <Link
                   href={`/admin/approvals/${a.id}`}
-                  className="block border-b border-soil/10 py-2 last:border-b-0 hover:bg-surface-alt/60"
+                  className="block border-b border-adm-hairline py-2 last:border-b-0 hover:bg-adm-sunken"
                 >
                   <span className="flex flex-wrap items-center justify-between gap-x-2 gap-y-0.5">
                     <ActionBadge action={a.action} />
-                    <span className="font-adminmono ml-auto flex-none text-[11px] tabular-nums text-soil">
+                    <span className="font-adminmono ml-auto flex-none text-[11px] tabular-nums text-adm-muted">
                       {approvalStamp(a.createdAt)}
                     </span>
                   </span>
-                  <span className="font-adminmono mt-1 block min-w-0 text-[13px] leading-tight font-bold whitespace-normal text-ink line-clamp-1 [overflow-wrap:anywhere]">
+                  <span className="font-adminmono mt-1 block min-w-0 text-[13px] leading-tight font-bold whitespace-normal text-adm-ink line-clamp-1 [overflow-wrap:anywhere]">
                     {headline}
                   </span>
-                  <span className="mt-0.5 block min-w-0 text-[11.5px] whitespace-normal text-soil line-clamp-1 [overflow-wrap:anywhere]">
+                  <span className="mt-0.5 block min-w-0 text-[11.5px] whitespace-normal text-adm-muted line-clamp-1 [overflow-wrap:anywhere]">
                     {[a.requestedBy?.name, detail].filter(Boolean).join(" · ") ||
                       a.entityType}
                   </span>

@@ -38,17 +38,17 @@ function VolumeTooltip({
   if (!active || !payload?.length) return null;
   const total = payload.reduce((a, p) => a + (p.value || 0), 0);
   return (
-    <div className="rounded-none border-[1.5px] border-soil/30 bg-paper px-3 py-2 text-[12px] shadow-doc-sm">
-      <div className="mb-1 font-semibold text-ink">{label}</div>
+    <div className="rounded-none border-[1.5px] border-adm-line bg-adm-card px-3 py-2 text-[12px] shadow-[0_1px_2px_rgba(16,24,40,0.05)]">
+      <div className="mb-1 font-semibold text-adm-ink">{label}</div>
       {payload.map((p) => (
         <div key={p.name} className="flex items-center justify-between gap-4">
           <LegendItem color={p.color ?? "#999"} label={p.name} />
-          <span className="font-semibold text-ink">{formatWeight(p.value)}</span>
+          <span className="font-semibold text-adm-ink">{formatWeight(p.value)}</span>
         </div>
       ))}
-      <div className="mt-1 flex items-center justify-between gap-4 border-t border-soil/15 pt-1">
-        <span className="text-soil">Total</span>
-        <span className="font-semibold text-ink">{formatWeight(total)}</span>
+      <div className="mt-1 flex items-center justify-between gap-4 border-t border-adm-hairline pt-1">
+        <span className="text-adm-muted">Total</span>
+        <span className="font-semibold text-adm-ink">{formatWeight(total)}</span>
       </div>
     </div>
   );

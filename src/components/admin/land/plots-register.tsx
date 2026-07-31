@@ -60,10 +60,10 @@ export function PlotsRegister() {
   return (
     <div>
       <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Land plots
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           Every plot the business holds - photos, title documents and what is
           published to the website
         </p>
@@ -124,7 +124,7 @@ export function PlotsRegister() {
               href={`${LIST}/${p.id}`}
               // Squared off and 1.5px-bordered to match AdminCard, which every other
               // surface in the console uses. These were the only rounded cards.
-              className="shadow-doc-sm overflow-hidden rounded-none border-[1.5px] border-soil/30 bg-paper transition-colors hover:border-soil/50"
+              className="shadow-[0_1px_2px_rgba(16,24,40,0.05)] overflow-hidden rounded-none border-[1.5px] border-adm-line bg-adm-card transition-colors hover:border-adm-line"
             >
               {p.photos[0] ? (
                 // eslint-disable-next-line @next/next/no-img-element -- Cloudinary
@@ -134,7 +134,7 @@ export function PlotsRegister() {
                   className="h-[130px] w-full object-cover"
                 />
               ) : (
-                <div className="flex h-[130px] w-full items-center justify-center bg-surface-alt text-[12px] text-soil/60">
+                <div className="flex h-[130px] w-full items-center justify-center bg-adm-sunken text-[12px] text-adm-faint">
                   No photo
                 </div>
               )}
@@ -150,15 +150,15 @@ export function PlotsRegister() {
                     <PlotStatusBadge status={p.status} />
                   </span>
                 </div>
-                <div className="max-w-[22rem] truncate text-[14px] font-semibold text-ink">
+                <div className="max-w-[22rem] truncate text-[14px] font-semibold text-adm-ink">
                   {p.locationText}
                 </div>
-                <div className="mt-0.5 flex items-center justify-between text-[12.5px] text-soil">
+                <div className="mt-0.5 flex items-center justify-between text-[12.5px] text-adm-muted">
                   <span>
                     {p.sizeText}
                     {p.use ? ` · ${p.use}` : ""}
                   </span>
-                  <Mono className="text-ink">
+                  <Mono className="text-adm-ink">
                     <Money value={p.askingPriceGhs} />
                   </Mono>
                 </div>

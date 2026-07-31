@@ -163,7 +163,7 @@ export function PlotDetail({ id }: { id: string }) {
 
   const aside = (
     <AdminCard className="px-5 py-3">
-      <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+      <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         Pricing & status
       </p>
       <DetailGrid columns={2}>
@@ -181,7 +181,7 @@ export function PlotDetail({ id }: { id: string }) {
           {p.showPriceOnWebsite ? "Shown" : "Hidden"}
         </DetailItem>
       </DetailGrid>
-      <div className="mt-3 border-t border-soil/12 pt-3.5">
+      <div className="mt-3 border-t border-adm-hairline pt-3.5">
         <div className="flex flex-wrap gap-2 xl:flex-col">
           {p.status === "AVAILABLE" ? (
             <AdminButton className="h-9 px-4" asChild>
@@ -246,8 +246,8 @@ export function PlotDetail({ id }: { id: string }) {
         main={
           <div className="flex flex-col gap-4">
             {p.description ? (
-              <AdminCard className="px-5 py-3 text-[13.5px] text-ink [overflow-wrap:anywhere]">
-                <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              <AdminCard className="px-5 py-3 text-[13.5px] text-adm-ink [overflow-wrap:anywhere]">
+                <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                   Description
                 </div>
                 {p.description}
@@ -260,11 +260,11 @@ export function PlotDetail({ id }: { id: string }) {
                 slips through anyway. */}
             <AdminCard className="px-5 py-4">
               <div className="mb-2 flex items-center justify-between gap-3">
-                <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+                <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                   Photos (public)
                 </span>
                 {p.photos.length >= 3 ? (
-                  <span className="text-[11.5px] text-soil/70">
+                  <span className="text-[11.5px] text-adm-faint">
                     3 of 3 photos
                   </span>
                 ) : (
@@ -279,7 +279,7 @@ export function PlotDetail({ id }: { id: string }) {
                 )}
               </div>
               {p.photos.length === 0 ? (
-                <p className="text-[13px] text-soil">No photos yet.</p>
+                <p className="text-[13px] text-adm-muted">No photos yet.</p>
               ) : (
                 <div className="flex flex-col gap-2">
                   {photoTile(p.photos[0], true)}
@@ -294,16 +294,16 @@ export function PlotDetail({ id }: { id: string }) {
 
             {/* Private documents */}
             <AdminCard className="px-5 py-4">
-              <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+              <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Ownership documents (private)
               </div>
-              <p className="mb-2 text-[12px] text-soil">
+              <p className="mb-2 text-[12px] text-adm-muted">
                 Never shown on the website. Downloads are logged.
               </p>
               {p.documents.map((doc) => (
                 <div
                   key={doc.id}
-                  className="flex items-center justify-between border-b border-soil/10 py-2 text-[13px] last:border-b-0"
+                  className="flex items-center justify-between border-b border-adm-hairline py-2 text-[13px] last:border-b-0"
                 >
                   <a
                     href={plotDocumentUrl(p.id, doc.id)}
@@ -316,7 +316,7 @@ export function PlotDetail({ id }: { id: string }) {
                   <div className="flex items-center gap-3">
                     {/* An upload stamp: when the title document reached the
                         office is the fact being recorded, hour included. */}
-                    <Mono className="text-right text-[12px] text-soil">
+                    <Mono className="text-right text-[12px] text-adm-muted">
                       <DateTimeCell value={doc.createdAt} muted />
                     </Mono>
                     <button
@@ -340,7 +340,7 @@ export function PlotDetail({ id }: { id: string }) {
                   onChange={(e) => setDocName(e.target.value)}
                   placeholder="Document name (e.g. Indenture)"
                   className={cn(
-                    "h-8 flex-1 rounded border border-soil/25 bg-paper px-2.5 text-[13px]",
+                    "h-8 flex-1 rounded border border-adm-line bg-adm-card px-2.5 text-[13px]",
                   )}
                 />
                 <FilePicker

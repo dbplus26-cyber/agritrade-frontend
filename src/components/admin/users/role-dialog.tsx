@@ -73,19 +73,19 @@ export function RoleChangeDialog({
 
   return (
     <ResponsiveDialog open={open} onOpenChange={close}>
-      <ResponsiveDialogContent className="border-soil/25 p-5 sm:max-w-[400px]">
+      <ResponsiveDialogContent className="border-adm-line p-5 sm:max-w-[400px]">
         <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle className="text-[15px] font-bold text-ink">
+          <ResponsiveDialogTitle className="text-[15px] font-bold text-adm-ink">
             Change role - {user.firstName} {user.lastName}
           </ResponsiveDialogTitle>
-          <ResponsiveDialogDescription className="text-[12.5px] leading-[1.55] text-soil">
+          <ResponsiveDialogDescription className="text-[12.5px] leading-[1.55] text-adm-muted">
             The user is signed out everywhere and their access changes the
             moment they sign back in.
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
 
         <div className="grid gap-1 py-1">
-          <span className="text-[10.5px] font-bold uppercase tracking-[0.08em] text-soil/70">
+          <span className="text-[10.5px] font-bold uppercase tracking-[0.08em] text-adm-faint">
             Access level
           </span>
           <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>

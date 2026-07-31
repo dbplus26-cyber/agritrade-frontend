@@ -27,17 +27,17 @@ export default function AdminErrorBoundary({
         <p className="text-[10.5px] font-bold tracking-[0.09em] text-console-red uppercase">
           Not processed
         </p>
-        <h1 className="mt-1 text-[19px] font-bold text-forest">
+        <h1 className="mt-1 text-[19px] font-bold text-adm-ink">
           This screen didn&rsquo;t load
         </h1>
-        <p className="mt-1.5 text-[13px] leading-[1.6] text-soil">
+        <p className="mt-1.5 text-[13px] leading-[1.6] text-adm-muted">
           The action that failed saved nothing - no money, stock or paperwork
           moved. Try again; if it keeps failing, quote the reference below to
           whoever maintains the console.
         </p>
         {error.digest ? (
-          <p className="mt-3 text-[12.5px] text-soil">
-            Reference <Mono className="text-ink">{error.digest}</Mono>
+          <p className="mt-3 text-[12.5px] text-adm-muted">
+            Reference <Mono className="text-adm-ink">{error.digest}</Mono>
           </p>
         ) : null}
         <div className="mt-4 flex flex-wrap gap-2">

@@ -133,13 +133,13 @@ export function PurchasesTable() {
               onClick={(e) => e.stopPropagation()}
             >
               <span className="block min-w-0 max-w-[20rem]">
-                <span className="block truncate font-medium text-ink">
+                <span className="block truncate font-medium text-adm-ink">
                   {p.commodity.name}
-                  <Mono className="ml-1.5 text-[12px] text-soil">
+                  <Mono className="ml-1.5 text-[12px] text-adm-muted">
                     {formatKg(p.weightKg)}
                   </Mono>
                 </span>
-                <span className="block truncate text-[11.5px] text-soil/70">
+                <span className="block truncate text-[11.5px] text-adm-faint">
                   {purchaseCounterparty(p)}
                 </span>
               </span>
@@ -154,7 +154,7 @@ export function PurchasesTable() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-ink">
+          <Mono className="whitespace-nowrap text-[12.5px] text-adm-ink">
             <CompactCedis amount={row.original.totalGhs} />
           </Mono>
         ),
@@ -174,7 +174,7 @@ export function PurchasesTable() {
         enableSorting: false,
         meta: columnMeta({ at: "xl" }),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-soil">
+          <Mono className="whitespace-nowrap text-[12.5px] text-adm-muted">
             <CompactCedis amount={row.original.unitPriceGhs} />
           </Mono>
         ),
@@ -187,7 +187,7 @@ export function PurchasesTable() {
         meta: columnMeta({ at: "lg" }),
         cell: ({ row }) =>
           row.original.warehouse ? (
-            <span className="block max-w-[22rem] truncate text-soil">
+            <span className="block max-w-[22rem] truncate text-adm-muted">
               {row.original.warehouse.name}
             </span>
           ) : (
@@ -217,10 +217,10 @@ export function PurchasesTable() {
   return (
     <div>
       <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Purchases
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           Goods bought at the farm gate and beyond - money is real from the
           moment a purchase is recorded
         </p>
@@ -338,7 +338,7 @@ export function PurchasesTable() {
               onPageSizeChange: (size) => setFilter("size", String(size)),
             }}
             rowHref={(p) => `${LIST}/${p.id}`}
-            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+            rowClassName={() => "h-12 hover:bg-adm-sunken"}
           />
         </AdminCard>
       )}

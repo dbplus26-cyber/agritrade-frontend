@@ -58,10 +58,10 @@ export function ExpenseDonut({ summary }: { summary?: IExpenseSummary }) {
               </PieChart>
             </ResponsiveContainer>
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-[15px] font-bold text-ink">
+              <span className="text-[15px] font-bold text-adm-ink">
                 <Money value={total} />
               </span>
-              <span className="text-[9.5px] font-semibold tracking-[0.08em] text-soil uppercase">
+              <span className="text-[9.5px] font-semibold tracking-[0.08em] text-adm-muted uppercase">
                 Total
               </span>
             </div>
@@ -71,10 +71,10 @@ export function ExpenseDonut({ summary }: { summary?: IExpenseSummary }) {
               <div key={s.id} className="flex items-center justify-between gap-2">
                 <LegendItem color={colorFor(i)} label={s.name} />
                 <span className="flex flex-none items-center gap-2 text-[12px]">
-                  <span className="font-semibold text-ink">
+                  <span className="font-semibold text-adm-ink">
                     <Money value={s.amount} />
                   </span>
-                  <span className="text-soil">
+                  <span className="text-adm-muted">
                     {sum > 0 ? Math.round((s.amount / sum) * 100) : 0}%
                   </span>
                 </span>

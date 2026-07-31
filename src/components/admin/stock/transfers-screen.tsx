@@ -80,12 +80,12 @@ function Route({ from, to }: { from: string; to: string }) {
     // widen the page.
     <span
       aria-label={`${from} to ${to}`}
-      className="block max-w-[24rem] truncate text-[13px] text-ink md:min-w-[11rem]"
+      className="block max-w-[24rem] truncate text-[13px] text-adm-ink md:min-w-[11rem]"
       title={`${from} -> ${to}`}
     >
       <span aria-hidden="true">
         {from}
-        <span className="mx-1.5 text-soil">→</span>
+        <span className="mx-1.5 text-adm-muted">→</span>
         {to}
       </span>
     </span>
@@ -179,7 +179,7 @@ export function TransfersScreen() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-ink">
+          <Mono className="whitespace-nowrap text-[12.5px] text-adm-ink">
             {row.original.transactionNo}
           </Mono>
         ),
@@ -218,7 +218,7 @@ export function TransfersScreen() {
         cell: ({ row }) => (
           <Kg
             kg={row.original.weightKg}
-            className="text-[12.5px] font-semibold text-ink"
+            className="text-[12.5px] font-semibold text-adm-ink"
           />
         ),
       },
@@ -251,7 +251,7 @@ export function TransfersScreen() {
         cell: ({ row }) =>
           row.original.notes ? (
             <TextCell
-              className="text-soil"
+              className="text-adm-muted"
               value={row.original.notes}
               width="prose"
             />
@@ -270,10 +270,10 @@ export function TransfersScreen() {
     // inside its own box, so a phone got a sideways-scrolling page.
     <div className="min-w-0">
       <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
+        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
           Transfers
         </h1>
-        <p className="mt-0.5 text-[13px] text-soil">
+        <p className="mt-0.5 text-[13px] text-adm-muted">
           Stock moved between warehouses - each posts an out and an in on the
           ledger
         </p>
@@ -289,8 +289,8 @@ export function TransfersScreen() {
           action={
             isSuperAdmin ? (
               <Button
-                variant="harvest"
-                className="h-8 px-3.5 text-[13px]"
+                variant="default"
+                className="h-[34px] rounded-[6px] bg-console px-3.5 text-[13px] font-semibold text-white shadow-none hover:translate-x-0 hover:translate-y-0 hover:bg-console-hover hover:shadow-none"
                 onClick={() => setDialogOpen(true)}
               >
                 + New transfer
@@ -373,7 +373,7 @@ export function TransfersScreen() {
             itemNoun="transfers"
             isFetching={isFetching}
             rowHref={(t) => `/admin/transfers/${t.id}`}
-            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
+            rowClassName={() => "h-12 hover:bg-adm-sunken"}
             serverPagination={{
               totalCount,
               page,
@@ -547,7 +547,7 @@ function TransferDialog({
           {serverError ? (
             <p
               role="alert"
-              className="rounded-[2px] border border-error/40 bg-error/5 px-3 py-2 text-[12.5px] font-medium text-error"
+              className="rounded-[6px] border border-console-red/40 bg-console-red/5 px-3 py-2 text-[12.5px] font-medium text-console-red"
             >
               {serverError}
             </p>

@@ -255,16 +255,16 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
           {/* Not an AdminField: its Label wrapper would nest the row labels
               (invalid HTML) and steal clicks for the first control. */}
           <div>
-            <span className="stencil mb-[7px] block text-[11px] uppercase tracking-[0.14em] text-harvest-deep">
+            <span className="mb-[7px] block text-[11px] uppercase tracking-[0.14em] text-adm-muted">
               Sales on this trip
             </span>
             <div
               className={cn(
-                "rounded-[2px] border-[1.5px] border-soil/35 bg-[#FBFCF7]",
-                errors.saleIds && "border-error",
+                "rounded-[6px] border-[1.5px] border-adm-line bg-[#FBFCF7]",
+                errors.saleIds && "border-console-red",
               )}
             >
-              <div className="border-b border-soil/15 p-2">
+              <div className="border-b border-adm-hairline p-2">
                 <Input
                   value={saleSearch}
                   onChange={(e) => setSaleSearch(e.target.value)}
@@ -273,15 +273,15 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
                 />
               </div>
               {eligible.isLoading ? (
-                <p className="px-3 py-3 text-[13px] text-soil">
+                <p className="px-3 py-3 text-[13px] text-adm-muted">
                   Loading shippable sales…
                 </p>
               ) : eligible.isError ? (
-                <p className="px-3 py-3 text-[13px] text-error">
+                <p className="px-3 py-3 text-[13px] text-console-red">
                   Couldn&apos;t load the shippable sales. Reload and try again.
                 </p>
               ) : visibleSales.length === 0 ? (
-                <p className="px-3 py-3 text-[13px] text-soil">
+                <p className="px-3 py-3 text-[13px] text-adm-muted">
                   {allSales.length === 0
                     ? "No sales are ready to ship - a sale appears here once it is confirmed, its payment terms are met and it isn't already on a truck."
                     : "No sales match this search."}
@@ -291,7 +291,7 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
                   {visibleSales.map((s) => (
                     <label
                       key={s.id}
-                      className="flex cursor-pointer items-start gap-2.5 border-b border-soil/10 px-3 py-2 last:border-b-0 hover:bg-soil/5"
+                      className="flex cursor-pointer items-start gap-2.5 border-b border-adm-hairline px-3 py-2 last:border-b-0 hover:bg-soil/5"
                     >
                       <input
                         type="checkbox"
@@ -304,14 +304,14 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
                           <Mono className="block text-[12.5px] text-console">
                             {s.transactionNo}
                           </Mono>
-                          <Mono className="flex-none text-[12.5px] font-bold text-ink">
+                          <Mono className="flex-none text-[12.5px] font-bold text-adm-ink">
                             {formatKg(s.totalRemainingKg)}
                           </Mono>
                         </span>
-                        <span className="block min-w-0 text-[13px] text-ink [overflow-wrap:anywhere]">
+                        <span className="block min-w-0 text-[13px] text-adm-ink [overflow-wrap:anywhere]">
                           {s.buyer.name}
                         </span>
-                        <span className="mt-0.5 block text-[12px] text-soil">
+                        <span className="mt-0.5 block text-[12px] text-adm-muted">
                           {s.lines.map((l) => (
                             <span
                               key={l.commodityId}
@@ -327,7 +327,7 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
                   ))}
                 </div>
               )}
-              <div className="border-t border-soil/15 px-3 py-1.5 text-[12px] text-soil">
+              <div className="border-t border-adm-hairline px-3 py-1.5 text-[12px] text-adm-muted">
                 {selected.length} sale{selected.length === 1 ? "" : "s"} selected
                 {selectedKg > 0 ? (
                   <>
@@ -340,12 +340,12 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
             {errors.saleIds ? (
               <span
                 role="alert"
-                className="mt-1 block text-[12px] font-medium text-error"
+                className="mt-1 block text-[12px] font-medium text-console-red"
               >
                 {errors.saleIds.message}
               </span>
             ) : (
-              <span className="mt-1 block text-[12.5px] text-soil">
+              <span className="mt-1 block text-[12.5px] text-adm-muted">
                 One truck can serve several sales. Each shows the weight still
                 to ship.
               </span>
@@ -359,7 +359,7 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
               className={cn(
                 adminSelectClass,
                 "w-full",
-                errors.originWarehouseId && "border-error",
+                errors.originWarehouseId && "border-console-red",
               )}
               {...register("originWarehouseId")}
             >
@@ -374,7 +374,7 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
         </AdminCard>
 
         <AdminCard className="flex flex-col gap-3 px-5 py-4">
-          <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+          <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
             Truck &amp; destination
           </div>
           {/* Always rendered, even with an empty book. Hiding the picker when
@@ -403,7 +403,7 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
                 ))}
               </select>
             ) : (
-              <p className="text-[12.5px] text-soil">
+              <p className="text-[12.5px] text-adm-muted">
                 No saved destinations yet - enter this one below, or{" "}
                 <Link
                   href="/admin/delivery-addresses/new"
@@ -416,8 +416,8 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
             )}
           </AdminField>
           {pickedAddress ? (
-            <div className="rounded-[2px] border-[1.5px] border-soil/25 bg-surface-alt/50 px-3 py-2 text-[12.5px] text-soil">
-              <p className="min-w-0 font-medium text-ink [overflow-wrap:anywhere]">
+            <div className="rounded-[6px] border-[1.5px] border-adm-line bg-adm-sunken px-3 py-2 text-[12.5px] text-adm-muted">
+              <p className="min-w-0 font-medium text-adm-ink [overflow-wrap:anywhere]">
                 {pickedAddress.label} · {pickedAddress.city}
                 {pickedAddress.area ? `, ${pickedAddress.area}` : ""}
               </p>
@@ -454,7 +454,7 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
               <Input
                 className={cn(
                   adminInputClass,
-                  errors.destination && "border-error",
+                  errors.destination && "border-console-red",
                 )}
                 placeholder="Accra / Kumasi / address"
                 {...register("destination")}
@@ -467,7 +467,7 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
               error={errors.truckReg?.message}
             >
               <Input
-                className={cn(adminInputClass, errors.truckReg && "border-error")}
+                className={cn(adminInputClass, errors.truckReg && "border-console-red")}
                 placeholder="GT-1234-24"
                 {...register("truckReg")}
               />
@@ -481,7 +481,7 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
                 inputMode="decimal"
                 className={cn(
                   adminInputClass,
-                  errors.truckCapacityKg && "border-error",
+                  errors.truckCapacityKg && "border-console-red",
                 )}
                 {...register("truckCapacityKg")}
               />
@@ -503,7 +503,7 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
         </AdminCard>
 
         <AdminCard className="flex flex-col gap-3 px-5 py-4">
-          <div className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+          <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
             Driver
           </div>
           {/* Same rule as the destination: the directory stays visible even
@@ -531,7 +531,7 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
                 ))}
               </select>
             ) : (
-              <p className="text-[12.5px] text-soil">
+              <p className="text-[12.5px] text-adm-muted">
                 No drivers saved yet - enter this trip&apos;s driver below, or{" "}
                 <Link
                   href="/admin/drivers/new"
@@ -544,9 +544,9 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
             )}
           </AdminField>
           {pickedDriver && !showDriverOverrides ? (
-            <div className="flex flex-wrap items-center justify-between gap-2 rounded-[2px] border-[1.5px] border-soil/25 bg-surface-alt/50 px-3 py-2">
-              <div className="min-w-0 text-[12.5px] text-soil">
-                <p className="min-w-0 font-medium text-ink [overflow-wrap:anywhere]">
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-[6px] border-[1.5px] border-adm-line bg-adm-sunken px-3 py-2">
+              <div className="min-w-0 text-[12.5px] text-adm-muted">
+                <p className="min-w-0 font-medium text-adm-ink [overflow-wrap:anywhere]">
                   {ovName || pickedDriver.name}
                 </p>
                 <p className="min-w-0 [overflow-wrap:anywhere]">
@@ -570,7 +570,7 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
                 <Input
                   className={cn(
                     adminInputClass,
-                    errors.driverName && "border-error",
+                    errors.driverName && "border-console-red",
                   )}
                   {...register("driverName")}
                 />
@@ -580,7 +580,7 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
                   type="tel"
                   className={cn(
                     adminInputClass,
-                    errors.driverPhone && "border-error",
+                    errors.driverPhone && "border-console-red",
                   )}
                   {...register("driverPhone")}
                 />
@@ -594,7 +594,7 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
                   type="email"
                   className={cn(
                     adminInputClass,
-                    errors.driverEmail && "border-error",
+                    errors.driverEmail && "border-console-red",
                   )}
                   {...register("driverEmail")}
                 />
