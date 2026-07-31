@@ -1,7 +1,6 @@
 import { BoardHeader } from "@/components/commodities/board-header";
 import { EmptyLots } from "@/components/commodities/empty-lots";
 import { LotCards } from "@/components/commodities/lot-cards";
-import { LotFiles } from "@/components/commodities/lot-files";
 import {
   fetchPublicCommodities,
   toBoardLines,
@@ -23,10 +22,10 @@ export const metadata = pageMetadata({
 });
 
 export default async function CommoditiesPage() {
-  // One live read feeds both the planks and the lot files, cached under the
+  // One live read feeds both the register and the cards, cached under the
   // `commodities` tag - the backend purges it on every stock/register write,
-  // so the board follows the records within seconds. Nothing published (or
-  // the API briefly down) renders the designed empty board, never stand-ins.
+  // so the page follows the records within seconds. Nothing published (or the
+  // API briefly down) renders the designed empty board, never stand-ins.
   const commodities = await fetchPublicCommodities();
   const lines = toBoardLines(commodities);
   const lots = toLots(commodities);
@@ -35,23 +34,14 @@ export default async function CommoditiesPage() {
     month: "short",
     year: "numeric",
   });
-  // The hero board stays a glance, not a list: at most 3 planks (sliced here
-  // so BoardHeader remains a dumb presenter). The first 3 lots keep the rich
-  // full-bleed file treatment; the remainder files into the compact card grid
-  // (client-paginated once it grows past 9).
-  const featuredLots = lots.slice(0, 3);
-  const remainingLots = lots.slice(3);
+  // The register at the top stays a glance, not a list: at most 3 lines. Every
+  // lot then files into the card grid, and each card opens the lot's own page
+  // - which is where the full record is read now, rather than three of them
+  // being unrolled inline while the rest were summarised.
   return (
     <div className="texture-grain bg-surface">
       <BoardHeader updatedOn={updatedOn} lines={lines.slice(0, 3)} />
-      {lots.length === 0 ? (
-        <EmptyLots />
-      ) : (
-        <>
-          <LotFiles lots={featuredLots} />
-          {remainingLots.length > 0 ? <LotCards lots={remainingLots} /> : null}
-        </>
-      )}
+      {lots.length === 0 ? <EmptyLots /> : <LotCards lots={lots} />}
     </div>
   );
 }

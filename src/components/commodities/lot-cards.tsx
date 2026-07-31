@@ -1,10 +1,12 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { DocCard } from "@/components/ui/DocCard";
 import { CommodityPlaceholder } from "@/components/ui/CommodityPlaceholder";
 import { Photo } from "@/components/ui/Photo";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { routes } from "@/lib/routes";
 import type { PublicLot } from "@/lib/public-commodities";
 
 const PAGE_SIZE = 9;
@@ -24,21 +26,23 @@ function ThumbFrame({ children }: { children: React.ReactNode }) {
 
 
 
-/** One filed lot in the compact register: photo thumb (when the records hold
- * one), lot number, name, grades and the availability chip. Informational -
- * there is no per-commodity page to link to. Heights stay uniform via
- * reserved line-clamp space so mixed rows never stagger. */
+/**
+ * One lot in the register, as a SUMMARY that opens its page.
+ *
+ * The card used to print the whole record - variety, grade and the full
+ * description - because there was nowhere else for that text to live. Now
+ * there is: everything past the identifying facts moves to the lot's own page,
+ * and the card carries what a reader needs to choose between lots. The
+ * description is clamped to three lines here, so a long one cannot set the
+ * height of the row it sits in.
+ */
 function LotCard({ lot }: { lot: PublicLot }) {
   const spec = [lot.variety, lot.qualityGrade].filter(Boolean).join(" · ");
   return (
-    // Two 1fr rows, so the picture and the paper under it are ALWAYS the same
-    // height: the text is shown in full here (these cards have no detail page
-    // to go to), and a card whose copy ran three times the depth of its own
-    // photograph read as broken.
-    <DocCard tint="paper" className="grid h-full min-w-0 grid-rows-[1fr_1fr]">
-      {/* No photo on file - or one whose URL no longer resolves - falls back
-          to the cropped ghost stencil (the lot-files idiom), so mixed rows
-          keep one even card rhythm either way. */}
+    <DocCard
+      tint="paper"
+      className="group grid h-full min-w-0 grid-rows-[1fr_auto] transition-[transform,box-shadow] duration-150 focus-within:shadow-[3px_3px_0_rgb(31_33_28/0.18)] hover:-translate-y-px hover:shadow-[3px_3px_0_rgb(31_33_28/0.18)]"
+    >
       <ThumbFrame>
         {lot.photo ? (
           <Photo
@@ -57,14 +61,13 @@ function LotCard({ lot }: { lot: PublicLot }) {
         <span className="stencil mb-2.5 block whitespace-nowrap text-[10px] leading-none tracking-[0.16em] text-harvest-deep">
           {lot.lotNo}
         </span>
-        {/* Everything renders IN FULL, with no clamp and no title tooltip:
-            there is no per-commodity page behind these cards, so the card is
-            the only place the text exists, and a tooltip is unopenable on the
-            phones most of these readers are holding. The fields are the
-            office's own - variety, grade, description - and each is dropped
-            when the record does not carry it. */}
         <h3 className="min-w-0 font-display text-[16px] font-bold leading-[1.2] tracking-[0.01em] text-forest [overflow-wrap:anywhere]">
-          {lot.name}
+          {/* The whole card is the target: the overlay covers it, so the row
+              is one honest link rather than a card with a small link on it. */}
+          <Link href={routes.commodity(lot.slug)} className="focus-visible:outline-none">
+            <span aria-hidden="true" className="absolute inset-0 z-[1]" />
+            {lot.name}
+          </Link>
         </h3>
         {spec ? (
           <p className="mt-1.5 min-w-0 text-[12.5px] leading-[1.5] text-harvest-deep [overflow-wrap:anywhere]">
@@ -72,12 +75,11 @@ function LotCard({ lot }: { lot: PublicLot }) {
           </p>
         ) : null}
         {lot.description ? (
-          <p className="mt-2 min-w-0 text-[13px] leading-[1.6] text-soil [overflow-wrap:anywhere]">
+          <p className="mt-2 min-w-0 line-clamp-3 text-[13px] leading-[1.6] text-soil [overflow-wrap:anywhere]">
             {lot.description}
           </p>
         ) : null}
-        {/* The availability line - same vocabulary as the board planks. */}
-        <div className="mt-auto flex items-center justify-between gap-3 border-t border-dotted border-soil/40 pt-3.5">
+        <div className="mt-4 flex items-center justify-between gap-3 border-t border-dotted border-soil/40 pt-3.5">
           {lot.inStock ? (
             <span className="stencil rounded-[2px] border border-leaf/55 px-2 py-1 text-[9px] leading-none tracking-[0.14em] text-forest">
               IN STOCK
@@ -87,8 +89,8 @@ function LotCard({ lot }: { lot: PublicLot }) {
               ON ORDER · ASK US
             </span>
           )}
-          <span className="whitespace-nowrap text-[11px] text-soil/70">
-            Call for a quote
+          <span className="stencil whitespace-nowrap text-[10px] tracking-[0.14em] text-forest transition-transform group-hover:translate-x-0.5">
+            READ MORE →
           </span>
         </div>
       </div>
@@ -124,14 +126,14 @@ export function LotCards({ lots }: { lots: PublicLot[] }) {
   return (
     <section
       ref={topRef}
-      aria-label="The rest of the register"
+      aria-label="The register"
       className="mx-auto max-w-[1312px] scroll-mt-24 px-5 pb-14 lg:px-8 lg:pb-[88px]"
     >
       <div aria-hidden="true" className="ledger-rule mb-10 lg:mb-14" />
       <SectionHeading
-        eyebrow="THE REST OF THE REGISTER"
-        title="Also on file."
-        lede="Every other lot in the records - same grading, same certified scale. Call with tonnage and destination for a same-day quote."
+        eyebrow="THE REGISTER"
+        title="Every lot on file."
+        lede="Same grading, same certified scale. Open a lot to read what the office keeps on it, or call with tonnage and destination for a same-day quote."
         className="mb-8 lg:mb-10"
       />
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

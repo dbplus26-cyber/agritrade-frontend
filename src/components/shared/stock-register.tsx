@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { routes } from "@/lib/routes";
 import type { CommodityLine } from "@/static-data/availability";
 import { cn } from "@/lib/utils";
 
@@ -57,12 +59,15 @@ function RegisterRow({
   meta,
   name,
   available,
+  slug,
   wrap = false,
 }: {
   available: boolean;
   first: boolean;
   meta: string;
   name: string;
+  /** When present the whole row opens the commodity's page. */
+  slug?: string;
   /**
    * Let both lines run onto as many lines as they need instead of clipping.
    * Used for the empty-register notice, which is a message rather than a
@@ -74,7 +79,8 @@ function RegisterRow({
   return (
     <div
       className={cn(
-        "relative flex items-center justify-between gap-4 px-4 py-4 sm:gap-6 sm:px-7 sm:py-[18px]",
+        "group relative flex items-center justify-between gap-4 px-4 py-4 transition-colors sm:gap-6 sm:px-7 sm:py-[18px]",
+        slug && "hover:bg-harvest/6",
         !first && "border-t border-dotted border-soil/40",
       )}
     >
@@ -84,6 +90,16 @@ function RegisterRow({
           ~75px, which is the floor on how much of a 390px row it can give
           back. */}
       <span className="min-w-0 basis-full pr-[80px] sm:basis-auto sm:pr-0">
+        {/* The whole row is the target when the line has a page behind it -
+            reading the board and opening a lot are the same gesture. */}
+        {slug ? (
+          <Link
+            href={routes.commodity(slug)}
+            className="absolute inset-0 z-[1] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-forest"
+          >
+            <span className="sr-only">{name}</span>
+          </Link>
+        ) : null}
         {/* Both lines are held to ONE line and clipped: the name and the
             grade text are owner-entered and can run to any length, and a
             register whose rows change height with the length of a variety
@@ -139,6 +155,7 @@ export function StockRegister({ lines }: { lines: CommodityLine[] }) {
           first={i === 0}
           meta={line.meta}
           name={line.name}
+          slug={line.slug}
           wrap={isEmpty}
         />
       ))}

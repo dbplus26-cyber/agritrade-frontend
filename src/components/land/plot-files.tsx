@@ -1,12 +1,13 @@
 import Link from "next/link";
-import { PlotGallery, type PlotPhoto } from "@/components/land/plot-gallery";
+import type { PlotPhoto } from "@/components/land/plot-gallery";
+import { Photo, PhotoFallback } from "@/components/ui/Photo";
 import { Reveal } from "@/components/ui/Reveal";
 import { Stamp } from "@/components/ui/Stamp";
 import { StencilLabel } from "@/components/ui/StencilLabel";
 import { formatCedis } from "@/lib/format-money";
 import { routes } from "@/lib/routes";
 import { getSiteContact } from "@/lib/public-contact";
-import type { PublicLandPlot } from "@/lib/public-land";
+import { plotSlug, type PublicLandPlot } from "@/lib/public-land";
 import { cn } from "@/lib/utils";
 
 /** The torn-ledger perforation strip down a plot document's left edge. */
@@ -19,24 +20,6 @@ function PerforatedEdge() {
   );
 }
 
-/** Phones stack the label above its value; sm+ keeps the ledger columns. */
-function PlotRow({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    // The value sits UNDER its label at every width. As a label-left ledger
-    // the 110px column stood empty for all but the first line of a long size
-    // convention, leaving a caption stranded at the top of a tall blank
-    // column and distorting the card.
-    <div className="flex flex-col gap-1">
-      <dt className="stencil text-[10px] tracking-[0.14em] text-harvest-deep">
-        {label}
-      </dt>
-      <dd className="m-0 border-b border-dotted border-soil/40 pb-[5px] text-[13.5px] leading-[1.55] text-ink lg:text-[14px]">
-        {children}
-      </dd>
-    </div>
-  );
-}
-
 /**
  * A plot's photos in register order. `PublicLandPlot` (src/lib/public-land)
  * still types the cover photo alone, so the optional `photos` array the land
@@ -44,7 +27,7 @@ function PlotRow({ label, children }: { label: string; children: React.ReactNode
  * public endpoint ships it, every one of them shows here with no further
  * change. The single cover photo is the fallback.
  */
-function plotPhotos(plot: PublicLandPlot): PlotPhoto[] {
+export function plotPhotos(plot: PublicLandPlot): PlotPhoto[] {
   const filed = (
     plot as PublicLandPlot & {
       photos?: { alt?: null | string; url: string }[];
@@ -58,92 +41,67 @@ function plotPhotos(plot: PublicLandPlot): PlotPhoto[] {
 
 function PlotCard({ plot, offset }: { plot: PublicLandPlot; offset: boolean }) {
   const available = plot.status === "AVAILABLE";
-  const photos = plotPhotos(plot);
-  const enquiryHref = `${routes.contact}?subject=${encodeURIComponent("Land / plots")}&about=${encodeURIComponent(`Plot ${plot.reference} - ${plot.name}`)}`;
+  const cover = plotPhotos(plot)[0];
   return (
+    // A SUMMARY of the plot, opening its own page. The card used to carry the
+    // gallery, the papers row and the whole description, which a documented
+    // plot has far too much of to fit under a photograph; what is left is what
+    // a buyer chooses between plots on.
     <article
       className={cn(
-        "shadow-doc relative grid grid-cols-[26px_1fr] border border-soil/35 bg-paper",
+        "shadow-doc group relative grid grid-cols-[26px_1fr] border border-soil/35 bg-paper transition-[transform,box-shadow] duration-150 focus-within:shadow-[3px_3px_0_rgb(31_33_28/0.18)] hover:-translate-y-px hover:shadow-[3px_3px_0_rgb(31_33_28/0.18)]",
         offset && "lg:mt-11",
       )}
     >
       <PerforatedEdge />
       <div>
-        {photos.length > 0 ? (
-          // "Reserved" is carried by the stamp and the muted enquiry button,
-          // never by fogging the picture.
-          <PlotGallery
-            fallbackAlt={`Plot ${plot.reference} - ${plot.name}`}
-            photos={photos}
-          />
-        ) : (
-          // No photo on file yet: the ruled ledger paper keeps the card's
-          // document framing instead of a broken image slot.
-          <div className="relative h-[180px] border-b-[1.5px] border-soil/50 sm:h-[210px]">
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 bg-[repeating-linear-gradient(180deg,transparent_0px,transparent_35px,rgb(89_82_59/0.28)_35px,rgb(89_82_59/0.28)_36px)]"
-            >
-              <span className="stencil absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[-4deg] whitespace-nowrap text-[13px] tracking-[0.16em] text-soil">
-                PHOTO TO FOLLOW
-              </span>
-            </div>
-          </div>
-        )}
+        <div className="relative h-[180px] overflow-hidden border-b-[1.5px] border-soil/50 sm:h-[210px]">
+          {cover ? (
+            // "Reserved" is carried by the stamp and the muted action, never
+            // by fogging the picture: a buyer is judging the land.
+            <Photo
+              src={cover.url}
+              alt={cover.alt ?? `Plot ${plot.reference} - ${plot.name}`}
+              fill
+              sizes="(min-width: 1024px) 560px, 100vw"
+              className="object-cover"
+              fallback={<PhotoFallback className="absolute inset-0" />}
+            />
+          ) : (
+            <PhotoFallback className="absolute inset-0" />
+          )}
+        </div>
         <div className="relative px-5 pb-6 pt-6 sm:px-7">
           <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
             <h3 className="min-w-0 font-display text-[16px] font-bold leading-[1.25] text-forest [overflow-wrap:anywhere] lg:text-[18px]">
-              {plot.name}
+              {/* The whole card is the target; the overlay covers it. */}
+              <Link
+                href={routes.plot(plotSlug(plot))}
+                className="focus-visible:outline-none"
+              >
+                <span aria-hidden="true" className="absolute inset-0 z-[1]" />
+                {plot.name}
+              </Link>
             </h3>
             <span className="stencil text-[11px] tracking-[0.14em] text-harvest-deep lg:text-[12px]">
               PLOT {plot.reference}
             </span>
           </div>
-          <dl className="mb-[18px] flex flex-col gap-2.5 sm:gap-1.5">
-            <PlotRow label="SIZE">
-              {plot.use ? `${plot.sizeText} · ${plot.use}` : plot.sizeText}
-            </PlotRow>
-            {plot.priceGhs != null ? (
-              <PlotRow label="PRICE">
-                <span className="font-bold text-forest">
-                  {formatCedis(Number(plot.priceGhs))}
-                </span>
-              </PlotRow>
-            ) : null}
-            {plot.description ? (
-              // Printed IN FULL: a plot has no page of its own to open, so
-              // this card is the only place the owner's description exists.
-              <PlotRow label="ABOUT THIS PLOT">
-                <span className="[overflow-wrap:anywhere]">
-                  {plot.description}
-                </span>
-              </PlotRow>
-            ) : null}
-            <PlotRow label="PAPERS">
-              <span className="flex flex-wrap items-center gap-1.5">
-                {["Site plan", "Indenture"].map((paper) => (
-                  <span
-                    key={paper}
-                    className="stencil rounded-[2px] border border-leaf/55 px-2 py-1 text-[9px] leading-none tracking-[0.12em] text-forest"
-                  >
-                    {paper.toUpperCase()} ✓
-                  </span>
-                ))}
-                <span className="text-[12.5px] text-soil">on file</span>
-              </span>
-            </PlotRow>
-          </dl>
-          <Link
-            href={enquiryHref}
-            className={cn(
-              "inline-block rounded-[2px] border-2 px-6 py-3 text-[14px] font-bold transition-[transform,box-shadow] duration-100 hover:translate-x-px hover:translate-y-px",
-              available
-                ? "shadow-doc-sm border-forest text-forest hover:shadow-[2px_2px_0_rgb(89_82_59/0.4)]"
-                : "border-soil/55 text-soil shadow-[3px_3px_0_rgb(89_82_59/0.3)] hover:text-ink hover:shadow-[2px_2px_0_rgb(89_82_59/0.3)]",
-            )}
-          >
-            {available ? "Enquire about this plot" : "Ask about similar plots"}
-          </Link>
+          {/* Two facts, on one line each, and nothing else. The card carried
+              labelled ledger rows for size and price and a papers row of its
+              own, which is a document rather than a summary - all of that is
+              on the plot's page now. */}
+          <p className="mb-1 line-clamp-2 text-[13px] leading-[1.55] text-soil [overflow-wrap:anywhere]">
+            {plot.use ? `${plot.sizeText} · ${plot.use}` : plot.sizeText}
+          </p>
+          <p className="mb-[18px] text-[14px] font-bold text-forest">
+            {plot.priceGhs == null
+              ? "Price on request"
+              : formatCedis(Number(plot.priceGhs))}
+          </p>
+          <span className="stencil inline-flex items-center gap-1.5 text-[10px] tracking-[0.14em] text-forest transition-transform group-hover:translate-x-0.5">
+            READ MORE →
+          </span>
           <Stamp
             tone="leaf"
             className={cn(

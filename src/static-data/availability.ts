@@ -17,6 +17,12 @@ export interface CommodityLine {
   available: boolean;
   /** One line of market context shown under the name on desktop planks. */
   meta: string;
+  /**
+   * URL key for the commodity's page. Present on every live line; the sample
+   * set below leaves it out, so the style guide renders a plain row rather
+   * than a link to a commodity that does not exist.
+   */
+  slug?: string;
 }
 
 export const availabilityBoard: CommodityLine[] = [
