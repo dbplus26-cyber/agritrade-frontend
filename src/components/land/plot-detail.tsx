@@ -2,7 +2,6 @@ import Link from "next/link";
 import { PlotGallery } from "@/components/land/plot-gallery";
 import { plotPhotos } from "@/components/land/plot-files";
 import { BackButton } from "@/components/ui/BackButton";
-import { PhotoFallback } from "@/components/ui/Photo";
 import { Stamp } from "@/components/ui/Stamp";
 import { StencilLabel } from "@/components/ui/StencilLabel";
 import { formatCedis } from "@/lib/format-money";
@@ -61,19 +60,16 @@ export async function PlotDetail({ plot }: { plot: PublicLandPlot }) {
         </h1>
 
         <div className="mt-8 flex flex-col gap-8 lg:mt-10 lg:gap-10">
-          <div className="shadow-doc-dark relative border border-soil/30">
-            {photos.length > 0 ? (
+          {/* Nothing filed, no frame - see PhotoFrame for why. */}
+          {photos.length > 0 ? (
+            <div className="shadow-doc-dark relative border border-soil/30">
               <PlotGallery
                 className="h-[240px] border-b-0 sm:h-[360px] lg:h-[440px]"
                 fallbackAlt={`Plot ${plot.reference} - ${plot.name}`}
                 photos={photos}
               />
-            ) : (
-              <div className="relative h-[240px] sm:h-[360px] lg:h-[440px]">
-                <PhotoFallback className="absolute inset-0" />
-              </div>
-            )}
-          </div>
+            </div>
+          ) : null}
 
           <div className="shadow-doc relative border border-soil/35 bg-surface-alt p-6 sm:p-9 lg:p-10">
             <Stamp

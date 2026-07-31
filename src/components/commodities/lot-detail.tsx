@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { BackButton } from "@/components/ui/BackButton";
-import { CommodityPlaceholder } from "@/components/ui/CommodityPlaceholder";
-import { Photo } from "@/components/ui/Photo";
+import { PhotoFrame } from "@/components/ui/PhotoFrame";
 import { Stamp } from "@/components/ui/Stamp";
 import { StencilLabel } from "@/components/ui/StencilLabel";
 import { routes } from "@/lib/routes";
@@ -53,24 +52,15 @@ export function LotDetail({ lot }: { lot: PublicLot }) {
         </h1>
 
         <div className="mt-8 flex flex-col gap-8 lg:mt-10 lg:gap-10">
-          {/* The picture box is always here: a commodity with no photograph on
-              file, or one whose upload no longer resolves, gets the drawn
-              stand-in rather than leaving the page a column of text. */}
-          <div className="relative h-[240px] border border-soil/30 shadow-[6px_6px_0_rgb(31_33_28/0.18)] sm:h-[360px] lg:h-[440px]">
-            {lot.photo ? (
-              <Photo
-                src={lot.photo}
-                alt={lot.photoAlt}
-                fill
-                priority
-                sizes="(min-width: 1024px) 880px, 100vw"
-                className="object-cover"
-                fallback={<CommodityPlaceholder />}
-              />
-            ) : (
-              <CommodityPlaceholder />
-            )}
-          </div>
+          {/* No photograph on file means no frame: on a page about one record
+              an empty picture box says nothing the reader needs. */}
+          <PhotoFrame
+            alt={lot.photoAlt}
+            className="h-[240px] border border-soil/30 shadow-[6px_6px_0_rgb(31_33_28/0.18)] sm:h-[360px] lg:h-[440px]"
+            priority
+            sizes="(min-width: 1024px) 880px, 100vw"
+            src={lot.photo}
+          />
 
           <div className="shadow-doc relative border border-soil/35 bg-surface-alt p-6 sm:p-9 lg:p-10">
             <Stamp
