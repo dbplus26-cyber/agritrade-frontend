@@ -28,11 +28,10 @@ function StarRow({ rating }: { rating: number }) {
 }
 
 /**
- * One review filed as a document: star row, the quote (clamped - the full
- * text is in the title tooltip), then the ledger footer with author, role,
- * date and the provenance mark. VERIFIED TRANSACTION means the office
- * matched it to a real receipt; ADMIN-source reviews were recorded by the
- * office itself.
+ * One review filed as a document: star row, the quote in full, then the
+ * ledger footer with author, role, date and the provenance mark. VERIFIED
+ * TRANSACTION means the office matched it to a real receipt; ADMIN-source
+ * reviews were recorded by the office itself.
  */
 export function ReviewCard({
   review,
@@ -62,10 +61,12 @@ export function ReviewCard({
           </span>
         ) : null}
       </div>
-      <blockquote
-        title={review.text}
-        className="mb-4 line-clamp-6 min-w-0 text-[14px] leading-[1.7] text-ink [overflow-wrap:anywhere]"
-      >
+      {/* The review is shown in FULL. It used to clamp with the rest hidden
+          behind a title tooltip, which no touch device can open and no screen
+          reader announces reliably - so on a phone the end of every long
+          review was simply unreadable. The 450-character cap is what keeps a
+          card a card. */}
+      <blockquote className="mb-4 min-w-0 text-[14px] leading-[1.7] text-ink [overflow-wrap:anywhere]">
         &ldquo;{review.text}&rdquo;
       </blockquote>
       <div className="mt-auto flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-t border-dotted border-soil/40 pt-3">

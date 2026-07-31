@@ -1,3 +1,4 @@
+import { REVIEW_MAX_CHARS, REVIEWER_NAME_MAX } from "@/lib/limits";
 import { z } from "zod";
 import { REVIEW_ROLES } from "@/types/public-review.types";
 
@@ -13,7 +14,10 @@ export const reviewSchema = z.object({
     .string()
     .trim()
     .min(2, "Please enter your name.")
-    .max(150, "Please keep your name under 150 characters."),
+    .max(
+      REVIEWER_NAME_MAX,
+      `Please keep your name under ${String(REVIEWER_NAME_MAX)} characters.`,
+    ),
   phone: z
     .string()
     .trim()
@@ -36,7 +40,7 @@ export const reviewSchema = z.object({
     .string()
     .trim()
     .min(10, "Tell us a little more - at least a sentence.")
-    .max(2000, "Please keep your review under 2000 characters."),
+    .max(REVIEW_MAX_CHARS, `Please keep your review under ${String(REVIEW_MAX_CHARS)} characters.`),
   /**
    * Honeypot - rendered invisibly, real users never fill it; the backend
    * rejects any submission where it's non-empty. Permissive here so the

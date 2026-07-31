@@ -12,6 +12,7 @@ import {
   TurnstileWidget,
 } from "@/components/ui/TurnstileWidget";
 import { extractApiError } from "@/lib/extract-api-error";
+import { REVIEWER_NAME_MAX } from "@/lib/limits";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import { useSubmitPublicReviewMutation } from "@/redux/reviews/public-reviews-api";
@@ -212,6 +213,7 @@ export function ReviewForm() {
             <input
               id={`${fieldId}-name`}
               {...register("authorName")}
+              maxLength={REVIEWER_NAME_MAX}
               placeholder="e.g. Kwame Mensah"
               aria-invalid={errors.authorName ? true : undefined}
               aria-describedby={

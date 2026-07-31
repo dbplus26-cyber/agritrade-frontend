@@ -1,3 +1,4 @@
+import { REVIEW_MAX_CHARS, REVIEWER_NAME_MAX } from "@/lib/limits";
 import { z } from "zod";
 import { REVIEW_ROLES } from "@/types/public-review.types";
 
@@ -14,7 +15,10 @@ export const adminReviewSchema = z.object({
     .string()
     .trim()
     .min(2, "Enter the reviewer's name.")
-    .max(150, "Keep the name under 150 characters."),
+    .max(
+      REVIEWER_NAME_MAX,
+      `Keep the name under ${String(REVIEWER_NAME_MAX)} characters.`,
+    ),
   role: z.enum(REVIEW_ROLES),
   // The star group writes a number via setValue; 0 (nothing picked yet)
   // fails min(1) with the friendly message.
@@ -27,7 +31,7 @@ export const adminReviewSchema = z.object({
     .string()
     .trim()
     .min(10, "Write at least a sentence - 10 characters minimum.")
-    .max(2000, "Keep the review under 2000 characters."),
+    .max(REVIEW_MAX_CHARS, `Keep the review under ${String(REVIEW_MAX_CHARS)} characters.`),
 });
 
 export type AdminReviewValues = z.infer<typeof adminReviewSchema>;
