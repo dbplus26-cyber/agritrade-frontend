@@ -1,58 +1,81 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Image from "next/image";
 import { DocCard } from "@/components/ui/DocCard";
+import { CommodityPlaceholder } from "@/components/ui/CommodityPlaceholder";
+import { Photo } from "@/components/ui/Photo";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import type { MergedLot } from "@/lib/public-commodities";
+import type { PublicLot } from "@/lib/public-commodities";
 
 const PAGE_SIZE = 9;
+
+/**
+ * The slot a thumbnail lives in, used for the photo AND for both no-photo
+ * paths (never filed, or filed but no longer resolving), so the card keeps one
+ * height whatever the records hold.
+ */
+function ThumbFrame({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="relative min-h-[150px] w-full overflow-hidden border-b border-soil/30">
+      {children}
+    </div>
+  );
+}
+
+
 
 /** One filed lot in the compact register: photo thumb (when the records hold
  * one), lot number, name, grades and the availability chip. Informational -
  * there is no per-commodity page to link to. Heights stay uniform via
  * reserved line-clamp space so mixed rows never stagger. */
-function LotCard({ lot }: { lot: MergedLot }) {
+function LotCard({ lot }: { lot: PublicLot }) {
+  const spec = [lot.variety, lot.qualityGrade].filter(Boolean).join(" · ");
   return (
-    <DocCard tint="paper" className="flex h-full min-w-0 flex-col">
-      {lot.photo ? (
-        <div className="relative h-[150px] w-full border-b border-soil/30">
-          <Image
+    // Two 1fr rows, so the picture and the paper under it are ALWAYS the same
+    // height: the text is shown in full here (these cards have no detail page
+    // to go to), and a card whose copy ran three times the depth of its own
+    // photograph read as broken.
+    <DocCard tint="paper" className="grid h-full min-w-0 grid-rows-[1fr_1fr]">
+      {/* No photo on file - or one whose URL no longer resolves - falls back
+          to the cropped ghost stencil (the lot-files idiom), so mixed rows
+          keep one even card rhythm either way. */}
+      <ThumbFrame>
+        {lot.photo ? (
+          <Photo
             src={lot.photo}
             alt={lot.photoAlt}
             fill
             sizes="(min-width: 1024px) 416px, (min-width: 640px) 50vw, 100vw"
             className="object-cover"
+            fallback={<CommodityPlaceholder />}
           />
-        </div>
-      ) : (
-        // No photo on file: the cropped ghost stencil (the lot-files idiom)
-        // holds the slot so mixed rows keep one even card rhythm.
-        <div className="relative flex h-[150px] w-full items-center overflow-hidden border-b border-soil/30 bg-surface-alt">
-          <span
-            aria-hidden="true"
-            className="stencil select-none whitespace-nowrap pl-5 text-[64px] leading-none tracking-[0.02em] text-soil/12"
-          >
-            {lot.ghost}
-          </span>
-        </div>
-      )}
-      <div className="flex min-w-0 flex-1 flex-col p-5">
+        ) : (
+          <CommodityPlaceholder />
+        )}
+      </ThumbFrame>
+      <div className="flex min-w-0 flex-col p-5">
         <span className="stencil mb-2.5 block whitespace-nowrap text-[10px] leading-none tracking-[0.16em] text-harvest-deep">
           {lot.lotNo}
         </span>
-        <h3
-          title={lot.name}
-          className="stencil min-h-[2.2em] min-w-0 text-[21px] leading-[1.1] tracking-[0.05em] text-forest line-clamp-2 [overflow-wrap:anywhere]"
-        >
-          {lot.name.toUpperCase()}
+        {/* Everything renders IN FULL, with no clamp and no title tooltip:
+            there is no per-commodity page behind these cards, so the card is
+            the only place the text exists, and a tooltip is unopenable on the
+            phones most of these readers are holding. The fields are the
+            office's own - variety, grade, description - and each is dropped
+            when the record does not carry it. */}
+        <h3 className="min-w-0 font-display text-[16px] font-bold leading-[1.2] tracking-[0.01em] text-forest [overflow-wrap:anywhere]">
+          {lot.name}
         </h3>
-        <p
-          title={lot.grades}
-          className="mt-2 min-h-[3.2em] min-w-0 text-[13px] leading-[1.6] text-soil line-clamp-2 [overflow-wrap:anywhere]"
-        >
-          {lot.grades}
-        </p>
+        {spec ? (
+          <p className="mt-1.5 min-w-0 text-[12.5px] leading-[1.5] text-harvest-deep [overflow-wrap:anywhere]">
+            {spec}
+          </p>
+        ) : null}
+        {lot.description ? (
+          <p className="mt-2 min-w-0 text-[13px] leading-[1.6] text-soil [overflow-wrap:anywhere]">
+            {lot.description}
+          </p>
+        ) : null}
         {/* The availability line - same vocabulary as the board planks. */}
         <div className="mt-auto flex items-center justify-between gap-3 border-t border-dotted border-soil/40 pt-3.5">
           {lot.inStock ? (
@@ -80,7 +103,7 @@ function LotCard({ lot }: { lot: MergedLot }) {
  * the register grows past 9 (stencilled PAGE X OF Y between square PREV/NEXT
  * blocks, in the site's ledger idiom).
  */
-export function LotCards({ lots }: { lots: MergedLot[] }) {
+export function LotCards({ lots }: { lots: PublicLot[] }) {
   const [page, setPage] = useState(1);
   const topRef = useRef<HTMLElement>(null);
   const totalPages = Math.max(1, Math.ceil(lots.length / PAGE_SIZE));

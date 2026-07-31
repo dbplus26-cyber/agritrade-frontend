@@ -1,11 +1,6 @@
 import { CACHE_TAGS } from "@/config/cache-tags";
 import { env } from "@/lib/env";
-import {
-  availabilityBoard,
-  commodityLots,
-  type CommodityLine,
-  type CommodityLot,
-} from "@/static-data/availability";
+import type { CommodityLine } from "@/static-data/availability";
 
 /**
  * The live availability feed behind the plank board and the lot files, fetched
@@ -47,82 +42,76 @@ export async function fetchPublicCommodities(): Promise<
   }
 }
 
-const byName = <T extends { name: string }>(items: T[]) =>
-  new Map(items.map((item) => [item.name.trim().toLowerCase(), item]));
-
 /**
- * Board lines from the live feed, keeping the static market-context copy
- * where names match. Null (API down) or an empty publish list returns [] -
- * PlankRows renders its designed empty plank, never a stand-in list.
+ * Board lines from the live feed. Null (API down) or an empty publish list
+ * returns [] - StockRegister renders its one honest empty line, never a
+ * stand-in list.
+ *
+ * The context line under each name is the commodity's OWN variety and grade.
+ * It used to prefer a hand-written line of market copy where the name matched
+ * a launch commodity ("Main harvest from September"), which meant the site
+ * could contradict the register: the office edits a commodity in the console
+ * and the board keeps announcing something nobody typed.
  */
 export function toBoardLines(
   commodities: PublicCommodity[] | null,
 ): CommodityLine[] {
   if (!commodities || commodities.length === 0) return [];
-  const staticByName = byName<CommodityLine>(availabilityBoard);
-  return commodities.map((c) => {
-    const known = staticByName.get(c.name.trim().toLowerCase());
-    return {
-      name: c.name,
-      available: c.available,
-      meta:
-        known?.meta ??
-        ([c.variety, c.qualityGrade].filter(Boolean).join(" · ") ||
-          "Call for today's position"),
-    };
-  });
+  return commodities.map((c) => ({
+    name: c.name,
+    available: c.available,
+    meta:
+      [c.variety, c.qualityGrade].filter(Boolean).join(" · ") ||
+      "Call for today's position",
+  }));
 }
 
-/** A lot file merged from the live feed and the static rich content. */
-export interface MergedLot extends Omit<CommodityLot, "photo" | "boardName"> {
+/**
+ * A lot file on /commodities. Every field is the commodity's OWN record, as
+ * the office keeps it in the console: name, variety, quality grade,
+ * description, photo and whether it is available. Nothing else - the page used
+ * to merge a bundle of hand-written "grades / season / sold as" copy over the
+ * feed, so a reader was shown paragraphs about moisture readings and truckload
+ * terms that nobody had entered anywhere and the office could not correct.
+ */
+export interface PublicLot {
   /** The commodity's API id - the stable render key. */
   id: string;
-  photo: string | null;
+  name: string;
+  /** Register position, e.g. "LOT-01". */
+  lotNo: string;
+  /** Uppercased name, used as the decorative ghost watermark. */
+  ghost: string;
+  variety: null | string;
+  qualityGrade: null | string;
+  description: null | string;
+  photo: null | string;
+  photoAlt: string;
+  /** Contact prefill subject for the enquiry CTA. */
+  subject: string;
   inStock: boolean;
 }
 
 /**
- * Lot files from the live feed: API commodities matched to the static lot
- * content by name keep their rich copy and photography; API-only commodities
- * render from their own fields (photo included when present). API down or
+ * Lot files from the live feed, one per published commodity. API down or
  * nothing published returns [] - the page renders the empty register, not
  * stand-in files.
  */
-export function toLots(commodities: PublicCommodity[] | null): MergedLot[] {
+export function toLots(commodities: PublicCommodity[] | null): PublicLot[] {
   if (!commodities || commodities.length === 0) return [];
-
-  const lotByName = byName<CommodityLot>(
-    commodityLots.map((l) => ({ ...l, name: l.name })),
-  );
-  return commodities.map((c, i) => {
-    // Lot numbers follow the live feed's order for every entry - mixing the
-    // static files' own numbering with generated ones can collide (two
-    // LOT-02s) once the register grows past the launch commodities.
-    const lotNo = `LOT-${String(i + 1).padStart(2, "0")}`;
-    const known = lotByName.get(c.name.trim().toLowerCase());
-    if (known) {
-      return {
-        ...known,
-        id: c.id,
-        lotNo,
-        photo: c.photo ?? known.photo,
-        inStock: c.available,
-      };
-    }
-    return {
-      id: c.id,
-      name: c.name,
-      lotNo,
-      ghost: c.name.toUpperCase(),
-      grades:
-        [c.variety, c.qualityGrade].filter(Boolean).join(", ") ||
-        "Graded to trade standard - call for the current specification",
-      season: c.description ?? "Ask for the current position",
-      soldAs: "Full truckloads, bagged and weighed over a certified scale",
-      photo: c.photo,
-      photoAlt: `${c.name} from the DB Plus warehouse`,
-      subject: `${c.name} enquiry`,
-      inStock: c.available,
-    };
-  });
+  return commodities.map((c, i) => ({
+    id: c.id,
+    name: c.name,
+    // Lot numbers follow the live feed's order, so they stay stable for a
+    // given register and never collide.
+    lotNo: `LOT-${String(i + 1).padStart(2, "0")}`,
+    ghost: c.name.toUpperCase(),
+    variety: c.variety,
+    qualityGrade: c.qualityGrade,
+    description: c.description,
+    photo: c.photo,
+    photoAlt: `${c.name} from the DB Plus warehouse`,
+    subject: `${c.name} enquiry`,
+    inStock: c.available,
+  }));
 }

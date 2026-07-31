@@ -24,12 +24,17 @@ describe("toBoardLines", () => {
     expect(toBoardLines(null)).toEqual([]);
   });
 
-  it("maps live commodities, keeping static market copy for known names", () => {
+  it("maps live commodities, describing each by its OWN variety and grade", () => {
     const lines = toBoardLines([maize]);
     expect(lines).toHaveLength(1);
     expect(lines[0].name).toBe("Maize");
     expect(lines[0].available).toBe(true);
-    expect(lines[0].meta).toBe("Main harvest from September");
+    expect(lines[0].meta).toBe("White · Grade 1");
+  });
+
+  it("falls back to a call-to-action when the record carries neither", () => {
+    const bare = { ...maize, qualityGrade: null, variety: null };
+    expect(toBoardLines([bare])[0].meta).toBe("Call for today's position");
   });
 });
 
@@ -39,18 +44,29 @@ describe("toLots", () => {
     expect(toLots(null)).toEqual([]);
   });
 
-  it("keeps the rich static lot copy for known names and live stock flags", () => {
+  it("carries the record's own fields and the live stock flag", () => {
     const lots = toLots([{ ...maize, available: false }]);
     expect(lots).toHaveLength(1);
     expect(lots[0].name).toBe("Maize");
     expect(lots[0].inStock).toBe(false);
     expect(lots[0].photo).toBe(maize.photo);
+    expect(lots[0].variety).toBe("White");
+    expect(lots[0].qualityGrade).toBe("Grade 1");
   });
 
-  it("renders unknown commodities from their own fields", () => {
-    const lots = toLots([{ ...maize, id: "c2", name: "Sorghum" }]);
+  it("invents nothing for a record whose optional fields are empty", () => {
+    const lots = toLots([
+      { ...maize, description: null, photo: null, qualityGrade: null, variety: null },
+    ]);
     expect(lots[0].lotNo).toBe("LOT-01");
-    expect(lots[0].grades).toContain("White");
-    expect(lots[0].inStock).toBe(true);
+    expect(lots[0].variety).toBeNull();
+    expect(lots[0].qualityGrade).toBeNull();
+    expect(lots[0].description).toBeNull();
+    expect(lots[0].photo).toBeNull();
+  });
+
+  it("numbers lots by the feed's order", () => {
+    const lots = toLots([maize, { ...maize, id: "c2", name: "Sorghum" }]);
+    expect(lots.map((l) => l.lotNo)).toEqual(["LOT-01", "LOT-02"]);
   });
 });
