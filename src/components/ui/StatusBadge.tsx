@@ -15,6 +15,10 @@ export type StatusBadgeVariant =
 /**
  * The stencilled status tag from the availability board. The gold variant
  * carries the little nail head that "pins" it to the plank.
+ *
+ * Tags never wrap: every one of them is a two-word status ("AVAILABLE NOW",
+ * "ASK US") and a printed tag that breaks mid-phrase reads as a mistake. The
+ * board reserves room for the tag rather than letting it fold.
  */
 export function StatusBadge({
   variant = "gold",
@@ -31,7 +35,7 @@ export function StatusBadge({
   return (
     <span
       className={cn(
-        "stencil relative inline-block rounded-[2px] px-3.5 py-2 text-[11px] leading-none tracking-[0.18em]",
+        "stencil relative inline-block whitespace-nowrap rounded-[2px] px-3.5 py-2 text-[11px] leading-none tracking-[0.18em]",
         variant === "gold" &&
           "bg-harvest text-ink shadow-[2px_3px_0_rgb(0_0_0/0.4)]",
         variant === "dashed" &&
