@@ -31,28 +31,47 @@ export const siteConfig = {
   /** Full home-page title (the layout template's `default`). */
   title: "DB Plus · Bulk grain trading from Tamale, Ghana",
   description:
-    "Maize, soya beans and groundnuts bought at the farm gate across Ghana's Northern Region — weighed honestly, aggregated in Tamale and trucked south by the load.",
+    "Maize, soya beans and groundnuts bought at the farm gate across Ghana's Northern Region - weighed honestly, aggregated in Tamale and trucked south by the load.",
   locale: "en_GH",
   /**
    * Contact details are OWNER DATA, not code: the live values come from the
    * backend settings block and are merged over these in `public-contact.ts`.
+   * These stand in only while the settings block is blank or unreachable.
    *
-   * Phone and email are intentionally EMPTY. The placeholders that used to sit
-   * here ("+233 24 000 0000", "info@dbplus.example" - .example is a reserved,
-   * undeliverable TLD) were rendered as real contacts in the header, footer,
-   * hero and legal pages, so every share and every walk-up enquiry hit a dead
-   * number. A missing contact is recoverable; a confidently wrong one is not.
-   * Fill these in ONLY with numbers the owner confirms, as the offline
-   * fallback for when the settings API is unreachable.
+   * ⚠ PLACEHOLDERS - REPLACE BEFORE LAUNCH. They are deliberately dead ends
+   * rather than plausible details: 024 000 0000 is an unassigned line and
+   * `.example` is a reserved, undeliverable TLD, so a forgotten placeholder
+   * misses the office instead of sending a real customer to a stranger. They
+   * do render as the company's contact in the header, footer, hero and legal
+   * pages, so swap them for details the owner confirms - or, better, have the
+   * owner fill Admin → Settings, which overrides them everywhere with no
+   * deploy.
    */
-  phone: "",
-  email: "",
+  phone: "+233 24 000 0000",
+  email: "info@dbplus.example",
   /**
    * Where the call/WhatsApp links point while no number is configured: the
    * contact page, never a `tel:`/`wa.me` that dials nobody.
    */
   phoneHref: routes.contact,
   whatsappHref: routes.contact,
+  /**
+   * The company's social profiles, shown as icons in the footer.
+   *
+   * These live in code rather than the settings registry on purpose: a
+   * profile URL is set once and effectively never changes, unlike the phone
+   * line. A BLANK entry renders NO icon at all, never a link to a profile
+   * that does not exist.
+   *
+   * ⚠ PLACEHOLDERS - REPLACE BEFORE LAUNCH with the company's real profile
+   * URLs. Nobody has checked that these handles belong to DB Plus, so until
+   * they are confirmed each icon may well point at a stranger's page.
+   */
+  social: {
+    facebook: "https://www.facebook.com/dbplustrading",
+    instagram: "https://www.instagram.com/dbplustrading",
+    tiktok: "https://www.tiktok.com/@dbplustrading",
+  },
   address: "Industrial Area, off Bolgatanga Road, Tamale, Northern Region",
   hours: "Mon – Sat 7:00 – 17:00 · Sunday closed",
   city: "Tamale",
