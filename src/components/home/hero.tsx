@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { Photo } from "@/components/ui/Photo";
 import { StencilLabel } from "@/components/ui/StencilLabel";
 import { getSiteContact } from "@/lib/public-contact";
 
@@ -34,7 +34,7 @@ export async function Hero() {
             className="mb-1.5 font-display text-[19px] font-semibold leading-[1.25] text-soil lg:text-[30px]"
             style={{ animation: "sack-drop .6s cubic-bezier(.2,.9,.3,1) .18s backwards" }}
           >
-            Bulk agro commodities —
+            Bulk agro commodities -
           </p>
           <h1 className="mb-7 font-display font-bold leading-[0.98] tracking-[-0.015em] text-forest lg:mb-8">
             <span
@@ -58,7 +58,7 @@ export async function Hero() {
             style={{ animation: "fade-up .5s ease 1s backwards" }}
           >
             Bought at the farm gate across the Northern Region, paid on the
-            spot, aggregated in our Tamale warehouses — delivered by the
+            spot, aggregated in our Tamale warehouses - delivered by the
             truckload to Accra and Kumasi.
           </p>
           {/* Phones stack the pair full width - a half-and-half row of two
@@ -101,16 +101,17 @@ export async function Hero() {
           </span>
           {/* The photo crosses into the board below. */}
           <div className="shadow-doc-dark absolute inset-x-0 top-5 z-[3] h-[280px] border border-soil/30 sm:h-[380px] lg:left-0 lg:right-16 lg:top-[110px] lg:h-[520px]">
-            <Image
+            <Photo
               src={HERO_PHOTO}
               alt="A loaded truck at the Tamale warehouse"
               fill
               priority
               sizes="(min-width: 1024px) 440px, 100vw"
               className="object-cover"
+              fallbackLabel="TAMALE DEPOT"
             />
             <div className="absolute -left-1.5 bottom-5 max-w-[240px] rotate-[-1.2deg] bg-forest px-3.5 py-2.5 text-[11.5px] font-semibold leading-[1.45] text-surface shadow-[2px_2px_0_rgb(31_33_28/0.3)] lg:-left-4 lg:bottom-7 lg:max-w-[270px] lg:px-[18px] lg:py-3 lg:text-[13px]">
-              Full loads southbound — Tamale depot.
+              Full loads southbound - Tamale depot.
             </div>
           </div>
         </div>

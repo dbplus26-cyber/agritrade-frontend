@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Photo, PhotoFallback } from "@/components/ui/Photo";
 
 export interface PlotPhoto {
   alt: null | string;
@@ -56,10 +56,15 @@ export function PlotGallery({
         onTouchEnd(e.changedTouches[0]?.clientX ?? 0);
       }}
     >
+      {/* The ledger panel is the floor of the frame. A photo that no longer
+          resolves renders nothing and simply reveals it, so a deleted upload
+          reads as "photo to follow" instead of a broken-image box - and the
+          frame keeps its height either way. */}
+      <PhotoFallback className="absolute inset-0" />
       {photos.map((photo, i) => (
         // No scrim over the plot photo: a buyer is judging the land, so it
         // renders at true colour.
-        <Image
+        <Photo
           key={`${String(i)}-${photo.url}`}
           src={photo.url}
           alt={photo.alt ?? fallbackAlt}
@@ -69,6 +74,7 @@ export function PlotGallery({
           className={`object-cover transition-opacity duration-200 ${
             i === index ? "opacity-100" : "opacity-0"
           }`}
+          fallback={null}
         />
       ))}
 

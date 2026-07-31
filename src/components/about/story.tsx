@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { Photo } from "@/components/ui/Photo";
 import { StencilLabel } from "@/components/ui/StencilLabel";
 
 const STORY_PHOTO =
@@ -28,7 +28,7 @@ export function Story() {
             A trading house built one season at a time.
           </h1>
           <p className="mb-4 text-[14px] leading-[1.7] text-ink lg:text-[16.5px] lg:leading-[1.75]">
-            DB Plus started the way most trading in the north starts — one
+            DB Plus started the way most trading in the north starts - one
             buyer, a weighing scale and a rented corner of a warehouse in
             Tamale. Season by season the relationships grew: farmers who knew
             the scale was honest, agents who knew payment came the same day,
@@ -42,7 +42,7 @@ export function Story() {
             Kumasi.
           </p>
           <p className="max-w-[34ch] font-display text-[16px] font-semibold leading-[1.5] text-forest lg:text-[20px]">
-            The founder still walks the warehouse floor —{" "}
+            The founder still walks the warehouse floor - {" "}
             <span className="shadow-[inset_0_-9px_0_rgb(216_156_46/0.45)]">
               that&rsquo;s how the weighing stays honest.
             </span>
@@ -50,18 +50,19 @@ export function Story() {
         </div>
         <div className="relative z-[3] mb-8 lg:-mb-16 lg:mb-[-64px]">
           <div className="shadow-doc-dark relative h-[220px] border border-soil/30 sm:h-[340px] lg:h-[500px]">
-            <Image
+            <Photo
               src={STORY_PHOTO}
               alt="Weighing and trading at a Tamale warehouse"
               fill
               priority
               sizes="(min-width: 1024px) 560px, 100vw"
               className="object-cover saturate-[0.72]"
+              fallbackLabel="TAMALE WAREHOUSE"
             />
             <div aria-hidden="true" className="photo-treatment absolute inset-0" />
           </div>
           <div className="absolute -bottom-3.5 left-0 max-w-[250px] rotate-[-1.2deg] bg-forest px-3.5 py-2.5 text-[11.5px] font-semibold leading-[1.45] text-surface shadow-[2px_2px_0_rgb(31_33_28/0.3)] lg:-left-[22px] lg:bottom-[26px] lg:max-w-[300px] lg:px-[18px] lg:py-[13px] lg:text-[13px] lg:leading-[1.5] lg:shadow-[3px_3px_0_rgb(31_33_28/0.3)]">
-            Weighing at the Tamale warehouse — every bag gets a ticket.
+            Weighing at the Tamale warehouse - every bag gets a ticket.
           </div>
         </div>
       </div>

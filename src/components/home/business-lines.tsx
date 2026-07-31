@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { Photo } from "@/components/ui/Photo";
 import { Reveal } from "@/components/ui/Reveal";
 import { StencilLabel } from "@/components/ui/StencilLabel";
 import { routes } from "@/lib/routes";
@@ -67,27 +67,33 @@ export function BusinessLines() {
           href={routes.commodities}
           className="shadow-doc relative flex flex-col border border-soil/35 bg-paper text-ink transition-[transform,box-shadow] duration-150 hover:translate-x-px hover:translate-y-px hover:shadow-[3px_3px_0_rgb(31_33_28/0.18)]"
         >
-          <div className="relative h-[200px] border-b-[1.5px] border-soil/50 sm:h-[290px]">
-            <Image
+          {/* On lg this card stands beside a stack of two file cards and is
+              therefore taller than its own content. The slack goes to the
+              PHOTO rather than to a band of empty paper between the picture
+              and the copy, which is what `flex-1` on the text block used to
+              produce. */}
+          <div className="relative h-[200px] border-b-[1.5px] border-soil/50 sm:h-[290px] lg:h-auto lg:min-h-[290px] lg:flex-1">
+            <Photo
               src={TRADING_PHOTO}
               alt="Traders at Tamale Aboabo market"
               fill
               sizes="(min-width: 1024px) 760px, 100vw"
               className="object-cover"
+              fallbackLabel="GRAIN TRADING"
             />
             {/* The stencil tag carries its own ink plate, so the photo needs
                 no scrim under it and renders at true colour. */}
             <span className="stencil absolute left-4 top-4 bg-ink/70 px-[11px] py-1.5 text-[12px] tracking-[0.16em] text-surface">
-              LOT FILE — GRAIN
+              LOT FILE - GRAIN
             </span>
           </div>
-          <div className="flex flex-1 items-end justify-between gap-6 p-6 sm:p-7">
+          <div className="flex items-center justify-between gap-6 p-6 sm:p-7">
             <div>
-              <h3 className="mb-2 font-display text-[24px] font-bold text-forest lg:text-[30px]">
+              <h3 className="mb-2 font-display text-[24px] font-bold text-forest lg:text-[32px]">
                 Commodity trading
               </h3>
-              <p className="max-w-[44ch] text-[14px] leading-[1.6] text-soil">
-                Maize, soya beans and groundnuts by the truckload — graded,
+              <p className="max-w-[46ch] text-[15px] leading-[1.6] text-soil lg:text-[16px] lg:leading-[1.65]">
+                Maize, soya beans and groundnuts by the truckload - graded,
                 bagged and weighed over a certified scale.
               </p>
             </div>
@@ -98,10 +104,10 @@ export function BusinessLines() {
         </Link>
         <div className="flex flex-col gap-6 lg:gap-[26px]">
           <FileCard
-            header="PLOT FILE — TML"
+            header="PLOT FILE - TML"
             fileNo="N° 02"
             title="Land"
-            body="Documented plots in and around Tamale — papers first, boundary walked together."
+            body="Documented plots in and around Tamale - papers first, boundary walked together."
             footer="SEE PLOTS"
             href={routes.land}
           />
