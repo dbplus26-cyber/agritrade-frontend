@@ -20,6 +20,8 @@ export type PublicPlotStatus = "AVAILABLE" | "RESERVED";
  * never part of this payload.
  */
 export interface PublicLandPlot {
+  /** The owner's own description; the card prints it in full. */
+  description: string | null;
   id: string;
   /** Register code, e.g. "TML-014". */
   reference: string;

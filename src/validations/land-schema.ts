@@ -1,3 +1,4 @@
+import { LAND_PLOT_DESCRIPTION_MAX, LAND_PLOT_TITLE_MAX } from "@/lib/limits";
 import { z } from "zod";
 
 const posNumber = (label: string, max: number) =>
@@ -20,13 +21,25 @@ const optNumber = (max: number) =>
 
 export const plotSchema = z.object({
   reference: z.string().trim().min(1, "Enter a reference").max(40),
-  locationText: z.string().trim().min(1, "Enter the location").max(200),
+  locationText: z
+    .string()
+    .trim()
+    .min(1, "Enter the location")
+    .max(
+      LAND_PLOT_TITLE_MAX,
+      `Keep the location under ${String(LAND_PLOT_TITLE_MAX)} characters - the description has its own field.`,
+    ),
   sizeText: z.string().trim().min(1, "Enter the size").max(120),
   askingPriceGhs: posNumber("asking price", 100_000_000),
   use: z.string().trim().max(60).or(z.literal("")).optional(),
   sizeAcres: optNumber(1_000_000),
   purchaseCostGhs: optNumber(100_000_000),
-  description: z.string().trim().max(2000).or(z.literal("")).optional(),
+  description: z
+    .string()
+    .trim()
+    .max(LAND_PLOT_DESCRIPTION_MAX)
+    .or(z.literal(""))
+    .optional(),
   showPriceOnWebsite: z.boolean(),
 });
 
@@ -91,7 +104,12 @@ export const landAcquisitionSchema = z.object({
   agreedCostGhs: posNumber("agreed cost", 100_000_000),
   sizeAcres: optNumber(1_000_000),
   use: z.string().trim().max(60).or(z.literal("")).optional(),
-  description: z.string().trim().max(2000).or(z.literal("")).optional(),
+  description: z
+    .string()
+    .trim()
+    .max(LAND_PLOT_DESCRIPTION_MAX)
+    .or(z.literal(""))
+    .optional(),
   notes: z.string().trim().max(1000).or(z.literal("")).optional(),
 });
 

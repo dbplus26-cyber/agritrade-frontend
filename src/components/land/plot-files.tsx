@@ -22,8 +22,12 @@ function PerforatedEdge() {
 /** Phones stack the label above its value; sm+ keeps the ledger columns. */
 function PlotRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex flex-col gap-1 sm:grid sm:grid-cols-[110px_1fr] sm:gap-x-4">
-      <dt className="stencil text-[10px] tracking-[0.14em] text-harvest-deep sm:pt-[3px]">
+    // The value sits UNDER its label at every width. As a label-left ledger
+    // the 110px column stood empty for all but the first line of a long size
+    // convention, leaving a caption stranded at the top of a tall blank
+    // column and distorting the card.
+    <div className="flex flex-col gap-1">
+      <dt className="stencil text-[10px] tracking-[0.14em] text-harvest-deep">
         {label}
       </dt>
       <dd className="m-0 border-b border-dotted border-soil/40 pb-[5px] text-[13.5px] leading-[1.55] text-ink lg:text-[14px]">
@@ -88,7 +92,7 @@ function PlotCard({ plot, offset }: { plot: PublicLandPlot; offset: boolean }) {
         )}
         <div className="relative px-5 pb-6 pt-6 sm:px-7">
           <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <h3 className="font-display text-[20px] font-bold text-forest lg:text-[24px]">
+            <h3 className="min-w-0 font-display text-[16px] font-bold leading-[1.25] text-forest [overflow-wrap:anywhere] lg:text-[18px]">
               {plot.name}
             </h3>
             <span className="stencil text-[11px] tracking-[0.14em] text-harvest-deep lg:text-[12px]">
@@ -103,6 +107,15 @@ function PlotCard({ plot, offset }: { plot: PublicLandPlot; offset: boolean }) {
               <PlotRow label="PRICE">
                 <span className="font-bold text-forest">
                   {formatCedis(Number(plot.priceGhs))}
+                </span>
+              </PlotRow>
+            ) : null}
+            {plot.description ? (
+              // Printed IN FULL: a plot has no page of its own to open, so
+              // this card is the only place the owner's description exists.
+              <PlotRow label="ABOUT THIS PLOT">
+                <span className="[overflow-wrap:anywhere]">
+                  {plot.description}
                 </span>
               </PlotRow>
             ) : null}
