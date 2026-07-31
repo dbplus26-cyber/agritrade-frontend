@@ -1,3 +1,8 @@
+import {
+  BUYER_NAME_MAX,
+  COMMODITY_DESCRIPTION_MAX,
+  COMMODITY_NAME_MAX,
+} from "@/lib/limits";
 import { z } from "zod";
 import { PurchaseSource } from "@/types/registry.types";
 
@@ -22,10 +27,17 @@ const phoneField = z
   .optional();
 
 export const commoditySchema = z.object({
-  name: z.string().trim().min(2, "Enter the commodity name").max(100),
+  name: z
+    .string()
+    .trim()
+    .min(2, "Enter the commodity name")
+    .max(
+      COMMODITY_NAME_MAX,
+      `Keep the name under ${String(COMMODITY_NAME_MAX)} characters - the variety and grade have their own fields.`,
+    ),
   variety: optionalText(100),
   qualityGrade: optionalText(50),
-  description: optionalText(1000),
+  description: optionalText(COMMODITY_DESCRIPTION_MAX),
   /** Kept as a string so the field can be emptied while typing. */
   bagWeightKg: z
     .string()
@@ -76,7 +88,11 @@ export const supplierSchema = z.object({
 export type SupplierValues = z.infer<typeof supplierSchema>;
 
 export const buyerSchema = z.object({
-  name: z.string().trim().min(2, "Enter the buyer's name").max(150),
+  name: z
+    .string()
+    .trim()
+    .min(2, "Enter the buyer's name")
+    .max(BUYER_NAME_MAX, `Keep the name under ${String(BUYER_NAME_MAX)} characters.`),
   phone: phoneField,
   /** A second line reaching the same person - two networks is the norm here. */
   altPhone: phoneField,
