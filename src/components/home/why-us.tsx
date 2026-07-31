@@ -10,7 +10,7 @@ const REASONS = [
   {
     no: "02",
     title: "HONEST WEIGHING",
-    body: "Every bag over a certified scale — you get the ticket with the delivery.",
+    body: "Every bag over a certified scale - you get the ticket with the delivery.",
   },
   {
     no: "03",
@@ -44,7 +44,7 @@ export function WhyUs() {
               <span className="stencil text-[13px] tracking-[0.1em] text-harvest lg:text-[14px]">
                 {reason.no}
               </span>
-              <span className="stencil text-[14px] tracking-[0.14em] text-surface lg:text-[16px]">
+              <span className="font-display text-[14px] font-bold tracking-[0.04em] text-surface lg:text-[16px]">
                 {reason.title}
               </span>
               <p className="col-start-2 text-[13.5px] leading-[1.65] text-surface/70 sm:col-start-auto lg:text-[14px]">

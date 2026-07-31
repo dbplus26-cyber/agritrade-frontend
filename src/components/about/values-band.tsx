@@ -5,7 +5,7 @@ const VALUES = [
   {
     no: "01",
     title: "FAIR PRICES TO FARMERS",
-    body: "The day's price, quoted openly at the farm gate. A farmer who feels cheated once never sells to you again — our supply depends on being straight.",
+    body: "The day's price, quoted openly at the farm gate. A farmer who feels cheated once never sells to you again - our supply depends on being straight.",
   },
   {
     no: "02",
@@ -39,7 +39,7 @@ export function ValuesBand() {
               <span className="stencil text-[13px] tracking-[0.1em] text-harvest lg:text-[14px]">
                 {value.no}
               </span>
-              <span className="stencil text-[14px] tracking-[0.12em] text-surface lg:text-[16px] lg:tracking-[0.14em]">
+              <span className="font-display text-[14px] font-bold tracking-[0.04em] text-surface lg:text-[16px]">
                 {value.title}
               </span>
               <p className="col-start-2 text-[13px] leading-[1.65] text-surface/75 sm:col-start-auto lg:text-[14px]">

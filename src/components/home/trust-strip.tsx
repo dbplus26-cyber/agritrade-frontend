@@ -9,7 +9,7 @@ const FACTS = [
   {
     value: "100%",
     label: "CERTIFIED WEIGHING",
-    note: "Every bag over the scale — the ticket travels with the load.",
+    note: "Every bag over the scale - the ticket travels with the load.",
   },
   {
     value: "03",
@@ -44,7 +44,7 @@ export function TrustStrip() {
                   : ""
               } ${i === 2 ? "max-lg:sm:border-t max-lg:sm:border-l-0" : ""} ${i === 3 ? "max-lg:sm:border-t" : ""}`}
             >
-              <div className="stencil mb-1.5 whitespace-nowrap text-[26px] leading-none tracking-[0.06em] text-forest lg:text-[32px]">
+              <div className="mb-1.5 whitespace-nowrap font-display text-[26px] font-bold leading-none tracking-[0.01em] text-forest lg:text-[32px]">
                 {fact.value}
               </div>
               <div className="stencil mb-2 text-[10px] tracking-[0.22em] text-harvest-deep lg:text-[11px]">

@@ -71,16 +71,20 @@ export async function LegalDoc({
                 </span>
                 {section.title}
               </h2>
+              {/* These paragraphs interpolate owner data - the office email
+                  and phone - and an email is one unbreakable word. At 320px a
+                  long one pushed the whole document into sideways scroll, so
+                  the break is forced rather than trusted to whitespace. */}
               {section.paragraphs.map((paragraph) => (
                 <p
                   key={paragraph.slice(0, 40)}
-                  className="mb-2.5 pl-[26px] text-[14px] leading-[1.7] text-ink last:mb-0 lg:pl-[30px]"
+                  className="mb-2.5 pl-[26px] text-[14px] leading-[1.7] text-ink last:mb-0 [overflow-wrap:anywhere] lg:pl-[30px]"
                 >
                   {paragraph}
                 </p>
               ))}
               {section.points ? (
-                <ul className="mt-1 flex list-disc flex-col gap-1.5 pl-[44px] text-[14px] leading-[1.65] text-ink lg:pl-[48px]">
+                <ul className="mt-1 flex list-disc flex-col gap-1.5 pl-[44px] text-[14px] leading-[1.65] text-ink [overflow-wrap:anywhere] lg:pl-[48px]">
                   {section.points.map((point) => (
                     <li key={point.slice(0, 40)}>{point}</li>
                   ))}
@@ -93,7 +97,7 @@ export async function LegalDoc({
         {/* Only offers the channels the owner has actually published: a legal
             page naming an address nobody reads is worse than one that does
             not. With neither published this falls back to the contact page. */}
-        <p className="mt-6 text-[13px] leading-[1.65] text-soil">
+        <p className="mt-6 text-[13px] leading-[1.65] text-soil [overflow-wrap:anywhere]">
           Questions about this document?{" "}
           {contact.hasPhone ? (
             <>

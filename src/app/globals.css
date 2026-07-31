@@ -144,21 +144,26 @@
   .texture-grain-dark {
     background-image: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22150%22%3E%3Cfilter id=%22m%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%222%22/%3E%3CfeColorMatrix values=%220 0 0 0 1 0 0 0 0 1 0 0 0 0 0.9 0 0 0 0.04 0%22/%3E%3C/filter%3E%3Crect width=%22150%22 height=%22150%22 filter=%22url(%23m)%22/%3E%3C/svg%3E");
   }
-  /* Hard offset "paperwork" shadows — the design never blurs card shadows. */
+  /* Hard offset "paperwork" shadows — the design never blurs card shadows.
+     Kept HARD (the signature), but slimmed: the old 5-6px offsets at heavy
+     opacity read as a thick slab under every card, and with a page full of
+     cards the effect stacked into visual noise. A 2px offset at lower opacity
+     still lifts the card off the paper and still reads as printed stock,
+     without any single card shouting. */
   .shadow-doc {
-    box-shadow: 5px 5px 0 rgb(31 33 28 / 0.15);
+    box-shadow: 2px 2px 0 rgb(31 33 28 / 0.09);
   }
   .shadow-doc-sm {
-    box-shadow: 3px 3px 0 rgb(89 82 59 / 0.4);
+    box-shadow: 1.5px 1.5px 0 rgb(89 82 59 / 0.2);
   }
   .shadow-doc-dark {
-    box-shadow: 6px 6px 0 rgb(31 33 28 / 0.22);
+    box-shadow: 2px 2px 0 rgb(31 33 28 / 0.14);
   }
   .shadow-block {
-    box-shadow: 3px 3px 0 #1f211c;
+    box-shadow: 2px 2px 0 rgb(31 33 28 / 0.85);
   }
   .shadow-block-sm {
-    box-shadow: 2px 2px 0 rgb(89 82 59 / 0.35);
+    box-shadow: 1.5px 1.5px 0 rgb(89 82 59 / 0.22);
   }
   /* The double "ledger rule" that closes the header and section breaks. */
   .ledger-rule {
@@ -166,7 +171,12 @@
     border-bottom: 1px solid rgb(89 82 59 / 0.3);
     height: 4px;
   }
-  /* Stencilled utility text — eyebrows, tags, nav numerals. */
+  /* Stencilled utility text — eyebrows, tags, stamps and ledger numerals.
+     NEVER a title: names, headings and figures are set in the house display
+     face. The rule of thumb is 15px, above which the stencil is only allowed
+     inside a Stamp, a decorative ghost watermark, or on a bare numeral. Read
+     as titling it looks like a foreign face bolted onto the page; read as a
+     stamped caption it is the whole point of the document language. */
   .stencil {
     font-family: var(--font-stencil);
     font-weight: 700;
@@ -212,6 +222,18 @@
     transform: none;
   }
 }
+/* The mobile menu rows dealing themselves in from the drawer's edge. */
+@keyframes menu-row-in {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @keyframes fade-up {
   from {
     opacity: 0;
