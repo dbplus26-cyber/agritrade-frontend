@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, Menu, Phone, X } from "lucide-react";
+import { ChevronDown, ChevronRight, Menu, Phone, X } from "lucide-react";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 import {
   DropdownMenu,
@@ -53,40 +53,39 @@ function BrandMark({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
+/**
+ * The mobile menu is one flat list, in the order the site is read: the
+ * services are lifted out of their dropdown and take their place inline
+ * rather than being filed under a caption of their own. A phone menu of seven
+ * words does not need a table of contents.
+ */
+const mobileNav = primaryNav.flatMap<{ href: string; label: string }>((item) =>
+  "children" in item ? [...item.children] : [item],
+);
+
 const desktopItem =
   "stencil relative flex items-baseline gap-1.5 px-3.5 py-3 text-[11px] tracking-[0.16em] text-soil transition-colors hover:text-ink bg-[linear-gradient(#D89C2E,#D89C2E)] bg-no-repeat bg-[length:0%_2px] bg-[position:14px_calc(100%-8px)] hover:bg-[length:60%_2px] [transition:background-size_.18s_ease,color_.18s_ease]";
 
 /** The gold tag that marks the active nav item — the fill alone carries it. */
-function ActiveTag({ index, label }: { index: string; label: string }) {
+function ActiveTag({ label }: { label: string }) {
   return (
-    <span className="stencil flex items-baseline gap-1.5 rounded-[2px] bg-harvest px-3.5 py-3 text-[11px] tracking-[0.16em] text-ink shadow-[2px_2px_0_rgb(31_33_28/0.35)]">
-      <span className="text-[9px] text-[#5F4A12]">{index}</span>
+    <span className="stencil flex items-baseline rounded-[2px] bg-harvest px-3.5 py-3 text-[11px] tracking-[0.16em] text-ink shadow-[2px_2px_0_rgb(31_33_28/0.35)]">
       {label}
     </span>
   );
 }
 
 /**
- * A quiet stencilled caption that opens a branch of the mobile index. It is a
- * plain label - no trailing rule - so the drawer reads as a printed index page
- * rather than a decorated app menu.
- */
-function MenuCaption({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="stencil border-b border-soil/16 bg-surface-alt/60 px-5 pb-2 pt-[13px] text-[9.5px] leading-none tracking-[0.3em] text-soil">
-      {children}
-    </p>
-  );
-}
-
-/**
- * One entry in the mobile index: a ledger numeral (or, for a service under its
- * caption, a gold dash) in a fixed left column, then the name. Rows clear 56px,
- * well over the 44px tap floor.
+ * One line in the mobile menu. The drawer is a plain list of destinations and
+ * nothing else: it used to carry two stencilled group captions, a numeral or a
+ * gold dash in a left column, a tinted active row with a rail AND an
+ * ink-stroke under the label, and rules between every entry - so choosing a
+ * page meant reading past five kinds of decoration to find seven words.
  *
- * The current page is marked by SHAPE, not colour alone - a solid rail down the
- * leading edge plus the house gold ink-stroke under the name - and carries
- * aria-current for assistive tech.
+ * What is left is the word, at a size worth tapping, on 56px rows with no
+ * dividers. The current page is still marked by SHAPE as well as colour - a
+ * single gold rail on the leading edge, plus the heavier weight - and still
+ * carries aria-current for assistive tech.
  */
 function MobileNavItem({
   active,
@@ -97,8 +96,8 @@ function MobileNavItem({
 }: {
   active: boolean;
   href: string;
-  /** The ledger numeral; omitted for rows that sit under a caption. */
-  index?: string;
+  /** Row position, used only to stagger the opening animation. */
+  index: number;
   label: string;
   onNavigate: () => void;
 }) {
@@ -107,31 +106,50 @@ function MobileNavItem({
       href={href}
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
+      // Rows deal themselves in from the drawer's edge, a beat apart. The
+      // global prefers-reduced-motion rule switches every one of these off.
+      style={{
+        animation: `menu-row-in .34s cubic-bezier(.22,.9,.3,1) ${String(
+          0.04 + index * 0.035,
+        )}s backwards`,
+      }}
+      // Each row is a filed card, the same object the rest of the site is
+      // built from: soil hairline, bright paper, hard offset shadow, squared
+      // corners. The current page is the card that has been pulled forward -
+      // gold edge, gold tint and a heavier shadow.
       className={cn(
-        "relative flex min-h-[56px] items-center gap-4 border-b border-soil/16 pl-5 pr-5 transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-forest",
-        active ? "bg-harvest/12" : "active:bg-soil/8",
+        "group relative mx-4 my-[3px] flex min-h-[54px] items-center justify-between gap-3 rounded-[2px] border pl-4 pr-3 transition-[box-shadow,transform,background-color,border-color] active:translate-x-px active:translate-y-px",
+        active
+          ? "border-harvest-deep/45 bg-harvest/15 shadow-block-sm"
+          : "border-soil/30 bg-paper shadow-doc-sm active:shadow-none",
       )}
     >
       {active ? (
-        <span aria-hidden="true" className="absolute inset-y-0 left-0 w-1 bg-harvest-deep" />
+        <span
+          aria-hidden="true"
+          className="absolute inset-y-0 left-0 w-[3px] bg-harvest-deep"
+        />
       ) : null}
-      <span className="flex w-[26px] shrink-0 justify-start">
-        {index ? (
-          <span className="stencil text-[10px] tracking-[0.1em] text-harvest-deep">
-            {index}
-          </span>
-        ) : (
-          <span aria-hidden="true" className="mt-[1px] h-0.5 w-2.5 bg-harvest" />
-        )}
-      </span>
       <span
         className={cn(
-          "font-display text-[17px] font-bold text-forest",
-          active && "shadow-[inset_0_-9px_0_rgb(216_156_46/0.55)]",
+          "font-display text-[18px] transition-colors",
+          active ? "font-bold text-forest" : "font-medium text-soil",
         )}
       >
         {label}
       </span>
+      {/* A quiet chevron gives every row somewhere to go, and leans in on the
+          current page so the marked row is the one that looks live. */}
+      <ChevronRight
+        aria-hidden="true"
+        strokeWidth={2.4}
+        className={cn(
+          "size-4 shrink-0 transition-[transform,color]",
+          active
+            ? "translate-x-0.5 text-harvest-deep"
+            : "text-soil/35 group-active:translate-x-0.5",
+        )}
+      />
     </Link>
   );
 }
@@ -147,12 +165,6 @@ export function SiteHeader() {
   const services = primaryNav.find((item) => "children" in item);
   const serviceLinks = services && "children" in services ? services.children : [];
   const onServicePage = serviceLinks.some((s) => pathname.startsWith(s.href));
-  // The mobile index is split into two captioned branches; everything that is
-  // neither Home nor a service reads as a page of the company file.
-  const companyLinks = primaryNav.filter(
-    (item): item is Extract<(typeof primaryNav)[number], { href: string }> =>
-      !("children" in item) && item.href !== routes.home,
-  );
 
   return (
     // Sticky so the nav stays reachable however deep the page — z-50 clears
@@ -172,11 +184,10 @@ export function SiteHeader() {
               <DropdownMenu key={item.label}>
                 {onServicePage ? (
                   <DropdownMenuTrigger className="cursor-pointer">
-                    <ActiveTag index={item.index} label={item.label} />
+                    <ActiveTag label={item.label} />
                   </DropdownMenuTrigger>
                 ) : (
                   <DropdownMenuTrigger className={cn(desktopItem, "cursor-pointer uppercase")}>
-                    <span className="text-[9px] text-harvest-deep">{item.index}</span>
                     {item.label}
                     <ChevronDown aria-hidden="true" className="size-2.5 self-center" strokeWidth={3.2} />
                   </DropdownMenuTrigger>
@@ -199,22 +210,18 @@ export function SiteHeader() {
                     >
                       <Link
                         href={service.href}
-                        className="flex items-center justify-between gap-5 font-display text-[15px] font-bold text-forest"
+                        className="flex items-center font-display text-[15px] font-bold text-forest"
                       >
                         {service.label}
-                        <span className="stencil text-[10px] tracking-[0.12em] text-harvest-deep">
-                          {service.index}
-                        </span>
                       </Link>
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : pathname === item.href ? (
-              <ActiveTag key={item.href} index={item.index} label={item.label} />
+              <ActiveTag key={item.href} label={item.label} />
             ) : (
               <Link key={item.href} href={item.href} className={cn(desktopItem, "uppercase")}>
-                <span className="text-[9px] text-harvest-deep">{item.index}</span>
                 {item.label}
               </Link>
             ),
@@ -256,97 +263,85 @@ export function SiteHeader() {
             // The width is variant-scoped on purpose: the base SheetContent
             // sets `data-[side=right]:w-3/4`, which out-specifies a plain
             // `w-*` and silently wins.
-            className="texture-grain flex flex-col gap-0 border-l-0 bg-surface p-0 shadow-[-8px_0_28px_-14px_rgb(31_33_28/0.55)] duration-[260ms] ease-[cubic-bezier(.22,.9,.3,1)] data-[side=right]:w-[min(330px,86vw)] data-open:slide-in-from-right-full data-closed:slide-out-to-right-full"
+            // No gradient here: `.texture-grain` owns background-image (it is
+            // declared after Tailwind's utilities and wins), and tailwind-merge
+            // reads the v3-era `bg-gradient-to-b` as a background COLOUR, which
+            // silently dropped `bg-surface` and left the panel see-through.
+            className="texture-grain flex flex-col gap-0 border-l-0 bg-surface p-0 shadow-[-10px_0_34px_-16px_rgb(31_33_28/0.6)] duration-[280ms] ease-[cubic-bezier(.22,.9,.3,1)] data-[side=right]:w-[min(330px,86vw)] data-open:slide-in-from-right-full data-closed:slide-out-to-right-full"
           >
-            <SheetHeader className="gap-0 border-b-[2.5px] border-forest bg-surface-alt/70 p-0">
-              <div className="flex items-center justify-between gap-3 px-5 py-3">
+            {/* A gold thread runs under the brand: one warm line is what stops
+                the sheet reading as an empty page, and it ties the drawer to
+                the tags and buttons that carry the same colour. */}
+            <SheetHeader className="relative gap-0 p-0 after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-gradient-to-r after:from-harvest/70 after:via-soil/20 after:to-transparent">
+              <div className="flex items-center justify-between gap-3 px-6 py-3.5">
                 <BrandMark onNavigate={closeMenu} />
                 <SheetClose
                   aria-label="Close menu"
-                  className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-[2px] border-2 border-forest text-forest shadow-doc-sm transition-colors active:bg-harvest/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+                  className="-mr-2.5 flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-soil transition-colors active:bg-soil/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
                 >
-                  <X aria-hidden="true" className="size-[19px]" strokeWidth={2.4} />
+                  <X aria-hidden="true" className="size-5" strokeWidth={2} />
                 </SheetClose>
               </div>
               <SheetTitle className="sr-only">Site menu</SheetTitle>
             </SheetHeader>
+            {/* One flat list, in the order the site is read. Services used to
+                sit in their own captioned branch, which cost two extra rows of
+                chrome to say something the page titles already say. */}
             <nav
               aria-label="Primary"
-              className="flex flex-1 flex-col overflow-y-auto overscroll-contain"
+              className="flex flex-1 flex-col py-3 overflow-y-auto overscroll-contain"
             >
-              <MobileNavItem
-                active={pathname === routes.home}
-                href={routes.home}
-                index="01"
-                label="Home"
-                onNavigate={closeMenu}
-              />
-              {/* Services carry the group numeral in their caption, so the rows
-                  themselves take a dash - two "03"s a few lines apart read as a
-                  mistake. */}
-              <MenuCaption>{services ? `${services.index} · SERVICES` : "SERVICES"}</MenuCaption>
-              {serviceLinks.map((service) => (
-                <MobileNavItem
-                  key={service.href}
-                  active={pathname.startsWith(service.href)}
-                  href={service.href}
-                  label={service.label}
-                  onNavigate={closeMenu}
-                />
-              ))}
-              <MenuCaption>THE COMPANY</MenuCaption>
-              {companyLinks.map((item) => (
+              {mobileNav.map((item, i) => (
                 <MobileNavItem
                   key={item.href}
-                  active={pathname === item.href}
+                  index={i}
+                  active={
+                    item.href === routes.home
+                      ? pathname === routes.home
+                      : pathname.startsWith(item.href)
+                  }
                   href={item.href}
-                  index={item.index}
                   label={item.label}
                   onNavigate={closeMenu}
                 />
               ))}
             </nav>
-            {/* Contact actions close the drawer, pinned to the bottom and clear
-                of the home indicator. One obvious action first; unpublished
-                channels are dropped rather than linked to nothing. */}
-            <div className="mt-auto border-t-[2.5px] border-forest bg-surface-alt/70 px-5 pb-[calc(18px+env(safe-area-inset-bottom,0px))] pt-4">
-              <span className="stencil mb-2.5 block text-[9.5px] leading-none tracking-[0.3em] text-soil">
-                DISPATCH LINE
-              </span>
+            {/* One action, pinned clear of the home indicator: calling is what
+                a visitor on a phone actually wants, and WhatsApp follows as a
+                quiet second line rather than a second slab. The stencilled
+                caption and the address that used to sit here were repeating
+                the contact page at the bottom of a menu. */}
+            <div className="mt-auto border-t border-soil/12 bg-surface-alt/50 px-6 pb-[calc(20px+env(safe-area-inset-bottom,0px))] pt-4">
               {contact.hasPhone ? (
                 <a
                   href={contact.phoneHref}
                   onClick={closeMenu}
-                  className="shadow-block mb-2.5 flex min-h-12 items-center justify-center gap-2.5 rounded-[2px] bg-harvest text-[15px] font-bold text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+                  className="shadow-block flex min-h-12 items-center justify-center gap-2.5 rounded-[2px] bg-harvest text-[15px] font-bold text-ink transition-[transform,box-shadow] active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_rgb(31_33_28/0.85)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
                 >
                   <Phone aria-hidden="true" className="size-[17px]" strokeWidth={2.3} />
                   Call {contact.phone}
                 </a>
-              ) : null}
+              ) : (
+                <Link
+                  href={routes.contact}
+                  onClick={closeMenu}
+                  className="shadow-block flex min-h-12 items-center justify-center rounded-[2px] bg-harvest text-[15px] font-bold text-ink transition-[transform,box-shadow] active:translate-x-px active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+                >
+                  Contact us
+                </Link>
+              )}
               {contact.hasWhatsapp ? (
                 <a
                   href={contact.whatsappHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={closeMenu}
-                  className="shadow-doc-sm flex min-h-12 items-center justify-center gap-2.5 rounded-[2px] border-2 border-forest text-[15px] font-bold text-forest focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+                  className="mt-2.5 flex min-h-11 items-center justify-center gap-2 rounded-[2px] border border-forest/45 bg-surface text-[14px] font-bold text-forest shadow-doc-sm transition-[transform,box-shadow] active:translate-x-px active:translate-y-px active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
                 >
-                  <WhatsAppIcon aria-hidden="true" className="size-[18px]" />
+                  <WhatsAppIcon aria-hidden="true" className="size-[16px]" />
                   WhatsApp us
                 </a>
               ) : null}
-              {!contact.hasPhone && !contact.hasWhatsapp ? (
-                <Link
-                  href={routes.contact}
-                  onClick={closeMenu}
-                  className="shadow-block flex min-h-12 items-center justify-center rounded-[2px] bg-harvest text-[15px] font-bold text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
-                >
-                  Contact us
-                </Link>
-              ) : null}
-              <p className="mt-3.5 text-[12.5px] leading-[1.5] text-soil">
-                {contact.address}
-              </p>
             </div>
           </SheetContent>
         </Sheet>

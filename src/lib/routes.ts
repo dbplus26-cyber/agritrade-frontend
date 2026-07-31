@@ -13,19 +13,18 @@ export const routes = {
   styleGuide: "/style-guide",
 } as const;
 
-/** The numbered primary nav, in board order. Services nest under 02. */
+/** The primary nav, in board order. Services nest under their own entry. */
 export const primaryNav = [
-  { index: "01", label: "Home", href: routes.home },
+  { label: "Home", href: routes.home },
   {
-    index: "02",
     label: "Services",
     children: [
-      { index: "01", label: "Commodities", href: routes.commodities },
-      { index: "02", label: "Land", href: routes.land },
-      { index: "03", label: "Farming Investment", href: routes.farmingInvestment },
+      { label: "Commodities", href: routes.commodities },
+      { label: "Land", href: routes.land },
+      { label: "Farming Investment", href: routes.farmingInvestment },
     ],
   },
-  { index: "03", label: "About", href: routes.about },
-  { index: "04", label: "Reviews", href: routes.reviews },
-  { index: "05", label: "Contact", href: routes.contact },
+  { label: "About", href: routes.about },
+  { label: "Reviews", href: routes.reviews },
+  { label: "Contact", href: routes.contact },
 ] as const;
