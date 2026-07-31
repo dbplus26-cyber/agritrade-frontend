@@ -11,6 +11,7 @@ import {
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
 import { Absent, columnMeta } from "@/components/admin/registry/registry-bits";
+import { TextCell } from "@/components/admin/table-cells";
 import { DateOnlyCell, DateTimeCell } from "@/components/admin/date-cell";
 import {
   AdminCard,
@@ -58,19 +59,35 @@ const FILTER_DEFAULTS = {
   size: "20",
 };
 
-/** "WH A → WH B", clamped to one line with the full route in the tooltip. */
+/**
+ * "WH A -> WH B" on one line, with the full route on hover.
+ *
+ * Uses `truncate`, NOT `line-clamp-1`. The two cannot be combined with
+ * `block`: line-clamp works by setting `display: -webkit-box`, which the
+ * `block` utility then overrides, so the clamp silently does nothing. That is
+ * what produced this register's worst bug - the route column, starved of
+ * width by an unbounded commodity column beside it, wrapped one character per
+ * line and pushed rows past 700px tall.
+ */
 function Route({ from, to }: { from: string; to: string }) {
   return (
+    // The accessible reading lives on the span itself, NOT in an `sr-only`
+    // child. `sr-only` is `position: absolute`, and this span is not a
+    // positioned ancestor, so the child's containing block was the page
+    // shell: it escaped the truncation clip entirely and sat at the
+    // x-position of the UNTRUNCATED text, dragging the page's scroll width
+    // out to 723px on a phone. An invisible element should never be able to
+    // widen the page.
     <span
-      className="block min-w-0 max-w-[320px] line-clamp-1 whitespace-normal text-[13px] text-ink [overflow-wrap:anywhere]"
-      title={`${from} → ${to}`}
+      aria-label={`${from} to ${to}`}
+      className="block max-w-[24rem] truncate text-[13px] text-ink md:min-w-[11rem]"
+      title={`${from} -> ${to}`}
     >
-      {from}
-      <span aria-hidden="true" className="mx-1.5 text-soil">
-        →
+      <span aria-hidden="true">
+        {from}
+        <span className="mx-1.5 text-soil">→</span>
+        {to}
       </span>
-      <span className="sr-only">to </span>
-      {to}
     </span>
   );
 }
@@ -186,10 +203,10 @@ export function TransfersScreen() {
         accessorFn: (t) => t.commodity.name,
         enableSorting: false,
         meta: columnMeta(),
+        // Bounded: an unbounded commodity name is what starved the route
+        // column in the first place.
         cell: ({ row }) => (
-          <span className="text-[12.5px] text-ink">
-            {row.original.commodity.name}
-          </span>
+          <TextCell value={row.original.commodity.name} width="label" />
         ),
       },
       {
@@ -197,7 +214,7 @@ export function TransfersScreen() {
         header: "Weight",
         accessorFn: (t) => t.weightKg,
         enableSorting: false,
-        meta: columnMeta({ className: "text-right" }),
+        meta: columnMeta(),
         cell: ({ row }) => (
           <Kg
             kg={row.original.weightKg}
@@ -218,7 +235,7 @@ export function TransfersScreen() {
         header: "Recorded",
         accessorFn: (t) => t.createdAt,
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ at: "xl" }),
         cell: ({ row }) => (
           <DateTimeCell value={row.original.createdAt} muted />
         ),
@@ -228,15 +245,16 @@ export function TransfersScreen() {
         header: "Notes",
         accessorFn: (t) => t.notes ?? "",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        // Last in, last shown: a note is the one thing here a reader can do
+        // without, so it waits for a screen with room to spare.
+        meta: columnMeta({ at: "2xl" }),
         cell: ({ row }) =>
           row.original.notes ? (
-            <span
-              className="block max-w-[240px] truncate text-soil"
-              title={row.original.notes}
-            >
-              {row.original.notes}
-            </span>
+            <TextCell
+              className="text-soil"
+              value={row.original.notes}
+              width="prose"
+            />
           ) : (
             <Absent />
           ),
@@ -246,7 +264,11 @@ export function TransfersScreen() {
   );
 
   return (
-    <div>
+    // min-w-0: the console shell lays pages out with flex, and a flex item
+    // defaults to `min-width: auto` - it refuses to shrink below its content.
+    // Without this the widest table stretched the PAGE instead of scrolling
+    // inside its own box, so a phone got a sideways-scrolling page.
+    <div className="min-w-0">
       <div className="mb-4">
         <h1 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
           Transfers
@@ -350,6 +372,8 @@ export function TransfersScreen() {
             data={transfers}
             itemNoun="transfers"
             isFetching={isFetching}
+            rowHref={(t) => `/admin/transfers/${t.id}`}
+            rowClassName={() => "h-12 hover:bg-surface-alt/60"}
             serverPagination={{
               totalCount,
               page,

@@ -22,6 +22,12 @@ export const transfersApi = apiSlice.injectEndpoints({
       providesTags: [{ type: "Transfers", id: "LIST" }],
     }),
 
+    /** One transfer, for the detail page the register links each row to. */
+    getTransfer: builder.query<ITransferResponse, string>({
+      query: (id) => `admin/stock/transfers/${id}`,
+      providesTags: (_r, _e, id) => [{ type: "Transfers", id }],
+    }),
+
     createTransfer: builder.mutation<ITransferResponse, ICreateTransferInput>({
       query: (body) => ({
         url: "admin/stock/transfers",
@@ -37,4 +43,8 @@ export const transfersApi = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useGetTransfersQuery, useCreateTransferMutation } = transfersApi;
+export const {
+  useCreateTransferMutation,
+  useGetTransferQuery,
+  useGetTransfersQuery,
+} = transfersApi;
