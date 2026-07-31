@@ -93,7 +93,7 @@ export function NotificationsScreen() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <div className="min-w-0">
+          <div className="min-w-0 max-w-[21rem]">
             <div className="font-medium text-ink">
               {EVENT_LABEL[row.original.event] ?? row.original.event}
             </div>

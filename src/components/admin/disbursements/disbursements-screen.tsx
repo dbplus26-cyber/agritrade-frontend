@@ -240,6 +240,7 @@ export function DisbursementsScreen() {
               />
             }
             isFetching={isFetching}
+        isFiltered={activeFilterCount > 0 || Boolean(queryParams.search)}
             itemNoun="payouts"
             rowClassName={() => "h-12 hover:bg-surface-alt/60"}
             rowHref={(row) => `${LIST}/${row.id}`}

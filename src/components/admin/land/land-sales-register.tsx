@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { useGetLandSalesQuery } from "@/redux/land/land-sales-api";
 import type { ILandSale, ILandSaleListQuery, LandSaleStatus } from "@/types/land.types";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
+import { TextCell } from "@/components/admin/table-cells";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import { Money } from "@/components/admin/trading/sale-bits";
 import {
@@ -75,7 +76,7 @@ export function LandSalesRegister() {
         cell: ({ row }) => (
           <Link
             href={`/admin/land-sales/${row.original.id}`}
-            className="block min-w-0 outline-none focus-visible:underline"
+            className="block min-w-[9rem] max-w-[22rem] outline-none focus-visible:underline"
             onClick={(e) => { e.stopPropagation(); }}
           >
             <Mono className="text-[12.5px] font-semibold text-console">
@@ -93,14 +94,14 @@ export function LandSalesRegister() {
         enableSorting: false,
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
-          <span className="text-ink">{row.original.buyer.name}</span>
+          <TextCell value={row.original.buyer.name} width="label" />
         ),
       },
       {
         id: "agreed",
         header: "Agreed",
         enableSorting: false,
-        meta: columnMeta({ className: "text-right", wide: true }),
+        meta: columnMeta({ at: "xl" }),
         cell: ({ row }) => (
           <Mono className="whitespace-nowrap text-[12.5px] text-ink">
             <Money value={row.original.agreedPriceGhs} />
@@ -111,7 +112,7 @@ export function LandSalesRegister() {
         id: "balance",
         header: "Balance",
         enableSorting: false,
-        meta: columnMeta({ className: "text-right" }),
+        meta: columnMeta(),
         cell: ({ row }) => {
           const b = row.original.balanceGhs;
           return (

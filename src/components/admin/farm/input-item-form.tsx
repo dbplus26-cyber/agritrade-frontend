@@ -12,6 +12,7 @@ import {
   adminInputClass,
 } from "@/components/admin/ui";
 import { ActiveBadge } from "./farm-bits";
+import { RecordFacts } from "@/components/admin/record-facts";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
 import { useConfirm } from "@/hooks/use-confirm";
@@ -131,6 +132,34 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
     }
   };
 
+  // At rest an existing record READS; the form appears only on Edit.
+  if (item && !isEditing) {
+    return (
+      <div className="max-w-[640px]">
+        <BackButton href={LIST} label="All items" className="mb-2" />
+        <AdminPageHeader
+          title={item.name}
+          sub={"An input the programme grants to farmers - what it is, and the unit it is issued in"}
+          actions={<ActiveBadge active={item.isActive} />}
+        />
+        <AdminCard className="px-5 py-4">
+          <RecordFacts
+            facts={[
+              { label: "Name", value: item.name },
+              { label: "Unit", value: item.unitLabel },
+              { full: true, label: "Description", value: item.description },
+            ]}
+          />
+          <div className="mt-4 flex justify-end">
+            <AdminButton onClick={() => setIsEditing(true)} type="button">
+              Edit item
+            </AdminButton>
+          </div>
+        </AdminCard>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-[640px]">
       <BackButton href={LIST} label="All items" className="mb-2" />
@@ -172,7 +201,7 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
             className="sm:col-span-2"
           >
             <textarea
-              rows={2}
+              rows={4}
               placeholder="NPK 15-15-15, 50kg bag"
               disabled={readOnly}
               className={cn(

@@ -14,6 +14,7 @@ import {
   EditableFormActions,
   adminInputClass,
 } from "@/components/admin/ui";
+import { RecordFacts } from "@/components/admin/record-facts";
 import { BackButton } from "@/components/ui/BackButton";
 import { FormSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -27,6 +28,7 @@ import {
   useUpdateCommodityMutation,
 } from "@/redux/commodities/commodities-api";
 import { extractApiError } from "@/lib/extract-api-error";
+import { COMMODITY_DESCRIPTION_MAX, COMMODITY_NAME_MAX } from "@/lib/limits";
 import { notify } from "@/lib/notify";
 import { optimizeImage } from "@/lib/optimize-image";
 import { cn } from "@/lib/utils";
@@ -181,6 +183,41 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
     }
   };
 
+  // At rest an existing record READS. The form is what you get after
+  // pressing Edit, not a greyed-out copy of the page you were already on.
+  if (isEdit && !isEditing && commodity) {
+    return (
+      <AdminCard className="px-5 py-[18px]">
+        <RecordFacts
+          facts={[
+            { label: "Name", value: commodity.name },
+            { label: "Variety", value: commodity.variety },
+            { label: "Quality grade", value: commodity.qualityGrade },
+            {
+              label: "Bag weight",
+              mono: true,
+              value:
+                commodity.bagWeightKg === null
+                  ? null
+                  : `${String(commodity.bagWeightKg)} kg`,
+            },
+            {
+              label: "Sort order",
+              mono: true,
+              value: String(commodity.sortOrder),
+            },
+            { full: true, label: "Description", value: commodity.description },
+          ]}
+        />
+        <div className="mt-4 flex justify-end">
+          <AdminButton onClick={() => setIsEditing(true)} type="button">
+            Edit commodity
+          </AdminButton>
+        </div>
+      </AdminCard>
+    );
+  }
+
   return (
     <AdminCard className="px-5 py-[18px]">
       <form
@@ -192,6 +229,7 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
           <Input
             placeholder="e.g. White Maize"
             disabled={readOnly}
+            maxLength={COMMODITY_NAME_MAX}
             className={cn(adminInputClass, roCls, errors.name && "border-error")}
             {...register("name")}
           />
@@ -277,13 +315,14 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
           error={errors.description?.message}
         >
           <textarea
-            rows={3}
+            rows={4}
+            maxLength={COMMODITY_DESCRIPTION_MAX}
             placeholder="Shown on the website's commodity card when published."
             disabled={readOnly}
             className={cn(
               adminInputClass,
               roCls,
-              "h-auto min-h-[76px] w-full resize-y py-2",
+              "h-auto min-h-[104px] w-full resize-y py-2",
               errors.description && "border-error",
             )}
             {...register("description")}

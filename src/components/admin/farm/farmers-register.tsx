@@ -42,8 +42,8 @@ function FarmerCell({ farmer }: { farmer: IFarmer }) {
       >
         {a.init}
       </span>
-      <div className="min-w-0">
-        <div className="truncate font-semibold text-ink">{farmer.name}</div>
+      <div className="min-w-0 max-w-[21rem]">
+        <div className="max-w-[20rem] truncate font-semibold text-ink">{farmer.name}</div>
         {farmer.phone ? (
           <div className="text-[12px] text-soil">{farmer.phone}</div>
         ) : null}
@@ -110,7 +110,7 @@ export function FarmersRegister() {
         accessorFn: (f) => f.createdAt,
         header: "Added",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ at: "2xl" }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {

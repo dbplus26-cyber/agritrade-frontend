@@ -692,9 +692,14 @@ export function ShipmentDetail({ id }: { id: string }) {
     <div className="flex flex-wrap gap-2 xl:flex-col">
       {beforeDispatch ? (
         <>
-          {/* A page, not a dialog: the lot list is long and a dialog's inner
-              scroll inside the scrolling page was unusable on a phone. */}
-          <AdminButton className="h-9 px-4" asChild>
+          {/* Exactly ONE primary action per state. Allocating and dispatching
+              were both filled amber, so the rail offered two equally loud
+              answers to "what do I do next" - and dispatch is the one that
+              moves stock, which makes it the one that should look decisive.
+              A page, not a dialog, for allocation: the lot list is long, and a
+              dialog's inner scroll inside the scrolling page was unusable on a
+              phone. */}
+          <AdminButton className="h-9 px-4" variant="outline" asChild>
             <Link href={`${LIST}/${s.id}/allocate`}>Allocate lots</Link>
           </AdminButton>
           <AdminButton
@@ -882,7 +887,7 @@ export function ShipmentDetail({ id }: { id: string }) {
               {formatKg(s.truckCapacityKg)}
             </DetailItem>
           ) : null}
-          <DetailItem label="Route">
+          <DetailItem className="col-span-full" label="Route">
             {s.originWarehouse.name} → {s.destination}
           </DetailItem>
           <DetailItem label="Total weight" mono>
@@ -908,7 +913,7 @@ export function ShipmentDetail({ id }: { id: string }) {
             </DetailItem>
           ) : null}
           {s.notes ? (
-            <DetailItem label="Notes" className="sm:col-span-2 xl:col-span-3">
+            <DetailItem className="col-span-full" label="Notes">
               {s.notes}
             </DetailItem>
           ) : null}
@@ -928,7 +933,9 @@ export function ShipmentDetail({ id }: { id: string }) {
             </DetailItem>
           ) : null}
           {s.driverEmail ? (
-            <DetailItem label="Email">{s.driverEmail}</DetailItem>
+            <DetailItem className="col-span-full" label="Email">
+              {s.driverEmail}
+            </DetailItem>
           ) : null}
           <DetailItem label="Company">
             {s.driverCompany ?? (anyDriverExtra ? "Solo operator" : <Absent />)}
@@ -1099,10 +1106,20 @@ export function ShipmentDetail({ id }: { id: string }) {
               key={e.id}
               className="flex items-baseline justify-between gap-3 border-b border-soil/10 py-2 last:border-b-0"
             >
+              {/* The category leads; its note follows on a quieter second
+                  line, clamped to two. Run inline and unclamped, a full-length
+                  voucher note turned every row into a six-line paragraph and
+                  buried the amounts the list exists to show. The full text
+                  stays one hover away. */}
               <div className="min-w-0">
-                <span className="text-ink">{e.category.name}</span>
+                <span className="block truncate text-ink">
+                  {e.category.name}
+                </span>
                 {e.description ? (
-                  <span className="ml-2 text-[12px] text-soil">
+                  <span
+                    className="mt-0.5 line-clamp-2 text-[12px] text-soil"
+                    title={e.description}
+                  >
                     {e.description}
                   </span>
                 ) : null}

@@ -21,6 +21,7 @@ import {
   adminInputClass,
   adminSelectClass,
 } from "@/components/admin/ui";
+import { RecordFacts } from "@/components/admin/record-facts";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/button";
 import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons";
@@ -61,6 +62,11 @@ import {
   supplierSchema,
   type SupplierValues,
 } from "@/validations/registry-schema";
+import {
+  RailCard,
+  RailStatus,
+  RecordShell,
+} from "@/components/admin/record-shell";
 import { LifecycleActions } from "./lifecycle-actions";
 import {
   Absent,
@@ -218,7 +224,7 @@ export function SupplierTable() {
               onClick={(e) => e.stopPropagation()}
             >
               <RegistryAvatar name={s.name} photoUrl={s.photoUrl} />
-              <span className="min-w-0">
+              <span className="block min-w-0 max-w-[20rem]">
                 <span className="block truncate font-medium text-ink">
                   {s.name}
                 </span>
@@ -252,7 +258,7 @@ export function SupplierTable() {
         enableSorting: false,
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
-          <span className="whitespace-nowrap text-soil">
+          <span className="block max-w-[22rem] truncate text-soil">
             {SOURCE_LABEL[row.original.sourceType]}
           </span>
         ),
@@ -551,6 +557,35 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
     }
   };
 
+  // At rest an existing record READS. The form is what you get after
+  // pressing Edit, not a greyed-out copy of the page you were already on.
+  if (isEdit && !isEditing && supplier) {
+    return (
+      <AdminCard className="px-5 py-[18px]">
+        <RecordFacts
+          facts={[
+            { label: "Name", value: supplier.name },
+            { mono: true, label: "Phone", value: supplier.phone },
+            { mono: true, label: "Other phone", value: supplier.altPhone },
+            { label: "Community", value: supplier.community },
+            { label: "Email", value: supplier.email },
+            { mono: true, label: "ID number", value: supplier.idNumber },
+            { full: true, label: "Address", value: supplier.address },
+            { label: "Bank name", value: supplier.bankName },
+            { mono: true, label: "Bank account number", value: supplier.bankAccountNumber },
+            { mono: true, label: "Mobile money number", value: supplier.momoNumber },
+            { full: true, label: "Notes", value: supplier.notes },
+          ]}
+        />
+        <div className="mt-4 flex justify-end">
+          <AdminButton onClick={() => setIsEditing(true)} type="button">
+            Edit supplier
+          </AdminButton>
+        </div>
+      </AdminCard>
+    );
+  }
+
   return (
     <AdminCard className="px-5 py-[18px]">
       <form
@@ -804,13 +839,13 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
         </AdminField>
         <AdminField label="Notes" optional error={errors.notes?.message}>
           <textarea
-            rows={3}
+            rows={4}
             placeholder="Anything worth remembering about this supplier."
             disabled={readOnly}
             className={cn(
               adminInputClass,
               roCls,
-              "h-auto min-h-[76px] w-full resize-y py-2",
+              "h-auto min-h-[104px] w-full resize-y py-2",
               errors.notes && "border-error",
             )}
             {...register("notes")}
@@ -839,14 +874,18 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
 
 export function SupplierCreate() {
   return (
-    <div className="max-w-[560px]">
-      <BackButton href={LIST} label="All suppliers" className="mb-2" />
-      <AdminPageHeader
-        title="Add supplier"
-        sub="A person or company the business buys from"
-      />
+    <RecordShell
+      backHref={LIST}
+      backLabel="All suppliers"
+      header={
+        <AdminPageHeader
+          title="Add supplier"
+          sub="A person or company the business buys from"
+        />
+      }
+    >
       <SupplierFormFields />
-    </div>
+    </RecordShell>
   );
 }
 
@@ -867,26 +906,39 @@ export function SupplierEdit({ id }: { id: string }) {
 
   const supplier = data.data.supplier;
   return (
-    <div className="max-w-[560px]">
-      <BackButton href={LIST} label="All suppliers" className="mb-2" />
-      <AdminPageHeader
-        title={supplier.name}
-        sub="Edit the supplier and their lifecycle"
-      />
+    <RecordShell
+      backHref={LIST}
+      backLabel="All suppliers"
+      header={
+        <AdminPageHeader
+          title={supplier.name}
+          sub="Supplier record"
+        />
+      }
+      aside={
+        <>
+          <RailStatus isActive={supplier.isActive} />
+          <RailCard title="Filed">
+            <RecordTimestamps
+              createdAt={supplier.createdAt}
+              updatedAt={supplier.updatedAt}
+            />
+          </RailCard>
+          <RailCard title="Lifecycle">
+            <LifecycleActions
+              noun="supplier"
+              name={supplier.name}
+              isActive={supplier.isActive}
+              listHref={LIST}
+              onActivate={() => activate(id).unwrap()}
+              onDeactivate={() => deactivate(id).unwrap()}
+              onDelete={() => remove(id).unwrap()}
+            />
+          </RailCard>
+        </>
+      }
+    >
       <SupplierFormFields supplier={supplier} />
-      <RecordTimestamps
-        createdAt={supplier.createdAt}
-        updatedAt={supplier.updatedAt}
-      />
-      <LifecycleActions
-        noun="supplier"
-        name={supplier.name}
-        isActive={supplier.isActive}
-        listHref={LIST}
-        onActivate={() => activate(id).unwrap()}
-        onDeactivate={() => deactivate(id).unwrap()}
-        onDelete={() => remove(id).unwrap()}
-      />
-    </div>
+    </RecordShell>
   );
 }

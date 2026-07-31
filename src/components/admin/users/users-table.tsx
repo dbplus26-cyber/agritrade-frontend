@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
+import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { ConsoleDataTable } from "@/components/admin/data-table";
@@ -68,15 +69,6 @@ const statusToQuery = (status: StatusFilter): Partial<IUserListQuery> => {
       return {};
   }
 };
-
-const columnMeta = (opts?: { wide?: boolean }) => ({
-  className: cn(
-    "px-4 py-0 text-[13px]",
-    opts?.wide ? "hidden xl:table-cell" : "table-cell",
-  ),
-  headerClassName:
-    "h-[38px] whitespace-nowrap bg-surface-alt/70 py-0 text-[10.5px] font-bold uppercase tracking-[0.09em] text-soil",
-});
 
 /**
  * The live Users register, fully server-driven (dms pattern): the debounced
@@ -199,7 +191,7 @@ export function UsersTable() {
                     {initialsOf(u)}
                   </span>
                 )}
-                <span className="min-w-0">
+                <span className="block min-w-0 max-w-[19rem]">
                   <span className="block truncate font-medium text-ink">
                     {u.firstName} {u.lastName}
                   </span>
@@ -217,7 +209,7 @@ export function UsersTable() {
         accessorFn: (u) => ROLE_LABEL[u.role],
         header: "Role",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ at: "lg" }),
         cell: ({ row }) => (
           <span className="whitespace-nowrap text-soil">
             {ROLE_LABEL[row.original.role]}
@@ -229,7 +221,7 @@ export function UsersTable() {
         accessorFn: (u) => u.phone ?? "",
         header: "Phone",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ at: "xl" }),
         cell: ({ row }) => (
           <span className="whitespace-nowrap text-soil">
             {row.original.phone ?? "—"}
@@ -241,7 +233,7 @@ export function UsersTable() {
         accessorFn: visibilityLabel,
         header: "Visibility",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ at: "xl" }),
         cell: ({ row }) => (
           <span className="whitespace-nowrap text-soil">
             {visibilityLabel(row.original)}
@@ -253,7 +245,7 @@ export function UsersTable() {
         accessorFn: lastActiveLabel,
         header: "Last active",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ at: "xl" }),
         cell: ({ row }) => (
           <span className="whitespace-nowrap text-soil">
             {lastActiveLabel(row.original)}
@@ -265,7 +257,7 @@ export function UsersTable() {
         accessorFn: (u) => u.createdAt,
         header: "Added",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ at: "2xl" }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {

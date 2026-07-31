@@ -78,11 +78,11 @@ export function GrantAging() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <div className="min-w-0">
+          <div className="min-w-0 max-w-[21rem]">
             <Link
               href={`/admin/farmers/${row.original.farmer.id}`}
               onClick={(e) => e.stopPropagation()}
-              className="block max-w-[220px] truncate font-semibold text-ink underline-offset-2 hover:underline"
+              className="block max-w-[20rem] truncate font-semibold text-ink underline-offset-2 hover:underline"
               title={row.original.farmer.name}
             >
               {row.original.farmer.name}
@@ -112,7 +112,7 @@ export function GrantAging() {
         header: "Invested",
         accessorFn: (r) => r.investedGhs ?? 0,
         enableSorting: false,
-        meta: columnMeta({ wide: true, className: "text-right" }),
+        meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
           <Mono className="whitespace-nowrap text-[12.5px] text-soil">
             <Money value={row.original.investedGhs} compact />
@@ -124,7 +124,7 @@ export function GrantAging() {
         header: "Recovered",
         accessorFn: (r) => r.recoveredGhs ?? 0,
         enableSorting: false,
-        meta: columnMeta({ wide: true, className: "text-right" }),
+        meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
           <Mono className="whitespace-nowrap text-[12.5px] text-soil">
             <Money value={row.original.recoveredGhs} compact />
@@ -136,7 +136,7 @@ export function GrantAging() {
         header: "Outstanding",
         accessorFn: (r) => r.outstandingGhs ?? 0,
         enableSorting: false,
-        meta: columnMeta({ className: "text-right" }),
+        meta: columnMeta(),
         cell: ({ row }) => (
           <Mono className="whitespace-nowrap text-[12.5px] font-semibold text-ink">
             <Money value={row.original.outstandingGhs} compact />

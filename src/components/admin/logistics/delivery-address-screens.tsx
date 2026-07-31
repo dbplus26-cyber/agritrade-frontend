@@ -13,12 +13,14 @@ import {
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
 import {
+  AdminButton,
   AdminCard,
   AdminField,
   AdminPageHeader,
   EditableFormActions,
   adminInputClass,
 } from "@/components/admin/ui";
+import { RecordFacts } from "@/components/admin/record-facts";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/button";
 import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons";
@@ -47,6 +49,11 @@ import {
   deliveryAddressSchema,
   type DeliveryAddressValues,
 } from "@/validations/logistics-schema";
+import {
+  RailCard,
+  RailStatus,
+  RecordShell,
+} from "@/components/admin/record-shell";
 import { LifecycleActions } from "@/components/admin/registry/lifecycle-actions";
 import {
   Absent,
@@ -56,6 +63,7 @@ import {
   statusToQuery,
   type StatusFilter,
 } from "@/components/admin/registry/registry-bits";
+import { TextCell, TitleCell } from "@/components/admin/table-cells";
 import { RecordTimestamps } from "@/components/admin/registry/supplier-screens";
 
 const LIST = "/admin/delivery-addresses";
@@ -111,19 +119,11 @@ export function DeliveryAddressTable() {
         cell: ({ row }) => {
           const a = row.original;
           return (
-            <Link
+            <TitleCell
               href={`${LIST}/${a.id}`}
-              className="block min-w-0 outline-none focus-visible:underline"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <span className="block truncate font-medium text-ink">
-                {a.label}
-              </span>
-              <span className="block truncate text-[11.5px] text-soil/70">
-                {a.city}
-                {a.area ? ` · ${a.area}` : ""}
-              </span>
-            </Link>
+              meta={`${a.city}${a.area ? ` · ${a.area}` : ""}`}
+              title={a.label}
+            />
           );
         },
       },
@@ -137,18 +137,11 @@ export function DeliveryAddressTable() {
           const a = row.original;
           if (!a.contactName && !a.contactPhone) return <Absent />;
           return (
-            <span className="block min-w-0">
-              {a.contactName ? (
-                <span className="block truncate text-[12.5px] text-ink">
-                  {a.contactName}
-                </span>
-              ) : null}
-              {a.contactPhone ? (
-                <span className="font-adminmono block truncate text-[12px] text-soil">
-                  {a.contactPhone}
-                </span>
-              ) : null}
-            </span>
+            <TitleCell
+              meta={a.contactPhone}
+              title={a.contactName ?? a.contactPhone ?? ""}
+              width="label"
+            />
           );
         },
       },
@@ -157,12 +150,14 @@ export function DeliveryAddressTable() {
         accessorFn: (a) => a.shopName ?? "",
         header: "Shop",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ at: "xl" }),
         cell: ({ row }) =>
           row.original.shopName ? (
-            <span className="block max-w-[220px] truncate text-soil">
-              {row.original.shopName}
-            </span>
+            <TextCell
+              className="text-soil"
+              value={row.original.shopName}
+              width="label"
+            />
           ) : (
             <Absent />
           ),
@@ -172,7 +167,7 @@ export function DeliveryAddressTable() {
         accessorFn: (a) => a.createdAt,
         header: "Added",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ at: "2xl" }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
@@ -392,6 +387,41 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
     }
   };
 
+  // At rest an existing record READS - the form is what you get after
+  // pressing Edit, not a greyed-out version of the page you were already on.
+  if (isEdit && !isEditing && address) {
+    return (
+      <AdminCard className="px-5 py-[18px]">
+        <RecordFacts
+          facts={[
+            { label: "Label", value: address.label },
+            { label: "City", value: address.city },
+            { label: "Area", value: address.area },
+            {
+              label: "Digital address",
+              mono: true,
+              value: address.digitalAddress,
+            },
+            { label: "Landmark", value: address.landmark },
+            { label: "Shop name", value: address.shopName },
+            { label: "Contact name", value: address.contactName },
+            {
+              label: "Contact phone",
+              mono: true,
+              value: address.contactPhone,
+            },
+            { full: true, label: "Directions", value: address.directions },
+          ]}
+        />
+        <div className="mt-4 flex justify-end">
+          <AdminButton onClick={() => setIsEditing(true)} type="button">
+            Edit address
+          </AdminButton>
+        </div>
+      </AdminCard>
+    );
+  }
+
   return (
     <AdminCard className="px-5 py-[18px]">
       <form
@@ -515,13 +545,13 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
           error={errors.directions?.message}
         >
           <textarea
-            rows={3}
+            rows={4}
             placeholder="e.g. Enter through the Kimberly Ave gate, third shop on the right."
             disabled={readOnly}
             className={cn(
               adminInputClass,
               roCls,
-              "h-auto min-h-[76px] w-full resize-y py-2",
+              "h-auto min-h-[104px] w-full resize-y py-2",
               errors.directions && "border-error",
             )}
             {...register("directions")}
@@ -549,55 +579,66 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
 
 export function DeliveryAddressCreate() {
   return (
-    <div className="max-w-[560px]">
-      <BackButton href={LIST} label="All addresses" className="mb-2" />
-      <AdminPageHeader
-        title="Add delivery address"
-        sub="A destination trucks deliver to, saved for reuse"
-      />
+    <RecordShell
+      backHref={LIST}
+      backLabel="All addresses"
+      header={
+        <AdminPageHeader title="Add delivery address" sub="A destination trucks deliver to, saved for reuse" />
+      }
+    >
       <DeliveryAddressFormFields />
-    </div>
+    </RecordShell>
   );
 }
 
 export function DeliveryAddressEdit({ id }: { id: string }) {
-  const { data, isLoading, isError, error, refetch } =
-    useGetDeliveryAddressQuery(id);
+  const { data, isLoading, isError, error, refetch } = useGetDeliveryAddressQuery(id);
   const [activate] = useActivateDeliveryAddressMutation();
   const [deactivate] = useDeactivateDeliveryAddressMutation();
   const [remove] = useDeleteDeliveryAddressMutation();
 
-  if (isLoading) return <FormSkeleton fields={6} />;
-  if (isError || !data)
+  if (isLoading) return <FormSkeleton fields={8} />;
+  if (isError || !data) {
     return (
       <ErrorMessage
         description={extractApiError(error).message}
         onRetry={() => void refetch()}
       />
     );
+  }
 
   const address = data.data.address;
   return (
-    <div className="max-w-[560px]">
-      <BackButton href={LIST} label="All addresses" className="mb-2" />
-      <AdminPageHeader
-        title={address.label}
-        sub="Edit the delivery address and its lifecycle"
-      />
+    <RecordShell
+      backHref={LIST}
+      backLabel="All addresses"
+      header={
+        <AdminPageHeader title={address.label} sub="Delivery address record" />
+      }
+      aside={
+        <>
+          <RailStatus isActive={address.isActive} />
+          <RailCard title="Filed">
+            <RecordTimestamps
+              createdAt={address.createdAt}
+              updatedAt={address.updatedAt}
+            />
+          </RailCard>
+          <RailCard title="Lifecycle">
+            <LifecycleActions
+              noun="address"
+              name={address.label}
+              isActive={address.isActive}
+              listHref={LIST}
+              onActivate={() => activate(id).unwrap()}
+              onDeactivate={() => deactivate(id).unwrap()}
+              onDelete={() => remove(id).unwrap()}
+            />
+          </RailCard>
+        </>
+      }
+    >
       <DeliveryAddressFormFields key={address.updatedAt} address={address} />
-      <RecordTimestamps
-        createdAt={address.createdAt}
-        updatedAt={address.updatedAt}
-      />
-      <LifecycleActions
-        noun="delivery address"
-        name={address.label}
-        isActive={address.isActive}
-        listHref={LIST}
-        onActivate={() => activate(id).unwrap()}
-        onDeactivate={() => deactivate(id).unwrap()}
-        onDelete={() => remove(id).unwrap()}
-      />
-    </div>
+    </RecordShell>
   );
 }

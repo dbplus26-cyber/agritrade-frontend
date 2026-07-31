@@ -318,7 +318,7 @@ export function PurchaseCreate() {
 
           <AdminField label="Notes" optional error={errors.notes?.message}>
             <textarea
-              rows={2}
+              rows={4}
               placeholder="Anything worth remembering about this purchase."
               className={cn(
                 adminInputClass,

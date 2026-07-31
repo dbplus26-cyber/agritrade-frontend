@@ -113,7 +113,7 @@ export function EnquiriesScreen() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <span className="block min-w-0">
+          <span className="block min-w-[8rem] max-w-[20rem]">
             <span className="block truncate font-medium text-ink">
               {row.original.fullName}
             </span>
@@ -142,7 +142,7 @@ export function EnquiriesScreen() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <span className="block max-w-[220px] truncate text-soil">
+          <span className="block max-w-[20rem] truncate text-soil">
             {row.original.subject}
           </span>
         ),

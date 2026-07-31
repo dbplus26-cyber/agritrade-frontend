@@ -192,7 +192,7 @@ export function LandAcquisitionForm() {
           </div>
           <AdminField label="Description" optional>
             <textarea
-              rows={2}
+              rows={4}
               className={cn(
                 adminInputClass,
                 "h-auto min-h-[60px] w-full resize-y py-2",

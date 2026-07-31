@@ -112,7 +112,7 @@ export function CommodityTable() {
                     {c.name.charAt(0).toUpperCase()}
                   </span>
                 )}
-                <span className="min-w-0">
+                <span className="block min-w-0 max-w-[19rem]">
                   <span className="block truncate font-medium text-ink">
                     {c.name}
                   </span>
@@ -130,10 +130,10 @@ export function CommodityTable() {
         accessorFn: (c) => c.qualityGrade ?? "",
         header: "Grade",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ at: "xl" }),
         cell: ({ row }) =>
           row.original.qualityGrade ? (
-            <span className="whitespace-nowrap text-soil">
+            <span className="block max-w-[22rem] truncate text-soil">
               {row.original.qualityGrade}
             </span>
           ) : (
@@ -145,7 +145,7 @@ export function CommodityTable() {
         accessorFn: (c) => c.bagWeightKg ?? "",
         header: "Bag",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ at: "xl" }),
         cell: ({ row }) =>
           row.original.bagWeightKg !== null ? (
             <Mono className="whitespace-nowrap text-soil">
@@ -159,7 +159,7 @@ export function CommodityTable() {
         id: "website",
         header: "Website",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ at: "xl" }),
         cell: ({ row }) => (
           <PublishedBadge published={row.original.publishToWebsite} />
         ),
@@ -169,7 +169,7 @@ export function CommodityTable() {
         accessorFn: (c) => c.createdAt,
         header: "Added",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ at: "2xl" }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {

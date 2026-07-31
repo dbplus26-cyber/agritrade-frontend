@@ -12,12 +12,14 @@ import {
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
 import {
+  AdminButton,
   AdminCard,
   AdminField,
   AdminPageHeader,
   EditableFormActions,
   adminInputClass,
 } from "@/components/admin/ui";
+import { RecordFacts } from "@/components/admin/record-facts";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/button";
 import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons";
@@ -43,6 +45,11 @@ import {
   landSellerSchema,
   type LandSellerValues,
 } from "@/validations/land-schema";
+import {
+  RailCard,
+  RailStatus,
+  RecordShell,
+} from "@/components/admin/record-shell";
 import { LifecycleActions } from "@/components/admin/registry/lifecycle-actions";
 import {
   Absent,
@@ -106,7 +113,7 @@ export function LandSellerTable() {
               className="outline-none focus-visible:underline"
               onClick={(e) => e.stopPropagation()}
             >
-              <span className="min-w-0">
+              <span className="block min-w-0 max-w-[20rem]">
                 <span className="block truncate font-medium text-ink">
                   {s.name}
                 </span>
@@ -138,7 +145,7 @@ export function LandSellerTable() {
         accessorFn: (s) => s.createdAt,
         header: "Added",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ at: "2xl" }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
@@ -336,6 +343,29 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
     }
   };
 
+  // At rest an existing record READS. The form is what you get after
+  // pressing Edit, not a greyed-out copy of the page you were already on.
+  if (isEdit && !isEditing && seller) {
+    return (
+      <AdminCard className="px-5 py-[18px]">
+        <RecordFacts
+          facts={[
+            { label: "Name", value: seller.name },
+            { mono: true, label: "Phone", value: seller.phone },
+            { label: "Email", value: seller.email },
+            { label: "Community", value: seller.community },
+            { full: true, label: "Notes", value: seller.notes },
+          ]}
+        />
+        <div className="mt-4 flex justify-end">
+          <AdminButton onClick={() => setIsEditing(true)} type="button">
+            Edit seller
+          </AdminButton>
+        </div>
+      </AdminCard>
+    );
+  }
+
   return (
     <AdminCard className="px-5 py-[18px]">
       <form
@@ -391,13 +421,13 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
         </div>
         <AdminField label="Notes" optional error={errors.notes?.message}>
           <textarea
-            rows={3}
+            rows={4}
             placeholder="Anything worth remembering about this seller."
             disabled={readOnly}
             className={cn(
               adminInputClass,
               roCls,
-              "h-auto min-h-[76px] w-full resize-y py-2",
+              "h-auto min-h-[104px] w-full resize-y py-2",
               errors.notes && "border-error",
             )}
             {...register("notes")}
@@ -425,14 +455,18 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
 
 export function LandSellerCreate() {
   return (
-    <div className="max-w-[560px]">
-      <BackButton href={LIST} label="All sellers" className="mb-2" />
-      <AdminPageHeader
-        title="Add seller"
-        sub="A person or company the business buys land from"
-      />
+    <RecordShell
+      backHref={LIST}
+      backLabel="All sellers"
+      header={
+        <AdminPageHeader
+          title="Add seller"
+          sub="A landowner the business acquires plots from"
+        />
+      }
+    >
       <LandSellerFormFields />
-    </div>
+    </RecordShell>
   );
 }
 
@@ -453,22 +487,28 @@ export function LandSellerEdit({ id }: { id: string }) {
 
   const seller = data.data.seller;
   return (
-    <div className="max-w-[560px]">
-      <BackButton href={LIST} label="All sellers" className="mb-2" />
-      <AdminPageHeader
-        title={seller.name}
-        sub="Edit the seller and their lifecycle"
-      />
+    <RecordShell
+      backHref={LIST}
+      backLabel="All sellers"
+      header={<AdminPageHeader title={seller.name} sub="Seller record" />}
+      aside={
+        <>
+          <RailStatus isActive={seller.isActive} />
+          <RailCard title="Lifecycle">
+            <LifecycleActions
+              noun="seller"
+              name={seller.name}
+              isActive={seller.isActive}
+              listHref={LIST}
+              onActivate={() => activate(id).unwrap()}
+              onDeactivate={() => deactivate(id).unwrap()}
+              onDelete={() => remove(id).unwrap()}
+            />
+          </RailCard>
+        </>
+      }
+    >
       <LandSellerFormFields seller={seller} />
-      <LifecycleActions
-        noun="seller"
-        name={seller.name}
-        isActive={seller.isActive}
-        listHref={LIST}
-        onActivate={() => activate(id).unwrap()}
-        onDeactivate={() => deactivate(id).unwrap()}
-        onDelete={() => remove(id).unwrap()}
-      />
-    </div>
+    </RecordShell>
   );
 }

@@ -132,7 +132,7 @@ export function PurchasesTable() {
               className="outline-none focus-visible:underline"
               onClick={(e) => e.stopPropagation()}
             >
-              <span className="min-w-0">
+              <span className="block min-w-0 max-w-[20rem]">
                 <span className="block truncate font-medium text-ink">
                   {p.commodity.name}
                   <Mono className="ml-1.5 text-[12px] text-soil">
@@ -152,7 +152,7 @@ export function PurchasesTable() {
         accessorFn: (p) => p.totalGhs,
         header: "Total",
         enableSorting: false,
-        meta: columnMeta({ className: "text-right" }),
+        meta: columnMeta(),
         cell: ({ row }) => (
           <Mono className="whitespace-nowrap text-[12.5px] text-ink">
             <CompactCedis amount={row.original.totalGhs} />
@@ -172,7 +172,7 @@ export function PurchasesTable() {
         accessorFn: (p) => p.unitPriceGhs,
         header: "Price/kg",
         enableSorting: false,
-        meta: columnMeta({ wide: true, className: "text-right" }),
+        meta: columnMeta({ at: "xl" }),
         cell: ({ row }) => (
           <Mono className="whitespace-nowrap text-[12.5px] text-soil">
             <CompactCedis amount={row.original.unitPriceGhs} />
@@ -184,10 +184,10 @@ export function PurchasesTable() {
         accessorFn: (p) => p.warehouse?.name ?? "",
         header: "Warehouse",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ at: "lg" }),
         cell: ({ row }) =>
           row.original.warehouse ? (
-            <span className="whitespace-nowrap text-soil">
+            <span className="block max-w-[22rem] truncate text-soil">
               {row.original.warehouse.name}
             </span>
           ) : (

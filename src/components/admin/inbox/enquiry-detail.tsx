@@ -200,7 +200,7 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
                     placeholder="Who called back, what was agreed…"
                     className={cn(
                       adminInputClass,
-                      "h-auto min-h-[96px] w-full resize-y py-2",
+                      "h-auto min-h-[112px] w-full resize-y py-2",
                     )}
                   />
                 </AdminField>

@@ -11,6 +11,7 @@ import {
   AdminPageHeader,
   adminInputClass,
 } from "@/components/admin/ui";
+import { RecordFacts } from "@/components/admin/record-facts";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -161,6 +162,61 @@ export function FarmerForm({
       });
     }
   };
+
+  // At rest an existing record READS; the form appears only on Edit.
+  if (farmer && !isEditing) {
+    return (
+      <div className="max-w-[600px]">
+        <BackButton href={LIST} label="All farmers" className="mb-2" />
+        <AdminPageHeader
+          title={farmer.name}
+          sub="The outgrower's identity, community and guarantors - every input grant is booked against this record"
+        />
+        <AdminCard className="px-5 py-4">
+          <RecordFacts
+            facts={[
+              { label: "Name", value: farmer.name },
+              { label: "Phone", mono: true, value: farmer.phone },
+              {
+                label: "Date of birth",
+                value: farmer.dateOfBirth?.slice(0, 10) ?? null,
+              },
+              { label: "ID type", value: farmer.idType },
+              { label: "ID number", mono: true, value: farmer.idNumber },
+              { label: "Community", value: farmer.community },
+              { label: "Farm location", value: farmer.farmLocation },
+              {
+                label: "Farm size",
+                mono: true,
+                value:
+                  farmer.farmSizeAcres === null
+                    ? null
+                    : `${String(farmer.farmSizeAcres)} acres`,
+              },
+              { label: "Next of kin", value: farmer.nextOfKinName },
+              {
+                label: "Next of kin phone",
+                mono: true,
+                value: farmer.nextOfKinPhone,
+              },
+              {
+                label: "Mobile money",
+                mono: true,
+                value: farmer.momoNumber,
+              },
+              { full: true, label: "Address", value: farmer.address },
+              { full: true, label: "Notes", value: farmer.notes },
+            ]}
+          />
+          <div className="mt-4 flex justify-end">
+            <AdminButton onClick={() => setIsEditing(true)} type="button">
+              Edit farmer
+            </AdminButton>
+          </div>
+        </AdminCard>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-[600px]">
@@ -319,7 +375,7 @@ export function FarmerForm({
           </div>
           <AdminField label="Address" optional error={errors.address?.message}>
             <textarea
-              rows={2}
+              rows={4}
               disabled={readOnly}
               className={cn(
                 adminInputClass,

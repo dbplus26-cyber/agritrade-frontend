@@ -9,6 +9,7 @@ import {
   Absent,
   ActiveBadge,
 } from "@/components/admin/registry/registry-bits";
+import { RecordFacts } from "@/components/admin/record-facts";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { Money } from "@/components/admin/trading/sale-bits";
 import {
@@ -147,7 +148,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         header: "Counterparty",
         enableSorting: false,
         cell: ({ row }) => (
-          <span className="block max-w-[220px] truncate text-ink">
+          <span className="block max-w-[19rem] truncate text-ink">
             {row.original.counterparty}
           </span>
         ),
@@ -189,7 +190,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         enableSorting: false,
         cell: ({ row }) =>
           row.original.reference ? (
-            <Mono className="block max-w-[180px] truncate text-[12px] text-soil">
+            <Mono className="block max-w-[19rem] truncate text-[12px] text-soil">
               {row.original.reference}
             </Mono>
           ) : (
@@ -198,7 +199,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         // Reconciliation detail: only in genuinely wide containers. The empty
         // accessor value also drops the row from the mobile card when there is
         // no reference to show.
-        meta: { className: "hidden px-4 text-[13px] @5xl/table:table-cell" },
+        meta: { className: "hidden px-4 text-[13px] 2xl:table-cell" },
       },
       {
         accessorFn: (m) => accountDelta(m) ?? 0,
@@ -223,7 +224,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
             </Mono>
           );
         },
-        meta: { className: "px-4 text-right text-[13px]" },
+        meta: { className: "px-4 text-[13px]" },
       },
     ],
     [],
@@ -272,33 +273,35 @@ export function PaymentAccountDetail({ id }: { id: string }) {
 
       {/* The facts a caller quotes down the phone. */}
       <AdminCard className="mb-4 px-5 py-3">
-        <DetailGrid columns={3}>
-          <DetailItem label="Account number" mono strong>
-            {account.accountNumber}
-          </DetailItem>
-          <DetailItem label="Account name">{account.accountName}</DetailItem>
-          <DetailItem label="Bank / network">
-            {where ?? <Absent />}
-            {account.branch ? ` · ${account.branch}` : ""}
-          </DetailItem>
-          <DetailItem label="Kind">{account.kind}</DetailItem>
-          <DetailItem label="On invoices">
-            {account.showOnInvoice ? "Printed" : "Internal only"}
-          </DetailItem>
-          {account.sortCode ? (
-            <DetailItem label="Sort code" mono>
-              {account.sortCode}
-            </DetailItem>
-          ) : null}
-          {account.swiftCode ? (
-            <DetailItem label="SWIFT" mono>
-              {account.swiftCode}
-            </DetailItem>
-          ) : null}
-          {account.instructions ? (
-            <DetailItem label="Instructions">{account.instructions}</DetailItem>
-          ) : null}
-        </DetailGrid>
+        <RecordFacts
+          columns={3}
+          facts={[
+            {
+              label: "Account number",
+              mono: true,
+              value: account.accountNumber,
+            },
+            { label: "Account name", value: account.accountName },
+            {
+              label: "Bank / network",
+              value: where
+                ? `${where}${account.branch ? ` · ${account.branch}` : ""}`
+                : null,
+            },
+            { label: "Kind", value: account.kind },
+            {
+              label: "On invoices",
+              value: account.showOnInvoice ? "Printed" : "Internal only",
+            },
+            { label: "Sort code", mono: true, value: account.sortCode },
+            { label: "SWIFT", mono: true, value: account.swiftCode },
+            {
+              full: true,
+              label: "Instructions",
+              value: account.instructions,
+            },
+          ]}
+        />
       </AdminCard>
 
       {/* The history: every payment row that named this account. */}
@@ -311,6 +314,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
           data={rows}
           itemNoun="movements"
           isFetching={isFetching}
+        isFiltered={false}
           serverPagination={{
             totalCount: data.meta.total,
             page,

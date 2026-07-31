@@ -14,6 +14,7 @@ import {
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
+import { TitleCell } from "@/components/admin/table-cells";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import {
   AdminButton,
@@ -111,14 +112,10 @@ export function FloatHoldersScreen() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <span className="block min-w-0 text-left">
-            <span className="block truncate font-medium text-ink">
-              {row.original.firstName} {row.original.lastName}
-            </span>
-            <span className="block truncate text-[11.5px] text-soil/70">
-              {row.original.email}
-            </span>
-          </span>
+          <TitleCell
+            meta={row.original.email}
+            title={`${row.original.firstName} ${row.original.lastName}`}
+          />
         ),
       },
       {
@@ -127,7 +124,7 @@ export function FloatHoldersScreen() {
           h.role === UserRole.AGENT ? "Field agent" : "Office staff",
         header: "Role",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ at: "lg" }),
       },
       {
         id: "float",
@@ -135,7 +132,7 @@ export function FloatHoldersScreen() {
           !h.accountId ? "Not funded yet" : h.accountActive ? "Active" : "Suspended",
         header: "Float",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ at: "md" }),
         cell: ({ row }) => <HolderState holder={row.original} />,
       },
     ];
@@ -166,7 +163,7 @@ export function FloatHoldersScreen() {
       id: "actions",
       header: "",
       enableSorting: false,
-      meta: columnMeta({ className: "text-right" }),
+      meta: columnMeta(),
       cell: ({ row }) => (
         <HolderActions holder={row.original} onTopUp={setToppingUp} />
       ),
@@ -224,6 +221,7 @@ export function FloatHoldersScreen() {
           />
         }
         isFetching={isFetching}
+        isFiltered={activeFilterCount > 0 || Boolean(queryParams.search)}
         itemNoun="people"
         rowClassName={() => "h-14 hover:bg-surface-alt/60"}
         serverPagination={{

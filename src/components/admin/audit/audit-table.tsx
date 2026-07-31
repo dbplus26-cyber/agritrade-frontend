@@ -116,11 +116,11 @@ export function AuditTable() {
             return <span className="text-soil/70">System</span>;
           }
           return (
-            <div className="min-w-0 max-w-[220px]">
-              <div className="truncate font-medium text-ink">
+            <div className="min-w-0 max-w-[20rem]">
+              <div className="max-w-[20rem] truncate font-medium text-ink">
                 {actor.name}
               </div>
-              <div className="truncate text-[11.5px] text-soil/70">
+              <div className="max-w-[20rem] truncate text-[11.5px] text-soil/70">
                 {actor.email}
               </div>
             </div>

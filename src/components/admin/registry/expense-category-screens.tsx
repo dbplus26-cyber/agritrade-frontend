@@ -18,6 +18,7 @@ import {
   Mono,
   adminInputClass,
 } from "@/components/admin/ui";
+import { RecordFacts } from "@/components/admin/record-facts";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/button";
 import {
@@ -73,6 +74,7 @@ import {
   statusToQuery,
   type StatusFilter,
 } from "./registry-bits";
+import { TitleCell } from "@/components/admin/table-cells";
 
 const LIST = "/admin/expense-categories";
 const FILTER_DEFAULTS = { status: "all", size: "10" };
@@ -156,7 +158,7 @@ function CreateCategoryDialog({
             error={errors.description?.message}
           >
             <textarea
-              rows={2}
+              rows={4}
               placeholder="e.g. Fuel, tolls and truck hire for deliveries"
               className={cn(
                 adminInputClass,
@@ -229,38 +231,17 @@ export function ExpenseCategoryTable() {
         header: "Category",
         enableSorting: false,
         meta: columnMeta(),
+        // What belongs in the category rides under its name instead of
+        // holding a column: prose has no natural width, so on its own it is
+        // always the column that pushes the table sideways.
         cell: ({ row }) => (
-          <Link
+          <TitleCell
             href={`${LIST}/${row.original.id}`}
-            className="block truncate font-medium text-ink outline-none focus-visible:underline"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {row.original.name}
-          </Link>
+            meta={row.original.description}
+            title={row.original.name}
+            width="wide"
+          />
         ),
-      },
-      {
-        id: "description",
-        // An accessor (not just a cell) so the mobile card drops the row
-        // entirely when there is no description, rather than printing a
-        // "DESCRIPTION —" placeholder on every phone row.
-        accessorFn: (c) => c.description ?? "",
-        header: "What belongs here",
-        enableSorting: false,
-        // `wide` hides it below xl: on a narrow console the category name and
-        // its status are what the register is scanned by.
-        meta: columnMeta({ wide: true }),
-        cell: ({ row }) =>
-          row.original.description ? (
-            <span
-              className="block max-w-[320px] truncate text-[12.5px] text-soil"
-              title={row.original.description}
-            >
-              {row.original.description}
-            </span>
-          ) : (
-            <Absent />
-          ),
       },
       {
         id: "added",
@@ -454,6 +435,26 @@ function ExpenseCategoryFormFields({
     }
   };
 
+  // At rest an existing record READS. The form is what you get after
+  // pressing Edit, not a greyed-out copy of the page you were already on.
+  if (isEdit && !isEditing && category) {
+    return (
+      <AdminCard className="px-5 py-[18px]">
+        <RecordFacts
+          facts={[
+            { label: "Name", value: category.name },
+            { full: true, label: "Description", value: category.description },
+          ]}
+        />
+        <div className="mt-4 flex justify-end">
+          <AdminButton onClick={() => setIsEditing(true)} type="button">
+            Edit category
+          </AdminButton>
+        </div>
+      </AdminCard>
+    );
+  }
+
   return (
     <AdminCard className="px-5 py-[18px]">
       <form
@@ -476,7 +477,7 @@ function ExpenseCategoryFormFields({
           error={errors.description?.message}
         >
           <textarea
-            rows={2}
+            rows={4}
             placeholder="e.g. Fuel, tolls and truck hire for deliveries"
             disabled={readOnly}
             className={cn(

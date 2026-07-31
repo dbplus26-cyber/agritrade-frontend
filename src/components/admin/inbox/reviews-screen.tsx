@@ -35,6 +35,7 @@ import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatDateTime } from "@/lib/format-date";
 import { notify } from "@/lib/notify";
+import { REVIEW_MAX_CHARS, REVIEWER_NAME_MAX } from "@/lib/limits";
 import { cn } from "@/lib/utils";
 import {
   useCreateAdminReviewMutation,
@@ -265,6 +266,7 @@ function AddReviewDialog({
             error={errors.authorName?.message}
           >
             <input
+              maxLength={REVIEWER_NAME_MAX}
               placeholder="e.g. Amina Alhassan"
               className={cn(
                 adminInputClass,
@@ -327,11 +329,11 @@ function AddReviewDialog({
           <AdminField label="Their words" error={errors.text?.message}>
             <textarea
               rows={4}
-              maxLength={2000}
+              maxLength={REVIEW_MAX_CHARS}
               placeholder="What they said, as close to their words as possible."
               className={cn(
                 adminInputClass,
-                "h-auto min-h-[96px] w-full resize-y py-2",
+                "h-auto min-h-[112px] w-full resize-y py-2",
                 errors.text && "border-error",
               )}
               {...register("text")}

@@ -30,11 +30,36 @@ export function PublishedBadge({ published }: { published: boolean }) {
   );
 }
 
+/**
+ * Where a secondary column starts appearing. Not every fact earns room at
+ * every width: a table that shows all twelve of its columns on a laptop is a
+ * table that scrolls sideways, and the reader loses the first column - the one
+ * that says WHICH row they are looking at - the moment they go looking for the
+ * last. So the columns that identify a row are always present, and the rest
+ * arrive as the screen can afford them.
+ */
+const REVEAL_AT = {
+  md: "hidden md:table-cell",
+  lg: "hidden lg:table-cell",
+  xl: "hidden xl:table-cell",
+  "2xl": "hidden 2xl:table-cell",
+} as const;
+
 /** Column meta shared by every register table (users-table convention). */
-export const columnMeta = (opts?: { wide?: boolean; className?: string }) => ({
+export const columnMeta = (opts?: {
+  /** Show this column only from a breakpoint up. */
+  at?: keyof typeof REVEAL_AT;
+  className?: string;
+  /** Older shorthand for `at: "xl"`, kept so existing tables read the same. */
+  wide?: boolean;
+}) => ({
   className: cn(
     "px-4 py-0 text-[13px]",
-    opts?.wide ? "hidden xl:table-cell" : "table-cell",
+    opts?.at
+      ? REVEAL_AT[opts.at]
+      : opts?.wide
+        ? REVEAL_AT.xl
+        : "table-cell",
     opts?.className,
   ),
   headerClassName:

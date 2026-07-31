@@ -20,6 +20,7 @@ import {
   EditableFormActions,
   adminInputClass,
 } from "@/components/admin/ui";
+import { RecordFacts } from "@/components/admin/record-facts";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/button";
 import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons";
@@ -44,6 +45,11 @@ import { optimizeImage } from "@/lib/optimize-image";
 import { cn } from "@/lib/utils";
 import type { IBuyer, IRegistryListQuery } from "@/types/registry.types";
 import { buyerSchema, type BuyerValues } from "@/validations/registry-schema";
+import {
+  RailCard,
+  RailStatus,
+  RecordShell,
+} from "@/components/admin/record-shell";
 import { LifecycleActions } from "./lifecycle-actions";
 import {
   Absent,
@@ -114,7 +120,7 @@ export function BuyerTable() {
               onClick={(e) => e.stopPropagation()}
             >
               <RegistryAvatar name={b.name} photoUrl={b.photoUrl} />
-              <span className="min-w-0">
+              <span className="block min-w-0 max-w-[20rem]">
                 <span className="block truncate font-medium text-ink">
                   {b.name}
                 </span>
@@ -149,7 +155,7 @@ export function BuyerTable() {
         meta: columnMeta({ wide: true }),
         cell: ({ row }) =>
           row.original.email ? (
-            <span className="truncate text-soil">{row.original.email}</span>
+            <span className="block max-w-[17rem] truncate text-soil">{row.original.email}</span>
           ) : (
             <Absent />
           ),
@@ -433,6 +439,35 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
     }
   };
 
+  // At rest an existing record READS. The form is what you get after
+  // pressing Edit, not a greyed-out copy of the page you were already on.
+  if (isEdit && !isEditing && buyer) {
+    return (
+      <AdminCard className="px-5 py-[18px]">
+        <RecordFacts
+          facts={[
+            { label: "Name", value: buyer.name },
+            { mono: true, label: "Phone", value: buyer.phone },
+            { mono: true, label: "Other phone", value: buyer.altPhone },
+            { label: "City", value: buyer.city },
+            { label: "Email", value: buyer.email },
+            { full: true, label: "Address", value: buyer.address },
+            { label: "Business name", value: buyer.businessName },
+            { mono: true, label: "Registration number", value: buyer.registrationNumber },
+            { label: "Contact person", value: buyer.contactPersonName },
+            { mono: true, label: "Contact phone", value: buyer.contactPersonPhone },
+            { full: true, label: "Notes", value: buyer.notes },
+          ]}
+        />
+        <div className="mt-4 flex justify-end">
+          <AdminButton onClick={() => setIsEditing(true)} type="button">
+            Edit buyer
+          </AdminButton>
+        </div>
+      </AdminCard>
+    );
+  }
+
   return (
     <AdminCard className="px-5 py-[18px]">
       <form
@@ -653,13 +688,13 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
         </div>
         <AdminField label="Notes" optional error={errors.notes?.message}>
           <textarea
-            rows={3}
+            rows={4}
             placeholder="Anything worth remembering about this buyer."
             disabled={readOnly}
             className={cn(
               adminInputClass,
               roCls,
-              "h-auto min-h-[76px] w-full resize-y py-2",
+              "h-auto min-h-[104px] w-full resize-y py-2",
               errors.notes && "border-error",
             )}
             {...register("notes")}
@@ -688,14 +723,18 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
 
 export function BuyerCreate() {
   return (
-    <div className="max-w-[560px]">
-      <BackButton href={LIST} label="All buyers" className="mb-2" />
-      <AdminPageHeader
-        title="Add buyer"
-        sub="A trader or company the business sells to"
-      />
+    <RecordShell
+      backHref={LIST}
+      backLabel="All buyers"
+      header={
+        <AdminPageHeader
+          title="Add buyer"
+          sub="A customer the business sells to"
+        />
+      }
+    >
       <BuyerFormFields />
-    </div>
+    </RecordShell>
   );
 }
 
@@ -716,23 +755,34 @@ export function BuyerEdit({ id }: { id: string }) {
 
   const buyer = data.data.buyer;
   return (
-    <div className="max-w-[560px]">
-      <BackButton href={LIST} label="All buyers" className="mb-2" />
-      <AdminPageHeader
-        title={buyer.name}
-        sub="Edit the buyer and their lifecycle"
-      />
+    <RecordShell
+      backHref={LIST}
+      backLabel="All buyers"
+      header={<AdminPageHeader title={buyer.name} sub="Buyer record" />}
+      aside={
+        <>
+          <RailStatus isActive={buyer.isActive} />
+          <RailCard title="Filed">
+            <RecordTimestamps
+              createdAt={buyer.createdAt}
+              updatedAt={buyer.updatedAt}
+            />
+          </RailCard>
+          <RailCard title="Lifecycle">
+            <LifecycleActions
+              noun="buyer"
+              name={buyer.name}
+              isActive={buyer.isActive}
+              listHref={LIST}
+              onActivate={() => activate(id).unwrap()}
+              onDeactivate={() => deactivate(id).unwrap()}
+              onDelete={() => remove(id).unwrap()}
+            />
+          </RailCard>
+        </>
+      }
+    >
       <BuyerFormFields buyer={buyer} />
-      <RecordTimestamps createdAt={buyer.createdAt} updatedAt={buyer.updatedAt} />
-      <LifecycleActions
-        noun="buyer"
-        name={buyer.name}
-        isActive={buyer.isActive}
-        listHref={LIST}
-        onActivate={() => activate(id).unwrap()}
-        onDeactivate={() => deactivate(id).unwrap()}
-        onDelete={() => remove(id).unwrap()}
-      />
-    </div>
+    </RecordShell>
   );
 }

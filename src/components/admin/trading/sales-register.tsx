@@ -146,10 +146,10 @@ export function SalesRegister() {
         cell: ({ row }) => (
           <Link
             href={`/admin/sales/${row.original.id}`}
-            className="block min-w-0 outline-none focus-visible:underline"
+            className="block min-w-[9rem] max-w-[22rem] outline-none focus-visible:underline"
             onClick={(e) => { e.stopPropagation(); }}
           >
-            <div className="truncate font-semibold text-ink">
+            <div className="max-w-[20rem] truncate font-semibold text-ink">
               {row.original.buyer.name}
             </div>
           </Link>
@@ -159,7 +159,7 @@ export function SalesRegister() {
         id: "agreed",
         header: "Agreed",
         enableSorting: false,
-        meta: columnMeta({ className: "text-right", wide: true }),
+        meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
           <Mono className="whitespace-nowrap text-[12.5px] text-ink">
             <Money value={row.original.agreedTotalGhs} />
@@ -170,7 +170,7 @@ export function SalesRegister() {
         id: "balance",
         header: "Balance",
         enableSorting: false,
-        meta: columnMeta({ className: "text-right" }),
+        meta: columnMeta(),
         cell: ({ row }) => {
           const b = row.original.balanceGhs;
           return (
@@ -332,7 +332,7 @@ export function SalesRegister() {
                     className="shadow-doc-sm rounded-none border-[1.5px] border-soil/30 bg-paper px-3.5 py-[13px] text-left"
                   >
                     <div className="mb-1.5 flex items-center justify-between gap-2">
-                      <span className="truncate text-[14px] font-semibold text-ink">
+                      <span className="block max-w-[22rem] truncate text-[14px] font-semibold text-ink">
                         {s.buyer.name}
                       </span>
                       <SaleStatusBadge status={s.status} />

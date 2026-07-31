@@ -78,43 +78,62 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
         </p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[560px] text-[13px]">
+          {/* Fixed layout with declared column widths. Left to itself the
+              browser sized every column from its content, so the buyer name -
+              the one unbounded value here - took roughly three quarters of
+              the row and squeezed the figures into columns so narrow that
+              "GHS 59,377.38" wrapped. The figures are why this table exists;
+              they get the room they need first, and the name takes what is
+              left and wraps to at most two lines. */}
+          <table className="w-full min-w-[720px] table-fixed text-[13px]">
+            <colgroup>
+              <col className="w-[30%]" />
+              <col className="w-[9rem]" />
+              <col className="w-[9rem]" />
+              <col className="w-[8rem]" />
+              <col className="w-[8rem]" />
+              <col className="w-[8rem]" />
+            </colgroup>
             <thead>
               <tr className="text-left text-[11px] text-soil uppercase">
-                <th className="py-1.5">Buyer</th>
-                <th className="py-1.5">Book</th>
-                <th className="py-1.5">Ref</th>
-                <th className="py-1.5 text-right">Agreed</th>
-                <th className="py-1.5 text-right">Paid</th>
-                <th className="py-1.5 text-right">Balance</th>
+                <th className="py-1.5 pr-3">Buyer</th>
+                <th className="py-1.5 pr-3">Book</th>
+                <th className="py-1.5 pr-3">Ref</th>
+                <th className="py-1.5 pr-3">Agreed</th>
+                <th className="py-1.5 pr-3">Paid</th>
+                <th className="py-1.5">Balance</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((r) => (
-                <tr key={r.id} className="border-t border-soil/10">
-                  <td className="py-1.5 text-ink">
-                    <div className="truncate">{r.buyer.name}</div>
+                <tr key={r.id} className="border-t border-soil/10 align-top">
+                  <td className="py-1.5 pr-3 text-ink">
+                    <div className="line-clamp-2" title={r.buyer.name}>
+                      {r.buyer.name}
+                    </div>
                     {r.buyer.phone ? (
-                      <div className="text-[11.5px] text-soil">
+                      <div className="font-adminmono truncate text-[11.5px] text-soil">
                         {r.buyer.phone}
                       </div>
                     ) : null}
                   </td>
-                  <td className="py-1.5">
+                  <td className="py-1.5 pr-3">
                     <ToneBadge tone={r.kind === "LAND" ? "harvest" : "sky"}>
                       {r.kind === "LAND" ? "Land" : "Commodity"}
                     </ToneBadge>
                   </td>
-                  <td className="py-1.5">
-                    <Mono className="text-soil">{r.subject}</Mono>
+                  <td className="py-1.5 pr-3">
+                    <span className="block truncate" title={r.subject}>
+                      <Mono className="text-soil">{r.subject}</Mono>
+                    </span>
                   </td>
-                  <td className="py-1.5 text-right text-soil">
+                  <td className="py-1.5 pr-3 whitespace-nowrap text-soil">
                     <Money value={r.agreedGhs} />
                   </td>
-                  <td className="py-1.5 text-right text-soil">
+                  <td className="py-1.5 pr-3 whitespace-nowrap text-soil">
                     <Money value={r.paidGhs} />
                   </td>
-                  <td className="py-1.5 text-right font-semibold text-console-red">
+                  <td className="py-1.5 font-semibold whitespace-nowrap text-console-red">
                     <Money value={r.balanceGhs} />
                   </td>
                 </tr>

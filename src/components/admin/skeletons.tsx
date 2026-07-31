@@ -360,7 +360,7 @@ export function DetailSkeleton({
                   i === 0 ? (
                     <MediaSkeleton />
                   ) : (
-                    <LedgerSkeleton rows={3} />
+                    <LedgerSkeleton rows={4} />
                   )
                 ) : main === "ledger" ? (
                   <LedgerSkeleton />

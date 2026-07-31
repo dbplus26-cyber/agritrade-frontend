@@ -100,8 +100,23 @@ export function DetailGrid({
   return (
     <div
       className={cn(
-        "grid grid-cols-1 gap-x-8 gap-y-1 sm:grid-cols-2",
-        columns === 3 && "xl:grid-cols-3",
+        // auto-fit against a real MINIMUM, not a fixed column count.
+        //
+        // Fixed `sm:grid-cols-2 xl:grid-cols-3` gave every fact the same
+        // narrow slot regardless of what was in it, so a long free-text value
+        // - a route, a note, an address - became a several-hundred-pixel
+        // ribbon of text with empty columns sitting beside it, while short
+        // values wasted the room they were handed. Sizing from a floor lets
+        // rows carry as many facts as genuinely fit and no more.
+        //
+        // The floor also stops a column collapsing to nothing: DetailItem
+        // wraps with `overflow-wrap: anywhere`, which lets a value's
+        // min-content width fall to a single character, and a content-sized
+        // grid track will happily shrink that far.
+        "grid gap-x-8 gap-y-1",
+        columns === 3
+          ? "grid-cols-[repeat(auto-fit,minmax(min(100%,14rem),1fr))]"
+          : "grid-cols-[repeat(auto-fit,minmax(min(100%,16rem),1fr))]",
         className,
       )}
     >
@@ -180,7 +195,7 @@ export function ToneBadge({
   return (
     <Badge
       className={cn(
-        "gap-1.5 rounded-full border-transparent px-2 py-0.5 text-[11.5px] font-semibold whitespace-nowrap",
+        "gap-1.5 rounded-[2px] border-transparent px-2 py-0.5 text-[11.5px] font-semibold whitespace-nowrap",
         className,
       )}
       style={{ color: t.fg, background: t.bg }}
@@ -235,15 +250,22 @@ export function AdminPageHeader({
         className,
       )}
     >
-      <div className="min-w-0 max-w-full">
-        <h1
-          title={title}
-          className="truncate text-[19px] font-bold text-forest"
-        >
+      {/* A detail page is where a record is read IN FULL. Truncating its
+          title behind a tooltip meant the one thing identifying the page was
+          the one thing you could not read - so the heading wraps (to two
+          lines, so it stays a heading rather than a paragraph) and the
+          sub-line does the same.
+          
+          It takes the whole row that the actions leave it, rather than the
+          68ch it used to: on a 1216px console page that measured 404px, so
+          the heading and its description were folding inside a third of a
+          page whose tables and cards below them ran the full width. */}
+      <div className="min-w-0 flex-1">
+        <h1 className="line-clamp-2 text-[19px] leading-[1.3] font-bold text-forest">
           {title}
         </h1>
         {sub ? (
-          <p className="mt-0.5 truncate text-[13px] text-soil" title={sub}>
+          <p className="mt-0.5 line-clamp-2 text-[13px] text-soil" title={sub}>
             {sub}
           </p>
         ) : null}

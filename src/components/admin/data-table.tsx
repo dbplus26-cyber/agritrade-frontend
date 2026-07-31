@@ -77,6 +77,7 @@ export function ConsoleDataTable<TData>({
   renderBulkActions,
   serverPagination,
   isFetching = false,
+  isFiltered = false,
 }: {
   columns: ColumnDef<TData, unknown>[];
   data: TData[];
@@ -111,6 +112,21 @@ export function ConsoleDataTable<TData>({
   /** True while a refetch is in flight — the current rows stay visible,
    * slightly dimmed, and snap to the new list when it lands. */
   isFetching?: boolean;
+  /**
+   * True when a search or filter is narrowing the list.
+   *
+   * It changes what an empty table MEANS, and therefore what it should look
+   * like. Nothing on file at all is a register waiting to be started: it gets
+   * the empty state ALONE, with no column headings standing over nothing and
+   * no pager for a single absent page. Nothing matching a filter is a
+   * different message entirely - the headings stay, because the columns are
+   * what the reader just filtered on.
+   *
+   * Without this the shell always drew the full table furniture around an
+   * empty body, which is what made a register with no rows still scroll
+   * sideways: the header row, not the content, was setting the width.
+   */
+  isFiltered?: boolean;
 }) {
   const router = useRouter();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -195,8 +211,24 @@ export function ConsoleDataTable<TData>({
   // dms rule: no pager for a page that couldn't possibly need one.
   const showPagination = total > Math.min(...PAGE_SIZE_OPTIONS);
 
+  // A register with nothing in it and nothing filtering it shows the empty
+  // state and NOTHING else - no headings over an absent body, no pager, no
+  // scroll container. Withheld while fetching so the first paint of a table
+  // that does have rows isn't a flash of "nothing here".
+  if (!isFetching && rows.length === 0 && !isFiltered) {
+    return (
+      <div className={cn("@container/table min-w-0", className)}>
+        {emptyState ?? (
+          <div className="px-4 py-12 text-center text-[13px] text-soil">
+            Nothing here yet.
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
-    <div className={cn("@container/table", className)}>
+    <div className={cn("@container/table min-w-0", className)}>
       {enableSelection && selectedRows.length > 0 && renderBulkActions ? (
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-soil/25 bg-console/5 px-4 py-2">
           <span className="text-[12.5px] font-semibold text-soil">
@@ -288,9 +320,14 @@ export function ConsoleDataTable<TData>({
                             {label}
                           </span>
                         ) : null}
+                        {/* BLOCK, not the default inline. Cell content is
+                            routinely a block element with a max-width; inside
+                            an inline parent its containing block is resolved
+                            somewhere further up, so the clamp missed and wide
+                            content ran straight off the side of the card. */}
                         <span
                           className={cn(
-                            "min-w-0 [overflow-wrap:anywhere] text-ink",
+                            "block min-w-0 [overflow-wrap:anywhere] text-ink",
                             label ? "text-right" : "w-full",
                           )}
                         >
@@ -394,7 +431,13 @@ export function ConsoleDataTable<TData>({
                     <TableCell
                       key={cell.id}
                       className={cn(
-                        "px-3 py-3 text-[13.5px] text-ink",
+                        // Two lines is the ceiling for ANY cell. A row is a
+                        // scan target, not a paragraph: let one cell run to
+                        // four lines and every row beside it inherits the
+                        // height, and the table stops being scannable. Cells
+                        // that want a single line clamp themselves; this is
+                        // the backstop for the ones that do not.
+                        "px-3 py-3 text-[13.5px] text-ink [&_p]:line-clamp-2",
                         cell.column.columnDef.meta?.className,
                       )}
                     >

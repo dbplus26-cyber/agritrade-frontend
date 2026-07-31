@@ -79,7 +79,7 @@ export function RejectNoteDialog({
         <form onSubmit={(e) => void submit(e)} className="grid gap-3.5">
           <AdminField label="Why (required)" error={errors.note?.message}>
             <textarea
-              rows={3}
+              rows={4}
               autoFocus
               placeholder="Say what should happen instead"
               className={cn(adminInputClass, "h-auto py-2 leading-[1.5]")}

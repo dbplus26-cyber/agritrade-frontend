@@ -17,6 +17,7 @@ import { useGetStockMovementsQuery } from "@/redux/stock/stock-api";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
 import { columnMeta, Absent } from "@/components/admin/registry/registry-bits";
+import { TextCell, TitleCell } from "@/components/admin/table-cells";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import type {
   IStockMovement,
@@ -80,27 +81,29 @@ export function StockMovements({
         header: "Entry",
         enableSorting: false,
         meta: columnMeta({ className: "py-2" }),
-        // The always-visible lead cell: commodity + warehouse on top, the
-        // type chip beneath.
+        // Commodity leads, its warehouse sits underneath as the quiet second
+        // line - the register convention. The two used to run together on one
+        // unbounded line, so a long commodity name and a long warehouse name
+        // between them decided how wide this table got.
         cell: ({ row }) => (
-          <div className="min-w-0">
-            <div className="truncate text-[13.5px] font-semibold text-ink">
-              {row.original.commodity.name}
-              <span className="ml-2 font-normal text-soil">
-                {row.original.warehouse.name}
-              </span>
-            </div>
-            <div className="mt-1 flex min-w-0 items-center gap-2">
-              <MoveTypeBadge type={row.original.type} />
-            </div>
-          </div>
+          <TitleCell
+            meta={row.original.warehouse.name}
+            title={row.original.commodity.name}
+          />
         ),
+      },
+      {
+        id: "type",
+        header: "Type",
+        enableSorting: false,
+        meta: columnMeta(),
+        cell: ({ row }) => <MoveTypeBadge type={row.original.type} />,
       },
       {
         id: "delta",
         header: "Change",
         enableSorting: false,
-        meta: columnMeta({ className: "text-right" }),
+        meta: columnMeta(),
         cell: ({ row }) => <SignedKg kg={row.original.deltaKg} />,
       },
       {
@@ -114,15 +117,14 @@ export function StockMovements({
         id: "reason",
         header: "Reason / source",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ at: "xl" }),
         cell: ({ row }) =>
           row.original.reason ? (
-            <span
-              className="block max-w-[280px] truncate text-soil"
-              title={row.original.reason}
-            >
-              {row.original.reason}
-            </span>
+            <TextCell
+              className="text-soil"
+              value={row.original.reason}
+              width="prose"
+            />
           ) : row.original.purchaseId ? (
             <Link
               href={`/admin/purchases/${row.original.purchaseId}`}

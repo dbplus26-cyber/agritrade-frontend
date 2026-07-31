@@ -299,7 +299,7 @@ function VoidDialog({
         >
           <AdminField label="Reason" error={errors.reason?.message}>
             <textarea
-              rows={2}
+              rows={4}
               placeholder="Why is this purchase being voided?"
               className={cn(
                 adminInputClass,

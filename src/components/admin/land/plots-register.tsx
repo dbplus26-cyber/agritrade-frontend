@@ -150,7 +150,7 @@ export function PlotsRegister() {
                     <PlotStatusBadge status={p.status} />
                   </span>
                 </div>
-                <div className="truncate text-[14px] font-semibold text-ink">
+                <div className="max-w-[22rem] truncate text-[14px] font-semibold text-ink">
                   {p.locationText}
                 </div>
                 <div className="mt-0.5 flex items-center justify-between text-[12.5px] text-soil">

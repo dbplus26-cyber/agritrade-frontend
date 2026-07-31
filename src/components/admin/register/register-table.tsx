@@ -54,7 +54,7 @@ function BodyCell({
         >
           {av.init}
         </span>
-        <span className="truncate font-medium text-ink">{text}</span>
+        <span className="block max-w-[20rem] truncate font-medium text-ink">{text}</span>
       </span>
     );
   }

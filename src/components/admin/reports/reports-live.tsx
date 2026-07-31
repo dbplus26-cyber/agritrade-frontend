@@ -64,7 +64,8 @@ function PlStatement({ window }: { window: IReportWindow }) {
   const s = profit.data?.data.summary;
   const cats = expenses.data?.data.byCategory ?? [];
 
-  const rowClass = "flex items-center justify-between py-1.5 text-[13.5px]";
+  const rowClass =
+    "flex items-baseline justify-between gap-3 py-1.5 text-[13.5px] [&>span:first-child]:min-w-0 [&>span:first-child]:line-clamp-2 [&>*:last-child]:flex-none [&>*:last-child]:whitespace-nowrap";
   return (
     <AdminCard className="px-5 py-4">
       <div className="mb-2 text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
@@ -142,28 +143,44 @@ function AgentPerformance({
         <p className="text-[13px] text-soil">No agent purchases in this period.</p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[420px] text-[13px]">
+          {/* Declared widths so the figures are never the columns that give
+              way: an agent name has no natural limit and, left to size
+              itself, took the whole row and wrapped every number beside it. */}
+          <table className="w-full min-w-[560px] table-fixed text-[13px]">
+            <colgroup>
+              <col className="w-[38%]" />
+              <col className="w-[4.5rem]" />
+              <col className="w-[7.5rem]" />
+              <col className="w-[7rem]" />
+              <col className="w-[9rem]" />
+            </colgroup>
             <thead>
               <tr className="text-left text-[11px] text-soil uppercase">
-                <th className="py-1.5">Agent</th>
-                <th className="py-1.5 text-right">Buys</th>
-                <th className="py-1.5 text-right">Weight</th>
-                <th className="py-1.5 text-right">Avg/kg</th>
-                <th className="py-1.5 text-right">Spent</th>
+                <th className="py-1.5 pr-3">Agent</th>
+                <th className="py-1.5 pr-3">Buys</th>
+                <th className="py-1.5 pr-3">Weight</th>
+                <th className="py-1.5 pr-3">Avg/kg</th>
+                <th className="py-1.5">Spent</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((r) => (
-                <tr key={r.agentName} className="border-t border-soil/10">
-                  <td className="py-1.5 text-ink">{r.agentName}</td>
-                  <td className="py-1.5 text-right text-soil">{r.purchases}</td>
-                  <td className="py-1.5 text-right text-soil">
+                <tr key={r.agentName} className="border-t border-soil/10 align-top">
+                  <td className="py-1.5 pr-3 text-ink">
+                    <span className="line-clamp-2" title={r.agentName}>
+                      {r.agentName}
+                    </span>
+                  </td>
+                  <td className="py-1.5 pr-3 whitespace-nowrap text-soil">
+                    {r.purchases}
+                  </td>
+                  <td className="py-1.5 pr-3 whitespace-nowrap text-soil">
                     {formatKg(r.weightKg)}
                   </td>
-                  <td className="py-1.5 text-right text-soil">
+                  <td className="py-1.5 pr-3 whitespace-nowrap text-soil">
                     <Money value={r.avgPriceGhs} />
                   </td>
-                  <td className="py-1.5 text-right text-ink">
+                  <td className="py-1.5 whitespace-nowrap text-ink">
                     <Money value={r.spentGhs} />
                   </td>
                 </tr>

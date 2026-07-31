@@ -86,7 +86,7 @@ export function LandAcquisitionsRegister() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <div className="min-w-0">
+          <div className="min-w-0 max-w-[21rem]">
             <Mono className="text-[12.5px] font-semibold text-console">
               {row.original.reference}
             </Mono>
@@ -100,7 +100,7 @@ export function LandAcquisitionsRegister() {
         id: "agreed",
         header: "Agreed cost",
         enableSorting: false,
-        meta: columnMeta({ className: "text-right", wide: true }),
+        meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
           <Mono className="whitespace-nowrap text-[12.5px] text-ink">
             <Money value={row.original.agreedCostGhs} />
@@ -111,7 +111,7 @@ export function LandAcquisitionsRegister() {
         id: "balance",
         header: "Balance",
         enableSorting: false,
-        meta: columnMeta({ className: "text-right" }),
+        meta: columnMeta(),
         cell: ({ row }) => {
           const b = row.original.balanceGhs;
           return (

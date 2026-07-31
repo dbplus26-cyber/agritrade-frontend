@@ -9,12 +9,14 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
 import { ConsoleFilterBar, ConsoleLabeledSelect } from "@/components/admin/filter-bar";
 import {
+  AdminButton,
   AdminCard,
   AdminField,
   AdminPageHeader,
   EditableFormActions,
   adminInputClass,
 } from "@/components/admin/ui";
+import { RecordFacts } from "@/components/admin/record-facts";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/button";
 import { ConsoleTableSkeleton, DetailSkeleton } from "@/components/admin/skeletons";
@@ -44,6 +46,11 @@ import {
   warehouseSchema,
   type WarehouseValues,
 } from "@/validations/registry-schema";
+import {
+  RailCard,
+  RailStatus,
+  RecordShell,
+} from "@/components/admin/record-shell";
 import { LifecycleActions } from "./lifecycle-actions";
 import { RecordTimestamps } from "./supplier-screens";
 import {
@@ -105,7 +112,7 @@ export function WarehouseTable() {
         cell: ({ row }) => (
           <Link
             href={`${LIST}/${row.original.id}`}
-            className="block truncate font-medium text-ink outline-none focus-visible:underline"
+            className="block max-w-[20rem] truncate font-medium text-ink outline-none focus-visible:underline"
             onClick={(e) => e.stopPropagation()}
           >
             {row.original.name}
@@ -120,7 +127,7 @@ export function WarehouseTable() {
         meta: columnMeta(),
         cell: ({ row }) =>
           row.original.location ? (
-            <span className="truncate text-soil">{row.original.location}</span>
+            <span className="block max-w-[17rem] truncate text-soil">{row.original.location}</span>
           ) : (
             <Absent />
           ),
@@ -313,6 +320,27 @@ function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
     }
   };
 
+  // At rest an existing record READS. The form is what you get after
+  // pressing Edit, not a greyed-out copy of the page you were already on.
+  if (isEdit && !isEditing && warehouse) {
+    return (
+      <AdminCard className="px-5 py-[18px]">
+        <RecordFacts
+          facts={[
+            { label: "Name", value: warehouse.name },
+            { label: "Location", value: warehouse.location },
+            { full: true, label: "Description", value: warehouse.description },
+          ]}
+        />
+        <div className="mt-4 flex justify-end">
+          <AdminButton onClick={() => setIsEditing(true)} type="button">
+            Edit warehouse
+          </AdminButton>
+        </div>
+      </AdminCard>
+    );
+  }
+
   return (
     <AdminCard className="px-5 py-[18px]">
       <form
@@ -350,7 +378,7 @@ function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
           error={errors.description?.message}
         >
           <textarea
-            rows={2}
+            rows={4}
             placeholder="What this warehouse holds and anything staff need to know"
             disabled={readOnly}
             className={cn(
@@ -498,27 +526,40 @@ export function WarehouseEdit({ id }: { id: string }) {
 
   const warehouse = data.data.warehouse;
   return (
-    <div className="max-w-[560px]">
-      <BackButton href={LIST} label="All warehouses" className="mb-2" />
-      <AdminPageHeader
-        title={warehouse.name}
-        sub="Warehouse record and current stock"
-      />
+    <RecordShell
+      backHref={LIST}
+      backLabel="All warehouses"
+      header={
+        <AdminPageHeader
+          title={warehouse.name}
+          sub="Warehouse record and current stock"
+        />
+      }
+      aside={
+        <>
+          <RailStatus isActive={warehouse.isActive} />
+          <RailCard title="Filed">
+            <RecordTimestamps
+              createdAt={warehouse.createdAt}
+              updatedAt={warehouse.updatedAt}
+            />
+          </RailCard>
+          <RailCard title="Lifecycle">
+            <LifecycleActions
+              noun="warehouse"
+              name={warehouse.name}
+              isActive={warehouse.isActive}
+              listHref={LIST}
+              onActivate={() => activate(id).unwrap()}
+              onDeactivate={() => deactivate(id).unwrap()}
+              onDelete={() => remove(id).unwrap()}
+            />
+          </RailCard>
+        </>
+      }
+    >
       <WarehouseFormFields warehouse={warehouse} />
-      <RecordTimestamps
-        createdAt={warehouse.createdAt}
-        updatedAt={warehouse.updatedAt}
-      />
       <WarehouseStockSection warehouseId={id} />
-      <LifecycleActions
-        noun="warehouse"
-        name={warehouse.name}
-        isActive={warehouse.isActive}
-        listHref={LIST}
-        onActivate={() => activate(id).unwrap()}
-        onDeactivate={() => deactivate(id).unwrap()}
-        onDelete={() => remove(id).unwrap()}
-      />
-    </div>
+    </RecordShell>
   );
 }

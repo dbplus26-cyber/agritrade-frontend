@@ -23,6 +23,7 @@ import { useMoneyVisibility } from "@/hooks/use-money-visibility";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis } from "@/lib/format-money";
 import { DateOnlyCell } from "@/components/admin/date-cell";
+import { TitleCell } from "@/components/admin/table-cells";
 import { env } from "@/lib/env";
 import { useGetExpensesQuery } from "@/redux/expenses/expenses-api";
 import { useGetExpenseCategoriesQuery } from "@/redux/expense-categories/expense-categories-api";
@@ -92,16 +93,15 @@ export function ExpensesRegister() {
         accessorFn: (r) => r.category.name,
         id: "category",
         header: "Category",
-        meta: { className: "px-4 text-[13px]" },
-      },
-      {
-        accessorFn: (r) => r.description ?? "",
-        id: "description",
-        header: "Description",
+        // What the money was for, with the voucher's own words underneath.
+        // The description had a column of its own and, being prose, was the
+        // column that decided how wide this table got.
         cell: ({ row }) => (
-          <span className="block max-w-[280px] truncate">
-            {row.original.description ?? "—"}
-          </span>
+          <TitleCell
+            meta={row.original.description}
+            title={row.original.category.name}
+            width="wide"
+          />
         ),
         meta: { className: "px-4 text-[13px]" },
       },
@@ -119,13 +119,13 @@ export function ExpensesRegister() {
         // td — `headerClassName` reaches only the header, which would hide the
         // heading while leaving its cells in place and shift every column after
         // it out of alignment.
-        meta: { className: "hidden px-4 text-[13px] @5xl/table:table-cell" },
+        meta: { className: "hidden px-4 text-[13px] 2xl:table-cell" },
       },
       {
         id: "actions",
         header: "",
         cell: ({ row }) => (
-          <div className="flex justify-end gap-1.5">
+          <div className="flex gap-1.5">
             <AdminButton
               type="button"
               variant="ghost"
@@ -149,7 +149,7 @@ export function ExpensesRegister() {
           </div>
         ),
         enableSorting: false,
-        meta: { className: "px-4 text-right" },
+        meta: { className: "px-4" },
       },
       ...(showMoney
         ? [
@@ -160,7 +160,7 @@ export function ExpensesRegister() {
               cell: ({ row }: { row: { original: IExpense } }) => (
                 <Mono>{formatCedis(row.original.amountGhs)}</Mono>
               ),
-              meta: { className: "px-4 text-right text-[13px]" },
+              meta: { className: "px-4 text-[13px]" },
             } as ColumnDef<IExpense, unknown>,
           ]
         : []),

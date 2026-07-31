@@ -657,7 +657,7 @@ function AdjustmentDialog({
 
           <AdminField label="Reason" error={errors.reason?.message}>
             <textarea
-              rows={3}
+              rows={4}
               placeholder="Why is this stock moving? e.g. moisture loss after re-drying"
               className={cn(adminInputClass, "h-auto py-2 leading-[1.5]")}
               {...register("reason")}

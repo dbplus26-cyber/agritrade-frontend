@@ -104,7 +104,7 @@ export function AgentsTable() {
                 name={`${a.firstName} ${a.lastName}`}
                 photoUrl={a.profilePicture}
               />
-              <span className="min-w-0">
+              <span className="block min-w-0 max-w-[20rem]">
                 <span className="block truncate font-medium text-ink">
                   {a.firstName} {a.lastName}
                 </span>
@@ -121,7 +121,7 @@ export function AgentsTable() {
         accessorFn: (a) => a.balanceGhs,
         header: "Float balance",
         enableSorting: false,
-        meta: columnMeta({ className: "text-right" }),
+        meta: columnMeta(),
         cell: ({ row }) => <BalanceCell amount={row.original.balanceGhs} />,
       },
       {

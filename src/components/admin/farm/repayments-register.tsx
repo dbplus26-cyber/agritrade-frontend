@@ -11,6 +11,7 @@ import {
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
+import { TextCell, TitleCell } from "@/components/admin/table-cells";
 import { AdminCard, Mono, ToneBadge } from "@/components/admin/ui";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { Button } from "@/components/ui/button";
@@ -88,40 +89,32 @@ export function RepaymentsRegister() {
         header: "Farmer",
         enableSorting: false,
         meta: columnMeta(),
+        // The season sits under the farmer rather than holding its own
+        // column: context for the row, not something anybody scans down.
         cell: ({ row }) => (
-          <div className="truncate font-semibold text-ink">
-            {row.original.farmer.name}
-          </div>
+          <TitleCell
+            meta={row.original.season.name}
+            title={row.original.farmer.name}
+          />
         ),
       },
       {
         id: "produce",
         header: "Produce",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ at: "lg" }),
         cell: ({ row }) => (
-          <span className="text-[12.5px] text-ink">
-            {row.original.commodity.name}
-            <span className="text-soil"> · {row.original.weightKg} kg</span>
-          </span>
-        ),
-      },
-      {
-        id: "season",
-        header: "Season",
-        enableSorting: false,
-        meta: columnMeta({ wide: true }),
-        cell: ({ row }) => (
-          <span className="text-[12.5px] text-soil">
-            {row.original.season.name}
-          </span>
+          <TextCell
+            value={`${row.original.commodity.name} · ${String(row.original.weightKg)} kg`}
+            width="label"
+          />
         ),
       },
       {
         id: "value",
         header: "Value",
         enableSorting: false,
-        meta: columnMeta({ className: "text-right" }),
+        meta: columnMeta(),
         cell: ({ row }) => (
           <Mono className="whitespace-nowrap text-[12.5px] text-leaf">
             <Money value={row.original.valueGhs} />
@@ -141,7 +134,7 @@ export function RepaymentsRegister() {
         enableSorting: false,
         // Container-queried hiding lives on `className` (th + td together);
         // headerClassName alone would desync the header from its cells.
-        meta: columnMeta({ className: "hidden @5xl/table:table-cell" }),
+        meta: columnMeta({ at: "2xl" }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {

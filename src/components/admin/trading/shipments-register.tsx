@@ -149,16 +149,26 @@ export function ShipmentsRegister() {
               href={`${LIST}/${sh.id}`}
               className="shadow-doc-sm rounded-none border-[1.5px] border-soil/30 bg-paper px-4 py-[15px] hover:border-soil/45"
             >
-              <div className="mb-[7px] flex items-center justify-between gap-2.5">
-                <Mono className="text-[13px] font-semibold text-console">
-                  {sh.truckReg}
-                </Mono>
-                <ShipmentStatusBadge status={sh.status} />
+              {/* The badge sits beside the TITLE and pins to its top edge.
+                  It used to ride on the truck-registration line, vertically
+                  centred - so on a card whose route wrapped to two lines the
+                  tag floated in the middle of the block instead of reading as
+                  the status OF that title. items-start keeps it level with the
+                  first line however many the title takes. */}
+              <div className="mb-[7px] flex items-start justify-between gap-2.5">
+                <div className="min-w-0">
+                  <Mono className="block text-[13px] font-semibold text-console">
+                    {sh.truckReg}
+                  </Mono>
+                  <div className="mt-[3px] line-clamp-2 text-[14.5px] font-semibold text-ink">
+                    {sh.originWarehouse.name} → {sh.destination}
+                  </div>
+                </div>
+                <span className="flex-none">
+                  <ShipmentStatusBadge status={sh.status} />
+                </span>
               </div>
-              <div className="text-[14.5px] font-semibold text-ink">
-                {sh.originWarehouse.name} → {sh.destination}
-              </div>
-              <div className="mt-[3px] min-w-0 text-[12.5px] text-soil line-clamp-1 whitespace-normal [overflow-wrap:anywhere]">
+              <div className="mt-[3px] line-clamp-2 min-w-0 text-[12.5px] text-soil">
                 {sh.salesCount > 1
                   ? `${String(sh.salesCount)} sales · ${sh.sales
                       .map((sale) => sale.buyer.name)

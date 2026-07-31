@@ -12,12 +12,19 @@ import {
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
 import {
+  AdminButton,
   AdminCard,
   AdminField,
   AdminPageHeader,
   EditableFormActions,
   adminInputClass,
 } from "@/components/admin/ui";
+import { RecordFacts } from "@/components/admin/record-facts";
+import {
+  RailCard,
+  RailStatus,
+  RecordShell,
+} from "@/components/admin/record-shell";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/button";
 import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons";
@@ -134,7 +141,7 @@ export function PaymentAccountTable() {
           return (
             <Link
               href={`${LIST}/${a.id}`}
-              className="block min-w-0 outline-none focus-visible:underline"
+              className="block min-w-[9rem] max-w-[22rem] outline-none focus-visible:underline"
               onClick={(e) => e.stopPropagation()}
             >
               <span className="block truncate font-medium text-ink">
@@ -170,7 +177,7 @@ export function PaymentAccountTable() {
           const where = a.bankName ?? a.provider;
           if (!where) return <Absent />;
           return (
-            <span className="block min-w-0">
+            <span className="block min-w-[8rem] max-w-[20rem]">
               <span className="block truncate text-[12.5px] text-ink">
                 {where}
               </span>
@@ -430,6 +437,39 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
     }
   };
 
+  // At rest an existing record READS. The form is what you get after
+  // pressing Edit, not a greyed-out copy of the page you were already on.
+  if (isEdit && !isEditing && account) {
+    return (
+      <AdminCard className="px-5 py-[18px]">
+        <RecordFacts
+          facts={[
+            { label: "Label", value: account.label },
+            { label: "Kind", value: account.kind },
+            { label: "Account name", value: account.accountName },
+            { label: "Account number", mono: true, value: account.accountNumber },
+            { label: "Bank", value: account.bankName },
+            { label: "Branch", value: account.branch },
+            { label: "Sort code", mono: true, value: account.sortCode },
+            { label: "SWIFT", mono: true, value: account.swiftCode },
+            { label: "Network", value: account.provider },
+            { label: "Order", value: String(account.sortOrder) },
+            {
+              label: "On invoices",
+              value: account.showOnInvoice ? "Printed" : "Internal only",
+            },
+            { full: true, label: "Instructions", value: account.instructions },
+          ]}
+        />
+        <div className="mt-4 flex justify-end">
+          <AdminButton onClick={() => setIsEditing(true)} type="button">
+            Edit account
+          </AdminButton>
+        </div>
+      </AdminCard>
+    );
+  }
+
   return (
     <AdminCard className="px-5 py-[18px]">
       <form
@@ -600,7 +640,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
           error={errors.instructions?.message}
         >
           <textarea
-            rows={2}
+            rows={4}
             placeholder="e.g. Transfers only, no cash deposits at the counter."
             disabled={readOnly}
             className={cn(
@@ -712,32 +752,41 @@ export function PaymentAccountEdit({ id }: { id: string }) {
 
   const account = data.data.account;
   return (
-    <div className="max-w-[560px]">
-      {/* Back to the account's detail page (facts + movement history), not
-          the register - editing is reached from there. */}
-      <BackButton
-        href={`${LIST}/${id}`}
-        label="Account details"
-        className="mb-2"
-      />
-      <AdminPageHeader
-        title={account.label}
-        sub="Edit the account and whether customers are shown it"
-      />
+    // Back to the account's detail page (facts + movement history), not the
+    // register - editing is reached from there.
+    <RecordShell
+      backHref={`${LIST}/${id}`}
+      backLabel="Account details"
+      header={
+        <AdminPageHeader
+          title={account.label}
+          sub="Payment account record"
+        />
+      }
+      aside={
+        <>
+          <RailStatus isActive={account.isActive} />
+          <RailCard title="Filed">
+            <RecordTimestamps
+              createdAt={account.createdAt}
+              updatedAt={account.updatedAt}
+            />
+          </RailCard>
+          <RailCard title="Lifecycle">
+            <LifecycleActions
+              noun="payment account"
+              name={account.label}
+              isActive={account.isActive}
+              listHref={LIST}
+              onActivate={() => activate(id).unwrap()}
+              onDeactivate={() => deactivate(id).unwrap()}
+              onDelete={() => remove(id).unwrap()}
+            />
+          </RailCard>
+        </>
+      }
+    >
       <PaymentAccountFormFields key={account.updatedAt} account={account} />
-      <RecordTimestamps
-        createdAt={account.createdAt}
-        updatedAt={account.updatedAt}
-      />
-      <LifecycleActions
-        noun="payment account"
-        name={account.label}
-        isActive={account.isActive}
-        listHref={LIST}
-        onActivate={() => activate(id).unwrap()}
-        onDeactivate={() => deactivate(id).unwrap()}
-        onDelete={() => remove(id).unwrap()}
-      />
-    </div>
+    </RecordShell>
   );
 }

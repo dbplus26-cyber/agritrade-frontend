@@ -47,7 +47,13 @@ export function ConsoleLabeledSelect({
       <SelectTrigger
         aria-label={`Filter by ${label.toLowerCase()}`}
         className={cn(
-          "h-8 w-full min-w-0 cursor-pointer rounded-[2px] border-[1.5px] bg-paper px-2.5 text-[13px] font-normal text-soil shadow-none transition-colors focus:ring-0 focus-visible:ring-0 data-[state=open]:border-console",
+          // Full width on a phone, where filters stack; a fixed 150px from
+          // lg up, where they sit in a row. Without the lg cap a filter bar
+          // stretches its selects across the whole console - which is what
+          // the floats register looked like, and nothing else did. It is a
+          // DEFAULT rather than each caller's job to remember: twMerge lets
+          // `className` override it where a filter genuinely needs more room.
+          "h-8 w-full min-w-0 cursor-pointer rounded-[2px] border-[1.5px] bg-paper px-2.5 text-[13px] font-normal text-soil shadow-none transition-colors focus:ring-0 focus-visible:ring-0 lg:w-[150px] data-[state=open]:border-console",
           active ? "border-console/60" : "border-soil/30",
           className,
         )}

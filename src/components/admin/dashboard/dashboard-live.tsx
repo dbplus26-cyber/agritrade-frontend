@@ -85,16 +85,24 @@ function AgentFloatsCard() {
         <p className="text-[13px] text-soil">No active agents.</p>
       ) : (
         agents.map((a) => (
+          // The FIGURE is what this list is for, so it is the part that
+          // never gives way: flex-none and no wrapping. The name takes what
+          // is left and truncates. Before, both sides could shrink and the
+          // name - being longer - won, squeezing the amount until it wrapped
+          // its currency symbol onto a line of its own.
           <div
             key={a.userId}
-            className="flex items-center justify-between border-b border-soil/10 py-1.5 text-[13px] last:border-b-0"
+            className="flex items-baseline justify-between gap-3 border-b border-soil/10 py-1.5 text-[13px] last:border-b-0"
           >
-            <span className="truncate text-ink">
+            <span
+              className="min-w-0 truncate text-ink"
+              title={`${a.firstName} ${a.lastName}`}
+            >
               {a.firstName} {a.lastName}
             </span>
             <Mono
               className={cn(
-                "font-semibold",
+                "flex-none font-semibold whitespace-nowrap",
                 a.balanceGhs !== null && a.balanceGhs < 0
                   ? "text-console-red"
                   : "text-ink",

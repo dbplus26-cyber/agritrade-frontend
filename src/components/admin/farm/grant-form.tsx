@@ -217,7 +217,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
             error={errors.agreedTerms?.message}
           >
             <textarea
-              rows={2}
+              rows={4}
               placeholder="e.g. 50 bags of maize at harvest, or cash by 30 Nov"
               className={cn(
                 adminInputClass,

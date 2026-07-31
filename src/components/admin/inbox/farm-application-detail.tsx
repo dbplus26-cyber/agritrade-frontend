@@ -55,9 +55,14 @@ function SectionCard({
       <p className="stencil text-[11px] uppercase tracking-[0.14em] text-soil">
         {title}
       </p>
-      <DetailGrid columns={3} className="mt-1.5">
+      {/* auto-fit with a real floor, not a fixed 3 columns. A rigid
+          three-column grid gave every field the same narrow slot, so a long
+          free-text answer - previous experience, items needed - became a
+          400px-tall ribbon of text with two empty columns sitting beside it.
+          Short facts now share a row; prose takes the whole width. */}
+      <div className="mt-1.5 grid grid-cols-[repeat(auto-fit,minmax(min(100%,14rem),1fr))] gap-x-8">
         {children}
-      </DetailGrid>
+      </div>
     </AdminCard>
   );
 }
@@ -169,7 +174,7 @@ function FarmApplicationDetailBody({
                   {application.phone}
                 </a>
               </DetailItem>
-              <DetailItem label="Email">
+              <DetailItem className="col-span-full" label="Email">
                 {application.email ? (
                   <a
                     href={`mailto:${application.email}`}
@@ -184,7 +189,7 @@ function FarmApplicationDetailBody({
               <DetailItem label="Community">
                 {orAbsent(application.community)}
               </DetailItem>
-              <DetailItem label="Address">
+              <DetailItem className="col-span-full" label="Address">
                 {orAbsent(application.address)}
               </DetailItem>
             </SectionCard>
@@ -200,16 +205,16 @@ function FarmApplicationDetailBody({
                   <Absent />
                 )}
               </DetailItem>
-              <DetailItem label="Crops">
+              <DetailItem className="col-span-full" label="Crops">
                 {orAbsent(application.crops)}
               </DetailItem>
-              <DetailItem label="Previous experience">
+              <DetailItem className="col-span-full" label="Previous experience">
                 {orAbsent(application.previousExperience)}
               </DetailItem>
             </SectionCard>
 
             <SectionCard title="Request">
-              <DetailItem label="Items needed">
+              <DetailItem className="col-span-full" label="Items needed">
                 {orAbsent(application.itemsNeeded)}
               </DetailItem>
               <DetailItem label="Expected yield" mono>
@@ -302,7 +307,7 @@ function FarmApplicationDetailBody({
                     placeholder="Site visit findings, guarantor checks…"
                     className={cn(
                       adminInputClass,
-                      "h-auto min-h-[96px] w-full resize-y py-2",
+                      "h-auto min-h-[112px] w-full resize-y py-2",
                     )}
                   />
                 </AdminField>

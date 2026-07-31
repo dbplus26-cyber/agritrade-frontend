@@ -10,6 +10,7 @@ import {
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
 import { Absent, columnMeta } from "@/components/admin/registry/registry-bits";
+import { TitleCell } from "@/components/admin/table-cells";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import { AdminCard } from "@/components/admin/ui";
 import { Button } from "@/components/ui/button";
@@ -65,15 +66,17 @@ export function InputItemsRegister() {
         header: "Item",
         enableSorting: false,
         meta: columnMeta(),
-        // Real anchor — keyboard, middle-click and open-in-new-tab.
+        // The description rides underneath rather than holding a column of
+        // its own. Prose has no natural width, so given a column it is always
+        // the one that pushes the table off the side of the screen; under the
+        // name it is subordinate in the layout as well as the reading order.
         cell: ({ row }) => (
-          <Link
+          <TitleCell
             href={`${LIST}/${row.original.id}/edit`}
-            className="block font-semibold text-ink outline-none focus-visible:underline"
-            onClick={(e) => { e.stopPropagation(); }}
-          >
-            {row.original.name}
-          </Link>
+            meta={row.original.description}
+            title={row.original.name}
+            width="wide"
+          />
         ),
       },
       {
@@ -84,29 +87,6 @@ export function InputItemsRegister() {
         cell: ({ row }) => (
           <span className="text-[12.5px] text-soil">{row.original.unitLabel}</span>
         ),
-      },
-      {
-        id: "description",
-        // An accessor (not just a cell) so the mobile card drops the row
-        // entirely when there is no description, rather than printing a
-        // "DESCRIPTION —" placeholder on every phone row.
-        accessorFn: (i) => i.description ?? "",
-        header: "What it is",
-        enableSorting: false,
-        // `wide` hides it below xl: on a narrow console the name and unit are
-        // what a register is scanned by, and prose would squeeze them out.
-        meta: columnMeta({ wide: true }),
-        cell: ({ row }) =>
-          row.original.description ? (
-            <span
-              className="block max-w-[280px] truncate text-[12.5px] text-soil"
-              title={row.original.description}
-            >
-              {row.original.description}
-            </span>
-          ) : (
-            <Absent />
-          ),
       },
       {
         id: "added",

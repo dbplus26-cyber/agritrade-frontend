@@ -70,9 +70,16 @@ export function VolumeChart({ window }: { window: IReportWindow }) {
   );
 
   const legend = (
-    <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+    // Each entry capped so one long commodity name cannot claim the whole
+    // legend and push the rest onto their own lines.
+    <span className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1">
       {commodities.map((c, i) => (
-        <LegendItem key={c.id} color={colorFor(i)} label={c.name} />
+        <LegendItem
+          className="max-w-[21rem]"
+          color={colorFor(i)}
+          key={c.id}
+          label={c.name}
+        />
       ))}
     </span>
   );

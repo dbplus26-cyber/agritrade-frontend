@@ -126,7 +126,7 @@ export function StocktakesScreen() {
         header: "Lines",
         accessorFn: (s) => s.lines.length,
         enableSorting: false,
-        meta: columnMeta({ className: "text-right" }),
+        meta: columnMeta(),
         cell: ({ row }) => (
           <Mono className="text-[12.5px] text-ink">
             {row.original.lines.length}

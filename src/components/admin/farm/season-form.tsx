@@ -11,6 +11,7 @@ import {
   AdminPageHeader,
   adminInputClass,
 } from "@/components/admin/ui";
+import { RecordFacts } from "@/components/admin/record-facts";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -108,6 +109,38 @@ export function SeasonForm({
     }
   };
 
+  // At rest an existing record READS; the form appears only on Edit.
+  if (season && !isEditing) {
+    return (
+      <div className="max-w-[520px]">
+        <BackButton href={LIST} label="All seasons" className="mb-2" />
+        <AdminPageHeader
+          title={season.name}
+          sub="The planting season that grants and repayments are booked against"
+        />
+        <AdminCard className="px-5 py-4">
+          <RecordFacts
+            facts={[
+              { label: "Name", value: season.name },
+              { label: "Starts on", value: season.startsOn.slice(0, 10) },
+              { label: "Ends on", value: season.endsOn?.slice(0, 10) ?? null },
+              {
+                full: true,
+                label: "Description",
+                value: season.description,
+              },
+            ]}
+          />
+          <div className="mt-4 flex justify-end">
+            <AdminButton onClick={() => setIsEditing(true)} type="button">
+              Edit season
+            </AdminButton>
+          </div>
+        </AdminCard>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-[520px]">
       <BackButton href={LIST} label="All seasons" className="mb-2" />
@@ -135,7 +168,7 @@ export function SeasonForm({
             error={errors.description?.message}
           >
             <textarea
-              rows={2}
+              rows={4}
               placeholder="What this season covers"
               disabled={readOnly}
               className={cn(

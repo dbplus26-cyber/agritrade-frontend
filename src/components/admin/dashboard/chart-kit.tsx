@@ -54,11 +54,19 @@ export function CardHeader({
   title: string;
 }) {
   return (
-    <div className="mb-3 flex items-center justify-between gap-2">
-      <span className="text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
+    // The heading never wraps and never shrinks; whatever sits on the right
+    // (a legend, a link) takes the room that is left and wraps there instead.
+    // Previously both sides could shrink, so a long legend squeezed "Volume
+    // bought (t)" into a three-line column - the heading, the one fixed thing
+    // on the card, was the piece being pushed around.
+    //
+    // items-start, not centre: when the right-hand side wraps to two or three
+    // lines, centring drags the heading down to float in the middle of them.
+    <div className="mb-3 flex items-start justify-between gap-3">
+      <span className="flex-none pt-px text-[10.5px] font-bold tracking-[0.09em] text-soil uppercase">
         {title}
       </span>
-      {right}
+      {right ? <span className="min-w-0 text-right">{right}</span> : null}
     </div>
   );
 }
@@ -85,22 +93,30 @@ export function WidgetCard({
 
 /** A legend dot + label + optional trailing value, reused across widgets. */
 export function LegendItem({
+  className,
   color,
   label,
   value,
 }: {
+  className?: string;
   color: string;
   label: string;
   value?: React.ReactNode;
 }) {
   return (
-    <span className="flex items-center gap-1.5 text-[11.5px] text-soil">
+    // min-w-0 on BOTH the row and the label. A flex item defaults to
+    // `min-width: auto`, meaning it refuses to shrink below its content - so
+    // `truncate` on the label had nothing to clamp against and a long
+    // commodity name ran straight out past the card's edge.
+    <span className={cn("flex min-w-0 items-center gap-1.5 text-[11.5px] text-soil", className)}>
       <span
         aria-hidden="true"
         className="h-2 w-2 flex-none rounded-full"
         style={{ background: color }}
       />
-      <span className="truncate">{label}</span>
+      <span className="min-w-0 truncate" title={label}>
+        {label}
+      </span>
       {value !== undefined ? (
         <span className="font-semibold text-ink">{value}</span>
       ) : null}

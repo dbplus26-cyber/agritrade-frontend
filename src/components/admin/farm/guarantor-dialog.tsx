@@ -196,7 +196,7 @@ export function GuarantorDialog({
           </div>
           <AdminField label="Address" optional error={errors.address?.message}>
             <textarea
-              rows={2}
+              rows={4}
               className={cn(
                 adminInputClass,
                 "h-auto min-h-[60px] w-full resize-y py-2",

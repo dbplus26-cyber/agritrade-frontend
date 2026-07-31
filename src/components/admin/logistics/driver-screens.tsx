@@ -20,6 +20,7 @@ import {
   EditableFormActions,
   adminInputClass,
 } from "@/components/admin/ui";
+import { RecordFacts } from "@/components/admin/record-facts";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/button";
 import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons";
@@ -44,6 +45,11 @@ import { optimizeImage } from "@/lib/optimize-image";
 import { cn } from "@/lib/utils";
 import type { IDriver, IDriverListQuery } from "@/types/logistics.types";
 import { driverSchema, type DriverValues } from "@/validations/logistics-schema";
+import {
+  RailCard,
+  RailStatus,
+  RecordShell,
+} from "@/components/admin/record-shell";
 import { LifecycleActions } from "@/components/admin/registry/lifecycle-actions";
 import {
   Absent,
@@ -53,6 +59,7 @@ import {
   statusToQuery,
   type StatusFilter,
 } from "@/components/admin/registry/registry-bits";
+import { TextCell } from "@/components/admin/table-cells";
 import {
   RecordTimestamps,
   RegistryAvatar,
@@ -117,7 +124,7 @@ export function DriverTable() {
               onClick={(e) => e.stopPropagation()}
             >
               <RegistryAvatar name={d.name} photoUrl={d.photoUrl} />
-              <span className="min-w-0">
+              <span className="block min-w-0 max-w-[20rem]">
                 <span className="block truncate font-medium text-ink">
                   {d.name}
                 </span>
@@ -134,7 +141,7 @@ export function DriverTable() {
         accessorFn: (d) => d.phone,
         header: "Phone",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ at: "lg" }),
         cell: ({ row }) => (
           <span className="font-adminmono whitespace-nowrap text-[12.5px] text-soil">
             {row.original.phone}
@@ -146,12 +153,10 @@ export function DriverTable() {
         accessorFn: (d) => d.city ?? "",
         header: "City",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ at: "xl" }),
         cell: ({ row }) =>
           row.original.city ? (
-            <span className="whitespace-nowrap text-soil">
-              {row.original.city}
-            </span>
+            <TextCell className="text-soil" value={row.original.city} width="label" />
           ) : (
             <Absent />
           ),
@@ -161,7 +166,7 @@ export function DriverTable() {
         accessorFn: (d) => d.createdAt,
         header: "Added",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ at: "2xl" }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
@@ -401,6 +406,32 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
     }
   };
 
+  // At rest an existing record READS. The form is what you get after
+  // pressing Edit, not a greyed-out copy of the page you were already on.
+  if (isEdit && !isEditing && driver) {
+    return (
+      <AdminCard className="px-5 py-[18px]">
+        <RecordFacts
+          facts={[
+            { label: "Name", value: driver.name },
+            { mono: true, label: "Phone", value: driver.phone },
+            { label: "Email", value: driver.email },
+            { label: "Company", value: driver.company },
+            { label: "City", value: driver.city },
+            { mono: true, label: "Licence no", value: driver.licenseNo },
+            { mono: true, label: "ID number", value: driver.idNumber },
+            { full: true, label: "Notes", value: driver.notes },
+          ]}
+        />
+        <div className="mt-4 flex justify-end">
+          <AdminButton onClick={() => setIsEditing(true)} type="button">
+            Edit driver
+          </AdminButton>
+        </div>
+      </AdminCard>
+    );
+  }
+
   return (
     <AdminCard className="px-5 py-[18px]">
       <form
@@ -568,13 +599,13 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
         </div>
         <AdminField label="Notes" optional error={errors.notes?.message}>
           <textarea
-            rows={3}
+            rows={4}
             placeholder="Anything worth remembering about this driver."
             disabled={readOnly}
             className={cn(
               adminInputClass,
               roCls,
-              "h-auto min-h-[76px] w-full resize-y py-2",
+              "h-auto min-h-[104px] w-full resize-y py-2",
               errors.notes && "border-error",
             )}
             {...register("notes")}
@@ -603,14 +634,15 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
 
 export function DriverCreate() {
   return (
-    <div className="max-w-[560px]">
-      <BackButton href={LIST} label="All drivers" className="mb-2" />
-      <AdminPageHeader
-        title="Add driver"
-        sub="A driver shipments can pull their trip details from"
-      />
+    <RecordShell
+      backHref={LIST}
+      backLabel="All drivers"
+      header={
+        <AdminPageHeader title="Add driver" sub="A trucker the shipments module can pick from" />
+      }
+    >
       <DriverFormFields />
-    </div>
+    </RecordShell>
   );
 }
 
@@ -621,36 +653,47 @@ export function DriverEdit({ id }: { id: string }) {
   const [remove] = useDeleteDriverMutation();
 
   if (isLoading) return <FormSkeleton fields={6} />;
-  if (isError || !data)
+  if (isError || !data) {
     return (
       <ErrorMessage
         description={extractApiError(error).message}
         onRetry={() => void refetch()}
       />
     );
+  }
 
   const driver = data.data.driver;
   return (
-    <div className="max-w-[560px]">
-      <BackButton href={LIST} label="All drivers" className="mb-2" />
-      <AdminPageHeader
-        title={driver.name}
-        sub="Edit the driver and their lifecycle"
-      />
+    <RecordShell
+      backHref={LIST}
+      backLabel="All drivers"
+      header={
+        <AdminPageHeader title={driver.name} sub="Driver record" />
+      }
+      aside={
+        <>
+          <RailStatus isActive={driver.isActive} />
+          <RailCard title="Filed">
+            <RecordTimestamps
+              createdAt={driver.createdAt}
+              updatedAt={driver.updatedAt}
+            />
+          </RailCard>
+          <RailCard title="Lifecycle">
+            <LifecycleActions
+              noun="driver"
+              name={driver.name}
+              isActive={driver.isActive}
+              listHref={LIST}
+              onActivate={() => activate(id).unwrap()}
+              onDeactivate={() => deactivate(id).unwrap()}
+              onDelete={() => remove(id).unwrap()}
+            />
+          </RailCard>
+        </>
+      }
+    >
       <DriverFormFields key={driver.updatedAt} driver={driver} />
-      <RecordTimestamps
-        createdAt={driver.createdAt}
-        updatedAt={driver.updatedAt}
-      />
-      <LifecycleActions
-        noun="driver"
-        name={driver.name}
-        isActive={driver.isActive}
-        listHref={LIST}
-        onActivate={() => activate(id).unwrap()}
-        onDeactivate={() => deactivate(id).unwrap()}
-        onDelete={() => remove(id).unwrap()}
-      />
-    </div>
+    </RecordShell>
   );
 }

@@ -294,20 +294,42 @@ function PolicyCard({ policy }: { policy: IPaymentPolicy }) {
 
   return (
     <AdminCard className="px-4 py-3">
-      <div className="mb-1.5 flex flex-wrap items-center gap-2">
-        <span className="text-[14px] font-bold text-ink">{policy.name}</span>
-        {policy.isDefault ? <ToneBadge tone="forest">Default</ToneBadge> : null}
-        {policy.isActive ? null : <ToneBadge tone="slate">Inactive</ToneBadge>}
+      {/* The tag pins to the top of the title, not its vertical middle - a
+          policy name here routinely runs to three lines. */}
+      <div className="mb-2 flex items-start justify-between gap-2">
+        <span className="line-clamp-2 text-[14px] font-bold text-ink">
+          {policy.name}
+        </span>
+        <span className="flex flex-none gap-1.5">
+          {policy.isDefault ? (
+            <ToneBadge tone="forest">Default</ToneBadge>
+          ) : null}
+          {policy.isActive ? null : (
+            <ToneBadge tone="slate">Inactive</ToneBadge>
+          )}
+        </span>
       </div>
-      <div className="flex flex-col gap-0.5">
+      {/* The SCHEDULE is what a policy is, so it is set as one: the share
+          leads each row at figure weight, the trigger explains it beneath.
+          Previously the share and its trigger shared one truncating line and
+          the percentage - the single number that matters - was the part being
+          cut off ("80% ·…"). */}
+      <div className="flex flex-col divide-y divide-soil/10 border-y border-soil/10">
         {policy.milestones.map((m, i) => (
           <div
             key={`${m.label}-${String(i)}`}
-            className="flex items-baseline justify-between gap-2 text-[12.5px]"
+            className="flex items-baseline gap-3 py-1.5"
           >
-            <span className="truncate text-ink">{m.label}</span>
-            <span className="whitespace-nowrap text-soil">
-              {m.percent}% · {milestoneTriggerLabel(m.trigger)}
+            <span className="font-adminmono w-[3.25rem] flex-none text-[13.5px] font-bold text-console tabular-nums">
+              {m.percent}%
+            </span>
+            <span className="min-w-0">
+              <span className="block truncate text-[12.5px] text-ink">
+                {m.label}
+              </span>
+              <span className="block truncate text-[11.5px] text-soil">
+                {milestoneTriggerLabel(m.trigger)}
+              </span>
             </span>
           </div>
         ))}
@@ -388,7 +410,7 @@ export function PaymentPoliciesScreen() {
           onAction={() => setCreateOpen(true)}
         />
       ) : (
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="grid items-start gap-3 md:grid-cols-2 xl:grid-cols-3">
           {policies.map((p) => (
             <PolicyCard key={p.id} policy={p} />
           ))}

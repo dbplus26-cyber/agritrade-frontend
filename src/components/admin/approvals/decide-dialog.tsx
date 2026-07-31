@@ -150,7 +150,7 @@ export function DecideDialog({
             error={errors.note?.message}
           >
             <textarea
-              rows={3}
+              rows={4}
               placeholder={
                 isReject
                   ? "The requester sees this - say what should happen instead"
