@@ -1,5 +1,6 @@
 import { CACHE_TAGS } from "@/config/cache-tags";
 import { env } from "@/lib/env";
+import { slugify } from "@/lib/slug";
 
 /**
  * The live plot register behind /land, fetched from the real backend under the
@@ -36,6 +37,17 @@ export interface PublicLandPlot {
   status: PublicPlotStatus;
   photo: string | null;
   photoAlt: string | null;
+  /**
+   * Every published photo of the plot, in register order - a buyer judging
+   * land wants the frontage, the access road and the survey pillar. `photo`
+   * is simply the first of these, kept for the summary cards.
+   */
+  photos?: { alt: string | null; url: string }[];
+}
+
+/** URL key for a plot's page: its register reference, e.g. "tml-014". */
+export function plotSlug(plot: PublicLandPlot): string {
+  return slugify(plot.reference);
 }
 
 /** Fetches the published plots, or null when the API is unreachable. */

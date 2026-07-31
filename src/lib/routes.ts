@@ -4,7 +4,11 @@ export const routes = {
   about: "/about",
   contact: "/contact",
   commodities: "/commodities",
+  /** One commodity's page, keyed by its (unique) name. */
+  commodity: (slug: string) => `/commodities/${slug}`,
   land: "/land",
+  /** One plot's page, keyed by its (unique) register reference. */
+  plot: (slug: string) => `/land/${slug}`,
   farmingInvestment: "/farming-investment",
   farmingApply: "/farming-investment/apply",
   reviews: "/reviews",

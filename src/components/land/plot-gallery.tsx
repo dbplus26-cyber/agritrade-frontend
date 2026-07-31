@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Photo, PhotoFallback } from "@/components/ui/Photo";
+import { cn } from "@/lib/utils";
 
 export interface PlotPhoto {
   alt: null | string;
@@ -19,9 +20,12 @@ export interface PlotPhoto {
  * exactly as before: no controls, no count.
  */
 export function PlotGallery({
+  className,
   fallbackAlt,
   photos,
 }: {
+  /** Frame height override - the detail page gives its gallery more room. */
+  className?: string;
   /** Used when a photo has no alt text of its own. */
   fallbackAlt: string;
   photos: PlotPhoto[];
@@ -48,7 +52,10 @@ export function PlotGallery({
 
   return (
     <div
-      className="relative h-[180px] border-b-[1.5px] border-soil/50 sm:h-[210px]"
+      className={cn(
+        "relative h-[180px] border-b-[1.5px] border-soil/50 sm:h-[210px]",
+        className,
+      )}
       onTouchStart={(e) => {
         setTouchX(e.touches[0]?.clientX ?? null);
       }}

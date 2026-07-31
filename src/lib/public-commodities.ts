@@ -1,5 +1,6 @@
 import { CACHE_TAGS } from "@/config/cache-tags";
 import { env } from "@/lib/env";
+import { slugify } from "@/lib/slug";
 import type { CommodityLine } from "@/static-data/availability";
 
 /**
@@ -60,6 +61,7 @@ export function toBoardLines(
   return commodities.map((c) => ({
     name: c.name,
     available: c.available,
+    slug: slugify(c.name),
     meta:
       [c.variety, c.qualityGrade].filter(Boolean).join(" · ") ||
       "Call for today's position",
@@ -80,6 +82,8 @@ export interface PublicLot {
   name: string;
   /** Register position, e.g. "LOT-01". */
   lotNo: string;
+  /** URL key for this commodity's page, from its (unique) name. */
+  slug: string;
   /** Uppercased name, used as the decorative ghost watermark. */
   ghost: string;
   variety: null | string;
@@ -105,6 +109,7 @@ export function toLots(commodities: PublicCommodity[] | null): PublicLot[] {
     // Lot numbers follow the live feed's order, so they stay stable for a
     // given register and never collide.
     lotNo: `LOT-${String(i + 1).padStart(2, "0")}`,
+    slug: slugify(c.name),
     ghost: c.name.toUpperCase(),
     variety: c.variety,
     qualityGrade: c.qualityGrade,
