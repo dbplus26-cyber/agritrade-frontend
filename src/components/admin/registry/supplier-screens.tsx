@@ -52,7 +52,7 @@ import { formatDateTime } from "@/lib/format-date";
 import { notify } from "@/lib/notify";
 import { optimizeImage } from "@/lib/optimize-image";
 import { cn } from "@/lib/utils";
-import { avatarOf } from "@/static-data/admin/registers";
+import { avatarOf } from "@/lib/avatar";
 import {
   PurchaseSource,
   type ISupplier,

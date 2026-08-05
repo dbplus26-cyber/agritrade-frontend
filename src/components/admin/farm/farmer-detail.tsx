@@ -31,7 +31,7 @@ import {
 } from "@/redux/farm/farmers-api";
 import { useGetGrantsQuery } from "@/redux/farm/grants-api";
 import { useGetRepaymentsQuery } from "@/redux/farm/repayments-api";
-import { avatarOf } from "@/static-data/admin/registers";
+import { avatarOf } from "@/lib/avatar";
 import type { IFarmerGuarantor } from "@/types/farm.types";
 import {
   ActiveBadge,

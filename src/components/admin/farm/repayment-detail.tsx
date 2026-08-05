@@ -23,7 +23,7 @@ import {
   useGetRepaymentQuery,
   useRemoveRepaymentDocumentMutation,
 } from "@/redux/farm/repayments-api";
-import { avatarOf } from "@/static-data/admin/registers";
+import { avatarOf } from "@/lib/avatar";
 import { FarmDocumentsSection } from "./farm-bits";
 
 const LIST = "/admin/repayments";

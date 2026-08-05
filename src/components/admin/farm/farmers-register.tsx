@@ -19,7 +19,7 @@ import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import { useGetFarmersQuery } from "@/redux/farm/farmers-api";
-import { avatarOf } from "@/static-data/admin/registers";
+import { avatarOf } from "@/lib/avatar";
 import type { IFarmer, IFarmerListQuery } from "@/types/farm.types";
 import { ACTIVE_FILTER_OPTIONS, ActiveBadge } from "./farm-bits";
 

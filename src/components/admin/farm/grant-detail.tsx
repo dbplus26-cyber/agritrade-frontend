@@ -20,7 +20,7 @@ import {
   useGetGrantQuery,
   useRemoveGrantDocumentMutation,
 } from "@/redux/farm/grants-api";
-import { avatarOf } from "@/static-data/admin/registers";
+import { avatarOf } from "@/lib/avatar";
 import { FarmDocumentsSection, GrantApprovalBadge } from "./farm-bits";
 
 const LIST = "/admin/grants";
