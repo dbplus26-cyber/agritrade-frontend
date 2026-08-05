@@ -415,7 +415,7 @@ export function FarmerDetail({ id }: { id: string }) {
                           <span className="font-semibold text-adm-ink">
                             {r.commodity.name}
                           </span>
-                          <Mono className="text-leaf">
+                          <Mono className="text-console">
                             <Money value={r.valueGhs} />
                           </Mono>
                         </div>

@@ -274,11 +274,11 @@ function AddSalesDialog({
             No other sale is ready to ship right now.
           </p>
         ) : (
-          <div className="max-h-[46dvh] overflow-y-auto rounded-[6px] border-[1.5px] border-adm-line">
+          <div className="max-h-[46dvh] overflow-y-auto rounded-[6px] border border-adm-line">
             {sales.map((s) => (
               <label
                 key={s.id}
-                className="flex cursor-pointer items-start gap-2.5 border-b border-adm-hairline px-3 py-2 last:border-b-0 hover:bg-soil/5"
+                className="flex cursor-pointer items-start gap-2.5 border-b border-adm-hairline px-3 py-2 last:border-b-0 hover:bg-adm-sunken"
               >
                 <input
                   type="checkbox"
@@ -317,7 +317,7 @@ function AddSalesDialog({
         {serverError ? (
           <p
             role="alert"
-            className="rounded-[6px] border-[1.5px] border-console-red/50 bg-console-red/[0.06] px-3 py-2 text-[12.5px] font-medium text-console-red"
+            className="rounded-[6px] border border-console-red/50 bg-console-red/[0.06] px-3 py-2 text-[12.5px] font-medium text-console-red"
           >
             {serverError}
           </p>
@@ -813,7 +813,7 @@ export function ShipmentDetail({ id }: { id: string }) {
             return (
               <div
                 key={sale.id}
-                className="rounded-[6px] border-[1.5px] border-adm-line bg-adm-sunken px-3.5 py-2.5"
+                className="rounded-[6px] border border-adm-line bg-adm-sunken px-3.5 py-2.5"
               >
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                   <span className="font-adminmono text-[11px] text-adm-faint tabular-nums">
@@ -858,7 +858,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                       className={cn(
                         sale.balanceGhs !== null &&
                           (sale.balanceGhs === 0
-                            ? "text-leaf"
+                            ? "text-console"
                             : "text-console-red"),
                       )}
                     >

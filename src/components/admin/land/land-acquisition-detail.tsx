@@ -407,7 +407,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
       />
 
       {a.status === "COMPLETED" && a.plot ? (
-        <AdminCard className="mb-4 border-leaf/40 bg-leaf/[0.05] px-4 py-3 text-[13px] text-adm-ink">
+        <AdminCard className="mb-4 border-console/40 bg-console/[0.05] px-4 py-3 text-[13px] text-adm-ink">
           This acquisition produced plot{" "}
           <Link
             href={`/admin/plots/${a.plot.id}`}
@@ -440,7 +440,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
               <Row label="Balance owed" strong>
                 <span
                   className={cn(
-                    a.balanceGhs === 0 ? "text-leaf" : "text-console-red",
+                    a.balanceGhs === 0 ? "text-console" : "text-console-red",
                   )}
                 >
                   {a.balanceGhs === 0 ? (
@@ -492,7 +492,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
                         "whitespace-nowrap text-[13px] font-semibold",
                         p.amountGhs !== null && p.amountGhs < 0
                           ? "text-console-red"
-                          : "text-leaf",
+                          : "text-console",
                       )}
                     >
                       <Money value={p.amountGhs} />

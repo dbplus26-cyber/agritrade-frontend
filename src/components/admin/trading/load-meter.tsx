@@ -33,7 +33,7 @@ export function LoadMeter({
   return (
     <div
       className={cn(
-        "rounded-[6px] border-[1.5px] px-3 py-2",
+        "rounded-[6px] border px-3 py-2",
         over
           ? "border-console-red/60 bg-console-red/[0.05]"
           : "border-adm-line bg-adm-sunken",
@@ -59,12 +59,12 @@ export function LoadMeter({
             aria-valuemin={0}
             aria-valuemax={capacityKg}
             aria-valuenow={loadedKg}
-            className="mt-1.5 h-2 overflow-hidden rounded-full bg-soil/15"
+            className="mt-1.5 h-2 overflow-hidden rounded-full bg-adm-sunken"
           >
             <div
               className={cn(
                 "h-full rounded-full transition-[width]",
-                over ? "bg-console-red" : "bg-leaf",
+                over ? "bg-console-red" : "bg-console",
               )}
               style={{ width: `${pct}%` }}
             />

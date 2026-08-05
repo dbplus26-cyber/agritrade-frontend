@@ -91,7 +91,7 @@ export function SearchableSelect({
         collisionPadding={8}
         // z-[80]: above dialogs (z-50), the shell's bottom tab bar (z-[60])
         // and responsive bottom sheets (z-[70]).
-        className="z-[80] w-[var(--radix-popover-trigger-width)] min-w-[min(92vw,240px)] max-w-[min(92vw,26rem)] rounded-[6px] border-[1.5px] border-adm-line bg-adm-card p-0 shadow-[0_1px_2px_rgba(16,24,40,0.05)] ring-0"
+        className="z-[80] w-[var(--radix-popover-trigger-width)] min-w-[min(92vw,240px)] max-w-[min(92vw,26rem)] rounded-[6px] border border-adm-line bg-adm-card p-0 shadow-[0_1px_2px_rgba(16,24,40,0.05)] ring-0"
       >
         <Command className="rounded-[6px]! bg-transparent p-0">
           <CommandInput autoFocus placeholder="Type to search..." />

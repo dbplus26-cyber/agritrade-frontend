@@ -259,10 +259,10 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                   aria-selected={active}
                   onClick={() => setActiveSaleId(s.id)}
                   className={cn(
-                    "flex-none rounded-[6px] border-[1.5px] px-2.5 py-1.5 text-left outline-none focus-visible:ring-2 focus-visible:ring-console/40",
+                    "flex-none rounded-[6px] border px-2.5 py-1.5 text-left outline-none focus-visible:ring-2 focus-visible:ring-console/40",
                     active
-                      ? "border-forest bg-forest text-white"
-                      : "border-adm-line bg-[#FBFCF7] text-adm-ink hover:bg-soil/5",
+                      ? "border-console bg-console text-white"
+                      : "border-adm-line bg-[#FBFCF7] text-adm-ink hover:bg-adm-sunken",
                   )}
                 >
                   <Mono className="block text-[11.5px]">{s.transactionNo}</Mono>
@@ -319,7 +319,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                           overKeyed > 0
                             ? "font-semibold text-console-red"
                             : stillToLoad === 0
-                              ? "text-leaf"
+                              ? "text-console"
                               : "text-adm-muted",
                         )}
                       >
@@ -390,7 +390,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
             {fillNote ? (
               <p
                 role="status"
-                className="mt-2 rounded-[6px] border-[1.5px] border-adm-line bg-adm-sunken px-3 py-2 text-[12.5px] text-adm-ink"
+                className="mt-2 rounded-[6px] border border-adm-line bg-adm-sunken px-3 py-2 text-[12.5px] text-adm-ink"
               >
                 {fillNote}
               </p>
@@ -487,7 +487,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
           {serverError ? (
             <p
               role="alert"
-              className="rounded-[6px] border-[1.5px] border-console-red/50 bg-console-red/[0.06] px-3 py-2 text-[12.5px] font-medium text-console-red"
+              className="rounded-[6px] border border-console-red/50 bg-console-red/[0.06] px-3 py-2 text-[12.5px] font-medium text-console-red"
             >
               {serverError}
             </p>

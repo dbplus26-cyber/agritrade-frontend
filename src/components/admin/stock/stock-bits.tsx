@@ -63,7 +63,7 @@ export function SignedKg({ kg }: { kg: number }) {
       className={
         kg < 0
           ? "font-adminmono text-[13px] font-semibold text-console-red"
-          : "font-adminmono text-[13px] font-semibold text-leaf"
+          : "font-adminmono text-[13px] font-semibold text-console"
       }
       title={`${kg.toLocaleString("en-GH")} kg`}
     >

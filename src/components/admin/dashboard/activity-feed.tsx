@@ -44,7 +44,7 @@ export function ActivityFeed() {
       {isLoading ? (
         <div className="flex flex-col gap-2.5">
           {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-9 w-full rounded-none" />
+            <Skeleton key={i} className="h-9 w-full rounded-[6px]" />
           ))}
         </div>
       ) : rows.length === 0 ? (

@@ -299,7 +299,7 @@ export function SaleDetail({
           <SummaryRow label="Balance" strong>
             <span
               className={cn(
-                sale.balanceGhs === 0 ? "text-leaf" : "text-console-red",
+                sale.balanceGhs === 0 ? "text-console" : "text-console-red",
               )}
             >
               {sale.balanceGhs === 0 ? (
@@ -413,7 +413,7 @@ export function SaleDetail({
                     "whitespace-nowrap text-[13px] font-semibold",
                     p.amountGhs !== null && p.amountGhs < 0
                       ? "text-console-red"
-                      : "text-leaf",
+                      : "text-console",
                   )}
                 >
                   <Money value={p.amountGhs} />

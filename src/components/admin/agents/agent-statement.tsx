@@ -171,7 +171,7 @@ export function AgentStatement({ id }: { id: string }) {
       {/* Left-aligned like every other console page - the sheet keeps its own
           720px measure so it still reads as a piece of paper. */}
       <div className="max-w-[720px] rounded-[8px] border border-adm-line bg-white p-8 text-adm-ink print:max-w-none print:rounded-none print:border-0 print:p-0">
-        <div className="flex items-start justify-between gap-4 border-b-2 border-ink pb-3">
+        <div className="flex items-start justify-between gap-4 border-b-2 border-adm-strong pb-3">
           <div>
             <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">
               DB PLUS
@@ -207,7 +207,7 @@ export function AgentStatement({ id }: { id: string }) {
               <col className="w-[124px]" />
             </colgroup>
             <thead>
-              <tr className="border-y border-ink align-bottom text-left text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
+              <tr className="border-y border-adm-strong align-bottom text-left text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
                 <th className="py-2">Date</th>
                 <th className="py-2">Detail</th>
                 <th className="py-2 text-right">In / out</th>
@@ -266,7 +266,7 @@ export function AgentStatement({ id }: { id: string }) {
                           className={cn(
                             "font-semibold",
                             amount !== null &&
-                              (isDebit ? "text-console-red" : "text-leaf"),
+                              (isDebit ? "text-console-red" : "text-console"),
                           )}
                         />
                         {amount !== null ? (
@@ -316,7 +316,7 @@ export function AgentStatement({ id }: { id: string }) {
                       (netOverPeriod < 0
                         ? "text-console-red"
                         : netOverPeriod > 0
-                          ? "text-leaf"
+                          ? "text-console"
                           : ""),
                   )}
                 />
@@ -329,15 +329,15 @@ export function AgentStatement({ id }: { id: string }) {
               </div>
             </>
           ) : null}
-          <div className="flex items-baseline justify-between gap-4 border-t-2 border-ink py-2 text-[12px] font-bold tracking-[0.08em] uppercase">
+          <div className="flex items-baseline justify-between gap-4 border-t-2 border-adm-strong py-2 text-[12px] font-bold tracking-[0.08em] uppercase">
             <span>{windowed ? "Current float" : "Closing balance"}</span>
             <Figure value={balance} className="text-[16px] font-bold normal-case" />
           </div>
         </div>
 
         <div className="mt-12 grid grid-cols-2 gap-8 text-[12px]">
-          <div className="border-t border-ink pt-1">Agent&apos;s signature</div>
-          <div className="border-t border-ink pt-1">Owner&apos;s signature</div>
+          <div className="border-t border-adm-strong pt-1">Agent&apos;s signature</div>
+          <div className="border-t border-adm-strong pt-1">Owner&apos;s signature</div>
         </div>
       </div>
     </div>

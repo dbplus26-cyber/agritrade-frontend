@@ -147,7 +147,7 @@ export function ShipmentsRegister() {
             <Link
               key={sh.id}
               href={`${LIST}/${sh.id}`}
-              className="shadow-[0_1px_2px_rgba(16,24,40,0.05)] rounded-none border-[1.5px] border-adm-line bg-adm-card px-4 py-[15px] hover:border-adm-line"
+              className="shadow-[0_1px_2px_rgba(16,24,40,0.05)] rounded-[6px] border border-adm-line bg-adm-card px-4 py-[15px] hover:border-adm-line"
             >
               {/* The badge sits beside the TITLE and pins to its top edge.
                   It used to ride on the truck-registration line, vertically

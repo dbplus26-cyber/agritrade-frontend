@@ -61,7 +61,7 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
             type="button"
             onClick={() => onSearch("")}
             aria-label="Clear search"
-            className="absolute right-1.5 top-1/2 flex h-5 w-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-adm-faint hover:bg-soil/15 hover:text-adm-muted"
+            className="absolute right-1.5 top-1/2 flex h-5 w-5 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-adm-faint hover:bg-adm-sunken hover:text-adm-muted"
           >
             <X className="h-3.5 w-3.5" aria-hidden="true" />
           </button>

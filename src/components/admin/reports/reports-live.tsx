@@ -48,7 +48,7 @@ function ReportKpi({
       <div
         className={cn(
           "mt-1 text-[18px] font-bold",
-          accent ? "text-leaf" : "text-adm-ink",
+          accent ? "text-console" : "text-adm-ink",
         )}
       >
         {value}
@@ -108,7 +108,7 @@ function PlStatement({ window }: { window: IReportWindow }) {
       <div
         className={cn(
           rowClass,
-          "border-t border-adm-hairline text-[15px] font-bold text-leaf",
+          "border-t border-adm-hairline text-[15px] font-bold text-console",
         )}
       >
         <span>Net profit</span>
@@ -214,7 +214,7 @@ function CashComingIn() {
       <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         {label}
       </div>
-      <div className="font-adminmono mt-0.5 text-[17px] font-bold text-leaf tabular-nums">
+      <div className="font-adminmono mt-0.5 text-[17px] font-bold text-console tabular-nums">
         <Money value={value} compact />
       </div>
     </div>
@@ -241,7 +241,7 @@ function CashComingIn() {
               onClick={() => setDays(d)}
               aria-pressed={days === d}
               className={cn(
-                "cursor-pointer rounded-[6px] border-[1.5px] px-2.5 py-1 text-[12px] font-semibold transition-colors",
+                "cursor-pointer rounded-[6px] border px-2.5 py-1 text-[12px] font-semibold transition-colors",
                 days === d
                   ? "border-console bg-console text-white"
                   : "border-adm-line bg-adm-card text-adm-muted hover:border-console/60",

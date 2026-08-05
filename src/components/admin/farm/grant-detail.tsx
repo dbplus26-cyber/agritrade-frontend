@@ -181,7 +181,7 @@ export function GrantDetail({ id }: { id: string }) {
                   <Money value={g.seasonBalance.investedGhs} />
                 </DetailItem>
                 <DetailItem label="Recovered" mono>
-                  <span className="text-leaf">
+                  <span className="text-console">
                     <Money value={g.seasonBalance.recoveredGhs} />
                   </span>
                 </DetailItem>

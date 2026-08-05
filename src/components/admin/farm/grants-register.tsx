@@ -174,7 +174,7 @@ export function GrantsRegister() {
               <Button
                 asChild
                 variant="outline"
-                className="h-8 border-[1.5px] border-adm-line px-3 text-[13px] text-adm-muted shadow-none hover:bg-soil/5"
+                className="h-8 border border-adm-line px-3 text-[13px] text-adm-muted shadow-none hover:bg-adm-sunken"
               >
                 <Link href={`${LIST}/aging`}>Aging</Link>
               </Button>

@@ -267,7 +267,7 @@ export function ConsoleFilterBar({
           type="button"
           onClick={() => onSearch?.("")}
           aria-label="Clear search"
-          className="flex h-4 w-4 flex-none cursor-pointer items-center justify-center rounded-full text-adm-faint hover:bg-soil/20 hover:text-adm-muted"
+          className="flex h-4 w-4 flex-none cursor-pointer items-center justify-center rounded-full text-adm-faint hover:bg-adm-sunken hover:text-adm-muted"
         >
           <X className="h-3 w-3" aria-hidden="true" />
         </button>
@@ -318,7 +318,7 @@ export function ConsoleFilterBar({
             aria-expanded={open}
             aria-controls="console-filters"
             className={cn(
-              "inline-flex h-8 cursor-pointer items-center gap-2 whitespace-nowrap rounded-[6px] border-[1.5px] bg-adm-card px-2.5 text-[10.5px] uppercase tracking-[0.14em] transition-colors",
+              "inline-flex h-8 cursor-pointer items-center gap-2 whitespace-nowrap rounded-[6px] border bg-adm-card px-2.5 text-[10.5px] uppercase tracking-[0.14em] transition-colors",
               open
                 ? "border-console text-console"
                 : "border-adm-line text-adm-muted hover:text-console",

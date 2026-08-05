@@ -216,7 +216,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
                   ? "text-adm-muted"
                   : delta < 0
                     ? "text-console-red"
-                    : "text-leaf",
+                    : "text-console",
               )}
             >
               {delta !== null && delta > 0 ? "+" : ""}

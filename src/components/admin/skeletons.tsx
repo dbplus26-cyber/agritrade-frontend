@@ -53,7 +53,7 @@ export function ConsoleTableSkeleton({
           {Array.from({ length: Math.min(rows, 5) }, (_, row) => (
             <div
               key={row}
-              className="rounded-none border-[1.5px] border-adm-line bg-adm-card px-3 py-2"
+              className="rounded-[6px] border border-adm-line bg-adm-card px-3 py-2"
             >
               {Array.from({ length: Math.min(columns, 4) }, (_, line) => (
                 <div
@@ -236,7 +236,7 @@ export function RecordCardGridSkeleton({
     >
       {Array.from({ length: cards }, (_, i) => (
         <AdminCard key={i} className="overflow-hidden">
-          {media ? <Skeleton className="h-[130px] w-full rounded-none" /> : null}
+          {media ? <Skeleton className="h-[130px] w-full rounded-[6px]" /> : null}
           <div className="px-4 py-3">
             <div className="mb-2 flex items-center justify-between gap-2.5">
               <Skeleton className="h-3 w-24" />
@@ -528,8 +528,8 @@ export function DocumentSkeleton({ lines = 6 }: { lines?: number }) {
         <Skeleton className="h-3 w-28" />
         <Skeleton className="h-9 w-24" />
       </div>
-      <div className="max-w-[720px] border-[1.5px] border-adm-line bg-white p-8">
-        <div className="flex items-start justify-between border-b-2 border-ink/20 pb-3">
+      <div className="max-w-[720px] border border-adm-line bg-white p-8">
+        <div className="flex items-start justify-between border-b-2 border-adm-line pb-3">
           <div>
             <Skeleton className="h-5 w-32" />
             <Skeleton className="mt-2 h-2.5 w-40" />
@@ -540,7 +540,7 @@ export function DocumentSkeleton({ lines = 6 }: { lines?: number }) {
             <Skeleton className="h-2.5 w-28" />
           </div>
         </div>
-        <div className="mt-6 flex items-center gap-4 border-y border-ink/20 py-2">
+        <div className="mt-6 flex items-center gap-4 border-y border-adm-line py-2">
           {Array.from({ length: 4 }, (_, i) => (
             <Skeleton key={i} className="h-2.5 flex-1" />
           ))}

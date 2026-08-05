@@ -92,8 +92,8 @@ export function FarmerStatement({
 
       {/* Left-aligned like every other console page - the sheet keeps its own
           720px measure so it still reads as a piece of paper. */}
-      <div className="max-w-[720px] border-[1.5px] border-adm-line bg-white p-8 text-adm-ink print:max-w-none print:border-0 print:p-0">
-        <div className="flex items-start justify-between border-b-2 border-ink pb-3">
+      <div className="max-w-[720px] border border-adm-line bg-white p-8 text-adm-ink print:max-w-none print:border-0 print:p-0">
+        <div className="flex items-start justify-between border-b-2 border-adm-strong pb-3">
           <div>
             <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">
               DB PLUS
@@ -120,7 +120,7 @@ export function FarmerStatement({
 
         <table className="mt-6 w-full border-collapse text-[13px]">
           <thead>
-            <tr className="border-y border-ink text-left">
+            <tr className="border-y border-adm-strong text-left">
               <th className="py-2">Date</th>
               <th className="py-2">Detail</th>
               <th className="py-2 text-right">Amount</th>
@@ -163,7 +163,7 @@ export function FarmerStatement({
                   <td
                     className={cn(
                       "py-1.5 text-right",
-                      r.kind === "repayment" ? "text-leaf" : "text-console-red",
+                      r.kind === "repayment" ? "text-console" : "text-console-red",
                     )}
                   >
                     <Money value={r.deltaGhs} />
@@ -179,14 +179,14 @@ export function FarmerStatement({
           </tbody>
         </table>
 
-        <div className="mt-4 ml-auto flex w-full max-w-[280px] justify-between border-t border-ink py-1.5 text-[15px] font-bold">
+        <div className="mt-4 ml-auto flex w-full max-w-[280px] justify-between border-t border-adm-strong py-1.5 text-[15px] font-bold">
           <span>Outstanding balance</span>
           <Money value={st.balanceGhs} />
         </div>
 
         <div className="mt-12 grid grid-cols-2 gap-8 text-[12px]">
-          <div className="border-t border-ink pt-1">Farmer&apos;s signature</div>
-          <div className="border-t border-ink pt-1">Owner&apos;s signature</div>
+          <div className="border-t border-adm-strong pt-1">Farmer&apos;s signature</div>
+          <div className="border-t border-adm-strong pt-1">Owner&apos;s signature</div>
         </div>
       </div>
     </div>

@@ -122,7 +122,7 @@ export function DecideDialog({
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
         {approval && summary && link ? (
-          <div className="rounded-[6px] border-[1.5px] border-adm-hairline bg-adm-sunken px-3 py-2.5">
+          <div className="rounded-[6px] border border-adm-hairline bg-adm-sunken px-3 py-2.5">
             {/* The inbox card's title block + meta strip, in miniature. */}
             <div className="font-adminmono text-[15px] leading-tight font-bold text-adm-ink [overflow-wrap:anywhere]">
               {summary.headline}

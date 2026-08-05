@@ -44,7 +44,7 @@ export function TrendBadge({
     <span
       className={cn(
         "inline-flex items-center gap-0.5 text-[11.5px] font-semibold",
-        good ? "text-leaf" : "text-console-red",
+        good ? "text-console" : "text-console-red",
         className,
       )}
       title="vs the previous period of equal length"

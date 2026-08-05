@@ -121,8 +121,8 @@ export function SaleInvoice({ id }: { id: string }) {
       {/* Left-aligned like every other console page - the sheet keeps its own
           720px measure so it still reads as a piece of paper. Squared and
           1.5px-bordered to match AdminCard. */}
-      <div className="max-w-[720px] border-[1.5px] border-adm-line bg-white p-8 text-adm-ink print:max-w-none print:border-0 print:p-0">
-        <div className="flex items-start justify-between border-b-2 border-ink pb-3">
+      <div className="max-w-[720px] border border-adm-line bg-white p-8 text-adm-ink print:max-w-none print:border-0 print:p-0">
+        <div className="flex items-start justify-between border-b-2 border-adm-strong pb-3">
           <div>
             <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">
               DB PLUS
@@ -171,7 +171,7 @@ export function SaleInvoice({ id }: { id: string }) {
 
         <table className="mt-6 w-full border-collapse text-[13px]">
           <thead>
-            <tr className="border-y border-ink text-left">
+            <tr className="border-y border-adm-strong text-left">
               <th className="py-2">Commodity</th>
               <th className="py-2 text-right">Weight</th>
               <th className="py-2 text-right">Price/kg</th>
@@ -207,7 +207,7 @@ export function SaleInvoice({ id }: { id: string }) {
               <Money value={s.paidGhs} />
             </span>
           </div>
-          <div className="flex justify-between border-t border-ink py-1.5 text-[15px] font-bold">
+          <div className="flex justify-between border-t border-adm-strong py-1.5 text-[15px] font-bold">
             <span>{isReceipt ? "Settled" : "Balance due"}</span>
             <span>
               {isReceipt ? "Paid in full" : <Money value={s.balanceGhs} />}

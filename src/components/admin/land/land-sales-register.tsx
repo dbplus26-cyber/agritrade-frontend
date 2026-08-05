@@ -119,7 +119,7 @@ export function LandSalesRegister() {
             <Mono
               className={cn(
                 "whitespace-nowrap text-[12.5px] font-semibold",
-                b === 0 ? "text-leaf" : "text-console-red",
+                b === 0 ? "text-console" : "text-console-red",
               )}
             >
               {b === 0 ? "Paid in full" : <Money value={b} />}

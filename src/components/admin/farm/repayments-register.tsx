@@ -116,7 +116,7 @@ export function RepaymentsRegister() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-leaf">
+          <Mono className="whitespace-nowrap text-[12.5px] text-console">
             <Money value={row.original.valueGhs} />
           </Mono>
         ),

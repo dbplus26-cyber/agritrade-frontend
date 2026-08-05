@@ -180,7 +180,7 @@ export function SalesRegister() {
                 b === null
                   ? "text-adm-faint"
                   : b === 0
-                    ? "text-leaf"
+                    ? "text-console"
                     : "text-console-red",
               )}
             >
@@ -329,7 +329,7 @@ export function SalesRegister() {
                     onClick={() => router.push(`${LIST}/${s.id}`)}
                     // Squared and 1.5px-bordered to match AdminCard, the
                     // surface every other console screen is filed on.
-                    className="shadow-[0_1px_2px_rgba(16,24,40,0.05)] rounded-none border-[1.5px] border-adm-line bg-adm-card px-3.5 py-[13px] text-left"
+                    className="shadow-[0_1px_2px_rgba(16,24,40,0.05)] rounded-[6px] border border-adm-line bg-adm-card px-3.5 py-[13px] text-left"
                   >
                     <div className="mb-1.5 flex items-center justify-between gap-2">
                       <span className="block max-w-[22rem] truncate text-[14px] font-semibold text-adm-ink">
@@ -342,7 +342,7 @@ export function SalesRegister() {
                       <Mono
                         className={cn(
                           "text-[14px] font-bold",
-                          s.balanceGhs === 0 ? "text-leaf" : "text-console-red",
+                          s.balanceGhs === 0 ? "text-console" : "text-console-red",
                         )}
                       >
                         {s.balanceGhs === 0 ? (

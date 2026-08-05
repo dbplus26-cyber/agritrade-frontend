@@ -36,7 +36,7 @@ export function ApprovalsPreview() {
       {isLoading ? (
         <div className="flex flex-col gap-2.5">
           {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-12 w-full rounded-none" />
+            <Skeleton key={i} className="h-12 w-full rounded-[6px]" />
           ))}
         </div>
       ) : rows.length === 0 ? (

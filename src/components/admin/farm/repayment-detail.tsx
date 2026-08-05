@@ -108,7 +108,7 @@ export function RepaymentDetail({ id }: { id: string }) {
                   <Money value={r.ratePerKgGhs} />
                 </DetailItem>
                 <DetailItem label="Value credited" mono strong>
-                  <span className="text-leaf">
+                  <span className="text-console">
                     <Money value={r.valueGhs} />
                   </span>
                 </DetailItem>
@@ -172,7 +172,7 @@ export function RepaymentDetail({ id }: { id: string }) {
             <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
               Value credited
             </p>
-            <p className="font-adminmono mt-1 text-[26px] font-bold text-leaf tabular-nums">
+            <p className="font-adminmono mt-1 text-[26px] font-bold text-console tabular-nums">
               <Money value={r.valueGhs} />
             </p>
             <p className="mt-1 text-[12.5px] text-adm-muted">

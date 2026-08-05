@@ -116,7 +116,7 @@ export function SeasonDetail({ id }: { id: string }) {
           <Money value={stats?.investedGhs ?? null} />
         </StatTile>
         <StatTile label="Recovered">
-          <span className="text-leaf">
+          <span className="text-console">
             <Money value={stats?.recoveredGhs ?? null} />
           </span>
         </StatTile>
@@ -203,7 +203,7 @@ export function SeasonDetail({ id }: { id: string }) {
                     className={
                       stats.expectations.actualYieldKg >=
                       stats.expectations.expectedYieldKg
-                        ? "text-[14px] text-leaf"
+                        ? "text-[14px] text-console"
                         : "text-[14px]"
                     }
                   >
@@ -272,7 +272,7 @@ export function SeasonDetail({ id }: { id: string }) {
                           <Money value={b.investedGhs} />
                         </Mono>
                       </td>
-                      <td className="px-5 py-2.5 text-right text-leaf">
+                      <td className="px-5 py-2.5 text-right text-console">
                         <Mono>
                           <Money value={b.recoveredGhs} />
                         </Mono>

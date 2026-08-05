@@ -179,7 +179,7 @@ export function PaymentDialog({
             the screen. Money may be redacted (null): `Money` prints the
             placeholder, never the word "null". */}
         {detailQuery.isLoading ? (
-          <div className="border-[1.5px] border-adm-line bg-adm-sunken px-3.5 py-3">
+          <div className="border border-adm-line bg-adm-sunken px-3.5 py-3">
             <div className="flex items-end justify-between gap-4">
               <div className="flex-1">
                 <Skeleton className="h-3.5 w-28" />
@@ -190,7 +190,7 @@ export function PaymentDialog({
             <Skeleton className="mt-3 h-3 w-2/3" />
           </div>
         ) : detail ? (
-          <div className="border-[1.5px] border-adm-line bg-adm-sunken">
+          <div className="border border-adm-line bg-adm-sunken">
             <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2 px-3.5 py-3">
               <div className="min-w-0">
                 <Mono className="block text-[13px] font-semibold text-console">
@@ -207,7 +207,7 @@ export function PaymentDialog({
                 <Mono
                   className={cn(
                     "block text-[20px] leading-tight font-bold",
-                    detail.balanceGhs === 0 ? "text-leaf" : "text-adm-ink",
+                    detail.balanceGhs === 0 ? "text-console" : "text-adm-ink",
                   )}
                 >
                   <Money value={detail.balanceGhs} />
@@ -321,7 +321,7 @@ export function PaymentDialog({
                   key={f.key}
                   type="button"
                   onClick={() => fillAmount(f.amount)}
-                  className="flex w-full cursor-pointer flex-col items-start gap-0.5 rounded-[6px] border-[1.5px] border-adm-line bg-adm-card px-3 py-2 text-left transition-colors outline-none hover:border-console hover:bg-console/[0.04] focus-visible:border-console focus-visible:ring-3 focus-visible:ring-leaf/30"
+                  className="flex w-full cursor-pointer flex-col items-start gap-0.5 rounded-[6px] border border-adm-line bg-adm-card px-3 py-2 text-left transition-colors outline-none hover:border-console hover:bg-console/[0.04] focus-visible:border-console focus-visible:ring-3 focus-visible:ring-leaf/30"
                 >
                   <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                     {f.label}

@@ -634,7 +634,7 @@ function UserDetailSkeleton() {
         asideFirstOnStack={false}
         main={
         <AdminCard className="overflow-hidden p-0">
-          <Skeleton className="h-[88px] w-full rounded-none" />
+          <Skeleton className="h-[88px] w-full rounded-[6px]" />
           <div className="px-4 pb-6 sm:px-6">
             <div className="-mt-[52px] flex flex-col items-center gap-3 sm:flex-row sm:items-end sm:gap-5">
               <Skeleton className="h-[104px] w-[104px] flex-none rounded-full ring-4 ring-white" />

@@ -298,7 +298,7 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
 
         <div className="flex items-center justify-between rounded-[6px] border border-adm-hairline bg-adm-sunken px-4 py-3 text-[13px]">
           <span className="font-semibold text-adm-muted">Value credited</span>
-          <span className="text-[16px] font-bold text-leaf">
+          <span className="text-[16px] font-bold text-console">
             {value === null ? "-" : formatCedis(value)}
           </span>
         </div>

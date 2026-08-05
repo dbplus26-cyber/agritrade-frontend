@@ -132,7 +132,7 @@ function SignedAmount({ amount }: { amount: number | null }) {
       <Mono
         className={cn(
           "block text-[13.5px] font-semibold whitespace-nowrap",
-          isDebit ? "text-console-red" : "text-leaf",
+          isDebit ? "text-console-red" : "text-console",
         )}
       >
         {isDebit ? "-" : "+"}
@@ -141,7 +141,7 @@ function SignedAmount({ amount }: { amount: number | null }) {
       <span
         className={cn(
           "block text-[9.5px] font-bold tracking-[0.12em] uppercase",
-          isDebit ? "text-console-red/70" : "text-leaf/70",
+          isDebit ? "text-console-red/70" : "text-console/70",
         )}
       >
         {isDebit ? "Out" : "In"}
@@ -500,7 +500,7 @@ function ReconcileDialog({
                   className={cn(
                     "text-[12.5px] font-medium",
                     variance === 0
-                      ? "text-leaf"
+                      ? "text-console"
                       : variance > 0
                         ? "text-adm-muted"
                         : "text-console-red",
@@ -776,7 +776,7 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
                         r.varianceGhs === null
                           ? "text-adm-faint"
                           : r.varianceGhs === 0
-                            ? "text-leaf"
+                            ? "text-console"
                             : r.varianceGhs > 0
                               ? "text-adm-muted"
                               : "text-console-red",

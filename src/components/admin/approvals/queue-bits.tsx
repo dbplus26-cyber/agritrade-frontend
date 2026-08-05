@@ -25,30 +25,35 @@ import { ApprovalAction, ApprovalStatus, type IApproval } from "@/types/approval
 type CssVars = React.CSSProperties & Record<`--${string}`, string>;
 
 export const APPROVAL_TOKENS: CssVars = {
-  "--ap-paper": "#f2f1ec",
+  // Meridian neutrals. This module used to carry a warm palette of its own -
+  // paper #f2f1ec, hairlines the colour of string, a different forest - which
+  // is why the approvals queue read as a different product from every other
+  // screen. The names stay (the module's rails and chips are built on them);
+  // only the values move onto the console system.
+  "--ap-paper": "#fafaf8",
   "--ap-surface": "#ffffff",
-  "--ap-surface-alt": "#fbfaf7",
-  "--ap-ink": "#1b1a17",
-  "--ap-ink-2": "#4a4842",
-  "--ap-muted": "#7b7870",
-  "--ap-hair": "#e6e3da",
-  "--ap-hair-soft": "#efece4",
-  "--ap-forest": "#14513c",
-  "--ap-forest-hover": "#0f3d2d",
-  "--ap-forest-soft": "#e8f0ec",
-  "--ap-amber": "#a2620d",
-  "--ap-amber-soft": "#fbf1e0",
-  "--ap-clay": "#9c3d2c",
-  "--ap-clay-soft": "#f8ebe7",
-  "--ap-leaf": "#2f6f4e",
-  "--ap-leaf-soft": "#e9f2ec",
-  "--ap-track": "#eceadf",
-  "--ap-track-base": "#c9c5b7",
-  "--ap-chevron": "#b8b4a9",
-  "--ap-tabs": "#e9e7e0",
-  "--ap-pill": "#dcd9d1",
-  "--ap-link-rule": "#b9d0c5",
-  "--ap-chip": "#f0eee7",
+  "--ap-surface-alt": "#f5f7f9",
+  "--ap-ink": "#161c24",
+  "--ap-ink-2": "#39424f",
+  "--ap-muted": "#6a7686",
+  "--ap-hair": "#e1e6ec",
+  "--ap-hair-soft": "#eceff3",
+  "--ap-forest": "#1e3d2b",
+  "--ap-forest-hover": "#3e7a50",
+  "--ap-forest-soft": "#e8f2ea",
+  "--ap-amber": "#b8860b",
+  "--ap-amber-soft": "#f7eed8",
+  "--ap-clay": "#b03a2e",
+  "--ap-clay-soft": "#f8e9e7",
+  "--ap-leaf": "#2f5e3d",
+  "--ap-leaf-soft": "#e8f2ea",
+  "--ap-track": "#eceff3",
+  "--ap-track-base": "#cfd6df",
+  "--ap-chevron": "#9ba6b3",
+  "--ap-tabs": "#eceff3",
+  "--ap-pill": "#cfd6df",
+  "--ap-link-rule": "#cfd6df",
+  "--ap-chip": "#f5f7f9",
 };
 
 /** Status to rail colour. Absolute - it must never vary by view or filter. */
@@ -183,7 +188,7 @@ export function OverageMeter({
       role="img"
       aria-label={sentence}
       className={cn(
-        "flex h-1 w-full max-w-[150px] overflow-hidden rounded-none bg-[var(--ap-track)]",
+        "flex h-1 w-full max-w-[150px] overflow-hidden rounded-[6px] bg-[var(--ap-track)]",
         className,
       )}
     >

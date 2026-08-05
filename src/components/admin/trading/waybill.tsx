@@ -66,8 +66,8 @@ export function Waybill({ id }: { id: string }) {
       {/* Left-aligned like every other console page - the sheet keeps its own
           720px measure so it still reads as a piece of paper. Squared and
           1.5px-bordered to match AdminCard. */}
-      <div className="max-w-[720px] border-[1.5px] border-adm-line bg-white p-8 text-adm-ink print:max-w-none print:border-0 print:p-0">
-        <div className="flex items-start justify-between border-b-2 border-ink pb-3">
+      <div className="max-w-[720px] border border-adm-line bg-white p-8 text-adm-ink print:max-w-none print:border-0 print:p-0">
+        <div className="flex items-start justify-between border-b-2 border-adm-strong pb-3">
           <div>
             <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">
               DB PLUS
@@ -126,7 +126,7 @@ export function Waybill({ id }: { id: string }) {
 
         <table className="mt-6 w-full border-collapse text-[13px]">
           <thead>
-            <tr className="border-y border-ink text-left">
+            <tr className="border-y border-adm-strong text-left">
               <th className="py-2">Commodity</th>
               <th className="py-2 text-right">Weight</th>
             </tr>
@@ -146,10 +146,10 @@ export function Waybill({ id }: { id: string }) {
         </table>
 
         <div className="mt-12 grid grid-cols-2 gap-8 text-[12px]">
-          <div className="border-t border-ink pt-1">
+          <div className="border-t border-adm-strong pt-1">
             Driver&apos;s signature
           </div>
-          <div className="border-t border-ink pt-1">
+          <div className="border-t border-adm-strong pt-1">
             Receiver&apos;s signature
           </div>
         </div>

@@ -88,7 +88,7 @@ export function StarRow({ rating }: { rating: number }) {
         <span
           key={star}
           aria-hidden="true"
-          className={star <= clamped ? "text-harvest" : "text-adm-faint"}
+          className={star <= clamped ? "text-console-gold" : "text-adm-faint"}
         >
           ★
         </span>

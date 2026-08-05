@@ -315,7 +315,7 @@ function AddReviewDialog({
                         aria-hidden="true"
                         className={cn(
                           "block px-0.5 text-[26px] leading-none transition-colors peer-focus-visible:rounded-[6px] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-leaf",
-                          star <= field.value ? "text-harvest" : "text-adm-faint",
+                          star <= field.value ? "text-console-gold" : "text-adm-faint",
                         )}
                       >
                         ★
@@ -495,7 +495,7 @@ export function ReviewsScreen() {
                 }}
                 aria-pressed={filters.status === value}
                 className={cn(
-                  "cursor-pointer rounded-[6px] border-[1.5px] px-3.5 py-1.5 text-[13px] font-semibold transition-colors",
+                  "cursor-pointer rounded-[6px] border px-3.5 py-1.5 text-[13px] font-semibold transition-colors",
                   filters.status === value
                     ? "border-console bg-console text-white"
                     : "border-adm-line bg-adm-card text-adm-muted hover:border-console/60",

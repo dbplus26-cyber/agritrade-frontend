@@ -31,7 +31,7 @@ export function ErrorMessage({
         className,
       )}
     >
-      <div className="shadow-doc w-[min(440px,100%)] border border-soil/35 bg-paper px-8 pb-9 pt-7">
+      <div className="w-[min(440px,100%)] border px-8 pb-9 pt-7 [border-color:var(--state-frame)] [border-radius:var(--state-radius)] [box-shadow:var(--state-shadow)] [background:var(--state-ground)]">
         <div
           aria-hidden="true"
           className="relative mb-6 h-[104px] bg-[repeating-linear-gradient(180deg,transparent_0px,transparent_25px,rgb(89_82_59/0.25)_25px,rgb(89_82_59/0.25)_26px)]"
@@ -43,10 +43,10 @@ export function ErrorMessage({
             Not processed
           </Stamp>
         </div>
-        <h3 className="break-words mb-2 font-display text-[20px] font-bold text-forest">
+        <h3 className="break-words mb-2 font-display text-[20px] font-bold [color:var(--state-title)]">
           {title}
         </h3>
-        <p className="break-words mx-auto max-w-[40ch] text-[13.5px] leading-[1.65] text-soil">
+        <p className="break-words mx-auto max-w-[40ch] text-[13.5px] leading-[1.65] [color:var(--state-body)]">
           {description}
         </p>
         {onRetry ? (

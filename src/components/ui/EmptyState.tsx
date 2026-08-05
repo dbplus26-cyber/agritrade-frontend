@@ -57,10 +57,10 @@ export function EmptyState({
     return (
       <div className={cn("w-full min-w-0 px-6 py-14 text-center", className)}>
         <EmptyFolder className="mx-auto mb-3.5" />
-        <div className="mb-1 break-words text-[15px] font-bold text-ink">
+        <div className="mb-1 break-words text-[15px] font-bold [color:var(--state-title)]">
           {title}
         </div>
-        <p className="mx-auto mb-0 max-w-[42ch] break-words text-[13.5px] leading-[1.6] text-soil">
+        <p className="mx-auto mb-0 max-w-[42ch] break-words text-[13.5px] leading-[1.6] [color:var(--state-body)]">
           {description}
         </p>
         {actionLabel && onAction ? (
@@ -79,15 +79,15 @@ export function EmptyState({
         className,
       )}
     >
-      <div className="w-[min(420px,100%)] min-w-0 border border-dashed border-soil/50 bg-surface-alt/60 px-4 py-8 sm:px-8 sm:py-10">
-        <span className="stencil mb-6 inline-block border-b border-dotted border-soil/40 pb-2 text-[10px] tracking-[0.28em] text-harvest-deep">
+      <div className="w-[min(420px,100%)] min-w-0 border px-4 py-8 [border-color:var(--state-frame)] [border-radius:var(--state-radius)] [border-style:var(--state-frame-style)] [box-shadow:var(--state-shadow)] [background:var(--state-ground)] sm:px-8 sm:py-10">
+        <span className="stencil mb-6 inline-block border-b border-dotted border-soil/40 pb-2 text-[10px] tracking-[0.28em] [color:var(--state-caption)]">
           File empty
         </span>
         <EmptyFolder className="mx-auto mb-4" />
-        <h3 className="mb-2 break-words font-display text-[17px] font-semibold text-forest sm:text-[19px]">
+        <h3 className="mb-2 break-words font-display text-[17px] font-semibold [color:var(--state-title)] sm:text-[19px]">
           {title}
         </h3>
-        <p className="mx-auto mb-0 max-w-[38ch] break-words text-[13px] leading-[1.65] text-soil sm:text-[13.5px]">
+        <p className="mx-auto mb-0 max-w-[38ch] break-words text-[13px] leading-[1.65] [color:var(--state-body)] sm:text-[13.5px]">
           {description}
         </p>
         {actionLabel && onAction ? (

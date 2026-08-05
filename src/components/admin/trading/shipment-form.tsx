@@ -260,7 +260,7 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
             </span>
             <div
               className={cn(
-                "rounded-[6px] border-[1.5px] border-adm-line bg-[#FBFCF7]",
+                "rounded-[6px] border border-adm-line bg-[#FBFCF7]",
                 errors.saleIds && "border-console-red",
               )}
             >
@@ -291,7 +291,7 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
                   {visibleSales.map((s) => (
                     <label
                       key={s.id}
-                      className="flex cursor-pointer items-start gap-2.5 border-b border-adm-hairline px-3 py-2 last:border-b-0 hover:bg-soil/5"
+                      className="flex cursor-pointer items-start gap-2.5 border-b border-adm-hairline px-3 py-2 last:border-b-0 hover:bg-adm-sunken"
                     >
                       <input
                         type="checkbox"
@@ -416,7 +416,7 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
             )}
           </AdminField>
           {pickedAddress ? (
-            <div className="rounded-[6px] border-[1.5px] border-adm-line bg-adm-sunken px-3 py-2 text-[12.5px] text-adm-muted">
+            <div className="rounded-[6px] border border-adm-line bg-adm-sunken px-3 py-2 text-[12.5px] text-adm-muted">
               <p className="min-w-0 font-medium text-adm-ink [overflow-wrap:anywhere]">
                 {pickedAddress.label} · {pickedAddress.city}
                 {pickedAddress.area ? `, ${pickedAddress.area}` : ""}
@@ -544,7 +544,7 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
             )}
           </AdminField>
           {pickedDriver && !showDriverOverrides ? (
-            <div className="flex flex-wrap items-center justify-between gap-2 rounded-[6px] border-[1.5px] border-adm-line bg-adm-sunken px-3 py-2">
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-[6px] border border-adm-line bg-adm-sunken px-3 py-2">
               <div className="min-w-0 text-[12.5px] text-adm-muted">
                 <p className="min-w-0 font-medium text-adm-ink [overflow-wrap:anywhere]">
                   {ovName || pickedDriver.name}

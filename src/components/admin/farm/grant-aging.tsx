@@ -31,13 +31,13 @@ const BUCKETS: {
   {
     key: "1-30",
     label: "1-30 days",
-    cardClass: "bg-harvest/10",
+    cardClass: "bg-console-gold/10",
     valueClass: "text-adm-ink",
   },
   {
     key: "31-60",
     label: "31-60 days",
-    cardClass: "bg-harvest/25",
+    cardClass: "bg-console-gold/25",
     valueClass: "text-adm-ink",
   },
   {

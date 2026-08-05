@@ -66,7 +66,7 @@ export function IdentityAvatar({
         </div>
       )}
       {busy ? (
-        <div className="absolute inset-0 flex items-center justify-center rounded-full bg-ink/45">
+        <div className="absolute inset-0 flex items-center justify-center rounded-full bg-[rgba(11,15,20,0.45)]">
           <Loader2 className="h-5 w-5 animate-spin text-white" aria-hidden="true" />
         </div>
       ) : null}
@@ -94,7 +94,7 @@ export function PhotoViewDialog({
             {name}
           </DialogTitle>
         </DialogHeader>
-        <div className="aspect-square w-full overflow-hidden rounded-[8px] bg-soil/10">
+        <div className="aspect-square w-full overflow-hidden rounded-[8px] bg-adm-sunken">
           {/* eslint-disable-next-line @next/next/no-img-element -- full-view photo */}
           <img src={src} alt={name} className="h-full w-full object-cover" />
         </div>

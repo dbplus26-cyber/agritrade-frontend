@@ -42,7 +42,7 @@ function TrendTooltip({
 }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-none border-[1.5px] border-adm-line bg-adm-card px-3 py-2 text-[12px] shadow-[0_1px_2px_rgba(16,24,40,0.05)]">
+    <div className="rounded-[6px] border border-adm-line bg-adm-card px-3 py-2 text-[12px] shadow-[0_1px_2px_rgba(16,24,40,0.05)]">
       <div className="mb-1 font-semibold text-adm-ink">{label}</div>
       {payload.map((p) => (
         <div key={p.name} className="flex items-center justify-between gap-4">
@@ -84,7 +84,7 @@ export function PlTrendChart() {
           className={
             months === m
               ? "rounded-[4px] bg-console px-2 py-0.5 text-[11px] font-semibold text-white"
-              : "cursor-pointer rounded-[4px] px-2 py-0.5 text-[11px] font-semibold text-adm-muted hover:bg-soil/10"
+              : "cursor-pointer rounded-[4px] px-2 py-0.5 text-[11px] font-semibold text-adm-muted hover:bg-adm-sunken"
           }
         >
           {m}m
@@ -96,7 +96,7 @@ export function PlTrendChart() {
   return (
     <WidgetCard title="Sales in vs purchases out" right={toggle}>
       {isLoading ? (
-        <Skeleton className="h-[240px] w-full rounded-none" />
+        <Skeleton className="h-[240px] w-full rounded-[6px]" />
       ) : redacted ? (
         <ChartNote>Financial figures are hidden for your role.</ChartNote>
       ) : rows.length === 0 ? (

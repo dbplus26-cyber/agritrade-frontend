@@ -408,7 +408,7 @@ export function LandSaleDetail({ id }: { id: string }) {
                   {s.forfeitedGhs === null ? (
                     <span className="text-adm-muted">Refunded in full</span>
                   ) : (
-                    <span className="text-leaf">
+                    <span className="text-console">
                       <Money value={s.forfeitedGhs} />
                     </span>
                   )}
@@ -419,7 +419,7 @@ export function LandSaleDetail({ id }: { id: string }) {
                 <Row label="Balance" strong>
                   <span
                     className={cn(
-                      s.balanceGhs === 0 ? "text-leaf" : "text-console-red",
+                      s.balanceGhs === 0 ? "text-console" : "text-console-red",
                     )}
                   >
                     {s.balanceGhs === 0 ? (
@@ -498,7 +498,7 @@ export function LandSaleDetail({ id }: { id: string }) {
                         "whitespace-nowrap text-[13px] font-semibold",
                         p.amountGhs !== null && p.amountGhs < 0
                           ? "text-console-red"
-                          : "text-leaf",
+                          : "text-console",
                       )}
                     >
                       <Money value={p.amountGhs} />

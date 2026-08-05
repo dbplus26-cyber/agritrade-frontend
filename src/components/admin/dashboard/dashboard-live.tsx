@@ -193,7 +193,7 @@ export function DashboardLive() {
       {isLoading || !d ? (
         <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-5">
           {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-[86px] w-full rounded-none" />
+            <Skeleton key={i} className="h-[86px] w-full rounded-[6px]" />
           ))}
         </div>
       ) : (

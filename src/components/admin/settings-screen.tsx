@@ -46,7 +46,7 @@ function GhsInput({
   return (
     <div
       className={cn(
-        "flex h-[42px] items-center overflow-hidden rounded-[6px] border-[1.5px] bg-[#FBFCF7] transition-[border-color,box-shadow] focus-within:border-leaf focus-within:shadow-[0_0_0_3px_rgb(62_125_98/0.16)]",
+        "flex h-[42px] items-center overflow-hidden rounded-[6px] border bg-[#FBFCF7] transition-[border-color,box-shadow] focus-within:border-console focus-within:shadow-[0_0_0_3px_rgb(62_125_98/0.16)]",
         error ? "border-console-red" : "border-adm-line",
       )}
     >

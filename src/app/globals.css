@@ -161,6 +161,45 @@
   }
 }
 
+/* ------------------------------------------------------------------
+   Shared state components (EmptyState, ErrorMessage) render on BOTH
+   sides. The public site wants filed paper - dashed husk rules, a
+   stencilled caption, a rubber stamp. The console wants Meridian - a
+   white sheet with a hairline. Rather than fork the components or
+   thread a prop through 111 call sites, they read these variables and
+   the console scope re-points them.
+   ------------------------------------------------------------------ */
+:root {
+  --state-frame: rgb(89 82 59 / 0.5);
+  --state-frame-style: dashed;
+  --state-ground: rgb(230 234 224 / 0.6);
+  --state-title: #155744;
+  --state-body: #59523b;
+  --state-caption: #7a611c;
+  --state-radius: 0px;
+  --state-shadow: none;
+}
+
+.admin-scope {
+  --state-frame: #e1e6ec;
+  --state-frame-style: solid;
+  --state-ground: #ffffff;
+  --state-title: #161c24;
+  --state-body: #6a7686;
+  --state-caption: #6a7686;
+  --state-radius: 8px;
+  --state-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+}
+
+/* The stencil face is a printed-site idiom. Inside the console it falls
+   back to the UI face, so a shared component's caption reads as a label
+   rather than a rubber stamp. */
+.admin-scope .stencil {
+  font-family: var(--font-admin);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
 @layer utilities {
   /* Faint husk grain on light surfaces (hero, page shells). */
   .texture-grain {

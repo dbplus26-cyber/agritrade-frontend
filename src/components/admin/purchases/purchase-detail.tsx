@@ -181,7 +181,7 @@ function ReceiveDialog({
               <p
                 className={cn(
                   "text-[12.5px]",
-                  variance > 0 ? "text-console-red" : "text-leaf",
+                  variance > 0 ? "text-console-red" : "text-console",
                 )}
               >
                 {variance > 0
