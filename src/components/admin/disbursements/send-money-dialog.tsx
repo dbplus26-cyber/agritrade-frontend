@@ -61,6 +61,17 @@ const DEFAULTS: DisbursementValues = {
  * separate limits and a bare "conflict" leaves the sender guessing which one
  * stopped them - and, more importantly, guessing what to DO about it.
  */
+/**
+ * Refusals worth rewriting in the sender's own terms. Keyed on the API's
+ * `code`, which only reaches us for 4xx codes the backend allowlists
+ * (CLIENT_ACTIONABLE_CODES in its error handler) - so a new entry here needs
+ * the code added there too, or it silently never fires.
+ *
+ * COMPANY_BALANCE_UNKNOWN and HUBTEL_NOT_CONFIGURED are 503s, and the backend
+ * strips `code` from every 5xx by design. Their entries are therefore
+ * unreachable and kept only as documentation of the two states; both fall
+ * through to the server's own message, which already says the same thing.
+ */
 const GUIDANCE: Record<string, string> = {
   COMPANY_BALANCE_UNKNOWN:
     "The company account balance could not be checked just now, so nothing was sent. Try again in a moment.",
