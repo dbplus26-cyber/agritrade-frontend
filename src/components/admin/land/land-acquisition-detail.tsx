@@ -402,8 +402,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
     <div className="max-w-[1120px]">
       <BackButton href={LIST} label="All acquisitions" className="mb-2" />
       <AdminPageHeader
-        title={`${a.reference} · ${a.seller.name}`}
-        sub={a.locationText}
+        title="Acquisition details"
         actions={<LandAcquisitionStatusBadge status={a.status} />}
       />
 
@@ -429,6 +428,9 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
       <DetailShell
         aside={
           <AdminCard className="px-5 py-3">
+            {/* Which plot, from whom - what the heading used to carry. */}
+            <Row label="Reference">{a.reference}</Row>
+            <Row label="Seller">{a.seller.name}</Row>
             <Row label="Agreed cost" strong>
               <Money value={a.agreedCostGhs} />
             </Row>

@@ -248,7 +248,6 @@ export function PaymentAccountDetail({ id }: { id: string }) {
       <BackButton href={LIST} label="All accounts" className="mb-2" />
       <AdminPageHeader
         title="Payment account details"
-        sub={`${account.accountName} · ${account.accountNumber}`}
         actions={
           <span className="flex flex-wrap items-center gap-2">
             <ActiveBadge isActive={account.isActive} />
@@ -276,6 +275,9 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         <RecordFacts
           columns={3}
           facts={[
+            // What staff call this account. It was the page heading; the
+            // heading now says what the page is, so the record says which.
+            { label: "Label", value: account.label },
             {
               label: "Account number",
               mono: true,

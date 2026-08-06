@@ -411,7 +411,7 @@ export function PurchaseDetail({ id }: { id: string }) {
     <div className="max-w-[1120px]">
       <BackButton href={LIST} label="All purchases" className="mb-2" />
       <AdminPageHeader
-        title={`${p.commodity.name} · ${formatKg(p.weightKg)}`}
+        title="Purchase details"
         sub={`${SOURCE_LABEL[p.source]} purchase from ${purchaseCounterparty(p)}`}
         actions={
           <span className="flex flex-wrap items-center gap-1.5">
@@ -452,6 +452,10 @@ export function PurchaseDetail({ id }: { id: string }) {
                 Weights & variance
               </p>
               <DetailGrid>
+                {/* What was bought - the heading names the page now. */}
+                <DetailItem label="Commodity" strong>
+                  {p.commodity.name}
+                </DetailItem>
                 <DetailItem label="Recorded weight" mono>
                   {formatKg(p.weightKg)}
                 </DetailItem>

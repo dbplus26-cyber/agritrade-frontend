@@ -543,10 +543,6 @@ export function ShipmentDetail({ id }: { id: string }) {
 
   const s = data.data.shipment;
   const beforeDispatch = s.status === "PLANNED" || s.status === "LOADING";
-  const saleSummary =
-    s.sales.length === 1
-      ? (s.sales[0]?.buyer.name ?? "")
-      : `${String(s.salesCount)} sales`;
   const anyDriverExtra = Boolean(
     s.driverEmail ?? s.driverCity ?? s.driverLicenseNo ?? s.driverIdNumber,
   );
@@ -885,9 +881,9 @@ export function ShipmentDetail({ id }: { id: string }) {
           their own labels inside, so the grouping survives without the second
           frame.
 
-          The truck registration and the route are NOT repeated here - the
-          page header is "REG - destination" and its subtitle names the origin,
-          so stating them again was the third time on one screen. */}
+          The truck and the route live here now. They were dropped when the
+          page header carried them; the header says what KIND of page this is,
+          so the record has to say which shipment. */}
       <AdminCard className="p-5">
         <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
           Trip
@@ -895,6 +891,12 @@ export function ShipmentDetail({ id }: { id: string }) {
         <DetailGrid className="mt-1">
           <DetailItem label="Waybill no" mono>
             {s.transactionNo}
+          </DetailItem>
+          <DetailItem label="Truck" strong>
+            {s.truckReg}
+          </DetailItem>
+          <DetailItem full label="Route">
+            {s.originWarehouse.name} → {s.destination}
           </DetailItem>
           <DetailItem label="Total weight" mono>
             {formatKg(s.totalWeightKg)}
@@ -1188,8 +1190,7 @@ export function ShipmentDetail({ id }: { id: string }) {
     <div className="max-w-[1120px]">
       <BackButton href={LIST} label="All shipments" className="mb-2" />
       <AdminPageHeader
-        title={`${s.truckReg} · ${s.destination}`}
-        sub={`For ${saleSummary} · from ${s.originWarehouse.name}`}
+        title="Shipment details"
         actions={
           <span className="flex flex-wrap items-center gap-1.5">
             <ShipmentStatusBadge status={s.status} />

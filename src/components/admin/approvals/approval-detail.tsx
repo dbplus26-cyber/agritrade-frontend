@@ -54,7 +54,7 @@ export function ApprovalDetail({ id }: { id: string }) {
     <div className="max-w-[640px]">
       <BackButton href={LIST} label="All approvals" className="mb-2" />
       <AdminPageHeader
-        title={headline}
+        title="Approval details"
         sub={ACTION_LABEL[approval.action] ?? approval.action}
       />
 

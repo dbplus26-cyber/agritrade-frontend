@@ -197,6 +197,14 @@ export function PlotDetail({ id }: { id: string }) {
         Pricing & status
       </p>
       <DetailGrid columns={2}>
+        {/* The plot's location and reference: what the heading used to say. */}
+        <DetailItem full label="Location" strong>
+          {p.locationText}
+        </DetailItem>
+        <DetailItem label="Reference" mono>
+          {p.reference}
+        </DetailItem>
+        <DetailItem label="Size">{p.sizeText}</DetailItem>
         <DetailItem label="Asking price" mono strong>
           <Money value={p.askingPriceGhs} />
         </DetailItem>

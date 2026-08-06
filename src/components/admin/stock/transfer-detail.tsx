@@ -42,7 +42,7 @@ export function TransferDetail({ id }: { id: string }) {
       backLabel="All transfers"
       header={
         <AdminPageHeader
-          title={`${t.fromWarehouse.name} → ${t.toWarehouse.name}`}
+          title="Transfer details"
           sub={`Transfer ${t.transactionNo}`}
         />
       }

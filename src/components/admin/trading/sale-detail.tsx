@@ -287,6 +287,9 @@ export function SaleDetail({
     <div className="flex flex-col gap-4">
       {/* Money summary + actions */}
       <AdminCard className="px-5 py-3">
+        {/* Which buyer. The heading names the page, so the record has to
+            name the counterparty. */}
+        <SummaryRow label="Buyer">{sale.buyer.name}</SummaryRow>
         <SummaryRow label="Agreed total" strong>
           <Money value={sale.agreedTotalGhs} />
         </SummaryRow>

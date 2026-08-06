@@ -134,6 +134,12 @@ export function SeasonDetail({ id }: { id: string }) {
               Season
             </p>
             <DetailGrid columns={2}>
+              {/* The name is here rather than in the page heading, which now
+                  says what KIND of page this is. Something has to say which
+                  season. */}
+              <DetailItem full label="Name" strong>
+                {s.name}
+              </DetailItem>
               <DetailItem label="Starts">{formatFarmDate(s.startsOn)}</DetailItem>
               <DetailItem label="Ends">
                 {s.endsOn ? (

@@ -138,7 +138,7 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
       <div className="max-w-[640px]">
         <BackButton href={LIST} label="All items" className="mb-2" />
         <AdminPageHeader
-          title={item.name}
+          title="Input item details"
           sub={"An input the programme grants to farmers - what it is, and the unit it is issued in"}
           actions={<ActiveBadge active={item.isActive} />}
         />

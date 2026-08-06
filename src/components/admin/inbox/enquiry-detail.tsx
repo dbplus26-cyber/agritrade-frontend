@@ -133,6 +133,11 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
                 Sender &amp; provenance
               </p>
               <DetailGrid>
+                {/* Who sent it. This was the page heading; the heading now
+                    names the page, so the record names the sender. */}
+                <DetailItem label="From" strong>
+                  {enquiry.fullName}
+                </DetailItem>
                 <DetailItem label="Reference" mono>
                   {enquiry.reference}
                 </DetailItem>

@@ -702,8 +702,7 @@ export function UserDetail({ id }: { id: string }) {
     <div className="w-full max-w-[1120px]">
       <BackButton href="/admin/users" label="All users" className="mb-2" />
       <AdminPageHeader
-        title={`${user.firstName} ${user.lastName}`}
-        sub={`${ROLE_TITLE[user.role] ?? user.role} · ${user.email}`}
+        title="User details"
       />
 
       <DetailShell
