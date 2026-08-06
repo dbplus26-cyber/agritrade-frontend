@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { AdminButton, AdminPageHeader } from "@/components/admin/ui";
+import { AdminPageHeader, PdfLink } from "@/components/admin/ui";
 import { DocumentSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -45,20 +45,10 @@ export function Waybill({ id }: { id: string }) {
           title={`Waybill ${s.transactionNo}`}
           sub={`What ${s.truckReg} is carrying to ${s.destination} - print it and have the driver sign`}
           actions={
-            <>
-              <AdminButton variant="outline" className="h-9 px-4" asChild>
-                <a
-                  href={shipmentWaybillPdfUrl(s.id)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Download PDF
-                </a>
-              </AdminButton>
-              <AdminButton className="h-9 px-4" onClick={() => window.print()}>
-                Print
-              </AdminButton>
-            </>
+            // One action, not two pointing at the same document. This screen
+            // offered "Download PDF" AND "Print" - the first fetched the real
+            // waybill, the second printed the web page it was rendered on.
+            <PdfLink href={shipmentWaybillPdfUrl(s.id)}>Waybill PDF</PdfLink>
           }
         />
       </div>

@@ -139,6 +139,11 @@ export function AgentStatement({ id }: { id: string }) {
           title={`${a.firstName} ${a.lastName} - float statement`}
           sub="Every top-up, purchase and expense against the cash this agent holds, ready to print and sign"
           actions={
+              // No server-rendered PDF for a statement: the API's receipt
+              // types cover single documents (a voucher, an invoice, a
+              // waybill), not a ledger over a period. So this one really does
+              // print the page - which is now only the sheet, since the shell
+              // hides itself for print.
             <AdminButton className="h-9 px-4" onClick={() => window.print()}>
               Print
             </AdminButton>

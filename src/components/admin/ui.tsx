@@ -490,3 +490,42 @@ export function EditableFormActions({
     </div>
   );
 }
+
+/**
+ * Opens a server-rendered PDF in a new tab.
+ *
+ * The console's one way of handing over a document. Printing a screen was the
+ * other way, and it was the wrong one: the browser captured whatever was on
+ * the page - rail, topbar, crumbs, footer - and the reader got the console
+ * with a document somewhere in the middle of it. The API already renders these
+ * as real PDFs (`/admin/receipts/<type>/<id>.pdf`), correctly paginated, with
+ * nothing on them that is not the document, and reaching one is a link rather
+ * than a print dialog and a set of browser settings to get right.
+ *
+ * Styled as a quiet action, not a button: on every screen that has one there
+ * is already a primary action beside it, and the document is a thing you
+ * fetch, not the thing the page is for.
+ */
+export function PdfLink({
+  children,
+  className,
+  href,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  href: string;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={cn(
+        "inline-flex h-9 flex-none items-center px-3 text-[13px] whitespace-nowrap text-console underline-offset-2 hover:underline",
+        className,
+      )}
+    >
+      {children}
+    </a>
+  );
+}

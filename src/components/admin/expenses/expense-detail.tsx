@@ -10,6 +10,7 @@ import {
   AdminCard,
   AdminPageHeader,
   Mono,
+  PdfLink,
 } from "@/components/admin/ui";
 import { DateOnlyCell, DateTimeCell } from "@/components/admin/date-cell";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -69,14 +70,11 @@ export function ExpenseDetail({ id }: { id: string }) {
           sub="A cost recorded against this heading"
           actions={
             <div className="flex flex-wrap items-center gap-2">
-              <a
+              <PdfLink
                 href={`${env.SERVER_URI}/api/v1/admin/receipts/expense/${expense.id}.pdf`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex h-9 items-center px-3 text-[13px] text-console hover:underline"
               >
                 Voucher PDF
-              </a>
+              </PdfLink>
               {isSuperAdmin ? (
                 <AdminButton
                   className="h-9 px-4"

@@ -1,14 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { AdminButton, AdminPageHeader } from "@/components/admin/ui";
+import { AdminPageHeader,
+  PdfLink,
+} from "@/components/admin/ui";
 import { DocumentSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatDateOnly } from "@/lib/format-date";
 import { formatKg } from "@/lib/format-money";
 import { useGetPayableAccountsQuery } from "@/redux/payment-accounts/payment-accounts-api";
-import { useGetSaleQuery } from "@/redux/sales/admin-sales-api";
+import {
+  saleInvoicePdfUrl,
+  useGetSaleQuery,
+} from "@/redux/sales/admin-sales-api";
 import { useGetSettingsQuery } from "@/redux/settings/settings-api";
 import type { IPayableAccount } from "@/types/payment-account.types";
 import { Money, formatSaleDate } from "./sale-bits";
@@ -111,9 +116,12 @@ export function SaleInvoice({ id }: { id: string }) {
               : `What ${s.buyer.name} still owes on this sale, and where to pay it`
           }
           actions={
-            <AdminButton className="h-9 px-4" onClick={() => window.print()}>
-              Print
-            </AdminButton>
+            // The server renders this same document as a real PDF, so the
+            // action fetches it rather than asking the browser to print a web
+            // page that happens to look like one.
+            <PdfLink href={saleInvoicePdfUrl(s.id)}>
+              {isReceipt ? "Receipt PDF" : "Invoice PDF"}
+            </PdfLink>
           }
         />
       </div>

@@ -61,6 +61,11 @@ export function FarmerStatement({
           title={`${st.farmer.name} - statement`}
           sub="Every grant and repayment with a running balance, ready to print and sign"
           actions={
+              // No server-rendered PDF for a statement: the API's receipt
+              // types cover single documents (a voucher, an invoice, a
+              // waybill), not a ledger over a period. So this one really does
+              // print the page - which is now only the sheet, since the shell
+              // hides itself for print.
             <AdminButton className="h-9 px-4" onClick={() => window.print()}>
               Print
             </AdminButton>

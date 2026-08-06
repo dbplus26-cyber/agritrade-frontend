@@ -1,4 +1,5 @@
 import { apiSlice } from "../api-slice";
+import { env } from "@/lib/env";
 import { toQueryString } from "@/lib/to-query-string";
 import type {
   ICreateSaleInput,
@@ -16,6 +17,12 @@ import type {
  * moves both the sale and the derived stats/debtors, so those tags invalidate
  * together. (The public /pay flow lives in ../sales/sales-api and is separate.)
  */
+/** The server-rendered invoice / receipt PDF for a sale. Titled "Invoice"
+ * while a balance is outstanding and "Receipt" once it is settled - the same
+ * split the on-screen sheet makes. */
+export const saleInvoicePdfUrl = (saleId: string): string =>
+  `${env.SERVER_URI}/api/v1/admin/receipts/sale/${saleId}.pdf`;
+
 export const adminSalesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getSales: builder.query<ISaleListResponse, ISaleListQuery | void>({

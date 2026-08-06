@@ -591,11 +591,19 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const activeKey = activeNavKey(pathname);
 
   return (
+    // PRINT DROPS THE CONSOLE. A statement or a waybill is a document, and
+    // printing one used to put the rail, the topbar, the crumbs and the footer
+    // on the paper with it - the screens each hid their own chrome with
+    // `print:hidden`, but nothing hid the shell they sit inside, which is
+    // most of what ends up on the page. Hidden here, once, rather than by
+    // every printable screen remembering to reach up and do it.
     <SidebarProvider style={SIDEBAR_VARS}>
-      <ConsoleSidebar activeKey={activeKey} />
+      <div className="contents print:hidden">
+        <ConsoleSidebar activeKey={activeKey} />
+      </div>
 
-      <SidebarInset className="min-w-0 bg-transparent pb-[62px] md:pb-0">
-        <header className="sticky top-0 z-40 flex h-[54px] flex-none items-center gap-3 border-b border-adm-line bg-adm-card px-4 lg:px-[26px]">
+      <SidebarInset className="min-w-0 bg-transparent pb-[62px] md:pb-0 print:pb-0">
+        <header className="sticky top-0 z-40 flex h-[54px] flex-none items-center gap-3 border-b border-adm-line bg-adm-card px-4 lg:px-[26px] print:hidden">
           {/* Collapse/expand the rail (sheet on mobile) - dms behaviour in the
               console skin, living on the topbar's left edge. */}
           <SidebarTrigger className="h-[30px] w-[30px] flex-none cursor-pointer rounded-[6px] border border-adm-line bg-adm-card text-adm-muted hover:bg-adm-sunken hover:text-adm-ink max-md:hidden" />
@@ -613,13 +621,17 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             768px tablet a viewport-based `md:` fires while the content area is
             only ~512px wide, which is exactly how a table ends up rendered
             into half the room it was designed for. */}
-        <main className="@container/main mx-auto w-full min-w-0 max-w-[1360px] flex-1 p-4 lg:p-[26px]">
+        <main className="@container/main mx-auto w-full min-w-0 max-w-[1360px] flex-1 p-4 lg:p-[26px] print:max-w-none print:p-0">
           {children}
         </main>
-        <ConsoleFooter />
+        <div className="print:hidden">
+          <ConsoleFooter />
+        </div>
       </SidebarInset>
 
-      <MobileTabs activeKey={activeKey} />
+      <div className="print:hidden">
+        <MobileTabs activeKey={activeKey} />
+      </div>
     </SidebarProvider>
   );
 }
