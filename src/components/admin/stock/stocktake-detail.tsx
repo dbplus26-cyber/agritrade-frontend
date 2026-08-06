@@ -213,8 +213,7 @@ export function StocktakeDetail({ id }: { id: string }) {
     <div className="max-w-[1120px]">
       <BackButton href={LIST} label="All stocktakes" className="mb-2" />
       <AdminPageHeader
-        title={`Stocktake ${st.transactionNo}`}
-        sub={`Created ${formatDateTime(st.createdAt)}`}
+        title="Stocktake details"
         actions={<StocktakeStatusBadge status={st.status} />}
       />
 
@@ -252,6 +251,9 @@ export function StocktakeDetail({ id }: { id: string }) {
               Sheet
             </div>
             <DetailGrid className="mt-1">
+              <DetailItem label="Stocktake no" mono strong>
+                {st.transactionNo}
+              </DetailItem>
               <DetailItem label="Warehouse">
                 <Link
                   href={`/admin/warehouses/${st.warehouse.id}`}

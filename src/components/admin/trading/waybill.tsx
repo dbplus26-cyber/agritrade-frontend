@@ -42,8 +42,8 @@ export function Waybill({ id }: { id: string }) {
           ← Back to shipment
         </Link>
         <AdminPageHeader
-          title={`Waybill ${s.transactionNo}`}
-          sub={`What ${s.truckReg} is carrying to ${s.destination} - print it and have the driver sign`}
+          title="Waybill"
+          sub="Print it and have the driver sign"
           actions={
             // Two genuinely different artefacts, not one action twice over.
             // Print reproduces the sheet below EXACTLY - same measure, same

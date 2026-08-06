@@ -435,7 +435,6 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
         </div>
         <RecordFacts
           facts={[
-            { label: "Name", value: driver.name },
             { mono: true, label: "Phone", value: driver.phone },
             { label: "Email", value: driver.email },
             { label: "Company", value: driver.company },

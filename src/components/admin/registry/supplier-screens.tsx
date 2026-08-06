@@ -586,7 +586,6 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
         </div>
         <RecordFacts
           facts={[
-            { label: "Name", value: supplier.name },
             { mono: true, label: "Phone", value: supplier.phone },
             { mono: true, label: "Other phone", value: supplier.altPhone },
             { label: "Community", value: supplier.community },

@@ -58,7 +58,7 @@ export function FarmerStatement({
           ← Back to farmer
         </Link>
         <AdminPageHeader
-          title={`${st.farmer.name} - statement`}
+          title="Farmer statement"
           sub="Every grant and repayment with a running balance, ready to print and sign"
           actions={
               // No server-rendered PDF for a statement: the API's receipt

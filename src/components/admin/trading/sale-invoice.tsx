@@ -109,7 +109,7 @@ export function SaleInvoice({ id }: { id: string }) {
           ← Back to sale
         </Link>
         <AdminPageHeader
-          title={`${isReceipt ? "Receipt" : "Invoice"} ${s.transactionNo}`}
+          title={isReceipt ? "Receipt" : "Invoice"}
           sub={
             isReceipt
               ? `Proof that ${s.buyer.name} settled this sale in full`

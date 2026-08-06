@@ -48,7 +48,7 @@ export function GrantDetail({ id }: { id: string }) {
     <div className="max-w-[1120px]">
       <BackButton href={LIST} label="All grants" className="mb-2" />
       <AdminPageHeader
-        title={`Grant ${g.transactionNo}`}
+        title="Grant details"
         sub={`Recorded ${formatDateTime(g.createdAt)}`}
         actions={<GrantApprovalBadge status={g.approval?.status} />}
       />
@@ -95,6 +95,11 @@ export function GrantDetail({ id }: { id: string }) {
                 </div>
               </Link>
               <DetailGrid className="mt-3 border-t border-adm-hairline pt-1">
+                {/* The grant's own number. It was the page heading; the
+                    heading names the page now, so the record names itself. */}
+                <DetailItem label="Grant no" mono strong>
+                  {g.transactionNo}
+                </DetailItem>
                 <DetailItem label="Item">
                   {g.item.name} · {g.quantity} {g.item.unitLabel}
                 </DetailItem>

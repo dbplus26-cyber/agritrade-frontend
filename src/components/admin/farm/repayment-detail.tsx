@@ -51,7 +51,7 @@ export function RepaymentDetail({ id }: { id: string }) {
     <div className="max-w-[1120px]">
       <BackButton href={LIST} label="All repayments" className="mb-2" />
       <AdminPageHeader
-        title={`Repayment ${r.transactionNo}`}
+        title="Repayment details"
         sub={`Recorded ${formatDateTime(r.createdAt)}`}
         actions={
           r.intoStock ? <ToneBadge tone="sky">Taken into stock</ToneBadge> : null
@@ -100,6 +100,9 @@ export function RepaymentDetail({ id }: { id: string }) {
                 </div>
               </Link>
               <DetailGrid className="mt-3 border-t border-adm-hairline pt-1">
+                <DetailItem label="Receipt no" mono strong>
+                  {r.transactionNo}
+                </DetailItem>
                 <DetailItem label="Commodity">{r.commodity.name}</DetailItem>
                 <DetailItem label="Weight" mono>
                   {formatKg(r.weightKg)}

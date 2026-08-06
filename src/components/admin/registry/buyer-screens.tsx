@@ -468,7 +468,6 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
         </div>
         <RecordFacts
           facts={[
-            { label: "Name", value: buyer.name },
             { mono: true, label: "Phone", value: buyer.phone },
             { mono: true, label: "Other phone", value: buyer.altPhone },
             { label: "City", value: buyer.city },
