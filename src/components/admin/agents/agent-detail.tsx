@@ -419,9 +419,11 @@ function ReconcileDialog({
   };
 
   const line = (label: string, amount: number, sign?: "+" | "-") => (
-    <div className="flex items-baseline justify-between gap-3 py-0.5">
-      <span className="min-w-0 text-[12px] text-adm-muted [overflow-wrap:anywhere]">{label}</span>
-      <Mono className="text-[12.5px] text-adm-ink">
+    <div className="flex items-baseline justify-between gap-4 border-b border-adm-hairline py-2 last:border-b-0">
+      <span className="min-w-0 text-[12.5px] text-adm-body [overflow-wrap:anywhere]">
+        {label}
+      </span>
+      <Mono className="flex-none text-[13px] text-adm-ink">
         {sign ?? ""}
         {formatCedis(Math.abs(amount))}
       </Mono>
@@ -449,7 +451,11 @@ function ReconcileDialog({
           />
         ) : (
           <>
-            <div className="rounded border border-adm-hairline bg-adm-sunken px-3 py-2">
+            {/* The workings, as a statement rather than a grey block. Rows
+                were 2px apart with the label and its figure at almost the
+                same weight, so the whole computation read as one texture and
+                the total - the only line anyone needs - sat inside it. */}
+            <div className="rounded-[6px] border border-adm-line bg-adm-sunken px-4 py-1">
               {line(
                 p.since
                   ? `Opening (last count ${formatConsoleDate(p.since)})`
@@ -466,11 +472,11 @@ function ReconcileDialog({
                     p.adjustmentsGhs >= 0 ? "+" : "-",
                   )
                 : null}
-              <div className="ledger-rule mt-1 flex items-baseline justify-between pt-1.5">
-                <span className="text-[11px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+              <div className="mt-1 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-t-[1.5px] border-adm-strong py-3">
+                <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                   Expected in hand
                 </span>
-                <Mono className="text-[14px] font-semibold text-adm-ink">
+                <Mono className="text-[18px] font-semibold text-adm-ink">
                   {formatCedis(p.expectedGhs)}
                 </Mono>
               </div>
@@ -479,7 +485,7 @@ function ReconcileDialog({
             <form
               noValidate
               onSubmit={handleSubmit(onSubmit)}
-              className="flex flex-col gap-3"
+              className="mt-4 flex flex-col gap-3.5"
             >
               <AdminField
                 label="Counted cash (GH₵)"

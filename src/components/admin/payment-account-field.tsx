@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import { AdminField } from "@/components/admin/ui";
-import { SearchableSelect } from "@/components/admin/searchable-select";
+import { AdminField, adminSelectClass } from "@/components/admin/ui";
+
 import { cn } from "@/lib/utils";
 import { useGetPaymentAccountsQuery } from "@/redux/payment-accounts/payment-accounts-api";
 import type { PaymentAccountKind } from "@/types/payment-account.types";
@@ -63,6 +63,7 @@ export function PaymentAccountField({
     [data, method],
   );
 
+  const chosen = accounts.find((a) => a.id === value);
   const optional = method === "CASH";
   const hint = isError
     ? "Couldn't load the accounts register - close and try again."
@@ -77,29 +78,39 @@ export function PaymentAccountField({
       hint={hint}
       error={error}
     >
-      {/* Not a native <select>. Its popup is drawn by the operating system at
-          the width of the longest option, which CSS cannot touch - so an
-          account named at any length opened a list wider than the dialog
-          containing it. This one is ours: the panel matches the control, and a
-          long name wraps inside it instead of widening it. */}
-      <SearchableSelect
+      {/* Native. The rendered version drew its own panel, which sized to its
+          content and escaped the dialog around it; a native list is drawn by
+          the platform against the control and cannot.
+          
+          The option text is kept SHORT for the same reason - the label alone,
+          not "label · ····1234". A native popup does follow its longest
+          option, so the way to keep it narrow is to not write a long one; the
+          masked number sits under the field instead, where it is readable
+          without opening anything. */}
+      <select
+        disabled={isLoading}
         value={value}
-        onChange={onChange}
-        options={accounts.map((a) => ({
-          value: a.id,
-          label: a.label,
-          hint: maskAccountNumber(a.accountNumber),
-        }))}
-        placeholder={
-          isLoading
+        onChange={(e) => onChange(e.target.value)}
+        className={cn(adminSelectClass, "w-full", error && "border-console-red")}
+      >
+        <option value="">
+          {isLoading
             ? "Loading accounts…"
             : optional
               ? "Cash till (no account)"
-              : "Select the account…"
-        }
-        disabled={isLoading}
-        className={cn(error && "border-console-red")}
-      />
+              : "Select the account…"}
+        </option>
+        {accounts.map((a) => (
+          <option key={a.id} value={a.id}>
+            {a.label}
+          </option>
+        ))}
+      </select>
+      {chosen ? (
+        <p className="mt-1 text-[12px] text-adm-muted">
+          {chosen.accountName} · {maskAccountNumber(chosen.accountNumber)}
+        </p>
+      ) : null}
     </AdminField>
   );
 }

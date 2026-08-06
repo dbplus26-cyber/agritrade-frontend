@@ -54,10 +54,14 @@ function LinesCard({ lines }: { lines: IStocktakeLine[] }) {
           <table className="w-full text-[13px]">
             <thead>
               <tr className="bg-adm-sunken text-left text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted">
-                <th className="px-5 py-2.5">Commodity</th>
-                <th className="px-5 py-2.5 text-right">Counted</th>
-                <th className="px-5 py-2.5 text-right">Book</th>
-                <th className="px-5 py-2.5 text-right">Difference</th>
+                {/* The named column takes the slack; Counted, Book and Difference
+                    are short fixed figures and size to themselves. Without
+                    this the four columns split evenly and the commodity - the
+                    only one that can run long - got a quarter of the table. */}
+                <th className="w-full px-5 py-2.5">Commodity</th>
+                <th className="px-5 py-2.5 text-right whitespace-nowrap">Counted</th>
+                <th className="px-5 py-2.5 text-right whitespace-nowrap">Book</th>
+                <th className="px-5 py-2.5 text-right whitespace-nowrap">Difference</th>
               </tr>
             </thead>
             <tbody>

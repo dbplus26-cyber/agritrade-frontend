@@ -1,15 +1,8 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { X } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 /**
@@ -43,47 +36,48 @@ export function ConsoleLabeledSelect({
   className?: string;
 }) {
   return (
-    <Select value={value} onValueChange={onChange}>
-      <SelectTrigger
-        aria-label={`Filter by ${label.toLowerCase()}`}
+    // A NATIVE select, not a rendered one.
+    //
+    // The rendered version drew its own panel in a portal, and a portal has
+    // no obligation to the control that opened it: it sized to the longest
+    // option, so a 150px filter opened a list twice its width and a toolbar
+    // of them came out ragged. Pinning the panel to the trigger fixed the
+    // width and cost the thing a native control gives free - the platform's
+    // own list, which is a wheel on a phone, is keyboard-navigable by typing,
+    // and never escapes its own control.
+    //
+    // The label rides INSIDE the control as a prefix on the option text
+    // instead of a separate span, because a native select renders one line of
+    // text and cannot hold a second element.
+    <label className={cn("relative flex min-w-0", className)}>
+      <span className="sr-only">{`Filter by ${label.toLowerCase()}`}</span>
+      <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-[10px] font-semibold tracking-[0.06em] text-adm-faint uppercase">
+        {label}
+      </span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
         className={cn(
-          // Full width on a phone, where filters stack; a fixed 150px from
-          // lg up, where they sit in a row. Without the lg cap a filter bar
-          // stretches its selects across the whole console - which is what
-          // the floats register looked like, and nothing else did. It is a
-          // DEFAULT rather than each caller's job to remember: twMerge lets
-          // `className` override it where a filter genuinely needs more room.
-          "h-[34px] w-full min-w-0 cursor-pointer rounded-[6px] border bg-adm-card px-2.5 text-[13px] font-normal text-adm-body shadow-none transition-colors focus:ring-0 focus-visible:ring-0 lg:w-[150px] data-[state=open]:border-console",
+          "h-[34px] w-full min-w-0 cursor-pointer appearance-none rounded-[6px] border bg-adm-card pr-7 text-[13px] font-normal text-adm-body transition-colors focus:ring-0 focus-visible:ring-0 lg:w-[150px]",
           active ? "border-console/60" : "border-adm-line",
-          className,
         )}
+        // Inline, not a class: Tailwind cannot build one from a runtime
+        // value. Leaves room for the label prefix sitting over the control.
+        style={{
+          paddingLeft: `calc(0.625rem + ${String(label.length)}ch + 0.5rem)`,
+        }}
       >
-        {/* The dimension being filtered, always visible - "Fuel" alone says
-            nothing about WHICH filter it came from once picked. */}
-        <span className="pointer-events-none flex-none pr-1.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-adm-faint">
-          {label}
-        </span>
-        <SelectValue />
-      </SelectTrigger>
-      {/* The panel matches the control it opens from.
-          SelectContent carries a min-width and no maximum, so it sizes to its
-          widest option - and warehouse and commodity names are exactly the
-          kind of thing that runs long. A 150px filter opening a 400px panel
-          reads as a mistake, and on a toolbar of several filters they all come
-          out different widths. Pinned to the trigger, a long option wraps
-          inside the panel rather than widening it. */}
-      <SelectContent className="w-(--radix-select-trigger-width) min-w-(--radix-select-trigger-width)">
         {options.map((o) => (
-          <SelectItem
-            key={o.value}
-            value={o.value}
-            className="cursor-pointer [&_span]:whitespace-normal [&_span]:[overflow-wrap:anywhere]"
-          >
+          <option key={o.value} value={o.value}>
             {o.label}
-          </SelectItem>
+          </option>
         ))}
-      </SelectContent>
-    </Select>
+      </select>
+      <ChevronDown
+        aria-hidden="true"
+        className="pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 text-adm-faint"
+      />
+    </label>
   );
 }
 

@@ -376,12 +376,12 @@ function WarehouseSections({
   commodities: MatrixCommodity[];
 }) {
   return (
-    <div>
-      {warehouses.map((w, index) => (
-        <section
-          key={w.id}
-          className={cn(index > 0 && "border-t-[1.5px] border-adm-hairline")}
-        >
+    // Sections tile on a wide console rather than running one-per-row down a
+    // long page; each keeps its own frame so the grid reads as a set of
+    // stores rather than one continuous ledger.
+    <div className="grid gap-px bg-adm-hairline @4xl/main:grid-cols-2">
+      {warehouses.map((w) => (
+        <section key={w.id} className="bg-adm-card">
           {/* THREE LEVELS, and they have to look like three.
               The warehouse was set in the same 11px micro-caps the console
               uses for section labels, while the commodities under it were
@@ -413,7 +413,14 @@ function WarehouseSections({
               </span>
             </div>
           </div>
-          <div className="px-4 py-1 @xl/main:columns-2 @xl/main:gap-x-10 @4xl/main:columns-3">
+          {/* One column, read straight down. This was a CSS multi-column
+              list, and CSS columns flow top-to-bottom and THEN wrap to the
+              next column - so a reader looking for a commodity had no single
+              direction to scan, which is what made the panel feel scattered.
+              Width is spent on showing more warehouses side by side instead
+              (see the grid on the section list), where each one stays a plain
+              vertical list. */}
+          <div className="px-4 py-1">
             {commodities
               .filter((c) => w.byCommodity.has(c.id))
               .map((c) => {
