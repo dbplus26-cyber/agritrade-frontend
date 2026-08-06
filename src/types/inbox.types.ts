@@ -32,6 +32,26 @@ export interface IAdminEnquiry {
   ip: null | string;
   receivedAt: string;
   updatedAt: string;
+  /**
+   * The replies already sent, oldest first. The conversation lives in the
+   * system rather than in one person's sent folder, so whoever picks the
+   * enquiry up next can see it has been answered.
+   */
+  replies: IEnquiryReply[];
+}
+
+export interface IEnquiryReply {
+  id: string;
+  body: string;
+  /** Snapshotted at send time, so editing the enquiry never rewrites it. */
+  sentToEmail: string;
+  /**
+   * False when the send failed. The reply is recorded either way, because a
+   * failed send is exactly the thing staff have to be able to see and retry.
+   */
+  delivered: boolean;
+  sentById: null | string;
+  sentAt: string;
 }
 
 export interface IEnquiryListQuery {

@@ -26,6 +26,7 @@ import { cn } from "@/lib/utils";
 import {
   useDeleteEnquiryMutation,
   useGetEnquiryQuery,
+  useReplyToEnquiryMutation,
   useUpdateEnquiryMutation,
 } from "@/redux/enquiries/enquiries-api";
 import {
@@ -43,6 +44,7 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
   const { confirm, confirmationDialog } = useConfirm();
   const [updateEnquiry, { isLoading: saving }] = useUpdateEnquiryMutation();
   const [deleteEnquiry, { isLoading: deleting }] = useDeleteEnquiryMutation();
+  const [replyToEnquiry, { isLoading: replying }] = useReplyToEnquiryMutation();
 
   const [status, setStatus] = useState<EnquiryStatus>(enquiry.status);
   const [notes, setNotes] = useState(enquiry.notes ?? "");
@@ -50,11 +52,42 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
   const notesDirty = notes.trim() !== (enquiry.notes ?? "");
   const dirty = statusDirty || notesDirty;
 
-  const replyHref = enquiry.email
-    ? `mailto:${enquiry.email}?subject=${encodeURIComponent(
-        `Re: ${enquiry.subject} (${enquiry.reference})`,
-      )}`
-    : null;
+  const [replyBody, setReplyBody] = useState("");
+  const canReply = Boolean(enquiry.email);
+
+  /**
+   * Sends the reply and records it.
+   *
+   * This used to be a `mailto:` link. That hands the job to whatever mail
+   * client the machine has - nothing at all on a machine with none configured,
+   * which is why it looked like the button did nothing - and whatever was
+   * eventually typed lived in one person's sent folder, so the console still
+   * showed the enquiry as unanswered. The endpoint behind this sends the email
+   * AND stores the text, and it reports `delivered` from the real outcome, so
+   * a bounce is visible rather than assumed away.
+   */
+  const onReply = async () => {
+    const body = replyBody.trim();
+    if (!body) return;
+    try {
+      const res = await replyToEnquiry({ body, id: enquiry.id }).unwrap();
+      setReplyBody("");
+      if (res.data.reply.delivered) {
+        notify.success("Reply sent");
+      } else {
+        // Recorded but not delivered. Saying "sent" here would be a lie the
+        // reader has no way to catch.
+        notify.error("Saved, but the email did not go out", {
+          description:
+            "The reply is on the record so you can try again. Check the address on file.",
+        });
+      }
+    } catch (err) {
+      notify.error("Couldn't send the reply", {
+        description: extractApiError(err).message,
+      });
+    }
+  };
 
   const onSave = async () => {
     try {
@@ -114,13 +147,85 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
               <p className="mt-3 text-[14px] leading-[1.75] whitespace-pre-wrap text-adm-ink [overflow-wrap:anywhere]">
                 {enquiry.message}
               </p>
-              {replyHref ? (
+              {/* The thread, then the composer. Anyone opening this needs to
+                  know it has already been answered before they answer it
+                  again, so the history reads above the box. */}
+              {enquiry.replies.length > 0 ? (
                 <div className="mt-4 border-t border-adm-hairline pt-3.5">
-                  <AdminButton asChild variant="gold" className="h-9 px-4">
-                    <a href={replyHref}>Reply by email</a>
-                  </AdminButton>
+                  <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+                    {enquiry.replies.length === 1
+                      ? "1 reply sent"
+                      : `${String(enquiry.replies.length)} replies sent`}
+                  </p>
+                  <ul className="mt-2 flex flex-col gap-3">
+                    {enquiry.replies.map((r) => (
+                      <li
+                        className="rounded-[6px] bg-adm-sunken px-3.5 py-3"
+                        key={r.id}
+                      >
+                        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                          <span className="text-[11.5px] text-adm-faint">
+                            {formatDateTime(r.sentAt)}
+                          </span>
+                          <span className="min-w-0 text-[11.5px] text-adm-faint [overflow-wrap:anywhere]">
+                            to {r.sentToEmail}
+                          </span>
+                          {!r.delivered ? (
+                            <span className="text-[11px] font-bold tracking-[0.06em] text-console-red uppercase">
+                              Not delivered
+                            </span>
+                          ) : null}
+                        </div>
+                        <p className="mt-1.5 text-[13.5px] leading-[1.7] whitespace-pre-wrap text-adm-ink [overflow-wrap:anywhere]">
+                          {r.body}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               ) : null}
+
+              <div className="mt-4 border-t border-adm-hairline pt-3.5">
+                {canReply ? (
+                  <>
+                    <AdminField label="Reply">
+                      <textarea
+                        className={cn(
+                          adminInputClass,
+                          "h-auto min-h-[104px] w-full resize-y py-2",
+                        )}
+                        onChange={(e) => {
+                          setReplyBody(e.target.value);
+                        }}
+                        placeholder="Write the reply that will be emailed to them."
+                        rows={4}
+                        value={replyBody}
+                      />
+                    </AdminField>
+                    <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+                      <AdminButton
+                        className="h-9 px-4"
+                        disabled={replying || replyBody.trim().length === 0}
+                        onClick={() => void onReply()}
+                        variant="gold"
+                      >
+                        {replying ? "Sending…" : "Send reply"}
+                      </AdminButton>
+                      <span className="min-w-0 text-[12px] text-adm-muted [overflow-wrap:anywhere]">
+                        Goes to {enquiry.email}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  // Many enquiries arrive phone-only, and the server refuses a
+                  // reply with nowhere to send it. Saying so here is better
+                  // than a button that can only fail.
+                  <p className="text-[13px] text-adm-muted">
+                    No email address on file, so there is nowhere to send a
+                    reply. Call or message the number on the record instead.
+                  </p>
+                )}
+              </div>
             </AdminCard>
 
             {/* Provenance as a fact GRID, not label-left/value-right rows.
