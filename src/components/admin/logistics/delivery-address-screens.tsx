@@ -122,6 +122,7 @@ export function DeliveryAddressTable() {
             <TitleCell
               href={`${LIST}/${a.id}`}
               meta={`${a.city}${a.area ? ` · ${a.area}` : ""}`}
+              stretch
               title={a.label}
             />
           );

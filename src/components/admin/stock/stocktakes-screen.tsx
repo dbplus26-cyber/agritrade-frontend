@@ -104,7 +104,7 @@ export function StocktakesScreen() {
         meta: columnMeta({ stretch: true }),
         cell: ({ row }) => (
           <span
-            className="block min-w-0 max-w-[240px] text-[13px] font-medium text-adm-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere]"
+            className="block min-w-0 max-w-[90%] text-[13px] font-medium text-adm-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere]"
             title={row.original.warehouse.name}
           >
             {row.original.warehouse.name}

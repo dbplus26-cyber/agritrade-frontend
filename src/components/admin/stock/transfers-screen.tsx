@@ -80,7 +80,7 @@ function Route({ from, to }: { from: string; to: string }) {
     // widen the page.
     <span
       aria-label={`${from} to ${to}`}
-      className="block max-w-[24rem] truncate text-[13px] text-adm-ink md:min-w-[11rem]"
+      className="block max-w-[90%] truncate text-[13px] text-adm-ink md:min-w-[11rem]"
       title={`${from} -> ${to}`}
     >
       <span aria-hidden="true">

@@ -42,8 +42,10 @@ function FarmerCell({ farmer }: { farmer: IFarmer }) {
       >
         {a.init}
       </span>
-      <div className="min-w-0 max-w-[21rem]">
-        <div className="max-w-[20rem] truncate font-semibold text-adm-ink">{farmer.name}</div>
+      <div className="w-full min-w-0">
+        <div className="max-w-[85%] truncate font-semibold text-adm-ink" title={farmer.name}>
+          {farmer.name}
+        </div>
         {farmer.phone ? (
           <div className="text-[12px] text-adm-muted">{farmer.phone}</div>
         ) : null}

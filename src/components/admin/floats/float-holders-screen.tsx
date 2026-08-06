@@ -18,6 +18,7 @@ import { TitleCell } from "@/components/admin/table-cells";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import {
   AdminButton,
+  AdminCard,
   AdminField,
   AdminPageHeader,
   ToneBadge,
@@ -211,27 +212,32 @@ export function FloatHoldersScreen() {
         />
       </ConsoleFilterBar>
 
-      <ConsoleDataTable<IFloatHolder>
-        columns={columns}
-        data={rows}
-        emptyState={
-          <EmptyState
-            title="Nobody matches"
-            description="Try a different role or search term."
-          />
-        }
-        isFetching={isFetching}
-        isFiltered={activeFilterCount > 0 || Boolean(queryParams.search)}
-        itemNoun="people"
-        rowClassName={() => "h-14 hover:bg-adm-sunken"}
-        serverPagination={{
-          onPageChange: setPage,
-          onPageSizeChange: (size) => setFilter("size", String(size)),
-          page,
-          pageSize: limit,
-          totalCount: total,
-        }}
-      />
+      {/* Every other register files its rows on an AdminCard. This screen and
+          the payout register rendered the table bare, so the two money
+          surfaces were the only ones with no sheet under the rows. */}
+      <AdminCard className="overflow-hidden">
+        <ConsoleDataTable<IFloatHolder>
+          columns={columns}
+          data={rows}
+          emptyState={
+            <EmptyState
+              title="Nobody matches"
+              description="Try a different role or search term."
+            />
+          }
+          isFetching={isFetching}
+          isFiltered={activeFilterCount > 0 || Boolean(queryParams.search)}
+          itemNoun="people"
+          rowClassName={() => "h-14 hover:bg-adm-sunken"}
+          serverPagination={{
+            onPageChange: setPage,
+            onPageSizeChange: (size) => setFilter("size", String(size)),
+            page,
+            pageSize: limit,
+            totalCount: total,
+          }}
+        />
+      </AdminCard>
 
       <TopUpDialog holder={toppingUp} onClose={() => setToppingUp(null)} />
     </div>

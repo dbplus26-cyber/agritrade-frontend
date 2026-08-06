@@ -69,8 +69,9 @@ export function SeasonsRegister() {
         cell: ({ row }) => (
           <Link
             href={`/admin/seasons/${row.original.id}`}
-            className="block font-semibold text-adm-ink outline-none focus-visible:underline"
+            className="block max-w-[90%] truncate font-semibold text-adm-ink outline-none focus-visible:underline"
             onClick={(e) => { e.stopPropagation(); }}
+            title={row.original.name}
           >
             {row.original.name}
           </Link>

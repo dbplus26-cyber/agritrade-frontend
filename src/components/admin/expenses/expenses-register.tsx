@@ -7,7 +7,6 @@ import {
   AdminCard,
   AdminPageHeader,
   Mono,
-  ToneBadge,
 } from "@/components/admin/ui";
 import { ConsoleDataTable } from "@/components/admin/data-table";
 import {
@@ -109,9 +108,18 @@ export function ExpensesRegister() {
         accessorFn: (r) => r.shipment?.transactionNo ?? "",
         id: "shipment",
         header: "Trip",
+        // A truck registration is typed by hand and the column allows 40
+        // characters, so it is not badge material: a pill sizes to its content
+        // with no room to give, and a long one distends the row at every width.
+        // Plain mono text, truncating, with the full value on hover.
         cell: ({ row }) =>
           row.original.shipment ? (
-            <ToneBadge tone="sky">{row.original.shipment.truckReg}</ToneBadge>
+            <span
+              className="font-adminmono block max-w-[12rem] truncate text-[12px] text-adm-body"
+              title={row.original.shipment.truckReg}
+            >
+              {row.original.shipment.truckReg}
+            </span>
           ) : (
             <span className="text-adm-faint">Operating</span>
           ),

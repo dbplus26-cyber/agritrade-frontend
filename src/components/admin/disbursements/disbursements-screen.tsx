@@ -8,7 +8,12 @@ import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
-import { AdminButton, AdminPageHeader, Mono } from "@/components/admin/ui";
+import {
+  AdminButton,
+  AdminCard,
+  AdminPageHeader,
+  Mono,
+} from "@/components/admin/ui";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -106,8 +111,11 @@ export function DisbursementsScreen() {
         enableSorting: false,
         meta: columnMeta({ stretch: true }),
         cell: ({ row }) => (
-          <span className="block min-w-0 text-left">
-            <span className="block truncate font-medium text-adm-ink">
+          <span className="block w-full min-w-0 text-left">
+            <span
+              className="block max-w-[90%] truncate font-medium text-adm-ink"
+              title={row.original.recipientName}
+            >
               {row.original.recipientName}
             </span>
             <span className="font-adminmono block truncate text-[11.5px] text-adm-faint">
@@ -230,28 +238,33 @@ export function DisbursementsScreen() {
             />
           </ConsoleFilterBar>
 
-          <ConsoleDataTable<IDisbursement>
-            columns={columns}
-            data={rows}
-            emptyState={
-              <EmptyState
-                title="Nothing matches"
-                description="Try a different status, rail or search term."
-              />
-            }
-            isFetching={isFetching}
-        isFiltered={activeFilterCount > 0 || Boolean(queryParams.search)}
-            itemNoun="payouts"
-            rowClassName={() => "h-12 hover:bg-adm-sunken"}
-            rowHref={(row) => `${LIST}/${row.id}`}
-            serverPagination={{
-              onPageChange: setPage,
-              onPageSizeChange: (size) => setFilter("size", String(size)),
-              page,
-              pageSize: limit,
-              totalCount: total,
-            }}
-          />
+          {/* Every other register files its rows on an AdminCard. This one
+              and the float register rendered the table bare, so the two money
+              surfaces were the only screens with no sheet under the rows. */}
+          <AdminCard className="overflow-hidden">
+            <ConsoleDataTable<IDisbursement>
+              columns={columns}
+              data={rows}
+              emptyState={
+                <EmptyState
+                  title="Nothing matches"
+                  description="Try a different status, rail or search term."
+                />
+              }
+              isFetching={isFetching}
+              isFiltered={activeFilterCount > 0 || Boolean(queryParams.search)}
+              itemNoun="payouts"
+              rowClassName={() => "h-12 hover:bg-adm-sunken"}
+              rowHref={(row) => `${LIST}/${row.id}`}
+              serverPagination={{
+                onPageChange: setPage,
+                onPageSizeChange: (size) => setFilter("size", String(size)),
+                page,
+                pageSize: limit,
+                totalCount: total,
+              }}
+            />
+          </AdminCard>
         </>
       )}
 

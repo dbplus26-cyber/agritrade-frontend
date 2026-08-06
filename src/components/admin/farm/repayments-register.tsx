@@ -94,6 +94,7 @@ export function RepaymentsRegister() {
         cell: ({ row }) => (
           <TitleCell
             meta={row.original.season.name}
+            stretch
             title={row.original.farmer.name}
           />
         ),
