@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { AdminButton, AdminPageHeader, Mono } from "@/components/admin/ui";
+import {
+  adminLinkClass,
+  AdminButton,
+  AdminPageHeader,
+  Mono,
+} from "@/components/admin/ui";
 import { ConsoleDateRange } from "@/components/admin/filter-bar";
 import { HelpWrap } from "@/components/admin/help-tip";
 import { DocumentSkeleton } from "@/components/admin/skeletons";
@@ -132,7 +137,7 @@ export function AgentStatement({ id }: { id: string }) {
       <div className="print:hidden">
         <Link
           href={`/admin/agents/${id}`}
-          className="mb-2 inline-block text-[13px] text-console underline-offset-2 hover:underline"
+          className={cn(adminLinkClass, "mb-2 inline-block text-[13px]")}
         >
           ← Back to agent
         </Link>

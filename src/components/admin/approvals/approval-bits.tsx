@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { HelpWrap } from "@/components/admin/help-tip";
-import { ToneBadge, type Tone } from "@/components/admin/ui";
+import { adminLinkClass, ToneBadge, type Tone } from "@/components/admin/ui";
 import { formatCedis } from "@/lib/format-money";
 import { cn } from "@/lib/utils";
 import { ApprovalAction, ApprovalStatus } from "@/types/approval.types";
@@ -229,7 +229,7 @@ export function ModuleValue({
           {" · "}
           <Link
             href={link.href}
-            className="font-semibold whitespace-nowrap text-console underline-offset-2 hover:underline"
+            className={cn(adminLinkClass, "font-semibold whitespace-nowrap")}
           >
             {verbose ? link.linkText : "View"} {"->"}
           </Link>

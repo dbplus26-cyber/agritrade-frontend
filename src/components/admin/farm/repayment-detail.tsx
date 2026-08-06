@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import {
+  adminLinkClass,
   AdminCard,
   AdminPageHeader,
   DetailGrid,
@@ -10,6 +11,7 @@ import {
   Mono,
   ToneBadge,
 } from "@/components/admin/ui";
+import { cn } from "@/lib/utils";
 import { HelpTip } from "@/components/admin/help-tip";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { BackButton } from "@/components/ui/BackButton";
@@ -70,7 +72,13 @@ export function RepaymentDetail({ id }: { id: string }) {
               </div>
               <Link
                 href={`/admin/farmers/${r.farmer.id}`}
-                className="flex min-w-0 items-center gap-2.5 outline-none focus-visible:underline"
+                // The underline belongs to the NAME, not to the photo and the
+                // phone number beside it, so the anchor lends its colour and
+                // its focus ring and hands the rule to the child.
+                className={cn(
+                  adminLinkClass,
+                  "group flex min-w-0 items-center gap-2.5 hover:no-underline",
+                )}
               >
                 {r.farmer.photoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element -- Cloudinary
@@ -88,7 +96,7 @@ export function RepaymentDetail({ id }: { id: string }) {
                   </span>
                 )}
                 <div className="min-w-0">
-                  <div className="truncate text-[14px] font-semibold text-adm-ink hover:underline">
+                  <div className="truncate text-[14px] font-semibold underline-offset-2 group-hover:underline">
                     {r.farmer.name}
                   </div>
                   {[r.farmer.phone, r.farmer.community].filter(Boolean).length >
@@ -105,7 +113,14 @@ export function RepaymentDetail({ id }: { id: string }) {
                 <DetailItem label="Receipt no" mono strong>
                   {r.transactionNo}
                 </DetailItem>
-                <DetailItem label="Commodity">{r.commodity.name}</DetailItem>
+                <DetailItem label="Commodity">
+                  <Link
+                    className={adminLinkClass}
+                    href={`/admin/commodities/${r.commodity.id}`}
+                  >
+                    {r.commodity.name}
+                  </Link>
+                </DetailItem>
                 <DetailItem label="Weight" mono>
                   {formatKg(r.weightKg)}
                 </DetailItem>
@@ -117,20 +132,44 @@ export function RepaymentDetail({ id }: { id: string }) {
                     <Money value={r.valueGhs} />
                   </span>
                 </DetailItem>
-                <DetailItem label="Season">{r.season.name}</DetailItem>
+                <DetailItem label="Season">
+                  <Link
+                    className={adminLinkClass}
+                    href={`/admin/seasons/${r.season.id}`}
+                  >
+                    {r.season.name}
+                  </Link>
+                </DetailItem>
                 <DetailItem label="Received">
                   {formatDateTime(r.receivedAt)}
                 </DetailItem>
+                {/* "Received by" is free text typed on the intake form - who
+                    physically took delivery at the shed. It is not a user
+                    record, so there is nothing to point at. */}
                 <DetailItem label="Received by">
                   {r.receivedByName ?? <NotRecorded />}
                 </DetailItem>
                 <DetailItem label="Recorded by">
-                  {r.recordedBy?.name ?? <NotRecorded />}
+                  {r.recordedBy ? (
+                    <Link
+                      className={adminLinkClass}
+                      href={`/admin/users/${r.recordedBy.id}`}
+                    >
+                      {r.recordedBy.name}
+                    </Link>
+                  ) : (
+                    <NotRecorded />
+                  )}
                 </DetailItem>
                 <DetailItem label="Intake warehouse">
                   {r.intakeWarehouse ? (
                     <span className="inline-flex flex-wrap items-center gap-1.5">
-                      {r.intakeWarehouse.name}
+                      <Link
+                        className={adminLinkClass}
+                        href={`/admin/warehouses/${r.intakeWarehouse.id}`}
+                      >
+                        {r.intakeWarehouse.name}
+                      </Link>
                       {r.intoStock ? (
                         <ToneBadge tone="sky">Taken into stock</ToneBadge>
                       ) : null}

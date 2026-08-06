@@ -10,7 +10,7 @@ import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
-import { AdminCard, Mono } from "@/components/admin/ui";
+import { adminLinkClass, AdminCard, Mono } from "@/components/admin/ui";
 import { Button } from "@/components/ui/button";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -21,7 +21,6 @@ import { cn } from "@/lib/utils";
 import { useGetLandSalesQuery } from "@/redux/land/land-sales-api";
 import type { ILandSale, ILandSaleListQuery, LandSaleStatus } from "@/types/land.types";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
-import { TextCell } from "@/components/admin/table-cells";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import { Money } from "@/components/admin/trading/sale-bits";
 import {
@@ -93,8 +92,16 @@ export function LandSalesRegister() {
         header: "Buyer",
         enableSorting: false,
         meta: columnMeta({ wide: true }),
+        // The row navigates to the sale, so the buyer stops the click first.
         cell: ({ row }) => (
-          <TextCell value={row.original.buyer.name} width="label" />
+          <Link
+            className={cn(adminLinkClass, "block min-w-0 truncate text-[13px]")}
+            href={`/admin/buyers/${row.original.buyer.id}`}
+            onClick={(e) => e.stopPropagation()}
+            title={row.original.buyer.name}
+          >
+            {row.original.buyer.name}
+          </Link>
         ),
       },
       {

@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { HelpWrap } from "@/components/admin/help-tip";
-import { Mono, ToneBadge } from "@/components/admin/ui";
+import { adminLinkClass, Mono, ToneBadge } from "@/components/admin/ui";
+import { cn } from "@/lib/utils";
 import { FilePicker } from "@/components/ui/FilePicker";
 import { SignaturePad } from "@/components/ui/SignaturePad";
 import { useConfirm } from "@/hooks/use-confirm";
@@ -144,7 +145,7 @@ export function FarmDocumentsSection({
               href={urlOf(doc.id)}
               target="_blank"
               rel="noreferrer"
-              className="min-w-0 text-console [overflow-wrap:anywhere] hover:underline"
+              className={cn(adminLinkClass, "min-w-0 [overflow-wrap:anywhere]")}
             >
               {doc.name}
             </a>
@@ -185,7 +186,7 @@ export function FarmDocumentsSection({
         <button
           type="button"
           onClick={() => setSigning((v) => !v)}
-          className="cursor-pointer text-[12px] font-semibold text-console underline-offset-2 hover:underline"
+          className={cn(adminLinkClass, "cursor-pointer text-[12px] font-semibold")}
           aria-expanded={signing}
         >
           {signing ? "Hide signature pad" : "Or sign on this screen"}

@@ -6,7 +6,12 @@ import { DateTimeCell } from "@/components/admin/date-cell";
 import { RecordFacts } from "@/components/admin/record-facts";
 import { RailCard, RecordShell } from "@/components/admin/record-shell";
 import { DetailSkeleton } from "@/components/admin/skeletons";
-import { AdminCard, AdminPageHeader, Mono } from "@/components/admin/ui";
+import {
+  adminLinkClass,
+  AdminCard,
+  AdminPageHeader,
+  Mono,
+} from "@/components/admin/ui";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatKg } from "@/lib/format-money";
@@ -70,9 +75,39 @@ export function TransferDetail({ id }: { id: string }) {
               label: "Reference",
               value: <Mono>{t.transactionNo}</Mono>,
             },
-            { label: "Commodity", value: t.commodity.name },
-            { label: "From", value: t.fromWarehouse.name },
-            { label: "To", value: t.toWarehouse.name },
+            {
+              label: "Commodity",
+              value: (
+                <Link
+                  className={adminLinkClass}
+                  href={`/admin/commodities/${t.commodity.id}`}
+                >
+                  {t.commodity.name}
+                </Link>
+              ),
+            },
+            {
+              label: "From",
+              value: (
+                <Link
+                  className={adminLinkClass}
+                  href={`/admin/warehouses/${t.fromWarehouse.id}`}
+                >
+                  {t.fromWarehouse.name}
+                </Link>
+              ),
+            },
+            {
+              label: "To",
+              value: (
+                <Link
+                  className={adminLinkClass}
+                  href={`/admin/warehouses/${t.toWarehouse.id}`}
+                >
+                  {t.toWarehouse.name}
+                </Link>
+              ),
+            },
             { label: "Weight", mono: true, value: formatKg(t.weightKg) },
             { full: true, label: "Notes", value: t.notes },
           ]}
@@ -87,13 +122,21 @@ export function TransferDetail({ id }: { id: string }) {
         </div>
         <p className="text-[13px] text-adm-muted">
           This move wrote a transfer-out against{" "}
-          <span className="text-adm-ink">{t.fromWarehouse.name}</span> and a
-          matching transfer-in against{" "}
-          <span className="text-adm-ink">{t.toWarehouse.name}</span>.{" "}
           <Link
-            className="text-console hover:underline"
-            href="/admin/stock?tab=movements"
+            className={adminLinkClass}
+            href={`/admin/warehouses/${t.fromWarehouse.id}`}
           >
+            {t.fromWarehouse.name}
+          </Link>{" "}
+          and a matching transfer-in against{" "}
+          <Link
+            className={adminLinkClass}
+            href={`/admin/warehouses/${t.toWarehouse.id}`}
+          >
+            {t.toWarehouse.name}
+          </Link>
+          .{" "}
+          <Link className={adminLinkClass} href="/admin/stock?tab=movements">
             See the movements
           </Link>
           .

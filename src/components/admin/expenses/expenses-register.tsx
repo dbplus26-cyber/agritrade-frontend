@@ -2,7 +2,9 @@
 
 import { useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
+import Link from "next/link";
 import {
+  adminLinkClass,
   AdminButton,
   AdminCard,
   AdminPageHeader,
@@ -21,6 +23,7 @@ import { useTableQuery } from "@/hooks/use-table-query";
 import { useMoneyVisibility } from "@/hooks/use-money-visibility";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis } from "@/lib/format-money";
+import { cn } from "@/lib/utils";
 import { DateOnlyCell } from "@/components/admin/date-cell";
 import { TitleCell } from "@/components/admin/table-cells";
 import { env } from "@/lib/env";
@@ -123,12 +126,19 @@ export function ExpensesRegister() {
         // Plain mono text, truncating, with the full value on hover.
         cell: ({ row }) =>
           row.original.shipment ? (
-            <span
-              className="font-adminmono block max-w-[12rem] truncate text-[12px] text-adm-body"
+            // The row navigates to the expense, so the trip has to stop the
+            // click reaching it or the two destinations race.
+            <Link
+              className={cn(
+                adminLinkClass,
+                "font-adminmono block max-w-[12rem] truncate text-[12px]",
+              )}
+              href={`/admin/shipments/${row.original.shipment.id}`}
+              onClick={(e) => e.stopPropagation()}
               title={row.original.shipment.truckReg}
             >
               {row.original.shipment.truckReg}
-            </span>
+            </Link>
           ) : (
             <span className="text-adm-faint">Operating</span>
           ),
@@ -159,7 +169,7 @@ export function ExpensesRegister() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => { e.stopPropagation(); }}
-              className="inline-flex h-7 items-center px-2 text-[12px] text-console hover:underline"
+              className={cn(adminLinkClass, "inline-flex h-7 items-center px-2 text-[12px]")}
             >
               Voucher
             </a>

@@ -11,13 +11,14 @@ import {
 } from "@/components/admin/filter-bar";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { DateTimeCell } from "@/components/admin/date-cell";
-import { AdminCard, Mono } from "@/components/admin/ui";
+import { adminLinkClass, AdminCard, Mono } from "@/components/admin/ui";
 import { Button } from "@/components/ui/button";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
+import { cn } from "@/lib/utils";
 import { useGetStocktakesQuery } from "@/redux/stocktakes/stocktakes-api";
 import { useGetWarehousesQuery } from "@/redux/warehouses/warehouses-api";
 import type { IStocktake, IStocktakeListQuery } from "@/types/ops.types";
@@ -105,13 +106,20 @@ export function StocktakesScreen() {
         accessorFn: (s) => s.warehouse.name,
         enableSorting: false,
         meta: columnMeta({ stretch: true }),
+        // The row navigates to the stocktake, so the warehouse has to stop
+        // the click reaching it or the two destinations race.
         cell: ({ row }) => (
-          <span
-            className="block min-w-0 max-w-[90%] text-[13px] font-medium text-adm-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere]"
+          <Link
+            className={cn(
+              adminLinkClass,
+              "block min-w-0 max-w-[90%] text-[13px] font-medium line-clamp-1 whitespace-normal [overflow-wrap:anywhere]",
+            )}
+            href={`/admin/warehouses/${row.original.warehouse.id}`}
+            onClick={(e) => e.stopPropagation()}
             title={row.original.warehouse.name}
           >
             {row.original.warehouse.name}
-          </span>
+          </Link>
         ),
       },
       {

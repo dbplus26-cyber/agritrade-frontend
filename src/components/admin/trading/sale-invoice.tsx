@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { AdminButton, AdminPageHeader,
   PdfLink,
+  adminLinkClass,
 } from "@/components/admin/ui";
+import { cn } from "@/lib/utils";
 import { DocumentSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -104,7 +106,7 @@ export function SaleInvoice({ id }: { id: string }) {
       <div className="print:hidden">
         <Link
           href={`/admin/sales/${s.id}`}
-          className="mb-2 inline-block text-[13px] text-console underline-offset-2 hover:underline"
+          className={cn(adminLinkClass, "mb-2 inline-block text-[13px]")}
         >
           ← Back to sale
         </Link>

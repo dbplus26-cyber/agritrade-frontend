@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
@@ -132,15 +134,23 @@ export function FarmApplicationsScreen() {
         header: "Applicant",
         enableSorting: false,
         meta: columnMeta({ stretch: true }),
+        // A real anchor, as every other register's identity column has: the
+        // row's own click handler gives no keyboard target, no middle-click
+        // and nothing to copy a link from. Ink, not green - see adminLinkClass
+        // on why a whole identity column does not go green.
         cell: ({ row }) => (
-          <span className="block min-w-0 max-w-[90%]">
+          <Link
+            className="block min-w-0 max-w-[90%] outline-none focus-visible:underline"
+            href={`${LIST}/${row.original.id}`}
+            onClick={(e) => e.stopPropagation()}
+          >
             <span className="block truncate font-medium text-adm-ink">
               {row.original.name}
             </span>
             <Mono className="block text-[11px] text-adm-faint">
               {row.original.reference}
             </Mono>
-          </span>
+          </Link>
         ),
       },
       {

@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { AdminCard, AdminPageHeader } from "@/components/admin/ui";
+import Link from "next/link";
+import {
+  adminLinkClass,
+  AdminCard,
+  AdminPageHeader,
+} from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/button";
 import { DetailSkeleton } from "@/components/admin/skeletons";
@@ -100,12 +105,30 @@ export function ApprovalDetail({ id }: { id: string }) {
             />
           </MetaRow>
           <MetaRow label="Requested by">
-            {approval.requestedBy?.name ?? "Unknown"}
+            {approval.requestedBy ? (
+              <Link
+                className={adminLinkClass}
+                href={`/admin/users/${approval.requestedBy.id}`}
+              >
+                {approval.requestedBy.name}
+              </Link>
+            ) : (
+              "Unknown"
+            )}
           </MetaRow>
           <MetaRow label="Decided by">
             {decidedAt ? (
               <>
-                {approval.decidedBy?.name ?? "Unknown"}
+                {approval.decidedBy ? (
+                  <Link
+                    className={adminLinkClass}
+                    href={`/admin/users/${approval.decidedBy.id}`}
+                  >
+                    {approval.decidedBy.name}
+                  </Link>
+                ) : (
+                  "Unknown"
+                )}
                 <span className="text-adm-muted"> · {approvalStamp(decidedAt)}</span>
               </>
             ) : (

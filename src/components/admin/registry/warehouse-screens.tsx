@@ -15,6 +15,7 @@ import {
   AdminPageHeader,
   EditableFormActions,
   adminInputClass,
+  adminLinkClass,
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
 import { BackButton } from "@/components/ui/BackButton";
@@ -429,7 +430,7 @@ function WarehouseStockSection({ warehouseId }: { warehouseId: string }) {
         </h2>
         <Link
           href="/admin/stock"
-          className="whitespace-nowrap text-[12.5px] font-semibold text-console underline-offset-2 hover:underline"
+          className={cn(adminLinkClass, "whitespace-nowrap text-[12.5px] font-semibold")}
         >
           Full stock view
         </Link>
@@ -467,9 +468,15 @@ function WarehouseStockSection({ warehouseId }: { warehouseId: string }) {
                 key={row.commodityId}
                 className="flex items-center justify-between gap-3 border-b border-adm-hairline px-4 py-2.5"
               >
-                <span className="min-w-0 truncate text-[13.5px] font-medium text-adm-ink">
+                <Link
+                  className={cn(
+                    adminLinkClass,
+                    "min-w-0 truncate text-[13.5px] font-medium",
+                  )}
+                  href={`/admin/commodities/${row.commodityId}`}
+                >
                   {row.commodityName}
-                </span>
+                </Link>
                 <span
                   className="font-adminmono flex-none text-[13.5px] font-semibold text-adm-ink"
                   title={`${row.balanceKg.toLocaleString("en-GH")} kg`}

@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { AdminButton, AdminPageHeader, PdfLink } from "@/components/admin/ui";
+import {
+  adminLinkClass,
+  AdminButton,
+  AdminPageHeader,
+  PdfLink,
+} from "@/components/admin/ui";
+import { cn } from "@/lib/utils";
 import { DocumentSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -37,7 +43,7 @@ export function Waybill({ id }: { id: string }) {
       <div className="print:hidden">
         <Link
           href={`/admin/shipments/${s.id}`}
-          className="mb-2 inline-block text-[13px] text-console underline-offset-2 hover:underline"
+          className={cn(adminLinkClass, "mb-2 inline-block text-[13px]")}
         >
           ← Back to shipment
         </Link>

@@ -13,6 +13,7 @@ import {
   DetailShell,
   Mono,
   adminInputClass,
+  adminLinkClass,
   adminSelectClass,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
@@ -170,7 +171,7 @@ function FarmApplicationDetailBody({
               <DetailItem label="Phone" mono>
                 <a
                   href={`tel:${application.phone}`}
-                  className="text-console hover:underline"
+                  className={adminLinkClass}
                 >
                   {application.phone}
                 </a>
@@ -179,7 +180,7 @@ function FarmApplicationDetailBody({
                 {application.email ? (
                   <a
                     href={`mailto:${application.email}`}
-                    className="text-console hover:underline"
+                    className={adminLinkClass}
                   >
                     {application.email}
                   </a>
@@ -235,7 +236,7 @@ function FarmApplicationDetailBody({
                 {application.guarantorPhone ? (
                   <a
                     href={`tel:${application.guarantorPhone}`}
-                    className="text-console hover:underline"
+                    className={adminLinkClass}
                   >
                     {application.guarantorPhone}
                   </a>

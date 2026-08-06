@@ -8,7 +8,13 @@ import {
 } from "@/components/admin/dashboard/date-range-selector";
 import { HelpTip, HelpWrap } from "@/components/admin/help-tip";
 import { Money } from "@/components/admin/trading/sale-bits";
-import { AdminButton, AdminCard, Mono, ToneBadge } from "@/components/admin/ui";
+import {
+  adminLinkClass,
+  AdminButton,
+  AdminCard,
+  Mono,
+  ToneBadge,
+} from "@/components/admin/ui";
 import { env } from "@/lib/env";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatDateTime } from "@/lib/format-date";
@@ -152,7 +158,7 @@ function AgentPerformance({
             text="What each field agent bought for you in the period you picked, and what they paid per kilo."
           />
         </span>
-        <a href={exportHref} className="text-[12px] text-console hover:underline">
+        <a href={exportHref} className={cn(adminLinkClass, "text-[12px]")}>
           Export CSV
         </a>
       </div>
@@ -325,15 +331,22 @@ function CashComingIn() {
                       className="flex items-baseline justify-between gap-3 border-t border-adm-hairline py-1.5 text-[13px] first:border-t-0"
                     >
                       <div className="min-w-0">
-                        <span
-                          className="block min-w-0 text-adm-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere]"
+                        <Link
+                          className={cn(
+                            adminLinkClass,
+                            "block min-w-0 line-clamp-1 whitespace-normal [overflow-wrap:anywhere]",
+                          )}
+                          href={`/admin/buyers/${r.buyer.id}`}
                           title={r.buyer.name}
                         >
                           {r.buyer.name}
-                        </span>
+                        </Link>
                         <Link
                           href={`/admin/sales/${r.id}`}
-                          className="font-adminmono text-[11.5px] text-console tabular-nums underline-offset-2 hover:underline"
+                          className={cn(
+                            adminLinkClass,
+                            "font-adminmono text-[11.5px] tabular-nums",
+                          )}
                         >
                           {r.transactionNo}
                         </Link>
@@ -367,14 +380,20 @@ function CashComingIn() {
                         <span className="flex min-w-0 flex-wrap items-baseline gap-x-1.5">
                           <Link
                             href={`/admin/farmers/${r.farmer.id}`}
-                            className="min-w-0 text-adm-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere] underline-offset-2 hover:underline"
+                            className={cn(
+                              adminLinkClass,
+                              "min-w-0 line-clamp-1 whitespace-normal [overflow-wrap:anywhere]",
+                            )}
                             title={r.farmer.name}
                           >
                             {r.farmer.name}
                           </Link>
-                          <span className="text-[11.5px] text-adm-muted">
+                          <Link
+                            className={cn(adminLinkClass, "text-[11.5px]")}
+                            href={`/admin/seasons/${r.season.id}`}
+                          >
                             {r.season.name}
-                          </span>
+                          </Link>
                         </span>
                         <span className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[11.5px] text-adm-muted">
                           Due {formatDateTime(r.dueDate)}

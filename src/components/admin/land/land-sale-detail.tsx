@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,6 +15,7 @@ import {
   DetailShell,
   Mono,
   adminInputClass,
+  adminLinkClass,
   adminSelectClass,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
@@ -399,8 +402,19 @@ export function LandSaleDetail({ id }: { id: string }) {
         aside={
           <AdminCard className="px-5 py-3">
             {/* Which plot, to whom - what the heading used to carry. */}
-            <Row label="Plot">{s.plot.reference}</Row>
-            <Row label="Buyer">{s.buyer.name}</Row>
+            <Row label="Plot">
+              <Link className={adminLinkClass} href={`/admin/plots/${s.plot.id}`}>
+                {s.plot.reference}
+              </Link>
+            </Row>
+            <Row label="Buyer">
+              <Link
+                className={adminLinkClass}
+                href={`/admin/buyers/${s.buyer.id}`}
+              >
+                {s.buyer.name}
+              </Link>
+            </Row>
             <Row
               hint="The price the buyer agreed to pay for this plot, before anything is paid."
               label="Agreed price"

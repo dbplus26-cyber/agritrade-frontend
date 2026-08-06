@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { adminLinkClass } from "@/components/admin/ui";
+import { cn } from "@/lib/utils";
 import {
   ActionBadge,
   approvalStamp,
@@ -26,7 +28,7 @@ export function ApprovalsPreview() {
   const rows = data?.data ?? [];
 
   const link = (
-    <Link href="/admin/approvals" className="text-[12px] text-console hover:underline">
+    <Link href="/admin/approvals" className={cn(adminLinkClass, "text-[12px]")}>
       Inbox
     </Link>
   );

@@ -11,6 +11,7 @@ import {
   AdminField,
   AdminPageHeader,
   adminInputClass,
+  adminLinkClass,
   DetailGrid,
   DetailItem,
   DetailShell,
@@ -431,7 +432,7 @@ export function PurchaseDetail({ id }: { id: string }) {
               waiting for sign-off.{" "}
               <Link
                 href="/admin/approvals"
-                className="font-semibold text-console underline-offset-2 hover:underline"
+                className={cn(adminLinkClass, "font-semibold")}
               >
                 Open the approvals inbox →
               </Link>
@@ -460,7 +461,12 @@ export function PurchaseDetail({ id }: { id: string }) {
               <DetailGrid>
                 {/* What was bought - the heading names the page now. */}
                 <DetailItem label="Commodity" strong>
-                  {p.commodity.name}
+                  <Link
+                    className={adminLinkClass}
+                    href={`/admin/commodities/${p.commodity.id}`}
+                  >
+                    {p.commodity.name}
+                  </Link>
                 </DetailItem>
                 <DetailItem label="Recorded weight" mono>
                   {formatKg(p.weightKg)}
@@ -509,13 +515,32 @@ export function PurchaseDetail({ id }: { id: string }) {
               <DetailGrid>
                 <DetailItem label="Source">{SOURCE_LABEL[p.source]}</DetailItem>
                 <DetailItem label="Warehouse">
-                  {p.warehouse?.name ?? "Not yet assigned"}
+                  {p.warehouse ? (
+                    <Link
+                      className={adminLinkClass}
+                      href={`/admin/warehouses/${p.warehouse.id}`}
+                    >
+                      {p.warehouse.name}
+                    </Link>
+                  ) : (
+                    "Not yet assigned"
+                  )}
                 </DetailItem>
+                {/* The agent stays plain text: the API gives a field profile
+                    id here, and the agent page is keyed by USER id - there is
+                    no id on this record that would reach it. */}
                 {p.agent ? (
                   <DetailItem label="Paying agent">{p.agent.name}</DetailItem>
                 ) : null}
                 {p.supplier ? (
-                  <DetailItem label="Supplier">{p.supplier.name}</DetailItem>
+                  <DetailItem label="Supplier">
+                    <Link
+                      className={adminLinkClass}
+                      href={`/admin/suppliers/${p.supplier.id}`}
+                    >
+                      {p.supplier.name}
+                    </Link>
+                  </DetailItem>
                 ) : null}
               </DetailGrid>
             </AdminCard>

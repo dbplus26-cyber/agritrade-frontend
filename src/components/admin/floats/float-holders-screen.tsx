@@ -114,14 +114,15 @@ export function FloatHoldersScreen() {
         meta: columnMeta({ stretch: true }),
         cell: ({ row }) => (
           <TitleCell
-            // A field agent has a profile page holding their float ledger and
-            // their reconciliations; office staff do not, so only the agent's
-            // name is a link. TitleCell turns that same signal into the right
-            // hover text, so an unlinked staff row still shows the full value.
+            // A field agent goes to the agent profile, which holds their float
+            // ledger and their reconciliations; office staff have no such page,
+            // so they go to their user record instead. Every holder is somebody
+            // the console can show you - the two just live in different
+            // registers.
             href={
               row.original.role === UserRole.AGENT
                 ? `/admin/agents/${row.original.userId}`
-                : undefined
+                : `/admin/users/${row.original.userId}`
             }
             meta={row.original.email}
             title={`${row.original.firstName} ${row.original.lastName}`}

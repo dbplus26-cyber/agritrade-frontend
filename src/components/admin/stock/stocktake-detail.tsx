@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
+  adminLinkClass,
   AdminButton,
   AdminCard,
   AdminPageHeader,
@@ -20,6 +21,7 @@ import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatDateTime } from "@/lib/format-date";
 import { notify } from "@/lib/notify";
+import { cn } from "@/lib/utils";
 import {
   useApproveStocktakeMutation,
   useCancelStocktakeMutation,
@@ -92,13 +94,17 @@ function LinesCard({ lines }: { lines: IStocktakeLine[] }) {
             <tbody>
               {lines.map((l) => (
                 <tr key={l.commodity.id} className="border-t border-adm-hairline">
-                  <td className="px-5 py-2 font-medium text-adm-ink">
-                    <span
-                      className="block min-w-0 max-w-[260px] line-clamp-1 whitespace-normal [overflow-wrap:anywhere]"
+                  <td className="px-5 py-2 font-medium">
+                    <Link
+                      className={cn(
+                        adminLinkClass,
+                        "block min-w-0 max-w-[260px] line-clamp-1 whitespace-normal [overflow-wrap:anywhere]",
+                      )}
+                      href={`/admin/commodities/${l.commodity.id}`}
                       title={l.commodity.name}
                     >
                       {l.commodity.name}
-                    </span>
+                    </Link>
                   </td>
                   <td className="whitespace-nowrap px-5 py-2 text-right">
                     <Kg kg={l.countedKg} className="font-semibold text-adm-ink" />
@@ -126,12 +132,16 @@ function LinesCard({ lines }: { lines: IStocktakeLine[] }) {
               className="border-b border-adm-hairline py-2.5 last:border-b-0"
             >
               <div className="flex items-baseline justify-between gap-3">
-                <span
-                  className="min-w-0 text-[13.5px] font-medium text-adm-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere]"
+                <Link
+                  className={cn(
+                    adminLinkClass,
+                    "min-w-0 text-[13.5px] font-medium line-clamp-1 whitespace-normal [overflow-wrap:anywhere]",
+                  )}
+                  href={`/admin/commodities/${l.commodity.id}`}
                   title={l.commodity.name}
                 >
                   {l.commodity.name}
-                </span>
+                </Link>
                 <Kg
                   kg={l.countedKg}
                   className="flex-none text-[13px] font-semibold text-adm-ink"
@@ -287,7 +297,7 @@ export function StocktakeDetail({ id }: { id: string }) {
               <DetailItem label="Warehouse">
                 <Link
                   href={`/admin/warehouses/${st.warehouse.id}`}
-                  className="text-console underline-offset-2 hover:underline"
+                  className={adminLinkClass}
                 >
                   {st.warehouse.name}
                 </Link>

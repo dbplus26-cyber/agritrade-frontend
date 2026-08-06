@@ -7,7 +7,12 @@ import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import { HelpTip } from "@/components/admin/help-tip";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { DateOnlyCell } from "@/components/admin/date-cell";
-import { AdminCard, Mono, ToneBadge } from "@/components/admin/ui";
+import {
+  adminLinkClass,
+  AdminCard,
+  Mono,
+  ToneBadge,
+} from "@/components/admin/ui";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { BackButton } from "@/components/ui/BackButton";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
@@ -115,9 +120,13 @@ export function GrantAging() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <span className="text-[12.5px] text-adm-muted">
+          <Link
+            className={cn(adminLinkClass, "text-[12.5px]")}
+            href={`/admin/seasons/${row.original.season.id}`}
+            onClick={(e) => e.stopPropagation()}
+          >
             {row.original.season.name}
-          </span>
+          </Link>
         ),
       },
       {

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { HelpWrap } from "@/components/admin/help-tip";
 import { ShipmentStatusBadge } from "@/components/admin/trading/shipment-bits";
 import { Money } from "@/components/admin/trading/sale-bits";
-import { AdminCard, Mono } from "@/components/admin/ui";
+import { adminLinkClass, AdminCard, Mono } from "@/components/admin/ui";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import {
@@ -91,7 +91,7 @@ function AgentFloatsCard() {
       title="Cash with agents"
       hint="What each field agent still holds of the money you gave them to buy with."
       right={
-        <Link href="/admin/agents" className="text-[12px] text-console hover:underline">
+        <Link href="/admin/agents" className={cn(adminLinkClass, "text-[12px]")}>
           All agents
         </Link>
       }
@@ -145,7 +145,7 @@ function TrucksCard() {
       title="Trucks on the road"
       hint="Loads that have been started or dispatched and have not been signed off yet."
       right={
-        <Link href="/admin/shipments" className="text-[12px] text-console hover:underline">
+        <Link href="/admin/shipments" className={cn(adminLinkClass, "text-[12px]")}>
           All shipments
         </Link>
       }

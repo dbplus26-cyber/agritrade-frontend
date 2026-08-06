@@ -10,7 +10,9 @@ import {
   DetailItem,
   DetailShell,
   Mono,
+  adminLinkClass,
 } from "@/components/admin/ui";
+import { cn } from "@/lib/utils";
 import { HelpTip } from "@/components/admin/help-tip";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { BackButton } from "@/components/ui/BackButton";
@@ -328,7 +330,7 @@ export function SeasonDetail({ id }: { id: string }) {
                       <td className="px-5 py-2.5">
                         <Link
                           href={`/admin/farmers/${b.farmerId}/statement?seasonId=${s.id}`}
-                          className="font-semibold text-console hover:underline"
+                          className={cn(adminLinkClass, "font-semibold")}
                         >
                           {b.farmerName}
                         </Link>

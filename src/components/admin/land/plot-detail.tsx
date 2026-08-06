@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
+  adminLinkClass,
   AdminButton,
   AdminCard,
   AdminPageHeader,
@@ -363,7 +364,7 @@ export function PlotDetail({ id }: { id: string }) {
                     href={plotDocumentUrl(p.id, doc.id)}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-console hover:underline"
+                    className={adminLinkClass}
                   >
                     {doc.name}
                   </a>

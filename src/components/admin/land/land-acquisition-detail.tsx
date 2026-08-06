@@ -14,6 +14,7 @@ import {
   DetailShell,
   Mono,
   adminInputClass,
+  adminLinkClass,
   adminSelectClass,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
@@ -415,7 +416,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
           This acquisition produced plot{" "}
           <Link
             href={`/admin/plots/${a.plot.id}`}
-            className="font-semibold text-console hover:underline"
+            className={cn(adminLinkClass, "font-semibold")}
           >
             {a.plot.reference}
           </Link>{" "}
@@ -434,7 +435,14 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
           <AdminCard className="px-5 py-3">
             {/* Which plot, from whom - what the heading used to carry. */}
             <Row label="Reference">{a.reference}</Row>
-            <Row label="Seller">{a.seller.name}</Row>
+            <Row label="Seller">
+              <Link
+                className={adminLinkClass}
+                href={`/admin/land-sellers/${a.seller.id}`}
+              >
+                {a.seller.name}
+              </Link>
+            </Row>
             <Row
               hint="What you agreed to pay the seller for this land, before anything is paid."
               label="Agreed cost"

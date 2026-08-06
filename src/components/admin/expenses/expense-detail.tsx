@@ -6,12 +6,14 @@ import { useState } from "react";
 import { RailCard, RecordShell } from "@/components/admin/record-shell";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import {
+  adminLinkClass,
   AdminButton,
   AdminCard,
   AdminPageHeader,
   Mono,
   PdfLink,
 } from "@/components/admin/ui";
+import { cn } from "@/lib/utils";
 import { DateOnlyCell, DateTimeCell } from "@/components/admin/date-cell";
 import { ExpenseSettlementCard } from "@/components/admin/expenses/expense-settlement-card";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -129,9 +131,16 @@ export function ExpenseDetail({ id }: { id: string }) {
             Amount hidden
           </span>
         )}
-        <div className="mt-1.5 text-[13px] text-adm-muted">
+        {/* The category is the cost's classification, and the classification
+            has a page of its own carrying every other cost filed under it -
+            "what else did we spend on fuel" is the next question after "how
+            much was this". */}
+        <Link
+          className={cn(adminLinkClass, "mt-1.5 inline-block text-[13px]")}
+          href={`/admin/expense-categories/${expense.category.id}`}
+        >
           {expense.category.name}
-        </div>
+        </Link>
 
         <div className="mt-4 border-t border-adm-hairline pt-4">
           <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
@@ -166,7 +175,7 @@ export function ExpenseDetail({ id }: { id: string }) {
           </div>
           <Link
             href={`/admin/shipments/${expense.shipment.id}`}
-            className="mt-2 block text-[14px] font-medium text-console hover:underline"
+            className={cn(adminLinkClass, "mt-2 block text-[14px] font-medium")}
           >
             {expense.shipment.transactionNo}
           </Link>

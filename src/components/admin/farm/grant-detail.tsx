@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import {
+  adminLinkClass,
   AdminCard,
   AdminPageHeader,
   DetailGrid,
   DetailItem,
   DetailShell,
 } from "@/components/admin/ui";
+import { cn } from "@/lib/utils";
 import { HelpTip } from "@/components/admin/help-tip";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { BackButton } from "@/components/ui/BackButton";
@@ -65,7 +67,13 @@ export function GrantDetail({ id }: { id: string }) {
               </div>
               <Link
                 href={`/admin/farmers/${g.farmer.id}`}
-                className="flex min-w-0 items-center gap-2.5 outline-none focus-visible:underline"
+                // The underline belongs to the NAME, not to the photo and the
+                // phone number beside it, so the anchor lends its colour and
+                // its focus ring and hands the rule to the child.
+                className={cn(
+                  adminLinkClass,
+                  "group flex min-w-0 items-center gap-2.5 hover:no-underline",
+                )}
               >
                 {g.farmer.photoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element -- Cloudinary
@@ -83,7 +91,7 @@ export function GrantDetail({ id }: { id: string }) {
                   </span>
                 )}
                 <div className="min-w-0">
-                  <div className="truncate text-[14px] font-semibold text-adm-ink hover:underline">
+                  <div className="truncate text-[14px] font-semibold underline-offset-2 group-hover:underline">
                     {g.farmer.name}
                   </div>
                   {[g.farmer.phone, g.farmer.community].filter(Boolean).length >
@@ -102,10 +110,19 @@ export function GrantDetail({ id }: { id: string }) {
                 <DetailItem label="Grant no" mono strong>
                   {g.transactionNo}
                 </DetailItem>
+                {/* The item stays plain: the input-items register has no read
+                    page, only an edit form. */}
                 <DetailItem label="Item">
                   {g.item.name} · {g.quantity} {g.item.unitLabel}
                 </DetailItem>
-                <DetailItem label="Season">{g.season.name}</DetailItem>
+                <DetailItem label="Season">
+                  <Link
+                    className={adminLinkClass}
+                    href={`/admin/seasons/${g.season.id}`}
+                  >
+                    {g.season.name}
+                  </Link>
+                </DetailItem>
                 <DetailItem label="Granted">
                   {formatDateTime(g.grantedAt)}
                 </DetailItem>

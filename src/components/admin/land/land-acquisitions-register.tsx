@@ -10,7 +10,7 @@ import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
-import { AdminCard, Mono } from "@/components/admin/ui";
+import { adminLinkClass, AdminCard, Mono } from "@/components/admin/ui";
 import { Button } from "@/components/ui/button";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -91,7 +91,16 @@ export function LandAcquisitionsRegister() {
               {row.original.reference}
             </Mono>
             <div className="truncate text-[12px] text-adm-muted">
-              {row.original.seller.name} · {row.original.locationText}
+              {/* The row navigates to the acquisition, so the seller has to
+                  stop the click reaching it. */}
+              <Link
+                className={cn(adminLinkClass, "text-[12px]")}
+                href={`/admin/land-sellers/${row.original.seller.id}`}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {row.original.seller.name}
+              </Link>{" "}
+              · {row.original.locationText}
             </div>
           </div>
         ),

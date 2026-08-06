@@ -12,7 +12,8 @@ import {
   ConsoleDateRange,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
-import { AdminCard, Mono } from "@/components/admin/ui";
+import { adminLinkClass, AdminCard, Mono } from "@/components/admin/ui";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -193,9 +194,15 @@ export function PurchasesTable() {
         meta: columnMeta({ at: "lg" }),
         cell: ({ row }) =>
           row.original.warehouse ? (
-            <span className="block max-w-[22rem] truncate text-adm-muted">
+            // The row itself navigates to the purchase, so the warehouse has
+            // to stop the click reaching it or the two destinations race.
+            <Link
+              className={cn(adminLinkClass, "block max-w-[22rem] truncate")}
+              href={`/admin/warehouses/${row.original.warehouse.id}`}
+              onClick={(e) => e.stopPropagation()}
+            >
               {row.original.warehouse.name}
-            </span>
+            </Link>
           ) : (
             <Absent />
           ),

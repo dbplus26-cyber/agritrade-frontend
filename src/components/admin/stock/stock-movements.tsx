@@ -9,7 +9,7 @@ import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
-import { AdminCard } from "@/components/admin/ui";
+import { adminLinkClass, AdminCard } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -89,7 +89,11 @@ export function StockMovements({
         // unbounded line, so a long commodity name and a long warehouse name
         // between them decided how wide this table got.
         cell: ({ row }) => (
+          // The commodity carries the row's link (TitleCell keeps a table's
+          // identity column in ink by design). The warehouse underneath is
+          // TitleCell's plain meta line and cannot hold one of its own.
           <TitleCell
+            href={`/admin/commodities/${row.original.commodity.id}`}
             meta={row.original.warehouse.name}
             stretch
             title={row.original.commodity.name}
@@ -140,7 +144,7 @@ export function StockMovements({
           ) : row.original.purchaseId ? (
             <Link
               href={`/admin/purchases/${row.original.purchaseId}`}
-              className="text-console underline-offset-2 hover:underline"
+              className={adminLinkClass}
             >
               View purchase
             </Link>

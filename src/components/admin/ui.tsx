@@ -451,6 +451,29 @@ export const adminInputClass =
 export const adminSelectClass = cn(adminInputClass, "cursor-pointer");
 
 /**
+ * The console's one cross-reference link: a record named somewhere it is not
+ * the subject, pointing at the page where it IS.
+ *
+ * These used to be ink-coloured with an underline that appeared on hover,
+ * which meant the only way to discover that a supplier, a warehouse or a
+ * shipment was reachable was to sweep the pointer over the page and watch for
+ * something to move. A link has to read as a link AT REST, so it carries the
+ * console green - the one accent the reader already reads as "the system's own
+ * colour" - and keeps the underline for hover so the resting page is not a
+ * field of rules.
+ *
+ * The focus ring is an outline rather than a `ring`: a link is inline text
+ * that can wrap across two lines, and an outline follows both fragments where
+ * a box-shadow ring draws one rectangle around the lot.
+ *
+ * One exception by design: `TitleCell` keeps a table's identity column in ink.
+ * Every row of a register is a link, and a column of forty green names reads
+ * as a wall rather than as a set of names.
+ */
+export const adminLinkClass =
+  "text-console underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-console rounded-[2px]";
+
+/**
  * The action row for a console form that opens read-only and unlocks on Edit.
  *
  * The `key` on each branch is load-bearing, not decoration. Without it React
@@ -559,7 +582,8 @@ export function PdfLink({
       target="_blank"
       rel="noopener noreferrer"
       className={cn(
-        "inline-flex h-9 flex-none items-center px-3 text-[13px] whitespace-nowrap text-console underline-offset-2 hover:underline",
+        adminLinkClass,
+        "inline-flex h-9 flex-none items-center px-3 text-[13px] whitespace-nowrap",
         className,
       )}
     >

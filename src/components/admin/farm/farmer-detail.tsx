@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
+  adminLinkClass,
   AdminButton,
   AdminCard,
   AdminPageHeader,
@@ -11,6 +12,7 @@ import {
   DetailShell,
   Mono,
 } from "@/components/admin/ui";
+import { cn } from "@/lib/utils";
 import { Absent } from "@/components/admin/registry/registry-bits";
 import { ViewablePhoto } from "@/components/admin/photo-view";
 import { Money } from "@/components/admin/trading/sale-bits";
@@ -389,7 +391,7 @@ export function FarmerDetail({ id }: { id: string }) {
                     href={farmerDocumentUrl(f.id, doc.id)}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-console hover:underline"
+                    className={adminLinkClass}
                   >
                     {doc.name}
                   </a>
@@ -436,7 +438,7 @@ export function FarmerDetail({ id }: { id: string }) {
                   </span>
                   <Link
                     href={`/admin/grants/new?farmerId=${f.id}`}
-                    className="text-[12.5px] text-console hover:underline"
+                    className={cn(adminLinkClass, "text-[12.5px]")}
                   >
                     + New
                   </Link>
@@ -448,6 +450,10 @@ export function FarmerDetail({ id }: { id: string }) {
                     {(grants.data?.data ?? []).map((g) => (
                       <li key={g.id} className="px-5 py-2.5 text-[13px]">
                         <div className="flex items-center justify-between gap-2">
+                          {/* The input item stays plain: the register has no
+                              read page, only an edit form, and a fact on a
+                              farmer's card should not open something you can
+                              type into. */}
                           <span className="font-semibold text-adm-ink">{g.item.name}</span>
                           <Mono className="text-adm-ink">
                             <Money value={g.valueGhs} />
@@ -455,7 +461,13 @@ export function FarmerDetail({ id }: { id: string }) {
                         </div>
                         <div className="mt-0.5 flex items-center justify-between text-[12px] text-adm-muted">
                           <span>
-                            {g.season.name} · {formatFarmDate(g.grantedAt)}
+                            <Link
+                              className={adminLinkClass}
+                              href={`/admin/seasons/${g.season.id}`}
+                            >
+                              {g.season.name}
+                            </Link>{" "}
+                            · {formatFarmDate(g.grantedAt)}
                           </span>
                           <GrantApprovalBadge status={g.approval?.status} />
                         </div>
@@ -479,7 +491,7 @@ export function FarmerDetail({ id }: { id: string }) {
                   </span>
                   <Link
                     href={`/admin/repayments/new?farmerId=${f.id}`}
-                    className="text-[12.5px] text-console hover:underline"
+                    className={cn(adminLinkClass, "text-[12.5px]")}
                   >
                     + New
                   </Link>
@@ -491,9 +503,12 @@ export function FarmerDetail({ id }: { id: string }) {
                     {(repayments.data?.data ?? []).map((r) => (
                       <li key={r.id} className="px-5 py-2.5 text-[13px]">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="font-semibold text-adm-ink">
+                          <Link
+                            className={cn(adminLinkClass, "font-semibold")}
+                            href={`/admin/commodities/${r.commodity.id}`}
+                          >
                             {r.commodity.name}
-                          </span>
+                          </Link>
                           <Mono className="text-console">
                             <Money value={r.valueGhs} />
                           </Mono>

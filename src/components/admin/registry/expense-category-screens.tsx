@@ -21,6 +21,7 @@ import {
   EditableFormActions,
   Mono,
   adminInputClass,
+  adminLinkClass,
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
 import { BackButton } from "@/components/ui/BackButton";
@@ -548,7 +549,15 @@ function ExpenseLine({ expense }: { expense: IExpense }) {
           {expense.description ?? <Absent />}
         </p>
         <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11.5px] text-adm-muted">
-          <Mono className="text-[11.5px]">{expense.transactionNo}</Mono>
+          {/* The voucher number is the line's handle: the description can be
+              empty, the number never is, so it carries the link to the cost's
+              own page. */}
+          <Link
+            className={cn(adminLinkClass, "font-adminmono text-[11.5px] tabular-nums")}
+            href={`/admin/expenses/${expense.id}`}
+          >
+            {expense.transactionNo}
+          </Link>
           <span aria-hidden="true" className="text-adm-faint">
             ·
           </span>

@@ -1,15 +1,22 @@
 "use client";
 
 import { X } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { CardHeader } from "@/components/admin/dashboard/chart-kit";
 import { HelpWrap } from "@/components/admin/help-tip";
 import { Money } from "@/components/admin/trading/sale-bits";
-import { AdminCard, Mono, ToneBadge } from "@/components/admin/ui";
+import {
+  adminLinkClass,
+  AdminCard,
+  Mono,
+  ToneBadge,
+} from "@/components/admin/ui";
 import { Input } from "@/components/ui/input";
 import { ListPagination } from "@/components/ui/ListPagination";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useGetDebtorsQuery } from "@/redux/reports/reports-api";
+import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 10;
 
@@ -43,7 +50,7 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
         right={
           <a
             href={exportHref}
-            className="text-[12px] text-console hover:underline"
+            className={cn(adminLinkClass, "text-[12px]")}
           >
             Export CSV
           </a>
@@ -130,9 +137,15 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
               {rows.map((r) => (
                 <tr key={r.id} className="border-t border-adm-hairline align-top">
                   <td className="py-1.5 pr-3 text-adm-ink">
-                    <div className="line-clamp-2" title={r.buyer.name}>
+                    {/* Both books - commodity and land - owe against the same
+                        buyer register, so one link serves either kind. */}
+                    <Link
+                      className={cn(adminLinkClass, "block line-clamp-2")}
+                      href={`/admin/buyers/${r.buyer.id}`}
+                      title={r.buyer.name}
+                    >
                       {r.buyer.name}
-                    </div>
+                    </Link>
                     {r.buyer.phone ? (
                       <div className="font-adminmono truncate text-[11.5px] text-adm-muted">
                         {r.buyer.phone}

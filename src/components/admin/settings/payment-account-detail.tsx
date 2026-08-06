@@ -21,6 +21,7 @@ import {
   Mono,
   ToneBadge,
   type Tone,
+  adminLinkClass,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/button";
@@ -176,7 +177,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
             <Link
               href={SOURCE[m.source].href(m.parentId)}
               onClick={(e) => e.stopPropagation()}
-              className="font-adminmono text-[12.5px] text-console tabular-nums hover:underline"
+              className={cn(adminLinkClass, "font-adminmono text-[12.5px] tabular-nums")}
             >
               {m.parentNo}
             </Link>
