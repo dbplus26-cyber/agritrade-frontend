@@ -14,6 +14,7 @@ import {
   adminInputClass,
   adminSelectClass,
 } from "@/components/admin/ui";
+import { SearchableSelect } from "@/components/admin/searchable-select";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
 import {
@@ -23,10 +24,12 @@ import {
 import { useGetDriversQuery } from "@/redux/drivers/drivers-api";
 import { useGetDeliveryAddressesQuery } from "@/redux/delivery-addresses/delivery-addresses-api";
 import { useGetWarehousesQuery } from "@/redux/warehouses/warehouses-api";
+import { useRemoteSearch } from "@/hooks/use-remote-search";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatKg } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
+import type { IDeliveryAddress, IDriver } from "@/types/logistics.types";
 import {
   shipmentSchema,
   type ShipmentValues,
@@ -71,8 +74,23 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
   // met, unshipped weight left, and not already on an active truck.
   const eligible = useGetEligibleSalesQuery();
   const warehouses = useGetWarehousesQuery({ limit: 100, isActive: true });
-  const drivers = useGetDriversQuery({ isActive: true, limit: 100 });
-  const addresses = useGetDeliveryAddressesQuery({ isActive: true, limit: 100 });
+  // Both directories are open registers: a haulier keeps adding drivers and
+  // depots and never removes the old ones. Fetching a page and filtering it
+  // in the browser meant everything past the limit was invisible AND
+  // unselectable, with the picker reporting "no matches" for records that
+  // exist. So the typed text goes to the server. See useRemoteSearch.
+  const driverSearch = useRemoteSearch();
+  const drivers = useGetDriversQuery({
+    isActive: true,
+    limit: 20,
+    search: driverSearch.query,
+  });
+  const addressSearch = useRemoteSearch();
+  const addresses = useGetDeliveryAddressesQuery({
+    isActive: true,
+    limit: 20,
+    search: addressSearch.query,
+  });
 
   const {
     register,
@@ -119,6 +137,16 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
   // "Edit details" reopens them as overrides sent alongside driverId.
   const [showDriverOverrides, setShowDriverOverrides] = useState(false);
 
+  // The picked records are HELD, not looked up in whatever page is loaded.
+  // Once the user types a fresh search that page is replaced, and a lookup
+  // would then find nothing: the driver summary would vanish, and the
+  // address summary vanishing would silently swap the form back to a
+  // free-text destination while deliveryAddressId was still set.
+  const [pickedDriver, setPickedDriver] = useState<IDriver | null>(null);
+  const [pickedAddress, setPickedAddress] = useState<IDeliveryAddress | null>(
+    null,
+  );
+
   const toggleSale = (id: string) => {
     const next = selected.includes(id)
       ? selected.filter((s) => s !== id)
@@ -151,12 +179,21 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
 
   const driverList = drivers.data?.data ?? [];
   const addressList = addresses.data?.data ?? [];
-  const pickedDriver = driverList.find((d) => d.id === driverId);
-  const pickedAddress = addressList.find((a) => a.id === deliveryAddressId);
+
+  // "The register is empty" and "this search found nothing" are different
+  // answers. Only the unfiltered first page can say the book is empty, so a
+  // search in flight or a search term typed keeps the picker on screen -
+  // otherwise a typo would replace it with "add one to the address book" and
+  // leave no way back to clear the search.
+  const addressBookEmpty =
+    !addressSearch.query && !addresses.isFetching && addressList.length === 0;
+  const driverBookEmpty =
+    !driverSearch.query && !drivers.isFetching && driverList.length === 0;
 
   const pickDriver = (id: string) => {
     setValue("driverId", id, { shouldValidate: false });
     const d = driverList.find((x) => x.id === id);
+    setPickedDriver(d ?? null);
     if (d) {
       // Fill the snapshot fields from the directory; they stay editable as
       // overrides but start folded away.
@@ -176,6 +213,7 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
 
   const pickAddress = (id: string) => {
     setValue("deliveryAddressId", id, { shouldValidate: false });
+    setPickedAddress(addressList.find((a) => a.id === id) ?? null);
     if (id) clearErrors("destination");
   };
 
@@ -385,25 +423,37 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
           <AdminField
             label="Deliver to"
             hint={
-              addressList.length > 0
-                ? "Pick a saved destination, or enter this one by hand."
-                : undefined
+              addressBookEmpty
+                ? undefined
+                : "Type to search the address book, or enter this one by hand."
             }
             error={errors.deliveryAddressId?.message}
           >
-            {addressList.length > 0 ? (
-              <select
-                className={cn(adminSelectClass, "w-full")}
+            {!addressBookEmpty ? (
+              <SearchableSelect
                 value={deliveryAddressId}
-                onChange={(e) => pickAddress(e.target.value)}
-              >
-                <option value="">Enter destination manually</option>
-                {addressList.map((a) => (
-                  <option key={a.id} value={a.id}>
-                    {a.label} · {a.city}
-                  </option>
-                ))}
-              </select>
+                onChange={pickAddress}
+                options={[
+                  { value: "", label: "Enter destination manually" },
+                  ...addressList.map((a) => ({
+                    value: a.id,
+                    label: a.label,
+                    hint: a.city,
+                  })),
+                ]}
+                placeholder="Enter destination manually"
+                onSearchChange={addressSearch.onSearchChange}
+                loading={addresses.isFetching}
+                // The picked address is usually off the page a search left
+                // loaded; without this the trigger would read as empty on a
+                // field that is set.
+                selectedLabel={
+                  pickedAddress
+                    ? `${pickedAddress.label} · ${pickedAddress.city}`
+                    : undefined
+                }
+                emptyText="No saved destination matches that."
+              />
             ) : (
               <p className="text-[12.5px] text-adm-muted">
                 No saved destinations yet - enter this one below, or{" "}
@@ -514,25 +564,36 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
           <AdminField
             label="Driver"
             hint={
-              driverList.length > 0
-                ? "Pick from the directory or enter the trip's driver by hand."
-                : undefined
+              driverBookEmpty
+                ? undefined
+                : "Type to search the directory, or enter the trip's driver by hand."
             }
             error={errors.driverId?.message}
           >
-            {driverList.length > 0 ? (
-              <select
-                className={cn(adminSelectClass, "w-full")}
+            {!driverBookEmpty ? (
+              <SearchableSelect
                 value={driverId}
-                onChange={(e) => pickDriver(e.target.value)}
-              >
-                <option value="">Enter details manually</option>
-                {driverList.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.name} · {d.phone}
-                  </option>
-                ))}
-              </select>
+                onChange={pickDriver}
+                options={[
+                  { value: "", label: "Enter details manually" },
+                  ...driverList.map((d) => ({
+                    value: d.id,
+                    label: d.name,
+                    hint: d.phone,
+                  })),
+                ]}
+                placeholder="Enter details manually"
+                onSearchChange={driverSearch.onSearchChange}
+                loading={drivers.isFetching}
+                // Same reason as the address picker: the chosen driver is
+                // often not among the rows a later search loaded.
+                selectedLabel={
+                  pickedDriver
+                    ? `${pickedDriver.name} · ${pickedDriver.phone}`
+                    : undefined
+                }
+                emptyText="No driver matches that."
+              />
             ) : (
               <p className="text-[12.5px] text-adm-muted">
                 No drivers saved yet - enter this trip&apos;s driver below, or{" "}
