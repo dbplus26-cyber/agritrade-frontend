@@ -75,7 +75,7 @@ const statusToQuery = (status: StatusFilter): Partial<IUserListQuery> => {
  * search, the role/status facets, the page and the page size all travel to
  * GET /admin/users, and the table renders exactly the page the backend
  * returns. While a refetch is in flight the current list stays visible
- * (dimmed) and snaps to the new result — the skeleton shows only on first
+ * (dimmed) and snaps to the new result - the skeleton shows only on first
  * load. The navbar's global search (?q=) seeds the search box.
  */
 export function UsersTable() {
@@ -83,7 +83,7 @@ export function UsersTable() {
   const me = useCurrentUser();
 
   // URL-synced + session-remembered table state (khadys/dms convention):
-  // paginate to page 4, open a detail page or another tab, come back — the
+  // paginate to page 4, open a detail page or another tab, come back - the
   // table is exactly where you left it. The navbar's global search seeds the
   // same `search` param.
   const {
@@ -305,7 +305,7 @@ export function UsersTable() {
       </div>
 
       {/* dms rule: a failed PLAIN load hides the toolbar (dead UI beside an
-          error card) — but when the user's own search/filters might be the
+          error card) - but when the user's own search/filters might be the
           cause, the toolbar stays so they can clear or adjust them. */}
       {isError && !search && activeFilterCount === 0 ? null : (
       <ConsoleFilterBar
@@ -365,7 +365,7 @@ export function UsersTable() {
             <EmptyState
               variant="plain"
               title="No users yet"
-              description="Add your first staff account — assign a role, set the permission flags and hand over the first password."
+              description="Add your first staff account - assign a role, set the permission flags and hand over the first password."
               actionLabel="Add your first user"
               onAction={() => router.push("/admin/users/new")}
             />

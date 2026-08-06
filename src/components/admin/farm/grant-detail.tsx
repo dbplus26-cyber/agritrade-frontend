@@ -8,6 +8,7 @@ import {
   DetailGrid,
   DetailItem,
   DetailShell,
+  SectionHeading,
 } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
 import { HelpTip } from "@/components/admin/help-tip";
@@ -62,9 +63,7 @@ export function GrantDetail({ id }: { id: string }) {
           <div className="flex flex-col gap-4">
             {/* Who took what */}
             <AdminCard className="px-5 py-4">
-              <div className="mb-2 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                Who took what
-              </div>
+              <SectionHeading className="mb-2">Who took what</SectionHeading>
               <Link
                 href={`/admin/farmers/${g.farmer.id}`}
                 // The underline belongs to the NAME, not to the photo and the
@@ -145,10 +144,8 @@ export function GrantDetail({ id }: { id: string }) {
 
             {/* Agreement */}
             <AdminCard className="px-5 py-4">
-              <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                Agreement
-              </div>
-              <p className="mt-1 mb-1 text-[12px] text-adm-muted">
+              <SectionHeading className="mb-1">Agreement</SectionHeading>
+              <p className="mb-1 text-[12px] text-adm-muted">
                 The signed agreement is the binding record behind this grant.
                 Never shown publicly; downloads are logged.
               </p>
@@ -201,10 +198,8 @@ export function GrantDetail({ id }: { id: string }) {
 
             {/* Season position */}
             <AdminCard className="px-5 py-4">
-              <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                Season position
-              </div>
-              <p className="mt-1 mb-1 text-[12px] text-adm-muted">
+              <SectionHeading className="mb-1">Season position</SectionHeading>
+              <p className="mb-1 text-[12px] text-adm-muted">
                 {g.farmer.name}&apos;s running balance for {g.season.name}.
               </p>
               <DetailGrid columns={2}>

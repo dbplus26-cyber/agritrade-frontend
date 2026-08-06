@@ -47,7 +47,7 @@ const DOCS: PaperDoc[] = [
 ];
 
 /**
- * The paper trail — the brand's whole argument made visible: facsimiles of
+ * The paper trail - the brand's whole argument made visible: facsimiles of
  * the three documents that travel with every transaction. Values are
  * illustrative; the point is that the paperwork always exists.
  */

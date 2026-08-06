@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 /**
- * A rubber stamp — the rotated, double-bordered stencil mark the design uses
+ * A rubber stamp - the rotated, double-bordered stencil mark the design uses
  * to close documents ("ON RECORD", "EVERY LOAD", "RECEIVED").
  */
 export function Stamp({

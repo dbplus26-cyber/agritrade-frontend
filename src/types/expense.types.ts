@@ -1,7 +1,7 @@
 /**
  * Operating costs. Mirrors the backend `/admin/expenses` contract
  * (utils/mappers/expense.mapper.ts). Money fields are `null` when the caller
- * has no financial visibility — the API redacts, the UI just renders what it
+ * has no financial visibility - the API redacts, the UI just renders what it
  * is given.
  */
 

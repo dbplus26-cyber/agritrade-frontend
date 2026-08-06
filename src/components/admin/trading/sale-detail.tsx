@@ -11,6 +11,7 @@ import {
   AdminPageHeader,
   DetailShell,
   Mono,
+  SectionHeading,
   ToneBadge,
   adminInputClass,
 } from "@/components/admin/ui";
@@ -343,9 +344,7 @@ export function SaleDetail({
     <div className="flex flex-col gap-4">
       {/* Lines */}
       <AdminCard className="px-5 py-3">
-        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-          Goods
-        </div>
+        <SectionHeading className="mb-1">Goods</SectionHeading>
         {sale.lines.map((l) => (
           <div
             key={l.id}
@@ -367,13 +366,12 @@ export function SaleDetail({
       {/* Milestone schedule (once confirmed) */}
       {sale.milestones.length > 0 ? (
         <AdminCard className="px-5 py-3">
-          <div className="mb-1 flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-            <span className="min-w-0">Payment schedule</span>
-            <HelpTip
-              label="What is the payment schedule?"
-              text="The milestones this buyer pays in: how much is due at each stage, and what triggers it."
-            />
-          </div>
+          <SectionHeading
+            className="mb-1"
+            hint="The milestones this buyer pays in: how much is due at each stage, and what triggers it."
+          >
+            Payment schedule
+          </SectionHeading>
           {sale.milestones.map((m, i) => (
             <div
               key={`${m.label}-${String(i)}`}
@@ -414,9 +412,7 @@ export function SaleDetail({
 
       {/* Payments ledger */}
       <AdminCard className="px-5 py-3">
-        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-          Payments
-        </div>
+        <SectionHeading className="mb-1">Payments</SectionHeading>
         {sale.payments.length === 0 ? (
           <p className="py-2 text-[13px] text-adm-muted">No payments recorded yet.</p>
         ) : (
@@ -466,9 +462,7 @@ export function SaleDetail({
 
       {/* Shipments carrying this sale */}
       <AdminCard className="px-5 py-3">
-        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-          Shipments
-        </div>
+        <SectionHeading className="mb-1">Shipments</SectionHeading>
         {sale.shipments.length === 0 ? (
           <p className="py-2 text-[13px] text-adm-muted">Nothing shipped yet.</p>
         ) : (

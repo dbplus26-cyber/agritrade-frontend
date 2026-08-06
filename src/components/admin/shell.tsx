@@ -636,7 +636,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
         {/* A named CONTAINER, not just a layout box. Everything inside the
             console sizes itself against this element's width rather than the
-            viewport's — which matters because the sidebar eats 16rem. On a
+            viewport's - which matters because the sidebar eats 16rem. On a
             768px tablet a viewport-based `md:` fires while the content area is
             only ~512px wide, which is exactly how a table ends up rendered
             into half the room it was designed for. */}

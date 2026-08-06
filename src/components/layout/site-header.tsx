@@ -66,7 +66,7 @@ const mobileNav = primaryNav.flatMap<{ href: string; label: string }>((item) =>
 const desktopItem =
   "stencil relative flex items-baseline gap-1.5 px-3.5 py-3 text-[11px] tracking-[0.16em] text-soil transition-colors hover:text-ink bg-[linear-gradient(#D89C2E,#D89C2E)] bg-no-repeat bg-[length:0%_2px] bg-[position:14px_calc(100%-8px)] hover:bg-[length:60%_2px] [transition:background-size_.18s_ease,color_.18s_ease]";
 
-/** The gold tag that marks the active nav item — the fill alone carries it. */
+/** The gold tag that marks the active nav item - the fill alone carries it. */
 function ActiveTag({ label }: { label: string }) {
   return (
     <span className="stencil flex items-baseline rounded-[2px] bg-harvest px-3.5 py-3 text-[11px] tracking-[0.16em] text-ink shadow-[2px_2px_0_rgb(31_33_28/0.35)]">
@@ -167,7 +167,7 @@ export function SiteHeader() {
   const onServicePage = serviceLinks.some((s) => pathname.startsWith(s.href));
 
   return (
-    // Sticky so the nav stays reachable however deep the page — z-50 clears
+    // Sticky so the nav stays reachable however deep the page - z-50 clears
     // the hero (z-2), the board (z-1) and every stamp/ghost on the way down.
     <header className="texture-grain sticky top-0 z-50 bg-surface shadow-[0_10px_24px_-20px_rgb(31_33_28/0.45)]">
       {/* Desktop: brand · numbered nav · dispatch line, closed by the ledger rule. */}

@@ -24,7 +24,7 @@ const REASONS = [
   },
 ];
 
-/** Why buy from us — the dense editorial ledger on the forest band. */
+/** Why buy from us - the dense editorial ledger on the forest band. */
 export function WhyUs() {
   return (
     <section className="texture-grain-dark bg-forest px-5 py-14 lg:px-0 lg:py-[88px]">

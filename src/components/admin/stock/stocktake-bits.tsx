@@ -6,6 +6,7 @@ import {
   AdminCard,
   AdminField,
   adminInputClass,
+  SectionHeading,
   ToneBadge,
   type Tone,
 } from "@/components/admin/ui";
@@ -235,9 +236,7 @@ export function StocktakeCountSheet({
   return (
     <div className="flex flex-col gap-4">
       <AdminCard className="px-4 py-3 sm:px-5 sm:py-4">
-        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-          Count sheet
-        </div>
+        <SectionHeading className="mb-1">Count sheet</SectionHeading>
         <p className="mb-2 text-[12px] text-adm-muted">
           Enter what was physically counted. Leave a line blank to skip it -
           book balances are compared only when the sheet is submitted.

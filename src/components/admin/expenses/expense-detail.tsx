@@ -12,6 +12,7 @@ import {
   AdminPageHeader,
   Mono,
   PdfLink,
+  SectionHeading,
 } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
 import { DateOnlyCell, DateTimeCell } from "@/components/admin/date-cell";
@@ -142,16 +143,16 @@ export function ExpenseDetail({ id }: { id: string }) {
           {expense.category.name}
         </Link>
 
+        {/* The rule stays on the wrapper: it separates the reason from the
+            figure above it, and SectionHeading owns the gap beneath itself. */}
         <div className="mt-4 border-t border-adm-hairline pt-4">
-          <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-            What it was for
-          </div>
+          <SectionHeading>What it was for</SectionHeading>
           {expense.description ? (
-            <p className="mt-1.5 text-[13.5px] leading-[1.55] text-adm-body [overflow-wrap:anywhere]">
+            <p className="text-[13.5px] leading-[1.55] text-adm-body [overflow-wrap:anywhere]">
               {expense.description}
             </p>
           ) : (
-            <p className="mt-1.5 text-[13.5px] text-adm-faint">Not recorded</p>
+            <p className="text-[13.5px] text-adm-faint">Not recorded</p>
           )}
         </div>
       </AdminCard>
@@ -170,12 +171,12 @@ export function ExpenseDetail({ id }: { id: string }) {
           slot that never fills, which reads as a gap rather than a fact. */}
       {expense.shipment ? (
         <AdminCard className="p-5">
-          <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+          <SectionHeading hint="This cost rides on a shipment, so it lands in that trip's profit rather than in general overheads.">
             Charged to a trip
-          </div>
+          </SectionHeading>
           <Link
             href={`/admin/shipments/${expense.shipment.id}`}
-            className={cn(adminLinkClass, "mt-2 block text-[14px] font-medium")}
+            className={cn(adminLinkClass, "block text-[14px] font-medium")}
           >
             {expense.shipment.transactionNo}
           </Link>

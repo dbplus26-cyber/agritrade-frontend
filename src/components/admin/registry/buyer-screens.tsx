@@ -18,6 +18,7 @@ import {
   AdminField,
   AdminPageHeader,
   EditableFormActions,
+  SectionHeading,
   adminInputClass,
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
@@ -632,10 +633,10 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
             {...register("address")}
           />
         </AdminField>
+        {/* The rule stays on the wrapper - it divides the contact block from
+            the business one - and the heading carries only its own text. */}
         <div className="mt-1 border-t border-adm-hairline pt-3">
-          <p className="text-[11px] uppercase tracking-[0.14em] text-adm-muted">
-            Business
-          </p>
+          <SectionHeading className="mb-0">Business</SectionHeading>
         </div>
         <div className="grid gap-[13px] sm:grid-cols-2">
           <AdminField

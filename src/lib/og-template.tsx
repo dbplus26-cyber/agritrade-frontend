@@ -39,7 +39,7 @@ export async function brandOgImage({
   eyebrow: string;
   title: string;
   subtitle: string;
-  /** The conversion line on the card — tailor it per page. */
+  /** The conversion line on the card - tailor it per page. */
   cta?: string;
 }) {
   // Scale the headline down as it gets longer so long titles never overflow.

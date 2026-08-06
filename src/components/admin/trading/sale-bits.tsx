@@ -61,7 +61,7 @@ const TRIGGER_LABEL: Record<MilestoneTrigger, string> = {
 export const milestoneTriggerLabel = (t: MilestoneTrigger): string =>
   TRIGGER_LABEL[t];
 
-/** "05 Jul 2026" — the console's date rendering (shared idiom). */
+/** "05 Jul 2026" - the console's date rendering (shared idiom). */
 export function formatSaleDate(iso: string): string {
   return formatDateTime(iso);
 }

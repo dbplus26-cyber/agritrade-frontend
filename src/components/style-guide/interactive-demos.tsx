@@ -8,7 +8,7 @@ import { notify } from "@/lib/notify";
 
 /**
  * The style guide's interactive corner: fire the toasts, open the confirm
- * gate, and peek at the general loader — the states a static sheet can't show.
+ * gate, and peek at the general loader - the states a static sheet can't show.
  */
 export function InteractiveDemos() {
   const { confirm, confirmationDialog } = useConfirm();

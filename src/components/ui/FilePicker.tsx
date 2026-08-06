@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils";
  *
  * Two shapes, because "save" means different things:
  *
- *   default — the picker owns the action. Preview, then Save uploads it now.
+ *   default - the picker owns the action. Preview, then Save uploads it now.
  *             Used on detail screens where the file IS the change.
  *   stage   — the picker is a form FIELD. The chosen file goes into form state
  *             immediately so the form's own submit carries it, and the preview
@@ -31,7 +31,7 @@ import { cn } from "@/lib/utils";
  *             before that submit. A second "Save" here would be a button that
  *             saves nothing.
  */
-/** A readable size. Sub-kilobyte files show bytes — "0 KB" reads as an error. */
+/** A readable size. Sub-kilobyte files show bytes - "0 KB" reads as an error. */
 const fileSize = (bytes: number): string => {
   if (bytes < 1024) return `${String(bytes)} B`;
   if (bytes < 1024 * 1024) return `${String(Math.round(bytes / 1024))} KB`;
@@ -60,7 +60,7 @@ export function FilePicker({
   className?: string;
   confirmLabel?: string;
   hint?: string;
-  /** Receives the prepared file — on confirm, or immediately when staging. */
+  /** Receives the prepared file - on confirm, or immediately when staging. */
   onConfirm: (file: null | File) => Promise<void> | void;
   optimize?: boolean;
   stage?: boolean;

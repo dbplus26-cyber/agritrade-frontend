@@ -1,7 +1,7 @@
 import { routes } from "@/lib/routes";
 
 /**
- * Central site config — canonical URL, brand strings, and SEO defaults.
+ * Central site config - canonical URL, brand strings, and SEO defaults.
  *
  * The base URL comes from `NEXT_PUBLIC_BASE_URL`, centralised here
  * (khadys-kitchen convention) so nothing redeclares origins. Trailing slash is
@@ -76,7 +76,7 @@ export const siteConfig = {
   hours: "Mon – Sat 7:00 – 17:00 · Sunday closed",
   city: "Tamale",
   country: "Ghana",
-  /** Viridian forest — theme-color and the OG image field. */
+  /** Viridian forest - theme-color and the OG image field. */
   themeColor: "#155744",
   /** Pale husk page background. */
   backgroundColor: "#EFF1E8",

@@ -6,7 +6,7 @@ export interface IUserLoginInput {
 }
 
 /**
- * A 2FA challenge — login returns this *instead of* a user when the account
+ * A 2FA challenge - login returns this *instead of* a user when the account
  * has two-factor enabled. The backend also sets a short-lived
  * `twoFactorPending` httpOnly cookie (10 min) that bridges the login step to
  * the verify step, so the verify call carries no user identifier in its body.
@@ -41,7 +41,7 @@ export interface ITwoFactorVerifyInput {
 
 /**
  * Confirming 2FA setup returns the user PLUS the one-time plaintext recovery
- * codes — the only moment they ever exist client-side. Mirrors the backend's
+ * codes - the only moment they ever exist client-side. Mirrors the backend's
  * `confirmEnableTwoFactor` controller.
  */
 export interface ITwoFactorEnabledResponse {

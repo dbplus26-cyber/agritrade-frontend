@@ -2,7 +2,12 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import { HelpWrap } from "@/components/admin/help-tip";
-import { AdminCard, ToneBadge, type Tone } from "@/components/admin/ui";
+import {
+  AdminCard,
+  SectionHeading,
+  ToneBadge,
+  type Tone,
+} from "@/components/admin/ui";
 import { formatCedis } from "@/lib/format-money";
 import { cn } from "@/lib/utils";
 import {
@@ -201,9 +206,9 @@ export function useIdempotencyKey(open: boolean): () => string {
 }
 
 /**
- * An AdminCard with the console's small uppercase section heading. The
- * heading treatment is copied from the land and sale detail screens rather
- * than invented, so the money-out pages read as part of the same console.
+ * An AdminCard titled with the console's section heading. The heading is the
+ * shared one rather than a local treatment, so the money-out pages announce
+ * their sections exactly as the land, sale and shipment screens do.
  */
 export function TitledCard({
   children,
@@ -216,9 +221,7 @@ export function TitledCard({
 }) {
   return (
     <AdminCard className={cn("px-5 py-3", className)}>
-      <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-        {title}
-      </div>
+      <SectionHeading className="mb-1">{title}</SectionHeading>
       {children}
     </AdminCard>
   );

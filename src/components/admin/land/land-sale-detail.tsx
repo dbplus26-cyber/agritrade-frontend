@@ -14,6 +14,7 @@ import {
   DetailRow,
   DetailShell,
   Mono,
+  SectionHeading,
   adminInputClass,
   adminLinkClass,
   adminSelectClass,
@@ -519,9 +520,7 @@ export function LandSaleDetail({ id }: { id: string }) {
         }
         main={
           <AdminCard className="px-5 py-3">
-            <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-              Payments
-            </div>
+            <SectionHeading className="mb-1">Payments</SectionHeading>
             {s.payments.length === 0 ? (
               <p className="py-2 text-[13px] text-adm-muted">
                 No payments recorded yet.

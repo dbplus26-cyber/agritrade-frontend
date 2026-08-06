@@ -50,7 +50,7 @@ function generatePassword(): string {
 
 /**
  * Create a console account. The initial password is set here and shared with
- * the person out of band — the welcome email deliberately carries no
+ * the person out of band - the welcome email deliberately carries no
  * credentials (backend rule).
  */
 export function UserForm() {
@@ -116,7 +116,7 @@ export function UserForm() {
       }).unwrap();
       notify.success("User created", {
         description:
-          "Share the initial password with them securely — it is not emailed.",
+          "Share the initial password with them securely - it is not emailed.",
         duration: 8000,
       });
       router.replace(`/admin/users/${res.data.user.id}`);
@@ -218,7 +218,7 @@ export function UserForm() {
           </AdminField>
           <AdminField
             label="Initial password"
-            hint="Share it with them securely — it is never emailed. They should change it on first sign-in."
+            hint="Share it with them securely - it is never emailed. They should change it on first sign-in."
             error={errors.password?.message}
           >
             <div className="flex gap-2">

@@ -21,7 +21,7 @@ export const twoFactorSchema = z.object({
 });
 export type TwoFactorValues = z.infer<typeof twoFactorSchema>;
 
-/** Format-agnostic — the backend normalizes case/dashes/spaces before hashing. */
+/** Format-agnostic - the backend normalizes case/dashes/spaces before hashing. */
 export const recoveryCodeSchema = z.object({
   code: z
     .string()

@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-/** Stencilled utility text — eyebrows, tags, file labels. */
+/** Stencilled utility text - eyebrows, tags, file labels. */
 export function StencilLabel({
   className,
   children,

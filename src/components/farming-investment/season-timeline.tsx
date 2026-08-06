@@ -34,7 +34,7 @@ const STAGES = [
 ];
 
 /**
- * The season cycle — a numbered horizontal timeline on desktop (connector
+ * The season cycle - a numbered horizontal timeline on desktop (connector
  * line behind the dots), collapsing to the vertical ledger line on mobile.
  */
 export function SeasonTimeline() {

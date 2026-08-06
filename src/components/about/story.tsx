@@ -4,7 +4,7 @@ import { StencilLabel } from "@/components/ui/StencilLabel";
 const STORY_PHOTO =
   "https://commons.wikimedia.org/wiki/Special:FilePath/Market%20in%20Tamale%20Northern%20Ghana.jpg?width=1000";
 
-/** Editorial opener — the ghost "TAMALE" stencil, story copy, treated photo
+/** Editorial opener - the ghost "TAMALE" stencil, story copy, treated photo
  * with the rotated caption plate. */
 export function Story() {
   return (

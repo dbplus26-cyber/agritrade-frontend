@@ -14,7 +14,7 @@ import { siteConfig } from "@/lib/site";
 interface PageMetaInput {
   title: string;
   description: string;
-  /** Absolute path, e.g. "/about" — canonical + OG url. */
+  /** Absolute path, e.g. "/about" - canonical + OG url. */
   path: string;
   keywords?: string[];
   /** Set false for placeholder/no-value pages. */
@@ -24,7 +24,7 @@ interface PageMetaInput {
 }
 
 // Search results truncate titles around 60 characters and social previews cut
-// descriptions near 125 — clamp centrally so no page can overflow either.
+// descriptions near 125 - clamp centrally so no page can overflow either.
 const MAX_TITLE = 60;
 const MAX_DESCRIPTION = 125;
 

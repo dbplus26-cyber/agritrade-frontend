@@ -5,7 +5,7 @@ import { StoreProvider } from "@/redux/store-provider";
 import { siteConfig, siteUrl } from "@/lib/site";
 import "./globals.css";
 
-// Display face: Archivo replaces the design file's Bricolage Grotesque — same
+// Display face: Archivo replaces the design file's Bricolage Grotesque - same
 // utilitarian grotesque character, but a taller x-height so headlines don't
 // read squat at size.
 const archivo = Archivo({
@@ -80,7 +80,7 @@ export default function RootLayout({
               classNames: {
                 title: "!text-[13.5px] !font-semibold !text-[#1F211C]",
                 // Sonner's default description tint is unreadable on the light
-                // paper background — pin it dark enough to actually read.
+                // paper background - pin it dark enough to actually read.
                 description: "!text-[12.5px] !leading-[1.5] !text-[#4A4E45]",
               },
             }}

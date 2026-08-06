@@ -22,12 +22,12 @@ export const metadata: Metadata = {
     default: "Console · DB Plus",
     template: "%s · DB Plus Console",
   },
-  // The console is private tooling — never indexed (robots.ts blocks /admin too).
+  // The console is private tooling - never indexed (robots.ts blocks /admin too).
   robots: { index: false, follow: false },
 };
 
 /**
- * The DB Plus Console — its own chrome (no public header/footer), Meridian
+ * The DB Plus Console - its own chrome (no public header/footer), Meridian
  * fonts, slate UI. RequireAuth validates the session against GET /auth/me
  * before the console renders; the proxy's cookie gate is only the first,
  * cheap line of defence.

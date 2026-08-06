@@ -8,7 +8,7 @@ const STEPS = [
   { no: "04", title: "Pay & transfer", note: "In your name before the sale closes." },
 ];
 
-/** How buying works — a compact numbered strip between the intro and the
+/** How buying works - a compact numbered strip between the intro and the
  * register, so the papers-first promise reads as a concrete sequence. */
 export function BuyingSteps() {
   return (

@@ -12,6 +12,7 @@ import {
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { AllocateSkeleton, LotRowsSkeleton } from "@/components/admin/skeletons";
+import { HelpTip } from "@/components/admin/help-tip";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -23,7 +24,11 @@ import {
   useGetShipmentQuery,
   useSetAllocationsMutation,
 } from "@/redux/shipments/shipments-api";
-import type { IShipment } from "@/types/admin-shipment.types";
+import type {
+  IAvailableLot,
+  IShipment,
+  IShipmentSale,
+} from "@/types/admin-shipment.types";
 import {
   autoAllocate,
   type AllocationRows,
@@ -47,6 +52,187 @@ const sumWeights = (byLot: Record<string, string> | undefined): number =>
 const keyedKg = (raw: string | undefined): number => {
   const n = Number(raw);
   return Number.isFinite(n) && n > 0 ? n : 0;
+};
+
+/**
+ * Weights are decimals, and the fill maths (take the smallest of the need, the
+ * lot's remainder and the capacity, then subtract) leaves float dust behind: a
+ * sale that is exactly full reads as 0.0000001 kg short. Every DECISION on
+ * this screen - is this sale short, does the balance button appear, how much
+ * does it place - is taken at 2dp, finer than any scale the goods will ever
+ * cross, so dust can never hold a "still short" button on screen forever.
+ */
+const round2 = (kg: number): number => Math.round(kg * 100) / 100;
+
+/** Below this a line is filled, not short: it is under the last kept decimal. */
+const KG_EPSILON = 0.005;
+
+/** kg keyed for one sale, per commodity, across every lot on the screen. */
+const commodityKgOf = (
+  saleRows: Record<string, string> | undefined,
+  lots: IAvailableLot[],
+): Record<string, number> => {
+  const byCommodity: Record<string, number> = {};
+  for (const lot of lots) {
+    const kg = keyedKg(saleRows?.[lot.id]);
+    if (kg > 0) {
+      byCommodity[lot.commodity.id] = (byCommodity[lot.commodity.id] ?? 0) + kg;
+    }
+  }
+  return byCommodity;
+};
+
+/**
+ * What a sale ordered, per commodity. Summed across lines because one sale can
+ * carry the same commodity on two lines, and the weight keyed against it is
+ * per commodity (a lot IS one commodity) - so the target it gets measured
+ * against has to be per commodity too, or both lines read as over-keyed.
+ */
+const agreedKgOf = (sale: IShipmentSale): Record<string, number> => {
+  const byCommodity: Record<string, number> = {};
+  for (const line of sale.lines) {
+    byCommodity[line.commodityId] =
+      (byCommodity[line.commodityId] ?? 0) + line.agreedKg;
+  }
+  return byCommodity;
+};
+
+/**
+ * What a sale is still short, per commodity, given the weights keyed for it.
+ * Commodities that are covered are left out, so a sale with nothing short is
+ * an empty object.
+ *
+ * The target is the line's FULL agreed weight, not `outstandingKg`. Saving is
+ * a wholesale replacement of this shipment's allocations (PUT deletes them and
+ * re-creates from these inputs), and the inputs are SEEDED from exactly those
+ * saved allocations - so netting `allocatedKg` off as well counts the same
+ * kilos twice, and a sale that is perfectly allocated reads as over-keyed by
+ * every kilo it already carries.
+ */
+const shortKgOf = (
+  sale: IShipmentSale,
+  keyedByCommodity: Record<string, number>,
+): Record<string, number> => {
+  const short: Record<string, number> = {};
+  for (const [commodityId, agreed] of Object.entries(agreedKgOf(sale))) {
+    const gap = round2(agreed - (keyedByCommodity[commodityId] ?? 0));
+    if (gap >= KG_EPSILON) short[commodityId] = gap;
+  }
+  return short;
+};
+
+/**
+ * Lots grouped per commodity and ordered by the chosen end of the price scale.
+ * Mirrors auto-allocate.ts deliberately: Array#sort is stable so equal-cost
+ * lots keep the API's oldest-first order, and a redacted cost (null, a caller
+ * without financial visibility) cannot be ranked at all, so it sorts last
+ * under either end rather than being guessed into the cheap pile.
+ */
+const lotsByCommodity = (
+  lots: IAvailableLot[],
+  strategy: AutoAllocateStrategy,
+): Map<string, IAvailableLot[]> => {
+  const byCommodity = new Map<string, IAvailableLot[]>();
+  for (const lot of lots) {
+    const list = byCommodity.get(lot.commodity.id);
+    if (list) list.push(lot);
+    else byCommodity.set(lot.commodity.id, [lot]);
+  }
+  for (const list of byCommodity.values()) {
+    list.sort((a, b) => {
+      if (a.unitCostGhs === null || b.unitCostGhs === null) {
+        return (a.unitCostGhs === null ? 1 : 0) - (b.unitCostGhs === null ? 1 : 0);
+      }
+      return strategy === "CHEAPEST"
+        ? a.unitCostGhs - b.unitCostGhs
+        : b.unitCostGhs - a.unitCostGhs;
+    });
+  }
+  return byCommodity;
+};
+
+/** One lot's share of a balance, and the total the whole top-up would place. */
+interface BalancePlan {
+  add: { kg: number; lotId: string; saleId: string }[];
+  totalKg: number;
+}
+
+/**
+ * Plans the top-up behind "Balance from …": for each sale in scope, ONLY the
+ * weight it is still short, drawn from the far end of the price order.
+ *
+ * It is a second pass rather than another `autoAllocate` call because the two
+ * do opposite things. Auto-allocate REPLACES a sale's weights, which is what
+ * lets a second strategy click undo the first; a balance has to ADD to what is
+ * on the screen, so every kilo already keyed - this sale's own, and every
+ * other sale's - is a claim it must work around instead of overwrite.
+ *
+ * It returns the plan instead of applying it so the same call can decide
+ * whether the button belongs on screen at all: an empty plan is a button that
+ * would do nothing, and this screen moves real stock, so it does not offer
+ * actions that quietly no-op.
+ */
+const planBalance = ({
+  capacityKg,
+  fill,
+  lots,
+  rows,
+  sales,
+  strategy,
+}: {
+  capacityKg: null | number;
+  fill: string[];
+  lots: IAvailableLot[];
+  rows: AllocationRows;
+  sales: IShipmentSale[];
+  strategy: AutoAllocateStrategy;
+}): BalancePlan => {
+  // Every kilo keyed anywhere on this screen is already spoken for. Counting
+  // only the sales being topped up is the classic double-spend: two sales on
+  // one truck each "get" the same 500 kg out of one lot.
+  const claimedByLot = new Map<string, number>();
+  let keyedTotalKg = 0;
+  for (const sale of sales) {
+    for (const [lotId, raw] of Object.entries(rows[sale.id] ?? {})) {
+      const kg = keyedKg(raw);
+      if (kg <= 0) continue;
+      claimedByLot.set(lotId, (claimedByLot.get(lotId) ?? 0) + kg);
+      keyedTotalKg += kg;
+    }
+  }
+
+  let capacityLeft =
+    typeof capacityKg === "number" && capacityKg > 0
+      ? round2(capacityKg - keyedTotalKg)
+      : Number.POSITIVE_INFINITY;
+
+  const byCommodity = lotsByCommodity(lots, strategy);
+  const saleById = new Map(sales.map((s) => [s.id, s]));
+  const add: BalancePlan["add"] = [];
+  let totalKg = 0;
+
+  for (const saleId of fill) {
+    const sale = saleById.get(saleId);
+    if (!sale) continue;
+    const short = shortKgOf(sale, commodityKgOf(rows[saleId], lots));
+    for (const [commodityId, shortKg] of Object.entries(short)) {
+      let need = shortKg;
+      for (const lot of byCommodity.get(commodityId) ?? []) {
+        if (need < KG_EPSILON || capacityLeft < KG_EPSILON) break;
+        const free = round2(lot.remainingKg - (claimedByLot.get(lot.id) ?? 0));
+        if (free < KG_EPSILON) continue;
+        const take = round2(Math.min(need, free, capacityLeft));
+        if (take < KG_EPSILON) continue;
+        add.push({ kg: take, lotId: lot.id, saleId });
+        claimedByLot.set(lot.id, (claimedByLot.get(lot.id) ?? 0) + take);
+        need = round2(need - take);
+        capacityLeft = round2(capacityLeft - take);
+        totalKg = round2(totalKg + take);
+      }
+    }
+  }
+
+  return { add, totalKg };
 };
 
 /**
@@ -81,6 +267,12 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
   /** The last auto-allocate run's outcome, shown so a short fill is stated
    * outright rather than discovered at dispatch. */
   const [fillNote, setFillNote] = useState<null | string>(null);
+  /** Which end of the price order was filled from last. It survives manual
+   * edits on purpose: an admin who fills from the cheapest, then hand-corrects
+   * one lot, still wants the balance offered from the other end. */
+  const [lastStrategy, setLastStrategy] = useState<AutoAllocateStrategy | null>(
+    null,
+  );
   /** The backend's refusal (OVER_SHIP, COMMODITY_NOT_ON_SALE…), kept inline
    * so the admin can fix the weights without losing them. */
   const [serverError, setServerError] = useState<null | string>(null);
@@ -116,19 +308,12 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
 
   const activeRows = rows[activeSaleId];
   const activeSale = shipment.sales.find((s) => s.id === activeSaleId);
-  const activeSaleLines = activeSale?.lines ?? [];
   /** kg already weighted per commodity for the ACTIVE sale (across lots) -
    * the flag that tells the admin "this sale already has maize on board". */
-  const activeCommodityKg = useMemo(() => {
-    const byCommodity: Record<string, number> = {};
-    for (const l of lots) {
-      const n = keyedKg(activeRows?.[l.id]);
-      if (n > 0) {
-        byCommodity[l.commodity.id] = (byCommodity[l.commodity.id] ?? 0) + n;
-      }
-    }
-    return byCommodity;
-  }, [lots, activeRows]);
+  const activeCommodityKg = useMemo(
+    () => commodityKgOf(activeRows, lots),
+    [lots, activeRows],
+  );
 
   const totalKg = useMemo(
     () => shipment.sales.reduce((sum, s) => sum + sumWeights(rows[s.id]), 0),
@@ -147,29 +332,77 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
     return names;
   }, [shipment.sales]);
 
-  const runAutoAllocate = (strategy: AutoAllocateStrategy) => {
-    const fill =
+  /**
+   * What the ACTIVE sale needs, one row per COMMODITY rather than per line.
+   * Weights are keyed per commodity (a lot IS one commodity), so a sale that
+   * lists the same commodity on two lines has to show one merged requirement -
+   * two rows would each measure the whole keyed weight against half the order
+   * and both would read as over-keyed.
+   */
+  const activeNeeds = activeSale
+    ? Object.entries(agreedKgOf(activeSale)).map(([commodityId, agreedKg]) => ({
+        agreedKg,
+        commodityId,
+        commodityName: commodityNames[commodityId] ?? "",
+      }))
+    : [];
+
+  /** The sales an auto-allocate or a balance fills, per the scope selector. */
+  const fillScopeIds = useMemo(
+    () =>
       scope === "ALL"
         ? shipment.sales.map((s) => s.id)
         : activeSaleId
           ? [activeSaleId]
-          : [];
+          : [],
+    [activeSaleId, scope, shipment.sales],
+  );
+
+  /**
+   * The most weight any fill on this screen may key in. Two totals bound it
+   * and the tighter one wins:
+   *
+   * - `truckCapacityKg`, what the booked truck can carry.
+   * - `plannedWeightKg`, what the sales on it are actually still due to move.
+   *   A sale's `agreedKg` is its weight across ALL trucks, so on a part-shipped
+   *   sale filling every line to its agreed weight loads goods that already
+   *   left on an earlier truck - the backend refuses exactly that with
+   *   OVER_SHIP. The payload carries no per-line "already shipped" figure, so
+   *   this can only bound the TOTAL; the per-commodity split of a part-shipped
+   *   sale still needs the admin's eye (or a remaining-per-line field here).
+   */
+  const fillCapKg = useMemo(() => {
+    const caps = [shipment.truckCapacityKg, shipment.plannedWeightKg].filter(
+      (c): c is number => typeof c === "number" && c > 0,
+    );
+    return caps.length > 0 ? Math.min(...caps) : null;
+  }, [shipment.plannedWeightKg, shipment.truckCapacityKg]);
+  /** Which of the two caps is doing the work, so a short fill says why. */
+  const truckIsTheCap =
+    shipment.truckCapacityKg !== null && fillCapKg === shipment.truckCapacityKg;
+
+  const runAutoAllocate = (strategy: AutoAllocateStrategy) => {
     const result = autoAllocate({
-      capacityKg: shipment.truckCapacityKg,
+      capacityKg: fillCapKg,
       current: rows,
-      fill,
+      fill: fillScopeIds,
       lots,
       sales: shipment.sales,
       strategy,
     });
     setRows(result.rows);
     setServerError(null);
+    setLastStrategy(strategy);
     const shortText = result.shortfalls
       .map((sf) => {
         const ref =
           shipment.sales.find((s) => s.id === sf.saleId)?.transactionNo ?? "";
         const reason =
-          sf.reason === "CAPACITY" ? "the truck is full" : "no stock left";
+          sf.reason !== "CAPACITY"
+            ? "no stock left"
+            : truckIsTheCap
+              ? "the truck is full"
+              : "these sales have no more weight left to ship";
         return `${ref} ${commodityNames[sf.commodityId] ?? ""} short ${formatKg(sf.shortKg)} - ${reason}`;
       })
       .join("; ");
@@ -177,6 +410,58 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
       `Filled ${formatKg(result.filledKg)} from the ${
         strategy === "CHEAPEST" ? "cheapest" : "costliest"
       } lots${shortText ? `. Still short: ${shortText}` : ""}. Adjust anything before saving.`,
+    );
+  };
+
+  /**
+   * The end a balance draws from: the OPPOSITE of the last auto-allocate.
+   * Topping a cheapest fill up from the cheapest again is just the same run
+   * twice - the point of the button is the other end of the price order, the
+   * dear stock worth clearing while a buyer is paying for it, or the cheap
+   * stock still sitting there after a costliest fill.
+   */
+  const balanceStrategy: AutoAllocateStrategy | null =
+    lastStrategy === null
+      ? null
+      : lastStrategy === "CHEAPEST"
+        ? "COSTLIEST"
+        : "CHEAPEST";
+
+  /**
+   * Planned every render, not on click: the plan is what decides whether the
+   * button is offered at all, so a sale that is covered - or one that is short
+   * with nothing left to draw on - never gets a button that does nothing.
+   */
+  const balancePlan = useMemo(() => {
+    if (!balanceStrategy) return null;
+    const plan = planBalance({
+      capacityKg: fillCapKg,
+      fill: fillScopeIds,
+      lots,
+      rows,
+      sales: shipment.sales,
+      strategy: balanceStrategy,
+    });
+    return plan.totalKg >= KG_EPSILON ? plan : null;
+  }, [balanceStrategy, fillCapKg, fillScopeIds, lots, rows, shipment.sales]);
+
+  const applyBalance = () => {
+    if (!balancePlan || !balanceStrategy) return;
+    const end = balanceStrategy === "CHEAPEST" ? "cheapest" : "costliest";
+    setServerError(null);
+    // Added to what is keyed, never assigned over it: a balance is a top-up of
+    // the remainder, and the weights it does not touch are the admin's.
+    setRows((r) => {
+      const next: AllocationRows = { ...r };
+      for (const a of balancePlan.add) {
+        const bySale = { ...(next[a.saleId] ?? {}) };
+        bySale[a.lotId] = String(round2(keyedKg(bySale[a.lotId]) + a.kg));
+        next[a.saleId] = bySale;
+      }
+      return next;
+    });
+    setFillNote(
+      `Balanced ${formatKg(balancePlan.totalKg)} from the ${end} lots - only what was still needed. Adjust anything before saving.`,
     );
   };
 
@@ -302,19 +587,24 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
               weighing lots against a document number from memory. Each row
               counts what is already keyed in below, so "still to load" walks
               to zero as the truck fills. */}
-          {activeSaleLines.length > 0 ? (
+          {activeNeeds.length > 0 ? (
             <AdminCard className="px-4 py-2.5">
               <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 This sale needs
               </div>
               <ul className="flex flex-col divide-y divide-adm-hairline">
-                {activeSaleLines.map((line) => {
+                {activeNeeds.map((line) => {
                   const onSale = activeCommodityKg[line.commodityId] ?? 0;
-                  const needed = line.agreedKg - line.allocatedKg;
-                  const stillToLoad = Math.max(needed - onSale, 0);
+                  // The full agreed weight, NOT `agreedKg - allocatedKg`: the
+                  // inputs replace this shipment's allocations wholesale and
+                  // are seeded from them, so netting the saved weight off here
+                  // too would count it twice and read a fully allocated sale
+                  // as short by nothing and over-keyed by everything.
+                  const needed = line.agreedKg;
+                  const stillToLoad = Math.max(round2(needed - onSale), 0);
                   // Keyed past what the sale ordered: the backend refuses this
                   // with OVER_SHIP, so it is flagged before the round trip.
-                  const overKeyed = onSale - needed;
+                  const overKeyed = round2(onSale - needed);
                   return (
                     <li
                       key={line.commodityId}
@@ -326,18 +616,18 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                       <Mono
                         className={cn(
                           "text-[12px]",
-                          overKeyed > 0
+                          overKeyed >= KG_EPSILON
                             ? "font-semibold text-console-red"
-                            : stillToLoad === 0
+                            : stillToLoad < KG_EPSILON
                               ? "text-console"
                               : "text-adm-muted",
                         )}
                       >
-                        {overKeyed > 0
+                        {overKeyed >= KG_EPSILON
                           ? `${formatKg(overKeyed)} more than this sale ordered`
-                          : stillToLoad === 0
-                            ? `${formatKg(line.agreedKg)} · covered`
-                            : `${formatKg(stillToLoad)} of ${formatKg(line.agreedKg)} still to load`}
+                          : stillToLoad < KG_EPSILON
+                            ? `${formatKg(needed)} · covered`
+                            : `${formatKg(stillToLoad)} of ${formatKg(needed)} still to load`}
                       </Mono>
                     </li>
                   );
@@ -397,6 +687,31 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                 </AdminButton>
               ) : null}
             </div>
+            {/* The top-up, offered only when there is a real remainder AND
+                stock (and room) to cover some of it - `balancePlan` is null
+                otherwise. Its own row so the pill and its tip stay together as
+                one block on a narrow phone instead of being pulled apart by
+                the wrapping row above. */}
+            {balancePlan && balanceStrategy ? (
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5">
+                  <AdminButton
+                    type="button"
+                    variant="ghost"
+                    className="h-9 px-3 whitespace-nowrap"
+                    onClick={applyBalance}
+                  >
+                    Balance from{" "}
+                    {balanceStrategy === "CHEAPEST" ? "cheapest" : "costliest"}
+                  </AdminButton>
+                  <HelpTip
+                    text={`Adds the ${formatKg(balancePlan.totalKg)} still needed here, taken from the ${
+                      balanceStrategy === "CHEAPEST" ? "cheapest" : "costliest"
+                    } lots left - nothing more.`}
+                  />
+                </span>
+              </div>
+            ) : null}
             {fillNote ? (
               <p
                 role="status"

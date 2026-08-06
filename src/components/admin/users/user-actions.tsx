@@ -35,7 +35,7 @@ import { RoleChangeDialog } from "./role-dialog";
 
 /**
  * Per-row actions menu (dms-frontend convention): view/edit, send reset link,
- * unblock, deactivate/activate, delete — each behind its confirm gate. Role
+ * unblock, deactivate/activate, delete - each behind its confirm gate. Role
  * changes live on the detail page (they carry more context).
  */
 export function UserActionsDropdown({ user }: { user: IUser }) {
@@ -74,7 +74,7 @@ export function UserActionsDropdown({ user }: { user: IUser }) {
       !(await confirm({
         title: `Unblock ${name}?`,
         description:
-          "If the failed attempts weren't theirs, someone may be guessing their password — worth a phone call first.",
+          "If the failed attempts weren't theirs, someone may be guessing their password - worth a phone call first.",
         confirmText: "Unblock",
       }))
     )
@@ -102,7 +102,7 @@ export function UserActionsDropdown({ user }: { user: IUser }) {
         !(await confirm({
           title: `Activate ${name}?`,
           description:
-            "They can sign in again immediately — this also clears any failed-attempts block.",
+            "They can sign in again immediately - this also clears any failed-attempts block.",
           confirmText: "Activate",
         }))
       )
@@ -129,10 +129,10 @@ export function UserActionsDropdown({ user }: { user: IUser }) {
   };
 
   return (
-    // display:contents wrapper — layout-neutral, but it intercepts the React
+    // display:contents wrapper - layout-neutral, but it intercepts the React
     // SYNTHETIC bubble from the portaled menu/dialogs. Radix portals render at
     // <body> in the DOM, yet React events still bubble through the component
-    // tree — without this, a click inside the role dialog or a confirm dialog
+    // tree - without this, a click inside the role dialog or a confirm dialog
     // reaches the table row's onClick and navigates to the detail page.
     <span className="contents" onClick={(e) => e.stopPropagation()}>
       <DropdownMenu>

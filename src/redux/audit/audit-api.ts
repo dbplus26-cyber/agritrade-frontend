@@ -7,7 +7,7 @@ import type {
 
 /**
  * The audit-log register (super-admin), mirroring GET /admin/audit-logs.
- * Read-only — a single tagged list query; audited mutations elsewhere don't
+ * Read-only - a single tagged list query; audited mutations elsewhere don't
  * need to invalidate it eagerly (the trail is append-only and refetches on
  * revisit), so no invalidation wiring here.
  */

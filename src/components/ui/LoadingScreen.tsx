@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 /**
- * The general loader — a miniature of the site's signature availability
+ * The general loader - a miniature of the site's signature availability
  * board: three planks settle in one after another while a gold "FETCHING…"
  * tag swings on its nail. Pure CSS, honours prefers-reduced-motion (the
  * global rule freezes the keyframes, leaving a readable static board).

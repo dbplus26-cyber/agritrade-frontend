@@ -12,7 +12,7 @@ import { IdentityAvatar } from "./user-identity";
 
 /**
  * The profile-photo control, shared by the self-service profile and the
- * admin's user detail. Choosing a file shows a LOCAL PREVIEW first — nothing
+ * admin's user detail. Choosing a file shows a LOCAL PREVIEW first - nothing
  * uploads until Save; Decline discards the choice. Saving sends the file
  * multipart (the backend owns Cloudinary); Remove is confirm-gated and has
  * the backend delete the asset and clear the stored URL. Clicking an existing
@@ -26,9 +26,9 @@ export function PhotoManager({
   size = 104,
 }: {
   user: IUser;
-  /** Uploads the chosen file (multipart) — resolves on success. */
+  /** Uploads the chosen file (multipart) - resolves on success. */
   onSave: (file: File) => Promise<void>;
-  /** Clears the existing photo server-side — resolves on success. */
+  /** Clears the existing photo server-side - resolves on success. */
   onRemove: () => Promise<void>;
   isSaving: boolean;
   size?: number;
@@ -135,10 +135,10 @@ export function PhotoManager({
       )}
 
       {previewing ? (
-        // Preview mode: commit or walk away — nothing has uploaded yet.
+        // Preview mode: commit or walk away - nothing has uploaded yet.
         <div className="flex flex-col items-center gap-1.5">
           <span className="text-[11px] font-semibold text-console-gold">
-            Preview — not saved yet
+            Preview - not saved yet
           </span>
           <div className="flex items-center gap-1.5">
             <button

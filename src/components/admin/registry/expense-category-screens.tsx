@@ -20,6 +20,7 @@ import {
   DetailShell,
   EditableFormActions,
   Mono,
+  SectionHeading,
   adminInputClass,
   adminLinkClass,
 } from "@/components/admin/ui";
@@ -638,24 +639,28 @@ function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
     // left column with the rail running past it - the same imbalance the tile
     // grid had, in a different shape.
     <div className="flex h-full flex-col">
-      <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h2 className="text-[15px] font-bold tracking-[-0.01em] text-adm-ink">
-          Expenses in this category
-        </h2>
-        {showMoney && windowTotal !== null && windowTotal !== undefined ? (
-          <span className="flex items-baseline gap-2">
-            {/* The server sums the WHOLE filtered set, not the page on
-                screen, so narrowing the window answers "what did we spend
-                on this in July?" rather than "what is on page 1?". */}
-            <span className="text-[11px] font-bold tracking-[0.08em] text-adm-muted uppercase">
-              {filtered ? "Matched" : "Total"}
+      {/* The same heading component every other section uses - this card had
+          hand-rolled its own copy of it. */}
+      <SectionHeading
+        className="mb-2"
+        actions={
+          showMoney && windowTotal !== null && windowTotal !== undefined ? (
+            <span className="flex items-baseline gap-2">
+              {/* The server sums the WHOLE filtered set, not the page on
+                  screen, so narrowing the window answers "what did we spend
+                  on this in July?" rather than "what is on page 1?". */}
+              <span className="text-[11px] font-bold tracking-[0.08em] text-adm-muted uppercase">
+                {filtered ? "Matched" : "Total"}
+              </span>
+              <Mono className="text-[14px] font-bold text-adm-ink">
+                {formatCedis(windowTotal)}
+              </Mono>
             </span>
-            <Mono className="text-[14px] font-bold text-adm-ink">
-              {formatCedis(windowTotal)}
-            </Mono>
-          </span>
-        ) : null}
-      </div>
+          ) : null
+        }
+      >
+        Expenses in this category
+      </SectionHeading>
 
       {/* Searching and the date window are the server's job here. Filtering
           12 rows in the browser would answer only for the page in hand, and

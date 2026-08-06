@@ -24,7 +24,7 @@ const FACTS = [
 ];
 
 /**
- * The credibility ledger — four stencil-numeral tiles between the board and
+ * The credibility ledger - four stencil-numeral tiles between the board and
  * the waybill. Traders buy on trust signals; this is where they land first.
  */
 export function TrustStrip() {

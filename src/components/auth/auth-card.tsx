@@ -12,8 +12,8 @@ interface AuthCardProps {
 /**
  * Shared brand shell for the auth screens (sign in, forgot / reset password):
  * a centered card on the console page with the DB Plus wordmark, a title +
- * subtitle, the form, and a footer link. Presentational only — no client
- * state — so it renders on the server for the forgot/reset pages and
+ * subtitle, the form, and a footer link. Presentational only - no client
+ * state - so it renders on the server for the forgot/reset pages and
  * client-side inside the login card.
  */
 export function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {

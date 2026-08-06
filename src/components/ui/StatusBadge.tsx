@@ -1,15 +1,15 @@
 import { cn } from "@/lib/utils";
 
 export type StatusBadgeVariant =
-  /** Gold tag with the nail dot — live from records ("AVAILABLE NOW"). */
+  /** Gold tag with the nail dot - live from records ("AVAILABLE NOW"). */
   | "gold"
-  /** Dashed outline — never disappears, degrades to "ASK US". */
+  /** Dashed outline - never disappears, degrades to "ASK US". */
   | "dashed"
-  /** Solid leaf — positive states ("AVAILABLE"). */
+  /** Solid leaf - positive states ("AVAILABLE"). */
   | "leaf"
-  /** Solid soil — held states ("RESERVED"). */
+  /** Solid soil - held states ("RESERVED"). */
   | "soil"
-  /** Error — failed states only. */
+  /** Error - failed states only. */
   | "error";
 
 /**

@@ -65,7 +65,7 @@ export function SeasonsRegister() {
         header: "Season",
         enableSorting: false,
         meta: columnMeta({ stretch: true }),
-        // Real anchor — keyboard, middle-click and open-in-new-tab.
+        // Real anchor - keyboard, middle-click and open-in-new-tab.
         cell: ({ row }) => (
           <Link
             href={`/admin/seasons/${row.original.id}`}

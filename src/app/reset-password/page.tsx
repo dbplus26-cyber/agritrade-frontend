@@ -5,7 +5,7 @@ import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 
 export const metadata: Metadata = {
   title: "Set a new password · DB Plus",
-  // Auth plumbing — keep it out of search indexes.
+  // Auth plumbing - keep it out of search indexes.
   robots: { index: false, follow: false },
 };
 
@@ -25,7 +25,7 @@ export default async function ResetPasswordPage({
     </Link>
   );
 
-  // A link with no token is unusable — send the user back to request a fresh
+  // A link with no token is unusable - send the user back to request a fresh
   // one rather than rendering a form that can only fail.
   if (!token) {
     return (

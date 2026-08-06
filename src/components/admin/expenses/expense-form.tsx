@@ -103,8 +103,8 @@ export function ExpenseFormDialog({
           </ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
             {isEdit
-              ? "This moves a figure the profit report is computed from — the change is audited."
-              : "Rent, salaries, fumigation, repairs — anything the business pays out."}
+              ? "This moves a figure the profit report is computed from - the change is audited."
+              : "Rent, salaries, fumigation, repairs - anything the business pays out."}
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
 
@@ -159,7 +159,7 @@ export function ExpenseFormDialog({
           <AdminField label="Description" error={errors.description?.message} optional>
             <input
               id="expense-description"
-              placeholder="e.g. Warehouse rent — July"
+              placeholder="e.g. Warehouse rent - July"
               className={adminInputClass}
               {...register("description")}
             />

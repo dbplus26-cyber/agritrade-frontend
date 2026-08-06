@@ -14,7 +14,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     fetchPublicCommodities().then(toLots),
     fetchPublicLandPlots().then((p) => p ?? []),
   ]);
-  // /pay is transactional (noindex) and /style-guide is internal — only the
+  // /pay is transactional (noindex) and /style-guide is internal - only the
   // real content pages are listed.
   return [
     { url: `${siteUrl}/`, lastModified: now, changeFrequency: "weekly", priority: 1 },

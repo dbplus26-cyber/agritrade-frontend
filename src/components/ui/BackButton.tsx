@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
- * Standard dashboard back control — placed at the TOP-LEFT of detail, create
+ * Standard dashboard back control - placed at the TOP-LEFT of detail, create
  * and edit pages, above the page header: the register-form link style (green
  * text, underline on hover, no background or border). Uses history when the
  * visitor navigated here in-app; falls back to `href` on a direct/deep link

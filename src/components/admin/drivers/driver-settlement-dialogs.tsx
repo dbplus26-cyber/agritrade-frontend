@@ -26,6 +26,7 @@ import { formatCedis } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import {
+  useAdjustDriverFeeMutation,
   useGetDriverPaymentPoliciesQuery,
   useRecordDriverPaymentMutation,
   useSetDriverFeeMutation,
@@ -193,6 +194,7 @@ export function DriverPaymentDialog({
     formState: { errors },
     handleSubmit,
     register,
+    setValue,
   } = useForm<PaymentValues>({
     defaultValues: {
       amountGhs: "",
@@ -204,6 +206,25 @@ export function DriverPaymentDialog({
     resolver: zodResolver(paymentSchema),
   });
   const method = useWatch({ control, name: "method" });
+
+  /**
+   * The one-tap amounts: half of what is left, and all of it.
+   *
+   * Half is offered only when it is not the same as the full amount (a tiny
+   * remaining balance would otherwise show two buttons that do the same
+   * thing) and only when it rounds to something payable.
+   */
+  const quickAmounts =
+    outstandingGhs === null || outstandingGhs <= 0
+      ? []
+      : (() => {
+          const full = Math.round(outstandingGhs * 100) / 100;
+          const half = Math.round((outstandingGhs / 2) * 100) / 100;
+          const out = [];
+          if (half > 0 && half < full) out.push({ label: "Half", value: half });
+          out.push({ label: "Full balance", value: full });
+          return out;
+        })();
 
   const onSubmit = async (values: PaymentValues) => {
     try {
@@ -274,6 +295,33 @@ export function DriverPaymentDialog({
                   placeholder="0.00"
                   {...register("amountGhs")}
                 />
+                {/* The two amounts anyone actually types here. A haulier is
+                    paid an advance and then the balance, so making those one
+                    tap each removes the arithmetic - and the mistyped figure
+                    that comes with doing it in your head. Hidden when the
+                    balance is redacted, since there would be no figure to
+                    put on the button. */}
+                {quickAmounts.length > 0 ? (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {quickAmounts.map((q) => (
+                      <AdminButton
+                        className="h-8 px-3 text-[12.5px]"
+                        key={q.label}
+                        onClick={() => {
+                          // shouldValidate so a prior "enter the amount"
+                          // error clears the moment the field is filled.
+                          setValue("amountGhs", q.value.toFixed(2), {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          });
+                        }}
+                        variant="ghost"
+                      >
+                        {q.label} · {formatCedis(q.value)}
+                      </AdminButton>
+                    ))}
+                  </div>
+                ) : null}
               </AdminField>
               <AdminField error={errors.paidAt?.message} label="Paid on">
                 <Input
@@ -414,6 +462,143 @@ export function ReverseReasonDialog({
             </AdminButton>
             <AdminButton disabled={submitting} type="submit" variant="danger">
               {submitting ? "Reversing…" : "Reverse payment"}
+            </AdminButton>
+          </ResponsiveDialogFooter>
+        </form>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
+  );
+}
+
+const adjustSchema = z.object({
+  amountGhs: z
+    .string()
+    .trim()
+    .min(1, "Enter the amount")
+    .refine((v) => Number(v) > 0, { message: "Enter an amount above zero" }),
+  direction: z.enum(["down", "up"]),
+  reason: z
+    .string()
+    .trim()
+    .min(3, "Say why in a few words")
+    .max(500, "Keep it under 500 characters"),
+});
+type AdjustValues = z.infer<typeof adjustSchema>;
+
+/**
+ * Changing what a DISPATCHED trip owes, without touching what was agreed.
+ *
+ * Before the truck leaves, a fee is still a negotiation and is simply edited.
+ * After it leaves, the agreed figure is what a haulier will later say was
+ * settled, so it stays put and the change is recorded beside it with a reason
+ * and a date. That is the whole point: "we agreed 4,000" can be answered with
+ * "yes, on the 4th, and it was reduced by 600 on the 9th, for this reason".
+ *
+ * Direction is a separate control rather than asking for a negative number.
+ * A minus sign is easy to miss and easy to forget, and getting it wrong here
+ * moves money the wrong way.
+ */
+export function DriverFeeAdjustDialog({
+  onClose,
+  shipmentId,
+}: {
+  onClose: () => void;
+  shipmentId: string;
+}) {
+  const [adjust, { isLoading }] = useAdjustDriverFeeMutation();
+  const {
+    control,
+    formState: { errors },
+    handleSubmit,
+    register,
+  } = useForm<AdjustValues>({
+    defaultValues: { amountGhs: "", direction: "down", reason: "" },
+    resolver: zodResolver(adjustSchema),
+  });
+  const direction = useWatch({ control, name: "direction" });
+
+  const onSubmit = async (values: AdjustValues) => {
+    const magnitude = Number(values.amountGhs);
+    try {
+      await adjust({
+        body: {
+          amountGhs: values.direction === "down" ? -magnitude : magnitude,
+          reason: values.reason,
+        },
+        shipmentId,
+      }).unwrap();
+      notify.success(
+        values.direction === "down" ? "Fee reduced" : "Fee increased",
+      );
+      onClose();
+    } catch (err) {
+      // The server refuses an adjustment that would take the fee below zero
+      // or below what has already been paid; those messages name the real
+      // problem, so they are shown rather than replaced.
+      notify.error("Couldn't adjust the fee", {
+        description: extractApiError(err).message,
+      });
+    }
+  };
+
+  return (
+    <ResponsiveDialog open onOpenChange={onClose}>
+      <ResponsiveDialogContent className="sm:max-w-[460px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>Adjust the driver fee</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
+            This trip has dispatched, so what was agreed stays on the record.
+            The change is added beside it with your reason and today&apos;s
+            date.
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
+
+        <form
+          className="flex flex-col gap-4"
+          noValidate
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <AdminField label="Which way">
+            <select className={adminSelectClass} {...register("direction")}>
+              <option value="down">Reduce what the driver is owed</option>
+              <option value="up">Increase what the driver is owed</option>
+            </select>
+          </AdminField>
+
+          <AdminField
+            error={errors.amountGhs?.message}
+            hint={
+              direction === "down"
+                ? "How much to take off the agreed fee."
+                : "How much to add to the agreed fee."
+            }
+            label="Amount (GHS)"
+          >
+            <Input
+              className={cn(adminInputClass, "text-right")}
+              inputMode="decimal"
+              placeholder="0.00"
+              {...register("amountGhs")}
+            />
+          </AdminField>
+
+          <AdminField error={errors.reason?.message} label="Why">
+            <textarea
+              className={cn(
+                adminInputClass,
+                "h-auto min-h-[72px] w-full resize-y py-2",
+              )}
+              placeholder="e.g. Agreed a reduction after the second drop was cancelled"
+              {...register("reason")}
+            />
+          </AdminField>
+
+          <ResponsiveDialogFooter className="gap-2">
+            <AdminButton onClick={onClose} type="button" variant="ghost">
+              Cancel
+            </AdminButton>
+            <AdminButton disabled={isLoading} type="submit">
+              {isLoading ? "Saving…" : "Record adjustment"}
             </AdminButton>
           </ResponsiveDialogFooter>
         </form>

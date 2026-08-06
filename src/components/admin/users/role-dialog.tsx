@@ -27,7 +27,7 @@ import { UserRole, type IUser } from "@/types/user.types";
 import { ROLE_LABEL, ROLE_OPTIONS } from "./user-bits";
 
 /**
- * Role change as a modal (dms convention) — used from the detail page and the
+ * Role change as a modal (dms convention) - used from the detail page and the
  * table's row-actions menu. The apply button doubles as the confirmation:
  * the dialog itself states the consequence, so there's one deliberate step.
  */

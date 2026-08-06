@@ -21,6 +21,7 @@ import type {
 } from "@/types/driver-settlement.types";
 
 import {
+  DriverFeeAdjustDialog,
   DriverFeeDialog,
   DriverPaymentDialog,
   ReverseReasonDialog,
@@ -96,8 +97,24 @@ function SettlementHeadline({ settlement }: { settlement: IDriverSettlement }) {
   );
 }
 
+/** "04 Aug 2026", or nothing when the date was never set. */
+const shortDate = (iso: null | string): null | string =>
+  iso === null
+    ? null
+    : new Date(iso).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
+
 /** Fee, paid and the terms, as a labelled trio that survives narrow columns. */
-function SettlementFacts({ settlement }: { settlement: IDriverSettlement }) {
+function SettlementFacts({
+  departedAt,
+  settlement,
+}: {
+  departedAt: null | string;
+  settlement: IDriverSettlement;
+}) {
   return (
     <dl className="mt-4 grid grid-cols-1 gap-x-6 gap-y-3 border-t border-adm-hairline pt-3.5 @min-[420px]/settle:grid-cols-3">
       <div className="min-w-0">
@@ -110,7 +127,23 @@ function SettlementFacts({ settlement }: { settlement: IDriverSettlement }) {
         </dt>
         <dd className="mt-0.5 text-[14px] text-adm-ink">
           {settlement.hasFee ? (
-            <Figure value={settlement.feeGhs} />
+            <>
+              <Figure value={settlement.feeGhs} />
+              {/* What was ORIGINALLY agreed, shown underneath whenever an
+                  adjustment has moved the headline figure away from it. */}
+              {settlement.adjustedByGhs !== null &&
+              settlement.adjustedByGhs !== 0 &&
+              settlement.agreedFeeGhs !== null ? (
+                <span className="mt-0.5 block text-[11.5px] text-adm-faint">
+                  agreed at {formatCedis(settlement.agreedFeeGhs)}
+                </span>
+              ) : null}
+              {shortDate(settlement.agreedAt) ? (
+                <span className="mt-0.5 block text-[11.5px] text-adm-faint">
+                  on {shortDate(settlement.agreedAt)}
+                </span>
+              ) : null}
+            </>
           ) : (
             <span className="text-adm-faint">Not agreed</span>
           )}
@@ -138,6 +171,14 @@ function SettlementFacts({ settlement }: { settlement: IDriverSettlement }) {
           {settlement.policy?.name ?? (
             <span className="text-adm-faint">Not set</span>
           )}
+          {/* The dispatch date belongs beside the terms: it is the moment the
+              fee stopped being negotiable, so it is what any later argument
+              about the figure is measured from. */}
+          {shortDate(departedAt) ? (
+            <span className="mt-0.5 block text-[11.5px] text-adm-faint">
+              dispatched {shortDate(departedAt)}
+            </span>
+          ) : null}
         </dd>
       </div>
     </dl>
@@ -280,6 +321,7 @@ export function DriverSettlementCard({
 }) {
   const { isSuperAdmin } = useAuthRole();
   const [feeOpen, setFeeOpen] = useState(false);
+  const [adjustOpen, setAdjustOpen] = useState(false);
   const [payOpen, setPayOpen] = useState(false);
   // The row being reversed, held so the dialog can name it. Null when closed.
   const [reversing, setReversing] = useState<IDriverPayment | null>(null);
@@ -325,7 +367,11 @@ export function DriverSettlementCard({
     );
   }
 
-  const { driver, payments, settlement } = data.data;
+  const { adjustments, departedAt, driver, payments, settlement } = data.data;
+  // Once the truck has gone the agreed fee is evidence, not a draft, so the
+  // action changes from "edit it" to "record what changed". The server
+  // enforces this too; the button just stops offering the wrong one.
+  const dispatched = departedAt !== null;
   // Only the owner moves money. Staff read the card, which is why every figure
   // on it is redactable rather than the whole card being hidden.
   const manage = canManage && isSuperAdmin;
@@ -352,7 +398,7 @@ export function DriverSettlementCard({
       </div>
 
       <SettlementHeadline settlement={settlement} />
-      <SettlementFacts settlement={settlement} />
+      <SettlementFacts departedAt={departedAt} settlement={settlement} />
 
       {/* A trip priced on terms nobody can read back is a real state and it
           says so, rather than silently showing an empty schedule - which
@@ -362,6 +408,53 @@ export function DriverSettlementCard({
           This trip&apos;s frozen terms could not be read. The fee and payments
           are still correct; re-agree the fee to restore the schedule.
         </p>
+      ) : null}
+
+      {/* The fee moved after dispatch, so both figures are on screen. Showing
+          only the current one is exactly how a haulier ends up saying "we
+          settled on X" against a record that no longer contains X. */}
+      {adjustments.length > 0 ? (
+        <div className="mt-4 rounded-[6px] border border-adm-line bg-adm-sunken px-3.5 py-3">
+          <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+            Changed after dispatch
+          </p>
+          <ul className="mt-2 flex flex-col gap-2">
+            {adjustments.map((a) => {
+              const up = (a.amountGhs ?? 0) > 0;
+              return (
+                <li className="flex items-baseline gap-3 text-[13px]" key={a.id}>
+                  {/* flex-none: the figure and its date hold their width and
+                      the reason gives way, never the other way round. */}
+                  <span
+                    className={cn(
+                      "flex-none font-semibold",
+                      up ? "text-adm-ink" : "text-console-red",
+                    )}
+                  >
+                    {a.amountGhs === null ? (
+                      <span className="text-adm-faint">Hidden</span>
+                    ) : (
+                      <>
+                        {up ? "+" : "-"}
+                        {formatCedis(Math.abs(a.amountGhs))}
+                      </>
+                    )}
+                  </span>
+                  <span className="min-w-0 flex-1 text-adm-body [overflow-wrap:anywhere]">
+                    {a.reason}
+                  </span>
+                  <span className="flex-none text-[11.5px] text-adm-faint">
+                    {new Date(a.createdAt).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       ) : null}
 
       <MilestoneSchedule settlement={settlement} />
@@ -389,13 +482,23 @@ export function DriverSettlementCard({
       {manage ? (
         // Buttons wrap as whole pills rather than wrapping their own labels.
         <div className="mt-5 flex flex-wrap gap-2">
-          <AdminButton
-            className="h-9 px-4"
-            onClick={() => setFeeOpen(true)}
-            variant={settlement.hasFee ? "ghost" : "primary"}
-          >
-            {settlement.hasFee ? "Change fee" : "Agree the fee"}
-          </AdminButton>
+          {dispatched && settlement.hasFee ? (
+            <AdminButton
+              className="h-9 px-4"
+              onClick={() => setAdjustOpen(true)}
+              variant="ghost"
+            >
+              Adjust the fee
+            </AdminButton>
+          ) : (
+            <AdminButton
+              className="h-9 px-4"
+              onClick={() => setFeeOpen(true)}
+              variant={settlement.hasFee ? "ghost" : "primary"}
+            >
+              {settlement.hasFee ? "Change fee" : "Agree the fee"}
+            </AdminButton>
+          )}
           {settlement.hasFee && settlement.status !== "SETTLED" ? (
             <AdminButton className="h-9 px-4" onClick={() => setPayOpen(true)}>
               Record a payment
@@ -420,6 +523,14 @@ export function DriverSettlementCard({
             setPayOpen(false);
           }}
           outstandingGhs={settlement.outstandingGhs}
+          shipmentId={shipmentId}
+        />
+      ) : null}
+      {adjustOpen ? (
+        <DriverFeeAdjustDialog
+          onClose={() => {
+            setAdjustOpen(false);
+          }}
           shipmentId={shipmentId}
         />
       ) : null}

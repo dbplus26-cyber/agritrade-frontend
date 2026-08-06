@@ -3,7 +3,7 @@ import { z } from "zod";
 /**
  * Mirrors the backend `createExpenseSchema` (validations/expense-validation.ts):
  * 2dp amounts so the wire format matches the Decimal(14,2) column, and a date
- * that has already happened. Kept in step deliberately — the client should
+ * that has already happened. Kept in step deliberately - the client should
  * refuse what the server would refuse, and say so before the round trip.
  */
 export const expenseSchema = z.object({

@@ -13,6 +13,7 @@ import {
   adminSelectClass,
   DetailShell,
   Mono,
+  SectionHeading,
   TONES,
   type Tone,
 } from "@/components/admin/ui";
@@ -682,20 +683,18 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
       <DetailShell
         main={
           <AdminCard className="@container/ledger px-5 py-3.5">
-            <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-              <p className="flex min-w-0 items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                <span className="min-w-0">Float ledger</span>
-                <HelpTip
-                  label="What is the float ledger?"
-                  text="Every movement in and out of this agent's money, newest first, so a balance can always be traced."
-                />
-              </p>
-              {totalTx > 0 ? (
-                <Mono className="text-[11px] text-adm-faint">
-                  {totalTx} {totalTx === 1 ? "entry" : "entries"}
-                </Mono>
-              ) : null}
-            </div>
+            <SectionHeading
+              actions={
+                totalTx > 0 ? (
+                  <Mono className="text-[11px] text-adm-faint">
+                    {totalTx} {totalTx === 1 ? "entry" : "entries"}
+                  </Mono>
+                ) : null
+              }
+              hint="Every movement in and out of this agent's money, newest first, so a balance can always be traced."
+            >
+              Float ledger
+            </SectionHeading>
             {ledger.isLoading ? (
               <LedgerSkeleton rows={5} />
             ) : transactions.length === 0 ? (
@@ -810,13 +809,12 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
 
             {(recons.data?.data.length ?? 0) > 0 ? (
               <AdminCard className="px-5 py-3">
-                <p className="mb-1 flex min-w-0 items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                  <span className="min-w-0">Reconciliations</span>
-                  <HelpTip
-                    label="What is a reconciliation?"
-                    text="A sit-down cash count: what the books expected against what was actually in the agent's hand."
-                  />
-                </p>
+                <SectionHeading
+                  className="mb-1"
+                  hint="A sit-down cash count: what the books expected against what was actually in the agent's hand."
+                >
+                  Reconciliations
+                </SectionHeading>
                 {(recons.data?.data ?? []).map((r) => (
                   <div
                     key={r.id}

@@ -1,6 +1,6 @@
 /**
  * The authenticated console user, mirroring the backend's `toPublicUser`
- * mapper (agritrade-backend `src/utils/mappers/user.mapper.ts`) — the safe,
+ * mapper (agritrade-backend `src/utils/mappers/user.mapper.ts`) - the safe,
  * client-facing subset (never the password hash or `tokenVersion`).
  */
 export enum UserRole {

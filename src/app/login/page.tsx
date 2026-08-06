@@ -3,7 +3,7 @@ import { LoginClient } from "@/components/auth/login-client";
 
 export const metadata: Metadata = {
   title: "Sign in · DB Plus",
-  // The sign-in page is private plumbing — keep it out of search indexes.
+  // The sign-in page is private plumbing - keep it out of search indexes.
   robots: { index: false, follow: false },
 };
 

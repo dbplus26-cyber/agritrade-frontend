@@ -16,7 +16,7 @@ import type { IUser, IUserResponse } from "@/types/user.types";
 /**
  * Seeds the `getMe` cache with the user a sign-in just returned. Without
  * this, the cache still holds the previous logout's 401 rejection when the
- * console mounts — RequireAuth would read that stale error while the refetch
+ * console mounts - RequireAuth would read that stale error while the refetch
  * is in flight and tear down the brand-new session (see require-auth.tsx).
  * Seeding also spares the console an extra `/auth/me` round trip on login.
  */
@@ -37,7 +37,7 @@ const seedSession = (
  * Auth endpoints, injected into the single `apiSlice`. These mirror the
  * agritrade-backend cookie-based contract (base `/api/v1`, httpOnly
  * `accessToken`/`refreshToken`/`twoFactorPending`). No `invalidatesTags`
- * here — session transitions are handled by dispatching auth actions and, on
+ * here - session transitions are handled by dispatching auth actions and, on
  * logout, purging the whole cache with `resetApiState`.
  */
 export const authApi = apiSlice.injectEndpoints({
@@ -47,7 +47,7 @@ export const authApi = apiSlice.injectEndpoints({
       async onQueryStarted(_arg, { queryFulfilled, dispatch }) {
         try {
           const { data } = await queryFulfilled;
-          // A 2FA challenge is not a session — only store a real user.
+          // A 2FA challenge is not a session - only store a real user.
           if (!isTwoFactorChallenge(data.data)) {
             dispatch(userLoggedIn({ user: data.data.user }));
             seedSession(dispatch, data.message, data.data.user);
@@ -78,12 +78,12 @@ export const authApi = apiSlice.injectEndpoints({
     }),
 
     /** Update the signed-in user's profile; refreshes the stored user. A new
-     * photo travels WITH the save as multipart (payload JSON + file) — the
+     * photo travels WITH the save as multipart (payload JSON + file) - the
      * backend uploads it to Cloudinary inside the same request and cleans up
      * on failure, so nothing is ever pre-uploaded or orphaned. Clearing an
      * existing photo sends `removeProfilePicture: true`; the backend deletes
      * the Cloudinary asset and nulls the stored URL. A changed email is NOT
-     * applied directly — the backend parks it pending mailbox confirmation. */
+     * applied directly - the backend parks it pending mailbox confirmation. */
     updateMe: builder.mutation<
       IUserResponse & { data: { emailChangeRequested?: boolean } },
       {
@@ -224,7 +224,7 @@ export const authApi = apiSlice.injectEndpoints({
           await queryFulfilled;
         } finally {
           // Clear client session and purge cached data even if the server call
-          // failed — the user intends to be logged out regardless.
+          // failed - the user intends to be logged out regardless.
           dispatch(userLoggedOut());
           dispatch(apiSlice.util.resetApiState());
         }

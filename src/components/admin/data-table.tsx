@@ -101,7 +101,7 @@ export interface ConsoleColumnMeta {
 }
 
 declare module "@tanstack/react-table" {
-  // The standard TanStack meta-augmentation shape — params/emptiness required.
+  // The standard TanStack meta-augmentation shape - params/emptiness required.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-object-type
   interface ColumnMeta<TData, TValue> extends ConsoleColumnMeta {}
 }
@@ -113,9 +113,9 @@ declare module "@tanstack/react-table" {
  *
  * - `enableSelection` injects the checkbox column; `renderBulkActions`
  *   receives the selected rows (and a clear function) and is rendered as a
- *   toolbar row while anything is selected — the home of "Delete selected".
+ *   toolbar row while anything is selected - the home of "Delete selected".
  * - Pagination is the shared DataTablePagination footer with a rows-per-page
- *   selector, and — dms rule — it only appears once there are more rows than
+ *   selector, and - dms rule - it only appears once there are more rows than
  *   the smallest page size. Two items never get a pager.
  */
 export interface ServerPagination {
@@ -155,7 +155,7 @@ export function ConsoleDataTable<TData>({
    * Extra classes for a TABLE ROW. Deliberately NOT applied to the mobile card:
    * every caller passes a fixed height here (`h-12`, `h-14`) because that is
    * what a `<tr>` wants, and clamping a card holding five stacked label/value
-   * rows to 48px made them overlap each other — the cramped, unreadable mobile
+   * rows to 48px made them overlap each other - the cramped, unreadable mobile
    * list this fixes. The card owns its own vertical rhythm.
    */
   rowClassName?: (row: TData) => string | undefined;
@@ -173,7 +173,7 @@ export function ConsoleDataTable<TData>({
    * `data` is exactly the current page and the footer drives these callbacks.
    */
   serverPagination?: ServerPagination;
-  /** True while a refetch is in flight — the current rows stay visible,
+  /** True while a refetch is in flight - the current rows stay visible,
    * slightly dimmed, and snap to the new list when it lands. */
   isFetching?: boolean;
   /**
@@ -311,7 +311,7 @@ export function ConsoleDataTable<TData>({
           Keyed to this component's OWN container width, not the viewport. A
           768px tablet has only ~512px of content once the 16rem sidebar is
           open, so a viewport `md:` would render the full table into half the
-          room it was designed for — the cramped, overflowing layout this
+          room it was designed for - the cramped, overflowing layout this
           replaces. Measuring the container instead means the switch is right
           wherever the table is placed, and there is exactly ONE rule setting
           `display` per view (a viewport fallback alongside would race it,

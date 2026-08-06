@@ -12,10 +12,10 @@ import { useDebounce } from "./use-debounce";
  * changes back into the query string. The mirror effect reads the *live* URL
  * (window.location) rather than the reactive `searchParams`, so writing the URL
  * can't feed back and cause a render loop, and it only navigates when the URL
- * actually differs (`router.replace(..., { scroll: false })` — no page jump).
+ * actually differs (`router.replace(..., { scroll: false })` - no page jump).
  *
  * Session memory: re-entering a table through the sidebar (a bare URL, no
- * params) restores where you left it — page, search and filters — while an
+ * params) restores where you left it - page, search and filters - while an
  * explicit URL always wins and a fresh browser session starts clean.
  *
  * `search` is the immediate input value; `queryParams.search` is the debounced
@@ -114,7 +114,7 @@ export function useTableQuery<F extends Record<string, string>>({
 
   // URL → state, for browser back/forward only. The mirror above uses
   // `router.replace` (history.replaceState), which does NOT emit `popstate`, so
-  // this listener can't fire from our own writes — no feedback loop. A real
+  // this listener can't fire from our own writes - no feedback loop. A real
   // back/forward changes the URL without touching our state, so we adopt the
   // popped URL's values here; the mirror then sees the URL already matches state
   // and skips navigating (no extra history entry).

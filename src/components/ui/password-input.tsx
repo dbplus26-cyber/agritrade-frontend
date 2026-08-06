@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * A password input with a show/hide toggle. Drop-in for `Input
- * type="password"` — forwards the ref so react-hook-form `register` spreads
+ * type="password"` - forwards the ref so react-hook-form `register` spreads
  * work. The toggle is a real button (keyboard reachable) but excluded from
  * the tab order so Tab still lands on the next field.
  */

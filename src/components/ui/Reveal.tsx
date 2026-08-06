@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Scroll reveal — the design files' `data-reveal` behaviour: a section fades
+ * Scroll reveal - the design files' `data-reveal` behaviour: a section fades
  * and rises the first time it enters the viewport. Content is server-rendered
  * visible (SEO/no-JS safe); the hide-then-reveal only engages after hydration,
  * and never under prefers-reduced-motion or without IntersectionObserver.

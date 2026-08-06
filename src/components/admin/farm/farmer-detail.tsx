@@ -11,6 +11,7 @@ import {
   DetailItem,
   DetailShell,
   Mono,
+  SectionHeading,
 } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
 import { Absent } from "@/components/admin/registry/registry-bits";
@@ -242,9 +243,7 @@ export function FarmerDetail({ id }: { id: string }) {
           <div className="flex flex-col gap-4">
             {/* Profile */}
             <AdminCard className="px-5 py-4">
-              <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                Profile
-              </div>
+              <SectionHeading className="mb-1">Profile</SectionHeading>
               {/* The identifying facts lead, because the page heading no
                   longer carries them: it says WHICH KIND of record this is,
                   and the record itself says which one. The short, comparable
@@ -291,18 +290,22 @@ export function FarmerDetail({ id }: { id: string }) {
             {/* Guarantors */}
             <AdminCard className="overflow-hidden">
               <div className="border-b border-adm-hairline px-5 py-3">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                    Guarantors
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setGuarantorDialog("new")}
-                    className="text-[12.5px] whitespace-nowrap text-console hover:underline"
-                  >
-                    + Add guarantor
-                  </button>
-                </div>
+                {/* mb-0: the header band's own py-3 is the gap under the
+                    title, so the heading must not add a second one. */}
+                <SectionHeading
+                  className="mb-0"
+                  actions={
+                    <button
+                      type="button"
+                      onClick={() => setGuarantorDialog("new")}
+                      className="text-[12.5px] whitespace-nowrap text-console hover:underline"
+                    >
+                      + Add guarantor
+                    </button>
+                  }
+                >
+                  Guarantors
+                </SectionHeading>
                 <p className="mt-0.5 text-[12px] text-adm-muted">
                   Who vouches for this farmer before grants are released.
                 </p>
@@ -376,9 +379,9 @@ export function FarmerDetail({ id }: { id: string }) {
 
             {/* Private documents */}
             <AdminCard className="px-5 py-4">
-              <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+              <SectionHeading className="mb-1">
                 Agreement documents (private)
-              </div>
+              </SectionHeading>
               <p className="mb-2 text-[12px] text-adm-muted">
                 Never shown publicly. Downloads are logged.
               </p>
@@ -432,16 +435,20 @@ export function FarmerDetail({ id }: { id: string }) {
             {/* Grants + repayments */}
             <div className="grid gap-4 lg:grid-cols-2">
               <AdminCard className="overflow-hidden">
-                <div className="flex items-center justify-between border-b border-adm-hairline px-5 py-3">
-                  <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                    Grants
-                  </span>
-                  <Link
-                    href={`/admin/grants/new?farmerId=${f.id}`}
-                    className={cn(adminLinkClass, "text-[12.5px]")}
+                <div className="border-b border-adm-hairline px-5 py-3">
+                  <SectionHeading
+                    className="mb-0"
+                    actions={
+                      <Link
+                        href={`/admin/grants/new?farmerId=${f.id}`}
+                        className={cn(adminLinkClass, "text-[12.5px]")}
+                      >
+                        + New
+                      </Link>
+                    }
                   >
-                    + New
-                  </Link>
+                    Grants
+                  </SectionHeading>
                 </div>
                 {(grants.data?.data ?? []).length === 0 ? (
                   <p className="px-5 py-4 text-[13px] text-adm-muted">No grants yet.</p>
@@ -485,16 +492,20 @@ export function FarmerDetail({ id }: { id: string }) {
               </AdminCard>
 
               <AdminCard className="overflow-hidden">
-                <div className="flex items-center justify-between border-b border-adm-hairline px-5 py-3">
-                  <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                    Repayments
-                  </span>
-                  <Link
-                    href={`/admin/repayments/new?farmerId=${f.id}`}
-                    className={cn(adminLinkClass, "text-[12.5px]")}
+                <div className="border-b border-adm-hairline px-5 py-3">
+                  <SectionHeading
+                    className="mb-0"
+                    actions={
+                      <Link
+                        href={`/admin/repayments/new?farmerId=${f.id}`}
+                        className={cn(adminLinkClass, "text-[12.5px]")}
+                      >
+                        + New
+                      </Link>
+                    }
                   >
-                    + New
-                  </Link>
+                    Repayments
+                  </SectionHeading>
                 </div>
                 {(repayments.data?.data ?? []).length === 0 ? (
                   <p className="px-5 py-4 text-[13px] text-adm-muted">No repayments yet.</p>

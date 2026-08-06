@@ -9,6 +9,7 @@ import {
   DetailItem,
   DetailShell,
   Mono,
+  SectionHeading,
   ToneBadge,
 } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
@@ -67,9 +68,9 @@ export function RepaymentDetail({ id }: { id: string }) {
           <div className="flex flex-col gap-4">
             {/* Who repaid what */}
             <AdminCard className="px-5 py-4">
-              <div className="mb-2 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+              <SectionHeading className="mb-2">
                 Who repaid what
-              </div>
+              </SectionHeading>
               <Link
                 href={`/admin/farmers/${r.farmer.id}`}
                 // The underline belongs to the NAME, not to the photo and the
@@ -191,10 +192,8 @@ export function RepaymentDetail({ id }: { id: string }) {
 
             {/* Evidence */}
             <AdminCard className="px-5 py-4">
-              <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                Evidence
-              </div>
-              <p className="mt-1 mb-1 text-[12px] text-adm-muted">
+              <SectionHeading className="mb-1">Evidence</SectionHeading>
+              <p className="mb-1 text-[12px] text-adm-muted">
                 The signed receipt or weigh slip is what settles &quot;I already
                 paid&quot; disputes. Never shown publicly; downloads are logged.
               </p>

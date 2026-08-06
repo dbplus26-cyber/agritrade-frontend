@@ -29,7 +29,7 @@ const labelClass = "stencil text-[11px] tracking-[0.14em] text-harvest-deep";
 
 /**
  * The enquiry form document. Validates on submit then live per-field (design
- * rule: error text sits under the field, never as a toast — the toast is for
+ * rule: error text sits under the field, never as a toast - the toast is for
  * transport failures only). Success swaps the sheet for the "RECEIVED" file.
  *
  * Bot protection mirrors the backend's: a hidden honeypot field bots fill and
@@ -38,7 +38,7 @@ const labelClass = "stencil text-[11px] tracking-[0.14em] text-harvest-deep";
  *
  * Service pages deep-link here with a preselected subject (and optionally
  * what the enquiry is about, e.g. a plot reference) via `defaultSubject` /
- * `defaultAbout` — the contact page derives both from its search params.
+ * `defaultAbout` - the contact page derives both from its search params.
  */
 export function EnquiryForm({
   defaultSubject = "General enquiry",
@@ -106,7 +106,7 @@ export function EnquiryForm({
         }
       }
       notify.error("Couldn't send your enquiry", { description: message });
-      // A Turnstile token is single-use — reset so a retry gets a fresh one.
+      // A Turnstile token is single-use - reset so a retry gets a fresh one.
       setTurnstileReset((n) => n + 1);
     }
   };

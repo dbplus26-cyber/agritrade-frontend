@@ -10,6 +10,7 @@ import {
   DetailGrid,
   DetailItem,
   DetailShell,
+  SectionHeading,
   adminInputClass,
   adminSelectClass,
 } from "@/components/admin/ui";
@@ -152,12 +153,12 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
                   again, so the history reads above the box. */}
               {enquiry.replies.length > 0 ? (
                 <div className="mt-4 border-t border-adm-hairline pt-3.5">
-                  <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+                  <SectionHeading className="mb-2">
                     {enquiry.replies.length === 1
                       ? "1 reply sent"
                       : `${String(enquiry.replies.length)} replies sent`}
-                  </p>
-                  <ul className="mt-2 flex flex-col gap-3">
+                  </SectionHeading>
+                  <ul className="flex flex-col gap-3">
                     {enquiry.replies.map((r) => (
                       <li
                         className="rounded-[6px] bg-adm-sunken px-3.5 py-3"
@@ -235,9 +236,9 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
                 over its value with a hairline under each, and the grid packs
                 three of them per row on a wide console. */}
             <AdminCard className="px-5 py-3">
-              <p className="mb-1.5 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+              <SectionHeading className="mb-1.5">
                 Sender &amp; provenance
-              </p>
+              </SectionHeading>
               <DetailGrid>
                 {/* Who sent it. This was the page heading; the heading now
                     names the page, so the record names the sender. */}

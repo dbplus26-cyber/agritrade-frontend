@@ -21,7 +21,7 @@ export function formatCedis(major: number | null, currency = "GH₵"): string {
   })}`;
 }
 
-/** "12,400 kg" — weights across the console. */
+/** "12,400 kg" - weights across the console. */
 export function formatKg(kg: number): string {
   return `${kg.toLocaleString("en-GH")} kg`;
 }
@@ -32,7 +32,7 @@ export function formatKg(kg: number): string {
  * Below 100k the exact amount fits, so it is shown in full. Above that the
  * figure is compacted (GH₵ 344.7k, GH₵ 1.2M) because the alternative is what
  * this replaces: "GH₵ 344,680.6…" clipped mid-number, which is worse than
- * rounded — a truncated figure reads as a DIFFERENT, smaller amount.
+ * rounded - a truncated figure reads as a DIFFERENT, smaller amount.
  *
  * Always pair with `formatCedis` in a `title` attribute so the exact value is
  * one hover (or one detail page) away.
@@ -48,7 +48,7 @@ export function formatCedisCompact(major: number | null, currency = "GH₵"): st
         ? [1_000_000, "M"]
         : [1_000, "k"];
   const scaled = major / divisor;
-  // One decimal below 100 of the unit (344.7k), none above (1,204k) — keeps
+  // One decimal below 100 of the unit (344.7k), none above (1,204k) - keeps
   // every compacted figure to at most 8 characters.
   const digits = Math.abs(scaled) < 100 ? 1 : 0;
   return `${currency} ${scaled.toLocaleString("en-GH", {

@@ -12,6 +12,7 @@ import {
   DetailItem,
   DetailShell,
   Mono,
+  SectionHeading,
   adminInputClass,
   adminLinkClass,
   adminSelectClass,
@@ -53,15 +54,13 @@ function SectionCard({
 }) {
   return (
     <AdminCard className="px-5 py-4">
-      <p className="text-[11px] uppercase tracking-[0.14em] text-adm-muted">
-        {title}
-      </p>
+      <SectionHeading className="mb-1.5">{title}</SectionHeading>
       {/* auto-fit with a real floor, not a fixed 3 columns. A rigid
           three-column grid gave every field the same narrow slot, so a long
           free-text answer - previous experience, items needed - became a
           400px-tall ribbon of text with two empty columns sitting beside it.
           Short facts now share a row; prose takes the whole width. */}
-      <div className="mt-1.5 grid grid-cols-[repeat(auto-fit,minmax(min(100%,14rem),1fr))] gap-x-8">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,14rem),1fr))] gap-x-8">
         {children}
       </div>
     </AdminCard>
@@ -247,15 +246,13 @@ function FarmApplicationDetailBody({
             </SectionCard>
 
             <AdminCard className="px-5 py-4">
-              <p className="text-[11px] uppercase tracking-[0.14em] text-adm-muted">
-                Message
-              </p>
+              <SectionHeading>Message</SectionHeading>
               {application.message ? (
-                <p className="mt-2.5 text-[13.5px] leading-[1.75] whitespace-pre-wrap text-adm-ink [overflow-wrap:anywhere]">
+                <p className="text-[13.5px] leading-[1.75] whitespace-pre-wrap text-adm-ink [overflow-wrap:anywhere]">
                   {application.message}
                 </p>
               ) : (
-                <p className="mt-2.5 text-[13px] text-adm-faint">
+                <p className="text-[13px] text-adm-faint">
                   No message included with the application.
                 </p>
               )}

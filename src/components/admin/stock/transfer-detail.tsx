@@ -11,6 +11,7 @@ import {
   AdminCard,
   AdminPageHeader,
   Mono,
+  SectionHeading,
 } from "@/components/admin/ui";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -117,9 +118,12 @@ export function TransferDetail({ id }: { id: string }) {
       {/* A transfer is two ledger entries; the stock screen is where they are
           read as such, so the page points at it rather than restating them. */}
       <AdminCard className="px-5 py-3">
-        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+        <SectionHeading
+          className="mb-1"
+          hint="A transfer is two entries: stock out of one warehouse and the same stock into the other."
+        >
           On the ledger
-        </div>
+        </SectionHeading>
         <p className="text-[13px] text-adm-muted">
           This move wrote a transfer-out against{" "}
           <Link

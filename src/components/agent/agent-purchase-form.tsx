@@ -191,7 +191,7 @@ export function AgentPurchaseForm() {
         <AgentLabel optional>Weigh-slip photo</AgentLabel>
         {/* The slip is the evidence for the money, and in a gallery of near
             identical photos the wrong one is easy to tap. Seeing it before the
-            submit is the only chance to catch that — after submit the purchase
+            submit is the only chance to catch that - after submit the purchase
             has already debited the float. */}
         <FilePicker
           accept="image/*"

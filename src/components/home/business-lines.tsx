@@ -52,7 +52,7 @@ function FileCard({
   );
 }
 
-/** Three lines of business — big trading card + the stacked file pair. */
+/** Three lines of business - big trading card + the stacked file pair. */
 export function BusinessLines() {
   return (
     <section className="mx-auto max-w-[1312px] px-5 pb-16 lg:px-8 lg:pb-[104px]">

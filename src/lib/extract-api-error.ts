@@ -50,7 +50,7 @@ export function extractApiError(error: unknown): NormalizedError {
 
   if (isRecord(error)) {
     // RTK aborts (e.g. a state reset or unmount cancelled the request) aren't
-    // a user-facing failure mode — never surface a bare "Aborted".
+    // a user-facing failure mode - never surface a bare "Aborted".
     const name = typeof error.name === "string" ? error.name : undefined;
     const msg = typeof error.message === "string" ? error.message : undefined;
     if (

@@ -59,12 +59,27 @@ export interface IDriverPayment {
   reversedByPaymentId: string | null;
 }
 
+/** One recorded change to a dispatched trip's fee. */
+export interface IDriverFeeAdjustment {
+  id: string;
+  /** Signed: positive raised what the driver is owed, negative reduced it. */
+  amountGhs: number | null;
+  reason: string;
+  createdAt: string;
+}
+
 export interface IDriverSettlement {
   /** Null until a fee is agreed, or when redacted - see hasFee. */
   feeGhs: number | null;
   paidGhs: number | null;
   outstandingGhs: number | null;
   dueAtLoadingGhs: number | null;
+  /** When the fee was agreed, so a disputed figure has a date on it. */
+  agreedAt: string | null;
+  /** What was ORIGINALLY agreed, before any post-dispatch adjustment. */
+  agreedFeeGhs: number | null;
+  /** Sum of the adjustments. Positive raised the fee, negative reduced it. */
+  adjustedByGhs: number | null;
   /** False until a fee is agreed. Never infer this from feeGhs being null. */
   hasFee: boolean;
   milestones: IDriverMilestoneAmount[];
@@ -77,6 +92,9 @@ export interface IDriverSettlement {
 export interface IDriverSettlementResponse {
   message: string;
   data: {
+    adjustments: IDriverFeeAdjustment[];
+    /** The trip's own dispatch date: a disputed fee is argued against it. */
+    departedAt: string | null;
     driver: { id: string | null; name: string; phone: string | null };
     payments: IDriverPayment[];
     settlement: IDriverSettlement;
@@ -128,6 +146,12 @@ export interface ISetDriverFeeInput {
   feeGhs: number;
   /** Overrides the driver's standing policy for this trip only. */
   policyId?: string;
+}
+
+export interface IAdjustDriverFeeInput {
+  /** Signed: positive raises what the driver is owed, negative reduces it. */
+  amountGhs: number;
+  reason: string;
 }
 
 export interface IRecordDriverPaymentInput {

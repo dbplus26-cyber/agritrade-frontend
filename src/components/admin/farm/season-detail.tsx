@@ -10,6 +10,7 @@ import {
   DetailItem,
   DetailShell,
   Mono,
+  SectionHeading,
   adminLinkClass,
 } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
@@ -152,9 +153,7 @@ export function SeasonDetail({ id }: { id: string }) {
       <DetailShell
         aside={
           <AdminCard className="px-5 py-3">
-            <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-              Season
-            </p>
+            <SectionHeading className="mb-1">Season</SectionHeading>
             <DetailGrid columns={2}>
               {/* The name is here rather than in the page heading, which now
                   says what KIND of page this is. Something has to say which
@@ -207,9 +206,9 @@ export function SeasonDetail({ id }: { id: string }) {
           <>
           {stats ? (
             <AdminCard className="mb-4 px-5 py-3">
-              <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+              <SectionHeading className="mb-1">
                 Expected vs actual
-              </p>
+              </SectionHeading>
               <p className="mb-2 text-[12px] text-adm-muted">
                 The season plans against what actually came back - the read
                 that makes next season&apos;s grant decisions better informed.
@@ -274,8 +273,10 @@ export function SeasonDetail({ id }: { id: string }) {
             </AdminCard>
           ) : null}
           <AdminCard className="overflow-hidden">
-            <div className="border-b border-adm-hairline px-5 py-3 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-              Farmer balances
+            {/* The rule stays on the band; the heading owns only its text,
+                so mb-0 leaves the band's py-3 as the gap under it. */}
+            <div className="border-b border-adm-hairline px-5 py-3">
+              <SectionHeading className="mb-0">Farmer balances</SectionHeading>
             </div>
             {summary.isLoading ? (
               <div className="p-5">

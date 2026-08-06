@@ -1,6 +1,7 @@
 import { apiSlice } from "../api-slice";
 import { toQueryString } from "@/lib/to-query-string";
 import type {
+  IAdjustDriverFeeInput,
   ICreateDriverPaymentPolicyInput,
   IDriverPaymentPolicyListResponse,
   IDriverPaymentPolicyResponse,
@@ -103,6 +104,27 @@ export const driverSettlementApi = apiSlice.injectEndpoints({
       ],
     }),
 
+    /**
+     * Changes what a DISPATCHED trip owes, without touching what was agreed.
+     * Separate endpoint from setDriverFee on purpose: that one edits a figure,
+     * this one appends to a history a driver can be walked through.
+     */
+    adjustDriverFee: builder.mutation<
+      { message: string },
+      { body: IAdjustDriverFeeInput; shipmentId: string }
+    >({
+      query: ({ body, shipmentId }) => ({
+        body,
+        method: "POST",
+        url: `admin/shipments/${shipmentId}/driver-fee-adjustments`,
+      }),
+      invalidatesTags: (_r, _e, { shipmentId }) => [
+        { type: "DriverSettlement", id: shipmentId },
+        { type: "Shipments", id: shipmentId },
+        { type: "DriverSettlement", id: "UNSETTLED" },
+      ],
+    }),
+
     recordDriverPayment: builder.mutation<
       { message: string },
       { shipmentId: string; body: IRecordDriverPaymentInput }
@@ -195,6 +217,7 @@ export const driverSettlementApi = apiSlice.injectEndpoints({
 });
 
 export const {
+  useAdjustDriverFeeMutation,
   useCreateDriverPaymentPolicyMutation,
   useDeleteDriverPaymentPolicyMutation,
   useGetDriverPaymentPoliciesQuery,

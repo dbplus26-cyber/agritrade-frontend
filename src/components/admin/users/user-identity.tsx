@@ -99,7 +99,7 @@ function Fact({
 
 /**
  * The spacious identity fact grid shared by the profile page and the admin's
- * user-detail view — labelled facts breathing in two columns instead of one
+ * user-detail view - labelled facts breathing in two columns instead of one
  * cramped sentence.
  */
 export function IdentityFacts({

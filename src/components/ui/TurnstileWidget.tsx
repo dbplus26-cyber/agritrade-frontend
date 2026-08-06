@@ -6,7 +6,7 @@ import { env } from "@/lib/env";
 
 /**
  * Whether Turnstile is configured. Forms use this to decide whether a token is
- * required before submit — when false (no site key, e.g. local dev), the widget
+ * required before submit - when false (no site key, e.g. local dev), the widget
  * renders nothing and submission proceeds unblocked, matching the backend which
  * skips verification when `TURNSTILE_SECRET_KEY` is unset.
  */

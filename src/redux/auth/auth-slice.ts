@@ -9,7 +9,7 @@ const STORAGE_KEY = "dbplus.auth.user";
 
 // Rehydrate synchronously so the console doesn't flash a logged-out state on
 // reload. localStorage is unavailable during SSR (and in reducer unit tests),
-// so every access is guarded. Only the *user* is persisted — never tokens,
+// so every access is guarded. Only the *user* is persisted - never tokens,
 // which live in httpOnly cookies the browser can't read.
 const storedUser =
   typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
@@ -28,7 +28,7 @@ const initialState: AuthState = {
 
 // First-party "probably signed in" hint for the Next.js proxy. The real session
 // cookies are httpOnly on the *API's* origin, which the proxy can't see when
-// the API lives on another domain (production) — so the /admin gate reads this
+// the API lives on another domain (production) - so the /admin gate reads this
 // hint instead. It's presence-only: RequireAuth still does the real check.
 const HINT_COOKIE = "dbplus.auth.hint";
 

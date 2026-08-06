@@ -16,6 +16,7 @@ import {
   DetailItem,
   DetailShell,
   Mono,
+  SectionHeading,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
 import { HelpTip } from "@/components/admin/help-tip";
@@ -451,13 +452,12 @@ export function PurchaseDetail({ id }: { id: string }) {
         main={
           <div className="flex flex-col gap-4">
             <AdminCard className="px-5 py-3">
-              <p className="mb-1 flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                <span className="min-w-0">Weights &amp; variance</span>
-                <HelpTip
-                  label="What is weight variance?"
-                  text="Variance is the gap between the weight written down at the village and the weight the warehouse scale gave."
-                />
-              </p>
+              <SectionHeading
+                className="mb-1"
+                hint="Variance is the gap between the weight written down at the village and the weight the warehouse scale gave."
+              >
+                Weights &amp; variance
+              </SectionHeading>
               <DetailGrid>
                 {/* What was bought - the heading names the page now. */}
                 <DetailItem label="Commodity" strong>
@@ -495,9 +495,7 @@ export function PurchaseDetail({ id }: { id: string }) {
             </AdminCard>
 
             <AdminCard className="px-5 py-3">
-              <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                Money
-              </p>
+              <SectionHeading className="mb-1">Money</SectionHeading>
               <DetailGrid>
                 <DetailItem label="Total" mono strong>
                   {formatCedis(p.totalGhs)}
@@ -509,9 +507,7 @@ export function PurchaseDetail({ id }: { id: string }) {
             </AdminCard>
 
             <AdminCard className="px-5 py-3">
-              <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                Parties & logistics
-              </p>
+              <SectionHeading className="mb-1">Parties & logistics</SectionHeading>
               <DetailGrid>
                 <DetailItem label="Source">{SOURCE_LABEL[p.source]}</DetailItem>
                 <DetailItem label="Warehouse">
@@ -546,9 +542,7 @@ export function PurchaseDetail({ id }: { id: string }) {
             </AdminCard>
 
             <AdminCard className="px-5 py-3">
-              <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                Timeline
-              </p>
+              <SectionHeading className="mb-1">Timeline</SectionHeading>
               <DetailGrid>
                 <DetailItem label="Purchased">
                   {formatConsoleDate(p.purchasedAt)}
@@ -611,9 +605,7 @@ export function PurchaseDetail({ id }: { id: string }) {
 
             {p.photo ? (
               <AdminCard className="px-5 py-4">
-                <p className="mb-2 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                  Weigh-slip
-                </p>
+                <SectionHeading className="mb-2">Weigh-slip</SectionHeading>
                 <Image
                   src={p.photo}
                   alt="Weigh-slip photo"

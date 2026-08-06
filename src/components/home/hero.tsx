@@ -6,7 +6,7 @@ const HERO_PHOTO =
   "https://commons.wikimedia.org/wiki/Special:FilePath/Truck%20and%20trike%2C%20Tamale%20(P1100339).jpg?width=1200";
 
 /**
- * Home hero — asymmetric 7/5: dispatch eyebrow, the two-line drop-in
+ * Home hero - asymmetric 7/5: dispatch eyebrow, the two-line drop-in
  * headline with the gold underline on "south.", CTAs, and the treated truck
  * photo that crosses down into the plank board below (negative margin pair).
  */
@@ -14,7 +14,7 @@ export async function Hero() {
   const contact = await getSiteContact();
   return (
     // overflow-x-clip (not hidden) crops the ghost word at the canvas edge
-    // while still letting the photo cross down into the board section — and
+    // while still letting the photo cross down into the board section - and
     // z-[2] stacks the hero above the board (z-[1]) so the crossing photo
     // paints ON TOP of the dark band instead of sliding underneath it.
     <section className="texture-grain relative z-[2] overflow-x-clip bg-surface">
@@ -91,7 +91,7 @@ export async function Hero() {
         <div className="relative mt-10 h-[300px] sm:h-[400px] lg:mt-0 lg:h-[560px]">
           {/* Ghost stencil word, cropped by the frame edge. */}
           {/* Ghost word at full ghost scale, anchored to the photo's left edge
-              so it only runs rightward — the section clips whatever falls off
+              so it only runs rightward - the section clips whatever falls off
               the canvas, and it can never reach the headline text. */}
           <span
             aria-hidden="true"

@@ -7,7 +7,7 @@ const CHECKLIST = [
   "Transfer completed in your name before the sale closes",
 ];
 
-/** Editorial intro — ghost "PLOTS", papers-first pitch, BEFORE YOU PAY card. */
+/** Editorial intro - ghost "PLOTS", papers-first pitch, BEFORE YOU PAY card. */
 export function LandIntro() {
   return (
     // overflow-x-clip crops the ghost word at the canvas edge without ever

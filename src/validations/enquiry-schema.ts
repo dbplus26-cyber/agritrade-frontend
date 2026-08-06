@@ -25,7 +25,7 @@ export const enquirySchema = z.object({
     .min(1, "Tell us briefly what you need so the right person calls you back.")
     .max(2000),
   /**
-   * Honeypot — rendered invisibly, real users never fill it; the backend
+   * Honeypot - rendered invisibly, real users never fill it; the backend
    * rejects any submission where it's non-empty. Permissive here so the form
    * itself never blocks on it.
    */

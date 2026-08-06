@@ -8,7 +8,7 @@ import { UserRole } from "@/types/user.types";
  * `resolveMoneyVisibility`: the owner and agents always can, staff only when
  * the owner granted `financialVisibility`.
  *
- * This hook decides only what the UI bothers to RENDER — the enforcement is
+ * This hook decides only what the UI bothers to RENDER - the enforcement is
  * the API's, which sends `null` in every redacted money field regardless of
  * what the client believes. Use it to drop whole columns, inputs and totals
  * that would otherwise be a row of "Hidden" placeholders; use the null-aware

@@ -20,7 +20,7 @@ function pageWindow(page: number, totalPages: number): (number | "…")[] {
 }
 
 /**
- * Numbered pagination for plain lists (cards, grids — anything that isn't a
+ * Numbered pagination for plain lists (cards, grids - anything that isn't a
  * data table), in the DB Plus ledger idiom: mono page figures as underline
  * tabs (the current page carries the console rule) between round ghost
  * chevrons. Hides itself entirely for a single page.

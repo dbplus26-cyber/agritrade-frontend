@@ -14,7 +14,7 @@ import type { IMessageResponse } from "@/types/auth.types";
  * Super-admin user management, mirroring the backend `/admin/users` surface.
  * Every mutation invalidates the list (and the touched user) so the register
  * refetches; the backend enforces the real guards (self-action blocks, the
- * last-active-super-admin rule) — errors surface through `extractApiError`.
+ * last-active-super-admin rule) - errors surface through `extractApiError`.
  */
 export const usersApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -40,7 +40,7 @@ export const usersApi = apiSlice.injectEndpoints({
     }),
 
     /** Admin profile edit. A new photo travels WITH the save as multipart
-     * (payload JSON + file) — the backend uploads to Cloudinary inside the
+     * (payload JSON + file) - the backend uploads to Cloudinary inside the
      * request; `removeProfilePicture: true` deletes the asset and clears the
      * stored URL. */
     updateUser: builder.mutation<

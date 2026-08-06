@@ -3,7 +3,7 @@ import { StencilLabel } from "@/components/ui/StencilLabel";
 
 /**
  * The design's one section-opening pattern: gold dash + stencil eyebrow,
- * display headline, optional lede — used identically on light and dark bands.
+ * display headline, optional lede - used identically on light and dark bands.
  */
 export function SectionHeading({
   eyebrow,

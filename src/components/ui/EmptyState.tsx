@@ -31,11 +31,11 @@ function EmptyFolder({ className }: { className?: string }) {
 }
 
 /**
- * "Nothing on file" — the empty document tray.
+ * "Nothing on file" - the empty document tray.
  *
  * `card` (default): the style guide's dashed file card with a stencil header,
- * for page-level empties. `plain`: the registers' inline folder — no
- * container — for use INSIDE a data-table card (the purchases-register
+ * for page-level empties. `plain`: the registers' inline folder - no
+ * container - for use INSIDE a data-table card (the purchases-register
  * shape).
  */
 export function EmptyState({

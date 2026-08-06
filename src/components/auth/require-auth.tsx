@@ -8,7 +8,7 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { useHydrated } from "@/hooks/use-hydrated";
 
 /**
- * Gates the admin console on a *validated* session — the real protection
+ * Gates the admin console on a *validated* session - the real protection
  * beyond the proxy's cookie-presence check.
  *
  * The proxy blocks visitors with no session sign, but it can't tell a live
@@ -16,7 +16,7 @@ import { useHydrated } from "@/hooks/use-hydrated";
  * (which flows through the api-slice's silent refresh on a 401): a valid
  * session resolves and renders the console; an invalid one is cleared and
  * bounced to `/login?from=…`. A persisted user renders optimistically while
- * `/me` revalidates in the background — but only after hydration: the
+ * `/me` revalidates in the background - but only after hydration: the
  * persisted user lives in localStorage, which the server can't see, so the
  * first client render must match the server's loading screen or React
  * reports a hydration mismatch.
@@ -53,11 +53,11 @@ export function RequireAuth({ children }: { children: ReactNode }) {
 
   // Once the check has failed, hold the loading screen while the redirect
   // fires. (getMe's onQueryStarted also clears the persisted user, so
-  // `cachedUser` is null here — we never leak the console to an invalid session.)
+  // `cachedUser` is null here - we never leak the console to an invalid session.)
   if (isError) return <LoadingScreen />;
 
   // Verified by /me, or optimistic from a persisted user while the check runs
-  // (post-hydration only — see the note above).
+  // (post-hydration only - see the note above).
   if (data || (hydrated && cachedUser)) return <>{children}</>;
 
   // First load with no persisted user: wait for /me before revealing anything.

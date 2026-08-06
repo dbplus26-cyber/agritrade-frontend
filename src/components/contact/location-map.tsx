@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Loader2, Navigation } from "lucide-react";
 
-// Office location — Industrial Area, off Bolgatanga Road, Tamale. Coordinates
+// Office location - Industrial Area, off Bolgatanga Road, Tamale. Coordinates
 // approximate the area; nudge when the real pin is confirmed.
 const OFFICE_LAT = 9.4449;
 const OFFICE_LNG = -0.8394;

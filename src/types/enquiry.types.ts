@@ -21,9 +21,9 @@ export interface IEnquiryInput {
   email?: string;
   subject: EnquirySubject;
   message: string;
-  /** Honeypot field — sent empty by real users; bots that fill it get 403'd. */
+  /** Honeypot field - sent empty by real users; bots that fill it get 403'd. */
   website?: string;
-  /** Cloudflare Turnstile token — required by the backend when enforcement is on. */
+  /** Cloudflare Turnstile token - required by the backend when enforcement is on. */
   turnstileToken?: string;
 }
 
@@ -34,7 +34,7 @@ export interface IEnquiry extends IEnquiryInput {
   receivedAt: string;
 }
 
-/** `POST /enquiries` — standard `{ message, data }` envelope. */
+/** `POST /enquiries` - standard `{ message, data }` envelope. */
 export interface IEnquiryResponse {
   message: string;
   data: IEnquiry;

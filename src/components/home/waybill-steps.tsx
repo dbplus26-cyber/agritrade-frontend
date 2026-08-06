@@ -26,7 +26,7 @@ const STEPS = [
   },
 ];
 
-/** How we work — 1/3 title, 2/3 waybill document stamped "EVERY LOAD". */
+/** How we work - 1/3 title, 2/3 waybill document stamped "EVERY LOAD". */
 export function WaybillSteps() {
   return (
     <section className="mx-auto grid max-w-[1312px] grid-cols-1 items-start gap-10 px-5 pb-16 pt-16 lg:grid-cols-[380px_1fr] lg:gap-[72px] lg:px-8 lg:pb-24 lg:pt-[88px]">

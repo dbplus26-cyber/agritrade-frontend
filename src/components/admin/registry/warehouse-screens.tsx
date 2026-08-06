@@ -14,6 +14,7 @@ import {
   AdminField,
   AdminPageHeader,
   EditableFormActions,
+  SectionHeading,
   adminInputClass,
   adminLinkClass,
 } from "@/components/admin/ui";
@@ -424,17 +425,22 @@ function WarehouseStockSection({ warehouseId }: { warehouseId: string }) {
 
   return (
     <div className="mt-6">
-      <div className="mb-2 flex items-center justify-between gap-3">
-        <h2 className="text-[12px] font-bold uppercase tracking-[0.1em] text-adm-muted">
-          Commodities in this warehouse
-        </h2>
-        <Link
-          href="/admin/stock"
-          className={cn(adminLinkClass, "whitespace-nowrap text-[12.5px] font-semibold")}
-        >
-          Full stock view
-        </Link>
-      </div>
+      <SectionHeading
+        className="mb-2"
+        actions={
+          <Link
+            href="/admin/stock"
+            className={cn(
+              adminLinkClass,
+              "whitespace-nowrap text-[12.5px] font-semibold",
+            )}
+          >
+            Full stock view
+          </Link>
+        }
+      >
+        Commodities in this warehouse
+      </SectionHeading>
 
       {isLoading ? (
         <AdminCard className="px-4 py-3.5">

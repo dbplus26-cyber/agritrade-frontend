@@ -11,6 +11,7 @@ import {
   DetailItem,
   DetailShell,
   Mono,
+  SectionHeading,
   ToneBadge,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
@@ -194,9 +195,7 @@ export function PlotDetail({ id }: { id: string }) {
 
   const aside = (
     <AdminCard className="px-5 py-3">
-      <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-        Pricing & status
-      </p>
+      <SectionHeading className="mb-1">Pricing & status</SectionHeading>
       <DetailGrid columns={2}>
         {/* The plot's location and reference: what the heading used to say. */}
         <DetailItem full label="Location" strong>
@@ -302,9 +301,7 @@ export function PlotDetail({ id }: { id: string }) {
           <div className="flex flex-col gap-4">
             {p.description ? (
               <AdminCard className="px-5 py-3 text-[13.5px] text-adm-ink [overflow-wrap:anywhere]">
-                <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                  Description
-                </div>
+                <SectionHeading className="mb-1">Description</SectionHeading>
                 {p.description}
               </AdminCard>
             ) : null}
@@ -314,25 +311,27 @@ export function PlotDetail({ id }: { id: string }) {
                 hides at the cap; `run` surfaces the API message if a 4th
                 slips through anyway. */}
             <AdminCard className="px-5 py-4">
-              <div className="mb-2 flex items-center justify-between gap-3">
-                <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                  Photos (public)
-                </span>
-                {p.photos.length >= 3 ? (
-                  <span className="text-[11.5px] text-adm-faint">
-                    3 of 3 photos
-                  </span>
-                ) : (
-                  <FilePicker
-                    accept="image/*"
-                    busy={addPhotoState.isLoading}
-                    confirmLabel="Add photo"
-                    hint="Shown on the public listing (up to 3)"
-                    onConfirm={onPhotoConfirm}
-                    triggerLabel="+ Add photo"
-                  />
-                )}
-              </div>
+              <SectionHeading
+                className="mb-2"
+                actions={
+                  p.photos.length >= 3 ? (
+                    <span className="text-[11.5px] text-adm-faint">
+                      3 of 3 photos
+                    </span>
+                  ) : (
+                    <FilePicker
+                      accept="image/*"
+                      busy={addPhotoState.isLoading}
+                      confirmLabel="Add photo"
+                      hint="Shown on the public listing (up to 3)"
+                      onConfirm={onPhotoConfirm}
+                      triggerLabel="+ Add photo"
+                    />
+                  )
+                }
+              >
+                Photos (public)
+              </SectionHeading>
               {p.photos.length === 0 ? (
                 <p className="text-[13px] text-adm-muted">No photos yet.</p>
               ) : (
@@ -349,9 +348,9 @@ export function PlotDetail({ id }: { id: string }) {
 
             {/* Private documents */}
             <AdminCard className="px-5 py-4">
-              <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+              <SectionHeading className="mb-1">
                 Ownership documents (private)
-              </div>
+              </SectionHeading>
               <p className="mb-2 text-[12px] text-adm-muted">
                 Never shown on the website. Downloads are logged.
               </p>

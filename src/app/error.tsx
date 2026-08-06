@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { routes } from "@/lib/routes";
 
-/** Route-segment error boundary — the failed-document state with a reset. */
+/** Route-segment error boundary - the failed-document state with a reset. */
 export default function ErrorBoundary({
   reset,
 }: {

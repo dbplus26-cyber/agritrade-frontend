@@ -5,7 +5,7 @@ import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 
 export const metadata: Metadata = {
   title: "Reset your password · DB Plus",
-  // Auth plumbing — keep it out of search indexes.
+  // Auth plumbing - keep it out of search indexes.
   robots: { index: false, follow: false },
 };
 

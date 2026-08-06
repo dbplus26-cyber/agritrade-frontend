@@ -10,6 +10,7 @@ import {
   DetailGrid,
   DetailItem,
   Mono,
+  SectionHeading,
 } from "@/components/admin/ui";
 import { Absent } from "@/components/admin/registry/registry-bits";
 import { HelpTip } from "@/components/admin/help-tip";
@@ -48,8 +49,10 @@ function Delta({ deltaKg }: { deltaKg: number | null }) {
 function LinesCard({ lines }: { lines: IStocktakeLine[] }) {
   return (
     <AdminCard className="overflow-hidden">
-      <div className="border-b border-adm-hairline px-4 py-3 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase sm:px-5">
-        Count lines
+      {/* The rule stays on the band; mb-0 because the band's py-3 already
+          spaces the title off the table below it. */}
+      <div className="border-b border-adm-hairline px-4 py-3 sm:px-5">
+        <SectionHeading className="mb-0">Count lines</SectionHeading>
       </div>
       <div className="@container/lines">
         {/* Wide: the real four-column table. */}
@@ -287,10 +290,8 @@ export function StocktakeDetail({ id }: { id: string }) {
         // second column left to be out of step with.
         <div className="flex flex-col gap-4">
           <AdminCard className="@container p-5">
-            <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-              Sheet
-            </div>
-            <DetailGrid className="mt-1">
+            <SectionHeading className="mb-1">Sheet</SectionHeading>
+            <DetailGrid>
               <DetailItem label="Stocktake no" mono strong>
                 {st.transactionNo}
               </DetailItem>

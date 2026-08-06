@@ -49,7 +49,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-/* ── Profile photo (managed on its own — no Edit mode required) ──────────── */
+/* ── Profile photo (managed on its own - no Edit mode required) ──────────── */
 
 /** PhotoManager wired to the self-service PATCH /auth/me. */
 function ProfilePhoto({ user }: { user: IUser }) {
@@ -194,7 +194,7 @@ function ProfileEditForm({
         body: {
           firstName: values.firstName,
           lastName: values.lastName,
-          // Only send the email when it actually changed — a new one starts
+          // Only send the email when it actually changed - a new one starts
           // the confirmation flow rather than switching directly.
           ...(values.email !== user.email ? { email: values.email } : {}),
           phone: values.phone?.trim() ? values.phone.trim() : null,
@@ -204,7 +204,7 @@ function ProfileEditForm({
       if (res.data.emailChangeRequested) {
         notify.info("Confirm your new email", {
           description:
-            "We sent a link to the new address — your sign-in email changes after you confirm it.",
+            "We sent a link to the new address - your sign-in email changes after you confirm it.",
         });
       }
       onClose();
@@ -448,13 +448,13 @@ function RecoveryCodesPanel({
       await navigator.clipboard.writeText(codes.join("\n"));
       notify.success("Recovery codes copied");
     } catch {
-      notify.error("Couldn't copy — select and copy them manually.");
+      notify.error("Couldn't copy - select and copy them manually.");
     }
   };
   return (
     <div className="mt-3 rounded-[6px] border border-console-gold/40 bg-[#FBF6EA] p-3.5">
       <div className="text-[12.5px] font-semibold text-adm-ink">
-        Save these recovery codes now — they are shown only once.
+        Save these recovery codes now - they are shown only once.
       </div>
       <p className="mt-1 text-[12px] leading-[1.5] text-adm-muted">
         Each code signs you in once if you can&apos;t receive the email code.
@@ -578,7 +578,7 @@ function TwoFactorCard() {
       <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <div className="text-[13.5px] font-semibold text-adm-ink">
-            {enabled ? "Email codes — enabled" : "Email codes — off"}
+            {enabled ? "Email codes - enabled" : "Email codes - off"}
           </div>
           <div className="mt-0.5 text-[12.5px] text-adm-muted">
             {enabled

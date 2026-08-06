@@ -19,6 +19,7 @@ import {
   DetailGrid,
   DetailItem,
   Mono,
+  SectionHeading,
   ToneBadge,
   type Tone,
   adminLinkClass,
@@ -332,9 +333,12 @@ export function PaymentAccountDetail({ id }: { id: string }) {
       </AdminCard>
 
       {/* The history: every payment row that named this account. */}
-      <div className="mb-1.5 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+      <SectionHeading
+        className="mb-1.5"
+        hint="Every payment that named this account, in or out, newest first."
+      >
         Movements
-      </div>
+      </SectionHeading>
       <AdminCard className="overflow-hidden">
         <ConsoleDataTable<IAccountMovement>
           columns={columns}

@@ -18,6 +18,7 @@ import {
   AdminField,
   AdminPageHeader,
   EditableFormActions,
+  SectionHeading,
   adminInputClass,
   adminSelectClass,
 } from "@/components/admin/ui";
@@ -808,10 +809,10 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
             )}
           />
         </AdminField>
+        {/* The rule stays on the wrapper - it divides the identity block from
+            the payout one - and the heading carries only its own text. */}
         <div className="mt-1 border-t border-adm-hairline pt-3">
-          <p className="text-[11px] uppercase tracking-[0.14em] text-adm-muted">
-            Payout details
-          </p>
+          <SectionHeading className="mb-0">Payout details</SectionHeading>
         </div>
         <div className="grid gap-[13px] sm:grid-cols-2">
           <AdminField label="Bank name" optional error={errors.bankName?.message}>

@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
  * Console primitives: shadcn components re-skinned to the DB Plus Console
  * system (Meridian slate + forest/gold/red accents, mono numerals). The
  * shadcn pieces provide behavior and a11y; the classes here pin the exact
- * console look — screens compose these, never restyle shadcn directly.
+ * console look - screens compose these, never restyle shadcn directly.
  */
 
 /**
@@ -210,7 +210,7 @@ export function DetailShell({
   );
 }
 
-/** The design's six status tones — used by chips, dots and timeline marks.
+/** The design's six status tones - used by chips, dots and timeline marks.
  * Drawn from the brand palette so chips read in-system on paper grounds. */
 export const TONES = {
   sky: { fg: "#3E6B8C", bg: "#EAF1F6", dot: "#3E6B8C" },
@@ -278,6 +278,47 @@ export function AdminCard({
     >
       {children}
     </Card>
+  );
+}
+
+/**
+ * The heading of a section INSIDE a detail page.
+ *
+ * Sections used to be titled with a 10.5px muted uppercase eyebrow, which is
+ * the same treatment the fact labels underneath it get. So a card announced
+ * itself no louder than the smallest thing inside it, and a long page read as
+ * one undifferentiated column with no way to find "Payments" by scanning. A
+ * section title is a heading and now looks like one.
+ *
+ * Renders a real `<h2>`, so the page also has an outline a screen reader can
+ * navigate rather than a run of styled spans.
+ */
+export function SectionHeading({
+  actions,
+  children,
+  className,
+  hint,
+}: {
+  /** Right-aligned slot: a count, a total, a small action. */
+  actions?: React.ReactNode;
+  children: React.ReactNode;
+  className?: string;
+  /** One sentence explaining the section, on hover beside the title. */
+  hint?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1",
+        className,
+      )}
+    >
+      <h2 className="flex min-w-0 items-center gap-1.5 text-[15px] font-bold tracking-[-0.01em] text-adm-ink">
+        <span className="min-w-0 [overflow-wrap:anywhere]">{children}</span>
+        {hint ? <HelpTip label={`About this section`} text={hint} /> : null}
+      </h2>
+      {actions ? <div className="flex-none">{actions}</div> : null}
+    </div>
   );
 }
 
@@ -386,7 +427,13 @@ export function AdminButton({
           "bg-console text-white hover:bg-console-hover",
         (variant === "secondary" || variant === "outline") &&
           "border border-adm-line bg-adm-card text-adm-body hover:bg-adm-sunken hover:text-adm-ink",
-        variant === "ghost" && "text-adm-body hover:bg-adm-sunken hover:text-adm-ink",
+        // A light border at REST. Ghost used to be bare text that only grew a
+        // background on hover, so until the pointer arrived it did not read as
+        // a button at all - and on a touch screen the pointer never arrives.
+        // Transparent rather than filled is what still separates it from
+        // `secondary`, which sits on the card colour.
+        variant === "ghost" &&
+          "border border-adm-line bg-transparent text-adm-body hover:bg-adm-sunken hover:text-adm-ink",
         variant === "danger" &&
           "bg-console-red text-white hover:bg-console-red-deep",
         variant === "gold" && "bg-console-gold text-white hover:bg-console-gold-deep",

@@ -12,12 +12,12 @@ import { LoginForm } from "./login-form";
 import { TwoFactorForm } from "./two-factor-form";
 
 /**
- * The console sign-in screen: either the credentials step or — when the
- * account has 2FA — the code step (emailed OTP, with a recovery-code fallback).
+ * The console sign-in screen: either the credentials step or - when the
+ * account has 2FA - the code step (emailed OTP, with a recovery-code fallback).
  *
  * A visitor with a persisted session is sent straight to the console, where
  * RequireAuth validates it for real (and bounces a stale one back here after
- * clearing it — no loop). Deliberately NOT a GET /auth/me here: for an
+ * clearing it - no loop). Deliberately NOT a GET /auth/me here: for an
  * anonymous visitor that 401 would churn through the silent-refresh reset
  * machinery instead of just showing the form.
  */
@@ -55,7 +55,7 @@ export function LoginClient({ redirectTo }: { redirectTo: string }) {
       subtitle={
         challengeEmail
           ? "One more step to keep the business secure."
-          : "Welcome back — sign in to run the trading house."
+          : "Welcome back - sign in to run the trading house."
       }
     >
       {challengeEmail ? (

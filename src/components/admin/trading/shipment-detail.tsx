@@ -14,11 +14,13 @@ import {
   DetailRow,
   DetailShell,
   Mono,
+  SectionHeading,
   adminInputClass,
   adminLinkClass,
   adminSelectClass,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
+import { HelpTip, HelpWrap } from "@/components/admin/help-tip";
 import { DateOnlyCell, DateTimeCell } from "@/components/admin/date-cell";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { DriverSettlementCard } from "@/components/admin/drivers/driver-settlement-card";
@@ -680,6 +682,14 @@ export function ShipmentDetail({ id }: { id: string }) {
     }
   };
 
+  /* Every action here says on hover what it DOES and what it commits you to.
+     These buttons move stock and money, and the label alone ("Close", "Mark
+     arrived") cannot carry that. HelpWrap rather than a HelpTip icon: the
+     button label is already on screen, and half of these render as links -
+     a HelpTip's own <button> inside an <a> is invalid HTML.
+     The wrapper is `inline-flex` and the buttons keep `xl:w-full` so the
+     rail's column layout still gives every pill the same width; without it
+     the wrapping span would stretch and the pill inside it would not. */
   const actions = (
     <div className="flex flex-wrap gap-2 xl:flex-col">
       {beforeDispatch ? (
@@ -691,60 +701,108 @@ export function ShipmentDetail({ id }: { id: string }) {
               A page, not a dialog, for allocation: the lot list is long, and a
               dialog's inner scroll inside the scrolling page was unusable on a
               phone. */}
-          <AdminButton className="h-9 px-4" variant="outline" asChild>
-            <Link href={`${LIST}/${s.id}/allocate`}>Allocate lots</Link>
-          </AdminButton>
-          <AdminButton
-            className="h-9 px-4"
-            disabled={dispatchState.isLoading}
-            onClick={() => void onDispatch()}
+          <HelpWrap
+            className="inline-flex flex-none xl:w-full"
+            text="Pick which stock lots fill each sale, so the trip is costed on the goods you actually load."
           >
-            {dispatchState.isLoading ? "Dispatching…" : "Dispatch"}
-          </AdminButton>
-          <AdminButton
-            variant="outline"
-            className="h-9 px-4"
-            onClick={() => setCancelOpen(true)}
+            <AdminButton
+              className="h-9 px-4 xl:w-full"
+              variant="secondary"
+              asChild
+            >
+              <Link href={`${LIST}/${s.id}/allocate`}>Allocate lots</Link>
+            </AdminButton>
+          </HelpWrap>
+          <HelpWrap
+            className="inline-flex flex-none xl:w-full"
+            text="Sends the truck: stock comes out of the warehouse on the record, and dispatch cannot be undone."
           >
-            Cancel
-          </AdminButton>
+            <AdminButton
+              className="h-9 px-4 xl:w-full"
+              disabled={dispatchState.isLoading}
+              onClick={() => void onDispatch()}
+            >
+              {dispatchState.isLoading ? "Dispatching…" : "Dispatch"}
+            </AdminButton>
+          </HelpWrap>
+          {/* Cancel ends the trip. It read as just another quiet bordered
+              pill beside Allocate lots, which is the wrong promise for the
+              one button here that throws the shipment away. */}
+          <HelpWrap
+            className="inline-flex flex-none xl:w-full"
+            text="Calls this trip off with a reason on file. The sales go back to the pool and can ride another truck."
+          >
+            <AdminButton
+              variant="danger"
+              className="h-9 px-4 xl:w-full"
+              onClick={() => setCancelOpen(true)}
+            >
+              Cancel
+            </AdminButton>
+          </HelpWrap>
         </>
       ) : null}
       {s.status === "DISPATCHED" ? (
-        <AdminButton
-          className="h-9 px-4"
-          disabled={arriveState.isLoading}
-          onClick={() => void onArrive()}
+        <HelpWrap
+          className="inline-flex flex-none xl:w-full"
+          text="Records that the truck reached the buyer, so the signed delivery note can be filed against the trip."
         >
-          {arriveState.isLoading ? "Updating…" : "Mark arrived"}
-        </AdminButton>
+          <AdminButton
+            className="h-9 px-4 xl:w-full"
+            disabled={arriveState.isLoading}
+            onClick={() => void onArrive()}
+          >
+            {arriveState.isLoading ? "Updating…" : "Mark arrived"}
+          </AdminButton>
+        </HelpWrap>
       ) : null}
       {s.status === "ARRIVED" ? (
-        <AdminButton
-          className="h-9 px-4"
-          disabled={closeState.isLoading}
-          onClick={() => void onClose()}
+        <HelpWrap
+          className="inline-flex flex-none xl:w-full"
+          text="Marks the trip finished now that it is delivered and settled, leaving its profit as the final figure."
         >
-          {closeState.isLoading ? "Closing…" : "Close shipment"}
-        </AdminButton>
+          <AdminButton
+            className="h-9 px-4 xl:w-full"
+            disabled={closeState.isLoading}
+            onClick={() => void onClose()}
+          >
+            {closeState.isLoading ? "Closing…" : "Close shipment"}
+          </AdminButton>
+        </HelpWrap>
       ) : null}
       {/* The waybill leads the paper trail: print it FIRST, the driver and an
           admin sign it, the signed copy is uploaded, THEN dispatch - so the
           buttons live on every non-cancelled shipment, not just loaded ones. */}
       {s.status !== "CANCELLED" ? (
         <>
-          <AdminButton variant="outline" className="h-9 px-4" asChild>
-            <Link href={`${LIST}/${s.id}/waybill`}>Waybill</Link>
-          </AdminButton>
-          <AdminButton variant="outline" className="h-9 px-4" asChild>
-            <a
-              href={shipmentWaybillPdfUrl(s.id)}
-              target="_blank"
-              rel="noopener noreferrer"
+          <HelpWrap
+            className="inline-flex flex-none xl:w-full"
+            text="Opens the waybill for this truck to print, for the driver and an admin to sign before it leaves."
+          >
+            <AdminButton
+              variant="secondary"
+              className="h-9 px-4 xl:w-full"
+              asChild
             >
-              PDF
-            </a>
-          </AdminButton>
+              <Link href={`${LIST}/${s.id}/waybill`}>Waybill</Link>
+            </AdminButton>
+          </HelpWrap>
+          {/* The same document in another wrapper, so it is the quietest
+              thing in the rail rather than a second Waybill button. */}
+          <HelpWrap
+            className="inline-flex flex-none xl:w-full"
+            text="Opens that same waybill as a PDF in a new tab, ready to print or send to the driver."
+          >
+            <AdminButton variant="ghost" className="h-9 px-4 xl:w-full" asChild>
+              <a
+                href={shipmentWaybillPdfUrl(s.id)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                PDF
+              </a>
+            </AdminButton>
+          </HelpWrap>
         </>
       ) : null}
     </div>
@@ -779,21 +837,32 @@ export function ShipmentDetail({ id }: { id: string }) {
           later payments. Each sale is its own bordered sub-card so a
           multi-sale trip reads as distinct orders, not one run-on list. */}
       <AdminCard className="p-5">
-        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-          <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-            Sales on this trip · {s.salesCount} sale
-            {s.salesCount === 1 ? "" : "s"}
-          </span>
-          {beforeDispatch ? (
-            <AdminButton
-              variant="outline"
-              className="h-7 px-2.5 text-[12px]"
-              onClick={() => setAddSalesOpen(true)}
-            >
-              + Add sales
-            </AdminButton>
-          ) : null}
-        </div>
+        <SectionHeading
+          actions={
+            <span className="flex items-center gap-2">
+              <Mono className="text-[11px] text-adm-faint">
+                {s.salesCount} {s.salesCount === 1 ? "sale" : "sales"}
+              </Mono>
+              {beforeDispatch ? (
+                <HelpWrap
+                  className="inline-flex"
+                  text="Puts another paid, unshipped sale on this truck so it does not travel half empty."
+                >
+                  <AdminButton
+                    variant="ghost"
+                    className="h-7 px-2.5 text-[12px]"
+                    onClick={() => setAddSalesOpen(true)}
+                  >
+                    + Add sales
+                  </AdminButton>
+                </HelpWrap>
+              ) : null}
+            </span>
+          }
+          hint="The orders this truck is carrying, and the weight each of them puts on it."
+        >
+          Sales on this trip
+        </SectionHeading>
         <div className="grid gap-2.5 pb-2 @3xl/main:grid-cols-2">
           {s.sales.map((sale) => {
             // Removal only where nothing would be silently thrown away: a sale
@@ -805,6 +874,17 @@ export function ShipmentDetail({ id }: { id: string }) {
             );
             const removable =
               beforeDispatch && s.sales.length > 1 && !hasAllocations;
+            // WHAT THIS SALE WEIGHS. Only a sale whose payment terms are met
+            // can be planned onto a truck at all, so by the time an order
+            // shows up here the money is settled and the kilos are what the
+            // trip turns on: whether it fits, and what has to come off if it
+            // does not. `agreedKg` is the sale's own ordered weight (across
+            // trucks, should one ever be split), which is the sale's total
+            // load - not to be confused with `plannedWeightKg`, the truck's.
+            const saleLoadKg = sale.lines.reduce(
+              (sum, l) => sum + l.agreedKg,
+              0,
+            );
             return (
               /* The three money figures were one mono sentence - "Agreed X ·
                  Paid Y · Balance Z" - which is the least comparable way to
@@ -828,16 +908,21 @@ export function ShipmentDetail({ id }: { id: string }) {
                   <span className="flex flex-none items-center gap-2">
                     <SaleStatusBadge status={sale.status} />
                     {removable ? (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          void onRemoveSale(sale.id, sale.transactionNo)
-                        }
-                        className="cursor-pointer text-[12px] text-console-red hover:underline"
-                        aria-label={`Remove ${sale.transactionNo} from this shipment`}
+                      <HelpWrap
+                        className="inline-flex"
+                        text="Takes this sale off the truck and back into the shippable pool. The sale itself is unchanged."
                       >
-                        ✕
-                      </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            void onRemoveSale(sale.id, sale.transactionNo)
+                          }
+                          className="cursor-pointer text-[12px] text-console-red hover:underline"
+                          aria-label={`Remove ${sale.transactionNo} from this shipment`}
+                        >
+                          ✕
+                        </button>
+                      </HelpWrap>
                     ) : null}
                   </span>
                 </div>
@@ -857,7 +942,47 @@ export function ShipmentDetail({ id }: { id: string }) {
                   </Mono>
                 ) : null}
 
-                <dl className="mt-auto grid grid-cols-3 gap-x-3 border-t border-dotted border-adm-line pt-3">
+                {/* The load leads the foot of the card, at the size the money
+                    trio used to own alone: it is the fact this screen is for.
+                    It never depends on financial visibility - weight is not
+                    money, and a loader who cannot see prices still has to
+                    know what is going on the truck. */}
+                <div className="mt-auto border-t border-dotted border-adm-line pt-3">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <HelpWrap
+                      className="min-w-0 text-[10px] font-bold tracking-[0.08em] text-adm-muted uppercase"
+                      text="The weight this whole order is due to move - what decides whether it fits on the truck."
+                    >
+                      Load
+                    </HelpWrap>
+                    <Mono className="flex-none text-[17px] leading-none font-semibold tabular-nums text-adm-ink">
+                      {formatKg(saleLoadKg)}
+                    </Mono>
+                  </div>
+                  {/* What the load actually IS. The per-commodity kilos only
+                      appear on a mixed order: on a single-commodity sale they
+                      would just restate the total beside them. */}
+                  {sale.lines.length > 0 ? (
+                    <p className="mt-1 min-w-0 text-[11.5px] leading-[1.5] text-adm-muted [overflow-wrap:anywhere]">
+                      {sale.lines.map((l, i) => (
+                        <span key={l.commodityId}>
+                          {i > 0 ? " · " : ""}
+                          {l.commodityName}
+                          {sale.lines.length > 1 ? (
+                            <>
+                              {" "}
+                              <Mono className="whitespace-nowrap">
+                                {formatKg(l.agreedKg)}
+                              </Mono>
+                            </>
+                          ) : null}
+                        </span>
+                      ))}
+                    </p>
+                  ) : null}
+                </div>
+
+                <dl className="mt-3 grid grid-cols-3 gap-x-3 border-t border-dotted border-adm-line pt-3">
                   {(
                     [
                       ["Agreed", sale.agreedTotalGhs, ""],
@@ -904,10 +1029,10 @@ export function ShipmentDetail({ id }: { id: string }) {
           page header carried them; the header says what KIND of page this is,
           so the record has to say which shipment. */}
       <AdminCard className="p-5">
-        <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+        <SectionHeading hint="Which truck this is, where it is going and when it moved.">
           Trip
-        </p>
-        <DetailGrid className="mt-1">
+        </SectionHeading>
+        <DetailGrid>
           <DetailItem label="Waybill no" mono>
             {s.transactionNo}
           </DetailItem>
@@ -957,43 +1082,48 @@ export function ShipmentDetail({ id }: { id: string }) {
           ) : null}
         </DetailGrid>
 
-        <p className="mt-4 border-t border-adm-hairline pt-3 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-          Driver
-        </p>
-        <DetailGrid className="mt-1">
-          {/* The driver block is a SNAPSHOT taken when the trip was booked -
-              name, phone, licence and the rest are copied onto the shipment
-              and editable here without touching the directory. Linking the
-              name would promise the reader that the record they land on says
-              what this page says, and on an old trip it will not. */}
-          <DetailItem label="Name">{s.driverName}</DetailItem>
-          {s.driverPhone ? (
-            <DetailItem label="Phone" mono>
-              {s.driverPhone}
+        {/* The rule that split the trip from the driver sat ON the old
+            eyebrow. SectionHeading owns its bottom margin, so the divider
+            moves out to this wrapper to keep the two blocks apart. */}
+        <div className="mt-4 border-t border-adm-hairline pt-4">
+          <SectionHeading hint="Who has the truck, as recorded when this trip was booked.">
+            Driver
+          </SectionHeading>
+          <DetailGrid>
+            {/* The driver block is a SNAPSHOT taken when the trip was booked -
+                name, phone, licence and the rest are copied onto the shipment
+                and editable here without touching the directory. Linking the
+                name would promise the reader that the record they land on says
+                what this page says, and on an old trip it will not. */}
+            <DetailItem label="Name">{s.driverName}</DetailItem>
+            {s.driverPhone ? (
+              <DetailItem label="Phone" mono>
+                {s.driverPhone}
+              </DetailItem>
+            ) : null}
+            <DetailItem label="Company">
+              {s.driverCompany ?? (anyDriverExtra ? "Solo operator" : <Absent />)}
             </DetailItem>
-          ) : null}
-          <DetailItem label="Company">
-            {s.driverCompany ?? (anyDriverExtra ? "Solo operator" : <Absent />)}
-          </DetailItem>
-          {s.driverCity ? (
-            <DetailItem label="City">{s.driverCity}</DetailItem>
-          ) : null}
-          {s.driverLicenseNo ? (
-            <DetailItem label="Licence no" mono>
-              {s.driverLicenseNo}
-            </DetailItem>
-          ) : null}
-          {s.driverIdNumber ? (
-            <DetailItem label="ID number" mono>
-              {s.driverIdNumber}
-            </DetailItem>
-          ) : null}
-          {s.driverEmail ? (
-            <DetailItem full label="Email">
-              {s.driverEmail}
-            </DetailItem>
-          ) : null}
-        </DetailGrid>
+            {s.driverCity ? (
+              <DetailItem label="City">{s.driverCity}</DetailItem>
+            ) : null}
+            {s.driverLicenseNo ? (
+              <DetailItem label="Licence no" mono>
+                {s.driverLicenseNo}
+              </DetailItem>
+            ) : null}
+            {s.driverIdNumber ? (
+              <DetailItem label="ID number" mono>
+                {s.driverIdNumber}
+              </DetailItem>
+            ) : null}
+            {s.driverEmail ? (
+              <DetailItem full label="Email">
+                {s.driverEmail}
+              </DetailItem>
+            ) : null}
+          </DetailGrid>
+        </div>
       </AdminCard>
 
       {/* What the driver is owed.
@@ -1008,9 +1138,12 @@ export function ShipmentDetail({ id }: { id: string }) {
 
       {/* Allocations */}
       <AdminCard className="p-5">
-        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+        <SectionHeading
+          className="mb-2"
+          hint="The exact stock this truck carries, lot by lot, and what that stock cost you."
+        >
           Loaded lots
-        </div>
+        </SectionHeading>
         {s.allocations.length === 0 ? (
           <p className="py-2 text-[13px] text-adm-muted">
             No lots allocated yet. Dispatching without allocations auto-fills
@@ -1053,9 +1186,12 @@ export function ShipmentDetail({ id }: { id: string }) {
 
       {/* Documents */}
       <AdminCard className="p-5">
-        <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+        <SectionHeading
+          className="mb-1.5"
+          hint="Paperwork filed against this trip alone, for staff only - a buyer never sees what is kept here."
+        >
           Documents (private)
-        </div>
+        </SectionHeading>
         <p className="mb-2 text-[12px] text-adm-muted">
           Download the waybill, sign it with the driver, then upload the signed
           copy before dispatch. Downloads are logged.
@@ -1081,14 +1217,19 @@ export function ShipmentDetail({ id }: { id: string }) {
                   <DateTimeCell value={doc.createdAt} muted />
                 </Mono>
                 {beforeDispatch ? (
-                  <button
-                    type="button"
-                    onClick={() => void onRemoveDocument(doc.id, doc.name)}
-                    className="cursor-pointer text-[12px] text-console-red"
-                    aria-label={`Remove ${doc.name}`}
+                  <HelpWrap
+                    className="inline-flex"
+                    text="Deletes this file from the shipment's record. Only possible while the truck has not left."
                   >
-                    ✕
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => void onRemoveDocument(doc.id, doc.name)}
+                      className="cursor-pointer text-[12px] text-console-red"
+                      aria-label={`Remove ${doc.name}`}
+                    >
+                      ✕
+                    </button>
+                  </HelpWrap>
                 ) : null}
               </div>
             </div>
@@ -1113,16 +1254,28 @@ export function ShipmentDetail({ id }: { id: string }) {
                 optimize={false}
                 triggerLabel="Choose document"
               />
+              {/* An icon rather than HelpWrap here: the picker renders a block
+                  of its own, and a tooltip trigger cannot wrap it without
+                  putting a <div> inside a <span>. */}
+              <HelpTip
+                label="About adding a document"
+                text="Files a copy of this paperwork against the trip - you see the file before anything is uploaded."
+              />
             </div>
             <div className="mt-3 border-t border-adm-hairline pt-3">
-              <button
-                type="button"
-                onClick={() => setSigning((v) => !v)}
-                className="cursor-pointer text-[12px] font-semibold text-console underline-offset-2 hover:underline"
-                aria-expanded={signing}
+              <HelpWrap
+                className="inline-flex"
+                text="Opens a pad so the driver can sign on this phone, and files that signature as a document here."
               >
-                {signing ? "Hide signature pad" : "Or sign on this screen"}
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setSigning((v) => !v)}
+                  className="cursor-pointer text-[12px] font-semibold text-console underline-offset-2 hover:underline"
+                  aria-expanded={signing}
+                >
+                  {signing ? "Hide signature pad" : "Or sign on this screen"}
+                </button>
+              </HelpWrap>
               {signing ? (
                 <div className="mt-2">
                   <SignaturePad
@@ -1147,18 +1300,26 @@ export function ShipmentDetail({ id }: { id: string }) {
 
       {/* Expenses */}
       <AdminCard className="p-5">
-        <div className="mb-1 flex items-center justify-between">
-          <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-            Expenses
-          </span>
-          <AdminButton
-            variant="outline"
-            className="h-7 px-2.5 text-[12px]"
-            onClick={() => setExpenseOpen(true)}
-          >
-            + Add
-          </AdminButton>
-        </div>
+        <SectionHeading
+          className="mb-2"
+          actions={
+            <HelpWrap
+              className="inline-flex"
+              text="Records a cost for this trip, such as transport or loading, and takes it off the trip's profit."
+            >
+              <AdminButton
+                variant="ghost"
+                className="h-7 px-2.5 text-[12px]"
+                onClick={() => setExpenseOpen(true)}
+              >
+                + Add
+              </AdminButton>
+            </HelpWrap>
+          }
+          hint="What this trip cost to run, on top of the stock itself - it comes straight off the profit."
+        >
+          Expenses
+        </SectionHeading>
         {s.expenses.length === 0 ? (
           <p className="py-2 text-[13px] text-adm-muted">No expenses recorded.</p>
         ) : (
@@ -1195,14 +1356,19 @@ export function ShipmentDetail({ id }: { id: string }) {
                 {/* Voiding is owner-only (like the general expense void):
                     striking out a cost moves the trip's profit. */}
                 {isSuperAdmin ? (
-                  <AdminButton
-                    type="button"
-                    variant="outline"
-                    className="h-[26px] flex-none px-2 text-[11.5px]"
-                    onClick={() => setVoidingExpense(e)}
+                  <HelpWrap
+                    className="inline-flex flex-none"
+                    text="Strikes this cost off the trip's profit with a reason. The voucher stays on record, never erased."
                   >
-                    Void
-                  </AdminButton>
+                    <AdminButton
+                      type="button"
+                      variant="danger"
+                      className="h-[26px] flex-none px-2 text-[11.5px]"
+                      onClick={() => setVoidingExpense(e)}
+                    >
+                      Void
+                    </AdminButton>
+                  </HelpWrap>
                 ) : null}
               </div>
             </div>

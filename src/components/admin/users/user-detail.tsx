@@ -13,6 +13,7 @@ import {
   AdminField,
   AdminPageHeader,
   DetailShell,
+  SectionHeading,
   ToneBadge,
   adminInputClass,
 } from "@/components/admin/ui";
@@ -40,14 +41,6 @@ import { StatusBadge } from "./user-bits";
 import { IdentityFacts, ROLE_TITLE } from "./user-identity";
 import { PhotoManager } from "./photo-manager";
 import { RoleChangeDialog } from "./role-dialog";
-
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="mb-3.5 text-[10.5px] font-bold tracking-[0.1em] text-adm-faint uppercase">
-      {children}
-    </div>
-  );
-}
 
 const onApiError = (title: string) => (err: unknown) => {
   notify.error(title, { description: extractApiError(err).message });
@@ -96,7 +89,7 @@ function IdentityCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
 
   return (
     <AdminCard className="overflow-hidden p-0">
-      {/* Forest banner mirroring the profile page — one identity language. */}
+      {/* Forest banner mirroring the profile page - one identity language. */}
       <div className="relative h-[88px] overflow-hidden bg-gradient-to-r from-console-deep via-console to-[#2C5B3E]">
         <div
           aria-hidden="true"
@@ -178,7 +171,7 @@ function IdentityCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
                     </dt>
                     <dd className="mt-1 text-[13.5px] font-medium text-adm-ink">
                       {user.canApprove ? (
-                        <span className="text-console">Yes — may decide approvals</span>
+                        <span className="text-console">Yes - may decide approvals</span>
                       ) : (
                         "No"
                       )}
@@ -190,7 +183,7 @@ function IdentityCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
                     </dt>
                     <dd className="mt-1 text-[13.5px] font-medium text-adm-ink">
                       {user.financialVisibility ? (
-                        <span className="text-console">Full — sees money columns</span>
+                        <span className="text-console">Full - sees money columns</span>
                       ) : (
                         "Hidden"
                       )}
@@ -390,7 +383,7 @@ function RoleCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
     // Plain-div anchor: the row-actions menu deep-links here as /users/:id#role.
     <div id="role" className="scroll-mt-20">
       <AdminCard className="px-4 py-[18px] sm:px-6">
-        <SectionLabel>Role</SectionLabel>
+        <SectionHeading className="mb-3.5">Role</SectionHeading>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="min-w-0">
             <div className="text-[13.5px] font-semibold text-adm-ink">
@@ -478,7 +471,7 @@ function ActionsCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
           !(await confirm({
             title: `Unblock ${name}?`,
             description:
-              "If the failed attempts weren't theirs, someone may be guessing their password — worth a phone call first.",
+              "If the failed attempts weren't theirs, someone may be guessing their password - worth a phone call first.",
             confirmText: "Unblock",
           }))
         )
@@ -535,7 +528,7 @@ function ActionsCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
       : {
           key: "activate",
           title: "Activate account",
-          sub: "Restores sign-in — and clears any failed-attempts block too.",
+          sub: "Restores sign-in - and clears any failed-attempts block too.",
           button: "Activate",
           busy: activating,
           hidden: isSelf,
@@ -583,8 +576,8 @@ function ActionsCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
 
   return (
     <AdminCard className="overflow-hidden">
-      <div className="px-6 pt-3.5 pb-1 text-[10.5px] font-bold tracking-[0.1em] text-adm-faint uppercase">
-        Account actions
+      <div className="px-6 pt-3.5 pb-1">
+        <SectionHeading className="mb-0">Account actions</SectionHeading>
       </div>
       {visible.map((row) => (
         <div
@@ -618,7 +611,7 @@ function ActionsCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
 
 /**
  * Skeleton mirroring the detail layout (dms convention: every screen loads in
- * its own silhouette, never a generic spinner) — banner, overlapping avatar,
+ * its own silhouette, never a generic spinner) - banner, overlapping avatar,
  * fact grid and the role/actions cards, so nothing jumps when data lands.
  */
 function UserDetailSkeleton() {

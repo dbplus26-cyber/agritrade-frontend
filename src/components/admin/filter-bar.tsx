@@ -19,7 +19,7 @@ const boxField = (active: boolean) =>
   );
 
 /** Dropdown filter in the console skin (aria-labelled; the value text —
- * "All roles", "Authentication" — carries the meaning, stock-register style). */
+ * "All roles", "Authentication" - carries the meaning, stock-register style). */
 export function ConsoleLabeledSelect({
   label,
   value,
@@ -33,7 +33,7 @@ export function ConsoleLabeledSelect({
   value: string;
   onChange: (value: string) => void;
   options: readonly { value: string; label: string }[];
-  /** True when the value is non-default — keeps the border half-lit. */
+  /** True when the value is non-default - keeps the border half-lit. */
   active?: boolean;
   className?: string;
   /**

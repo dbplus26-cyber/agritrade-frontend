@@ -15,7 +15,7 @@ export interface AuthRole {
 /**
  * Current user's role, read from the auth store. The backend authorizes with
  * the `UserRole` enum (`SUPER_ADMIN | STAFF | AGENT`) resolved live from the
- * DB — that is the real enforcement. This hook only decides what the UI
+ * DB - that is the real enforcement. This hook only decides what the UI
  * shows/hides.
  */
 export function useAuthRole(): AuthRole {

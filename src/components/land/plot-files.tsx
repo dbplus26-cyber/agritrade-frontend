@@ -127,7 +127,7 @@ function PlotCard({ plot }: { plot: PublicLandPlot }) {
   );
 }
 
-/** The empty ledger page — plots never render as a blank grid. */
+/** The empty ledger page - plots never render as a blank grid. */
 async function EmptyRegister() {
   const contact = await getSiteContact();
   return (

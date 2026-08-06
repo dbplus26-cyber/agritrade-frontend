@@ -37,8 +37,8 @@ const LIST = "/admin/expenses";
 const DEFAULTS = { categoryId: "", from: "", scope: "", to: "" };
 
 /**
- * Operating costs. Every cost the business carries lands here — rent, salaries,
- * fumigation, repairs — alongside the per-trip costs, because the P&L subtracts
+ * Operating costs. Every cost the business carries lands here - rent, salaries,
+ * fumigation, repairs - alongside the per-trip costs, because the P&L subtracts
  * all of them and a screen that showed only some would make the net-profit
  * figure impossible to reconcile.
  */
@@ -143,7 +143,7 @@ export function ExpensesRegister() {
             <span className="text-adm-faint">Operating</span>
           ),
         // Hiding belongs on `className`, which the table applies to BOTH th and
-        // td — `headerClassName` reaches only the header, which would hide the
+        // td - `headerClassName` reaches only the header, which would hide the
         // heading while leaving its cells in place and shift every column after
         // it out of alignment.
         meta: { className: "hidden px-4 text-[13px] 2xl:table-cell" },
