@@ -9,6 +9,7 @@ import {
   AdminField,
   AdminPageHeader,
   adminInputClass,
+  SectionHeading,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
@@ -98,56 +99,75 @@ export function SeasonForm({ season }: { season?: ISeason }) {
         sub="The planting season that grants and repayments are booked against"
       />
 
-      <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        <AdminCard className="flex flex-col gap-3 px-5 py-4">
-          <AdminField label="Name" error={errors.name?.message}>
-            <Input
-              placeholder="2026 Wet Season"
-              className={cn(adminInputClass, errors.name && "border-console-red")}
-              {...register("name")}
-            />
-          </AdminField>
-          {/* What the season covers - crops and window - for when the name
-              alone ("2026 Major") does not say enough to a field officer. */}
-          <AdminField
-            label="Description"
-            optional
-            hint="e.g. Major season maize and soya, planting from April."
-            error={errors.description?.message}
-          >
-            <textarea
-              rows={4}
-              placeholder="What this season covers"
-              className={cn(
-                adminInputClass,
-                "h-auto min-h-[62px] w-full resize-y py-2",
-                errors.description && "border-console-red",
-              )}
-              {...register("description")}
-            />
-          </AdminField>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <AdminField label="Starts on" error={errors.startsOn?.message}>
+      {/* The date pair measures against this form, not the viewport: the
+          console shell keeps a ~225px rail beside it, so `sm:` paired the two
+          dates up while the column was still too narrow for both. */}
+      <form
+        noValidate
+        onSubmit={handleSubmit(onSubmit)}
+        className="@container flex flex-col gap-4"
+      >
+        <AdminCard className="flex flex-col gap-5 px-5 py-4">
+          <section className="flex flex-col gap-3">
+            <SectionHeading className="mb-0">What the season is</SectionHeading>
+            <AdminField label="Name" error={errors.name?.message}>
               <Input
-                type="date"
-                  className={cn(
+                placeholder="e.g. 2026 Wet Season"
+                className={cn(adminInputClass, errors.name && "border-console-red")}
+                {...register("name")}
+              />
+            </AdminField>
+            {/* What the season covers - crops and window - for when the name
+                alone ("2026 Major") does not say enough to a field officer. */}
+            <AdminField
+              label="Description"
+              optional
+              hint="What this season covers, for when the name alone does not say enough."
+              error={errors.description?.message}
+            >
+              <textarea
+                rows={4}
+                placeholder="e.g. Major season maize and soya, planting from April"
+                className={cn(
                   adminInputClass,
+                  "h-auto min-h-[62px] w-full resize-y py-2",
+                  errors.description && "border-console-red",
+                )}
+                {...register("description")}
+              />
+            </AdminField>
+          </section>
+
+          <section className="flex flex-col gap-3 border-t border-adm-hairline pt-5">
+            <SectionHeading
+              className="mb-0"
+              hint="The window grants and repayments are booked against."
+            >
+              When it runs
+            </SectionHeading>
+            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+              <AdminField label="Starts on" error={errors.startsOn?.message}>
+                <Input
+                  type="date"
+                  className={cn(
+                    adminInputClass,
                     errors.startsOn && "border-console-red",
-                )}
-                {...register("startsOn")}
-              />
-            </AdminField>
-            <AdminField label="Ends on" optional error={errors.endsOn?.message}>
-              <Input
-                type="date"
+                  )}
+                  {...register("startsOn")}
+                />
+              </AdminField>
+              <AdminField label="Ends on" optional error={errors.endsOn?.message}>
+                <Input
+                  type="date"
                   className={cn(
-                  adminInputClass,
+                    adminInputClass,
                     errors.endsOn && "border-console-red",
-                )}
-                {...register("endsOn")}
-              />
-            </AdminField>
-          </div>
+                  )}
+                  {...register("endsOn")}
+                />
+              </AdminField>
+            </div>
+          </section>
         </AdminCard>
 
         {/* Cancel returns to where the record is read rather than locking

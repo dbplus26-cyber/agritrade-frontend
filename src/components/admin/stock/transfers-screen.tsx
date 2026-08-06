@@ -18,6 +18,7 @@ import {
   AdminField,
   adminInputClass,
   Mono,
+  SectionHeading,
 } from "@/components/admin/ui";
 import { Button } from "@/components/ui/button";
 import {
@@ -477,82 +478,93 @@ function TransferDialog({
         </ResponsiveDialogHeader>
         <form
           onSubmit={(e) => void onSubmit(e)}
-          className="@container grid gap-3.5"
+          className="@container grid gap-5"
         >
-          <AdminField
-            label="From warehouse"
-            error={errors.fromWarehouseId?.message}
-          >
-            <select
-              className={cn(adminInputClass, "cursor-pointer")}
-              {...register("fromWarehouseId")}
+          <section className="grid gap-3.5">
+            <SectionHeading className="mb-0">Where it moves</SectionHeading>
+            <AdminField
+              label="From warehouse"
+              error={errors.fromWarehouseId?.message}
             >
-              <option value="">Choose the source…</option>
-              {warehouses.map((w) => (
-                <option key={w.id} value={w.id}>
-                  {w.name}
-                </option>
-              ))}
-            </select>
-          </AdminField>
-          <AdminField
-            label="To warehouse"
-            error={errors.toWarehouseId?.message}
-          >
-            <select
-              className={cn(adminInputClass, "cursor-pointer")}
-              {...register("toWarehouseId")}
-            >
-              <option value="">Choose the destination…</option>
-              {warehouses.map((w) => (
-                <option key={w.id} value={w.id}>
-                  {w.name}
-                </option>
-              ))}
-            </select>
-          </AdminField>
-          <AdminField label="Commodity" error={errors.commodityId?.message}>
-            <select
-              className={cn(adminInputClass, "cursor-pointer")}
-              {...register("commodityId")}
-            >
-              <option value="">Choose a commodity…</option>
-              {commodities.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </AdminField>
-          <div className="grid grid-cols-1 gap-3.5 @[300px]:grid-cols-2">
-            <AdminField label="Weight (kg)" error={errors.weightKg?.message}>
-              <Input
-                inputMode="decimal"
-                placeholder="0.00"
-                className={adminInputClass}
-                {...register("weightKg")}
-              />
+              <select
+                className={cn(adminInputClass, "cursor-pointer")}
+                {...register("fromWarehouseId")}
+              >
+                <option value="">Choose the source…</option>
+                {warehouses.map((w) => (
+                  <option key={w.id} value={w.id}>
+                    {w.name}
+                  </option>
+                ))}
+              </select>
             </AdminField>
             <AdminField
-              label="Moved on"
-              optional
-              hint="The day the stock physically left, if that was not today."
-              error={errors.occurredAt?.message}
+              label="To warehouse"
+              error={errors.toWarehouseId?.message}
             >
+              <select
+                className={cn(adminInputClass, "cursor-pointer")}
+                {...register("toWarehouseId")}
+              >
+                <option value="">Choose the destination…</option>
+                {warehouses.map((w) => (
+                  <option key={w.id} value={w.id}>
+                    {w.name}
+                  </option>
+                ))}
+              </select>
+            </AdminField>
+          </section>
+
+          <section className="grid gap-3.5 border-t border-adm-hairline pt-5">
+            <SectionHeading className="mb-0">What, and how much</SectionHeading>
+            <AdminField label="Commodity" error={errors.commodityId?.message}>
+              <select
+                className={cn(adminInputClass, "cursor-pointer")}
+                {...register("commodityId")}
+              >
+                <option value="">Choose a commodity…</option>
+                {commodities.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </AdminField>
+            <div className="grid grid-cols-1 gap-3.5 @[300px]:grid-cols-2">
+              <AdminField label="Weight (kg)" error={errors.weightKg?.message}>
+                <Input
+                  inputMode="decimal"
+                  placeholder="e.g. 1200"
+                  className={adminInputClass}
+                  {...register("weightKg")}
+                />
+              </AdminField>
+              <AdminField
+                label="Moved on"
+                optional
+                hint="The day the stock physically left, if that was not today."
+                error={errors.occurredAt?.message}
+              >
+                <Input
+                  type="date"
+                  className={adminInputClass}
+                  {...register("occurredAt")}
+                />
+              </AdminField>
+            </div>
+          </section>
+
+          <section className="grid gap-3.5 border-t border-adm-hairline pt-5">
+            <SectionHeading className="mb-0">Anything else</SectionHeading>
+            <AdminField label="Notes" optional error={errors.notes?.message}>
               <Input
-                type="date"
+                placeholder="e.g. Consolidating for loading"
                 className={adminInputClass}
-                {...register("occurredAt")}
+                {...register("notes")}
               />
             </AdminField>
-          </div>
-          <AdminField label="Notes" optional error={errors.notes?.message}>
-            <Input
-              placeholder="e.g. consolidating for loading"
-              className={adminInputClass}
-              {...register("notes")}
-            />
-          </AdminField>
+          </section>
 
           {serverError ? (
             <p

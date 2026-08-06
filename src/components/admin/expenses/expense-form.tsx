@@ -11,7 +11,13 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
-import { AdminButton, AdminField, adminInputClass, adminSelectClass } from "@/components/admin/ui";
+import {
+  AdminButton,
+  AdminField,
+  adminInputClass,
+  adminSelectClass,
+  SectionHeading,
+} from "@/components/admin/ui";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
 import {
@@ -108,62 +114,73 @@ export function ExpenseFormDialog({
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
 
+        {/* The amount/date pair measures against this form rather than the
+            viewport: inside a 480px dialog a `sm:` pair never fires at all on
+            a phone-width sheet, and fires too eagerly on a desktop one. */}
         <form
-          className="grid gap-3"
+          className="@container grid gap-5"
           onSubmit={(e) => void handleSubmit(onSubmit)(e)}
           noValidate
         >
-          <AdminField
-            label="Category"
-            hint="The heading this cost is filed under, so spending can be grouped in reports."
-            error={errors.categoryId?.message}
-          >
-            <select
-              id="expense-category"
-              className={adminSelectClass}
-              {...register("categoryId")}
+          <section className="grid gap-3">
+            <SectionHeading className="mb-0">What it was</SectionHeading>
+            <AdminField
+              label="Category"
+              hint="The heading this cost is filed under, so spending can be grouped in reports."
+              error={errors.categoryId?.message}
             >
-              <option value="">Choose a category…</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </AdminField>
+              <select
+                id="expense-category"
+                className={adminSelectClass}
+                {...register("categoryId")}
+              >
+                <option value="">Choose a category…</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </AdminField>
 
-          <AdminField label="Amount (GH₵)" error={errors.amountGhs?.message}>
-            <input
-              id="expense-amount"
-              inputMode="decimal"
-              placeholder="0.00"
-              className={adminInputClass}
-              {...register("amountGhs")}
-            />
-          </AdminField>
+            <AdminField label="Description" error={errors.description?.message} optional>
+              <input
+                id="expense-description"
+                placeholder="e.g. Warehouse rent, July"
+                className={adminInputClass}
+                {...register("description")}
+              />
+            </AdminField>
+          </section>
 
-          <AdminField
-            label="Date incurred"
-            hint="The day the cost was actually run up, not the day it is being typed in."
-            error={errors.incurredAt?.message}
-          >
-            <input
-              id="expense-date"
-              type="date"
-              max={today()}
-              className={adminInputClass}
-              {...register("incurredAt")}
-            />
-          </AdminField>
+          <section className="grid gap-3 border-t border-adm-hairline pt-5">
+            <SectionHeading className="mb-0">How much, and when</SectionHeading>
+            <div className="grid gap-3 @min-[380px]:grid-cols-2">
+              <AdminField label="Amount (GH₵)" error={errors.amountGhs?.message}>
+                <input
+                  id="expense-amount"
+                  inputMode="decimal"
+                  placeholder="e.g. 850.00"
+                  className={adminInputClass}
+                  {...register("amountGhs")}
+                />
+              </AdminField>
 
-          <AdminField label="Description" error={errors.description?.message} optional>
-            <input
-              id="expense-description"
-              placeholder="e.g. Warehouse rent - July"
-              className={adminInputClass}
-              {...register("description")}
-            />
-          </AdminField>
+              <AdminField
+                label="Date incurred"
+                hint="The day the cost was actually run up, not the day it is being typed in."
+                error={errors.incurredAt?.message}
+              >
+                <input
+                  id="expense-date"
+                  type="date"
+                  max={today()}
+                  className={adminInputClass}
+                  {...register("incurredAt")}
+                />
+              </AdminField>
+            </div>
+          </section>
 
           <ResponsiveDialogFooter className="mt-2 gap-2">
             <AdminButton

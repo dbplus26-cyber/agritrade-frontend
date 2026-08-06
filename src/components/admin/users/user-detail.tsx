@@ -12,6 +12,8 @@ import {
   AdminCard,
   AdminField,
   AdminPageHeader,
+  DetailGrid,
+  DetailItem,
   DetailShell,
   SectionHeading,
   ToneBadge,
@@ -163,33 +165,30 @@ function IdentityCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
             <>
               <IdentityFacts user={user} />
 
+              {/* These two permissions used to be a hand-rolled dt/dd pair,
+                  so they read a size and a weight apart from every other fact
+                  in the console. DetailItem is the same pair, shared. */}
               <div className="mt-5 border-t border-adm-hairline pt-4">
-                <dl className="grid grid-cols-1 gap-x-8 gap-y-3 sm:grid-cols-2">
-                  <div>
-                    <dt className="text-[10.5px] font-bold uppercase tracking-[0.1em] text-adm-faint">
-                      Can approve
-                    </dt>
-                    <dd className="mt-1 text-[13.5px] font-medium text-adm-ink">
-                      {user.canApprove ? (
-                        <span className="text-console">Yes - may decide approvals</span>
-                      ) : (
-                        "No"
-                      )}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-[10.5px] font-bold uppercase tracking-[0.1em] text-adm-faint">
-                      Financial visibility
-                    </dt>
-                    <dd className="mt-1 text-[13.5px] font-medium text-adm-ink">
-                      {user.financialVisibility ? (
-                        <span className="text-console">Full - sees money columns</span>
-                      ) : (
-                        "Hidden"
-                      )}
-                    </dd>
-                  </div>
-                </dl>
+                <DetailGrid columns={2}>
+                  <DetailItem label="Can approve">
+                    {user.canApprove ? (
+                      <span className="text-console">
+                        Yes - may decide approvals
+                      </span>
+                    ) : (
+                      "No"
+                    )}
+                  </DetailItem>
+                  <DetailItem label="Financial visibility">
+                    {user.financialVisibility ? (
+                      <span className="text-console">
+                        Full - sees money columns
+                      </span>
+                    ) : (
+                      "Hidden"
+                    )}
+                  </DetailItem>
+                </DetailGrid>
               </div>
             </>
           )}

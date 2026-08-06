@@ -9,6 +9,7 @@ import {
   AdminCard,
   AdminField,
   AdminPageHeader,
+  SectionHeading,
   adminInputClass,
 } from "@/components/admin/ui";
 import { FormSkeleton } from "@/components/admin/skeletons";
@@ -29,14 +30,6 @@ import {
   settingsSchema,
   type SettingsValues,
 } from "@/validations/settings-schema";
-
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="mb-3.5 text-[10.5px] font-bold tracking-[0.1em] text-adm-faint uppercase">
-      {children}
-    </div>
-  );
-}
 
 /** Bordered number input with a GH₵ prefix addon (console money idiom). */
 function GhsInput({
@@ -135,7 +128,9 @@ function SettingsForm({
       className="flex max-w-[560px] flex-col gap-4"
     >
       <AdminCard className="px-5 py-[18px]">
-        <SectionLabel>Money thresholds</SectionLabel>
+        <SectionHeading hint="The figures the console checks a purchase or a float against before it asks anyone to approve it.">
+          Money thresholds
+        </SectionHeading>
         <div className="flex flex-col gap-[13px]">
           <AdminField
             label="Purchase approval threshold"
@@ -143,7 +138,7 @@ function SettingsForm({
             error={errors.purchaseApprovalThresholdGhs?.message}
           >
             <GhsInput
-              placeholder="10,000"
+              placeholder="e.g. 10,000"
               disabled={readOnly}
               error={!!errors.purchaseApprovalThresholdGhs}
               {...register("purchaseApprovalThresholdGhs")}
@@ -155,7 +150,7 @@ function SettingsForm({
             error={errors.lowFloatThresholdGhs?.message}
           >
             <GhsInput
-              placeholder="1,000"
+              placeholder="e.g. 1,000"
               disabled={readOnly}
               error={!!errors.lowFloatThresholdGhs}
               {...register("lowFloatThresholdGhs")}
@@ -165,7 +160,9 @@ function SettingsForm({
       </AdminCard>
 
       <AdminCard className="px-5 py-[18px]">
-        <SectionLabel>Company contact</SectionLabel>
+        <SectionHeading hint="What the public site and outgoing documents show as the way to reach the business.">
+          Company contact
+        </SectionHeading>
         <div className="flex flex-col gap-[13px]">
           <AdminField
             label="Phone (calls)"
@@ -174,7 +171,7 @@ function SettingsForm({
           >
             <Input
               type="tel"
-              placeholder="024 000 0000"
+              placeholder="e.g. 024 000 0000"
               disabled={readOnly}
               className={cn(
                 adminInputClass,
@@ -191,7 +188,7 @@ function SettingsForm({
           >
             <Input
               type="tel"
-              placeholder="024 000 0000"
+              placeholder="e.g. 024 000 0000"
               disabled={readOnly}
               className={cn(
                 adminInputClass,
@@ -208,7 +205,7 @@ function SettingsForm({
           >
             <Input
               type="email"
-              placeholder="info@dbplus.com"
+              placeholder="e.g. info@dbplus.com"
               disabled={readOnly}
               className={cn(
                 adminInputClass,
@@ -224,7 +221,7 @@ function SettingsForm({
             error={errors.companyContactAddress?.message}
           >
             <Input
-              placeholder="Tamale, Northern Region"
+              placeholder="e.g. Tamale, Northern Region"
               disabled={readOnly}
               className={cn(
                 adminInputClass,

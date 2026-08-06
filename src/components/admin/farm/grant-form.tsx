@@ -10,6 +10,7 @@ import {
   AdminField,
   AdminPageHeader,
   adminInputClass,
+  SectionHeading,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
 import { BackButton } from "@/components/ui/BackButton";
@@ -121,6 +122,9 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
         sub="Inputs handed to a farmer, valued in cedis and owed back at harvest"
       />
 
+      {/* Field pairs measure against this form, not the viewport: the console
+          shell keeps a ~225px rail beside it, so `sm:` paired fields up while
+          the column was still too narrow to carry two of them. */}
       <form
         noValidate
         // Surface the missing file alongside RHF's own errors: on an invalid
@@ -128,9 +132,15 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
         onSubmit={handleSubmit(onSubmit, () => {
           if (!agreement) setAgreementError(AGREEMENT_MISSING);
         })}
-        className="flex flex-col gap-4"
+        className="@container flex flex-col gap-4"
       >
         <AdminCard className="flex flex-col gap-3 px-5 py-4">
+          <SectionHeading
+            className="mb-0"
+            hint="Who is being advanced inputs, against which season, and what they are worth."
+          >
+            Who and what
+          </SectionHeading>
           <AdminField label="Farmer" error={errors.farmerId?.message}>
             <Controller
               control={control}
@@ -144,7 +154,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
                     label: f.name,
                     ...(f.community ? { hint: f.community } : {}),
                   }))}
-                  placeholder="Choose the farmer"
+                  placeholder="e.g. Abukari Yakubu"
                   onSearchChange={farmerSearch.onSearchChange}
                   loading={farmers.isFetching}
                   className={cn(errors.farmerId && "border-console-red")}
@@ -152,7 +162,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
               )}
             />
           </AdminField>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
             <AdminField label="Season" error={errors.seasonId?.message}>
               <Controller
                 control={control}
@@ -165,7 +175,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
                       value: s.id,
                       label: s.name,
                     }))}
-                    placeholder="Choose the season"
+                    placeholder="e.g. 2026 major season"
                     className={cn(errors.seasonId && "border-console-red")}
                   />
                 )}
@@ -184,7 +194,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
                       label: i.name,
                       hint: i.unitLabel,
                     }))}
-                    placeholder="Choose the item"
+                    placeholder="e.g. NPK fertiliser"
                     className={cn(errors.itemId && "border-console-red")}
                   />
                 )}
@@ -193,6 +203,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
             <AdminField label="Quantity" error={errors.quantity?.message}>
               <Input
                 inputMode="decimal"
+                placeholder="e.g. 10"
                 className={cn(adminInputClass, errors.quantity && "border-console-red")}
                 {...register("quantity")}
               />
@@ -204,26 +215,28 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
             >
               <Input
                 inputMode="decimal"
+                placeholder="e.g. 1200"
                 className={cn(adminInputClass, errors.valueGhs && "border-console-red")}
                 {...register("valueGhs")}
               />
             </AdminField>
           </div>
           <AdminField label="Notes" optional error={errors.notes?.message}>
-            <Input className={adminInputClass} {...register("notes")} />
+            <Input
+              placeholder="e.g. Collected at the Kumbungu depot"
+              className={adminInputClass}
+              {...register("notes")}
+            />
           </AdminField>
         </AdminCard>
 
         <AdminCard className="flex flex-col gap-3 px-5 py-4">
-          <div>
-            <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-              Signed agreement
-            </div>
-            <p className="mt-1 text-[12px] text-adm-muted">
-              The agreement the farmer signed becomes the binding record behind
-              this grant - what was taken, and what was agreed in return.
-            </p>
-          </div>
+          <SectionHeading
+            className="mb-0"
+            hint="The agreement the farmer signed becomes the binding record behind this grant - what was taken, and what was agreed in return."
+          >
+            Paperwork
+          </SectionHeading>
           <AdminField
             label="Agreed repayment terms"
             optional
@@ -240,7 +253,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
               {...register("agreedTerms")}
             />
           </AdminField>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
             <AdminField
               error={errors.dueDate?.message}
               hint="The day the farmer is meant to have paid this back by, in produce or cash."
@@ -255,7 +268,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
             </AdminField>
             <AdminField label="Document name" optional>
               <Input
-                placeholder="Grant agreement"
+                placeholder="e.g. Signed agreement, Abukari"
                 className={adminInputClass}
                 value={documentName}
                 onChange={(e) => setDocumentName(e.target.value)}
@@ -263,9 +276,10 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
             </AdminField>
           </div>
           {/* Not an AdminField: wrapping the picker's buttons in a <label>
-              would misroute label clicks. Same stencil-label + error markup. */}
+              would misroute label clicks. Same label/error markup as
+              AdminField so it reads as one of the fields above it. */}
           <div>
-            <span className="mb-[7px] block text-[11px] uppercase tracking-[0.14em] text-adm-muted">
+            <span className="mb-1 block text-[13px] font-semibold text-adm-ink">
               Agreement file
             </span>
             <FilePicker
@@ -282,7 +296,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
             {agreementError ? (
               <span
                 role="alert"
-                className="mt-1 block text-[12px] font-medium text-console-red"
+                className="mt-1.5 block text-[12.5px] font-medium text-console-red"
               >
                 {agreementError}
               </span>

@@ -10,6 +10,7 @@ import {
   AdminField,
   AdminPageHeader,
   Mono,
+  SectionHeading,
   adminInputClass,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
@@ -130,8 +131,21 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
         }
       />
 
-      <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      {/* The goods lines measure against this form, not the viewport: the
+          console shell keeps a ~225px rail beside it, so `sm:` put four
+          controls in one row while the column was still too narrow. */}
+      <form
+        noValidate
+        onSubmit={handleSubmit(onSubmit)}
+        className="@container flex flex-col gap-4"
+      >
         <AdminCard className="flex flex-col gap-3 px-5 py-4">
+          <SectionHeading
+            className="mb-0"
+            hint="Who is buying, and the terms they pay on."
+          >
+            Who and on what terms
+          </SectionHeading>
           <AdminField label="Buyer" error={errors.buyerId?.message}>
             <Controller
               control={control}
@@ -144,7 +158,7 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
                     value: b.id,
                     label: b.name,
                   }))}
-                  placeholder="Choose the buyer"
+                  placeholder="e.g. Accra Grain Traders"
                   onSearchChange={buyerSearch.onSearchChange}
                   loading={buyers.isFetching}
                   className={cn(errors.buyerId && "border-console-red")}
@@ -183,24 +197,27 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
         </AdminCard>
 
         <AdminCard className="flex flex-col gap-3 px-5 py-4">
-          <div className="flex items-center justify-between">
-            <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-              Goods
-            </span>
-            <AdminButton
-              type="button"
-              variant="outline"
-              className="h-8 px-3 text-[12.5px]"
-              onClick={() => append({ ...emptyLine })}
-            >
-              + Add line
-            </AdminButton>
-          </div>
+          <SectionHeading
+            className="mb-0"
+            hint="One line per commodity. Weight times price per kg gives the agreed total below."
+            actions={
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-8 px-3 text-[12.5px]"
+                onClick={() => append({ ...emptyLine })}
+              >
+                + Add line
+              </AdminButton>
+            }
+          >
+            Goods
+          </SectionHeading>
 
           {fields.map((field, index) => (
             <div
               key={field.id}
-              className="grid grid-cols-1 gap-2 border-b border-adm-hairline pb-3 last:border-b-0 sm:grid-cols-[1fr_100px_110px_auto]"
+              className="grid grid-cols-1 gap-2 border-b border-adm-hairline pb-3 last:border-b-0 @min-[520px]:grid-cols-[1fr_100px_110px_auto]"
             >
               <AdminField
                 label="Commodity"
@@ -217,7 +234,7 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
                         value: c.id,
                         label: c.name,
                       }))}
-                      placeholder="Choose"
+                      placeholder="e.g. Maize"
                       className={cn(
                         errors.lines?.[index]?.commodityId && "border-console-red",
                       )}
@@ -231,6 +248,7 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
               >
                 <Input
                   inputMode="decimal"
+                  placeholder="e.g. 1200"
                   className={adminInputClass}
                   {...register(`lines.${index}.weightKg`)}
                 />
@@ -241,6 +259,7 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
               >
                 <Input
                   inputMode="decimal"
+                  placeholder="e.g. 4.60"
                   className={adminInputClass}
                   {...register(`lines.${index}.unitPriceGhs`)}
                 />
@@ -274,11 +293,12 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
           </div>
         </AdminCard>
 
-        <AdminCard className="px-5 py-4">
+        <AdminCard className="flex flex-col gap-3 px-5 py-4">
+          <SectionHeading className="mb-0">Anything else</SectionHeading>
           <AdminField label="Notes" optional>
             <Input
               className={adminInputClass}
-              placeholder="Anything worth noting about this sale"
+              placeholder="e.g. Buyer collecting with their own truck"
               {...register("notes")}
             />
           </AdminField>

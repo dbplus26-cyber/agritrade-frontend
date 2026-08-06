@@ -6,6 +6,7 @@ import {
   AdminButton,
   AdminField,
   adminInputClass,
+  SectionHeading,
 } from "@/components/admin/ui";
 import {
   ResponsiveDialog,
@@ -134,80 +135,111 @@ export function GuarantorDialog({
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
 
+        {/* Field pairs measure against this form rather than the viewport:
+            inside a dialog the sheet is its own width, so a `sm:` pair fires
+            on screen size and not on the room the fields actually have. */}
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-3"
+          className="@container flex flex-col gap-5"
         >
-          <AdminField label="Name" error={errors.name?.message}>
-            <Input
-              placeholder="Fuseini Alhassan"
-              className={cn(adminInputClass, errors.name && "border-console-red")}
-              {...register("name")}
-            />
-          </AdminField>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <section className="flex flex-col gap-3">
+            <SectionHeading className="mb-0">Who they are</SectionHeading>
+            <AdminField label="Name" error={errors.name?.message}>
+              <Input
+                placeholder="e.g. Fuseini Alhassan"
+                className={cn(adminInputClass, errors.name && "border-console-red")}
+                {...register("name")}
+              />
+            </AdminField>
+            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+              <AdminField
+                label="Relationship"
+                optional
+                error={errors.relationship?.message}
+              >
+                <Input
+                  placeholder="e.g. Brother"
+                  className={cn(adminInputClass, errors.relationship && "border-console-red")}
+                  {...register("relationship")}
+                />
+              </AdminField>
+              <AdminField label="Occupation" optional error={errors.occupation?.message}>
+                <Input
+                  placeholder="e.g. Teacher"
+                  className={cn(adminInputClass, errors.occupation && "border-console-red")}
+                  {...register("occupation")}
+                />
+              </AdminField>
+            </div>
+          </section>
+
+          <section className="flex flex-col gap-3 border-t border-adm-hairline pt-5">
+            <SectionHeading
+              className="mb-0"
+              hint="The ID you checked, so the person vouching can be identified later."
+            >
+              Identification
+            </SectionHeading>
+            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+              <AdminField label="ID type" optional error={errors.idType?.message}>
+                <Input
+                  list="guarantor-id-types"
+                  placeholder="e.g. Ghana Card"
+                  className={cn(adminInputClass, errors.idType && "border-console-red")}
+                  {...register("idType")}
+                />
+                <datalist id="guarantor-id-types">
+                  {ID_TYPE_SUGGESTIONS.map((t) => (
+                    <option key={t} value={t} />
+                  ))}
+                </datalist>
+              </AdminField>
+              <AdminField label="ID number" optional error={errors.idNumber?.message}>
+                <Input
+                  placeholder="e.g. GHA-000000000-0"
+                  className={cn(adminInputClass, errors.idNumber && "border-console-red")}
+                  {...register("idNumber")}
+                />
+              </AdminField>
+            </div>
+          </section>
+
+          <section className="flex flex-col gap-3 border-t border-adm-hairline pt-5">
+            <SectionHeading
+              className="mb-0"
+              hint="How you would actually reach this person if repayment stalls."
+            >
+              How to reach them
+            </SectionHeading>
             <AdminField label="Phone" optional error={errors.phone?.message}>
               <Input
                 inputMode="tel"
-                placeholder="024 000 0000"
+                placeholder="e.g. 024 000 0000"
                 className={cn(adminInputClass, errors.phone && "border-console-red")}
                 {...register("phone")}
               />
             </AdminField>
-            <AdminField
-              label="Relationship"
-              optional
-              error={errors.relationship?.message}
-            >
-              <Input
-                placeholder="Brother, chief, neighbour…"
-                className={cn(adminInputClass, errors.relationship && "border-console-red")}
-                {...register("relationship")}
+            <AdminField label="Address" optional error={errors.address?.message}>
+              <textarea
+                rows={4}
+                placeholder="e.g. House 12, Kumbungu"
+                className={cn(
+                  adminInputClass,
+                  "h-auto min-h-[60px] w-full resize-y py-2",
+                  errors.address && "border-console-red",
+                )}
+                {...register("address")}
               />
             </AdminField>
-            <AdminField label="Occupation" optional error={errors.occupation?.message}>
+            <AdminField label="Notes" optional error={errors.notes?.message}>
               <Input
-                placeholder="Teacher"
-                className={cn(adminInputClass, errors.occupation && "border-console-red")}
-                {...register("occupation")}
+                placeholder="e.g. Vouched for two other farmers in 2025"
+                className={cn(adminInputClass, errors.notes && "border-console-red")}
+                {...register("notes")}
               />
             </AdminField>
-            <AdminField label="ID type" optional error={errors.idType?.message}>
-              <Input
-                list="guarantor-id-types"
-                placeholder="Ghana Card, Voter ID…"
-                className={cn(adminInputClass, errors.idType && "border-console-red")}
-                {...register("idType")}
-              />
-              <datalist id="guarantor-id-types">
-                {ID_TYPE_SUGGESTIONS.map((t) => (
-                  <option key={t} value={t} />
-                ))}
-              </datalist>
-            </AdminField>
-            <AdminField label="ID number" optional error={errors.idNumber?.message}>
-              <Input
-                placeholder="GHA-000000000-0"
-                className={cn(adminInputClass, errors.idNumber && "border-console-red")}
-                {...register("idNumber")}
-              />
-            </AdminField>
-          </div>
-          <AdminField label="Address" optional error={errors.address?.message}>
-            <textarea
-              rows={4}
-              className={cn(
-                adminInputClass,
-                "h-auto min-h-[60px] w-full resize-y py-2",
-                errors.address && "border-console-red",
-              )}
-              {...register("address")}
-            />
-          </AdminField>
-          <AdminField label="Notes" optional error={errors.notes?.message}>
-            <Input className={cn(adminInputClass, errors.notes && "border-console-red")} {...register("notes")} />
-          </AdminField>
+          </section>
 
           <ResponsiveDialogFooter className="gap-2">
             <AdminButton

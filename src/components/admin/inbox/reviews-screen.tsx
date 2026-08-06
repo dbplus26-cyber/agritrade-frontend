@@ -12,6 +12,7 @@ import {
   ToneBadge,
   adminInputClass,
   adminSelectClass,
+  SectionHeading,
 } from "@/components/admin/ui";
 import {
   ConsoleFilterBar,
@@ -275,86 +276,99 @@ function AddReviewDialog({
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-3"
+          className="flex flex-col gap-5"
         >
-          <AdminField
-            label="Reviewer's name"
-            error={errors.authorName?.message}
-          >
-            <input
-              maxLength={REVIEWER_NAME_MAX}
-              placeholder="e.g. Amina Alhassan"
-              className={cn(
-                adminInputClass,
-                errors.authorName && "border-console-red",
-              )}
-              {...register("authorName")}
-            />
-          </AdminField>
-          <AdminField
-            label="They dealt with us as"
-            error={errors.role?.message}
-          >
-            <select className={adminSelectClass} {...register("role")}>
-              {REVIEW_ROLES.map((r) => (
-                <option key={r} value={r}>
-                  {REVIEW_ROLE_LABELS[r]}
-                </option>
-              ))}
-            </select>
-          </AdminField>
-          <AdminField label="Rating" error={errors.rating?.message}>
-            <Controller
-              control={control}
-              name="rating"
-              render={({ field }) => (
-                <div
-                  role="radiogroup"
-                  aria-label="Rating"
-                  aria-invalid={Boolean(errors.rating) || undefined}
-                  className="flex items-center gap-1"
-                >
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <label key={star} className="cursor-pointer">
-                      <input
-                        type="radio"
-                        name="admin-review-rating"
-                        value={star}
-                        checked={field.value === star}
-                        onChange={() => {
-                          field.onChange(star);
-                        }}
-                        aria-label={`${String(star)} star${star > 1 ? "s" : ""}`}
-                        className="peer sr-only"
-                      />
-                      <span
-                        aria-hidden="true"
-                        className={cn(
-                          "block px-0.5 text-[26px] leading-none transition-colors peer-focus-visible:rounded-[6px] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-leaf",
-                          star <= field.value ? "text-console-gold" : "text-adm-faint",
-                        )}
-                      >
-                        ★
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            />
-          </AdminField>
-          <AdminField label="Their words" error={errors.text?.message}>
-            <textarea
-              rows={4}
-              maxLength={REVIEW_MAX_CHARS}
-              placeholder="What they said, as close to their words as possible."
-              className={cn(
-                adminInputClass,
-                "h-auto min-h-[112px] w-full resize-y py-2",
-                errors.text && "border-console-red",
-              )}
-              {...register("text")}
-            />
-          </AdminField>
+          <section className="flex flex-col gap-3">
+            <SectionHeading className="mb-0">Who reviewed us</SectionHeading>
+            <AdminField
+              label="Reviewer's name"
+              error={errors.authorName?.message}
+            >
+              <input
+                maxLength={REVIEWER_NAME_MAX}
+                placeholder="e.g. Amina Alhassan"
+                className={cn(
+                  adminInputClass,
+                  errors.authorName && "border-console-red",
+                )}
+                {...register("authorName")}
+              />
+            </AdminField>
+            <AdminField
+              label="They dealt with us as"
+              error={errors.role?.message}
+            >
+              <select className={adminSelectClass} {...register("role")}>
+                {REVIEW_ROLES.map((r) => (
+                  <option key={r} value={r}>
+                    {REVIEW_ROLE_LABELS[r]}
+                  </option>
+                ))}
+              </select>
+            </AdminField>
+          </section>
+
+          <section className="flex flex-col gap-3 border-t border-adm-hairline pt-5">
+            <SectionHeading
+              className="mb-0"
+              hint="Published as recorded by the office, never as verified."
+            >
+              What they said
+            </SectionHeading>
+            <AdminField label="Rating" error={errors.rating?.message}>
+              <Controller
+                control={control}
+                name="rating"
+                render={({ field }) => (
+                  <div
+                    role="radiogroup"
+                    aria-label="Rating"
+                    aria-invalid={Boolean(errors.rating) || undefined}
+                    className="flex items-center gap-1"
+                  >
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <label key={star} className="cursor-pointer">
+                        <input
+                          type="radio"
+                          name="admin-review-rating"
+                          value={star}
+                          checked={field.value === star}
+                          onChange={() => {
+                            field.onChange(star);
+                          }}
+                          aria-label={`${String(star)} star${star > 1 ? "s" : ""}`}
+                          className="peer sr-only"
+                        />
+                        <span
+                          aria-hidden="true"
+                          className={cn(
+                            "block px-0.5 text-[26px] leading-none transition-colors peer-focus-visible:rounded-[6px] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-leaf",
+                            star <= field.value ? "text-console-gold" : "text-adm-faint",
+                          )}
+                        >
+                          ★
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              />
+            </AdminField>
+            <AdminField label="Their words" error={errors.text?.message}>
+              <textarea
+                rows={4}
+                maxLength={REVIEW_MAX_CHARS}
+                placeholder="e.g. They paid the same day the maize was weighed."
+                className={cn(
+                  adminInputClass,
+                  "h-auto min-h-[112px] w-full resize-y py-2",
+                  errors.text && "border-console-red",
+                )}
+                {...register("text")}
+              />
+            </AdminField>
+          </section>
+
           <ResponsiveDialogFooter className="mt-1 gap-2">
             <AdminButton
               type="button"

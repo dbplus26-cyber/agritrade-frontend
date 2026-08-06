@@ -9,6 +9,7 @@ import {
   AdminField,
   adminInputClass,
   adminSelectClass,
+  SectionHeading,
 } from "@/components/admin/ui";
 import {
   ResponsiveDialog,
@@ -178,124 +179,141 @@ export function SendMoneyDialog({
         </ResponsiveDialogHeader>
 
         <form
-          className="space-y-4 px-4 pb-2 sm:px-0"
+          className="space-y-5 px-4 pb-2 sm:px-0"
           onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
         >
-          <AdminField label="How are they being paid?">
-            <select
-              className={adminSelectClass}
-              {...form.register("rail")}
-              // Switching rails clears the other rail's fields so a stale
-              // account number can never ride along with a MoMo send.
-              onChange={(e) => {
-                form.setValue("rail", e.target.value as "BANK" | "MOMO");
-                form.setValue("bankAccountNumber", "");
-                form.setValue("bankCode", "");
-                form.setValue("channel", "");
-                form.setValue("recipientMsisdn", "");
-                form.clearErrors();
-              }}
+          <section className="space-y-4">
+            <SectionHeading className="mb-0">How much, and how</SectionHeading>
+            <AdminField label="How are they being paid?">
+              <select
+                className={adminSelectClass}
+                {...form.register("rail")}
+                // Switching rails clears the other rail's fields so a stale
+                // account number can never ride along with a MoMo send.
+                onChange={(e) => {
+                  form.setValue("rail", e.target.value as "BANK" | "MOMO");
+                  form.setValue("bankAccountNumber", "");
+                  form.setValue("bankCode", "");
+                  form.setValue("channel", "");
+                  form.setValue("recipientMsisdn", "");
+                  form.clearErrors();
+                }}
+              >
+                <option value="MOMO">Mobile money</option>
+                <option value="BANK">Bank transfer</option>
+              </select>
+            </AdminField>
+
+            <AdminField
+              label="Amount (GH₵)"
+              error={form.formState.errors.amountGhs?.message}
             >
-              <option value="MOMO">Mobile money</option>
-              <option value="BANK">Bank transfer</option>
-            </select>
-          </AdminField>
+              <Input
+                className={cn(adminInputClass, "font-adminmono")}
+                inputMode="decimal"
+                placeholder="e.g. 850.00"
+                {...form.register("amountGhs")}
+              />
+            </AdminField>
 
-          <AdminField
-            label="Amount (GH₵)"
-            error={form.formState.errors.amountGhs?.message}
-          >
-            <Input
-              className={cn(adminInputClass, "font-adminmono")}
-              inputMode="decimal"
-              placeholder="0.00"
-              {...form.register("amountGhs")}
-            />
-          </AdminField>
+          </section>
 
-          <AdminField
-            label="Recipient's name"
-            error={form.formState.errors.recipientName?.message}
-            hint="Write it as their account shows it: the number below is what the money actually follows."
-          >
-            <Input
-              className={adminInputClass}
-              placeholder="As it appears on their account"
-              {...form.register("recipientName")}
-            />
-          </AdminField>
+          <section className="space-y-4 border-t border-adm-hairline pt-5">
+            <SectionHeading
+              className="mb-0"
+              hint="The account the money actually lands in. Check the number, not the name."
+            >
+              Who is being paid
+            </SectionHeading>
+            <AdminField
+              label="Recipient's name"
+              error={form.formState.errors.recipientName?.message}
+              hint="Write it as their account shows it: the number below is what the money actually follows."
+            >
+              <Input
+                className={adminInputClass}
+                placeholder="e.g. Ibrahim Fuseini"
+                {...form.register("recipientName")}
+              />
+            </AdminField>
 
-          {rail === "MOMO" ? (
-            <>
-              <AdminField
-                label="Network"
-                error={form.formState.errors.channel?.message}
-              >
-                <select className={adminSelectClass} {...form.register("channel")}>
-                  <option value="">Choose a network</option>
-                  {MOMO_CHANNEL_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
-              </AdminField>
-              <AdminField
-                label="Mobile money number"
-                error={form.formState.errors.recipientMsisdn?.message}
-                hint="International format, e.g. 233249111411"
-              >
-                <Input
-                  className={cn(adminInputClass, "font-adminmono")}
-                  inputMode="numeric"
-                  placeholder="233249111411"
-                  {...form.register("recipientMsisdn")}
-                />
-              </AdminField>
-            </>
-          ) : (
-            <>
-              <AdminField
-                label="Bank"
-                error={form.formState.errors.bankCode?.message}
-              >
-                <SearchableSelect
-                  disabled={banksQuery.isLoading}
-                  onChange={(v) =>
-                    form.setValue("bankCode", v, { shouldValidate: true })
-                  }
-                  options={bankOptions}
-                  placeholder={
-                    banksQuery.isLoading ? "Loading banks…" : "Choose a bank"
-                  }
-                  value={form.watch("bankCode") ?? ""}
-                />
-              </AdminField>
-              <AdminField
-                label="Account number"
-                error={form.formState.errors.bankAccountNumber?.message}
-              >
-                <Input
-                  className={cn(adminInputClass, "font-adminmono")}
-                  inputMode="numeric"
-                  {...form.register("bankAccountNumber")}
-                />
-              </AdminField>
-            </>
-          )}
+            {rail === "MOMO" ? (
+              <>
+                <AdminField
+                  label="Network"
+                  error={form.formState.errors.channel?.message}
+                >
+                  <select className={adminSelectClass} {...form.register("channel")}>
+                    <option value="">Choose a network</option>
+                    {MOMO_CHANNEL_OPTIONS.map((o) => (
+                      <option key={o.value} value={o.value}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
+                </AdminField>
+                <AdminField
+                  label="Mobile money number"
+                  error={form.formState.errors.recipientMsisdn?.message}
+                  hint="International format, e.g. 233249111411"
+                >
+                  <Input
+                    className={cn(adminInputClass, "font-adminmono")}
+                    inputMode="numeric"
+                    placeholder="e.g. 233249111411"
+                    {...form.register("recipientMsisdn")}
+                  />
+                </AdminField>
+              </>
+            ) : (
+              <>
+                <AdminField
+                  label="Bank"
+                  error={form.formState.errors.bankCode?.message}
+                >
+                  <SearchableSelect
+                    disabled={banksQuery.isLoading}
+                    onChange={(v) =>
+                      form.setValue("bankCode", v, { shouldValidate: true })
+                    }
+                    options={bankOptions}
+                    placeholder={
+                      banksQuery.isLoading ? "Loading banks…" : "Choose a bank"
+                    }
+                    value={form.watch("bankCode") ?? ""}
+                  />
+                </AdminField>
+                <AdminField
+                  label="Account number"
+                  error={form.formState.errors.bankAccountNumber?.message}
+                >
+                  <Input
+                    className={cn(adminInputClass, "font-adminmono")}
+                    inputMode="numeric"
+                    placeholder="e.g. 1234567890123"
+                    {...form.register("bankAccountNumber")}
+                  />
+                </AdminField>
+              </>
+            )}
 
-          <AdminField
-            label="What is it for?"
-            error={form.formState.errors.description?.message}
-            hint="The recipient sees this on their statement."
-          >
-            <Input
-              className={adminInputClass}
-              maxLength={100}
-              placeholder="e.g. Maize purchase, Tolon"
-              {...form.register("description")}
-            />
-          </AdminField>
+          </section>
+
+          <section className="space-y-4 border-t border-adm-hairline pt-5">
+            <SectionHeading className="mb-0">What it is for</SectionHeading>
+            <AdminField
+              label="What is it for?"
+              error={form.formState.errors.description?.message}
+              hint="The recipient sees this on their statement."
+            >
+              <Input
+                className={adminInputClass}
+                maxLength={100}
+                placeholder="e.g. Maize purchase, Tolon"
+                {...form.register("description")}
+              />
+            </AdminField>
+          </section>
         </form>
 
         <ResponsiveDialogFooter>

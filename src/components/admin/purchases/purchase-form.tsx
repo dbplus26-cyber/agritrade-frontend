@@ -13,6 +13,7 @@ import {
   adminInputClass,
   adminSelectClass,
   Mono,
+  SectionHeading,
 } from "@/components/admin/ui";
 import { HelpTip } from "@/components/admin/help-tip";
 import { BackButton } from "@/components/ui/BackButton";
@@ -155,259 +156,285 @@ export function PurchaseCreate() {
         sub="Goods bought and paid for - an agent-paid purchase debits their float immediately"
       />
       <AdminCard className="px-5 py-[18px]">
+        {/* The form is the container the field pairs measure themselves
+            against, not the viewport: the console shell keeps ~225px of rail
+            beside it, so a `sm:` pair fires while this column is still barely
+            300px wide and two selects sit shoulder to shoulder in it. */}
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-[13px]"
+          className="@container flex flex-col gap-5"
         >
-          <div className="grid gap-[13px] sm:grid-cols-2">
-            <AdminField
-              label="Source"
-              hint="Who you bought from: an individual farmer, a company, or one of your own field agents."
-              error={errors.source?.message}
-            >
-              <Controller
-                control={control}
-                name="source"
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className={cn(adminSelectClass, "w-full")}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {SOURCE_OPTIONS.map((s) => (
-                        <SelectItem key={s} value={s}>
-                          {SOURCE_LABEL[s]}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </AdminField>
-            <AdminField label="Commodity" error={errors.commodityId?.message}>
-              <Controller
-                control={control}
-                name="commodityId"
-                render={({ field }) => (
-                  <SearchableSelect
-                    value={field.value}
-                    onChange={field.onChange}
-                    options={(commodities.data?.data ?? []).map((c) => ({
-                      value: c.id,
-                      label: c.name,
-                    }))}
-                    placeholder="Choose a commodity"
-                    className={cn(errors.commodityId && "border-console-red")}
-                  />
-                )}
-              />
-            </AdminField>
-          </div>
-
-          {source === PurchaseSource.AGENT ? (
-            <AdminField
-              label="Paying agent"
-              hint="The float this purchase was paid from. An agent appears here once their float has been opened with a top-up."
-              error={errors.agentProfileId?.message}
-            >
-              <Controller
-                control={control}
-                name="agentProfileId"
-                render={({ field }) => (
-                  <SearchableSelect
-                    value={field.value ?? ""}
-                    onChange={field.onChange}
-                    options={agentOptions.map((a) => ({
-                      value: a.profileId ?? "",
-                      label: `${a.firstName} ${a.lastName}`,
-                    }))}
-                    placeholder="Choose the agent"
-                    emptyText="No agents with an opened float match."
-                    className={cn(errors.agentProfileId && "border-console-red")}
-                  />
-                )}
-              />
-            </AdminField>
-          ) : (
-            <AdminField
-              label="Supplier"
-              optional
-              hint="Who the goods were bought from."
-            >
-              <Controller
-                control={control}
-                name="supplierId"
-                render={({ field }) => (
-                  <SearchableSelect
-                    value={field.value ?? ""}
-                    onChange={field.onChange}
-                    options={[
-                      { value: "", label: "No supplier recorded" },
-                      ...(suppliers.data?.data ?? []).map((s) => ({
-                        value: s.id,
-                        label: s.name,
-                        ...(s.community ? { hint: s.community } : {}),
-                      })),
-                    ]}
-                    placeholder="Choose a supplier (optional)"
-                    onSearchChange={supplierSearch.onSearchChange}
-                    loading={suppliers.isFetching}
-                  />
-                )}
-              />
-            </AdminField>
-          )}
-
-          <div className="grid gap-[13px] sm:grid-cols-2">
-            <AdminField label="Weight (kg)" error={errors.weightKg?.message}>
-              <Input
-                inputMode="decimal"
-                placeholder="e.g. 1200"
-                className={cn(adminInputClass, errors.weightKg && "border-console-red")}
-                {...register("weightKg")}
-              />
-            </AdminField>
-            <AdminField
-              label="Price per kg (GH₵)"
-              error={errors.unitPriceGhs?.message}
-            >
-              <Input
-                inputMode="decimal"
-                placeholder="e.g. 4.20"
-                className={cn(
-                  adminInputClass,
-                  errors.unitPriceGhs && "border-console-red",
-                )}
-                {...register("unitPriceGhs")}
-              />
-            </AdminField>
-          </div>
-
-          <div className="ledger-rule flex items-baseline justify-between px-0.5 py-1.5">
-            <span className="flex items-center gap-1 text-[11px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-              <span className="min-w-0">Total</span>
-              <HelpTip
-                label="What is the Total?"
-                text="The weight times the price per kg: what this whole purchase will cost you."
-              />
-            </span>
-            <Mono className="text-[15px] font-semibold text-adm-ink">
-              {formatCedis(totalPreview)}
-            </Mono>
-          </div>
-
-          <div className="grid gap-[13px] sm:grid-cols-2">
-            <AdminField
-              label="Destination warehouse"
-              optional
-              hint="Can also be set at receipt."
-            >
-              <Controller
-                control={control}
-                name="warehouseId"
-                render={({ field }) => (
-                  <SearchableSelect
-                    value={field.value ?? ""}
-                    onChange={field.onChange}
-                    options={[
-                      { value: "", label: "Choose later" },
-                      ...(warehouses.data?.data ?? []).map((w) => ({
-                        value: w.id,
-                        label: w.name,
-                      })),
-                    ]}
-                    placeholder="Choose later"
-                  />
-                )}
-              />
-            </AdminField>
-            <AdminField
-              label="Purchase date"
-              error={errors.purchasedAt?.message}
-            >
-              <Input
-                type="date"
-                className={cn(
-                  adminInputClass,
-                  errors.purchasedAt && "border-console-red",
-                )}
-                {...register("purchasedAt")}
-              />
-            </AdminField>
-          </div>
-
-          <AdminField label="Notes" optional error={errors.notes?.message}>
-            <textarea
-              rows={4}
-              placeholder="Anything worth remembering about this purchase."
-              className={cn(
-                adminInputClass,
-                "h-auto min-h-[60px] w-full resize-y py-2",
-                errors.notes && "border-console-red",
-              )}
-              {...register("notes")}
-            />
-          </AdminField>
-
-          <AdminField
-            label="Weigh-slip photo"
-            optional
-            hint="The scale ticket from the village - proof of the recorded weight."
-          >
-            <div className="flex items-center gap-3">
-              {previewUrl ? (
-                <Image
-                  src={previewUrl}
-                  alt="Weigh-slip preview"
-                  width={56}
-                  height={56}
-                  unoptimized
-                  className="h-14 w-14 rounded border border-adm-line object-cover"
+          <section className="flex flex-col gap-[13px]">
+            <SectionHeading className="mb-0">Who and what</SectionHeading>
+            <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+              <AdminField
+                label="Source"
+                hint="Who you bought from: an individual farmer, a company, or one of your own field agents."
+                error={errors.source?.message}
+              >
+                <Controller
+                  control={control}
+                  name="source"
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger className={cn(adminSelectClass, "w-full")}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {SOURCE_OPTIONS.map((s) => (
+                          <SelectItem key={s} value={s}>
+                            {SOURCE_LABEL[s]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 />
-              ) : (
-                <div className="flex h-14 w-14 items-center justify-center rounded border border-dashed border-adm-line text-[10px] text-adm-faint">
-                  No photo
-                </div>
-              )}
-              <div className="flex gap-2">
-                <AdminButton
-                  type="button"
-                  variant="secondary"
-                  className="h-8 px-3 text-[12.5px]"
-                  onClick={() => fileInput.current?.click()}
-                >
-                  {previewUrl ? "Replace photo" : "Choose photo"}
-                </AdminButton>
-                {photoFile ? (
+              </AdminField>
+              <AdminField label="Commodity" error={errors.commodityId?.message}>
+                <Controller
+                  control={control}
+                  name="commodityId"
+                  render={({ field }) => (
+                    <SearchableSelect
+                      value={field.value}
+                      onChange={field.onChange}
+                      options={(commodities.data?.data ?? []).map((c) => ({
+                        value: c.id,
+                        label: c.name,
+                      }))}
+                      placeholder="e.g. Maize"
+                      className={cn(errors.commodityId && "border-console-red")}
+                    />
+                  )}
+                />
+              </AdminField>
+            </div>
+
+            {source === PurchaseSource.AGENT ? (
+              <AdminField
+                label="Paying agent"
+                hint="The float this purchase was paid from. An agent appears here once their float has been opened with a top-up."
+                error={errors.agentProfileId?.message}
+              >
+                <Controller
+                  control={control}
+                  name="agentProfileId"
+                  render={({ field }) => (
+                    <SearchableSelect
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                      options={agentOptions.map((a) => ({
+                        value: a.profileId ?? "",
+                        label: `${a.firstName} ${a.lastName}`,
+                      }))}
+                      placeholder="e.g. Musah Alhassan"
+                      emptyText="No agents with an opened float match."
+                      className={cn(errors.agentProfileId && "border-console-red")}
+                    />
+                  )}
+                />
+              </AdminField>
+            ) : (
+              <AdminField
+                label="Supplier"
+                optional
+                hint="Who the goods were bought from."
+              >
+                <Controller
+                  control={control}
+                  name="supplierId"
+                  render={({ field }) => (
+                    <SearchableSelect
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                      options={[
+                        { value: "", label: "No supplier recorded" },
+                        ...(suppliers.data?.data ?? []).map((s) => ({
+                          value: s.id,
+                          label: s.name,
+                          ...(s.community ? { hint: s.community } : {}),
+                        })),
+                      ]}
+                      placeholder="e.g. Bontanga Farms Ltd"
+                      onSearchChange={supplierSearch.onSearchChange}
+                      loading={suppliers.isFetching}
+                    />
+                  )}
+                />
+              </AdminField>
+            )}
+          </section>
+
+          <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+            <SectionHeading
+              className="mb-0"
+              hint="What the load weighs and what you agreed to pay for it. The total below is worked out from these two."
+            >
+              Weight and price
+            </SectionHeading>
+            <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+              <AdminField label="Weight (kg)" error={errors.weightKg?.message}>
+                <Input
+                  inputMode="decimal"
+                  placeholder="e.g. 1200"
+                  className={cn(adminInputClass, errors.weightKg && "border-console-red")}
+                  {...register("weightKg")}
+                />
+              </AdminField>
+              <AdminField
+                label="Price per kg (GH₵)"
+                error={errors.unitPriceGhs?.message}
+              >
+                <Input
+                  inputMode="decimal"
+                  placeholder="e.g. 4.20"
+                  className={cn(
+                    adminInputClass,
+                    errors.unitPriceGhs && "border-console-red",
+                  )}
+                  {...register("unitPriceGhs")}
+                />
+              </AdminField>
+            </div>
+
+            <div className="ledger-rule flex items-baseline justify-between px-0.5 py-1.5">
+              <span className="flex items-center gap-1 text-[11px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+                <span className="min-w-0">Total</span>
+                <HelpTip
+                  label="What is the Total?"
+                  text="The weight times the price per kg: what this whole purchase will cost you."
+                />
+              </span>
+              <Mono className="text-[15px] font-semibold text-adm-ink">
+                {formatCedis(totalPreview)}
+              </Mono>
+            </div>
+          </section>
+
+          <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+            <SectionHeading className="mb-0">Where it goes</SectionHeading>
+            <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+              <AdminField
+                label="Destination warehouse"
+                optional
+                hint="Can also be set at receipt."
+              >
+                <Controller
+                  control={control}
+                  name="warehouseId"
+                  render={({ field }) => (
+                    <SearchableSelect
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                      options={[
+                        { value: "", label: "Choose later" },
+                        ...(warehouses.data?.data ?? []).map((w) => ({
+                          value: w.id,
+                          label: w.name,
+                        })),
+                      ]}
+                      placeholder="e.g. Tamale main store"
+                    />
+                  )}
+                />
+              </AdminField>
+              <AdminField
+                label="Purchase date"
+                error={errors.purchasedAt?.message}
+              >
+                <Input
+                  type="date"
+                  className={cn(
+                    adminInputClass,
+                    errors.purchasedAt && "border-console-red",
+                  )}
+                  {...register("purchasedAt")}
+                />
+              </AdminField>
+            </div>
+          </section>
+
+          <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+            <SectionHeading
+              className="mb-0"
+              hint="What backs this record up if anyone questions it later."
+            >
+              Paperwork
+            </SectionHeading>
+            <AdminField label="Notes" optional error={errors.notes?.message}>
+              <textarea
+                rows={4}
+                placeholder="e.g. Second load from the same lorry"
+                className={cn(
+                  adminInputClass,
+                  "h-auto min-h-[60px] w-full resize-y py-2",
+                  errors.notes && "border-console-red",
+                )}
+                {...register("notes")}
+              />
+            </AdminField>
+
+            <AdminField
+              label="Weigh-slip photo"
+              optional
+              hint="The scale ticket from the village - proof of the recorded weight."
+            >
+              <div className="flex flex-wrap items-center gap-3">
+                {previewUrl ? (
+                  <Image
+                    src={previewUrl}
+                    alt="Weigh-slip preview"
+                    width={56}
+                    height={56}
+                    unoptimized
+                    className="h-14 w-14 rounded border border-adm-line object-cover"
+                  />
+                ) : (
+                  <div className="flex h-14 w-14 items-center justify-center rounded border border-dashed border-adm-line text-[10px] text-adm-faint">
+                    No photo
+                  </div>
+                )}
+                <div className="flex gap-2">
                   <AdminButton
                     type="button"
-                    variant="outline"
+                    variant="secondary"
                     className="h-8 px-3 text-[12.5px]"
-                    onClick={() => setPhotoFile(null)}
+                    onClick={() => fileInput.current?.click()}
                   >
-                    Remove
+                    {previewUrl ? "Replace photo" : "Choose photo"}
                   </AdminButton>
-                ) : null}
+                  {photoFile ? (
+                    <AdminButton
+                      type="button"
+                      variant="outline"
+                      className="h-8 px-3 text-[12.5px]"
+                      onClick={() => setPhotoFile(null)}
+                    >
+                      Remove
+                    </AdminButton>
+                  ) : null}
+                </div>
+                <input
+                  ref={fileInput}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] ?? null;
+                    if (!file) {
+                      setPhotoFile(null);
+                      return;
+                    }
+                    void optimizeImage(file).then(setPhotoFile);
+                  }}
+                />
               </div>
-              <input
-                ref={fileInput}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0] ?? null;
-                  if (!file) {
-                    setPhotoFile(null);
-                    return;
-                  }
-                  void optimizeImage(file).then(setPhotoFile);
-                }}
-              />
-            </div>
-          </AdminField>
+            </AdminField>
+          </section>
 
-          <div className="mt-1 flex gap-2">
+          <div className="mt-1 flex gap-2 border-t border-adm-hairline pt-5">
             <AdminButton
               type="submit"
               disabled={saving}

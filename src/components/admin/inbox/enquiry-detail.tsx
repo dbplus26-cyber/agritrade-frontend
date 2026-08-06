@@ -142,10 +142,14 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
           <div className="flex flex-col gap-5">
             {/* The message itself, filed as a document. */}
             <AdminCard className="px-5 py-[18px]">
-              <p className="text-[11px] uppercase tracking-[0.14em] text-adm-muted">
+              {/* The subject titles the message, so it is the card's heading -
+                  as a muted uppercase eyebrow it read quieter than the
+                  "replies sent" heading a few lines below it, and uppercasing
+                  a sentence the sender wrote themselves lost their emphasis. */}
+              <SectionHeading className="mb-3">
                 {enquiry.subject}
-              </p>
-              <p className="mt-3 text-[14px] leading-[1.75] whitespace-pre-wrap text-adm-ink [overflow-wrap:anywhere]">
+              </SectionHeading>
+              <p className="text-[14px] leading-[1.75] whitespace-pre-wrap text-adm-ink [overflow-wrap:anywhere]">
                 {enquiry.message}
               </p>
               {/* The thread, then the composer. Anyone opening this needs to

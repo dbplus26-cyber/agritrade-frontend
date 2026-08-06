@@ -345,53 +345,66 @@ function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
 
   return (
     <AdminCard className="px-5 py-[18px]">
+      {/* The name/location pair measures against this form, not the viewport:
+          the console shell keeps a ~225px rail beside it, so `sm:` would pair
+          them up while the column was still too narrow for two. */}
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col gap-[13px]"
+        className="@container flex flex-col gap-5"
       >
-        <AdminField label="Name" error={errors.name?.message}>
-          <Input
-            placeholder="e.g. Main Warehouse - Tamale"
-            disabled={readOnly}
-            className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
-            {...register("name")}
-          />
-        </AdminField>
-        <AdminField label="Location" optional error={errors.location?.message}>
-          <Input
-            placeholder="e.g. Tamale, Northern Region"
-            disabled={readOnly}
-            className={cn(
-              adminInputClass,
-              roCls,
-              errors.location && "border-console-red",
-            )}
-            {...register("location")}
-          />
-        </AdminField>
+        <section className="flex flex-col gap-[13px]">
+          <SectionHeading className="mb-0">Which shed</SectionHeading>
+          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+            <AdminField label="Name" error={errors.name?.message}>
+              <Input
+                placeholder="e.g. Main Warehouse - Tamale"
+                disabled={readOnly}
+                className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
+                {...register("name")}
+              />
+            </AdminField>
+            <AdminField label="Location" optional error={errors.location?.message}>
+              <Input
+                placeholder="e.g. Tamale, Northern Region"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.location && "border-console-red",
+                )}
+                {...register("location")}
+              />
+            </AdminField>
+          </div>
+        </section>
+
         {/* What the shed is actually for - which commodities it holds, its
             capacity, whether it is fumigated. Operational detail that
             otherwise lives in one person's head. */}
-        <AdminField
-          label="Description"
-          optional
-          hint="e.g. Maize and soya, 400 tonnes, fumigated monthly."
-          error={errors.description?.message}
-        >
-          <textarea
-            rows={4}
-            placeholder="What this warehouse holds and anything staff need to know"
-            disabled={readOnly}
-            className={cn(
-              adminInputClass,
-              roCls,
-              "h-auto min-h-[62px] w-full resize-y py-2",
-              errors.description && "border-console-red",
-            )}
-            {...register("description")}
-          />
-        </AdminField>
+        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+          <SectionHeading className="mb-0">What it holds</SectionHeading>
+          <AdminField
+            label="Description"
+            optional
+            hint="What this warehouse holds and anything staff need to know."
+            error={errors.description?.message}
+          >
+            <textarea
+              rows={4}
+              placeholder="e.g. Maize and soya, 400 tonnes, fumigated monthly"
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                "h-auto min-h-[62px] w-full resize-y py-2",
+                errors.description && "border-console-red",
+              )}
+              {...register("description")}
+            />
+          </AdminField>
+        </section>
+
         <EditableFormActions
           mode={!isEdit ? "create" : isEditing ? "editing" : "locked"}
           saving={saving}

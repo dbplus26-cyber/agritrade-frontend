@@ -12,12 +12,14 @@ import {
   AdminField,
   AdminPageHeader,
   EditableFormActions,
+  SectionHeading,
   adminInputClass,
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
 import { BackButton } from "@/components/ui/BackButton";
 import { FormSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { ViewablePhoto } from "@/components/admin/photo-view";
 import {
   useCreateCommodityMutation,
   useDeactivateCommodityMutation,
@@ -220,193 +222,237 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
 
   return (
     <AdminCard className="px-5 py-[18px]">
+      {/* Field pairs measure against this form, not the viewport: the console
+          shell keeps a ~225px rail beside it, so `sm:` paired fields up while
+          the column was still too narrow to carry two of them. */}
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col gap-[13px]"
+        className="@container flex flex-col gap-5"
       >
-        <AdminField label="Name" error={errors.name?.message}>
-          <Input
-            placeholder="e.g. White Maize"
-            disabled={readOnly}
-            maxLength={COMMODITY_NAME_MAX}
-            className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
-            {...register("name")}
-          />
-        </AdminField>
-        <div className="grid gap-[13px] sm:grid-cols-2">
-          <AdminField
-            label="Variety"
-            optional
-            error={errors.variety?.message}
-            hint="Cultivar shown on documents, e.g. Obatanpa."
-          >
+        <section className="flex flex-col gap-[13px]">
+          <SectionHeading className="mb-0">What it is</SectionHeading>
+          <AdminField label="Name" error={errors.name?.message}>
             <Input
-              placeholder="e.g. Obatanpa"
+              placeholder="e.g. White Maize"
               disabled={readOnly}
-              className={cn(
-                adminInputClass,
-                roCls,
-                errors.variety && "border-console-red",
-              )}
-              {...register("variety")}
+              maxLength={COMMODITY_NAME_MAX}
+              className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
+              {...register("name")}
             />
           </AdminField>
-          <AdminField
-            label="Quality grade"
-            optional
-            error={errors.qualityGrade?.message}
-          >
-            <Input
-              placeholder="e.g. Grade 1"
-              disabled={readOnly}
-              className={cn(
-                adminInputClass,
-                roCls,
-                errors.qualityGrade && "border-console-red",
-              )}
-              {...register("qualityGrade")}
-            />
-          </AdminField>
-        </div>
-        <div className="grid gap-[13px] sm:grid-cols-2">
-          <AdminField
-            label="Bag weight (kg)"
-            optional
-            hint="Display convention only - stock is always tracked in kg."
-            error={errors.bagWeightKg?.message}
-          >
-            <Input
-              inputMode="decimal"
-              placeholder="e.g. 50"
-              disabled={readOnly}
-              className={cn(
-                adminInputClass,
-                roCls,
-                "font-adminmono",
-                errors.bagWeightKg && "border-console-red",
-              )}
-              {...register("bagWeightKg")}
-            />
-          </AdminField>
-          <AdminField
-            label="Sort order"
-            optional
-            hint="Lower numbers list first in pickers and on the website."
-            error={errors.sortOrder?.message}
-          >
-            <Input
-              inputMode="numeric"
-              placeholder="0"
-              disabled={readOnly}
-              className={cn(
-                adminInputClass,
-                roCls,
-                "font-adminmono",
-                errors.sortOrder && "border-console-red",
-              )}
-              {...register("sortOrder")}
-            />
-          </AdminField>
-        </div>
-        <AdminField
-          label="Description"
-          optional
-          error={errors.description?.message}
-        >
-          <textarea
-            rows={4}
-            maxLength={COMMODITY_DESCRIPTION_MAX}
-            placeholder="Shown on the website's commodity card when published."
-            disabled={readOnly}
-            className={cn(
-              adminInputClass,
-              roCls,
-              "h-auto min-h-[104px] w-full resize-y py-2",
-              errors.description && "border-console-red",
-            )}
-            {...register("description")}
-          />
-        </AdminField>
-
-        <AdminField
-          label="Photo"
-          optional
-          hint="Used on the website's commodity card. JPG or PNG."
-        >
-          <div className="flex items-center gap-3">
-            {previewUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element -- preview
-              <img
-                src={previewUrl}
-                alt="Commodity photo"
-                className="h-14 w-14 flex-none rounded-[4px] border border-adm-line object-cover"
+          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+            <AdminField
+              label="Variety"
+              optional
+              error={errors.variety?.message}
+              hint="Cultivar shown on documents, e.g. Obatanpa."
+            >
+              <Input
+                placeholder="e.g. Obatanpa"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.variety && "border-console-red",
+                )}
+                {...register("variety")}
               />
-            ) : (
-              <span className="flex h-14 w-14 flex-none items-center justify-center rounded-[4px] border border-dashed border-adm-line text-[10px] text-adm-faint">
-                No photo
-              </span>
-            )}
-            {isEditing ? (
-              <div className="flex flex-wrap gap-2">
-                <AdminButton
-                  type="button"
-                  variant="secondary"
-                  className="h-[32px] px-3 text-[12.5px]"
-                  onClick={() => fileInput.current?.click()}
-                >
-                  {previewUrl ? "Replace photo" : "Choose photo"}
-                </AdminButton>
-                {previewUrl ? (
+            </AdminField>
+            <AdminField
+              label="Quality grade"
+              optional
+              error={errors.qualityGrade?.message}
+            >
+              <Input
+                placeholder="e.g. Grade 1"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.qualityGrade && "border-console-red",
+                )}
+                {...register("qualityGrade")}
+              />
+            </AdminField>
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+          <SectionHeading
+            className="mb-0"
+            hint="Conventions the console uses when it shows this commodity: nothing here changes how stock is counted."
+          >
+            Measurement and order
+          </SectionHeading>
+          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+            <AdminField
+              label="Bag weight (kg)"
+              optional
+              hint="Display convention only - stock is always tracked in kg."
+              error={errors.bagWeightKg?.message}
+            >
+              <Input
+                inputMode="decimal"
+                placeholder="e.g. 50"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  "font-adminmono",
+                  errors.bagWeightKg && "border-console-red",
+                )}
+                {...register("bagWeightKg")}
+              />
+            </AdminField>
+            <AdminField
+              label="Sort order"
+              optional
+              hint="Lower numbers list first in pickers and on the website."
+              error={errors.sortOrder?.message}
+            >
+              <Input
+                inputMode="numeric"
+                placeholder="e.g. 10"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  "font-adminmono",
+                  errors.sortOrder && "border-console-red",
+                )}
+                {...register("sortOrder")}
+              />
+            </AdminField>
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+          <SectionHeading
+            className="mb-0"
+            hint="What the public site shows for this commodity once it is published."
+          >
+            On the website
+          </SectionHeading>
+          <AdminField
+            label="Description"
+            optional
+            error={errors.description?.message}
+          >
+            <textarea
+              rows={4}
+              maxLength={COMMODITY_DESCRIPTION_MAX}
+              placeholder="e.g. Clean, sun-dried white maize from the Northern Region"
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                "h-auto min-h-[104px] w-full resize-y py-2",
+                errors.description && "border-console-red",
+              )}
+              {...register("description")}
+            />
+          </AdminField>
+
+          {/* Not an AdminField: the control is a button, and a <label> around a
+              button misroutes its clicks. Same label/hint markup as AdminField
+              so it stays in step with the fields above it. */}
+          <div>
+            <span className="mb-1 block text-[13px] font-semibold text-adm-ink">
+              Photo <span className="font-normal text-adm-faint">(optional)</span>
+            </span>
+            <span className="mb-1.5 block text-[12px] leading-[1.5] font-normal text-adm-muted">
+              Used on the website&apos;s commodity card. JPG or PNG.
+            </span>
+            <div className="flex flex-wrap items-center gap-3">
+              {/* At REST this is the record's picture, not an upload control.
+                  The page opens read-only, and a 56px inert thumbnail beside a
+                  "Choose photo" button read as a file field that had already
+                  been filled in - so the one screen that should show what a
+                  commodity looks like was the one screen that did not. It only
+                  becomes a picker preview once Edit is pressed. */}
+              {readOnly ? (
+                <ViewablePhoto
+                  className="rounded-[6px]"
+                  name={commodity?.name ?? "Commodity"}
+                  size={96}
+                  src={previewUrl}
+                />
+              ) : previewUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element -- preview
+                <img
+                  src={previewUrl}
+                  alt="Commodity photo"
+                  className="h-14 w-14 flex-none rounded-[4px] border border-adm-line object-cover"
+                />
+              ) : (
+                <span className="flex h-14 w-14 flex-none items-center justify-center rounded-[4px] border border-dashed border-adm-line text-[10px] text-adm-faint">
+                  No photo
+                </span>
+              )}
+              {isEditing ? (
+                <div className="flex flex-wrap gap-2">
                   <AdminButton
                     type="button"
-                    variant="outline"
+                    variant="secondary"
                     className="h-[32px] px-3 text-[12.5px]"
-                    onClick={() => {
-                      setPhotoFile(null);
-                      setRemovePhoto(true);
-                      if (fileInput.current) fileInput.current.value = "";
-                    }}
+                    onClick={() => fileInput.current?.click()}
                   >
-                    Remove
+                    {previewUrl ? "Replace photo" : "Choose photo"}
                   </AdminButton>
-                ) : null}
-              </div>
-            ) : null}
-            <input
-              ref={fileInput}
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0] ?? null;
-                if (file) {
-                  void optimizeImage(file).then((staged) => {
-                    setPhotoFile(staged);
-                    setRemovePhoto(false);
-                  });
-                }
-              }}
-            />
+                  {previewUrl ? (
+                    <AdminButton
+                      type="button"
+                      variant="outline"
+                      className="h-[32px] px-3 text-[12.5px]"
+                      onClick={() => {
+                        setPhotoFile(null);
+                        setRemovePhoto(true);
+                        if (fileInput.current) fileInput.current.value = "";
+                      }}
+                    >
+                      Remove
+                    </AdminButton>
+                  ) : null}
+                </div>
+              ) : null}
+              <input
+                ref={fileInput}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0] ?? null;
+                  if (file) {
+                    void optimizeImage(file).then((staged) => {
+                      setPhotoFile(staged);
+                      setRemovePhoto(false);
+                    });
+                  }
+                }}
+              />
+            </div>
           </div>
-        </AdminField>
+        </section>
 
-        <EditableFormActions
-          mode={!isEdit ? "create" : isEditing ? "editing" : "locked"}
-          saving={saving}
-          createLabel="Create commodity"
-          editLabel="Edit commodity"
-          onEdit={() => setIsEditing(true)}
-          onCancel={() => {
-            if (!isEdit) {
-              router.push(LIST);
-              return;
-            }
-            reset();
-            clearPhotoState();
-            setIsEditing(false);
-          }}
-        />
+        <div className="border-t border-adm-hairline pt-5">
+          <EditableFormActions
+            mode={!isEdit ? "create" : isEditing ? "editing" : "locked"}
+            saving={saving}
+            createLabel="Create commodity"
+            editLabel="Edit commodity"
+            onEdit={() => setIsEditing(true)}
+            onCancel={() => {
+              if (!isEdit) {
+                router.push(LIST);
+                return;
+              }
+              reset();
+              clearPhotoState();
+              setIsEditing(false);
+            }}
+          />
+        </div>
       </form>
     </AdminCard>
   );

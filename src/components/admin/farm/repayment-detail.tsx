@@ -27,7 +27,7 @@ import {
   useGetRepaymentQuery,
   useRemoveRepaymentDocumentMutation,
 } from "@/redux/farm/repayments-api";
-import { avatarOf } from "@/lib/avatar";
+import { ViewablePhoto } from "@/components/admin/photo-view";
 import { FarmDocumentsSection } from "./farm-bits";
 
 const LIST = "/admin/repayments";
@@ -49,7 +49,6 @@ export function RepaymentDetail({ id }: { id: string }) {
     );
 
   const r = data.data.repayment;
-  const a = avatarOf(r.farmer.name);
 
   return (
     <div className="max-w-[1120px]">
@@ -71,32 +70,23 @@ export function RepaymentDetail({ id }: { id: string }) {
               <SectionHeading className="mb-2">
                 Who repaid what
               </SectionHeading>
-              <Link
-                href={`/admin/farmers/${r.farmer.id}`}
-                // The underline belongs to the NAME, not to the photo and the
-                // phone number beside it, so the anchor lends its colour and
-                // its focus ring and hands the rule to the child.
-                className={cn(
-                  adminLinkClass,
-                  "group flex min-w-0 items-center gap-2.5 hover:no-underline",
-                )}
-              >
-                {r.farmer.photoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- Cloudinary
-                  <img
-                    src={r.farmer.photoUrl}
-                    alt={r.farmer.name}
-                    className="h-10 w-10 flex-none rounded-full object-cover"
-                  />
-                ) : (
-                  <span
-                    className="flex h-10 w-10 flex-none items-center justify-center rounded-full text-[13px] font-bold"
-                    style={{ background: a.bg, color: a.fg }}
-                  >
-                    {a.init}
-                  </span>
-                )}
-                <div className="min-w-0">
+              {/* The photo sits BESIDE the link, not inside it: it is now a
+                  ViewablePhoto, which is a button when there is something to
+                  open, and a button nested in an anchor is invalid markup.
+                  Keeping them siblings also keeps the underline on the NAME. */}
+              <div className="flex min-w-0 items-center gap-2.5">
+                <ViewablePhoto
+                  name={r.farmer.name}
+                  size={40}
+                  src={r.farmer.photoUrl}
+                />
+                <Link
+                  href={`/admin/farmers/${r.farmer.id}`}
+                  className={cn(
+                    adminLinkClass,
+                    "group min-w-0 hover:no-underline",
+                  )}
+                >
                   <div className="truncate text-[14px] font-semibold underline-offset-2 group-hover:underline">
                     {r.farmer.name}
                   </div>
@@ -108,8 +98,8 @@ export function RepaymentDetail({ id }: { id: string }) {
                         .join(" · ")}
                     </div>
                   ) : null}
-                </div>
-              </Link>
+                </Link>
+              </div>
               <DetailGrid className="mt-3 border-t border-adm-hairline pt-1">
                 <DetailItem label="Receipt no" mono strong>
                   {r.transactionNo}

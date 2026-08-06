@@ -10,6 +10,7 @@ import {
   AdminField,
   AdminPageHeader,
   adminInputClass,
+  SectionHeading,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
@@ -32,14 +33,6 @@ const ID_TYPE_SUGGESTIONS = [
   "Passport",
   "Driver Licence",
 ];
-
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-      {children}
-    </div>
-  );
-}
 
 /** "" for create, or the record's values for edit. */
 const toFormValues = (farmer?: IFarmer): FarmerValues => ({
@@ -146,43 +139,63 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
         sub="The outgrower's identity, community and guarantors - every input grant is booked against this record"
       />
 
-      <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      {/* Field pairs are measured against this form, not the viewport. The
+          console shell keeps a ~225px rail beside it, so `sm:` fired while the
+          column was still too narrow to carry two labelled inputs. */}
+      <form
+        noValidate
+        onSubmit={handleSubmit(onSubmit)}
+        className="@container flex flex-col gap-4"
+      >
         <AdminCard className="flex flex-col gap-3 px-5 py-4">
-          <SectionLabel>Identity</SectionLabel>
-          <div className="flex items-center gap-4">
-            {preview ? (
-              // eslint-disable-next-line @next/next/no-img-element -- Cloudinary/blob
-              <img
-                src={preview}
-                alt=""
-                className="h-16 w-16 rounded-full object-cover"
+          <SectionHeading
+            className="mb-0"
+            hint="Who this outgrower is, and the ID you verified them against."
+          >
+            Identity
+          </SectionHeading>
+          {/* Not an AdminField: the control here is a button, and wrapping a
+              button in a <label> misroutes its clicks. Same label markup as
+              AdminField so it stays in step with the fields under it. */}
+          <div>
+            <span className="mb-1 block text-[13px] font-semibold text-adm-ink">
+              Photo <span className="font-normal text-adm-faint">(optional)</span>
+            </span>
+            <div className="flex flex-wrap items-center gap-4">
+              {preview ? (
+                // eslint-disable-next-line @next/next/no-img-element -- Cloudinary/blob
+                <img
+                  src={preview}
+                  alt=""
+                  className="h-16 w-16 rounded-full object-cover"
+                />
+              ) : (
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-adm-sunken text-[11px] text-adm-faint">
+                  No photo
+                </div>
+              )}
+              <AdminButton
+                type="button"
+                variant="outline"
+                className="h-9 px-4"
+                onClick={() => photoInput.current?.click()}
+              >
+                {preview ? "Change photo" : "Add photo"}
+              </AdminButton>
+              <input
+                ref={photoInput}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => onPick(e.target.files?.[0])}
               />
-            ) : (
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-adm-sunken text-[11px] text-adm-faint">
-                No photo
-              </div>
-            )}
-            <AdminButton
-              type="button"
-              variant="outline"
-              className="h-9 px-4"
-              onClick={() => photoInput.current?.click()}
-            >
-              {preview ? "Change photo" : "Add photo"}
-            </AdminButton>
-            <input
-              ref={photoInput}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => onPick(e.target.files?.[0])}
-            />
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
             <AdminField label="Name" error={errors.name?.message}>
               <Input
-                placeholder="Abukari Yakubu"
+                placeholder="e.g. Abukari Yakubu"
                 className={cn(adminInputClass, errors.name && "border-console-red")}
                 {...register("name")}
               />
@@ -190,7 +203,7 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
             <AdminField label="Phone" optional error={errors.phone?.message}>
               <Input
                 inputMode="tel"
-                placeholder="024 000 0000"
+                placeholder="e.g. 024 000 0000"
                 className={cn(adminInputClass, errors.phone && "border-console-red")}
                 {...register("phone")}
               />
@@ -212,7 +225,7 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
             <AdminField label="ID type" optional error={errors.idType?.message}>
               <Input
                 list="farmer-id-types"
-                placeholder="Ghana Card, Voter ID…"
+                placeholder="e.g. Ghana Card"
                 className={cn(adminInputClass, errors.idType && "border-console-red")}
                 {...register("idType")}
               />
@@ -224,7 +237,7 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
             </AdminField>
             <AdminField label="ID number" optional error={errors.idNumber?.message}>
               <Input
-                placeholder="GHA-000000000-0"
+                placeholder="e.g. GHA-000000000-0"
                 className={cn(
                   adminInputClass,
                   errors.idNumber && "border-console-red",
@@ -236,11 +249,16 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
         </AdminCard>
 
         <AdminCard className="flex flex-col gap-3 px-5 py-4">
-          <SectionLabel>Location</SectionLabel>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <SectionHeading
+            className="mb-0"
+            hint="Where to find them, and how much land they work."
+          >
+            Where they farm
+          </SectionHeading>
+          <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
             <AdminField label="Community" optional error={errors.community?.message}>
               <Input
-                placeholder="Kumbungu"
+                placeholder="e.g. Kumbungu"
                 className={cn(
                   adminInputClass,
                   errors.community && "border-console-red",
@@ -254,7 +272,7 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
               error={errors.farmLocation?.message}
             >
               <Input
-                placeholder="Near the Bontanga dam"
+                placeholder="e.g. near the Bontanga dam"
                 className={cn(
                   adminInputClass,
                   errors.farmLocation && "border-console-red",
@@ -269,7 +287,7 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
             >
               <Input
                 inputMode="decimal"
-                placeholder="2.5"
+                placeholder="e.g. 2.5"
                 className={cn(
                   adminInputClass,
                   errors.farmSizeAcres && "border-console-red",
@@ -281,6 +299,7 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
           <AdminField label="Address" optional error={errors.address?.message}>
             <textarea
               rows={4}
+              placeholder="e.g. House 12, Sagnarigu, Tamale"
               className={cn(
                 adminInputClass,
                 "h-auto min-h-[60px] w-full resize-y py-2",
@@ -292,14 +311,20 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
         </AdminCard>
 
         <AdminCard className="flex flex-col gap-3 px-5 py-4">
-          <SectionLabel>Contacts &amp; payout</SectionLabel>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <SectionHeading
+            className="mb-0"
+            hint="Who to reach if the farmer cannot be, and the wallet repayments settle to."
+          >
+            Contacts and payout
+          </SectionHeading>
+          <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
             <AdminField
               label="Next of kin name"
               optional
               error={errors.nextOfKinName?.message}
             >
               <Input
+                placeholder="e.g. Fatima Abukari"
                 className={cn(
                   adminInputClass,
                   errors.nextOfKinName && "border-console-red",
@@ -314,7 +339,7 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
             >
               <Input
                 inputMode="tel"
-                placeholder="024 000 0000"
+                placeholder="e.g. 024 000 0000"
                 className={cn(
                   adminInputClass,
                   errors.nextOfKinPhone && "border-console-red",
@@ -329,7 +354,7 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
             >
               <Input
                 inputMode="tel"
-                placeholder="024 000 0000"
+                placeholder="e.g. 024 000 0000"
                 className={cn(
                   adminInputClass,
                   errors.momoNumber && "border-console-red",
@@ -340,9 +365,16 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
           </div>
         </AdminCard>
 
-        <AdminCard className="px-5 py-4">
+        <AdminCard className="flex flex-col gap-3 px-5 py-4">
+          <SectionHeading
+            className="mb-0"
+            hint="Anything about this farmer the next person to open the record should know."
+          >
+            Anything else
+          </SectionHeading>
           <AdminField label="Notes" optional error={errors.notes?.message}>
             <Input
+              placeholder="e.g. Farms with his two brothers"
               className={adminInputClass}
               {...register("notes")}
             />

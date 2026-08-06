@@ -391,7 +391,7 @@ function TopUpDialog({
             <Input
               className={cn(adminInputClass, "font-adminmono")}
               inputMode="decimal"
-              placeholder="0.00"
+              placeholder="e.g. 2000.00"
               {...form.register("amountGhs")}
             />
           </AdminField>

@@ -12,6 +12,7 @@ import {
   AdminField,
   AdminPageHeader,
   DetailShell,
+  SectionHeading,
   ToneBadge,
   adminInputClass,
 } from "@/components/admin/ui";
@@ -40,14 +41,6 @@ import {
   profileSchema,
   type ProfileValues,
 } from "@/validations/auth-schema";
-
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="mb-3.5 text-[10.5px] font-bold tracking-[0.1em] text-adm-faint uppercase">
-      {children}
-    </div>
-  );
-}
 
 /* ── Profile photo (managed on its own - no Edit mode required) ──────────── */
 
@@ -220,12 +213,16 @@ function ProfileEditForm({
   };
 
   return (
+    // Field pairs measure against this form, not the viewport: the console
+    // shell keeps a ~225px rail beside it, so `sm:` paired the names up while
+    // the column was still too narrow for two.
     <form
       noValidate
       onSubmit={handleSubmit(onSubmit)}
-      className="grid max-w-[560px] gap-[15px]"
+      className="@container grid max-w-[560px] gap-[15px]"
     >
-      <div className="grid gap-[15px] sm:grid-cols-2">
+      <SectionHeading className="mb-0">Your details</SectionHeading>
+      <div className="grid gap-[15px] @min-[440px]:grid-cols-2">
         <AdminField label="First name" error={errors.firstName?.message}>
           <Input
             placeholder="e.g. Abdul"
@@ -254,7 +251,7 @@ function ProfileEditForm({
       >
         <Input
           type="email"
-          placeholder="you@dbplus.com"
+          placeholder="e.g. you@dbplus.com"
           className={cn(adminInputClass, errors.email && "border-console-red")}
           {...register("email")}
         />
@@ -262,7 +259,7 @@ function ProfileEditForm({
       <AdminField label="Phone" optional error={errors.phone?.message}>
         <Input
           type="tel"
-          placeholder="024 000 0000"
+          placeholder="e.g. 024 000 0000"
           className={cn(adminInputClass, errors.phone && "border-console-red")}
           {...register("phone")}
         />
@@ -344,12 +341,12 @@ function PasswordCard() {
 
   return (
     <AdminCard className="px-6 py-[18px]">
-      <SectionLabel>Password</SectionLabel>
+      <SectionHeading>Password</SectionHeading>
       {open ? (
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="grid max-w-[560px] gap-[15px]"
+          className="@container grid max-w-[560px] gap-[15px]"
         >
           <AdminField
             label="Current password"
@@ -357,7 +354,7 @@ function PasswordCard() {
           >
             <PasswordInput
               autoComplete="current-password"
-              placeholder="Enter your current password"
+              placeholder="The one you sign in with now"
               className={cn(
                 adminInputClass,
                 errors.currentPassword && "border-console-red",
@@ -365,7 +362,7 @@ function PasswordCard() {
               {...register("currentPassword")}
             />
           </AdminField>
-          <div className="grid gap-[15px] sm:grid-cols-2">
+          <div className="grid gap-[15px] @min-[440px]:grid-cols-2">
             <AdminField label="New password" error={errors.newPassword?.message}>
               <PasswordInput
                 autoComplete="new-password"
@@ -383,7 +380,7 @@ function PasswordCard() {
             >
               <PasswordInput
                 autoComplete="new-password"
-                placeholder="Repeat the new password"
+                placeholder="Type the new one again"
                 className={cn(
                   adminInputClass,
                   errors.confirm && "border-console-red",
@@ -574,7 +571,7 @@ function TwoFactorCard() {
 
   return (
     <AdminCard className="px-6 py-[18px]">
-      <SectionLabel>Two-factor authentication</SectionLabel>
+      <SectionHeading>Two-factor authentication</SectionHeading>
       <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <div className="text-[13.5px] font-semibold text-adm-ink">

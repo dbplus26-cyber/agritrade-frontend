@@ -213,62 +213,48 @@ export function SeasonDetail({ id }: { id: string }) {
                 The season plans against what actually came back - the read
                 that makes next season&apos;s grant decisions better informed.
               </p>
+              {/* Four facts, so they keep a four-column grid rather than
+                  DetailGrid's auto-fit - but the pairs themselves are
+                  DetailItems, which they used to hand-roll a size adrift. */}
               <div className="grid grid-cols-2 gap-x-8 gap-y-1 sm:grid-cols-4">
-                <div className="border-b border-adm-hairline py-2">
-                  <p className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                    <span className="min-w-0">Expected yield</span>
-                    <HelpTip
-                      label="What is Expected yield?"
-                      text="The produce this season's grants were meant to bring back, added up across every farmer."
-                    />
-                  </p>
-                  <Mono className="text-[14px]">
-                    {formatKg(stats.expectations.expectedYieldKg)}
-                  </Mono>
-                </div>
-                <div className="border-b border-adm-hairline py-2">
-                  <p className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                    <span className="min-w-0">Actual yield</span>
-                    <HelpTip
-                      label="What is Actual yield?"
-                      text="The produce farmers have actually brought back to you this season."
-                    />
-                  </p>
-                  <Mono
+                <DetailItem
+                  label="Expected yield"
+                  mono
+                  hint="The produce this season's grants were meant to bring back, added up across every farmer."
+                >
+                  {formatKg(stats.expectations.expectedYieldKg)}
+                </DetailItem>
+                <DetailItem
+                  label="Actual yield"
+                  mono
+                  hint="The produce farmers have actually brought back to you this season."
+                >
+                  {/* Green only when the season has met what it planned for. */}
+                  <span
                     className={
                       stats.expectations.actualYieldKg >=
                       stats.expectations.expectedYieldKg
-                        ? "text-[14px] text-console"
-                        : "text-[14px]"
+                        ? "text-console"
+                        : undefined
                     }
                   >
                     {formatKg(stats.expectations.actualYieldKg)}
-                  </Mono>
-                </div>
-                <div className="border-b border-adm-hairline py-2">
-                  <p className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                    <span className="min-w-0">Expected return</span>
-                    <HelpTip
-                      label="What is Expected return?"
-                      text="What the expected produce was reckoned to be worth when the grants went out."
-                    />
-                  </p>
-                  <Mono className="text-[14px]">
-                    <Money value={stats.expectations.expectedReturnGhs} />
-                  </Mono>
-                </div>
-                <div className="border-b border-adm-hairline py-2">
-                  <p className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                    <span className="min-w-0">Actual return</span>
-                    <HelpTip
-                      label="What is Actual return?"
-                      text="What the produce farmers actually brought back was worth when it was taken in."
-                    />
-                  </p>
-                  <Mono className="text-[14px]">
-                    <Money value={stats.expectations.actualReturnGhs} />
-                  </Mono>
-                </div>
+                  </span>
+                </DetailItem>
+                <DetailItem
+                  label="Expected return"
+                  mono
+                  hint="What the expected produce was reckoned to be worth when the grants went out."
+                >
+                  <Money value={stats.expectations.expectedReturnGhs} />
+                </DetailItem>
+                <DetailItem
+                  label="Actual return"
+                  mono
+                  hint="What the produce farmers actually brought back was worth when it was taken in."
+                >
+                  <Money value={stats.expectations.actualReturnGhs} />
+                </DetailItem>
               </div>
             </AdminCard>
           ) : null}

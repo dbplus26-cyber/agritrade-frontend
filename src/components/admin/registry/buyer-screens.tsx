@@ -492,252 +492,284 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
 
   return (
     <AdminCard className="px-5 py-[18px]">
+      {/* Field pairs measure against this form, not the viewport: the console
+          shell keeps a ~225px rail beside it, so `sm:` paired fields up while
+          the column was still too narrow to carry two of them. */}
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col gap-[13px]"
+        className="@container flex flex-col gap-5"
       >
-        <div className="flex items-center gap-3.5">
-          {previewUrl && readOnly ? (
-            <button
-              type="button"
-              onClick={() => setViewPhoto(true)}
-              aria-label="View photo"
-              title="View photo"
-              className="cursor-zoom-in rounded-full outline-none focus-visible:ring-2 focus-visible:ring-console/40"
-            >
-              <RegistryAvatar
-                name={avatarName}
-                photoUrl={previewUrl}
-                size={64}
-              />
-            </button>
-          ) : (
-            <RegistryAvatar name={avatarName} photoUrl={previewUrl} size={64} />
-          )}
-          {isEditing ? (
-            <div className="flex flex-wrap gap-2">
-              <AdminButton
-                type="button"
-                variant="secondary"
-                className="h-[32px] px-3 text-[12.5px]"
-                onClick={() => fileInput.current?.click()}
-              >
-                {previewUrl ? "Change photo" : "Add photo"}
-              </AdminButton>
-              {previewUrl ? (
-                <AdminButton
+        <section className="flex flex-col gap-[13px]">
+          <SectionHeading className="mb-0">Who they are</SectionHeading>
+          {/* Not an AdminField: the control is a button, and a <label> around
+              a button misroutes its clicks. Same label markup as AdminField so
+              it stays in step with the fields under it. */}
+          <div>
+            <span className="mb-1 block text-[13px] font-semibold text-adm-ink">
+              Photo <span className="font-normal text-adm-faint">(optional)</span>
+            </span>
+            <div className="flex flex-wrap items-center gap-3.5">
+              {previewUrl && readOnly ? (
+                <button
                   type="button"
-                  variant="outline"
-                  className="h-[32px] px-3 text-[12.5px]"
-                  onClick={() => {
-                    setPhotoFile(null);
-                    setRemovePhoto(true);
-                    if (fileInput.current) fileInput.current.value = "";
-                  }}
+                  onClick={() => setViewPhoto(true)}
+                  aria-label="View photo"
+                  title="View photo"
+                  className="cursor-zoom-in rounded-full outline-none focus-visible:ring-2 focus-visible:ring-console/40"
                 >
-                  Remove photo
-                </AdminButton>
+                  <RegistryAvatar
+                    name={avatarName}
+                    photoUrl={previewUrl}
+                    size={64}
+                  />
+                </button>
+              ) : (
+                <RegistryAvatar name={avatarName} photoUrl={previewUrl} size={64} />
+              )}
+              {isEditing ? (
+                <div className="flex flex-wrap gap-2">
+                  <AdminButton
+                    type="button"
+                    variant="secondary"
+                    className="h-[32px] px-3 text-[12.5px]"
+                    onClick={() => fileInput.current?.click()}
+                  >
+                    {previewUrl ? "Change photo" : "Add photo"}
+                  </AdminButton>
+                  {previewUrl ? (
+                    <AdminButton
+                      type="button"
+                      variant="outline"
+                      className="h-[32px] px-3 text-[12.5px]"
+                      onClick={() => {
+                        setPhotoFile(null);
+                        setRemovePhoto(true);
+                        if (fileInput.current) fileInput.current.value = "";
+                      }}
+                    >
+                      Remove photo
+                    </AdminButton>
+                  ) : null}
+                </div>
               ) : null}
+              <input
+                ref={fileInput}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    void optimizeImage(file).then((staged) => {
+                      setPhotoFile(staged);
+                      setRemovePhoto(false);
+                    });
+                  }
+                }}
+              />
             </div>
+          </div>
+          {previewUrl ? (
+            <PhotoViewDialog
+              src={previewUrl}
+              name={avatarName || "Buyer photo"}
+              open={viewPhoto}
+              onOpenChange={setViewPhoto}
+            />
           ) : null}
-          <input
-            ref={fileInput}
-            type="file"
-            accept="image/png,image/jpeg,image/webp"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                void optimizeImage(file).then((staged) => {
-                  setPhotoFile(staged);
-                  setRemovePhoto(false);
-                });
+          <AdminField label="Name" error={errors.name?.message}>
+            <Input
+              placeholder="e.g. Accra Grain Traders"
+              disabled={readOnly}
+              className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
+              {...register("name")}
+            />
+          </AdminField>
+        </section>
+
+        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+          <SectionHeading
+            className="mb-0"
+            hint="Every way of reaching this buyer, and where they take delivery."
+          >
+            How to reach them
+          </SectionHeading>
+          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+            <AdminField label="Phone" optional error={errors.phone?.message}>
+              <Input
+                type="tel"
+                placeholder="e.g. 055 000 0000"
+                disabled={readOnly}
+                className={cn(adminInputClass, roCls, errors.phone && "border-console-red")}
+                {...register("phone")}
+              />
+            </AdminField>
+            {/* A second line reaching the SAME person. Traders here carry two
+                networks, and the number on file is the one that is off when a
+                truck is at the gate. */}
+            <AdminField
+              label="Other phone"
+              optional
+              error={errors.altPhone?.message}
+            >
+              <Input
+                type="tel"
+                placeholder="e.g. 024 000 0000"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.altPhone && "border-console-red",
+                )}
+                {...register("altPhone")}
+              />
+            </AdminField>
+            <AdminField label="Email" optional error={errors.email?.message}>
+              <Input
+                type="email"
+                placeholder="e.g. orders@accragrain.com"
+                disabled={readOnly}
+                className={cn(adminInputClass, roCls, errors.email && "border-console-red")}
+                {...register("email")}
+              />
+            </AdminField>
+            <AdminField label="City" optional error={errors.city?.message}>
+              <Input
+                placeholder="e.g. Accra"
+                disabled={readOnly}
+                className={cn(adminInputClass, roCls, errors.city && "border-console-red")}
+                {...register("city")}
+              />
+            </AdminField>
+          </div>
+          <AdminField label="Address" optional error={errors.address?.message}>
+            <Input
+              placeholder="e.g. Plot 5, Spintex Road, Accra"
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                errors.address && "border-console-red",
+              )}
+              {...register("address")}
+            />
+          </AdminField>
+        </section>
+
+        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+          <SectionHeading
+            className="mb-0"
+            hint="The registered company behind the buyer, and the person who answers for it."
+          >
+            Business
+          </SectionHeading>
+          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+            <AdminField
+              label="Business name"
+              optional
+              error={errors.businessName?.message}
+            >
+              <Input
+                placeholder="e.g. Accra Grain Traders Ltd"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.businessName && "border-console-red",
+                )}
+                {...register("businessName")}
+              />
+            </AdminField>
+            <AdminField
+              label="Registration number"
+              optional
+              error={errors.registrationNumber?.message}
+            >
+              <Input
+                placeholder="e.g. CS123456789"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  "font-adminmono",
+                  errors.registrationNumber && "border-console-red",
+                )}
+                {...register("registrationNumber")}
+              />
+            </AdminField>
+            <AdminField
+              label="Contact person name"
+              optional
+              error={errors.contactPersonName?.message}
+            >
+              <Input
+                placeholder="e.g. Ama Mensah"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.contactPersonName && "border-console-red",
+                )}
+                {...register("contactPersonName")}
+              />
+            </AdminField>
+            <AdminField
+              label="Contact person phone"
+              optional
+              error={errors.contactPersonPhone?.message}
+            >
+              <Input
+                type="tel"
+                placeholder="e.g. 055 000 0000"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.contactPersonPhone && "border-console-red",
+                )}
+                {...register("contactPersonPhone")}
+              />
+            </AdminField>
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+          <SectionHeading className="mb-0">Anything else</SectionHeading>
+          <AdminField label="Notes" optional error={errors.notes?.message}>
+            <textarea
+              rows={4}
+              placeholder="e.g. Only takes full 30-tonne loads"
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                "h-auto min-h-[104px] w-full resize-y py-2",
+                errors.notes && "border-console-red",
+              )}
+              {...register("notes")}
+            />
+          </AdminField>
+        </section>
+
+        <div className="border-t border-adm-hairline pt-5">
+          <EditableFormActions
+            mode={!isEdit ? "create" : isEditing ? "editing" : "locked"}
+            saving={saving}
+            createLabel="Create buyer"
+            editLabel="Edit buyer"
+            onEdit={() => setIsEditing(true)}
+            onCancel={() => {
+              if (!isEdit) {
+                router.push(LIST);
+                return;
               }
+              reset();
+              clearPhotoState();
+              setIsEditing(false);
             }}
           />
         </div>
-        {previewUrl ? (
-          <PhotoViewDialog
-            src={previewUrl}
-            name={avatarName || "Buyer photo"}
-            open={viewPhoto}
-            onOpenChange={setViewPhoto}
-          />
-        ) : null}
-        <AdminField label="Name" error={errors.name?.message}>
-          <Input
-            placeholder="e.g. Accra Grain Traders"
-            disabled={readOnly}
-            className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
-            {...register("name")}
-          />
-        </AdminField>
-        <div className="grid gap-[13px] sm:grid-cols-2">
-          <AdminField label="Phone" optional error={errors.phone?.message}>
-            <Input
-              type="tel"
-              placeholder="055 000 0000"
-              disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.phone && "border-console-red")}
-              {...register("phone")}
-            />
-          </AdminField>
-          {/* A second line reaching the SAME person. Traders here carry two
-              networks, and the number on file is the one that is off when a
-              truck is at the gate. */}
-          <AdminField
-            label="Other phone"
-            optional
-            error={errors.altPhone?.message}
-          >
-            <Input
-              type="tel"
-              placeholder="024 000 0000"
-              disabled={readOnly}
-              className={cn(
-                adminInputClass,
-                roCls,
-                errors.altPhone && "border-console-red",
-              )}
-              {...register("altPhone")}
-            />
-          </AdminField>
-          <AdminField label="City" optional error={errors.city?.message}>
-            <Input
-              placeholder="e.g. Accra"
-              disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.city && "border-console-red")}
-              {...register("city")}
-            />
-          </AdminField>
-        </div>
-        <AdminField label="Email" optional error={errors.email?.message}>
-          <Input
-            type="email"
-            placeholder="orders@buyer.com"
-            disabled={readOnly}
-            className={cn(adminInputClass, roCls, errors.email && "border-console-red")}
-            {...register("email")}
-          />
-        </AdminField>
-        <AdminField label="Address" optional error={errors.address?.message}>
-          <Input
-            placeholder="e.g. Plot 5, Spintex Road, Accra"
-            disabled={readOnly}
-            className={cn(
-              adminInputClass,
-              roCls,
-              errors.address && "border-console-red",
-            )}
-            {...register("address")}
-          />
-        </AdminField>
-        {/* The rule stays on the wrapper - it divides the contact block from
-            the business one - and the heading carries only its own text. */}
-        <div className="mt-1 border-t border-adm-hairline pt-3">
-          <SectionHeading className="mb-0">Business</SectionHeading>
-        </div>
-        <div className="grid gap-[13px] sm:grid-cols-2">
-          <AdminField
-            label="Business name"
-            optional
-            error={errors.businessName?.message}
-          >
-            <Input
-              placeholder="e.g. Accra Grain Traders Ltd"
-              disabled={readOnly}
-              className={cn(
-                adminInputClass,
-                roCls,
-                errors.businessName && "border-console-red",
-              )}
-              {...register("businessName")}
-            />
-          </AdminField>
-          <AdminField
-            label="Registration number"
-            optional
-            error={errors.registrationNumber?.message}
-          >
-            <Input
-              placeholder="e.g. CS123456789"
-              disabled={readOnly}
-              className={cn(
-                adminInputClass,
-                roCls,
-                "font-adminmono",
-                errors.registrationNumber && "border-console-red",
-              )}
-              {...register("registrationNumber")}
-            />
-          </AdminField>
-        </div>
-        <div className="grid gap-[13px] sm:grid-cols-2">
-          <AdminField
-            label="Contact person name"
-            optional
-            error={errors.contactPersonName?.message}
-          >
-            <Input
-              placeholder="e.g. Ama Mensah"
-              disabled={readOnly}
-              className={cn(
-                adminInputClass,
-                roCls,
-                errors.contactPersonName && "border-console-red",
-              )}
-              {...register("contactPersonName")}
-            />
-          </AdminField>
-          <AdminField
-            label="Contact person phone"
-            optional
-            error={errors.contactPersonPhone?.message}
-          >
-            <Input
-              type="tel"
-              placeholder="055 000 0000"
-              disabled={readOnly}
-              className={cn(
-                adminInputClass,
-                roCls,
-                errors.contactPersonPhone && "border-console-red",
-              )}
-              {...register("contactPersonPhone")}
-            />
-          </AdminField>
-        </div>
-        <AdminField label="Notes" optional error={errors.notes?.message}>
-          <textarea
-            rows={4}
-            placeholder="Anything worth remembering about this buyer."
-            disabled={readOnly}
-            className={cn(
-              adminInputClass,
-              roCls,
-              "h-auto min-h-[104px] w-full resize-y py-2",
-              errors.notes && "border-console-red",
-            )}
-            {...register("notes")}
-          />
-        </AdminField>
-        <EditableFormActions
-          mode={!isEdit ? "create" : isEditing ? "editing" : "locked"}
-          saving={saving}
-          createLabel="Create buyer"
-          editLabel="Edit buyer"
-          onEdit={() => setIsEditing(true)}
-          onCancel={() => {
-            if (!isEdit) {
-              router.push(LIST);
-              return;
-            }
-            reset();
-            clearPhotoState();
-            setIsEditing(false);
-          }}
-        />
       </form>
     </AdminCard>
   );

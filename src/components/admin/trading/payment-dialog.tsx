@@ -8,6 +8,7 @@ import {
   AdminButton,
   AdminField,
   Mono,
+  SectionHeading,
   adminInputClass,
   adminSelectClass,
 } from "@/components/admin/ui";
@@ -277,135 +278,150 @@ export function PaymentDialog({
           </p>
         ) : null}
 
+        {/* Pairs measure against this form rather than the viewport: inside a
+            dialog the sheet has its own width, so a viewport query fires on
+            screen size and not on the room the fields actually have. */}
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-3"
+          className="@container flex flex-col gap-5"
         >
-          {/* The amount is what this dialog is FOR, so it is the one oversized
-              field: a mono figure at cheque size with the currency standing
-              outside it, not a 14px box like the reference beside it. */}
-          <AdminField label="Amount (GHS)" error={errors.amountGhs?.message}>
-            <div className="relative">
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-[15px] font-semibold text-adm-faint"
-              >
-                GH₵
-              </span>
-              <Input
-                inputMode="decimal"
-                placeholder="0.00"
-                className={cn(
-                  adminInputClass,
-                  "font-adminmono h-[54px] pl-[54px] text-[20px] font-bold tabular-nums",
-                  errors.amountGhs && "border-console-red",
-                )}
-                {...register("amountGhs")}
-              />
-            </div>
-          </AdminField>
-
-          {/* Quick fills state their figure so admins confirm, not compute.
-              Two split the width evenly, one takes all of it. They are absent
-              whenever the figures are redacted - there is nothing to fill. */}
-          {quickFills.length > 0 ? (
-            <div
-              className={cn(
-                "grid gap-2",
-                quickFills.length > 1 && "min-[380px]:grid-cols-2",
-              )}
-            >
-              {quickFills.map((f) => (
-                <button
-                  key={f.key}
-                  type="button"
-                  onClick={() => fillAmount(f.amount)}
-                  className="flex w-full cursor-pointer flex-col items-start gap-0.5 rounded-[6px] border border-adm-line bg-adm-card px-3 py-2 text-left transition-colors outline-none hover:border-console hover:bg-console/[0.04] focus-visible:border-console focus-visible:ring-3 focus-visible:ring-leaf/30"
+          <section className="flex flex-col gap-3">
+            <SectionHeading className="mb-0">How much</SectionHeading>
+            {/* The amount is what this dialog is FOR, so it is the one oversized
+                field: a mono figure at cheque size with the currency standing
+                outside it, not a 14px box like the reference beside it. */}
+            <AdminField label="Amount (GHS)" error={errors.amountGhs?.message}>
+              <div className="relative">
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-[15px] font-semibold text-adm-faint"
                 >
-                  <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                    {f.label}
-                  </span>
-                  <Mono className="text-[15px] font-bold text-adm-ink">
-                    {formatCedis(f.amount)}
-                  </Mono>
-                </button>
-              ))}
-            </div>
-          ) : null}
-
-          {/* How it arrived and when - a pair of short fields, so they share
-              a row rather than each claiming one. */}
-          {/* `justify-end` on both cells: "Payment date - optional" wraps to
-              two lines in a narrow column while "Method" does not, and without
-              it the two controls would sit at different heights. */}
-          <div className="grid gap-3 min-[380px]:grid-cols-2">
-            <AdminField
-              label="Method"
-              error={errors.method?.message}
-              // items-stretch/gap-0 undo the shadcn Label base (`flex
-              // items-center gap-2`), which would otherwise centre the
-              // label over its control once this cell is a column.
-              className="flex flex-col items-stretch justify-end gap-0"
-            >
-              <select
-                className={cn(adminSelectClass, "w-full")}
-                {...register("method")}
-              >
-                {PAYMENT_METHOD_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
+                  GH₵
+                </span>
+                <Input
+                  inputMode="decimal"
+                  placeholder="e.g. 850.00"
+                  className={cn(
+                    adminInputClass,
+                    "font-adminmono h-[54px] pl-[54px] text-[20px] font-bold tabular-nums",
+                    errors.amountGhs && "border-console-red",
+                  )}
+                  {...register("amountGhs")}
+                />
+              </div>
             </AdminField>
+
+            {/* Quick fills state their figure so admins confirm, not compute.
+                Two split the width evenly, one takes all of it. They are absent
+                whenever the figures are redacted - there is nothing to fill. */}
+            {quickFills.length > 0 ? (
+              <div
+                className={cn(
+                  "grid gap-2",
+                  quickFills.length > 1 && "@min-[380px]:grid-cols-2",
+                )}
+              >
+                {quickFills.map((f) => (
+                  <button
+                    key={f.key}
+                    type="button"
+                    onClick={() => fillAmount(f.amount)}
+                    className="flex w-full cursor-pointer flex-col items-start gap-0.5 rounded-[6px] border border-adm-line bg-adm-card px-3 py-2 text-left transition-colors outline-none hover:border-console hover:bg-console/[0.04] focus-visible:border-console focus-visible:ring-3 focus-visible:ring-leaf/30"
+                  >
+                    <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+                      {f.label}
+                    </span>
+                    <Mono className="text-[15px] font-bold text-adm-ink">
+                      {formatCedis(f.amount)}
+                    </Mono>
+                  </button>
+                ))}
+              </div>
+            ) : null}
+
+          </section>
+
+          <section className="flex flex-col gap-3 border-t border-adm-hairline pt-5">
+            <SectionHeading
+              className="mb-0"
+              hint="How the money reached you, and the trail that proves it did."
+            >
+              How it arrived
+            </SectionHeading>
+            {/* How it arrived and when - a pair of short fields, so they share
+                a row rather than each claiming one. */}
+            {/* `justify-end` on both cells: "Payment date - optional" wraps to
+                two lines in a narrow column while "Method" does not, and without
+                it the two controls would sit at different heights. */}
+            <div className="grid gap-3 @min-[380px]:grid-cols-2">
+              <AdminField
+                label="Method"
+                error={errors.method?.message}
+                // items-stretch/gap-0 undo the shadcn Label base (`flex
+                // items-center gap-2`), which would otherwise centre the
+                // label over its control once this cell is a column.
+                className="flex flex-col items-stretch justify-end gap-0"
+              >
+                <select
+                  className={cn(adminSelectClass, "w-full")}
+                  {...register("method")}
+                >
+                  {PAYMENT_METHOD_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </AdminField>
+              <AdminField
+                label="Payment date"
+                optional
+                // items-stretch/gap-0 undo the shadcn Label base (`flex
+                // items-center gap-2`), which would otherwise centre the
+                // label over its control once this cell is a column.
+                className="flex flex-col items-stretch justify-end gap-0"
+              >
+                <Input
+                  type="date"
+                  className={adminInputClass}
+                  {...register("paidAt")}
+                />
+              </AdminField>
+            </div>
+
+            {/* Which company account the money landed in. Required for a
+                transfer - it is what the bank statement is reconciled against;
+                cash sits in the till. */}
+            <PaymentAccountField
+              method={method}
+              direction="in"
+              error={errors.paymentAccountId?.message}
+              onChange={(v) => setValue("paymentAccountId", v)}
+              value={watch("paymentAccountId") ?? ""}
+            />
+
+            {/* Required for a transfer: it is what stops the same payment being
+                recorded against the order twice. Cash has nothing to quote. */}
             <AdminField
-              label="Payment date"
-              optional
-              // items-stretch/gap-0 undo the shadcn Label base (`flex
-              // items-center gap-2`), which would otherwise centre the
-              // label over its control once this cell is a column.
-              className="flex flex-col items-stretch justify-end gap-0"
+              label="Reference"
+              optional={method === "CASH"}
+              hint={
+                method === "CASH"
+                  ? undefined
+                  : "The transaction ID on the transfer. It is what stops this being recorded twice."
+              }
+              error={errors.reference?.message}
             >
               <Input
-                type="date"
-                className={adminInputClass}
-                {...register("paidAt")}
+                className={cn(adminInputClass, errors.reference && "border-console-red")}
+                placeholder={
+                  method === "MOMO" ? "e.g. MP260118.1432.A12345" : "e.g. FT26018XYZ12"
+                }
+                {...register("reference")}
               />
             </AdminField>
-          </div>
-
-          {/* Which company account the money landed in. Required for a
-              transfer - it is what the bank statement is reconciled against;
-              cash sits in the till. */}
-          <PaymentAccountField
-            method={method}
-            direction="in"
-            error={errors.paymentAccountId?.message}
-            onChange={(v) => setValue("paymentAccountId", v)}
-            value={watch("paymentAccountId") ?? ""}
-          />
-
-          {/* Required for a transfer: it is what stops the same payment being
-              recorded against the order twice. Cash has nothing to quote. */}
-          <AdminField
-            label="Reference"
-            optional={method === "CASH"}
-            hint={
-              method === "CASH"
-                ? undefined
-                : "The transaction ID on the transfer. It is what stops this being recorded twice."
-            }
-            error={errors.reference?.message}
-          >
-            <Input
-              className={cn(adminInputClass, errors.reference && "border-console-red")}
-              placeholder={
-                method === "MOMO" ? "MoMo transaction ID" : "Bank reference"
-              }
-              {...register("reference")}
-            />
-          </AdminField>
+          </section>
 
           <ResponsiveDialogFooter className="gap-2">
             <AdminButton

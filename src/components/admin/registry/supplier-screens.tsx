@@ -614,285 +614,319 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
 
   return (
     <AdminCard className="px-5 py-[18px]">
+      {/* Field pairs measure against this form, not the viewport: the console
+          shell keeps a ~225px rail beside it, so `sm:` paired fields up while
+          the column was still too narrow to carry two of them. */}
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col gap-[13px]"
+        className="@container flex flex-col gap-5"
       >
-        <div className="flex items-center gap-3.5">
-          {previewUrl && readOnly ? (
-            <button
-              type="button"
-              onClick={() => setViewPhoto(true)}
-              aria-label="View photo"
-              title="View photo"
-              className="cursor-zoom-in rounded-full outline-none focus-visible:ring-2 focus-visible:ring-console/40"
-            >
-              <RegistryAvatar
-                name={avatarName}
-                photoUrl={previewUrl}
-                size={64}
-              />
-            </button>
-          ) : (
-            <RegistryAvatar name={avatarName} photoUrl={previewUrl} size={64} />
-          )}
-          {isEditing ? (
-            <div className="flex flex-wrap gap-2">
-              <AdminButton
-                type="button"
-                variant="secondary"
-                className="h-[32px] px-3 text-[12.5px]"
-                onClick={() => fileInput.current?.click()}
-              >
-                {previewUrl ? "Change photo" : "Add photo"}
-              </AdminButton>
-              {previewUrl ? (
-                <AdminButton
+        <section className="flex flex-col gap-[13px]">
+          <SectionHeading className="mb-0">Who they are</SectionHeading>
+          {/* Not an AdminField: the control is a button, and a <label> around
+              a button misroutes its clicks. Same label markup as AdminField so
+              it stays in step with the fields under it. */}
+          <div>
+            <span className="mb-1 block text-[13px] font-semibold text-adm-ink">
+              Photo <span className="font-normal text-adm-faint">(optional)</span>
+            </span>
+            <div className="flex flex-wrap items-center gap-3.5">
+              {previewUrl && readOnly ? (
+                <button
                   type="button"
-                  variant="outline"
-                  className="h-[32px] px-3 text-[12.5px]"
-                  onClick={() => {
-                    setPhotoFile(null);
-                    setRemovePhoto(true);
-                    if (fileInput.current) fileInput.current.value = "";
-                  }}
+                  onClick={() => setViewPhoto(true)}
+                  aria-label="View photo"
+                  title="View photo"
+                  className="cursor-zoom-in rounded-full outline-none focus-visible:ring-2 focus-visible:ring-console/40"
                 >
-                  Remove photo
-                </AdminButton>
+                  <RegistryAvatar
+                    name={avatarName}
+                    photoUrl={previewUrl}
+                    size={64}
+                  />
+                </button>
+              ) : (
+                <RegistryAvatar name={avatarName} photoUrl={previewUrl} size={64} />
+              )}
+              {isEditing ? (
+                <div className="flex flex-wrap gap-2">
+                  <AdminButton
+                    type="button"
+                    variant="secondary"
+                    className="h-[32px] px-3 text-[12.5px]"
+                    onClick={() => fileInput.current?.click()}
+                  >
+                    {previewUrl ? "Change photo" : "Add photo"}
+                  </AdminButton>
+                  {previewUrl ? (
+                    <AdminButton
+                      type="button"
+                      variant="outline"
+                      className="h-[32px] px-3 text-[12.5px]"
+                      onClick={() => {
+                        setPhotoFile(null);
+                        setRemovePhoto(true);
+                        if (fileInput.current) fileInput.current.value = "";
+                      }}
+                    >
+                      Remove photo
+                    </AdminButton>
+                  ) : null}
+                </div>
               ) : null}
+              <input
+                ref={fileInput}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    void optimizeImage(file).then((staged) => {
+                      setPhotoFile(staged);
+                      setRemovePhoto(false);
+                    });
+                  }
+                }}
+              />
             </div>
+          </div>
+          {previewUrl ? (
+            <PhotoViewDialog
+              src={previewUrl}
+              name={avatarName || "Supplier photo"}
+              open={viewPhoto}
+              onOpenChange={setViewPhoto}
+            />
           ) : null}
-          <input
-            ref={fileInput}
-            type="file"
-            accept="image/png,image/jpeg,image/webp"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                void optimizeImage(file).then((staged) => {
-                  setPhotoFile(staged);
-                  setRemovePhoto(false);
-                });
+          <AdminField label="Name" error={errors.name?.message}>
+            <Input
+              placeholder="e.g. Ibrahim Fuseini"
+              disabled={readOnly}
+              className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
+              {...register("name")}
+            />
+          </AdminField>
+          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+            <AdminField
+              label="Source type"
+              hint="Individual farmer, corporate seller, or an agent-recorded source."
+            >
+              <Controller
+                control={control}
+                name="sourceType"
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={readOnly}
+                  >
+                    <SelectTrigger className={cn(adminSelectClass, roCls, "w-full")}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SOURCE_OPTIONS.map((source) => (
+                        <SelectItem key={source} value={source}>
+                          {SOURCE_LABEL[source]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </AdminField>
+            <AdminField
+              label="ID number"
+              optional
+              hint="Ghana Card or another official ID."
+              error={errors.idNumber?.message}
+            >
+              <Input
+                placeholder="e.g. GHA-000000000-0"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.idNumber && "border-console-red",
+                )}
+                {...register("idNumber")}
+              />
+            </AdminField>
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+          <SectionHeading
+            className="mb-0"
+            hint="Every way of reaching this supplier, and where they are."
+          >
+            How to reach them
+          </SectionHeading>
+          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+            <AdminField label="Phone" optional error={errors.phone?.message}>
+              <Input
+                type="tel"
+                placeholder="e.g. 024 000 0000"
+                disabled={readOnly}
+                className={cn(adminInputClass, roCls, errors.phone && "border-console-red")}
+                {...register("phone")}
+              />
+            </AdminField>
+            {/* A second line reaching the SAME person. Traders here carry two
+                networks, and the number on file is the one that is off when a
+                truck is at the gate. */}
+            <AdminField
+              label="Other phone"
+              optional
+              error={errors.altPhone?.message}
+            >
+              <Input
+                type="tel"
+                placeholder="e.g. 055 000 0000"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.altPhone && "border-console-red",
+                )}
+                {...register("altPhone")}
+              />
+            </AdminField>
+            <AdminField label="Email" optional error={errors.email?.message}>
+              <Input
+                type="email"
+                placeholder="e.g. ibrahim@example.com"
+                disabled={readOnly}
+                className={cn(adminInputClass, roCls, errors.email && "border-console-red")}
+                {...register("email")}
+              />
+            </AdminField>
+            <AdminField
+              label="Community"
+              optional
+              error={errors.community?.message}
+            >
+              <Input
+                placeholder="e.g. Savelugu"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.community && "border-console-red",
+                )}
+                {...register("community")}
+              />
+            </AdminField>
+          </div>
+          <AdminField label="Address" optional error={errors.address?.message}>
+            <Input
+              placeholder="e.g. House No. 12, Savelugu"
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                errors.address && "border-console-red",
+              )}
+              {...register("address")}
+            />
+          </AdminField>
+        </section>
+
+        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+          <SectionHeading
+            className="mb-0"
+            hint="Where money owed to this supplier is sent."
+          >
+            Payout details
+          </SectionHeading>
+          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+            <AdminField label="Bank name" optional error={errors.bankName?.message}>
+              <Input
+                placeholder="e.g. GCB Bank"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.bankName && "border-console-red",
+                )}
+                {...register("bankName")}
+              />
+            </AdminField>
+            <AdminField
+              label="Bank account number"
+              optional
+              error={errors.bankAccountNumber?.message}
+            >
+              <Input
+                inputMode="numeric"
+                placeholder="e.g. 1234567890123"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  "font-adminmono",
+                  errors.bankAccountNumber && "border-console-red",
+                )}
+                {...register("bankAccountNumber")}
+              />
+            </AdminField>
+          </div>
+          <AdminField
+            label="Mobile money number"
+            optional
+            error={errors.momoNumber?.message}
+          >
+            <Input
+              type="tel"
+              placeholder="e.g. 024 000 0000"
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                errors.momoNumber && "border-console-red",
+              )}
+              {...register("momoNumber")}
+            />
+          </AdminField>
+        </section>
+
+        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+          <SectionHeading className="mb-0">Anything else</SectionHeading>
+          <AdminField label="Notes" optional error={errors.notes?.message}>
+            <textarea
+              rows={4}
+              placeholder="e.g. Prefers payment by bank transfer"
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                "h-auto min-h-[104px] w-full resize-y py-2",
+                errors.notes && "border-console-red",
+              )}
+              {...register("notes")}
+            />
+          </AdminField>
+        </section>
+
+        <div className="border-t border-adm-hairline pt-5">
+          <EditableFormActions
+            mode={!isEdit ? "create" : isEditing ? "editing" : "locked"}
+            saving={saving}
+            createLabel="Create supplier"
+            editLabel="Edit supplier"
+            onEdit={() => setIsEditing(true)}
+            onCancel={() => {
+              if (!isEdit) {
+                router.push(LIST);
+                return;
               }
+              reset();
+              clearPhotoState();
+              setIsEditing(false);
             }}
           />
         </div>
-        {previewUrl ? (
-          <PhotoViewDialog
-            src={previewUrl}
-            name={avatarName || "Supplier photo"}
-            open={viewPhoto}
-            onOpenChange={setViewPhoto}
-          />
-        ) : null}
-        <AdminField label="Name" error={errors.name?.message}>
-          <Input
-            placeholder="e.g. Ibrahim Fuseini"
-            disabled={readOnly}
-            className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
-            {...register("name")}
-          />
-        </AdminField>
-        <div className="grid gap-[13px] sm:grid-cols-2">
-          <AdminField label="Phone" optional error={errors.phone?.message}>
-            <Input
-              type="tel"
-              placeholder="024 000 0000"
-              disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.phone && "border-console-red")}
-              {...register("phone")}
-            />
-          </AdminField>
-          {/* A second line reaching the SAME person. Traders here carry two
-              networks, and the number on file is the one that is off when a
-              truck is at the gate. */}
-          <AdminField
-            label="Other phone"
-            optional
-            error={errors.altPhone?.message}
-          >
-            <Input
-              type="tel"
-              placeholder="024 000 0000"
-              disabled={readOnly}
-              className={cn(
-                adminInputClass,
-                roCls,
-                errors.altPhone && "border-console-red",
-              )}
-              {...register("altPhone")}
-            />
-          </AdminField>
-          <AdminField
-            label="Community"
-            optional
-            error={errors.community?.message}
-          >
-            <Input
-              placeholder="e.g. Savelugu"
-              disabled={readOnly}
-              className={cn(
-                adminInputClass,
-                roCls,
-                errors.community && "border-console-red",
-              )}
-              {...register("community")}
-            />
-          </AdminField>
-        </div>
-        <div className="grid gap-[13px] sm:grid-cols-2">
-          <AdminField label="Email" optional error={errors.email?.message}>
-            <Input
-              type="email"
-              placeholder="supplier@example.com"
-              disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.email && "border-console-red")}
-              {...register("email")}
-            />
-          </AdminField>
-          <AdminField
-            label="ID number"
-            optional
-            hint="Ghana Card or another official ID."
-            error={errors.idNumber?.message}
-          >
-            <Input
-              placeholder="e.g. GHA-000000000-0"
-              disabled={readOnly}
-              className={cn(
-                adminInputClass,
-                roCls,
-                errors.idNumber && "border-console-red",
-              )}
-              {...register("idNumber")}
-            />
-          </AdminField>
-        </div>
-        <AdminField label="Address" optional error={errors.address?.message}>
-          <Input
-            placeholder="e.g. House No. 12, Savelugu"
-            disabled={readOnly}
-            className={cn(
-              adminInputClass,
-              roCls,
-              errors.address && "border-console-red",
-            )}
-            {...register("address")}
-          />
-        </AdminField>
-        <AdminField
-          label="Source type"
-          hint="Individual farmer, corporate seller, or an agent-recorded source."
-        >
-          <Controller
-            control={control}
-            name="sourceType"
-            render={({ field }) => (
-              <Select
-                value={field.value}
-                onValueChange={field.onChange}
-                disabled={readOnly}
-              >
-                <SelectTrigger className={cn(adminSelectClass, roCls, "w-full")}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {SOURCE_OPTIONS.map((source) => (
-                    <SelectItem key={source} value={source}>
-                      {SOURCE_LABEL[source]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-        </AdminField>
-        {/* The rule stays on the wrapper - it divides the identity block from
-            the payout one - and the heading carries only its own text. */}
-        <div className="mt-1 border-t border-adm-hairline pt-3">
-          <SectionHeading className="mb-0">Payout details</SectionHeading>
-        </div>
-        <div className="grid gap-[13px] sm:grid-cols-2">
-          <AdminField label="Bank name" optional error={errors.bankName?.message}>
-            <Input
-              placeholder="e.g. GCB Bank"
-              disabled={readOnly}
-              className={cn(
-                adminInputClass,
-                roCls,
-                errors.bankName && "border-console-red",
-              )}
-              {...register("bankName")}
-            />
-          </AdminField>
-          <AdminField
-            label="Bank account number"
-            optional
-            error={errors.bankAccountNumber?.message}
-          >
-            <Input
-              inputMode="numeric"
-              placeholder="e.g. 1234567890123"
-              disabled={readOnly}
-              className={cn(
-                adminInputClass,
-                roCls,
-                "font-adminmono",
-                errors.bankAccountNumber && "border-console-red",
-              )}
-              {...register("bankAccountNumber")}
-            />
-          </AdminField>
-        </div>
-        <AdminField
-          label="Mobile money number"
-          optional
-          error={errors.momoNumber?.message}
-        >
-          <Input
-            type="tel"
-            placeholder="024 000 0000"
-            disabled={readOnly}
-            className={cn(
-              adminInputClass,
-              roCls,
-              errors.momoNumber && "border-console-red",
-            )}
-            {...register("momoNumber")}
-          />
-        </AdminField>
-        <AdminField label="Notes" optional error={errors.notes?.message}>
-          <textarea
-            rows={4}
-            placeholder="Anything worth remembering about this supplier."
-            disabled={readOnly}
-            className={cn(
-              adminInputClass,
-              roCls,
-              "h-auto min-h-[104px] w-full resize-y py-2",
-              errors.notes && "border-console-red",
-            )}
-            {...register("notes")}
-          />
-        </AdminField>
-        <EditableFormActions
-          mode={!isEdit ? "create" : isEditing ? "editing" : "locked"}
-          saving={saving}
-          createLabel="Create supplier"
-          editLabel="Edit supplier"
-          onEdit={() => setIsEditing(true)}
-          onCancel={() => {
-            if (!isEdit) {
-              router.push(LIST);
-              return;
-            }
-            reset();
-            clearPhotoState();
-            setIsEditing(false);
-          }}
-        />
       </form>
     </AdminCard>
   );

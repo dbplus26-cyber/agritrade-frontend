@@ -16,6 +16,7 @@ import {
   AdminField,
   AdminPageHeader,
   EditableFormActions,
+  SectionHeading,
   adminInputClass,
 } from "@/components/admin/ui";
 import {
@@ -436,209 +437,238 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
 
   return (
     <AdminCard className="px-5 py-[18px]">
+      {/* Field pairs measure against this form, not the viewport: the console
+          shell keeps a ~225px rail beside it, so `sm:` paired fields up while
+          the column was still too narrow to carry two of them. */}
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col gap-[13px]"
+        className="@container flex flex-col gap-5"
       >
-        <div className="grid gap-[13px] sm:grid-cols-2">
-          <AdminField
-            label="Label"
-            hint="What staff call it internally, e.g. 'Ecobank - main operating'."
-            error={errors.label?.message}
-          >
-            <Input
-              placeholder="e.g. Ecobank - main operating"
-              className={cn(
-                adminInputClass,
-                errors.label && "border-console-red",
-              )}
-              {...register("label")}
-            />
-          </AdminField>
-          <AdminField
-            label="Kind"
-            hint="What sort of account this is: a bank account, or a mobile money wallet."
-            error={errors.kind?.message}
-          >
-            <select
-              className={cn(
-                adminInputClass,
-                errors.kind && "border-console-red",
-              )}
-              {...register("kind")}
+        <section className="flex flex-col gap-[13px]">
+          <SectionHeading className="mb-0">What this account is</SectionHeading>
+          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+            <AdminField
+              label="Label"
+              hint="What staff call it internally, e.g. 'Ecobank - main operating'."
+              error={errors.label?.message}
             >
-              {KIND_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </AdminField>
-        </div>
-
-        <AdminField
-          label="Account name"
-          hint="The name the money must be sent to. A payer is asked to confirm this."
-          error={errors.accountName?.message}
-        >
-          <Input
-            placeholder="e.g. DB Plus Trading Ltd"
-            className={cn(
-              adminInputClass,
-              errors.accountName && "border-console-red",
-            )}
-            {...register("accountName")}
-          />
-        </AdminField>
-
-        <AdminField
-          label={isMomo ? "MoMo number" : "Account number"}
-          error={errors.accountNumber?.message}
-        >
-          <Input
-            inputMode={isMomo ? "tel" : "numeric"}
-            placeholder={isMomo ? "024 000 0000" : "1234567890123"}
-            className={cn(
-              adminInputClass,
-              "font-adminmono",
-              errors.accountNumber && "border-console-red",
-            )}
-            {...register("accountNumber")}
-          />
-        </AdminField>
-
-        {isBank ? (
-          <>
-            <div className="grid gap-[13px] sm:grid-cols-2">
-              <AdminField label="Bank" error={errors.bankName?.message}>
-                <Input
-                  placeholder="e.g. Ecobank Ghana"
-                  className={cn(
-                    adminInputClass,
-                    errors.bankName && "border-console-red",
-                  )}
-                  {...register("bankName")}
-                />
-              </AdminField>
-              <AdminField
-                label="Branch"
-                optional
-                error={errors.branch?.message}
+              <Input
+                placeholder="e.g. Ecobank - main operating"
+                className={cn(
+                  adminInputClass,
+                  errors.label && "border-console-red",
+                )}
+                {...register("label")}
+              />
+            </AdminField>
+            <AdminField
+              label="Kind"
+              hint="What sort of account this is: a bank account, or a mobile money wallet."
+              error={errors.kind?.message}
+            >
+              <select
+                className={cn(
+                  adminInputClass,
+                  errors.kind && "border-console-red",
+                )}
+                {...register("kind")}
               >
-                <Input
-                  placeholder="e.g. Tamale Main"
-                  className={cn(
-                    adminInputClass,
-                    errors.branch && "border-console-red",
-                  )}
-                  {...register("branch")}
-                />
-              </AdminField>
-            </div>
-            <div className="grid gap-[13px] sm:grid-cols-2">
-              <AdminField
-                label="Sort code"
-                optional
-                error={errors.sortCode?.message}
-              >
-                <Input
-                  className={cn(
-                    adminInputClass,
-                    "font-adminmono",
-                    errors.sortCode && "border-console-red",
-                  )}
-                  {...register("sortCode")}
-                />
-              </AdminField>
-              <AdminField
-                label="SWIFT"
-                optional
-                hint="Only needed for transfers from outside Ghana."
-                error={errors.swiftCode?.message}
-              >
-                <Input
-                  className={cn(
-                    adminInputClass,
-                    "font-adminmono",
-                    errors.swiftCode && "border-console-red",
-                  )}
-                  {...register("swiftCode")}
-                />
-              </AdminField>
-            </div>
-          </>
-        ) : null}
+                {KIND_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </AdminField>
+          </div>
 
-        {isMomo ? (
-          <AdminField label="Network" error={errors.provider?.message}>
+        </section>
+
+        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+          <SectionHeading
+            className="mb-0"
+            hint="The details a payer types in. Get these wrong and the money lands somewhere else."
+          >
+            Where the money goes
+          </SectionHeading>
+          <AdminField
+            label="Account name"
+            hint="The name the money must be sent to. A payer is asked to confirm this."
+            error={errors.accountName?.message}
+          >
             <Input
-              placeholder="e.g. MTN"
+              placeholder="e.g. DB Plus Trading Ltd"
               className={cn(
                 adminInputClass,
-                errors.provider && "border-console-red",
+                errors.accountName && "border-console-red",
               )}
-              {...register("provider")}
+              {...register("accountName")}
             />
           </AdminField>
-        ) : null}
 
-        <AdminField
-          label="Instructions"
-          optional
-          hint="Printed under the account on invoices. The document number is already added automatically."
-          error={errors.instructions?.message}
-        >
-          <textarea
-            rows={4}
-            placeholder="e.g. Transfers only, no cash deposits at the counter."
-            className={cn(
-              adminInputClass,
-              "h-auto min-h-[64px] w-full resize-y py-2",
-              errors.instructions && "border-console-red",
-            )}
-            {...register("instructions")}
+          <AdminField
+            label={isMomo ? "MoMo number" : "Account number"}
+            error={errors.accountNumber?.message}
+          >
+            <Input
+              inputMode={isMomo ? "tel" : "numeric"}
+              placeholder={isMomo ? "e.g. 024 000 0000" : "e.g. 1234567890123"}
+              className={cn(
+                adminInputClass,
+                "font-adminmono",
+                errors.accountNumber && "border-console-red",
+              )}
+              {...register("accountNumber")}
+            />
+          </AdminField>
+
+          {isBank ? (
+            <>
+              <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+                <AdminField label="Bank" error={errors.bankName?.message}>
+                  <Input
+                    placeholder="e.g. Ecobank Ghana"
+                    className={cn(
+                      adminInputClass,
+                      errors.bankName && "border-console-red",
+                    )}
+                    {...register("bankName")}
+                  />
+                </AdminField>
+                <AdminField
+                  label="Branch"
+                  optional
+                  error={errors.branch?.message}
+                >
+                  <Input
+                    placeholder="e.g. Tamale Main"
+                    className={cn(
+                      adminInputClass,
+                      errors.branch && "border-console-red",
+                    )}
+                    {...register("branch")}
+                  />
+                </AdminField>
+              </div>
+              <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+                <AdminField
+                  label="Sort code"
+                  optional
+                  error={errors.sortCode?.message}
+                >
+                  <Input
+                    placeholder="e.g. 130101"
+                    className={cn(
+                      adminInputClass,
+                      "font-adminmono",
+                      errors.sortCode && "border-console-red",
+                    )}
+                    {...register("sortCode")}
+                  />
+                </AdminField>
+                <AdminField
+                  label="SWIFT"
+                  optional
+                  hint="Only needed for transfers from outside Ghana."
+                  error={errors.swiftCode?.message}
+                >
+                  <Input
+                    placeholder="e.g. ECOCGHAC"
+                    className={cn(
+                      adminInputClass,
+                      "font-adminmono",
+                      errors.swiftCode && "border-console-red",
+                    )}
+                    {...register("swiftCode")}
+                  />
+                </AdminField>
+              </div>
+            </>
+          ) : null}
+
+          {isMomo ? (
+            <AdminField label="Network" error={errors.provider?.message}>
+              <Input
+                placeholder="e.g. MTN"
+                className={cn(
+                  adminInputClass,
+                  errors.provider && "border-console-red",
+                )}
+                {...register("provider")}
+              />
+            </AdminField>
+          ) : null}
+
+        </section>
+
+        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+          <SectionHeading
+            className="mb-0"
+            hint="How and whether this account is printed on invoices and statements."
+          >
+            On invoices
+          </SectionHeading>
+          <AdminField
+            label="Instructions"
+            optional
+            hint="Printed under the account on invoices. The document number is already added automatically."
+            error={errors.instructions?.message}
+          >
+            <textarea
+              rows={4}
+              placeholder="e.g. Transfers only, no cash deposits at the counter."
+              className={cn(
+                adminInputClass,
+                "h-auto min-h-[64px] w-full resize-y py-2",
+                errors.instructions && "border-console-red",
+              )}
+              {...register("instructions")}
+            />
+          </AdminField>
+
+          <AdminField
+            label="Order"
+            hint="Lower numbers print first on an invoice."
+            error={errors.sortOrder?.message}
+          >
+            <Input
+              type="number"
+              min={0}
+              placeholder="e.g. 10"
+              className={cn(
+                adminInputClass,
+                "max-w-[120px]",
+                errors.sortOrder && "border-console-red",
+              )}
+              {...register("sortOrder", { valueAsNumber: true })}
+            />
+          </AdminField>
+
+          <label className="flex items-center gap-2 text-[13px] text-adm-ink">
+            <input type="checkbox" {...register("showOnInvoice")} />
+            Print this account on invoices and statements
+          </label>
+          <label className="flex items-center gap-2 text-[13px] text-adm-ink">
+            <input type="checkbox" {...register("isActive")} />
+            Active
+          </label>
+        </section>
+
+        <div className="border-t border-adm-hairline pt-5">
+          {/* Never "locked" - there is no locked state on this route any more.
+              Cancel returns to the record, which is where it is read. */}
+          <EditableFormActions
+            mode={isEdit ? "editing" : "create"}
+            saving={saving}
+            createLabel="Save account"
+            editLabel="Edit account"
+            onEdit={() => undefined}
+            onCancel={() =>
+              router.push(isEdit && account ? `${LIST}/${account.id}` : LIST)
+            }
           />
-        </AdminField>
-
-        <AdminField
-          label="Order"
-          hint="Lower numbers print first on an invoice."
-          error={errors.sortOrder?.message}
-        >
-          <Input
-            type="number"
-            min={0}
-            className={cn(
-              adminInputClass,
-              "max-w-[120px]",
-              errors.sortOrder && "border-console-red",
-            )}
-            {...register("sortOrder", { valueAsNumber: true })}
-          />
-        </AdminField>
-
-        <label className="flex items-center gap-2 text-[13px] text-adm-ink">
-          <input type="checkbox" {...register("showOnInvoice")} />
-          Print this account on invoices and statements
-        </label>
-        <label className="flex items-center gap-2 text-[13px] text-adm-ink">
-          <input type="checkbox" {...register("isActive")} />
-          Active
-        </label>
-
-        {/* Never "locked" - there is no locked state on this route any more.
-            Cancel returns to the record, which is where it is read. */}
-        <EditableFormActions
-          mode={isEdit ? "editing" : "create"}
-          saving={saving}
-          createLabel="Save account"
-          editLabel="Edit account"
-          onEdit={() => undefined}
-          onCancel={() =>
-            router.push(isEdit && account ? `${LIST}/${account.id}` : LIST)
-          }
-        />
+        </div>
       </form>
     </AdminCard>
   );

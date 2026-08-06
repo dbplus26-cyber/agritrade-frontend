@@ -10,6 +10,7 @@ import {
   AdminField,
   AdminPageHeader,
   adminInputClass,
+  SectionHeading,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
@@ -142,44 +143,77 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
         }
       />
 
-      <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        <AdminCard className="grid grid-cols-1 gap-3 px-5 py-4 sm:grid-cols-2">
-          {field("reference", "Reference", {
-            placeholder: "TML-014",
-            locked: plot !== undefined,
-            hint: plot
-              ? "Fixed once assigned - the register code stays with the plot."
-              : undefined,
-          })}
-          {field("locationText", "Location / title", {
-            placeholder: "Kumbungu Road, Plot 14",
-          })}
-          {field("sizeText", "Size", { placeholder: "100 x 100 ft" })}
-          {field("use", "Use", { optional: true, placeholder: "residential" })}
-          {field("askingPriceGhs", "Asking price (GHS)", {
-            mode: "decimal",
-            hint: "What you are listing the plot at, which is the price a buyer is quoted.",
-          })}
-          {field("purchaseCostGhs", "Purchase cost (GHS)", {
-            optional: true,
-            mode: "decimal",
-            hint: "What the plot cost you to get hold of, used to work out what you make on a sale.",
-          })}
-          {field("sizeAcres", "Acres", {
-            optional: true,
-            mode: "decimal",
-            hint: "The same size as a plain number, so plots can be compared and priced per acre.",
-          })}
-        </AdminCard>
+      {/* Field pairs measure against this form, not the viewport: the console
+          shell keeps a ~225px rail beside it, so `sm:` paired fields up while
+          the column was still too narrow to carry two of them. */}
+      <form
+        noValidate
+        onSubmit={handleSubmit(onSubmit)}
+        className="@container flex flex-col gap-4"
+      >
+        <AdminCard className="flex flex-col gap-5 px-5 py-4">
+          <section className="flex flex-col gap-3">
+            <SectionHeading
+              className="mb-0"
+              hint="What this plot is called on the register, where it is, and how big."
+            >
+              The plot itself
+            </SectionHeading>
+            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+              {field("reference", "Reference", {
+                placeholder: "e.g. TML-014",
+                locked: plot !== undefined,
+                hint: plot
+                  ? "Fixed once assigned - the register code stays with the plot."
+                  : undefined,
+              })}
+              {field("locationText", "Location / title", {
+                placeholder: "e.g. Kumbungu Road, Plot 14",
+              })}
+              {field("sizeText", "Size", { placeholder: "e.g. 100 x 100 ft" })}
+              {field("sizeAcres", "Acres", {
+                optional: true,
+                mode: "decimal",
+                placeholder: "e.g. 0.25",
+                hint: "The same size as a plain number, so plots can be compared and priced per acre.",
+              })}
+              {field("use", "Use", { optional: true, placeholder: "e.g. residential" })}
+            </div>
+          </section>
 
-        <AdminCard className="flex flex-col gap-3 px-5 py-4">
-          {field("description", "Description", { optional: true })}
-          <label
-            className="flex items-center gap-2 text-[13px] text-adm-ink"
-          >
-            <input type="checkbox" {...register("showPriceOnWebsite")} />
-            Show the asking price on the public listing
-          </label>
+          <section className="flex flex-col gap-3 border-t border-adm-hairline pt-5">
+            <SectionHeading
+              className="mb-0"
+              hint="What the plot is listed at and what it cost you. The difference is what you make on a sale."
+            >
+              Pricing
+            </SectionHeading>
+            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+              {field("askingPriceGhs", "Asking price (GHS)", {
+                mode: "decimal",
+                placeholder: "e.g. 60000",
+                hint: "What you are listing the plot at, which is the price a buyer is quoted.",
+              })}
+              {field("purchaseCostGhs", "Purchase cost (GHS)", {
+                optional: true,
+                mode: "decimal",
+                placeholder: "e.g. 45000",
+                hint: "What the plot cost you to get hold of, used to work out what you make on a sale.",
+              })}
+            </div>
+            <label className="flex items-center gap-2 text-[13px] text-adm-ink">
+              <input type="checkbox" {...register("showPriceOnWebsite")} />
+              Show the asking price on the public listing
+            </label>
+          </section>
+
+          <section className="flex flex-col gap-3 border-t border-adm-hairline pt-5">
+            <SectionHeading className="mb-0">On the website</SectionHeading>
+            {field("description", "Description", {
+              optional: true,
+              placeholder: "e.g. Corner plot, fenced on two sides, borehole on site",
+            })}
+          </section>
         </AdminCard>
 
         {/* This row keeps its own markup rather than EditableFormActions

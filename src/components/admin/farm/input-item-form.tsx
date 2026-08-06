@@ -170,11 +170,18 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
         actions={item ? <ActiveBadge active={item.isActive} /> : undefined}
       />
 
-      <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        <AdminCard className="grid grid-cols-1 gap-3 px-5 py-4 sm:grid-cols-2">
+      {/* The name/unit pair measures against this form, not the viewport: the
+          console shell keeps a ~225px rail beside it, so `sm:` paired them up
+          while the column was still too narrow to carry two. */}
+      <form
+        noValidate
+        onSubmit={handleSubmit(onSubmit)}
+        className="@container flex flex-col gap-4"
+      >
+        <AdminCard className="grid grid-cols-1 gap-3 px-5 py-4 @min-[440px]:grid-cols-2">
           <AdminField label="Name" error={errors.name?.message}>
             <Input
-              placeholder="NPK fertiliser"
+              placeholder="e.g. NPK fertiliser"
               disabled={readOnly}
               className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
               {...register("name")}
@@ -186,7 +193,7 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
             label="Unit"
           >
             <Input
-              placeholder="bag"
+              placeholder="e.g. bag"
               disabled={readOnly}
               className={cn(
                 adminInputClass,
@@ -203,11 +210,11 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
             optional
             hint="What it actually is, so a field officer picking it knows - e.g. 'NPK 15-15-15, 50kg bag'."
             error={errors.description?.message}
-            className="sm:col-span-2"
+            className="@min-[440px]:col-span-2"
           >
             <textarea
               rows={4}
-              placeholder="NPK 15-15-15, 50kg bag"
+              placeholder="e.g. NPK 15-15-15, 50kg bag"
               disabled={readOnly}
               className={cn(
                 adminInputClass,

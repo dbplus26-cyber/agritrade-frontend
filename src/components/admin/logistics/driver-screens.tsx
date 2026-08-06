@@ -18,6 +18,7 @@ import {
   AdminField,
   AdminPageHeader,
   EditableFormActions,
+  SectionHeading,
   adminInputClass,
   adminSelectClass,
 } from "@/components/admin/ui";
@@ -461,221 +462,259 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
 
   return (
     <AdminCard className="px-5 py-[18px]">
+      {/* Field pairs measure against this form, not the viewport: the console
+          shell keeps a ~225px rail beside it, so `sm:` paired fields up while
+          the column was still too narrow to carry two of them. */}
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col gap-[13px]"
+        className="@container flex flex-col gap-5"
       >
-        <div className="flex items-center gap-3.5">
-          {previewUrl && readOnly ? (
-            <button
-              type="button"
-              onClick={() => setViewPhoto(true)}
-              aria-label="View photo"
-              title="View photo"
-              className="cursor-zoom-in rounded-full outline-none focus-visible:ring-2 focus-visible:ring-console/40"
-            >
-              <RegistryAvatar
-                name={avatarName}
-                photoUrl={previewUrl}
-                size={64}
-              />
-            </button>
-          ) : (
-            <RegistryAvatar name={avatarName} photoUrl={previewUrl} size={64} />
-          )}
-          {isEditing ? (
-            <div className="flex flex-wrap gap-2">
-              <AdminButton
-                type="button"
-                variant="secondary"
-                className="h-[32px] px-3 text-[12.5px]"
-                onClick={() => fileInput.current?.click()}
-              >
-                {previewUrl ? "Change photo" : "Add photo"}
-              </AdminButton>
-              {previewUrl ? (
-                <AdminButton
+        <section className="flex flex-col gap-[13px]">
+          <SectionHeading className="mb-0">Who they are</SectionHeading>
+          {/* Not an AdminField: the control is a button, and a <label> around
+              a button misroutes its clicks. Same label markup as AdminField so
+              it stays in step with the fields under it. */}
+          <div>
+            <span className="mb-1 block text-[13px] font-semibold text-adm-ink">
+              Photo <span className="font-normal text-adm-faint">(optional)</span>
+            </span>
+            <div className="flex flex-wrap items-center gap-3.5">
+              {previewUrl && readOnly ? (
+                <button
                   type="button"
-                  variant="outline"
-                  className="h-[32px] px-3 text-[12.5px]"
-                  onClick={() => {
-                    setPhotoFile(null);
-                    setRemovePhoto(true);
-                    if (fileInput.current) fileInput.current.value = "";
-                  }}
+                  onClick={() => setViewPhoto(true)}
+                  aria-label="View photo"
+                  title="View photo"
+                  className="cursor-zoom-in rounded-full outline-none focus-visible:ring-2 focus-visible:ring-console/40"
                 >
-                  Remove photo
-                </AdminButton>
+                  <RegistryAvatar
+                    name={avatarName}
+                    photoUrl={previewUrl}
+                    size={64}
+                  />
+                </button>
+              ) : (
+                <RegistryAvatar name={avatarName} photoUrl={previewUrl} size={64} />
+              )}
+              {isEditing ? (
+                <div className="flex flex-wrap gap-2">
+                  <AdminButton
+                    type="button"
+                    variant="secondary"
+                    className="h-[32px] px-3 text-[12.5px]"
+                    onClick={() => fileInput.current?.click()}
+                  >
+                    {previewUrl ? "Change photo" : "Add photo"}
+                  </AdminButton>
+                  {previewUrl ? (
+                    <AdminButton
+                      type="button"
+                      variant="outline"
+                      className="h-[32px] px-3 text-[12.5px]"
+                      onClick={() => {
+                        setPhotoFile(null);
+                        setRemovePhoto(true);
+                        if (fileInput.current) fileInput.current.value = "";
+                      }}
+                    >
+                      Remove photo
+                    </AdminButton>
+                  ) : null}
+                </div>
               ) : null}
+              <input
+                ref={fileInput}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    void optimizeImage(file).then((staged) => {
+                      setPhotoFile(staged);
+                      setRemovePhoto(false);
+                    });
+                  }
+                }}
+              />
             </div>
+          </div>
+          {previewUrl ? (
+            <PhotoViewDialog
+              src={previewUrl}
+              name={avatarName || "Driver photo"}
+              open={viewPhoto}
+              onOpenChange={setViewPhoto}
+            />
           ) : null}
-          <input
-            ref={fileInput}
-            type="file"
-            accept="image/png,image/jpeg,image/webp"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                void optimizeImage(file).then((staged) => {
-                  setPhotoFile(staged);
-                  setRemovePhoto(false);
-                });
+          <AdminField label="Name" error={errors.name?.message}>
+            <Input
+              placeholder="e.g. Yakubu Andani"
+              disabled={readOnly}
+              className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
+              {...register("name")}
+            />
+          </AdminField>
+          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+            <AdminField label="Phone" error={errors.phone?.message}>
+              <Input
+                type="tel"
+                placeholder="e.g. 024 000 0000"
+                disabled={readOnly}
+                className={cn(adminInputClass, roCls, errors.phone && "border-console-red")}
+                {...register("phone")}
+              />
+            </AdminField>
+            <AdminField label="Email" optional error={errors.email?.message}>
+              <Input
+                type="email"
+                placeholder="e.g. yakubu@example.com"
+                disabled={readOnly}
+                className={cn(adminInputClass, roCls, errors.email && "border-console-red")}
+                {...register("email")}
+              />
+            </AdminField>
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+          <SectionHeading className="mb-0">Where they work</SectionHeading>
+          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+            <AdminField
+              label="Company"
+              optional
+              hint="Haulage company, or leave blank for solo."
+              error={errors.company?.message}
+            >
+              <Input
+                placeholder="e.g. Sahel Haulage Ltd"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.company && "border-console-red",
+                )}
+                {...register("company")}
+              />
+            </AdminField>
+            <AdminField label="City" optional error={errors.city?.message}>
+              <Input
+                placeholder="e.g. Tamale"
+                disabled={readOnly}
+                className={cn(adminInputClass, roCls, errors.city && "border-console-red")}
+                {...register("city")}
+              />
+            </AdminField>
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+          <SectionHeading
+            className="mb-0"
+            hint="The papers you checked, so the person driving your load can be identified."
+          >
+            Licence and ID
+          </SectionHeading>
+          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+            <AdminField
+              label="Licence no"
+              optional
+              error={errors.licenseNo?.message}
+            >
+              <Input
+                placeholder="e.g. DL-000000"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.licenseNo && "border-console-red",
+                )}
+                {...register("licenseNo")}
+              />
+            </AdminField>
+            <AdminField
+              label="ID number"
+              optional
+              hint="Ghana Card or another official ID."
+              error={errors.idNumber?.message}
+            >
+              <Input
+                placeholder="e.g. GHA-000000000-0"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.idNumber && "border-console-red",
+                )}
+                {...register("idNumber")}
+              />
+            </AdminField>
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+          <SectionHeading className="mb-0">How they are paid</SectionHeading>
+          {/* What this driver is normally paid on. The middle of the
+              resolution order: a trip can override it, and a driver without one
+              falls through to the system default. */}
+          <AdminField
+            error={errors.paymentPolicyId?.message}
+            hint="Used when a trip does not set its own. Leave as the default if this driver has no special terms."
+            label="Payment terms"
+            optional
+          >
+            <select
+              className={cn(adminSelectClass, roCls)}
+              disabled={readOnly}
+              {...register("paymentPolicyId")}
+            >
+              <option value="">Use the system default</option>
+              {(policies.data?.data ?? []).map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+          </AdminField>
+        </section>
+
+        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+          <SectionHeading className="mb-0">Anything else</SectionHeading>
+          <AdminField label="Notes" optional error={errors.notes?.message}>
+            <textarea
+              rows={4}
+              placeholder="e.g. Runs the Tamale to Accra leg overnight"
+              disabled={readOnly}
+              className={cn(
+                adminInputClass,
+                roCls,
+                "h-auto min-h-[104px] w-full resize-y py-2",
+                errors.notes && "border-console-red",
+              )}
+              {...register("notes")}
+            />
+          </AdminField>
+        </section>
+
+        <div className="border-t border-adm-hairline pt-5">
+          <EditableFormActions
+            mode={!isEdit ? "create" : isEditing ? "editing" : "locked"}
+            saving={saving}
+            createLabel="Add driver"
+            editLabel="Edit driver"
+            onEdit={() => setIsEditing(true)}
+            onCancel={() => {
+              if (!isEdit) {
+                router.push(LIST);
+                return;
               }
+              reset();
+              clearPhotoState();
+              setIsEditing(false);
             }}
           />
         </div>
-        {previewUrl ? (
-          <PhotoViewDialog
-            src={previewUrl}
-            name={avatarName || "Driver photo"}
-            open={viewPhoto}
-            onOpenChange={setViewPhoto}
-          />
-        ) : null}
-        <AdminField label="Name" error={errors.name?.message}>
-          <Input
-            placeholder="e.g. Yakubu Andani"
-            disabled={readOnly}
-            className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
-            {...register("name")}
-          />
-        </AdminField>
-        <div className="grid gap-[13px] sm:grid-cols-2">
-          <AdminField label="Phone" error={errors.phone?.message}>
-            <Input
-              type="tel"
-              placeholder="024 000 0000"
-              disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.phone && "border-console-red")}
-              {...register("phone")}
-            />
-          </AdminField>
-          <AdminField label="Email" optional error={errors.email?.message}>
-            <Input
-              type="email"
-              placeholder="driver@example.com"
-              disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.email && "border-console-red")}
-              {...register("email")}
-            />
-          </AdminField>
-        </div>
-        <div className="grid gap-[13px] sm:grid-cols-2">
-          <AdminField
-            label="Company"
-            optional
-            hint="Haulage company, or leave blank for solo."
-            error={errors.company?.message}
-          >
-            <Input
-              placeholder="e.g. Sahel Haulage Ltd"
-              disabled={readOnly}
-              className={cn(
-                adminInputClass,
-                roCls,
-                errors.company && "border-console-red",
-              )}
-              {...register("company")}
-            />
-          </AdminField>
-          <AdminField label="City" optional error={errors.city?.message}>
-            <Input
-              placeholder="e.g. Tamale"
-              disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.city && "border-console-red")}
-              {...register("city")}
-            />
-          </AdminField>
-        </div>
-        <div className="grid gap-[13px] sm:grid-cols-2">
-          <AdminField
-            label="Licence no"
-            optional
-            error={errors.licenseNo?.message}
-          >
-            <Input
-              placeholder="e.g. DL-000000"
-              disabled={readOnly}
-              className={cn(
-                adminInputClass,
-                roCls,
-                errors.licenseNo && "border-console-red",
-              )}
-              {...register("licenseNo")}
-            />
-          </AdminField>
-          <AdminField
-            label="ID number"
-            optional
-            hint="Ghana Card or another official ID."
-            error={errors.idNumber?.message}
-          >
-            <Input
-              placeholder="e.g. GHA-000000000-0"
-              disabled={readOnly}
-              className={cn(
-                adminInputClass,
-                roCls,
-                errors.idNumber && "border-console-red",
-              )}
-              {...register("idNumber")}
-            />
-          </AdminField>
-        </div>
-        {/* What this driver is normally paid on. The middle of the
-            resolution order: a trip can override it, and a driver without one
-            falls through to the system default. */}
-        <AdminField
-          error={errors.paymentPolicyId?.message}
-          hint="Used when a trip does not set its own. Leave as the default if this driver has no special terms."
-          label="Payment terms"
-          optional
-        >
-          <select
-            className={cn(adminSelectClass, roCls)}
-            disabled={readOnly}
-            {...register("paymentPolicyId")}
-          >
-            <option value="">Use the system default</option>
-            {(policies.data?.data ?? []).map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
-        </AdminField>
-        <AdminField label="Notes" optional error={errors.notes?.message}>
-          <textarea
-            rows={4}
-            placeholder="Anything worth remembering about this driver."
-            disabled={readOnly}
-            className={cn(
-              adminInputClass,
-              roCls,
-              "h-auto min-h-[104px] w-full resize-y py-2",
-              errors.notes && "border-console-red",
-            )}
-            {...register("notes")}
-          />
-        </AdminField>
-        <EditableFormActions
-          mode={!isEdit ? "create" : isEditing ? "editing" : "locked"}
-          saving={saving}
-          createLabel="Add driver"
-          editLabel="Edit driver"
-          onEdit={() => setIsEditing(true)}
-          onCancel={() => {
-            if (!isEdit) {
-              router.push(LIST);
-              return;
-            }
-            reset();
-            clearPhotoState();
-            setIsEditing(false);
-          }}
-        />
       </form>
     </AdminCard>
   );

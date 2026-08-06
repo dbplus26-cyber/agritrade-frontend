@@ -7,6 +7,7 @@ import {
   AdminField,
   AdminPageHeader,
   adminSelectClass,
+  SectionHeading,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -55,6 +56,7 @@ export function StocktakeNew() {
       />
 
       <AdminCard className="mb-4 px-4 py-3 sm:px-5 sm:py-4">
+        <SectionHeading className="mb-3">Which warehouse</SectionHeading>
         <AdminField
           label="Warehouse"
           hint={

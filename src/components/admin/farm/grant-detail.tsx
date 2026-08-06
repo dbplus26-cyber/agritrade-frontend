@@ -24,7 +24,7 @@ import {
   useGetGrantQuery,
   useRemoveGrantDocumentMutation,
 } from "@/redux/farm/grants-api";
-import { avatarOf } from "@/lib/avatar";
+import { ViewablePhoto } from "@/components/admin/photo-view";
 import { FarmDocumentsSection, GrantApprovalBadge } from "./farm-bits";
 
 const LIST = "/admin/grants";
@@ -46,7 +46,6 @@ export function GrantDetail({ id }: { id: string }) {
     );
 
   const g = data.data.grant;
-  const a = avatarOf(g.farmer.name);
 
   return (
     <div className="max-w-[1120px]">
@@ -64,32 +63,23 @@ export function GrantDetail({ id }: { id: string }) {
             {/* Who took what */}
             <AdminCard className="px-5 py-4">
               <SectionHeading className="mb-2">Who took what</SectionHeading>
-              <Link
-                href={`/admin/farmers/${g.farmer.id}`}
-                // The underline belongs to the NAME, not to the photo and the
-                // phone number beside it, so the anchor lends its colour and
-                // its focus ring and hands the rule to the child.
-                className={cn(
-                  adminLinkClass,
-                  "group flex min-w-0 items-center gap-2.5 hover:no-underline",
-                )}
-              >
-                {g.farmer.photoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- Cloudinary
-                  <img
-                    src={g.farmer.photoUrl}
-                    alt={g.farmer.name}
-                    className="h-10 w-10 flex-none rounded-full object-cover"
-                  />
-                ) : (
-                  <span
-                    className="flex h-10 w-10 flex-none items-center justify-center rounded-full text-[13px] font-bold"
-                    style={{ background: a.bg, color: a.fg }}
-                  >
-                    {a.init}
-                  </span>
-                )}
-                <div className="min-w-0">
+              {/* The photo sits BESIDE the link, not inside it: it is now a
+                  ViewablePhoto, which is a button when there is something to
+                  open, and a button nested in an anchor is invalid markup.
+                  Keeping them siblings also keeps the underline on the NAME. */}
+              <div className="flex min-w-0 items-center gap-2.5">
+                <ViewablePhoto
+                  name={g.farmer.name}
+                  size={40}
+                  src={g.farmer.photoUrl}
+                />
+                <Link
+                  href={`/admin/farmers/${g.farmer.id}`}
+                  className={cn(
+                    adminLinkClass,
+                    "group min-w-0 hover:no-underline",
+                  )}
+                >
                   <div className="truncate text-[14px] font-semibold underline-offset-2 group-hover:underline">
                     {g.farmer.name}
                   </div>
@@ -101,8 +91,8 @@ export function GrantDetail({ id }: { id: string }) {
                         .join(" · ")}
                     </div>
                   ) : null}
-                </div>
-              </Link>
+                </Link>
+              </div>
               <DetailGrid className="mt-3 border-t border-adm-hairline pt-1">
                 {/* The grant's own number. It was the page heading; the
                     heading names the page now, so the record names itself. */}

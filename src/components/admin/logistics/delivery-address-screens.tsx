@@ -18,6 +18,7 @@ import {
   AdminField,
   AdminPageHeader,
   EditableFormActions,
+  SectionHeading,
   adminInputClass,
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
@@ -428,154 +429,176 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
 
   return (
     <AdminCard className="px-5 py-[18px]">
+      {/* Field pairs measure against this form, not the viewport: the console
+          shell keeps a ~225px rail beside it, so `sm:` paired fields up while
+          the column was still too narrow to carry two of them. */}
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col gap-[13px]"
+        className="@container flex flex-col gap-5"
       >
-        <AdminField
-          label="Label"
-          hint="How this address appears in pickers, e.g. 'Makola - Adjei Bros'."
-          error={errors.label?.message}
-        >
-          <Input
-            placeholder="e.g. Makola Market - Adjei Bros"
-            disabled={readOnly}
-            className={cn(adminInputClass, roCls, errors.label && "border-console-red")}
-            {...register("label")}
-          />
-        </AdminField>
-        <div className="grid gap-[13px] sm:grid-cols-2">
-          <AdminField label="City" error={errors.city?.message}>
-            <Input
-              placeholder="e.g. Accra"
-              disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.city && "border-console-red")}
-              {...register("city")}
-            />
-          </AdminField>
-          <AdminField label="Area" optional error={errors.area?.message}>
-            <Input
-              placeholder="e.g. Okaishie"
-              disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.area && "border-console-red")}
-              {...register("area")}
-            />
-          </AdminField>
-        </div>
-        <div className="grid gap-[13px] sm:grid-cols-2">
+        <section className="flex flex-col gap-[13px]">
+          <SectionHeading
+            className="mb-0"
+            hint="Where the drop-off is, in the terms a driver would use to find it."
+          >
+            Where it is
+          </SectionHeading>
           <AdminField
-            label="Digital address"
-            optional
-            hint="GhanaPostGPS, e.g. GA-183-8164."
-            error={errors.digitalAddress?.message}
+            label="Label"
+            hint="How this address appears in pickers, e.g. 'Makola - Adjei Bros'."
+            error={errors.label?.message}
           >
             <Input
-              placeholder="GA-183-8164"
+              placeholder="e.g. Makola Market - Adjei Bros"
               disabled={readOnly}
-              className={cn(
-                adminInputClass,
-                roCls,
-                "font-adminmono",
-                errors.digitalAddress && "border-console-red",
-              )}
-              {...register("digitalAddress")}
+              className={cn(adminInputClass, roCls, errors.label && "border-console-red")}
+              {...register("label")}
             />
           </AdminField>
-          <AdminField label="Landmark" optional error={errors.landmark?.message}>
+          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+            <AdminField label="City" error={errors.city?.message}>
+              <Input
+                placeholder="e.g. Accra"
+                disabled={readOnly}
+                className={cn(adminInputClass, roCls, errors.city && "border-console-red")}
+                {...register("city")}
+              />
+            </AdminField>
+            <AdminField label="Area" optional error={errors.area?.message}>
+              <Input
+                placeholder="e.g. Okaishie"
+                disabled={readOnly}
+                className={cn(adminInputClass, roCls, errors.area && "border-console-red")}
+                {...register("area")}
+              />
+            </AdminField>
+          </div>
+          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+            <AdminField
+              label="Digital address"
+              optional
+              hint="GhanaPostGPS, e.g. GA-183-8164."
+              error={errors.digitalAddress?.message}
+            >
+              <Input
+                placeholder="e.g. GA-183-8164"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  "font-adminmono",
+                  errors.digitalAddress && "border-console-red",
+                )}
+                {...register("digitalAddress")}
+              />
+            </AdminField>
+            <AdminField label="Landmark" optional error={errors.landmark?.message}>
+              <Input
+                placeholder="e.g. Opposite the UBA branch"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.landmark && "border-console-red",
+                )}
+                {...register("landmark")}
+              />
+            </AdminField>
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+          <SectionHeading className="mb-0">Who receives it</SectionHeading>
+          <AdminField label="Shop name" optional error={errors.shopName?.message}>
             <Input
-              placeholder="e.g. Opposite the UBA branch"
+              placeholder="e.g. Adjei Brothers Enterprise"
               disabled={readOnly}
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.landmark && "border-console-red",
+                errors.shopName && "border-console-red",
               )}
-              {...register("landmark")}
+              {...register("shopName")}
             />
           </AdminField>
-        </div>
-        <AdminField label="Shop name" optional error={errors.shopName?.message}>
-          <Input
-            placeholder="e.g. Adjei Brothers Enterprise"
-            disabled={readOnly}
-            className={cn(
-              adminInputClass,
-              roCls,
-              errors.shopName && "border-console-red",
-            )}
-            {...register("shopName")}
-          />
-        </AdminField>
-        <div className="grid gap-[13px] sm:grid-cols-2">
+          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+            <AdminField
+              label="Contact name"
+              optional
+              error={errors.contactName?.message}
+            >
+              <Input
+                placeholder="e.g. Kofi Adjei"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.contactName && "border-console-red",
+                )}
+                {...register("contactName")}
+              />
+            </AdminField>
+            <AdminField
+              label="Contact phone"
+              optional
+              error={errors.contactPhone?.message}
+            >
+              <Input
+                type="tel"
+                placeholder="e.g. 024 000 0000"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.contactPhone && "border-console-red",
+                )}
+                {...register("contactPhone")}
+              />
+            </AdminField>
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+          <SectionHeading className="mb-0">Finding it</SectionHeading>
           <AdminField
-            label="Contact name"
+            label="Directions"
             optional
-            error={errors.contactName?.message}
+            hint="Anything the driver needs to find the drop-off."
+            error={errors.directions?.message}
           >
-            <Input
-              placeholder="Who receives the goods"
+            <textarea
+              rows={4}
+              placeholder="e.g. Enter through the Kimberly Ave gate, third shop on the right."
               disabled={readOnly}
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.contactName && "border-console-red",
+                "h-auto min-h-[104px] w-full resize-y py-2",
+                errors.directions && "border-console-red",
               )}
-              {...register("contactName")}
+              {...register("directions")}
             />
           </AdminField>
-          <AdminField
-            label="Contact phone"
-            optional
-            error={errors.contactPhone?.message}
-          >
-            <Input
-              type="tel"
-              placeholder="024 000 0000"
-              disabled={readOnly}
-              className={cn(
-                adminInputClass,
-                roCls,
-                errors.contactPhone && "border-console-red",
-              )}
-              {...register("contactPhone")}
-            />
-          </AdminField>
-        </div>
-        <AdminField
-          label="Directions"
-          optional
-          hint="Anything the driver needs to find the drop-off."
-          error={errors.directions?.message}
-        >
-          <textarea
-            rows={4}
-            placeholder="e.g. Enter through the Kimberly Ave gate, third shop on the right."
-            disabled={readOnly}
-            className={cn(
-              adminInputClass,
-              roCls,
-              "h-auto min-h-[104px] w-full resize-y py-2",
-              errors.directions && "border-console-red",
-            )}
-            {...register("directions")}
+        </section>
+
+        <div className="border-t border-adm-hairline pt-5">
+          <EditableFormActions
+            mode={!isEdit ? "create" : isEditing ? "editing" : "locked"}
+            saving={saving}
+            createLabel="Save address"
+            editLabel="Edit address"
+            onEdit={() => setIsEditing(true)}
+            onCancel={() => {
+              if (!isEdit) {
+                router.push(LIST);
+                return;
+              }
+              reset();
+              setIsEditing(false);
+            }}
           />
-        </AdminField>
-        <EditableFormActions
-          mode={!isEdit ? "create" : isEditing ? "editing" : "locked"}
-          saving={saving}
-          createLabel="Save address"
-          editLabel="Edit address"
-          onEdit={() => setIsEditing(true)}
-          onCancel={() => {
-            if (!isEdit) {
-              router.push(LIST);
-              return;
-            }
-            reset();
-            setIsEditing(false);
-          }}
-        />
+        </div>
       </form>
     </AdminCard>
   );

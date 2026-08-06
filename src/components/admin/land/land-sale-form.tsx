@@ -9,6 +9,7 @@ import {
   AdminField,
   AdminPageHeader,
   adminInputClass,
+  SectionHeading,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
 import { BackButton } from "@/components/ui/BackButton";
@@ -84,62 +85,79 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
       />
 
       <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        <AdminCard className="flex flex-col gap-3 px-5 py-4">
-          <AdminField label="Plot" error={errors.plotId?.message}>
-            <Controller
-              control={control}
-              name="plotId"
-              render={({ field }) => (
-                <SearchableSelect
-                  value={field.value}
-                  onChange={field.onChange}
-                  options={(plots.data?.data ?? []).map((p) => ({
-                    value: p.id,
-                    label: p.reference,
-                    hint: p.locationText,
-                  }))}
-                  placeholder="Choose an available plot"
-                  onSearchChange={plotSearch.onSearchChange}
-                  loading={plots.isFetching}
-                  className={cn(errors.plotId && "border-console-red")}
-                />
-              )}
-            />
-          </AdminField>
-          <AdminField label="Buyer" error={errors.buyerId?.message}>
-            <Controller
-              control={control}
-              name="buyerId"
-              render={({ field }) => (
-                <SearchableSelect
-                  value={field.value}
-                  onChange={field.onChange}
-                  options={(buyers.data?.data ?? []).map((b) => ({
-                    value: b.id,
-                    label: b.name,
-                  }))}
-                  placeholder="Choose the buyer"
-                  onSearchChange={buyerSearch.onSearchChange}
-                  loading={buyers.isFetching}
-                  className={cn(errors.buyerId && "border-console-red")}
-                />
-              )}
-            />
-          </AdminField>
-          <AdminField
-            error={errors.agreedPriceGhs?.message}
-            hint="The whole price the buyer is taking the plot at, before any deposit."
-            label="Agreed price (GHS)"
-          >
-            <Input
-              inputMode="decimal"
-              className={cn(adminInputClass, errors.agreedPriceGhs && "border-console-red")}
-              {...register("agreedPriceGhs")}
-            />
-          </AdminField>
-          <AdminField label="Notes" optional>
-            <Input className={adminInputClass} {...register("notes")} />
-          </AdminField>
+        <AdminCard className="flex flex-col gap-5 px-5 py-4">
+          <section className="flex flex-col gap-3">
+            <SectionHeading className="mb-0">Which plot, and to whom</SectionHeading>
+            <AdminField label="Plot" error={errors.plotId?.message}>
+              <Controller
+                control={control}
+                name="plotId"
+                render={({ field }) => (
+                  <SearchableSelect
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={(plots.data?.data ?? []).map((p) => ({
+                      value: p.id,
+                      label: p.reference,
+                      hint: p.locationText,
+                    }))}
+                    placeholder="e.g. TML-021"
+                    onSearchChange={plotSearch.onSearchChange}
+                    loading={plots.isFetching}
+                    className={cn(errors.plotId && "border-console-red")}
+                  />
+                )}
+              />
+            </AdminField>
+            <AdminField label="Buyer" error={errors.buyerId?.message}>
+              <Controller
+                control={control}
+                name="buyerId"
+                render={({ field }) => (
+                  <SearchableSelect
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={(buyers.data?.data ?? []).map((b) => ({
+                      value: b.id,
+                      label: b.name,
+                    }))}
+                    placeholder="e.g. Ama Mensah"
+                    onSearchChange={buyerSearch.onSearchChange}
+                    loading={buyers.isFetching}
+                    className={cn(errors.buyerId && "border-console-red")}
+                  />
+                )}
+              />
+            </AdminField>
+          </section>
+
+          <section className="flex flex-col gap-3 border-t border-adm-hairline pt-5">
+            <SectionHeading
+              className="mb-0"
+              hint="What the buyer is taking the plot at. Deposits and instalments are recorded against the sale afterwards."
+            >
+              The price
+            </SectionHeading>
+            <AdminField
+              error={errors.agreedPriceGhs?.message}
+              hint="The whole price the buyer is taking the plot at, before any deposit."
+              label="Agreed price (GHS)"
+            >
+              <Input
+                inputMode="decimal"
+                placeholder="e.g. 60000"
+                className={cn(adminInputClass, errors.agreedPriceGhs && "border-console-red")}
+                {...register("agreedPriceGhs")}
+              />
+            </AdminField>
+            <AdminField label="Notes" optional>
+              <Input
+                placeholder="e.g. Buyer paying in three instalments"
+                className={adminInputClass}
+                {...register("notes")}
+              />
+            </AdminField>
+          </section>
         </AdminCard>
 
         <div className="flex justify-end gap-2">

@@ -10,6 +10,7 @@ import {
   AdminField,
   AdminPageHeader,
   adminInputClass,
+  SectionHeading,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
 import { BackButton } from "@/components/ui/BackButton";
@@ -131,6 +132,9 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
         sub="Produce a farmer brought back against their grant - optionally received into a warehouse"
       />
 
+      {/* Field pairs measure against this form, not the viewport: the console
+          shell keeps a ~225px rail beside it, so `sm:` paired fields up while
+          the column was still too narrow to carry two of them. */}
       <form
         noValidate
         // Surface the missing file alongside RHF's own errors: on an invalid
@@ -138,129 +142,166 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
         onSubmit={handleSubmit(onSubmit, () => {
           if (!receipt) setReceiptError(RECEIPT_MISSING);
         })}
-        className="flex flex-col gap-4"
+        className="@container flex flex-col gap-4"
       >
-        <AdminCard className="flex flex-col gap-3 px-5 py-4">
-          <AdminField label="Farmer" error={errors.farmerId?.message}>
-            <Controller
-              control={control}
-              name="farmerId"
-              render={({ field }) => (
-                <SearchableSelect
-                  value={field.value}
-                  onChange={field.onChange}
-                  options={(farmers.data?.data ?? []).map((f) => ({
-                    value: f.id,
-                    label: f.name,
-                    ...(f.community ? { hint: f.community } : {}),
-                  }))}
-                  placeholder="Choose the farmer"
-                  onSearchChange={farmerSearch.onSearchChange}
-                  loading={farmers.isFetching}
-                  className={cn(errors.farmerId && "border-console-red")}
-                />
-              )}
-            />
-          </AdminField>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <AdminField label="Season" error={errors.seasonId?.message}>
-              <Controller
-                control={control}
-                name="seasonId"
-                render={({ field }) => (
-                  <SearchableSelect
-                    value={field.value}
-                    onChange={field.onChange}
-                    options={(seasons.data?.data ?? []).map((s) => ({
-                      value: s.id,
-                      label: s.name,
-                    }))}
-                    placeholder="Choose the season"
-                    className={cn(errors.seasonId && "border-console-red")}
-                  />
-                )}
-              />
-            </AdminField>
-            <AdminField label="Commodity" error={errors.commodityId?.message}>
-              <Controller
-                control={control}
-                name="commodityId"
-                render={({ field }) => (
-                  <SearchableSelect
-                    value={field.value}
-                    onChange={field.onChange}
-                    options={(commodities.data?.data ?? []).map((c) => ({
-                      value: c.id,
-                      label: c.name,
-                    }))}
-                    placeholder="Choose the commodity"
-                    className={cn(errors.commodityId && "border-console-red")}
-                  />
-                )}
-              />
-            </AdminField>
-            <AdminField label="Weight (kg)" error={errors.weightKg?.message}>
-              <Input
-                inputMode="decimal"
-                className={cn(adminInputClass, errors.weightKg && "border-console-red")}
-                {...register("weightKg")}
-              />
-            </AdminField>
-            <AdminField
-              error={errors.ratePerKgGhs?.message}
-              hint="The price you are crediting this produce at, which sets how much it clears off the grant."
-              label="Rate per kg (GHS)"
+        <AdminCard className="flex flex-col gap-5 px-5 py-4">
+          <section className="flex flex-col gap-3">
+            <SectionHeading
+              className="mb-0"
+              hint="Which farmer brought produce back, against which season, and what it is."
             >
-              <Input
-                inputMode="decimal"
-                className={cn(adminInputClass, errors.ratePerKgGhs && "border-console-red")}
-                {...register("ratePerKgGhs")}
+              Who and what
+            </SectionHeading>
+            <AdminField label="Farmer" error={errors.farmerId?.message}>
+              <Controller
+                control={control}
+                name="farmerId"
+                render={({ field }) => (
+                  <SearchableSelect
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={(farmers.data?.data ?? []).map((f) => ({
+                      value: f.id,
+                      label: f.name,
+                      ...(f.community ? { hint: f.community } : {}),
+                    }))}
+                    placeholder="e.g. Abukari Yakubu"
+                    onSearchChange={farmerSearch.onSearchChange}
+                    loading={farmers.isFetching}
+                    className={cn(errors.farmerId && "border-console-red")}
+                  />
+                )}
               />
             </AdminField>
-          </div>
-
-          <AdminField
-            label="Take into stock at"
-            optional
-            hint="Choosing a warehouse mints a costed stock lot from this produce."
-            error={errors.intakeWarehouseId?.message}
-          >
-            <Controller
-              control={control}
-              name="intakeWarehouseId"
-              render={({ field }) => (
-                <SearchableSelect
-                  value={field.value ?? ""}
-                  onChange={field.onChange}
-                  options={[
-                    { value: "", label: "Do not take into stock" },
-                    ...(warehouses.data?.data ?? []).map((w) => ({
-                      value: w.id,
-                      label: w.name,
-                    })),
-                  ]}
-                  placeholder="Do not take into stock"
+            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+              <AdminField label="Season" error={errors.seasonId?.message}>
+                <Controller
+                  control={control}
+                  name="seasonId"
+                  render={({ field }) => (
+                    <SearchableSelect
+                      value={field.value}
+                      onChange={field.onChange}
+                      options={(seasons.data?.data ?? []).map((s) => ({
+                        value: s.id,
+                        label: s.name,
+                      }))}
+                      placeholder="e.g. 2026 major season"
+                      className={cn(errors.seasonId && "border-console-red")}
+                    />
+                  )}
                 />
-              )}
-            />
-          </AdminField>
+              </AdminField>
+              <AdminField label="Commodity" error={errors.commodityId?.message}>
+                <Controller
+                  control={control}
+                  name="commodityId"
+                  render={({ field }) => (
+                    <SearchableSelect
+                      value={field.value}
+                      onChange={field.onChange}
+                      options={(commodities.data?.data ?? []).map((c) => ({
+                        value: c.id,
+                        label: c.name,
+                      }))}
+                      placeholder="e.g. Maize"
+                      className={cn(errors.commodityId && "border-console-red")}
+                    />
+                  )}
+                />
+              </AdminField>
+            </div>
+          </section>
 
-          <AdminField label="Notes" optional error={errors.notes?.message}>
-            <Input className={adminInputClass} {...register("notes")} />
-          </AdminField>
+          <section className="flex flex-col gap-3 border-t border-adm-hairline pt-5">
+            <SectionHeading
+              className="mb-0"
+              hint="How much came back and what you are crediting it at. Those two set the value cleared off the grant."
+            >
+              Weight and value
+            </SectionHeading>
+            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+              <AdminField label="Weight (kg)" error={errors.weightKg?.message}>
+                <Input
+                  inputMode="decimal"
+                  placeholder="e.g. 900"
+                  className={cn(adminInputClass, errors.weightKg && "border-console-red")}
+                  {...register("weightKg")}
+                />
+              </AdminField>
+              <AdminField
+                error={errors.ratePerKgGhs?.message}
+                hint="The price you are crediting this produce at, which sets how much it clears off the grant."
+                label="Rate per kg (GHS)"
+              >
+                <Input
+                  inputMode="decimal"
+                  placeholder="e.g. 4.20"
+                  className={cn(adminInputClass, errors.ratePerKgGhs && "border-console-red")}
+                  {...register("ratePerKgGhs")}
+                />
+              </AdminField>
+            </div>
+            {/* The running total sits with the two figures it is worked out
+                from, not at the foot of the form where it read as a stray. */}
+            <div className="flex items-center justify-between rounded-[6px] border border-adm-hairline bg-adm-sunken px-4 py-3 text-[13px]">
+              <span className="font-semibold text-adm-muted">Value credited</span>
+              <span className="text-[16px] font-bold text-console">
+                {value === null ? "-" : formatCedis(value)}
+              </span>
+            </div>
+          </section>
+
+          <section className="flex flex-col gap-3 border-t border-adm-hairline pt-5">
+            <SectionHeading
+              className="mb-0"
+              hint="Whether this produce also becomes stock you can sell on."
+            >
+              Where it goes
+            </SectionHeading>
+            <AdminField
+              label="Take into stock at"
+              optional
+              hint="Choosing a warehouse mints a costed stock lot from this produce."
+              error={errors.intakeWarehouseId?.message}
+            >
+              <Controller
+                control={control}
+                name="intakeWarehouseId"
+                render={({ field }) => (
+                  <SearchableSelect
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    options={[
+                      { value: "", label: "Do not take into stock" },
+                      ...(warehouses.data?.data ?? []).map((w) => ({
+                        value: w.id,
+                        label: w.name,
+                      })),
+                    ]}
+                    placeholder="e.g. Tamale main store"
+                  />
+                )}
+              />
+            </AdminField>
+            <AdminField label="Notes" optional error={errors.notes?.message}>
+              <Input
+                placeholder="e.g. Two bags rejected for damp"
+                className={adminInputClass}
+                {...register("notes")}
+              />
+            </AdminField>
+          </section>
         </AdminCard>
 
         <AdminCard className="flex flex-col gap-3 px-5 py-4">
-          <div>
-            <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-              Signed receipt
-            </div>
-            <p className="mt-1 text-[12px] text-adm-muted">
-              The signed receipt or weigh slip is what settles &quot;I already
-              paid&quot; disputes - it stays on this record as the evidence.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <SectionHeading
+            className="mb-0"
+            hint="The signed receipt or weigh slip is what settles &quot;I already paid&quot; disputes - it stays on this record as the evidence."
+          >
+            Paperwork
+          </SectionHeading>
+          <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
             <AdminField
               label="Received by"
               optional
@@ -268,13 +309,14 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
               error={errors.receivedByName?.message}
             >
               <Input
+                placeholder="e.g. Musah Alhassan"
                 className={cn(adminInputClass, errors.receivedByName && "border-console-red")}
                 {...register("receivedByName")}
               />
             </AdminField>
             <AdminField label="Document name" optional>
               <Input
-                placeholder="Repayment receipt"
+                placeholder="e.g. Weigh slip, 12 Nov"
                 className={adminInputClass}
                 value={documentName}
                 onChange={(e) => setDocumentName(e.target.value)}
@@ -282,9 +324,10 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
             </AdminField>
           </div>
           {/* Not an AdminField: wrapping the picker's buttons in a <label>
-              would misroute label clicks. Same stencil-label + error markup. */}
+              would misroute label clicks. Same label/error markup as
+              AdminField so it reads as one of the fields above it. */}
           <div>
-            <span className="mb-[7px] block text-[11px] uppercase tracking-[0.14em] text-adm-muted">
+            <span className="mb-1 block text-[13px] font-semibold text-adm-ink">
               Receipt file
             </span>
             <FilePicker
@@ -301,20 +344,13 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
             {receiptError ? (
               <span
                 role="alert"
-                className="mt-1 block text-[12px] font-medium text-console-red"
+                className="mt-1.5 block text-[12.5px] font-medium text-console-red"
               >
                 {receiptError}
               </span>
             ) : null}
           </div>
         </AdminCard>
-
-        <div className="flex items-center justify-between rounded-[6px] border border-adm-hairline bg-adm-sunken px-4 py-3 text-[13px]">
-          <span className="font-semibold text-adm-muted">Value credited</span>
-          <span className="text-[16px] font-bold text-console">
-            {value === null ? "-" : formatCedis(value)}
-          </span>
-        </div>
 
         <div className="flex justify-end gap-2">
           <AdminButton

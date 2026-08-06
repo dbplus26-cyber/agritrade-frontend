@@ -20,6 +20,7 @@ import {
   AdminPageHeader,
   adminInputClass,
   adminSelectClass,
+  SectionHeading,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { useConfirm } from "@/hooks/use-confirm";
@@ -146,146 +147,169 @@ export function UserForm() {
         sub="Create a console account and hand over its first password"
       />
       <AdminCard className="px-5 py-[18px]">
+        {/* Field pairs measure against this form, not the viewport: the
+            console shell keeps a ~225px rail beside it, so `sm:` paired the
+            names up while the column was still too narrow for two. */}
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-[13px]"
+          className="@container flex flex-col gap-5"
         >
-          <div className="grid gap-[13px] sm:grid-cols-2">
-            <AdminField label="First name" error={errors.firstName?.message}>
-              <Input
-                placeholder="e.g. Amina"
-                className={cn(
-                  adminInputClass,
-                  errors.firstName && "border-console-red",
-                )}
-                {...register("firstName")}
-              />
-            </AdminField>
-            <AdminField label="Last name" error={errors.lastName?.message}>
-              <Input
-                placeholder="e.g. Abdulai"
-                className={cn(
-                  adminInputClass,
-                  errors.lastName && "border-console-red",
-                )}
-                {...register("lastName")}
-              />
-            </AdminField>
-          </div>
-          <AdminField label="Email" error={errors.email?.message}>
-            <Input
-              type="email"
-              placeholder="them@dbplus.com"
-              className={cn(adminInputClass, errors.email && "border-console-red")}
-              {...register("email")}
-            />
-          </AdminField>
-          <AdminField
-            label="Phone"
-            optional
-            error={errors.phone?.message}
-          >
-            <Input
-              type="tel"
-              placeholder="024 000 0000"
-              className={cn(adminInputClass, errors.phone && "border-console-red")}
-              {...register("phone")}
-            />
-          </AdminField>
-          <AdminField
-            label="Role"
-            hint="Agents only ever see their own float and purchases."
-          >
-            <Controller
-              control={control}
-              name="role"
-              render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className={cn(adminSelectClass, "w-full")}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ROLE_OPTIONS.map((role) => (
-                      <SelectItem key={role} value={role}>
-                        {ROLE_LABEL[role]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-          </AdminField>
-          <AdminField
-            label="Initial password"
-            hint="Share it with them securely - it is never emailed. They should change it on first sign-in."
-            error={errors.password?.message}
-          >
-            <div className="flex gap-2">
-              <div className="min-w-0 flex-1">
-                <PasswordInput
-                  autoComplete="new-password"
-                  placeholder="Set their first password"
+          <section className="flex flex-col gap-[13px]">
+            <SectionHeading className="mb-0">Who they are</SectionHeading>
+            <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+              <AdminField label="First name" error={errors.firstName?.message}>
+                <Input
+                  placeholder="e.g. Amina"
                   className={cn(
                     adminInputClass,
-                    errors.password && "border-console-red",
+                    errors.firstName && "border-console-red",
                   )}
-                  {...register("password")}
+                  {...register("firstName")}
                 />
-              </div>
-              <AdminButton
-                type="button"
-                variant="secondary"
-                className="h-[38px] flex-none px-3 text-[12.5px]"
-                onClick={() =>
-                  setValue("password", generatePassword(), {
-                    shouldValidate: true,
-                  })
-                }
-              >
-                Generate
-              </AdminButton>
+              </AdminField>
+              <AdminField label="Last name" error={errors.lastName?.message}>
+                <Input
+                  placeholder="e.g. Abdulai"
+                  className={cn(
+                    adminInputClass,
+                    errors.lastName && "border-console-red",
+                  )}
+                  {...register("lastName")}
+                />
+              </AdminField>
             </div>
-          </AdminField>
+            <AdminField label="Email" error={errors.email?.message}>
+              <Input
+                type="email"
+                placeholder="e.g. amina@dbplus.com"
+                className={cn(adminInputClass, errors.email && "border-console-red")}
+                {...register("email")}
+              />
+            </AdminField>
+            <AdminField
+              label="Phone"
+              optional
+              error={errors.phone?.message}
+            >
+              <Input
+                type="tel"
+                placeholder="e.g. 024 000 0000"
+                className={cn(adminInputClass, errors.phone && "border-console-red")}
+                {...register("phone")}
+              />
+            </AdminField>
+          </section>
 
-          <div className="mt-1 grid gap-3 rounded-[6px] border border-adm-line bg-adm-sunken p-3.5">
-            <Controller
-              control={control}
-              name="canApprove"
-              render={({ field }) => (
-                <label className="flex cursor-pointer items-center justify-between gap-3">
-                  <span>
-                    <span className="block text-[13px] font-semibold text-adm-ink">
-                      Can approve
-                    </span>
-                    <span className="block text-[12px] text-adm-muted">
-                      May decide pending approval requests (delegated authority).
-                    </span>
-                  </span>
-                  <Switch checked={field.value} onCheckedChange={field.onChange} />
-                </label>
-              )}
-            />
-            <Controller
-              control={control}
-              name="financialVisibility"
-              render={({ field }) => (
-                <label className="flex cursor-pointer items-center justify-between gap-3">
-                  <span>
-                    <span className="block text-[13px] font-semibold text-adm-ink">
-                      Financial visibility
-                    </span>
-                    <span className="block text-[12px] text-adm-muted">
-                      May see prices, totals and profit across the console.
-                    </span>
-                  </span>
-                  <Switch checked={field.value} onCheckedChange={field.onChange} />
-                </label>
-              )}
-            />
-          </div>
+          <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+            <SectionHeading
+              className="mb-0"
+              hint="What this account can reach, and the password you hand over to open it."
+            >
+              Access
+            </SectionHeading>
+            <AdminField
+              label="Role"
+              hint="Agents only ever see their own float and purchases."
+            >
+              <Controller
+                control={control}
+                name="role"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className={cn(adminSelectClass, "w-full")}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ROLE_OPTIONS.map((role) => (
+                        <SelectItem key={role} value={role}>
+                          {ROLE_LABEL[role]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </AdminField>
+            <AdminField
+              label="Initial password"
+              hint="Share it with them securely - it is never emailed. They should change it on first sign-in."
+              error={errors.password?.message}
+            >
+              <div className="flex gap-2">
+                <div className="min-w-0 flex-1">
+                  <PasswordInput
+                    autoComplete="new-password"
+                    placeholder="Type one, or press Generate"
+                    className={cn(
+                      adminInputClass,
+                      errors.password && "border-console-red",
+                    )}
+                    {...register("password")}
+                  />
+                </div>
+                <AdminButton
+                  type="button"
+                  variant="secondary"
+                  className="h-[38px] flex-none px-3 text-[12.5px]"
+                  onClick={() =>
+                    setValue("password", generatePassword(), {
+                      shouldValidate: true,
+                    })
+                  }
+                >
+                  Generate
+                </AdminButton>
+              </div>
+            </AdminField>
+          </section>
 
-          <div className="mt-1 flex gap-2">
+          <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+            <SectionHeading
+              className="mb-0"
+              hint="Two switches that widen the account beyond its role. Both are easy to leave on by accident."
+            >
+              Extra permissions
+            </SectionHeading>
+            <div className="grid gap-3 rounded-[6px] border border-adm-line bg-adm-sunken p-3.5">
+              <Controller
+                control={control}
+                name="canApprove"
+                render={({ field }) => (
+                  <label className="flex cursor-pointer items-center justify-between gap-3">
+                    <span>
+                      <span className="block text-[13px] font-semibold text-adm-ink">
+                        Can approve
+                      </span>
+                      <span className="block text-[12px] text-adm-muted">
+                        May decide pending approval requests (delegated authority).
+                      </span>
+                    </span>
+                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  </label>
+                )}
+              />
+              <Controller
+                control={control}
+                name="financialVisibility"
+                render={({ field }) => (
+                  <label className="flex cursor-pointer items-center justify-between gap-3">
+                    <span>
+                      <span className="block text-[13px] font-semibold text-adm-ink">
+                        Financial visibility
+                      </span>
+                      <span className="block text-[12px] text-adm-muted">
+                        May see prices, totals and profit across the console.
+                      </span>
+                    </span>
+                    <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  </label>
+                )}
+              />
+            </div>
+          </section>
+
+          <div className="flex gap-2 border-t border-adm-hairline pt-5">
             <AdminButton
               type="submit"
               disabled={isLoading}

@@ -17,6 +17,7 @@ import {
   AdminField,
   AdminPageHeader,
   EditableFormActions,
+  SectionHeading,
   adminInputClass,
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
@@ -368,86 +369,104 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
 
   return (
     <AdminCard className="px-5 py-[18px]">
+      {/* Field pairs measure against this form, not the viewport: the console
+          shell keeps a ~225px rail beside it, so `sm:` paired fields up while
+          the column was still too narrow to carry two of them. */}
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col gap-[13px]"
+        className="@container flex flex-col gap-5"
       >
-        <AdminField label="Name" error={errors.name?.message}>
-          <Input
-            placeholder="e.g. Alhaji Mahama"
-            disabled={readOnly}
-            className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
-            {...register("name")}
-          />
-        </AdminField>
-        <div className="grid gap-[13px] sm:grid-cols-2">
-          <AdminField label="Phone" optional error={errors.phone?.message}>
-            <Input
-              type="tel"
-              placeholder="024 000 0000"
-              disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.phone && "border-console-red")}
-              {...register("phone")}
-            />
-          </AdminField>
-          {/* Optional: most sellers here are reachable only by phone, but a
-              company seller sends its paperwork by email. */}
-          <AdminField label="Email" optional error={errors.email?.message}>
-            <Input
-              type="email"
-              placeholder="name@example.com"
-              disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.email && "border-console-red")}
-              {...register("email")}
-            />
-          </AdminField>
-          <AdminField
-            label="Community"
-            optional
-            error={errors.community?.message}
+        <section className="flex flex-col gap-[13px]">
+          <SectionHeading
+            className="mb-0"
+            hint="Who the landowner is, and how you get hold of them."
           >
+            Who they are
+          </SectionHeading>
+          <AdminField label="Name" error={errors.name?.message}>
             <Input
-              placeholder="e.g. Kumbungu"
+              placeholder="e.g. Alhaji Mahama"
+              disabled={readOnly}
+              className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
+              {...register("name")}
+            />
+          </AdminField>
+          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+            <AdminField label="Phone" optional error={errors.phone?.message}>
+              <Input
+                type="tel"
+                placeholder="e.g. 024 000 0000"
+                disabled={readOnly}
+                className={cn(adminInputClass, roCls, errors.phone && "border-console-red")}
+                {...register("phone")}
+              />
+            </AdminField>
+            {/* Optional: most sellers here are reachable only by phone, but a
+                company seller sends its paperwork by email. */}
+            <AdminField label="Email" optional error={errors.email?.message}>
+              <Input
+                type="email"
+                placeholder="e.g. mahama@example.com"
+                disabled={readOnly}
+                className={cn(adminInputClass, roCls, errors.email && "border-console-red")}
+                {...register("email")}
+              />
+            </AdminField>
+            <AdminField
+              label="Community"
+              optional
+              error={errors.community?.message}
+            >
+              <Input
+                placeholder="e.g. Kumbungu"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.community && "border-console-red",
+                )}
+                {...register("community")}
+              />
+            </AdminField>
+          </div>
+        </section>
+
+        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+          <SectionHeading className="mb-0">Anything else</SectionHeading>
+          <AdminField label="Notes" optional error={errors.notes?.message}>
+            <textarea
+              rows={4}
+              placeholder="e.g. Sells only through his son, who lives in Tamale"
               disabled={readOnly}
               className={cn(
                 adminInputClass,
                 roCls,
-                errors.community && "border-console-red",
+                "h-auto min-h-[104px] w-full resize-y py-2",
+                errors.notes && "border-console-red",
               )}
-              {...register("community")}
+              {...register("notes")}
             />
           </AdminField>
-        </div>
-        <AdminField label="Notes" optional error={errors.notes?.message}>
-          <textarea
-            rows={4}
-            placeholder="Anything worth remembering about this seller."
-            disabled={readOnly}
-            className={cn(
-              adminInputClass,
-              roCls,
-              "h-auto min-h-[104px] w-full resize-y py-2",
-              errors.notes && "border-console-red",
-            )}
-            {...register("notes")}
+        </section>
+
+        <div className="border-t border-adm-hairline pt-5">
+          <EditableFormActions
+            mode={!isEdit ? "create" : isEditing ? "editing" : "locked"}
+            saving={saving}
+            createLabel="Create seller"
+            editLabel="Edit seller"
+            onEdit={() => setIsEditing(true)}
+            onCancel={() => {
+              if (!isEdit) {
+                router.push(LIST);
+                return;
+              }
+              reset();
+              setIsEditing(false);
+            }}
           />
-        </AdminField>
-        <EditableFormActions
-          mode={!isEdit ? "create" : isEditing ? "editing" : "locked"}
-          saving={saving}
-          createLabel="Create seller"
-          editLabel="Edit seller"
-          onEdit={() => setIsEditing(true)}
-          onCancel={() => {
-            if (!isEdit) {
-              router.push(LIST);
-              return;
-            }
-            reset();
-            setIsEditing(false);
-          }}
-        />
+        </div>
       </form>
     </AdminCard>
   );
