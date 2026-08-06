@@ -8,6 +8,8 @@ import {
   BookUser,
   ChevronDown,
   ChevronRight,
+  Globe,
+  HandCoins,
   LayoutDashboard,
   LogOut,
   type LucideIcon,
@@ -238,13 +240,31 @@ function SidebarSignOut() {
   );
 }
 
-/** lucide icon per nav group, shown on each collapsible dropdown header. */
+/**
+ * lucide icon per nav group, shown on each collapsible dropdown header.
+ *
+ * Every group needs an entry. The header renders the icon only when one is
+ * found, so a missing key is not an error - the group just sits in the rail
+ * with a blank where its neighbours have a mark, which is how "Money out" and
+ * "Website" went unnoticed. Add the icon in the same change as the group.
+ *
+ * All concrete objects rather than abstractions, which is what keeps them
+ * readable at 16px and tells them apart at a glance in a collapsed rail.
+ */
 const GROUP_ICON: Record<string, LucideIcon> = {
   Overview: LayoutDashboard,
   Trading: Store,
+  // Money LEAVING the business - payouts, floats, the company's own account.
+  // A hand paying out rather than a banknote or a wallet: those say "money",
+  // and every group under this one is about money too. The direction is the
+  // distinguishing fact.
+  "Money out": HandCoins,
   Land: MapPin,
   Farm: Sprout,
   Directory: BookUser,
+  // The public site: everything here arrived through it - enquiries, reviews,
+  // applications - so the group is named for the door, not the post.
+  Website: Globe,
   Admin: ShieldCheck,
 };
 
