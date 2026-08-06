@@ -18,20 +18,39 @@ export interface PlotPhoto {
  * Every photo is mounted in the same fixed-height frame and only the current
  * one is shown, so stepping never shifts the card. A single photo renders
  * exactly as before: no controls, no count.
+ *
+ * NOTHING ON FILE MEANS NO FRAME. The gallery renders null when there is no
+ * photograph to show, and it owns its own border so that the frame goes with
+ * it - the caller cannot collapse a wrapper it drew around a client component
+ * whose contents failed after render.
+ *
+ * "Nothing to show" covers two cases the reader cannot tell apart: no photo
+ * was ever filed, and every filed photo has stopped resolving. Only the first
+ * was handled before, because it is the only one visible from the server. A
+ * plot whose upload had since been deleted still drew the full bordered frame
+ * and filled it with the PHOTO TO FOLLOW panel, which is exactly the empty
+ * rectangle the frame was supposed to spare the reader.
  */
 export function PlotGallery({
   className,
   fallbackAlt,
+  frameClassName,
   photos,
 }: {
   /** Frame height override - the detail page gives its gallery more room. */
   className?: string;
   /** Used when a photo has no alt text of its own. */
   fallbackAlt: string;
+  /** The border around the frame, dropped with it when there is no photo. */
+  frameClassName?: string;
   photos: PlotPhoto[];
 }) {
   const [index, setIndex] = useState(0);
-  const total = photos.length;
+  // Tracked by src rather than by position: the array is re-created on every
+  // render, so an index would move under a photo that had already failed.
+  const [failed, setFailed] = useState<string[]>([]);
+  const live = photos.filter((photo) => !failed.includes(photo.url));
+  const total = live.length;
   // Wrapping keeps a two or three photo set circular - there is no dead end to
   // discover at either edge.
   const step = (delta: number) => {
@@ -50,7 +69,15 @@ export function PlotGallery({
   const plate =
     "absolute top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-[2px] border-2 border-forest bg-surface text-forest shadow-[2px_2px_0_rgb(31_33_28/0.28)] transition-colors hover:bg-harvest/25 active:bg-harvest focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest";
 
+  if (total === 0) return null;
+
+  // The step wraps over what is LEFT, and the index is clamped rather than
+  // reset: losing the third of three photos should not throw the reader back
+  // to the first one they had already stepped past.
+  const current = Math.min(index, total - 1);
+
   return (
+    <div className={frameClassName}>
     <div
       className={cn(
         "relative h-[180px] border-b-[1.5px] border-soil/50 sm:h-[210px]",
@@ -63,25 +90,28 @@ export function PlotGallery({
         onTouchEnd(e.changedTouches[0]?.clientX ?? 0);
       }}
     >
-      {/* The ledger panel is the floor of the frame. A photo that no longer
-          resolves renders nothing and simply reveals it, so a deleted upload
-          reads as "photo to follow" instead of a broken-image box - and the
-          frame keeps its height either way. */}
+      {/* The ledger panel is the floor of the frame, and it is only ever seen
+          while a photo is still loading. Once every photo has failed the whole
+          gallery unmounts above, so it can no longer be left standing as the
+          finished state of a plot with nothing on file. */}
       <PhotoFallback className="absolute inset-0" />
-      {photos.map((photo, i) => (
+      {live.map((photo, i) => (
         // No scrim over the plot photo: a buyer is judging the land, so it
         // renders at true colour.
         <Photo
-          key={`${String(i)}-${photo.url}`}
+          key={photo.url}
           src={photo.url}
           alt={photo.alt ?? fallbackAlt}
           fill
           sizes="(min-width: 1024px) 560px, 100vw"
-          aria-hidden={i === index ? undefined : "true"}
+          aria-hidden={i === current ? undefined : "true"}
           className={`object-cover transition-opacity duration-200 ${
-            i === index ? "opacity-100" : "opacity-0"
+            i === current ? "opacity-100" : "opacity-0"
           }`}
           fallback={null}
+          onFailed={(src) => {
+            setFailed((prev) => (prev.includes(src) ? prev : [...prev, src]));
+          }}
         />
       ))}
 
@@ -114,10 +144,11 @@ export function PlotGallery({
             className="stencil absolute bottom-2.5 left-2.5 rounded-[2px] bg-forest px-2.5 py-1.5 text-[10px] leading-none tracking-[0.14em] text-surface"
           >
             <span className="sr-only">Photo </span>
-            {index + 1} / {total}
+            {current + 1} / {total}
           </p>
         </>
       ) : null}
+    </div>
     </div>
   );
 }

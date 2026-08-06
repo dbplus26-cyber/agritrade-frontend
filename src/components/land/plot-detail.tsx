@@ -60,16 +60,18 @@ export async function PlotDetail({ plot }: { plot: PublicLandPlot }) {
         </h1>
 
         <div className="mt-8 flex flex-col gap-8 lg:mt-10 lg:gap-10">
-          {/* Nothing filed, no frame - see PhotoFrame for why. */}
-          {photos.length > 0 ? (
-            <div className="shadow-doc-dark relative border border-soil/30">
-              <PlotGallery
-                className="h-[240px] border-b-0 sm:h-[360px] lg:h-[440px]"
-                fallbackAlt={`Plot ${plot.reference} - ${plot.name}`}
-                photos={photos}
-              />
-            </div>
-          ) : null}
+          {/* No conditional here any more, and no wrapper of our own. The
+              gallery renders null - border included - when there is no
+              photograph to show, which it is the only one in a position to
+              know: a plot can arrive with photos on file whose URLs have since
+              stopped resolving, and that only surfaces in the browser. A frame
+              drawn out here could not be taken back down. */}
+          <PlotGallery
+            className="h-[240px] border-b-0 sm:h-[360px] lg:h-[440px]"
+            fallbackAlt={`Plot ${plot.reference} - ${plot.name}`}
+            frameClassName="shadow-doc-dark relative border border-soil/30"
+            photos={photos}
+          />
 
           <div className="shadow-doc relative border border-soil/35 bg-surface-alt p-6 sm:p-9 lg:p-10">
             <Stamp

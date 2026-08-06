@@ -29,12 +29,20 @@ export function Photo({
   alt,
   fallback,
   fallbackLabel = "PHOTO TO FOLLOW",
+  onFailed,
   ...props
 }: {
   /** Rendered instead of the default panel when the photo fails to load. */
   fallback?: React.ReactNode;
   /** Wording on the default panel. */
   fallbackLabel?: string;
+  /**
+   * Told which src failed, so a PARENT can decide the picture is not coming.
+   * A call site that would rather remove its frame than fill it needs to know
+   * a photo died; on its own this component can only ever swap one box for
+   * another inside a frame somebody else drew.
+   */
+  onFailed?: (src: string) => void;
 } & ImageProps) {
   const [failedSrc, setFailedSrc] = useState<null | string>(null);
   const src = typeof props.src === "string" ? props.src : null;
@@ -55,6 +63,7 @@ export function Photo({
       alt={alt}
       onError={() => {
         setFailedSrc(src);
+        if (src !== null) onFailed?.(src);
       }}
     />
   );
