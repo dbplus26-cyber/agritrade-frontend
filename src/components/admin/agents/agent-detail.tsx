@@ -173,7 +173,7 @@ function FigureLine({
 /** Column headings for the ledger, so the two figure columns are named. */
 function LedgerHead({ withBalance }: { withBalance: boolean }) {
   return (
-    <div className="grid grid-cols-[24px_minmax(0,1fr)_124px] items-baseline gap-x-3 border-b-[1.5px] border-adm-line pb-1.5 text-[9.5px] font-bold tracking-[0.12em] text-adm-faint uppercase @md/ledger:grid-cols-[24px_minmax(0,1fr)_124px_124px]">
+    <div className="grid grid-cols-[24px_minmax(0,1fr)_minmax(124px,max-content)] items-baseline gap-x-3 border-b-[1.5px] border-adm-line pb-1.5 text-[9.5px] font-bold tracking-[0.12em] text-adm-faint uppercase @md/ledger:grid-cols-[24px_minmax(0,1fr)_minmax(124px,max-content)_minmax(124px,max-content)]">
       <span aria-hidden="true" />
       <span>Entry</span>
       <span className="text-right">Amount</span>
@@ -185,8 +185,14 @@ function LedgerHead({ withBalance }: { withBalance: boolean }) {
 }
 
 /**
- * One ledger line, on a fixed three-track grid: type marker, the entry, then
- * the money columns. The grid is what makes the ledger read as a ledger - the
+ * One ledger line: type marker, the entry, then the money columns.
+ *
+ * The money tracks are minmax(124px, max-content), NOT a flat 124px. A fixed
+ * track does not grow, and the figures inside it are whitespace-nowrap - so a
+ * float in the millions rendered past the end of its own column and over the
+ * one beside it. The floor keeps ordinary rows aligned on the same edge; the
+ * max-content ceiling lets one large figure widen the track for every row at
+ * once, which keeps the column straight instead of ragged. The grid is what makes the ledger read as a ledger - the
  * old flex row let the description push the amount around, so no two rows'
  * figures sat on the same edge and the running balance hid in a "Bal …" scrap
  * of body text.
@@ -206,7 +212,7 @@ function LedgerRow({
   withBalanceColumn: boolean;
 }) {
   return (
-    <div className="grid grid-cols-[24px_minmax(0,1fr)_124px] items-start gap-x-3 border-b border-adm-hairline py-2.5 last:border-b-0 @md/ledger:grid-cols-[24px_minmax(0,1fr)_124px_124px]">
+    <div className="grid grid-cols-[24px_minmax(0,1fr)_minmax(124px,max-content)] items-start gap-x-3 border-b border-adm-hairline py-2.5 last:border-b-0 @md/ledger:grid-cols-[24px_minmax(0,1fr)_minmax(124px,max-content)_minmax(124px,max-content)]">
       <TxMarker type={tx.type} />
       <div className="min-w-0">
         <p className="min-w-0 text-[13px] leading-snug text-adm-ink [overflow-wrap:anywhere]">
@@ -551,6 +557,9 @@ function ReconcileDialog({
   );
 }
 
+/** Counts per page in the reconciliations rail. */
+const RECON_PAGE_SIZE = 5;
+
 export function AgentDetail({ agentUserId }: { agentUserId: string }) {
   const detail = useGetAgentQuery(agentUserId);
   const [ledgerPage, setLedgerPage] = useState(1);
@@ -558,7 +567,15 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
     agentUserId,
     params: { page: ledgerPage, limit: 10 },
   });
-  const recons = useGetAgentReconciliationsQuery({ agentUserId, limit: 5 });
+  // Counts accumulate for as long as the agent holds a float, so the rail
+  // pages against the server rather than showing an unlabelled "first five"
+  // that quietly stops being the whole story.
+  const [reconPage, setReconPage] = useState(1);
+  const recons = useGetAgentReconciliationsQuery({
+    agentUserId,
+    limit: RECON_PAGE_SIZE,
+    page: reconPage,
+  });
   const [topUpOpen, setTopUpOpen] = useState(false);
   const [reconcileOpen, setReconcileOpen] = useState(false);
   const { isSuperAdmin } = useAuthRole();
@@ -795,6 +812,15 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
                     </Mono>
                   </div>
                 ))}
+                <ListPagination
+                  page={reconPage}
+                  totalPages={Math.max(
+                    1,
+                    Math.ceil((recons.data?.meta.total ?? 0) / RECON_PAGE_SIZE),
+                  )}
+                  onPageChange={setReconPage}
+                  className="mt-2"
+                />
               </AdminCard>
             ) : null}
           </div>

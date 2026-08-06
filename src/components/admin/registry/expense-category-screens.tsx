@@ -7,7 +7,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
-import { ConsoleFilterBar, ConsoleLabeledSelect } from "@/components/admin/filter-bar";
+import {
+  ConsoleDateRange,
+  ConsoleFilterBar,
+  ConsoleLabeledSelect,
+} from "@/components/admin/filter-bar";
 import {
   AdminButton,
   AdminCard,
@@ -48,8 +52,8 @@ import {
   useUpdateExpenseCategoryMutation,
 } from "@/redux/expense-categories/expense-categories-api";
 import { useGetExpensesQuery } from "@/redux/expenses/expenses-api";
-import { useTableQuery } from "@/hooks/use-table-query";
 import { useAuthRole } from "@/hooks/use-auth-role";
+import { useTableQuery } from "@/hooks/use-table-query";
 import { useMoneyVisibility } from "@/hooks/use-money-visibility";
 import { extractApiError } from "@/lib/extract-api-error";
 import { DateOnlyCell, DateTimeCell } from "@/components/admin/date-cell";
@@ -575,15 +579,48 @@ function ExpenseLine({ expense }: { expense: IExpense }) {
  * compared, which tiles never allowed; and the count no longer changes the
  * shape of the page.
  */
+/**
+ * Filters for the vouchers under a category. Module-const so the identity is
+ * stable across renders (useTableQuery compares against it to decide which
+ * params are non-default and therefore worth putting in the URL).
+ */
+const CATEGORY_EXPENSE_FILTERS = { from: "", to: "" };
+const CATEGORY_EXPENSE_PAGE_SIZE = 12;
+
 function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
   const showMoney = useMoneyVisibility();
-  const [page, setPage] = useState(1);
+  // Server-synced, not local state. A category accumulates vouchers for as
+  // long as the business runs, so this list can never be "just fetch them" -
+  // the page, the search and the date window all belong to the request, and
+  // the URL carries them so a filtered view can be shared, reloaded and
+  // stepped back through.
+  const {
+    filters,
+    page,
+    queryParams,
+    resetFilters,
+    search,
+    setFilter,
+    setPage,
+    setSearch,
+  } = useTableQuery({
+    defaults: CATEGORY_EXPENSE_FILTERS,
+    pageSize: CATEGORY_EXPENSE_PAGE_SIZE,
+    prefix: "exp",
+  });
+
   const { data, isLoading, isFetching, isError, error, refetch } =
-    useGetExpensesQuery({ categoryId, limit: 12, page });
+    useGetExpensesQuery({ ...queryParams, categoryId });
 
   const rows = data?.data ?? [];
   const windowTotal = data?.summary?.totalGhs;
-  const totalPages = Math.max(1, Math.ceil((data?.meta.total ?? 0) / 12));
+  const totalPages = Math.max(
+    1,
+    Math.ceil((data?.meta.total ?? 0) / CATEGORY_EXPENSE_PAGE_SIZE),
+  );
+  const matched = data?.meta.total ?? 0;
+  const activeFilterCount = (filters.from ? 1 : 0) + (filters.to ? 1 : 0);
+  const filtered = activeFilterCount > 0 || search.trim().length > 0;
 
   return (
     // Fills the column so the statement ends where the record rail beside it
@@ -597,8 +634,11 @@ function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
         </h2>
         {showMoney && windowTotal !== null && windowTotal !== undefined ? (
           <span className="flex items-baseline gap-2">
+            {/* The server sums the WHOLE filtered set, not the page on
+                screen, so narrowing the window answers "what did we spend
+                on this in July?" rather than "what is on page 1?". */}
             <span className="text-[11px] font-bold tracking-[0.08em] text-adm-muted uppercase">
-              Total
+              {filtered ? "Matched" : "Total"}
             </span>
             <Mono className="text-[14px] font-bold text-adm-ink">
               {formatCedis(windowTotal)}
@@ -606,6 +646,26 @@ function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
           </span>
         ) : null}
       </div>
+
+      {/* Searching and the date window are the server's job here. Filtering
+          12 rows in the browser would answer only for the page in hand, and
+          silently miss every voucher on the pages behind it. */}
+      <ConsoleFilterBar
+        search={search}
+        onSearch={setSearch}
+        searchPlaceholder="Search voucher no. or description…"
+        activeCount={activeFilterCount}
+        onClear={resetFilters}
+      >
+        <ConsoleDateRange
+          from={filters.from}
+          to={filters.to}
+          onFromChange={(v) => setFilter("from", v)}
+          onToChange={(v) => setFilter("to", v)}
+          fromLabel="Incurred from"
+          toLabel="Incurred to"
+        />
+      </ConsoleFilterBar>
 
       {isLoading ? (
         // A ledger skeleton, matching what actually arrives. A card-grid
@@ -623,8 +683,12 @@ function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
         <AdminCard className="overflow-hidden">
           <EmptyState
             variant="plain"
-            title="No expenses yet"
-            description="Nothing has been filed under this category so far."
+            title={filtered ? "No expenses match" : "No expenses yet"}
+            description={
+              filtered
+                ? "Nothing under this category matches that search or date window."
+                : "Nothing has been filed under this category so far."
+            }
           />
         </AdminCard>
       ) : (
@@ -645,11 +709,15 @@ function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
               ))}
             </ul>
           </AdminCard>
+          <p className="mt-3 text-[11.5px] text-adm-faint">
+            {matched === 1 ? "1 expense" : `${String(matched)} expenses`}
+            {filtered ? " matched" : " filed"}
+          </p>
           <ListPagination
             page={page}
             totalPages={totalPages}
             onPageChange={setPage}
-            className="mt-3"
+            className="mt-1"
           />
         </>
       )}

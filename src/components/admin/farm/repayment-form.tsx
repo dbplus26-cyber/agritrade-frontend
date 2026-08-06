@@ -24,6 +24,7 @@ import { useGetFarmersQuery } from "@/redux/farm/farmers-api";
 import { useGetSeasonsQuery } from "@/redux/farm/seasons-api";
 import { useCreateRepaymentMutation } from "@/redux/farm/repayments-api";
 import { useGetWarehousesQuery } from "@/redux/warehouses/warehouses-api";
+import { useRemoteSearch } from "@/hooks/use-remote-search";
 import { repaymentSchema, type RepaymentValues } from "@/validations/farm-schema";
 
 const LIST = "/admin/repayments";
@@ -33,7 +34,12 @@ const RECEIPT_MISSING = "Upload the signed receipt or weigh slip";
 export function RepaymentForm({ farmerId }: { farmerId?: string }) {
   const router = useRouter();
   const [createRepayment, { isLoading: saving }] = useCreateRepaymentMutation();
-  const farmers = useGetFarmersQuery({ isActive: true, limit: 100 });
+  const farmerSearch = useRemoteSearch();
+  const farmers = useGetFarmersQuery({
+    isActive: true,
+    limit: 20,
+    search: farmerSearch.query,
+  });
   const seasons = useGetSeasonsQuery({ isActive: true, limit: 100 });
   const commodities = useGetCommoditiesQuery({ isActive: true, limit: 100 });
   const warehouses = useGetWarehousesQuery({ isActive: true, limit: 100 });
@@ -148,6 +154,8 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
                     ...(f.community ? { hint: f.community } : {}),
                   }))}
                   placeholder="Choose the farmer"
+                  onSearchChange={farmerSearch.onSearchChange}
+                  loading={farmers.isFetching}
                   className={cn(errors.farmerId && "border-console-red")}
                 />
               )}

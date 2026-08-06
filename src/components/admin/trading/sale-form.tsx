@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { useGetBuyersQuery } from "@/redux/buyers/buyers-api";
 import { useGetCommoditiesQuery } from "@/redux/commodities/commodities-api";
 import { useGetPaymentPoliciesQuery } from "@/redux/payment-policies/payment-policies-api";
+import { useRemoteSearch } from "@/hooks/use-remote-search";
 import {
   useCreateSaleMutation,
   useUpdateSaleMutation,
@@ -40,7 +41,12 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
   const [updateSale, updateState] = useUpdateSaleMutation();
   const saving = createState.isLoading || updateState.isLoading;
 
-  const buyers = useGetBuyersQuery({ limit: 100, isActive: true });
+  const buyerSearch = useRemoteSearch();
+  const buyers = useGetBuyersQuery({
+    isActive: true,
+    limit: 20,
+    search: buyerSearch.query,
+  });
   const commodities = useGetCommoditiesQuery({ limit: 100, isActive: true });
   const policies = useGetPaymentPoliciesQuery({ limit: 100, isActive: true });
 
@@ -138,6 +144,8 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
                     label: b.name,
                   }))}
                   placeholder="Choose the buyer"
+                  onSearchChange={buyerSearch.onSearchChange}
+                  loading={buyers.isFetching}
                   className={cn(errors.buyerId && "border-console-red")}
                 />
               )}

@@ -22,6 +22,7 @@ import { useGetFarmersQuery } from "@/redux/farm/farmers-api";
 import { useCreateGrantMutation } from "@/redux/farm/grants-api";
 import { useGetInputItemsQuery } from "@/redux/farm/input-items-api";
 import { useGetSeasonsQuery } from "@/redux/farm/seasons-api";
+import { useRemoteSearch } from "@/hooks/use-remote-search";
 import { grantSchema, type GrantValues } from "@/validations/farm-schema";
 
 const LIST = "/admin/grants";
@@ -31,7 +32,12 @@ const AGREEMENT_MISSING = "Upload the signed grant agreement";
 export function GrantForm({ farmerId }: { farmerId?: string }) {
   const router = useRouter();
   const [createGrant, { isLoading: saving }] = useCreateGrantMutation();
-  const farmers = useGetFarmersQuery({ isActive: true, limit: 100 });
+  const farmerSearch = useRemoteSearch();
+  const farmers = useGetFarmersQuery({
+    isActive: true,
+    limit: 20,
+    search: farmerSearch.query,
+  });
   const seasons = useGetSeasonsQuery({ isActive: true, limit: 100 });
   const items = useGetInputItemsQuery({ isActive: true, limit: 100 });
 
@@ -138,6 +144,8 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
                     ...(f.community ? { hint: f.community } : {}),
                   }))}
                   placeholder="Choose the farmer"
+                  onSearchChange={farmerSearch.onSearchChange}
+                  loading={farmers.isFetching}
                   className={cn(errors.farmerId && "border-console-red")}
                 />
               )}

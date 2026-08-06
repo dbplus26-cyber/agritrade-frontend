@@ -29,6 +29,7 @@ import { useGetCommoditiesQuery } from "@/redux/commodities/commodities-api";
 import { useCreatePurchaseMutation } from "@/redux/purchases/purchases-api";
 import { useGetSuppliersQuery } from "@/redux/suppliers/suppliers-api";
 import { useGetWarehousesQuery } from "@/redux/warehouses/warehouses-api";
+import { useRemoteSearch } from "@/hooks/use-remote-search";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
@@ -65,7 +66,15 @@ export function PurchaseCreate() {
 
   const commodities = useGetCommoditiesQuery({ limit: 100, isActive: true });
   const warehouses = useGetWarehousesQuery({ limit: 100, isActive: true });
-  const suppliers = useGetSuppliersQuery({ limit: 100, isActive: true });
+  // Suppliers is an open register - a firm keeps adding them and never
+  // removes the old ones - so the picker asks the server rather than
+  // filtering a fetched page. See useRemoteSearch.
+  const supplierSearch = useRemoteSearch();
+  const suppliers = useGetSuppliersQuery({
+    isActive: true,
+    limit: 20,
+    search: supplierSearch.query,
+  });
   const agents = useGetAgentsQuery({ limit: 100, isActive: true });
   // Only agents with an opened float can pay for a purchase.
   const agentOptions = (agents.data?.data ?? []).filter((a) => a.profileId);
@@ -236,6 +245,8 @@ export function PurchaseCreate() {
                       })),
                     ]}
                     placeholder="Choose a supplier (optional)"
+                    onSearchChange={supplierSearch.onSearchChange}
+                    loading={suppliers.isFetching}
                   />
                 )}
               />

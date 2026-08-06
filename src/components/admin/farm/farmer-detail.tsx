@@ -18,6 +18,7 @@ import { BackButton } from "@/components/ui/BackButton";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { FilePicker } from "@/components/ui/FilePicker";
+import { ListPagination } from "@/components/ui/ListPagination";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatDateOnly } from "@/lib/format-date";
@@ -42,16 +43,74 @@ import { GuarantorDialog } from "./guarantor-dialog";
 
 const LIST = "/admin/farmers";
 
+/** Rows per page in the grants and repayments rails. */
+const RAIL_PAGE_SIZE = 8;
+
 /** "idType · idNumber"-style pair, or the shared absent placeholder. */
 function pairOrAbsent(...parts: (string | null)[]) {
   const joined = parts.filter(Boolean).join(" · ");
   return joined ? joined : <Absent />;
 }
 
+/**
+ * The foot of a rail card whose list is a page of a larger set.
+ *
+ * A farmer accrues grants and repayments for as long as they farm, so these
+ * cards can never render "all of them" - they hold one small page and this
+ * says how big the whole set is. Without the count a capped list looks like
+ * a complete one, which is the quiet way a detail page starts lying as the
+ * data grows.
+ */
+function RailPager({
+  noun,
+  onPageChange,
+  page,
+  pageSize,
+  total,
+}: {
+  /** Plural noun for the count line ("grants"). */
+  noun: string;
+  onPageChange: (page: number) => void;
+  page: number;
+  pageSize: number;
+  total: number;
+}) {
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  if (totalPages <= 1) return null;
+  const first = (page - 1) * pageSize + 1;
+  const last = Math.min(page * pageSize, total);
+  return (
+    <div className="border-t border-adm-hairline px-5 py-2.5">
+      <p className="text-center text-[11.5px] text-adm-faint">
+        {first}-{last} of {total} {noun}
+      </p>
+      <ListPagination
+        page={page}
+        totalPages={totalPages}
+        onPageChange={onPageChange}
+        className="mt-1"
+      />
+    </div>
+  );
+}
+
 export function FarmerDetail({ id }: { id: string }) {
   const { data, isLoading, isError, error, refetch } = useGetFarmerQuery(id);
-  const grants = useGetGrantsQuery({ farmerId: id, limit: 50 });
-  const repayments = useGetRepaymentsQuery({ farmerId: id, limit: 50 });
+  // Both rails page against the server. They were capped at 50 and rendered
+  // whole, which silently became "the last 50" the moment a farmer passed
+  // that - and nothing on screen said so.
+  const [grantPage, setGrantPage] = useState(1);
+  const [repaymentPage, setRepaymentPage] = useState(1);
+  const grants = useGetGrantsQuery({
+    farmerId: id,
+    limit: RAIL_PAGE_SIZE,
+    page: grantPage,
+  });
+  const repayments = useGetRepaymentsQuery({
+    farmerId: id,
+    limit: RAIL_PAGE_SIZE,
+    page: repaymentPage,
+  });
   const [setActive] = useSetFarmerActiveMutation();
   const [addDoc, addDocState] = useAddFarmerDocumentMutation();
   const [removeDoc] = useRemoveFarmerDocumentMutation();
@@ -403,6 +462,13 @@ export function FarmerDetail({ id }: { id: string }) {
                     ))}
                   </ul>
                 )}
+                <RailPager
+                  noun="grants"
+                  page={grantPage}
+                  pageSize={RAIL_PAGE_SIZE}
+                  total={grants.data?.meta.total ?? 0}
+                  onPageChange={setGrantPage}
+                />
               </AdminCard>
 
               <AdminCard className="overflow-hidden">
@@ -443,6 +509,13 @@ export function FarmerDetail({ id }: { id: string }) {
                     ))}
                   </ul>
                 )}
+                <RailPager
+                  noun="repayments"
+                  page={repaymentPage}
+                  pageSize={RAIL_PAGE_SIZE}
+                  total={repayments.data?.meta.total ?? 0}
+                  onPageChange={setRepaymentPage}
+                />
               </AdminCard>
             </div>
           </div>

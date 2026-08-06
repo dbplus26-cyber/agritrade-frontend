@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { useGetBuyersQuery } from "@/redux/buyers/buyers-api";
 import { useGetPlotsQuery } from "@/redux/land/land-plots-api";
 import { useCreateLandSaleMutation } from "@/redux/land/land-sales-api";
+import { useRemoteSearch } from "@/hooks/use-remote-search";
 import { landSaleSchema, type LandSaleValues } from "@/validations/land-schema";
 
 const LIST = "/admin/land-sales";
@@ -28,8 +29,18 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
   const router = useRouter();
   const [createSale, { isLoading: saving }] = useCreateLandSaleMutation();
   // Only AVAILABLE plots can be sold.
-  const plots = useGetPlotsQuery({ status: "AVAILABLE", limit: 100 });
-  const buyers = useGetBuyersQuery({ limit: 100, isActive: true });
+  const plotSearch = useRemoteSearch();
+  const plots = useGetPlotsQuery({
+    limit: 20,
+    search: plotSearch.query,
+    status: "AVAILABLE",
+  });
+  const buyerSearch = useRemoteSearch();
+  const buyers = useGetBuyersQuery({
+    isActive: true,
+    limit: 20,
+    search: buyerSearch.query,
+  });
 
   const {
     register,
@@ -87,6 +98,8 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
                     hint: p.locationText,
                   }))}
                   placeholder="Choose an available plot"
+                  onSearchChange={plotSearch.onSearchChange}
+                  loading={plots.isFetching}
                   className={cn(errors.plotId && "border-console-red")}
                 />
               )}
@@ -105,6 +118,8 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
                     label: b.name,
                   }))}
                   placeholder="Choose the buyer"
+                  onSearchChange={buyerSearch.onSearchChange}
+                  loading={buyers.isFetching}
                   className={cn(errors.buyerId && "border-console-red")}
                 />
               )}

@@ -18,6 +18,7 @@ import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import { useGetLandSellersQuery } from "@/redux/land/land-sellers-api";
 import { useCreateLandAcquisitionMutation } from "@/redux/land/land-acquisitions-api";
+import { useRemoteSearch } from "@/hooks/use-remote-search";
 import {
   landAcquisitionSchema,
   type LandAcquisitionValues,
@@ -29,7 +30,12 @@ const LIST = "/admin/land-acquisitions";
 export function LandAcquisitionForm() {
   const router = useRouter();
   const [create, { isLoading: saving }] = useCreateLandAcquisitionMutation();
-  const sellers = useGetLandSellersQuery({ limit: 100, isActive: true });
+  const sellerSearch = useRemoteSearch();
+  const sellers = useGetLandSellersQuery({
+    isActive: true,
+    limit: 20,
+    search: sellerSearch.query,
+  });
 
   const {
     register,
@@ -117,6 +123,8 @@ export function LandAcquisitionForm() {
                     ...(s.community ? { hint: s.community } : {}),
                   }))}
                   placeholder="Choose the seller"
+                  onSearchChange={sellerSearch.onSearchChange}
+                  loading={sellers.isFetching}
                   className={cn(errors.sellerId && "border-console-red")}
                 />
               )}
