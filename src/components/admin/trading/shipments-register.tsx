@@ -142,50 +142,71 @@ export function ShipmentsRegister() {
           />
         </AdminCard>
       ) : (
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {shipments.map((sh) => (
-            <Link
-              key={sh.id}
-              href={`${LIST}/${sh.id}`}
-              className="shadow-[0_1px_2px_rgba(16,24,40,0.05)] rounded-[6px] border border-adm-line bg-adm-card px-4 py-[15px] hover:border-adm-line"
-            >
-              {/* The badge sits beside the TITLE and pins to its top edge.
-                  It used to ride on the truck-registration line, vertically
-                  centred - so on a card whose route wrapped to two lines the
-                  tag floated in the middle of the block instead of reading as
-                  the status OF that title. items-start keeps it level with the
-                  first line however many the title takes. */}
-              <div className="mb-[7px] flex items-start justify-between gap-2.5">
-                <div className="min-w-0">
-                  <Mono className="block text-[13px] font-semibold text-console">
+        // Container columns, not viewport ones: this grid sits inside the
+        // console shell, where a viewport `md:` fires while the content area
+        // is still one column wide.
+        <div className="grid gap-3 @2xl/main:grid-cols-2 @5xl/main:grid-cols-3">
+          {shipments.map((sh) => {
+            const buyers =
+              sh.sales.length === 1
+                ? (sh.sales[0]?.buyer.name ?? "")
+                : sh.sales.map((sale) => sale.buyer.name).join(", ");
+            return (
+              /* FOUR ZONES, separated by space rather than run together.
+                 This card used to join the sale count, every buyer's name and
+                 the weight into one muted `·` string and clamp it - three
+                 unrelated facts read as one sentence, which is what made it
+                 feel crowded. The load figures are their own line now, the
+                 buyers are theirs, and the footer carries the date. Reads the
+                 way the reviews card does: subject on the left, meta on the
+                 right, and room between the zones. */
+              <Link
+                key={sh.id}
+                href={`${LIST}/${sh.id}`}
+                className="flex h-full flex-col rounded-[6px] border border-adm-line bg-adm-card p-4 shadow-[0_1px_2px_rgba(16,24,40,0.05)] transition-colors hover:border-adm-strong"
+              >
+                <div className="flex items-start justify-between gap-2.5">
+                  <Mono className="text-[12px] text-adm-muted">
                     {sh.truckReg}
                   </Mono>
-                  <div className="mt-[3px] line-clamp-2 text-[14.5px] font-semibold text-adm-ink">
-                    {sh.originWarehouse.name} → {sh.destination}
+                  <span className="flex-none">
+                    <ShipmentStatusBadge status={sh.status} />
+                  </span>
+                </div>
+
+                <div className="mt-2 line-clamp-2 text-[15px] leading-[1.35] font-semibold text-adm-ink [overflow-wrap:anywhere]">
+                  {sh.originWarehouse.name} → {sh.destination}
+                </div>
+
+                {buyers ? (
+                  <div className="mt-1.5 line-clamp-2 min-w-0 text-[13px] leading-[1.5] text-adm-body [overflow-wrap:anywhere]">
+                    {buyers}
+                  </div>
+                ) : null}
+
+                <div className="mt-auto pt-3">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-dotted border-adm-line pt-3">
+                    <Mono className="text-[12.5px] font-semibold text-adm-ink">
+                      {sh.totalWeightKg > 0 ? formatKg(sh.totalWeightKg) : "-"}
+                    </Mono>
+                    <span className="text-[12.5px] text-adm-muted">
+                      {sh.salesCount} sale{sh.salesCount === 1 ? "" : "s"}
+                    </span>
+                    <span className="ml-auto text-[12px] whitespace-nowrap text-adm-faint">
+                      {sh.departedAt
+                        ? `Departed ${formatShipmentDate(sh.departedAt)}`
+                        : `Planned ${formatShipmentDate(sh.createdAt)}`}
+                    </span>
+                  </div>
+                  {/* Renders only for an ESTIMATED basis, so it is an
+                      exception worth seeing rather than a permanent tag. */}
+                  <div className="empty:hidden mt-2">
+                    <CostBasisBadge basis={sh.costBasis} />
                   </div>
                 </div>
-                <span className="flex-none">
-                  <ShipmentStatusBadge status={sh.status} />
-                </span>
-              </div>
-              <div className="mt-[3px] line-clamp-2 min-w-0 text-[12.5px] text-adm-muted">
-                {sh.salesCount > 1
-                  ? `${String(sh.salesCount)} sales · ${sh.sales
-                      .map((sale) => sale.buyer.name)
-                      .join(", ")}`
-                  : (sh.sales[0]?.buyer.name ?? "")}
-                {sh.totalWeightKg > 0 ? ` · ${formatKg(sh.totalWeightKg)}` : ""}
-              </div>
-              <div className="mt-1.5 flex items-center justify-between">
-                <span className="text-[12px] text-adm-faint">
-                  {sh.departedAt
-                    ? `Departed ${formatShipmentDate(sh.departedAt)}`
-                    : `Planned ${formatShipmentDate(sh.createdAt)}`}
-                </span>
-                <CostBasisBadge basis={sh.costBasis} />
-              </div>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
       )}
 

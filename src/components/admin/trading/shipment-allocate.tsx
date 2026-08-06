@@ -259,26 +259,35 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                   aria-selected={active}
                   onClick={() => setActiveSaleId(s.id)}
                   className={cn(
-                    "flex-none rounded-[6px] border px-2.5 py-1.5 text-left outline-none focus-visible:ring-2 focus-visible:ring-console/40",
+                    "flex-none rounded-[6px] border px-3 py-2 text-left outline-none focus-visible:ring-2 focus-visible:ring-console/40",
                     active
                       ? "border-console bg-console text-white"
                       : "border-adm-line bg-[#FBFCF7] text-adm-ink hover:bg-adm-sunken",
                   )}
                 >
-                  <Mono className="block text-[11.5px]">{s.transactionNo}</Mono>
+                  {/* The BUYER leads. Three near-identical 11px lines with
+                      the document number on top made every tab look the same
+                      until you read it; the name is what tells them apart. */}
                   <span
                     className={cn(
-                      "block max-w-[140px] text-[11px]",
-                      active ? "text-white/80" : "text-adm-muted/80",
-                      "min-w-0 line-clamp-1 whitespace-normal [overflow-wrap:anywhere]",
+                      "block max-w-[150px] min-w-0 text-[12.5px] font-semibold line-clamp-1 whitespace-normal [overflow-wrap:anywhere]",
+                      active ? "text-white" : "text-adm-ink",
                     )}
                   >
                     {s.buyer.name}
                   </span>
                   <Mono
                     className={cn(
-                      "block text-[11px]",
-                      active ? "text-white/90" : "text-adm-muted",
+                      "mt-0.5 block text-[11px]",
+                      active ? "text-white/70" : "text-adm-muted/80",
+                    )}
+                  >
+                    {s.transactionNo}
+                  </Mono>
+                  <Mono
+                    className={cn(
+                      "mt-1 block text-[11.5px] font-semibold",
+                      active ? "text-white/90" : "text-adm-body",
                     )}
                   >
                     {subtotal > 0 ? formatKg(subtotal) : "Nothing yet"}
@@ -297,7 +306,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
               <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 This sale needs
               </div>
-              <ul className="flex flex-col gap-0.5">
+              <ul className="flex flex-col divide-y divide-adm-hairline">
                 {activeSaleLines.map((line) => {
                   const onSale = activeCommodityKg[line.commodityId] ?? 0;
                   const needed = line.agreedKg - line.allocatedKg;
@@ -308,7 +317,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                   return (
                     <li
                       key={line.commodityId}
-                      className="flex flex-wrap items-baseline justify-between gap-x-3 text-[12.5px]"
+                      className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 py-2 text-[12.5px]"
                     >
                       <span className="min-w-0 text-adm-ink [overflow-wrap:anywhere]">
                         {line.commodityName}

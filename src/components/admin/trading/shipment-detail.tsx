@@ -800,8 +800,8 @@ export function ShipmentDetail({ id }: { id: string }) {
             </AdminButton>
           ) : null}
         </div>
-        <div className="grid gap-2.5 pb-2 md:grid-cols-2">
-          {s.sales.map((sale, index) => {
+        <div className="grid gap-2.5 pb-2 @3xl/main:grid-cols-2">
+          {s.sales.map((sale) => {
             // Removal only where nothing would be silently thrown away: a sale
             // carrying allocated lots has costing decisions on it, so those get
             // cleared deliberately in Allocate lots first (the backend refuses
@@ -812,21 +812,23 @@ export function ShipmentDetail({ id }: { id: string }) {
             const removable =
               beforeDispatch && s.sales.length > 1 && !hasAllocations;
             return (
+              /* The three money figures were one mono sentence - "Agreed X ·
+                 Paid Y · Balance Z" - which is the least comparable way to
+                 show three related numbers. They are a labelled trio now, so
+                 the eye reads down a column instead of parsing a line. The
+                 buyer's phone drops to its own line for the same reason. */
               <div
                 key={sale.id}
-                className="rounded-[6px] border border-adm-line bg-adm-sunken px-3.5 py-2.5"
+                className="flex h-full flex-col rounded-[6px] border border-adm-line bg-adm-card p-3.5"
               >
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                  <span className="font-adminmono text-[11px] text-adm-faint tabular-nums">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
+                <div className="flex items-start justify-between gap-2.5">
                   <Link
                     href={`/admin/sales/${sale.id}`}
-                    className="font-adminmono text-[13px] font-semibold text-console tabular-nums hover:underline"
+                    className="font-adminmono min-w-0 text-[12.5px] font-semibold text-console tabular-nums hover:underline"
                   >
                     {sale.transactionNo}
                   </Link>
-                  <span className="ml-auto flex items-center gap-2">
+                  <span className="flex flex-none items-center gap-2">
                     <SaleStatusBadge status={sale.status} />
                     {removable ? (
                       <button
@@ -834,7 +836,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                         onClick={() =>
                           void onRemoveSale(sale.id, sale.transactionNo)
                         }
-                        className="cursor-pointer text-[12px] text-console-red"
+                        className="cursor-pointer text-[12px] text-console-red hover:underline"
                         aria-label={`Remove ${sale.transactionNo} from this shipment`}
                       >
                         ✕
@@ -842,31 +844,45 @@ export function ShipmentDetail({ id }: { id: string }) {
                     ) : null}
                   </span>
                 </div>
-                <div className="mt-1 min-w-0 text-[13px] font-semibold text-adm-ink [overflow-wrap:anywhere]">
+
+                <div className="mt-2 min-w-0 text-[14px] leading-[1.35] font-semibold text-adm-ink [overflow-wrap:anywhere]">
                   {sale.buyer.name}
-                  {sale.buyer.phone ? (
-                    <span className="font-normal text-adm-muted">
-                      {" "}
-                      · {sale.buyer.phone}
-                    </span>
-                  ) : null}
                 </div>
-                <div className="mt-1.5 border-t border-adm-hairline pt-1.5">
-                  <Mono className="text-[12.5px] text-adm-muted">
-                    Agreed <Money compact value={sale.agreedTotalGhs} /> · Paid{" "}
-                    <Money compact value={sale.paidGhs} /> · Balance{" "}
-                    <span
-                      className={cn(
-                        sale.balanceGhs !== null &&
-                          (sale.balanceGhs === 0
-                            ? "text-console"
-                            : "text-console-red"),
-                      )}
-                    >
-                      <Money compact value={sale.balanceGhs} />
-                    </span>
+                {sale.buyer.phone ? (
+                  <Mono className="mt-0.5 block text-[12px] text-adm-muted">
+                    {sale.buyer.phone}
                   </Mono>
-                </div>
+                ) : null}
+
+                <dl className="mt-auto grid grid-cols-3 gap-x-3 border-t border-dotted border-adm-line pt-3">
+                  {(
+                    [
+                      ["Agreed", sale.agreedTotalGhs, ""],
+                      ["Paid", sale.paidGhs, ""],
+                      [
+                        "Balance",
+                        sale.balanceGhs,
+                        sale.balanceGhs !== null && sale.balanceGhs !== 0
+                          ? "text-console-red"
+                          : "text-console",
+                      ],
+                    ] as const
+                  ).map(([label, value, tone]) => (
+                    <div key={label} className="min-w-0">
+                      <dt className="text-[10px] font-bold tracking-[0.08em] text-adm-muted uppercase">
+                        {label}
+                      </dt>
+                      <dd
+                        className={cn(
+                          "font-adminmono mt-0.5 text-[12.5px] font-semibold tabular-nums text-adm-ink",
+                          tone,
+                        )}
+                      >
+                        <Money compact value={value} />
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
               </div>
             );
           })}
