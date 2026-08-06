@@ -42,6 +42,23 @@ import type {
 } from "@/types/admin-sale.types";
 import { milestoneTriggerLabel } from "./sale-bits";
 
+/**
+ * The split bar's segments, in order.
+ *
+ * One hue stepped down in weight rather than a set of different colours: the
+ * milestones are shares of the same money, not separate categories, and giving
+ * them four hues would say otherwise. Descending weight also matches how a
+ * schedule is read - the first call on the money is the one that matters most,
+ * and it lands darkest. Wraps after five, which is past any real policy.
+ */
+const SEGMENT_TONES = [
+  "bg-console",
+  "bg-console/70",
+  "bg-console/50",
+  "bg-console/35",
+  "bg-console/25",
+];
+
 const TRIGGER_OPTIONS: { label: string; value: MilestoneTrigger }[] = [
   { label: "Before loading", value: "BEFORE_LOADING" },
   { label: "On arrival", value: "ON_ARRIVAL" },
@@ -293,98 +310,110 @@ function PolicyCard({ policy }: { policy: IPaymentPolicy }) {
   };
 
   return (
-    // h-full + flex-col is what makes a row of these line up. The grid
-    // stretches every card to the tallest in its row, and the column layout
-    // then lets the action row take `mt-auto` and sit on the bottom edge of
-    // all of them - so the buttons form one line across the row instead of
-    // floating at whatever height each card's schedule happened to end at.
-    <AdminCard className="flex h-full flex-col px-4 py-3">
-      {/* The tag pins to the top of the title, not its vertical middle - a
-          policy name here routinely runs to three lines. */}
-      <div className="mb-2 flex items-start justify-between gap-2">
-        {/* Two lines of room, reserved whether or not the name needs both.
-            Without the reservation a one-line name and a two-line name start
-            their schedules at different heights, and the cards read as
-            misaligned even when their outer heights match. */}
-        <span
-          className="line-clamp-2 min-h-[2.6em] text-[14px] font-bold text-adm-ink"
-          title={policy.name}
-        >
+    // h-full + flex-col is what lines a row of these up: the grid stretches
+    // every card to the tallest in its row, and the column layout lets the
+    // actions take mt-auto and sit on the bottom edge of all of them.
+    //
+    // At most ONE tag, and dimming carries the rest. The card used to show
+    // "Default" and "Inactive" as two pills in the same corner, which is two
+    // things asking to be read before the name is. They are mutually
+    // exclusive in practice, so the corner holds whichever applies and an
+    // inactive card additionally recedes.
+    <AdminCard
+      className={cn(
+        "flex h-full flex-col p-5",
+        !policy.isActive && "opacity-65",
+      )}
+    >
+      <div className="flex items-start justify-between gap-3">
+        {/* No clamp and no truncation: a policy name is the thing you are
+            looking for, and half of it is no use. It wraps. Two lines are
+            reserved so most cards still start their bar at the same height,
+            and a longer name simply takes the room it needs. */}
+        <h2 className="min-h-[2.6em] text-[15px] leading-[1.3] font-semibold text-adm-ink [overflow-wrap:anywhere]">
           {policy.name}
-        </span>
-        <span className="flex flex-none gap-1.5">
+        </h2>
+        <span className="flex-none">
           {policy.isDefault ? (
             <ToneBadge tone="forest">Default</ToneBadge>
-          ) : null}
-          {policy.isActive ? null : (
+          ) : policy.isActive ? null : (
             <ToneBadge tone="slate">Inactive</ToneBadge>
           )}
         </span>
       </div>
-      {/* The SCHEDULE is what a policy is, so it is set as one: the share
-          leads each row at figure weight, the trigger explains it beneath.
-          Previously the share and its trigger shared one truncating line and
-          the percentage - the single number that matters - was the part being
-          cut off ("80% ·…"). */}
-      <div className="flex flex-col divide-y divide-adm-hairline border-y border-adm-hairline">
+
+      {/* THE SIGNATURE. A policy is a split of 100, and that is the one fact
+          worth seeing from across the grid - 80/20 and 50/50 should not look
+          alike, which as a list of numbers they do. Each segment's width IS
+          its percentage, so the bar is the data rather than a decoration of
+          it, and the eye compares policies without reading any of them.
+          aria-hidden because every figure in it is spelled out underneath. */}
+      <div
+        aria-hidden="true"
+        className="mt-3 flex h-2 overflow-hidden rounded-full bg-adm-hairline"
+      >
         {policy.milestones.map((m, i) => (
           <div
-            key={`${m.label}-${String(i)}`}
-            className="flex items-baseline gap-3 py-1.5"
-          >
-            <span className="font-adminmono w-[3.25rem] flex-none text-[13.5px] font-bold text-console tabular-nums">
-              {m.percent}%
-            </span>
-            {/* flex-1 as well as min-w-0. Without it this sizes to
-                max-content, so `truncate` has nothing to truncate against and
-                an 80-character milestone label pushes straight out of the
-                card instead of clipping. */}
-            <span className="block min-w-0 flex-1">
-              <span
-                className="block truncate text-[12.5px] text-adm-ink"
-                title={m.label}
-              >
-                {m.label}
-              </span>
-              <span className="block truncate text-[11.5px] text-adm-muted">
-                {milestoneTriggerLabel(m.trigger)}
-              </span>
-            </span>
-          </div>
+            key={`bar-${m.label}-${String(i)}`}
+            className={SEGMENT_TONES[i % SEGMENT_TONES.length]}
+            style={{ width: `${String(m.percent)}%` }}
+          />
         ))}
       </div>
-      {/* mt-auto, not a fixed margin: the schedule is 2 to 5 rows long, so the
-          slack has to collect ABOVE the actions rather than below them. This
-          is the line that makes a stretched card look designed instead of
-          padded. */}
-      <div className="mt-auto flex flex-wrap gap-2 pt-2.5">
+
+      {/* One line per milestone, not two, and no rules between them. The bar
+          above already separates the shares, so dividers were drawing the
+          same boundary twice. */}
+      <ul className="mt-3.5 flex flex-col gap-2">
+        {policy.milestones.map((m, i) => (
+          <li
+            key={`${m.label}-${String(i)}`}
+            className="flex gap-3 text-[13px] leading-[1.4]"
+          >
+            <span className="font-adminmono w-9 flex-none tabular-nums text-adm-ink">
+              {m.percent}%
+            </span>
+            <span className="min-w-0 flex-1 text-adm-body [overflow-wrap:anywhere]">
+              {m.label}
+              <span className="text-adm-muted"> · {milestoneTriggerLabel(m.trigger)}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      {/* Plain text actions on one quiet line. Three filled and outlined
+          buttons in three colours were competing with the name and the bar
+          for the top of the reading order, on a card whose job is to be
+          scanned rather than acted on - the actions are the rarest thing
+          anyone does here. Destructive intent shows on hover, not at rest. */}
+      <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-4 text-[12.5px]">
         {!policy.isDefault && policy.isActive ? (
-          <AdminButton
-            variant="outline"
-            className="h-8 px-3 text-[12.5px]"
+          <button
+            type="button"
+            className="text-adm-muted transition-colors hover:text-console"
             onClick={() => void makeDefault()}
           >
             Make default
-          </AdminButton>
+          </button>
         ) : null}
         {!policy.isDefault ? (
-          <AdminButton
-            variant="ghost"
-            className="h-8 px-3 text-[12.5px]"
+          <button
+            type="button"
+            className="text-adm-muted transition-colors hover:text-console"
             onClick={() => void toggleActive()}
           >
             {policy.isActive ? "Deactivate" : "Activate"}
-          </AdminButton>
+          </button>
         ) : null}
         {isSuperAdmin ? (
-          <AdminButton
-            variant="ghost"
-            className="h-8 px-3 text-[12.5px] text-console-red"
+          <button
+            type="button"
+            className="text-adm-muted transition-colors hover:text-console-red disabled:opacity-50"
             disabled={deleteState.isLoading}
             onClick={() => void onDelete()}
           >
             Delete
-          </AdminButton>
+          </button>
         ) : null}
       </div>
       {confirmationDialog}
@@ -415,9 +444,9 @@ export function PaymentPoliciesScreen() {
 
       {/* Policies are immutable by design: sales freeze a snapshot of their
           terms, so there is deliberately no edit action here. */}
-      <p className="mb-3 text-[12.5px] text-adm-muted">
-        Policies can&apos;t be edited once created - create a new policy for new
-        terms instead.
+      <p className="mb-4 max-w-[62ch] text-[12.5px] leading-[1.5] text-adm-muted">
+        A policy can&apos;t be edited once created. Sales freeze their terms at
+        confirmation, so create a new policy when the terms change.
       </p>
 
       {isLoading ? (
@@ -443,7 +472,7 @@ export function PaymentPoliciesScreen() {
         // content area still only had room for two - three columns squeezed
         // into the width of two is most of what read as "scattered".
         // Container queries measure the content area itself.
-        <div className="grid gap-3 @2xl/main:grid-cols-2 @5xl/main:grid-cols-3">
+        <div className="grid gap-4 @2xl/main:grid-cols-2 @5xl/main:grid-cols-3">
           {policies.map((p) => (
             <PolicyCard key={p.id} policy={p} />
           ))}
