@@ -15,10 +15,17 @@ const PAGE_SIZE = 9;
  * The slot a thumbnail lives in, used for the photo AND for both no-photo
  * paths (never filed, or filed but no longer resolving), so the card keeps one
  * height whatever the records hold.
+ *
+ * The frame is a RATIO, not a minimum. It used to be `min-h-[150px]` in a
+ * row the text below it sized, which meant the picture absorbed whatever
+ * height the description left over: a lot with two lines of copy printed a
+ * tall photograph and the lot beside it a short one, off the same grid. A
+ * 4:3 box crops a portrait and a landscape original to the same shape, so
+ * every thumbnail in the row is the same picture size.
  */
 function ThumbFrame({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative min-h-[150px] w-full overflow-hidden border-b border-soil/30">
+    <div className="relative aspect-[4/3] w-full overflow-hidden border-b border-soil/30">
       {children}
     </div>
   );
@@ -33,15 +40,21 @@ function ThumbFrame({ children }: { children: React.ReactNode }) {
  * description - because there was nowhere else for that text to live. Now
  * there is: everything past the identifying facts moves to the lot's own page,
  * and the card carries what a reader needs to choose between lots. The
- * description is clamped to three lines here, so a long one cannot set the
- * height of the row it sits in.
+ * description is clamped here, so a long one cannot set the height of the row
+ * it sits in.
+ *
+ * h-full + flex-col is what lines a row of these up: the grid stretches every
+ * card to the tallest in its row, the column layout lets the stock/READ MORE
+ * bar take mt-auto and sit on the bottom edge of all of them, and each text
+ * line reserves its space so a lot with no variety on file does not print its
+ * description a line higher than the lot beside it.
  */
 function LotCard({ lot }: { lot: PublicLot }) {
   const spec = [lot.variety, lot.qualityGrade].filter(Boolean).join(" · ");
   return (
     <DocCard
       tint="paper"
-      className="group grid h-full min-w-0 grid-rows-[1fr_auto] transition-[transform,box-shadow] duration-150 focus-within:shadow-[3px_3px_0_rgb(31_33_28/0.18)] hover:-translate-y-px hover:shadow-[3px_3px_0_rgb(31_33_28/0.18)]"
+      className="group flex h-full min-w-0 flex-col transition-[transform,box-shadow] duration-150 focus-within:shadow-[3px_3px_0_rgb(31_33_28/0.18)] hover:-translate-y-px hover:shadow-[3px_3px_0_rgb(31_33_28/0.18)]"
     >
       <ThumbFrame>
         {lot.photo ? (
@@ -57,11 +70,13 @@ function LotCard({ lot }: { lot: PublicLot }) {
           <CommodityPlaceholder />
         )}
       </ThumbFrame>
-      <div className="flex min-w-0 flex-col p-5">
+      <div className="flex min-w-0 flex-1 flex-col p-5">
         <span className="stencil mb-2.5 block whitespace-nowrap text-[10px] leading-none tracking-[0.16em] text-harvest-deep">
           {lot.lotNo}
         </span>
-        <h3 className="min-w-0 font-display text-[16px] font-bold leading-[1.2] tracking-[0.01em] text-forest [overflow-wrap:anywhere]">
+        {/* Two lines are reserved whether the name takes one or two, so the
+            spec line under it starts at the same height on every card. */}
+        <h3 className="min-h-[2.6em] min-w-0 line-clamp-2 font-display text-[16px] font-bold leading-[1.2] tracking-[0.01em] text-forest [overflow-wrap:anywhere]">
           {/* The whole card is the target: the overlay covers it, so the row
               is one honest link rather than a card with a small link on it. */}
           <Link href={routes.commodity(lot.slug)} className="focus-visible:outline-none">
@@ -69,23 +84,25 @@ function LotCard({ lot }: { lot: PublicLot }) {
             {lot.name}
           </Link>
         </h3>
-        {spec ? (
-          <p className="mt-1.5 min-w-0 text-[12.5px] leading-[1.5] text-harvest-deep [overflow-wrap:anywhere]">
-            {spec}
-          </p>
-        ) : null}
-        {lot.description ? (
-          <p className="mt-2 min-w-0 line-clamp-3 text-[13px] leading-[1.6] text-soil [overflow-wrap:anywhere]">
-            {lot.description}
-          </p>
-        ) : null}
-        <div className="mt-4 flex items-center justify-between gap-3 border-t border-dotted border-soil/40 pt-3.5">
+        {/* Both lines print even when the record is empty. Dropping the line
+            for a lot that files no variety or no description pulled the rest
+            of that card up out of step with the row. */}
+        <p className="mt-1.5 min-h-[1.5em] min-w-0 line-clamp-1 text-[12.5px] leading-[1.5] text-harvest-deep [overflow-wrap:anywhere]">
+          {spec}
+        </p>
+        <p className="mb-4 mt-2 min-h-[3.2em] min-w-0 line-clamp-2 text-[13px] leading-[1.6] text-soil [overflow-wrap:anywhere]">
+          {lot.description}
+        </p>
+        {/* Stacked at fold widths: side by side, the longer ON ORDER tag and
+            READ MORE overrun a 280px card, and a tag that wrapped on some
+            cards and not others put the bar at two different heights. */}
+        <div className="mt-auto flex flex-col items-start gap-2 border-t border-dotted border-soil/40 pt-3.5 min-[340px]:flex-row min-[340px]:items-center min-[340px]:justify-between min-[340px]:gap-3">
           {lot.inStock ? (
-            <span className="stencil rounded-[2px] border border-leaf/55 px-2 py-1 text-[9px] leading-none tracking-[0.14em] text-forest">
+            <span className="stencil whitespace-nowrap rounded-[2px] border border-leaf/55 px-2 py-1 text-[9px] leading-none tracking-[0.14em] text-forest">
               IN STOCK
             </span>
           ) : (
-            <span className="stencil rounded-[2px] border border-dashed border-soil/50 px-2 py-1 text-[9px] leading-none tracking-[0.14em] text-soil">
+            <span className="stencil whitespace-nowrap rounded-[2px] border border-dashed border-soil/50 px-2 py-1 text-[9px] leading-none tracking-[0.14em] text-soil">
               ON ORDER · ASK US
             </span>
           )}

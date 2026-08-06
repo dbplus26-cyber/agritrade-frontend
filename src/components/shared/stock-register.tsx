@@ -88,8 +88,14 @@ function RegisterRow({
           record's own text ends in an ellipsis before it rather than running
           underneath. Spelled in full at a legible size the tag cannot go under
           ~75px, which is the floor on how much of a 390px row it can give
-          back. */}
-      <span className="min-w-0 basis-full pr-[80px] sm:basis-auto sm:pr-0">
+          back.
+
+          From sm up this column sizes to its own text, so the cap has to be an
+          absolute length: a percentage max-width here would resolve against a
+          width that is itself derived from this text, which is what used to
+          clip short entries. 42rem is roughly where a single line stops being
+          readable at a glance on a full-width row. */}
+      <span className="min-w-0 basis-full pr-[80px] sm:basis-auto sm:max-w-[42rem] sm:pr-0">
         {/* The whole row is the target when the line has a page behind it -
             reading the board and opening a lot are the same gesture. */}
         {slug ? (
@@ -103,23 +109,31 @@ function RegisterRow({
         {/* Both lines are held to ONE line and clipped: the name and the
             grade text are owner-entered and can run to any length, and a
             register whose rows change height with the length of a variety
-            note stops reading as a register. */}
+            note stops reading as a register.
+
+            The clamp is `line-clamp-1` over wrapping text, never `truncate`.
+            `truncate`'s `nowrap` makes each line's min-content the whole
+            string, so a short "Maize" was measured as wide as its longest
+            sibling line and then cut against a fraction of that - short
+            entries came out clipped. Wrapping text measures as one word, so
+            the column only ever narrows when the text genuinely does not
+            fit. */}
         <span
           className={cn(
-            "block font-display text-[16px] font-bold leading-[1.2] text-forest sm:text-[18px] lg:text-[20px]",
+            "font-display text-[16px] font-bold leading-[1.2] text-forest sm:text-[18px] lg:text-[20px]",
             wrap
-              ? "[overflow-wrap:anywhere]"
-              : "overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-[60%]",
+              ? "block [overflow-wrap:anywhere]"
+              : "min-w-0 line-clamp-1 whitespace-normal [overflow-wrap:anywhere]",
           )}
         >
           {name}
         </span>
         <span
           className={cn(
-            "mt-1 block text-[12.5px] leading-[1.5] text-soil sm:text-[13.5px]",
+            "mt-1 text-[12.5px] leading-[1.5] text-soil sm:text-[13.5px]",
             wrap
-              ? "[overflow-wrap:anywhere]"
-              : "overflow-hidden text-ellipsis whitespace-nowrap sm:max-w-[75%]",
+              ? "block [overflow-wrap:anywhere]"
+              : "min-w-0 line-clamp-1 whitespace-normal [overflow-wrap:anywhere]",
           )}
         >
           {meta}
