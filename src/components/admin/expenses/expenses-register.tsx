@@ -29,6 +29,8 @@ import { useGetExpenseCategoriesQuery } from "@/redux/expense-categories/expense
 import type { IExpense } from "@/types/expense.types";
 import { ExpenseFormDialog } from "./expense-form";
 
+const LIST = "/admin/expenses";
+
 const DEFAULTS = { categoryId: "", from: "", scope: "", to: "" };
 
 /**
@@ -298,6 +300,8 @@ export function ExpensesRegister() {
               data={rows}
               itemNoun="expenses"
               isFetching={isFetching}
+              rowClassName={() => "hover:bg-adm-sunken"}
+              rowHref={(row) => `${LIST}/${row.id}`}
               serverPagination={{
                 onPageChange: setPage,
                 onPageSizeChange: () => undefined,
