@@ -69,7 +69,7 @@ function SelectContent({
       <SelectPrimitive.Content
         data-slot="select-content"
         data-align-trigger={position === "item-aligned"}
-        className={cn("relative z-[80] max-h-(--radix-select-content-available-height) min-w-36 origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-none border-0 border-t-[1.5px] border-b-[3px] border-t-soil/50 border-b-forest bg-surface text-popover-foreground shadow-[0_18px_36px_rgb(31_33_28/0.3)] duration-100 data-[align-trigger=true]:animate-none data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95", position ==="popper"&&"data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1", className )}
+        className={cn("relative z-[80] max-h-(--radix-select-content-available-height) w-(--radix-select-trigger-width) max-w-[92vw] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-none border-0 border-t-[1.5px] border-b-[3px] border-t-soil/50 border-b-forest bg-surface text-popover-foreground shadow-[0_18px_36px_rgb(31_33_28/0.3)] duration-100 data-[align-trigger=true]:animate-none data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95", position ==="popper"&&"data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1", className )}
         position={position}
         align={align}
         {...props}
@@ -78,7 +78,12 @@ function SelectContent({
         <SelectPrimitive.Viewport
           data-position={position}
           className={cn(
-            "data-[position=popper]:h-(--radix-select-trigger-height) data-[position=popper]:w-full data-[position=popper]:min-w-(--radix-select-trigger-width)",
+            // NOT min-w-(--radix-select-trigger-width). A min-width is a floor the
+            // panel grows past whenever an option is longer than the control, which
+            // is how a 150px filter came to open a list twice its width. The Content
+            // above is pinned to the trigger's exact width instead, and this only
+            // fills it.
+            "data-[position=popper]:h-(--radix-select-trigger-height) data-[position=popper]:w-full data-[position=popper]:min-w-0",
             position === "popper" && ""
           )}
         >
@@ -115,7 +120,7 @@ function SelectItem({
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        "relative flex w-full cursor-default items-center gap-1.5 rounded-none border-b border-dotted border-soil/35 py-2.5 pr-8 pl-3.5 text-sm outline-hidden select-none last:border-b-0 focus:bg-harvest/12 focus:text-ink data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        "relative flex w-full min-w-0 cursor-default items-center gap-1.5 rounded-none border-b border-dotted border-soil/35 py-2.5 pr-8 pl-3.5 text-sm outline-hidden select-none last:border-b-0 focus:bg-harvest/12 focus:text-ink data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
         className
       )}
       {...props}
@@ -125,7 +130,14 @@ function SelectItem({
           <CheckIcon className="pointer-events-none" />
         </SelectPrimitive.ItemIndicator>
       </span>
-      <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+      {/* The panel no longer widens for a long option, so the option has to
+          give way instead: two lines, then ellipsis, wrapping mid-token so an
+          unbroken value cannot push a horizontal scrollbar into the list. */}
+      <SelectPrimitive.ItemText>
+        <span className="min-w-0 flex-1 line-clamp-2 whitespace-normal [overflow-wrap:anywhere]">
+          {children}
+        </span>
+      </SelectPrimitive.ItemText>
     </SelectPrimitive.Item>
   )
 }

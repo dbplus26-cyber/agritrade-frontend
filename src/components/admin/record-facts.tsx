@@ -39,36 +39,45 @@ export function RecordFacts({
   facts: RecordFact[];
 }) {
   return (
-    // An explicit `minmax` floor rather than plain `grid-cols-2`.
+    // Its OWN container, and container queries rather than `xl:`.
     //
-    // DetailItem wraps its value with `overflow-wrap: anywhere` so a single
-    // enormous unbroken value cannot overflow its card. But `anywhere` also
-    // lets a value's MIN-CONTENT width fall to one character, and a grid
-    // track sized from its content will happily collapse that far - which
-    // rendered a whole record as a column of single letters several thousand
-    // pixels tall. The floor makes each column at least readable-width, and
-    // auto-fit still gives one column on a phone.
-    <div
-      className={cn(
-        "grid grid-cols-[repeat(auto-fit,minmax(min(100%,15rem),1fr))] gap-x-8",
-        columns === 2 && "xl:grid-cols-2",
-        className,
-      )}
-    >
-      {facts.map((f) => (
-        <DetailItem
-          className={f.full ? "col-span-full" : undefined}
-          key={f.label}
-          label={f.label}
-          mono={f.mono}
-        >
-          {isEmpty(f.value) ? (
-            <span className="text-adm-faint">Not recorded</span>
-          ) : (
-            f.value
-          )}
-        </DetailItem>
-      ))}
+    // The split used to be `xl:grid-cols-2`, which fires on the VIEWPORT. On a
+    // detail page the facts often sit in a ~340px rail beside the main column,
+    // so a wide window forced that rail into two ~155px columns: a name took
+    // half a card it should have had all of, and wrapped inside it. The width
+    // that decides whether two columns fit is this block's own, never the
+    // window's.
+    //
+    // Splitting at @lg (32rem) means each column still clears ~15rem after the
+    // gap - the floor the old auto-fit `minmax` was there to guarantee. Below
+    // that it is one full-width column, which is what a rail always gets.
+    // Fixed tracks also settle the other half of that old problem: DetailItem
+    // wraps values with `overflow-wrap: anywhere`, whose min-content is a
+    // single character, and a content-sized track collapses that far - a whole
+    // record once rendered as a column of single letters. `grid-cols-*` tracks
+    // are `minmax(0,1fr)`, so they hold their share regardless.
+    <div className={cn("@container", className)}>
+      <div
+        className={cn(
+          "grid grid-cols-1 gap-x-8",
+          columns === 2 ? "@lg:grid-cols-2" : "@lg:grid-cols-2 @4xl:grid-cols-3",
+        )}
+      >
+        {facts.map((f) => (
+          <DetailItem
+            className={f.full ? "col-span-full" : undefined}
+            key={f.label}
+            label={f.label}
+            mono={f.mono}
+          >
+            {isEmpty(f.value) ? (
+              <span className="text-adm-faint">Not recorded</span>
+            ) : (
+              f.value
+            )}
+          </DetailItem>
+        ))}
+      </div>
     </div>
   );
 }

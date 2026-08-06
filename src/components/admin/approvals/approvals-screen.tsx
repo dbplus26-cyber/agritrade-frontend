@@ -14,6 +14,7 @@ import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
+import { AdminPageHeader } from "@/components/admin/ui";
 import { ListPagination } from "@/components/ui/ListPagination";
 import {
   useApproveApprovalMutation,
@@ -418,17 +419,26 @@ export function ApprovalsScreen() {
     (filters.to ? 1 : 0);
 
   return (
+    // Geometry comes from the console shell, not from here.
+    //
+    // This block used to add `max-w-[1180px] mx-auto`, its own `px-6`, and
+    // `pt-8 pb-20` on top of the shell's `<main>`, which already centres at
+    // 1360px and pads at 26px. Every one of those stacked: the queue sat
+    // narrower than the rest of the console, further in from the left edge,
+    // lower than every other page's first line, and above 80px of dead space.
+    // The colours were reconciled onto the console system a while back
+    // (see APPROVAL_TOKENS) and this was the last thing still making the
+    // screen read as a different product.
     <div
       style={APPROVAL_TOKENS}
-      className="mx-auto max-w-[1180px] bg-[var(--ap-paper)] px-0 pt-8 pb-20 font-admin @min-[900px]/main:px-6 text-[14px] leading-[1.5] text-[var(--ap-ink)] antialiased"
+      className="font-admin text-[14px] leading-[1.5] text-[var(--ap-ink)] antialiased"
     >
-      <h1 className="mb-[5px] text-[26px] leading-[1.25] font-[650] tracking-[-0.02em] text-[var(--ap-ink)]">
-        Approvals
-      </h1>
-      <p className="mb-[26px] max-w-[62ch] text-[14px] leading-[1.5] text-[var(--ap-muted)]">
-        Decisions waiting on you. Approving applies the change, rejecting leaves
-        everything as it stands.
-      </p>
+      {/* The shared header, at the shared size. The bespoke 26px h1 here was
+          the largest heading in the console; every other page titles at 19px. */}
+      <AdminPageHeader
+        title="Approvals"
+        sub="Decisions waiting on you. Approving applies the change, rejecting leaves everything as it stands."
+      />
 
       <div className="mb-[18px] flex flex-wrap items-center gap-3">
         <div
