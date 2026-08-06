@@ -104,7 +104,7 @@ export function LandSellerTable() {
         accessorFn: (s) => `${s.name} ${s.community ?? ""}`,
         header: "Seller",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         cell: ({ row }) => {
           const s = row.original;
           return (
@@ -113,7 +113,7 @@ export function LandSellerTable() {
               className="outline-none focus-visible:underline"
               onClick={(e) => e.stopPropagation()}
             >
-              <span className="block min-w-0 max-w-[20rem]">
+              <span className="block min-w-0 max-w-[90%]">
                 <span className="block truncate font-medium text-adm-ink">
                   {s.name}
                 </span>

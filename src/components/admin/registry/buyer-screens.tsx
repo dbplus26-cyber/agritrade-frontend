@@ -110,7 +110,7 @@ export function BuyerTable() {
         accessorFn: (b) => `${b.name} ${b.city ?? ""}`,
         header: "Buyer",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         cell: ({ row }) => {
           const b = row.original;
           return (
@@ -120,7 +120,7 @@ export function BuyerTable() {
               onClick={(e) => e.stopPropagation()}
             >
               <RegistryAvatar name={b.name} photoUrl={b.photoUrl} />
-              <span className="block min-w-0 max-w-[20rem]">
+              <span className="block min-w-0 max-w-[85%]">
                 <span className="block truncate font-medium text-adm-ink">
                   {b.name}
                 </span>

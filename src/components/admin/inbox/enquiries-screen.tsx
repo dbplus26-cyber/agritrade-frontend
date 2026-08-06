@@ -140,9 +140,9 @@ export function EnquiriesScreen() {
         accessorFn: (e) => e.subject,
         header: "Subject",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         cell: ({ row }) => (
-          <span className="block max-w-[20rem] truncate text-adm-muted">
+          <span className="block max-w-[90%] truncate text-adm-muted">
             {row.original.subject}
           </span>
         ),

@@ -135,13 +135,13 @@ export function PaymentAccountTable() {
         accessorFn: (a) => `${a.label} ${a.accountName}`,
         header: "Account",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         cell: ({ row }) => {
           const a = row.original;
           return (
             <Link
               href={`${LIST}/${a.id}`}
-              className="block min-w-[9rem] max-w-[22rem] outline-none focus-visible:underline"
+              className="block min-w-[9rem] max-w-[90%] outline-none focus-visible:underline"
               onClick={(e) => e.stopPropagation()}
             >
               <span className="block truncate font-medium text-adm-ink">

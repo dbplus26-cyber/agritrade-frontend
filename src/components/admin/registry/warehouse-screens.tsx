@@ -108,11 +108,11 @@ export function WarehouseTable() {
         accessorFn: (w) => w.name,
         header: "Warehouse",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         cell: ({ row }) => (
           <Link
             href={`${LIST}/${row.original.id}`}
-            className="block max-w-[20rem] truncate font-medium text-adm-ink outline-none focus-visible:underline"
+            className="block max-w-[90%] truncate font-medium text-adm-ink outline-none focus-visible:underline"
             onClick={(e) => e.stopPropagation()}
           >
             {row.original.name}

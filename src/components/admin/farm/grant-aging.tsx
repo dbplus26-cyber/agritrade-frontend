@@ -76,13 +76,13 @@ export function GrantAging() {
         header: "Farmer",
         accessorFn: (r) => r.farmer.name,
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         cell: ({ row }) => (
-          <div className="min-w-0 max-w-[21rem]">
+          <div className="min-w-0 w-full">
             <Link
               href={`/admin/farmers/${row.original.farmer.id}`}
               onClick={(e) => e.stopPropagation()}
-              className="block max-w-[20rem] truncate font-semibold text-adm-ink underline-offset-2 hover:underline"
+              className="block max-w-[90%] truncate font-semibold text-adm-ink underline-offset-2 hover:underline"
               title={row.original.farmer.name}
             >
               {row.original.farmer.name}

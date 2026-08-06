@@ -88,7 +88,7 @@ export function RepaymentsRegister() {
         id: "farmer",
         header: "Farmer",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         // The season sits under the farmer rather than holding its own
         // column: context for the row, not something anybody scans down.
         cell: ({ row }) => (

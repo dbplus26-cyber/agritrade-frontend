@@ -230,7 +230,7 @@ export function ExpenseCategoryTable() {
         accessorFn: (c) => c.name,
         header: "Category",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         // What belongs in the category rides under its name instead of
         // holding a column: prose has no natural width, so on its own it is
         // always the column that pushes the table sideways.
@@ -239,7 +239,7 @@ export function ExpenseCategoryTable() {
             href={`${LIST}/${row.original.id}`}
             meta={row.original.description}
             title={row.original.name}
-            width="wide"
+            stretch
           />
         ),
       },

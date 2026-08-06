@@ -148,11 +148,11 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         header: "Counterparty",
         enableSorting: false,
         cell: ({ row }) => (
-          <span className="block max-w-[19rem] truncate text-adm-ink">
+          <span className="block max-w-[90%] truncate text-adm-ink">
             {row.original.counterparty}
           </span>
         ),
-        meta: { className: "px-4 text-[13px]" },
+        meta: { stretch: true, className: "px-4 text-[13px]" },
       },
       {
         accessorFn: (m) => m.parentNo,

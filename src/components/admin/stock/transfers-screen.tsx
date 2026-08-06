@@ -189,7 +189,7 @@ export function TransfersScreen() {
         header: "Route",
         accessorFn: (t) => `${t.fromWarehouse.name} → ${t.toWarehouse.name}`,
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         cell: ({ row }) => (
           <Route
             from={row.original.fromWarehouse.name}

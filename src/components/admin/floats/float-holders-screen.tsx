@@ -110,7 +110,7 @@ export function FloatHoldersScreen() {
         accessorFn: (h) => `${h.firstName} ${h.lastName}`,
         header: "Person",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         cell: ({ row }) => (
           <TitleCell
             meta={row.original.email}

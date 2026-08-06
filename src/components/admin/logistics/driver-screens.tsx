@@ -114,7 +114,7 @@ export function DriverTable() {
         accessorFn: (d) => `${d.name} ${d.company ?? ""}`,
         header: "Driver",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         cell: ({ row }) => {
           const d = row.original;
           return (
@@ -124,7 +124,7 @@ export function DriverTable() {
               onClick={(e) => e.stopPropagation()}
             >
               <RegistryAvatar name={d.name} photoUrl={d.photoUrl} />
-              <span className="block min-w-0 max-w-[20rem]">
+              <span className="block min-w-0 max-w-[85%]">
                 <span className="block truncate font-medium text-adm-ink">
                   {d.name}
                 </span>

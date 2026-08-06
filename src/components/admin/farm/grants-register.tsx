@@ -89,7 +89,7 @@ export function GrantsRegister() {
         id: "farmer",
         header: "Farmer",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         // The season rides under the farmer's name rather than holding a
         // column of its own: it is context for the row, not a fact anybody
         // scans down, and season names here run long enough to have been one
@@ -98,7 +98,7 @@ export function GrantsRegister() {
           <TitleCell
             meta={row.original.season.name}
             title={row.original.farmer.name}
-            width="prose"
+            stretch
           />
         ),
       },

@@ -104,7 +104,7 @@ export function DisbursementsScreen() {
         accessorFn: (d) => d.recipientName,
         header: "Recipient",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         cell: ({ row }) => (
           <span className="block min-w-0 text-left">
             <span className="block truncate font-medium text-adm-ink">

@@ -101,7 +101,7 @@ export function StocktakesScreen() {
         header: "Warehouse",
         accessorFn: (s) => s.warehouse.name,
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         cell: ({ row }) => (
           <span
             className="block min-w-0 max-w-[240px] text-[13px] font-medium text-adm-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere]"

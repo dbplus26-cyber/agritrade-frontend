@@ -91,7 +91,7 @@ export function FarmersRegister() {
         id: "farmer",
         header: "Farmer",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         cell: ({ row }) => <FarmerCell farmer={row.original} />,
       },
       {

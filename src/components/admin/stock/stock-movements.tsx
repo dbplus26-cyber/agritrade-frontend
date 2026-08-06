@@ -80,7 +80,7 @@ export function StockMovements({
         id: "entry",
         header: "Entry",
         enableSorting: false,
-        meta: columnMeta({ className: "py-2" }),
+        meta: columnMeta({ className: "py-2", stretch: true }),
         // Commodity leads, its warehouse sits underneath as the quiet second
         // line - the register convention. The two used to run together on one
         // unbounded line, so a long commodity name and a long warehouse name
@@ -88,6 +88,7 @@ export function StockMovements({
         cell: ({ row }) => (
           <TitleCell
             meta={row.original.warehouse.name}
+            stretch
             title={row.original.commodity.name}
           />
         ),
@@ -117,6 +118,8 @@ export function StockMovements({
         id: "reason",
         header: "Reason / source",
         enableSorting: false,
+        // A secondary column, hidden below xl - so it keeps a fixed cap rather
+        // than a share. Only the always-visible primary column stretches.
         meta: columnMeta({ at: "xl" }),
         cell: ({ row }) =>
           row.original.reason ? (

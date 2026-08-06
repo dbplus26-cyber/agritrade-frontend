@@ -88,7 +88,7 @@ export function CommodityTable() {
         accessorFn: (c) => `${c.name} ${c.variety ?? ""}`,
         header: "Commodity",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         cell: ({ row }) => {
           const c = row.original;
           return (
@@ -112,7 +112,7 @@ export function CommodityTable() {
                     {c.name.charAt(0).toUpperCase()}
                   </span>
                 )}
-                <span className="block min-w-0 max-w-[19rem]">
+                <span className="block min-w-0 max-w-[90%]">
                   <span className="block truncate font-medium text-adm-ink">
                     {c.name}
                   </span>

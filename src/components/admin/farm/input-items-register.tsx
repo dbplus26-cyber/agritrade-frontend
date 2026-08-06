@@ -65,7 +65,7 @@ export function InputItemsRegister() {
         id: "name",
         header: "Item",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         // The description rides underneath rather than holding a column of
         // its own. Prose has no natural width, so given a column it is always
         // the one that pushes the table off the side of the screen; under the
@@ -75,7 +75,7 @@ export function InputItemsRegister() {
             href={`${LIST}/${row.original.id}/edit`}
             meta={row.original.description}
             title={row.original.name}
-            width="wide"
+            stretch
           />
         ),
       },

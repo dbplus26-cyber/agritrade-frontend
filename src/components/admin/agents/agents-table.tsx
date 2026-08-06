@@ -91,7 +91,7 @@ export function AgentsTable() {
         accessorFn: (a) => `${a.firstName} ${a.lastName}`,
         header: "Agent",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         cell: ({ row }) => {
           const a = row.original;
           return (
@@ -104,7 +104,7 @@ export function AgentsTable() {
                 name={`${a.firstName} ${a.lastName}`}
                 photoUrl={a.profilePicture}
               />
-              <span className="block min-w-0 max-w-[20rem]">
+              <span className="block min-w-0 max-w-[85%]">
                 <span className="block truncate font-medium text-adm-ink">
                   {a.firstName} {a.lastName}
                 </span>

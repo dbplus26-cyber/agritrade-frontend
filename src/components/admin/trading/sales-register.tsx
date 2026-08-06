@@ -138,7 +138,7 @@ export function SalesRegister() {
         accessorFn: (s) => s.buyer.name,
         header: "Buyer",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         // A real anchor, not just a clickable row: keyboard focus, middle-click
         // and "open in new tab" all come free from it, and none of them work on
         // a div with an onClick. stopPropagation so the row handler doesn't
@@ -146,10 +146,10 @@ export function SalesRegister() {
         cell: ({ row }) => (
           <Link
             href={`/admin/sales/${row.original.id}`}
-            className="block min-w-[9rem] max-w-[22rem] outline-none focus-visible:underline"
+            className="block min-w-[9rem] w-full outline-none focus-visible:underline"
             onClick={(e) => { e.stopPropagation(); }}
           >
-            <div className="max-w-[20rem] truncate font-semibold text-adm-ink">
+            <div className="max-w-[90%] truncate font-semibold text-adm-ink">
               {row.original.buyer.name}
             </div>
           </Link>

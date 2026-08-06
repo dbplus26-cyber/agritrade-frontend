@@ -107,9 +107,9 @@ export function FarmApplicationsScreen() {
         accessorFn: (a) => `${a.name} ${a.reference}`,
         header: "Applicant",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         cell: ({ row }) => (
-          <span className="block min-w-[8rem] max-w-[20rem]">
+          <span className="block min-w-[8rem] max-w-[90%]">
             <span className="block truncate font-medium text-adm-ink">
               {row.original.name}
             </span>

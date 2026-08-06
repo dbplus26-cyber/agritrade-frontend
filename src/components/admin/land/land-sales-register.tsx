@@ -71,12 +71,12 @@ export function LandSalesRegister() {
         id: "plot",
         header: "Plot",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         // Real anchor - keyboard, middle-click and open-in-new-tab.
         cell: ({ row }) => (
           <Link
             href={`/admin/land-sales/${row.original.id}`}
-            className="block min-w-[9rem] max-w-[22rem] outline-none focus-visible:underline"
+            className="block min-w-[9rem] max-w-[90%] outline-none focus-visible:underline"
             onClick={(e) => { e.stopPropagation(); }}
           >
             <Mono className="text-[12.5px] font-semibold text-console">

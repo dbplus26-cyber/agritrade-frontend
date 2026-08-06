@@ -50,6 +50,12 @@ export const columnMeta = (opts?: {
   /** Show this column only from a breakpoint up. */
   at?: keyof typeof REVEAL_AT;
   className?: string;
+  /**
+   * Marks this as the table's primary column: 40% of the table width, with
+   * the cell truncating at ~90% of it. Exactly one per table - see
+   * ConsoleColumnMeta.stretch for why a share beats a fixed cap.
+   */
+  stretch?: boolean;
   /** Older shorthand for `at: "xl"`, kept so existing tables read the same. */
   wide?: boolean;
 }) => ({
@@ -64,6 +70,7 @@ export const columnMeta = (opts?: {
   ),
   headerClassName:
     "h-[38px] whitespace-nowrap bg-adm-sunken py-0 text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted",
+  ...(opts?.stretch ? { stretch: true as const } : {}),
 });
 
 export const STATUS_FILTER_OPTIONS = [

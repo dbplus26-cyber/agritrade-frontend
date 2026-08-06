@@ -84,9 +84,9 @@ export function LandAcquisitionsRegister() {
         id: "acquisition",
         header: "Plot / seller",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         cell: ({ row }) => (
-          <div className="min-w-0 max-w-[21rem]">
+          <div className="min-w-0 max-w-[90%]">
             <Mono className="text-[12.5px] font-semibold text-console">
               {row.original.reference}
             </Mono>

@@ -59,6 +59,33 @@ const CELL_WIDTHS = {
  */
 const TITLE_CLAMP = "max-w-[92%]";
 
+/**
+ * The clamps used INSIDE the table's one stretch column (the 40% share).
+ *
+ * A fixed cap is wrong here and a share is right, which is worth being precise
+ * about because the two look interchangeable. A `<table>` lays each column out
+ * to its widest cell, so capping the cell at, say, 28rem does not bound the
+ * column - the column is still sized by the content, and the clamped text then
+ * ends well short of the column's right edge. The reader gets an ellipsis with
+ * empty space after it: the column was given the room and the text was not
+ * allowed to use it. Clamping to a PERCENTAGE of a column that is itself
+ * pinned to 40% inverts that - the text expands to fill what it was given and
+ * stops just shy of the edge, and the table stays bounded.
+ *
+ * 90% normally; 85% when an avatar sits beside the text and has already taken
+ * a fixed bite out of the line.
+ */
+const STRETCH_CLAMP = "max-w-[90%]";
+const STRETCH_CLAMP_WITH_AVATAR = "max-w-[85%]";
+
+/** The title clamp for a cell, given where it sits. */
+const titleClamp = (stretch?: boolean, avatar?: boolean): string =>
+  stretch
+    ? avatar
+      ? STRETCH_CLAMP_WITH_AVATAR
+      : STRETCH_CLAMP
+    : TITLE_CLAMP;
+
 export type CellWidth = keyof typeof CELL_WIDTHS;
 
 /**
@@ -70,23 +97,34 @@ export type CellWidth = keyof typeof CELL_WIDTHS;
  * scroll away.
  */
 export function TitleCell({
+  avatar = false,
   className,
   href,
   meta,
+  stretch = false,
   title,
   width = "identity",
 }: {
+  /** An avatar sits beside this text, so it clamps at 85% instead of 90%. */
+  avatar?: boolean;
   className?: string;
   /** Makes the title a link without swallowing the row's own click. */
   href?: string;
   /** The quieter second line: a description, a community, a reference. */
   meta?: null | string;
+  /**
+   * This cell is in the table's stretch column. Drops the fixed width preset
+   * for a share of the column, which is what lets long values use the room the
+   * 40% column was given instead of stopping short of its edge.
+   */
+  stretch?: boolean;
   title: string;
   width?: CellWidth;
 }) {
+  const clamp = titleClamp(stretch, avatar);
   const titleNode = href ? (
     <Link
-      className={cn(TITLE_CLAMP, "block truncate font-medium text-adm-ink hover:underline")}
+      className={cn(clamp, "block truncate font-medium text-adm-ink hover:underline")}
       href={href}
       onClick={(e) => e.stopPropagation()}
       title={title}
@@ -95,7 +133,7 @@ export function TitleCell({
     </Link>
   ) : (
     <span
-      className={cn(TITLE_CLAMP, "block truncate font-medium text-adm-ink")}
+      className={cn(clamp, "block truncate font-medium text-adm-ink")}
       title={title}
     >
       {title}
@@ -103,11 +141,24 @@ export function TitleCell({
   );
 
   return (
-    <div className={cn(CELL_WIDTHS[width], "text-left", className)}>
+    <div
+      className={cn(
+        // In a stretch column the td already carries the 40% + max-w-0, so the
+        // wrapper must only stop being a floor - a fixed preset here would
+        // fight the share it sits inside.
+        stretch ? "w-full min-w-0" : CELL_WIDTHS[width],
+        "text-left",
+        className,
+      )}
+    >
       {titleNode}
       {meta ? (
         <span
-          className="block truncate text-[11.5px] text-adm-faint"
+          className={cn(
+            "block truncate text-[11.5px] text-adm-faint",
+            // A little more than the title, preserving the hierarchy above.
+            stretch && "max-w-[96%]",
+          )}
           title={meta}
         >
           {meta}
@@ -125,6 +176,7 @@ export function TextCell({
   className,
   fallback = "-",
   mono = false,
+  stretch = false,
   value,
   width = "prose",
 }: {
@@ -132,6 +184,8 @@ export function TextCell({
   /** Shown when there is nothing, so the column never looks broken. */
   fallback?: string;
   mono?: boolean;
+  /** This cell is in the table's stretch column - see TitleCell.stretch. */
+  stretch?: boolean;
   value: null | string | undefined;
   width?: CellWidth;
 }) {
@@ -141,7 +195,7 @@ export function TextCell({
   return (
     <span
       className={cn(
-        CELL_WIDTHS[width],
+        stretch ? cn("w-full min-w-0", STRETCH_CLAMP) : CELL_WIDTHS[width],
         "block truncate text-left",
         mono && "font-adminmono tabular-nums",
         className,

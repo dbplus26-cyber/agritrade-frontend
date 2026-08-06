@@ -123,7 +123,7 @@ export function PurchasesTable() {
         accessorFn: (p) => p.commodity.name,
         header: "Purchase",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         cell: ({ row }) => {
           const p = row.original;
           return (
@@ -132,7 +132,7 @@ export function PurchasesTable() {
               className="outline-none focus-visible:underline"
               onClick={(e) => e.stopPropagation()}
             >
-              <span className="block min-w-0 max-w-[20rem]">
+              <span className="block min-w-0 max-w-[90%]">
                 <span className="block truncate font-medium text-adm-ink">
                   {p.commodity.name}
                   <Mono className="ml-1.5 text-[12px] text-adm-muted">

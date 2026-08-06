@@ -34,6 +34,27 @@ export interface ConsoleColumnMeta {
   className?: string;
   /** Applied to th only. */
   headerClassName?: string;
+  /**
+   * Marks the table's ONE primary column. It claims 40% of the table's width
+   * instead of sizing to its content, and the cell inside truncates at ~90% of
+   * that share (85% when an avatar sits beside the text).
+   *
+   * Why a share and not a fixed cap. A `<table>` sizes each column to its
+   * widest cell, so a column holding free text is always the one that decides
+   * the table's width. Capping the CELL at a fixed width (max-w-[28rem]) does
+   * not stop that: the column is still laid out to whatever the content wants,
+   * and the clamped text then stops well short of the column's right edge -
+   * the reader sees an ellipsis with dead space beside it, which is the worst
+   * of both. Pinning the COLUMN to 40% and clamping the cell to 90% OF THAT
+   * makes the text use the room it was given, and bounds the table at the same
+   * time: no column may ever exceed 40%.
+   *
+   * `max-w-0` on the td is what makes the percentage authoritative. Without it
+   * the cell's min-content width wins over `w-2/5` and the column grows again.
+   *
+   * Exactly one column per table. Mark the one that says WHICH row this is.
+   */
+  stretch?: boolean;
 }
 
 declare module "@tanstack/react-table" {
@@ -384,6 +405,8 @@ export function ConsoleDataTable<TData>({
                       sortable && "cursor-pointer select-none",
                       meta?.className,
                       meta?.headerClassName,
+                      // Last, so the share wins over any width in the meta.
+                      meta?.stretch && "w-2/5",
                     )}
                     onClick={
                       sortable
@@ -439,6 +462,10 @@ export function ConsoleDataTable<TData>({
                         // the backstop for the ones that do not.
                         "px-3 py-2.5 text-[13px] text-adm-body [&_p]:line-clamp-2",
                         cell.column.columnDef.meta?.className,
+                        // max-w-0 is not cosmetic: without it the cell's
+                        // min-content width beats w-2/5 and the column grows
+                        // back to whatever the longest value wants.
+                        cell.column.columnDef.meta?.stretch && "w-2/5 max-w-0",
                       )}
                     >
                       {flexRender(

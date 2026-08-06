@@ -100,10 +100,10 @@ export function ExpensesRegister() {
           <TitleCell
             meta={row.original.description}
             title={row.original.category.name}
-            width="wide"
+            stretch
           />
         ),
-        meta: { className: "px-4 text-[13px]" },
+        meta: { stretch: true, className: "px-4 text-[13px]" },
       },
       {
         accessorFn: (r) => r.shipment?.transactionNo ?? "",

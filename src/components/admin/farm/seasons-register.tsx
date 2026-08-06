@@ -64,7 +64,7 @@ export function SeasonsRegister() {
         id: "name",
         header: "Season",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         // Real anchor — keyboard, middle-click and open-in-new-tab.
         cell: ({ row }) => (
           <Link

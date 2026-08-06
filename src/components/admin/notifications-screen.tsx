@@ -91,9 +91,9 @@ export function NotificationsScreen() {
         id: "event",
         header: "Notification",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         cell: ({ row }) => (
-          <div className="min-w-0 max-w-[21rem]">
+          <div className="min-w-0 max-w-[90%]">
             <div className="font-medium text-adm-ink">
               {EVENT_LABEL[row.original.event] ?? row.original.event}
             </div>

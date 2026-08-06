@@ -2,7 +2,6 @@
 
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { cn } from "@/lib/utils";
 import { ConsoleDataTable } from "@/components/admin/data-table";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import {
@@ -18,6 +17,7 @@ import { useGetAuditLogsQuery } from "@/redux/audit/audit-api";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
 import type { IAuditListQuery, IAuditLog } from "@/types/audit.types";
+import { columnMeta } from "@/components/admin/registry/registry-bits";
 
 const CATEGORY_OPTIONS = [
   { value: "all", label: "All activity" },
@@ -44,14 +44,10 @@ const actionLabel = (action: string): string => {
   return words.charAt(0).toUpperCase() + words.slice(1);
 };
 
-const columnMeta = (opts?: { wide?: boolean }) => ({
-  className: cn(
-    "px-4 py-0 text-[13px]",
-    opts?.wide ? "hidden xl:table-cell" : "table-cell",
-  ),
-  headerClassName:
-    "h-[38px] whitespace-nowrap bg-adm-sunken py-0 text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted",
-});
+// columnMeta lives in registry-bits and is shared by every register table.
+// This file used to keep a private copy of it, which had already drifted -
+// it never gained `at` or `className`, so the audit log could not express a
+// breakpoint other than xl, and a stretch column was not expressible at all.
 
 /**
  * The audit-log register (super-admin): server-driven like the users table —
@@ -109,18 +105,18 @@ export function AuditTable() {
         id: "actor",
         header: "Actor",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         cell: ({ row }) => {
           const actor = row.original.actor;
           if (!actor) {
             return <span className="text-adm-faint">System</span>;
           }
           return (
-            <div className="min-w-0 max-w-[20rem]">
-              <div className="max-w-[20rem] truncate font-medium text-adm-ink">
+            <div className="min-w-0 w-full">
+              <div className="max-w-[90%] truncate font-medium text-adm-ink">
                 {actor.name}
               </div>
-              <div className="max-w-[20rem] truncate text-[11.5px] text-adm-faint">
+              <div className="max-w-[90%] truncate text-[11.5px] text-adm-faint">
                 {actor.email}
               </div>
             </div>

@@ -99,9 +99,18 @@ export function TreasuryScreen() {
         accessorFn: (t) => t.description,
         header: "Description",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        // The one free-text column here, so it takes the stretch share. It
+        // stays xl-only: below that the row is all references and figures,
+        // and there is nothing left to bound.
+        meta: columnMeta({ stretch: true, wide: true }),
         cell: ({ row }) => (
-          <span className="block truncate text-left">
+          // A bare `truncate` here did nothing: with no width to truncate
+          // AGAINST, the column simply grew to the longest description and
+          // took the table with it.
+          <span
+            className="block max-w-[90%] truncate text-left"
+            title={row.original.description}
+          >
             {row.original.description}
           </span>
         ),

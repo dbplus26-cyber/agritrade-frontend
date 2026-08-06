@@ -167,7 +167,7 @@ export function UsersTable() {
         accessorFn: (u) => `${u.firstName} ${u.lastName} ${u.email}`,
         header: "User",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         cell: ({ row }) => {
           const u = row.original;
           return (
@@ -191,7 +191,7 @@ export function UsersTable() {
                     {initialsOf(u)}
                   </span>
                 )}
-                <span className="block min-w-0 max-w-[19rem]">
+                <span className="block min-w-0 max-w-[90%]">
                   <span className="block truncate font-medium text-adm-ink">
                     {u.firstName} {u.lastName}
                   </span>

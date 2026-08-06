@@ -115,7 +115,7 @@ export function DeliveryAddressTable() {
         accessorFn: (a) => `${a.label} ${a.city}`,
         header: "Address",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ stretch: true }),
         cell: ({ row }) => {
           const a = row.original;
           return (
