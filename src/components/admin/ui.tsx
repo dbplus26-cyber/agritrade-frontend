@@ -47,7 +47,7 @@ export function DetailRow({
 }) {
   return (
     <div className="flex flex-col gap-0.5 py-2 @min-[420px]:flex-row @min-[420px]:items-baseline @min-[420px]:justify-between @min-[420px]:gap-3">
-      <span className="flex flex-none items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+      <span className="flex flex-none items-center gap-1 text-[11px] font-bold tracking-[0.08em] text-adm-muted uppercase">
         <span className="min-w-0">{label}</span>
         {hint ? <HelpTip label={`What is ${label}?`} text={hint} /> : null}
       </span>
@@ -55,7 +55,7 @@ export function DetailRow({
         className={cn(
           "min-w-0 text-[13.5px] text-adm-ink [overflow-wrap:anywhere] @min-[420px]:text-right",
           mono && "font-adminmono tabular-nums",
-          strong && "text-[15px] font-bold",
+          strong && "text-[16.5px] font-bold",
         )}
       >
         {children}
@@ -106,15 +106,15 @@ export function DetailItem({
         className,
       )}
     >
-      <p className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+      <p className="flex items-center gap-1 text-[11px] font-bold tracking-[0.08em] text-adm-muted uppercase">
         <span className="min-w-0">{label}</span>
         {hint ? <HelpTip label={`What is ${label}?`} text={hint} /> : null}
       </p>
       <div
         className={cn(
-          "mt-0.5 min-w-0 text-[13.5px] text-adm-ink [overflow-wrap:anywhere]",
+          "mt-1 min-w-0 text-[14.5px] font-medium text-adm-ink [overflow-wrap:anywhere]",
           mono && "font-adminmono tabular-nums",
-          strong && "text-[15px] font-bold",
+          strong && "text-[16.5px] font-bold",
         )}
       >
         {children}
@@ -465,20 +465,39 @@ export function AdminField({
 }) {
   return (
     <Label className={cn("block font-normal leading-normal", className)}>
-      {/* Meridian's eyebrow: small, semibold, wide-tracked, and in the
-          neutral - a stencilled gold micro-cap belongs on the printed site,
-          not over every field of a working form. */}
-      <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.06em] text-adm-muted">
+      {/* Four kinds of text live in a field - the LABEL, the value you type,
+          the HINT and the ERROR - and they used to sit within half a step of
+          each other in size and colour, all in the same muted grey. So a form
+          read as one flat wall and nothing said which line was the question
+          and which was the answer.
+          
+          The label is now ink rather than muted and sentence case rather than
+          a wide-tracked micro-cap: it is the question being asked, so it reads
+          first and it reads as words. "Optional" stays faint, because it
+          qualifies the label rather than competing with it. */}
+      <span className="mb-1 block text-[13px] font-semibold text-adm-ink">
         {label}
-        {optional ? <span className="text-adm-faint"> - optional</span> : null}
+        {optional ? (
+          <span className="font-normal text-adm-faint"> (optional)</span>
+        ) : null}
       </span>
+      {/* The hint sits ABOVE the control, not under it. Guidance you only meet
+          after you have already answered is guidance that arrived too late,
+          and putting it under the input also stacked it in the same place the
+          error appears, so the two swapped in and out of one slot. */}
+      {hint ? (
+        <span className="mb-1.5 block text-[12px] leading-[1.5] font-normal text-adm-muted">
+          {hint}
+        </span>
+      ) : null}
       {children}
       {error ? (
-        <span role="alert" className="mt-1 block text-[12px] font-medium text-console-red">
+        <span
+          className="mt-1.5 block text-[12.5px] font-medium text-console-red"
+          role="alert"
+        >
           {error}
         </span>
-      ) : hint ? (
-        <span className="mt-1 block text-[12.5px] font-normal text-adm-muted">{hint}</span>
       ) : null}
     </Label>
   );
@@ -493,7 +512,7 @@ export function AdminField({
  * was a public-site form control standing in a working tool.
  */
 export const adminInputClass =
-  "h-[36px] w-full rounded-[6px] border border-adm-line bg-adm-card px-3 text-[13.5px] font-normal text-adm-ink shadow-none outline-none transition-[border-color,box-shadow] placeholder:text-adm-faint focus:border-console focus:shadow-[0_0_0_3px_rgba(30,61,43,0.12)] focus-visible:border-console focus-visible:ring-0 aria-invalid:border-console-red";
+  "h-[38px] w-full rounded-[6px] border border-adm-line bg-adm-card px-3 text-[14.5px] font-medium text-adm-ink shadow-none outline-none transition-[border-color,box-shadow] placeholder:text-adm-faint focus:border-console focus:shadow-[0_0_0_3px_rgba(30,61,43,0.12)] focus-visible:border-console focus-visible:ring-0 aria-invalid:border-console-red";
 
 export const adminSelectClass = cn(adminInputClass, "cursor-pointer");
 

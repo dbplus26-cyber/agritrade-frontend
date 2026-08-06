@@ -172,7 +172,7 @@ export function TitleCell({
       {meta ? (
         <span
           className={cn(
-            "block truncate text-[11.5px] text-adm-faint",
+            "block truncate text-[12.5px] text-adm-faint",
             // A little more than the title, preserving the hierarchy above.
             stretch && "max-w-[96%]",
           )}

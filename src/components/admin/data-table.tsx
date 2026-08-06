@@ -283,7 +283,7 @@ export function ConsoleDataTable<TData>({
     return (
       <div className={cn("@container/table min-w-0", className)}>
         {emptyState ?? (
-          <div className="px-4 py-12 text-center text-[13px] text-adm-muted">
+          <div className="px-4 py-12 text-center text-[14px] text-adm-muted">
             Nothing here yet.
           </div>
         )}
@@ -295,7 +295,7 @@ export function ConsoleDataTable<TData>({
     <div className={cn("@container/table min-w-0", className)}>
       {enableSelection && selectedRows.length > 0 && renderBulkActions ? (
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-adm-line bg-adm-sunken px-4 py-2">
-          <span className="text-[12.5px] font-semibold text-adm-body">
+          <span className="text-[13.5px] font-semibold text-adm-body">
             {selectedRows.length} selected
           </span>
           <div className="flex items-center gap-2">
@@ -325,7 +325,7 @@ export function ConsoleDataTable<TData>({
       >
         {rows.length === 0
           ? (emptyState ?? (
-              <div className="px-4 py-12 text-center text-[13px] text-adm-muted">
+              <div className="px-4 py-12 text-center text-[14px] text-adm-muted">
                 Nothing here yet.
               </div>
             ))
@@ -377,7 +377,7 @@ export function ConsoleDataTable<TData>({
                     return (
                       <div
                         key={cell.id}
-                        className="flex items-start justify-between gap-3 border-b border-adm-hairline py-1.5 text-[13px] last:border-b-0"
+                        className="flex items-start justify-between gap-3 border-b border-adm-hairline py-1.5 text-[14px] last:border-b-0"
                       >
                         {label ? (
                           <span className="flex-none pt-px text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
@@ -473,7 +473,7 @@ export function ConsoleDataTable<TData>({
             <TableRow className="hover:bg-transparent">
               <TableCell colSpan={allColumns.length} className="p-0">
                 {emptyState ?? (
-                  <div className="px-4 py-12 text-center text-[13px] text-adm-muted">
+                  <div className="px-4 py-12 text-center text-[14px] text-adm-muted">
                     Nothing here yet.
                   </div>
                 )}
@@ -503,7 +503,7 @@ export function ConsoleDataTable<TData>({
                         // height, and the table stops being scannable. Cells
                         // that want a single line clamp themselves; this is
                         // the backstop for the ones that do not.
-                        "px-3 py-2.5 text-[13px] text-adm-body [&_p]:line-clamp-2",
+                        "px-3 py-2.5 text-[14px] text-adm-body [&_p]:line-clamp-2",
                         cell.column.columnDef.meta?.className,
                         // max-w-0 is not cosmetic: without it the cell's
                         // min-content width beats w-2/5 and the column grows
@@ -544,7 +544,7 @@ export function ConsoleDataTable<TData>({
           }
         />
       ) : total > 0 ? (
-        <div className="border-t border-adm-line px-4 py-2.5 text-[12.5px] text-adm-muted">
+        <div className="border-t border-adm-line px-4 py-2.5 text-[13.5px] text-adm-muted">
           {total} {itemNoun}
         </div>
       ) : null}

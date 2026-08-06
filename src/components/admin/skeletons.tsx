@@ -134,14 +134,32 @@ export function PageHeaderSkeleton({
   );
 }
 
-/** The filter toolbar: search box, filters, action - one row from `lg`. */
+/**
+ * The filter toolbar, in the TWO BANDS the real one uses: search and the page
+ * action on top, filters underneath.
+ *
+ * It has to mirror ConsoleFilterBar's own breakpoints or the page visibly
+ * rearranges itself the moment the real toolbar mounts, which is the one thing
+ * a skeleton exists to prevent. So the switches here are the same
+ * `@min-[680px]/main` container queries, not the `lg:` viewport ones this used
+ * to carry: the shell's sidebar eats ~225px, so `lg:` fires while the content
+ * area is still narrow and the placeholder would sit in the wide arrangement
+ * while the real toolbar sat in the narrow one.
+ */
 export function FilterBarSkeleton({ filters = 2 }: { filters?: number }) {
   return (
-    <div aria-hidden="true" className="mb-3 flex flex-wrap items-center gap-2">
-      <Skeleton className="h-8 w-full lg:w-[280px] xl:w-[320px]" />
-      {Array.from({ length: filters }, (_, i) => (
-        <Skeleton key={i} className="hidden h-8 w-[160px] lg:block" />
-      ))}
+    <div aria-hidden="true" className="mb-3 flex flex-col gap-2">
+      <div className="flex flex-col gap-2 @min-[680px]/main:flex-row @min-[680px]/main:items-center">
+        <Skeleton className="h-9 w-full @min-[680px]/main:w-[30%] @min-[680px]/main:min-w-[240px] @min-[680px]/main:flex-none" />
+        <Skeleton className="h-9 w-32 @min-[680px]/main:ml-auto" />
+      </div>
+      {/* Hidden behind the Filters toggle below 680px, exactly as the real
+          filters are, so nothing appears and then vanishes on mount. */}
+      <div className="hidden gap-2 @min-[680px]/main:grid @min-[680px]/main:grid-cols-[repeat(auto-fill,minmax(150px,190px))]">
+        {Array.from({ length: filters }, (_, i) => (
+          <Skeleton className="h-9 w-full" key={i} />
+        ))}
+      </div>
     </div>
   );
 }
