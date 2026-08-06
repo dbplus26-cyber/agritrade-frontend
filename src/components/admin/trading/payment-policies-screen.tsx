@@ -1,9 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { ColumnDef } from "@tanstack/react-table";
 import { z } from "zod";
 import {
   AdminButton,
@@ -14,10 +13,7 @@ import {
   adminInputClass,
   adminSelectClass,
 } from "@/components/admin/ui";
-import { ConsoleDataTable } from "@/components/admin/data-table";
-import { columnMeta } from "@/components/admin/registry/registry-bits";
-import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
-import { TitleCell } from "@/components/admin/table-cells";
+import { CardGridSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import {
@@ -41,7 +37,6 @@ import {
   useUpdatePaymentPolicyMutation,
 } from "@/redux/payment-policies/payment-policies-api";
 import type {
-  IMilestone,
   IPaymentPolicy,
   MilestoneTrigger,
 } from "@/types/admin-sale.types";
@@ -233,7 +228,7 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
   );
 }
 
-function PolicyActions({ policy }: { policy: IPaymentPolicy }) {
+function PolicyCard({ policy }: { policy: IPaymentPolicy }) {
   const [update] = useUpdatePaymentPolicyMutation();
   const [deletePolicy, deleteState] = useDeletePaymentPolicyMutation();
   const { confirm, confirmationDialog } = useConfirm();
@@ -298,62 +293,102 @@ function PolicyActions({ policy }: { policy: IPaymentPolicy }) {
   };
 
   return (
-    <div className="flex flex-wrap justify-end gap-1.5">
-      {!policy.isDefault && policy.isActive ? (
-        <AdminButton
-          variant="outline"
-          className="h-7 px-2 text-[12px]"
-          onClick={() => void makeDefault()}
+    // h-full + flex-col is what makes a row of these line up. The grid
+    // stretches every card to the tallest in its row, and the column layout
+    // then lets the action row take `mt-auto` and sit on the bottom edge of
+    // all of them - so the buttons form one line across the row instead of
+    // floating at whatever height each card's schedule happened to end at.
+    <AdminCard className="flex h-full flex-col px-4 py-3">
+      {/* The tag pins to the top of the title, not its vertical middle - a
+          policy name here routinely runs to three lines. */}
+      <div className="mb-2 flex items-start justify-between gap-2">
+        {/* Two lines of room, reserved whether or not the name needs both.
+            Without the reservation a one-line name and a two-line name start
+            their schedules at different heights, and the cards read as
+            misaligned even when their outer heights match. */}
+        <span
+          className="line-clamp-2 min-h-[2.6em] text-[14px] font-bold text-adm-ink"
+          title={policy.name}
         >
-          Make default
-        </AdminButton>
-      ) : null}
-      {!policy.isDefault ? (
-        <AdminButton
-          variant="ghost"
-          className="h-7 px-2 text-[12px]"
-          onClick={() => void toggleActive()}
-        >
-          {policy.isActive ? "Deactivate" : "Activate"}
-        </AdminButton>
-      ) : null}
-      {isSuperAdmin ? (
-        <AdminButton
-          variant="ghost"
-          className="h-7 px-2 text-[12px] text-console-red"
-          disabled={deleteState.isLoading}
-          onClick={() => void onDelete()}
-        >
-          Delete
-        </AdminButton>
-      ) : null}
+          {policy.name}
+        </span>
+        <span className="flex flex-none gap-1.5">
+          {policy.isDefault ? (
+            <ToneBadge tone="forest">Default</ToneBadge>
+          ) : null}
+          {policy.isActive ? null : (
+            <ToneBadge tone="slate">Inactive</ToneBadge>
+          )}
+        </span>
+      </div>
+      {/* The SCHEDULE is what a policy is, so it is set as one: the share
+          leads each row at figure weight, the trigger explains it beneath.
+          Previously the share and its trigger shared one truncating line and
+          the percentage - the single number that matters - was the part being
+          cut off ("80% ·…"). */}
+      <div className="flex flex-col divide-y divide-adm-hairline border-y border-adm-hairline">
+        {policy.milestones.map((m, i) => (
+          <div
+            key={`${m.label}-${String(i)}`}
+            className="flex items-baseline gap-3 py-1.5"
+          >
+            <span className="font-adminmono w-[3.25rem] flex-none text-[13.5px] font-bold text-console tabular-nums">
+              {m.percent}%
+            </span>
+            {/* flex-1 as well as min-w-0. Without it this sizes to
+                max-content, so `truncate` has nothing to truncate against and
+                an 80-character milestone label pushes straight out of the
+                card instead of clipping. */}
+            <span className="block min-w-0 flex-1">
+              <span
+                className="block truncate text-[12.5px] text-adm-ink"
+                title={m.label}
+              >
+                {m.label}
+              </span>
+              <span className="block truncate text-[11.5px] text-adm-muted">
+                {milestoneTriggerLabel(m.trigger)}
+              </span>
+            </span>
+          </div>
+        ))}
+      </div>
+      {/* mt-auto, not a fixed margin: the schedule is 2 to 5 rows long, so the
+          slack has to collect ABOVE the actions rather than below them. This
+          is the line that makes a stretched card look designed instead of
+          padded. */}
+      <div className="mt-auto flex flex-wrap gap-2 pt-2.5">
+        {!policy.isDefault && policy.isActive ? (
+          <AdminButton
+            variant="outline"
+            className="h-8 px-3 text-[12.5px]"
+            onClick={() => void makeDefault()}
+          >
+            Make default
+          </AdminButton>
+        ) : null}
+        {!policy.isDefault ? (
+          <AdminButton
+            variant="ghost"
+            className="h-8 px-3 text-[12.5px]"
+            onClick={() => void toggleActive()}
+          >
+            {policy.isActive ? "Deactivate" : "Activate"}
+          </AdminButton>
+        ) : null}
+        {isSuperAdmin ? (
+          <AdminButton
+            variant="ghost"
+            className="h-8 px-3 text-[12.5px] text-console-red"
+            disabled={deleteState.isLoading}
+            onClick={() => void onDelete()}
+          >
+            Delete
+          </AdminButton>
+        ) : null}
+      </div>
       {confirmationDialog}
-    </div>
-  );
-}
-
-/**
- * A policy's schedule on two lines, and always exactly two.
- *
- * As cards this was a variable-length list, so a 2-milestone policy and a
- * 5-milestone one produced cards of visibly different heights sitting in the
- * same grid row - the "scattered" look. In a register every row has to be the
- * same height or the table stops being scannable, so the shares lead on one
- * line and the triggers explain them on the next, both truncating, with the
- * whole schedule spelled out on hover.
- */
-function Schedule({ milestones }: { milestones: IMilestone[] }) {
-  const shares = milestones.map((m) => `${String(m.percent)}% ${m.label}`).join(" · ");
-  const triggers = milestones.map((m) => milestoneTriggerLabel(m.trigger)).join(" · ");
-  return (
-    <span className="block w-full min-w-0" title={`${shares} — ${triggers}`}>
-      <span className="block max-w-[96%] truncate text-[12.5px] text-adm-ink">
-        {shares}
-      </span>
-      <span className="block max-w-[96%] truncate text-[11.5px] text-adm-muted">
-        {triggers}
-      </span>
-    </span>
+    </AdminCard>
   );
 }
 
@@ -363,58 +398,10 @@ export function PaymentPoliciesScreen() {
   const [createOpen, setCreateOpen] = useState(false);
   const policies = data?.data ?? [];
 
-  // A register, not a card grid. As cards the schedule made every tile a
-  // different height - a policy is 2 to 5 milestones - so a row of them never
-  // lined up, and the same four facts were laid out differently here than in
-  // every other module. Nothing about a policy wants a tile: it is a name, a
-  // schedule and a state, which is a row.
-  const columns = useMemo<ColumnDef<IPaymentPolicy, unknown>[]>(
-    () => [
-      {
-        id: "policy",
-        accessorFn: (p) => p.name,
-        header: "Policy",
-        enableSorting: false,
-        meta: columnMeta({ stretch: true }),
-        cell: ({ row }) => <TitleCell stretch title={row.original.name} />,
-      },
-      {
-        id: "schedule",
-        accessorFn: (p) =>
-          p.milestones.map((m) => `${String(m.percent)}% ${m.label}`).join(" "),
-        header: "Schedule",
-        enableSorting: false,
-        meta: columnMeta(),
-        cell: ({ row }) => <Schedule milestones={row.original.milestones} />,
-      },
-      {
-        id: "status",
-        accessorFn: (p) =>
-          p.isDefault ? "Default" : p.isActive ? "Active" : "Inactive",
-        header: "Status",
-        enableSorting: false,
-        meta: columnMeta(),
-        cell: ({ row }) =>
-          row.original.isDefault ? (
-            <ToneBadge tone="forest">Default</ToneBadge>
-          ) : row.original.isActive ? (
-            <ToneBadge tone="leaf">Active</ToneBadge>
-          ) : (
-            <ToneBadge tone="slate">Inactive</ToneBadge>
-          ),
-      },
-      {
-        id: "actions",
-        header: "",
-        enableSorting: false,
-        meta: columnMeta({ className: "text-right" }),
-        cell: ({ row }) => <PolicyActions policy={row.original} />,
-      },
-    ],
-    [],
-  );
-
   return (
+    // No 680px cap. It was narrower than one card plus a gutter at some
+    // widths, so the grid was being asked for three columns inside the width
+    // of roughly one and a half.
     <div>
       <AdminPageHeader
         title="Payment Policies"
@@ -434,31 +421,33 @@ export function PaymentPoliciesScreen() {
       </p>
 
       {isLoading ? (
-        <ConsoleTableSkeleton columns={4} />
+        <CardGridSkeleton cards={4} columns={2} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}
           onRetry={() => void refetch()}
         />
       ) : policies.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          <EmptyState
-            variant="plain"
-            title="No payment policies"
-            description="Create the first policy sales will resolve their terms against."
-            actionLabel="New policy"
-            onAction={() => setCreateOpen(true)}
-          />
-        </AdminCard>
+        <EmptyState
+          variant="plain"
+          title="No payment policies"
+          description="Create the first policy sales will resolve their terms against."
+          actionLabel="New policy"
+          onAction={() => setCreateOpen(true)}
+        />
       ) : (
-        <AdminCard className="overflow-hidden">
-          <ConsoleDataTable<IPaymentPolicy>
-            columns={columns}
-            data={policies}
-            itemNoun="policies"
-            rowClassName={() => "h-14 hover:bg-adm-sunken"}
-          />
-        </AdminCard>
+        // Two things were fighting the alignment here. `items-start` told the
+        // grid NOT to stretch its cards, which is the setting that guarantees
+        // ragged bottoms. And the breakpoints were viewport ones inside a
+        // shell with a ~225px sidebar, so `xl:grid-cols-3` fired while the
+        // content area still only had room for two - three columns squeezed
+        // into the width of two is most of what read as "scattered".
+        // Container queries measure the content area itself.
+        <div className="grid gap-3 @2xl/main:grid-cols-2 @5xl/main:grid-cols-3">
+          {policies.map((p) => (
+            <PolicyCard key={p.id} policy={p} />
+          ))}
+        </div>
       )}
 
       {createOpen ? (
