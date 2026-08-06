@@ -158,7 +158,6 @@ export function StockMovements({
           onChange={(v) => setFilter("type", v)}
           options={MOVE_TYPE_FILTER_OPTIONS}
           active={filters.type !== "all"}
-          className="lg:w-[170px]"
         />
         <ConsoleLabeledSelect
           label="Warehouse"
@@ -166,7 +165,6 @@ export function StockMovements({
           onChange={(v) => setFilter("warehouse", v)}
           options={warehouseOptions}
           active={filters.warehouse !== "all"}
-          className="lg:w-[180px]"
         />
         <ConsoleLabeledSelect
           label="Commodity"
@@ -174,7 +172,6 @@ export function StockMovements({
           onChange={(v) => setFilter("commodity", v)}
           options={commodityOptions}
           active={filters.commodity !== "all"}
-          className="lg:w-[180px]"
         />
         <ConsoleDateRange
           from={filters.from}
@@ -200,19 +197,25 @@ export function StockMovements({
           />
         </AdminCard>
       ) : (
-        <ConsoleDataTable
-          columns={columns}
-          data={movements}
-          itemNoun="movements"
-          isFetching={isFetching}
-          serverPagination={{
-            totalCount,
-            page,
-            pageSize,
-            onPageChange: setPage,
-            onPageSizeChange: (size) => setFilter("size", String(size)),
-          }}
-        />
+        // On a card, like every other register - and like this screen's own
+        // empty state, which was already carded while the table beside it was
+        // not. The rows sat directly on the page background with no sheet
+        // under them, which is why this tab did not look like the rest.
+        <AdminCard className="overflow-hidden">
+          <ConsoleDataTable
+            columns={columns}
+            data={movements}
+            itemNoun="movements"
+            isFetching={isFetching}
+            serverPagination={{
+              totalCount,
+              page,
+              pageSize,
+              onPageChange: setPage,
+              onPageSizeChange: (size) => setFilter("size", String(size)),
+            }}
+          />
+        </AdminCard>
       )}
     </div>
   );

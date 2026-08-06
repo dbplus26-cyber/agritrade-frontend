@@ -586,7 +586,11 @@ function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
   const totalPages = Math.max(1, Math.ceil((data?.meta.total ?? 0) / 12));
 
   return (
-    <div>
+    // Fills the column so the statement ends where the record rail beside it
+    // does. A category with one expense left a short card at the top of the
+    // left column with the rail running past it - the same imbalance the tile
+    // grid had, in a different shape.
+    <div className="flex h-full flex-col">
       <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h2 className="text-[15px] font-bold tracking-[-0.01em] text-adm-ink">
           Expenses in this category
@@ -625,7 +629,7 @@ function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
         </AdminCard>
       ) : (
         <>
-          <AdminCard className="overflow-hidden">
+          <AdminCard className="flex-1 overflow-hidden">
             {/* divide-y, not a border per row: the hairline belongs BETWEEN
                 lines, so the last one has no rule under it running into the
                 card's own edge. */}

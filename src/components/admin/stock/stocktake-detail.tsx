@@ -44,7 +44,13 @@ function Delta({ deltaKg }: { deltaKg: number | null }) {
 /** The count lines, dual-rendered off this card's own container width. */
 function LinesCard({ lines }: { lines: IStocktakeLine[] }) {
   return (
-    <AdminCard className="overflow-hidden">
+    // h-full so the sheet ends where the rail beside it does. A stocktake of
+    // one or two lines left a short card at the top of the left column with
+    // the rail running past it to the bottom of the page - two columns that
+    // start together and end nowhere near each other read as broken rather
+    // than as a short list. Filling puts the slack inside the card, below the
+    // rows, where on a count sheet it reads as room for more.
+    <AdminCard className="flex h-full flex-col overflow-hidden">
       <div className="border-b border-adm-hairline px-4 py-3 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase sm:px-5">
         Count lines
       </div>
@@ -242,7 +248,7 @@ export function StocktakeDetail({ id }: { id: string }) {
               <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Sheet
               </div>
-              <div className="mt-1 divide-y divide-soil/10">
+              <div className="mt-1 divide-y divide-adm-hairline">
                 <DetailRow label="Warehouse">
                   <Link
                     href={`/admin/warehouses/${st.warehouse.id}`}

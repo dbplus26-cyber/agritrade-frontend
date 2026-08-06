@@ -93,6 +93,20 @@ export function StockView() {
     useGetStockBalancesQuery(balancesArgs);
 
   const balances = useMemo(() => data?.data ?? [], [data]);
+  /**
+   * How many of the rows on screen are cleared lines - a warehouse/commodity
+   * pair emptied to zero. Only ever above zero while the toggle is on, since
+   * the API omits them otherwise.
+   *
+   * Counted so the toggle can SAY when it found none. It is wired end to end
+   * and always was, but a filter whose effect is invisible is indistinguishable
+   * from one that is broken: you tick it, nothing moves, and you conclude the
+   * control is dead rather than that the warehouse has never been emptied.
+   */
+  const clearedCount = useMemo(
+    () => balances.filter((row) => row.balanceKg === 0).length,
+    [balances],
+  );
   const totals = useMemo(() => data?.summary.totals ?? [], [data]);
 
   /**
@@ -262,7 +276,6 @@ export function StockView() {
               onChange={setWarehouseId}
               options={warehouseOptions}
               active={warehouseId !== "all"}
-              className="lg:w-[190px]"
             />
             <ConsoleLabeledSelect
               label="Commodity"
@@ -270,7 +283,6 @@ export function StockView() {
               onChange={setCommodityId}
               options={commodityOptions}
               active={commodityId !== "all"}
-              className="lg:w-[190px]"
             />
             {/* Kept, but named for what it does. A warehouse/commodity pair
                 that has been fully loaded out drops to a zero balance and the
@@ -295,6 +307,13 @@ export function StockView() {
                 className="h-3.5 w-3.5 accent-[var(--color-forest)]"
               />
               Show cleared lines
+              {/* The count is the whole point of showing it. Ticked with
+                  nothing to show, the toggle looked broken; now it says so. */}
+              {includeZero ? (
+                <span className="text-adm-faint">
+                  {clearedCount === 0 ? "none" : clearedCount}
+                </span>
+              ) : null}
             </label>
           </ConsoleFilterBar>
 
@@ -373,9 +392,15 @@ function BalancesMatrix({
       <table className="w-full border-collapse text-[13px]">
         <thead>
           <tr className="border-b-[1.5px] border-adm-line bg-adm-sunken">
+            {/* The identity column takes whatever the figures do not.
+                A matrix has no single 40% column to give away - the warehouse
+                count decides how many there are - so the rule that applies
+                here is the one behind it: the named thing gets the slack and
+                the numbers, which are short and fixed, size to themselves.
+                `w-full` on one cell of a table does exactly that. */}
             <th
               scope="col"
-              className="px-4 py-2.5 text-left text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted"
+              className="w-full px-4 py-2.5 text-left text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted"
             >
               Commodity
             </th>
@@ -383,11 +408,11 @@ function BalancesMatrix({
               <th
                 key={w.id}
                 scope="col"
-                className="px-4 py-2.5 text-right text-[10.5px] font-bold uppercase tracking-[0.09em]"
+                className="px-4 py-2.5 text-right text-[10.5px] font-bold whitespace-nowrap uppercase tracking-[0.09em]"
               >
                 <Link
                   href={`/admin/warehouses/${w.id}`}
-                  className="ml-auto block max-w-[180px] truncate text-console underline-offset-2 hover:underline"
+                  className="ml-auto block max-w-[90%] truncate text-console underline-offset-2 hover:underline"
                   title={w.name}
                 >
                   {w.name}
@@ -403,7 +428,7 @@ function BalancesMatrix({
                 scope="row"
                 className="px-4 py-1.5 text-left font-medium text-adm-ink"
               >
-                <span className="block max-w-[240px] truncate" title={c.name}>
+                <span className="block max-w-[95%] truncate" title={c.name}>
                   {c.name}
                 </span>
               </th>

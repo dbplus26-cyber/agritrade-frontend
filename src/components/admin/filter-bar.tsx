@@ -65,9 +65,20 @@ export function ConsoleLabeledSelect({
         </span>
         <SelectValue />
       </SelectTrigger>
-      <SelectContent>
+      {/* The panel matches the control it opens from.
+          SelectContent carries a min-width and no maximum, so it sizes to its
+          widest option - and warehouse and commodity names are exactly the
+          kind of thing that runs long. A 150px filter opening a 400px panel
+          reads as a mistake, and on a toolbar of several filters they all come
+          out different widths. Pinned to the trigger, a long option wraps
+          inside the panel rather than widening it. */}
+      <SelectContent className="w-(--radix-select-trigger-width) min-w-(--radix-select-trigger-width)">
         {options.map((o) => (
-          <SelectItem key={o.value} value={o.value} className="cursor-pointer">
+          <SelectItem
+            key={o.value}
+            value={o.value}
+            className="cursor-pointer [&_span]:whitespace-normal [&_span]:[overflow-wrap:anywhere]"
+          >
             {o.label}
           </SelectItem>
         ))}
