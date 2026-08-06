@@ -14,6 +14,7 @@ import {
   adminSelectClass,
   Mono,
 } from "@/components/admin/ui";
+import { HelpTip } from "@/components/admin/help-tip";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
 import {
@@ -160,7 +161,11 @@ export function PurchaseCreate() {
           className="flex flex-col gap-[13px]"
         >
           <div className="grid gap-[13px] sm:grid-cols-2">
-            <AdminField label="Source" error={errors.source?.message}>
+            <AdminField
+              label="Source"
+              hint="Who you bought from: an individual farmer, a company, or one of your own field agents."
+              error={errors.source?.message}
+            >
               <Controller
                 control={control}
                 name="source"
@@ -280,8 +285,12 @@ export function PurchaseCreate() {
           </div>
 
           <div className="ledger-rule flex items-baseline justify-between px-0.5 py-1.5">
-            <span className="text-[11px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-              Total
+            <span className="flex items-center gap-1 text-[11px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+              <span className="min-w-0">Total</span>
+              <HelpTip
+                label="What is the Total?"
+                text="The weight times the price per kg: what this whole purchase will cost you."
+              />
             </span>
             <Mono className="text-[15px] font-semibold text-adm-ink">
               {formatCedis(totalPreview)}

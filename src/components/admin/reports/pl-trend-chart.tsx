@@ -94,7 +94,11 @@ export function PlTrendChart() {
   );
 
   return (
-    <WidgetCard title="Sales in vs purchases out" right={toggle}>
+    <WidgetCard
+      title="Sales in vs purchases out"
+      hint="Money coming in from buyers set against money going out to sellers, month by month."
+      right={toggle}
+    >
       {isLoading ? (
         <Skeleton className="h-[240px] w-full rounded-[6px]" />
       ) : redacted ? (

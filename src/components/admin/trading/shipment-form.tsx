@@ -354,6 +354,7 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
           </div>
           <AdminField
             label="Origin warehouse"
+            hint="The store the goods are loaded out of; its stock is what this truck can be filled from."
             error={errors.originWarehouseId?.message}
           >
             <select
@@ -476,6 +477,7 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
             <AdminField
               label="Truck capacity (kg)"
               optional
+              hint="The most this truck may carry; fill it in and the load meter warns you when you go over."
               error={errors.truckCapacityKg?.message}
             >
               <Input

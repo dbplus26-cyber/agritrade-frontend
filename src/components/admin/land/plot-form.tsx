@@ -156,12 +156,20 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
           })}
           {field("sizeText", "Size", { placeholder: "100 x 100 ft" })}
           {field("use", "Use", { optional: true, placeholder: "residential" })}
-          {field("askingPriceGhs", "Asking price (GHS)", { mode: "decimal" })}
+          {field("askingPriceGhs", "Asking price (GHS)", {
+            mode: "decimal",
+            hint: "What you are listing the plot at, which is the price a buyer is quoted.",
+          })}
           {field("purchaseCostGhs", "Purchase cost (GHS)", {
             optional: true,
             mode: "decimal",
+            hint: "What the plot cost you to get hold of, used to work out what you make on a sale.",
           })}
-          {field("sizeAcres", "Acres", { optional: true, mode: "decimal" })}
+          {field("sizeAcres", "Acres", {
+            optional: true,
+            mode: "decimal",
+            hint: "The same size as a plain number, so plots can be compared and priced per acre.",
+          })}
         </AdminCard>
 
         <AdminCard className="flex flex-col gap-3 px-5 py-4">

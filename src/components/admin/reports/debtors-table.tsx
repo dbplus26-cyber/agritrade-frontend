@@ -3,6 +3,7 @@
 import { X } from "lucide-react";
 import { useState } from "react";
 import { CardHeader } from "@/components/admin/dashboard/chart-kit";
+import { HelpWrap } from "@/components/admin/help-tip";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { AdminCard, Mono, ToneBadge } from "@/components/admin/ui";
 import { Input } from "@/components/ui/input";
@@ -38,6 +39,7 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
     <AdminCard className="min-w-0 px-5 py-4">
       <CardHeader
         title="Debtors - outstanding balances"
+        hint="Everyone who still owes you money, on grain orders and on land, in one list."
         right={
           <a
             href={exportHref}
@@ -97,11 +99,31 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
             <thead>
               <tr className="text-left text-[11px] text-adm-muted uppercase">
                 <th className="py-1.5 pr-3">Buyer</th>
-                <th className="py-1.5 pr-3">Book</th>
-                <th className="py-1.5 pr-3">Ref</th>
-                <th className="py-1.5 pr-3">Agreed</th>
-                <th className="py-1.5 pr-3">Paid</th>
-                <th className="py-1.5">Balance</th>
+                <th className="py-1.5 pr-3">
+                  <HelpWrap text="Which side of the business the debt sits on: a grain order, or a plot of land.">
+                    Book
+                  </HelpWrap>
+                </th>
+                <th className="py-1.5 pr-3">
+                  <HelpWrap text="The order or sale number this debt belongs to, for looking it up.">
+                    Ref
+                  </HelpWrap>
+                </th>
+                <th className="py-1.5 pr-3">
+                  <HelpWrap text="The full price the buyer signed up to pay.">
+                    Agreed
+                  </HelpWrap>
+                </th>
+                <th className="py-1.5 pr-3">
+                  <HelpWrap text="How much of the agreed price has actually reached you so far.">
+                    Paid
+                  </HelpWrap>
+                </th>
+                <th className="py-1.5">
+                  <HelpWrap text="What is still owed: the agreed price less everything paid.">
+                    Balance
+                  </HelpWrap>
+                </th>
               </tr>
             </thead>
             <tbody>

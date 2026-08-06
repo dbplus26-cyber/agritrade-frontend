@@ -19,6 +19,12 @@ import { cn } from "@/lib/utils";
 export interface RecordFact {
   /** Long prose (directions, notes) - given the full width of the grid. */
   full?: boolean;
+  /**
+   * One sentence on what the fact IS, on hover beside its label. For the
+   * domain words a record page is full of - float, basis, milestone, lot -
+   * not for the ones that need no help ("Name", "Phone").
+   */
+  hint?: string;
   label: string;
   mono?: boolean;
   /** Rendered as "Not recorded" when empty, never as a blank. */
@@ -66,6 +72,7 @@ export function RecordFacts({
         {facts.map((f) => (
           <DetailItem
             className={f.full ? "col-span-full" : undefined}
+            hint={f.hint}
             key={f.label}
             label={f.label}
             mono={f.mono}

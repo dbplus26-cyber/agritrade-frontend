@@ -13,6 +13,7 @@ import {
   adminInputClass,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
+import { HelpTip } from "@/components/admin/help-tip";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
 import { useGetBuyersQuery } from "@/redux/buyers/buyers-api";
@@ -152,7 +153,11 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
             />
           </AdminField>
 
-          <AdminField label="Payment terms" optional>
+          <AdminField
+            label="Payment terms"
+            optional
+            hint="When this buyer has to pay: the deposit up front, and what must be in before a truck may be loaded."
+          >
             <Controller
               control={control}
               name="paymentPolicyId"
@@ -256,7 +261,13 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
           ))}
 
           <div className="flex items-baseline justify-between pt-1">
-            <span className="text-[12px] text-adm-muted">Agreed total</span>
+            <span className="flex items-center gap-1 text-[12px] text-adm-muted">
+              <span className="min-w-0">Agreed total</span>
+              <HelpTip
+                label="What is the agreed total?"
+                text="Every line added up: the full price this buyer is agreeing to pay."
+              />
+            </span>
             <Mono className="text-[16px] font-bold text-adm-ink">
               {formatCedis(agreedTotal)}
             </Mono>

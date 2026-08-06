@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { useMoneyVisibility } from "@/hooks/use-money-visibility";
 import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ConsoleDataTable } from "@/components/admin/data-table";
+import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
@@ -119,7 +119,10 @@ export function AgentsTable() {
       {
         id: "balance",
         accessorFn: (a) => a.balanceGhs,
-        header: "Float balance",
+        header: columnHelp(
+          "Float balance",
+          "Company money still in this agent's hands: what you gave them, less what they have spent.",
+        ),
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => <BalanceCell amount={row.original.balanceGhs} />,

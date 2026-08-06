@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HelpWrap } from "@/components/admin/help-tip";
 import { ToneBadge, type Tone } from "@/components/admin/ui";
 import { formatCedis } from "@/lib/format-money";
 import { cn } from "@/lib/utils";
@@ -36,15 +37,44 @@ export const APPROVAL_STATUS_TONE: Record<ApprovalStatus, Tone> = {
   [ApprovalStatus.REJECTED]: "slate",
 };
 
+/** What kind of decision each request is actually asking for. */
+export const ACTION_HELP: Record<ApprovalAction, string> = {
+  [ApprovalAction.PURCHASE_ABOVE_THRESHOLD]:
+    "Somebody bought grain for more than staff are allowed to spend without you.",
+  [ApprovalAction.STOCK_ADJUSTMENT]:
+    "Somebody wants to correct warehouse stock outside a purchase, sale or transfer.",
+  [ApprovalAction.PUBLISH_TO_WEBSITE]:
+    "Somebody wants to show this on the public website where customers can see it.",
+  [ApprovalAction.LOAD_BELOW_MILESTONE]:
+    "Somebody wants to load a truck before the buyer has paid what the terms require.",
+  [ApprovalAction.INPUT_GRANT_ABOVE_THRESHOLD]:
+    "Somebody advanced a farmer more in seed, fertiliser or tools than staff may give without you.",
+};
+
+export const APPROVAL_STATUS_HELP: Record<ApprovalStatus, string> = {
+  [ApprovalStatus.PENDING]:
+    "Waiting on a decision; nothing changes until somebody approves or rejects it.",
+  [ApprovalStatus.APPROVED]:
+    "Agreed, and the change it asked for has already been applied.",
+  [ApprovalStatus.REJECTED]:
+    "Turned down, so the change was not applied and the record stands as it was.",
+};
+
 export function ActionBadge({ action }: { action: ApprovalAction }) {
-  return <ToneBadge tone={ACTION_TONE[action]}>{ACTION_LABEL[action]}</ToneBadge>;
+  return (
+    <HelpWrap text={ACTION_HELP[action]}>
+      <ToneBadge tone={ACTION_TONE[action]}>{ACTION_LABEL[action]}</ToneBadge>
+    </HelpWrap>
+  );
 }
 
 export function ApprovalStatusBadge({ status }: { status: ApprovalStatus }) {
   return (
-    <ToneBadge tone={APPROVAL_STATUS_TONE[status]}>
-      {APPROVAL_STATUS_LABEL[status]}
-    </ToneBadge>
+    <HelpWrap text={APPROVAL_STATUS_HELP[status]}>
+      <ToneBadge tone={APPROVAL_STATUS_TONE[status]}>
+        {APPROVAL_STATUS_LABEL[status]}
+      </ToneBadge>
+    </HelpWrap>
   );
 }
 

@@ -8,7 +8,7 @@ import {
   AdminPageHeader,
   Mono,
 } from "@/components/admin/ui";
-import { ConsoleDataTable } from "@/components/admin/data-table";
+import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleDateRange,
   ConsoleFilterBar,
@@ -79,7 +79,10 @@ export function ExpensesRegister() {
     () => [
       {
         accessorKey: "transactionNo",
-        header: "Voucher",
+        header: columnHelp(
+          "Voucher",
+          "The console\u2019s own number for this cost, so a paper receipt can be matched to it.",
+        ),
         cell: ({ row }) => <Mono>{row.original.transactionNo}</Mono>,
         meta: { className: "px-4 text-[13px]" },
       },
@@ -110,7 +113,10 @@ export function ExpensesRegister() {
       {
         accessorFn: (r) => r.shipment?.transactionNo ?? "",
         id: "shipment",
-        header: "Trip",
+        header: columnHelp(
+          "Trip",
+          "The truck this cost belongs to, or Operating when it is a running cost of the business.",
+        ),
         // A truck registration is typed by hand and the column allows 40
         // characters, so it is not badge material: a pill sizes to its content
         // with no room to give, and a long one distends the row at every width.
@@ -254,6 +260,7 @@ export function ExpensesRegister() {
             className="lg:w-[180px]"
           />
           <ConsoleLabeledSelect
+            hint="Splits running costs of the business from costs that belong to one truck trip."
             label="Kind"
             value={filters.scope}
             onChange={(v) => { setFilter("scope", v); }}

@@ -11,6 +11,7 @@ import {
   DetailShell,
   Mono,
 } from "@/components/admin/ui";
+import { HelpTip } from "@/components/admin/help-tip";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { BackButton } from "@/components/ui/BackButton";
 import { ConsoleTableSkeleton, DetailSkeleton } from "@/components/admin/skeletons";
@@ -32,15 +33,19 @@ const LIST = "/admin/seasons";
 
 function StatTile({
   label,
+  hint,
   children,
 }: {
   label: string;
+  /** One sentence on what this figure counts, on hover beside the label. */
+  hint?: string;
   children: React.ReactNode;
 }) {
   return (
     <AdminCard className="px-4 py-3">
-      <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-        {label}
+      <div className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+        <span className="min-w-0">{label}</span>
+        {hint ? <HelpTip label={`What does ${label} count?`} text={hint} /> : null}
       </div>
       <div className="mt-1 text-[19px] font-bold text-adm-ink">{children}</div>
     </AdminCard>
@@ -112,16 +117,30 @@ export function SeasonDetail({ id }: { id: string }) {
 
       {/* KPI strip - full width above the shell */}
       <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatTile label="Farmers">{stats?.farmerCount ?? "-"}</StatTile>
-        <StatTile label="Invested">
+        <StatTile
+          hint="How many farmers have taken inputs or brought produce back in this season."
+          label="Farmers"
+        >
+          {stats?.farmerCount ?? "-"}
+        </StatTile>
+        <StatTile
+          hint="What the seed, fertiliser and tools handed out this season were worth."
+          label="Invested"
+        >
           <Money value={stats?.investedGhs ?? null} />
         </StatTile>
-        <StatTile label="Recovered">
+        <StatTile
+          hint="What farmers have already paid back this season, in produce or in cash."
+          label="Recovered"
+        >
           <span className="text-console">
             <Money value={stats?.recoveredGhs ?? null} />
           </span>
         </StatTile>
-        <StatTile label="Outstanding">
+        <StatTile
+          hint="What farmers still owe on this season's inputs: invested less recovered."
+          label="Outstanding"
+        >
           <span className="text-console-red">
             <Money value={stats?.outstandingGhs ?? null} />
           </span>
@@ -195,16 +214,24 @@ export function SeasonDetail({ id }: { id: string }) {
               </p>
               <div className="grid grid-cols-2 gap-x-8 gap-y-1 sm:grid-cols-4">
                 <div className="border-b border-adm-hairline py-2">
-                  <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                    Expected yield
+                  <p className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+                    <span className="min-w-0">Expected yield</span>
+                    <HelpTip
+                      label="What is Expected yield?"
+                      text="The produce this season's grants were meant to bring back, added up across every farmer."
+                    />
                   </p>
                   <Mono className="text-[14px]">
                     {formatKg(stats.expectations.expectedYieldKg)}
                   </Mono>
                 </div>
                 <div className="border-b border-adm-hairline py-2">
-                  <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                    Actual yield
+                  <p className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+                    <span className="min-w-0">Actual yield</span>
+                    <HelpTip
+                      label="What is Actual yield?"
+                      text="The produce farmers have actually brought back to you this season."
+                    />
                   </p>
                   <Mono
                     className={
@@ -218,16 +245,24 @@ export function SeasonDetail({ id }: { id: string }) {
                   </Mono>
                 </div>
                 <div className="border-b border-adm-hairline py-2">
-                  <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                    Expected return
+                  <p className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+                    <span className="min-w-0">Expected return</span>
+                    <HelpTip
+                      label="What is Expected return?"
+                      text="What the expected produce was reckoned to be worth when the grants went out."
+                    />
                   </p>
                   <Mono className="text-[14px]">
                     <Money value={stats.expectations.expectedReturnGhs} />
                   </Mono>
                 </div>
                 <div className="border-b border-adm-hairline py-2">
-                  <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                    Actual return
+                  <p className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+                    <span className="min-w-0">Actual return</span>
+                    <HelpTip
+                      label="What is Actual return?"
+                      text="What the produce farmers actually brought back was worth when it was taken in."
+                    />
                   </p>
                   <Mono className="text-[14px]">
                     <Money value={stats.expectations.actualReturnGhs} />
@@ -255,9 +290,33 @@ export function SeasonDetail({ id }: { id: string }) {
                 <thead>
                   <tr className="border-b border-adm-hairline text-left text-[11px] uppercase tracking-[0.06em] text-adm-muted">
                     <th className="px-5 py-2 font-semibold">Farmer</th>
-                    <th className="px-5 py-2 text-right font-semibold">Invested</th>
-                    <th className="px-5 py-2 text-right font-semibold">Recovered</th>
-                    <th className="px-5 py-2 text-right font-semibold">Outstanding</th>
+                    <th className="px-5 py-2 text-right font-semibold">
+                      <span className="inline-flex items-center gap-1">
+                        Invested
+                        <HelpTip
+                          label="What does the Invested column show?"
+                          text="What the inputs this farmer took this season were worth."
+                        />
+                      </span>
+                    </th>
+                    <th className="px-5 py-2 text-right font-semibold">
+                      <span className="inline-flex items-center gap-1">
+                        Recovered
+                        <HelpTip
+                          label="What does the Recovered column show?"
+                          text="What this farmer has already paid back, in produce or in cash."
+                        />
+                      </span>
+                    </th>
+                    <th className="px-5 py-2 text-right font-semibold">
+                      <span className="inline-flex items-center gap-1">
+                        Outstanding
+                        <HelpTip
+                          label="What does the Outstanding column show?"
+                          text="What this farmer still owes you on this season's inputs."
+                        />
+                      </span>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>

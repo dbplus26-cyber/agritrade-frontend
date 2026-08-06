@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { HelpWrap } from "@/components/admin/help-tip";
 import { ShipmentStatusBadge } from "@/components/admin/trading/shipment-bits";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { AdminCard, Mono } from "@/components/admin/ui";
@@ -30,6 +31,7 @@ import { VolumeChart } from "./volume-chart";
 /** A headline KPI tile (state now - not affected by the date filter). */
 function Kpi({
   alert = false,
+  hint,
   href,
   label,
   sub,
@@ -42,18 +44,30 @@ function Kpi({
   valueText,
 }: {
   alert?: boolean;
+  /**
+   * One sentence on what the figure counts, on hover over the label.
+   *
+   * Attached to the label rather than to a help icon beside it, because the
+   * whole tile is a `<Link>` and a `<button>` inside an `<a>` is invalid HTML
+   * - the browser is entitled to reparent it, and the row would sometimes
+   * navigate instead of explaining itself.
+   */
+  hint?: string;
   href: string;
   label: string;
   sub?: React.ReactNode;
   value: React.ReactNode;
   valueText?: string;
 }) {
+  const heading = (
+    <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+      {label}
+    </div>
+  );
   return (
     <Link href={href}>
       <AdminCard className="h-full px-4 py-3 transition-colors hover:border-adm-line">
-        <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-          {label}
-        </div>
+        {hint ? <HelpWrap text={hint}>{heading}</HelpWrap> : heading}
         <div
           className={cn(
             "mt-1 min-w-0 font-bold",
@@ -75,6 +89,7 @@ function AgentFloatsCard() {
   return (
     <WidgetCard
       title="Cash with agents"
+      hint="What each field agent still holds of the money you gave them to buy with."
       right={
         <Link href="/admin/agents" className="text-[12px] text-console hover:underline">
           All agents
@@ -128,6 +143,7 @@ function TrucksCard() {
   return (
     <WidgetCard
       title="Trucks on the road"
+      hint="Loads that have been started or dispatched and have not been signed off yet."
       right={
         <Link href="/admin/shipments" className="text-[12px] text-console hover:underline">
           All shipments
@@ -200,6 +216,7 @@ export function DashboardLive() {
         <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-5">
           <Kpi
             label="Stock on hand"
+            hint="Everything sitting in your warehouses right now, across every commodity."
             value={formatKg(d.stockOnHandKg)}
             valueText={formatKg(d.stockOnHandKg)}
             sub={`${String(d.stockByCommodity.length)} commodities`}
@@ -207,6 +224,7 @@ export function DashboardLive() {
           />
           <Kpi
             label="Paid goods incoming"
+            hint="Grain you have already bought that has not reached a warehouse yet."
             value={<Money compact value={d.incomingGhs} />}
             valueText={formatCedisCompact(d.incomingGhs)}
             sub={formatKg(d.incomingKg)}
@@ -214,6 +232,7 @@ export function DashboardLive() {
           />
           <Kpi
             label="Cash with agents"
+            hint="Your money currently in field agents' hands, waiting to be spent or accounted for."
             value={<Money compact value={d.cashWithAgentsGhs} />}
             valueText={formatCedisCompact(d.cashWithAgentsGhs)}
             sub={`${String(d.activeAgents)} active agents`}
@@ -221,12 +240,14 @@ export function DashboardLive() {
           />
           <Kpi
             label="Sales in progress"
+            hint="Orders agreed with buyers that are not yet delivered and paid off."
             value={d.salesInProgress}
             sub={<Money value={d.salesInProgressAgreedGhs} />}
             href="/admin/sales"
           />
           <Kpi
             label="Balances due"
+            hint="What buyers still owe you across every order, right now."
             value={<Money compact value={d.debtorsOutstandingGhs} />}
             valueText={formatCedisCompact(d.debtorsOutstandingGhs)}
             sub={`${String(d.debtorCount)} buyers`}

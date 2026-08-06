@@ -1,5 +1,6 @@
 "use client";
 
+import { HelpTip } from "@/components/admin/help-tip";
 import { Mono } from "@/components/admin/ui";
 import { formatKg } from "@/lib/format-money";
 import { cn } from "@/lib/utils";
@@ -41,8 +42,12 @@ export function LoadMeter({
       )}
     >
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 text-[12px]">
-        <span className="font-bold tracking-[0.09em] text-adm-muted uppercase text-[10.5px]">
-          Truck load
+        <span className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+          <span className="min-w-0">Truck load</span>
+          <HelpTip
+            label="What is the truck load?"
+            text="How much weight is going on this truck, against the most it is allowed to carry."
+          />
         </span>
         <Mono
           className={cn("text-[12.5px]", over ? "text-console-red" : "text-adm-ink")}

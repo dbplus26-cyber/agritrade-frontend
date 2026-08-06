@@ -75,6 +75,7 @@ export const adminNavGroups: AdminNavGroup[] = [
       item("expenses", "Expenses", "Costs the business has incurred, and whether they have been paid."),
       item("expense-categories", "Expense Categories", "The headings costs are filed under, so spending can be grouped."),
       item("payment-policies", "Payment Policies", "When a buyer has to pay you: the deposit and balance split.", { ownerOnly: true }),
+      item("driver-payment-policies", "Driver Payment", "When a driver gets paid for a trip: the advance and balance split.", { ownerOnly: true }),
     ],
   },
   {

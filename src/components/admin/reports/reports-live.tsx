@@ -6,6 +6,7 @@ import {
   DateRangeSelector,
   DEFAULT_RANGE,
 } from "@/components/admin/dashboard/date-range-selector";
+import { HelpTip, HelpWrap } from "@/components/admin/help-tip";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { AdminButton, AdminCard, Mono, ToneBadge } from "@/components/admin/ui";
 import { env } from "@/lib/env";
@@ -33,17 +34,21 @@ const EXPORTS = `${env.SERVER_URI}/api/v1/admin/reports/exports`;
 /** A KPI tile on the reports header. */
 function ReportKpi({
   accent = false,
+  hint,
   label,
   value,
 }: {
   accent?: boolean;
+  /** One sentence on what the figure counts, on hover beside the label. */
+  hint?: string;
   label: string;
   value: React.ReactNode;
 }) {
   return (
     <AdminCard className="px-4 py-3">
-      <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-        {label}
+      <div className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+        <span className="min-w-0">{label}</span>
+        {hint ? <HelpTip label={`What does ${label} count?`} text={hint} /> : null}
       </div>
       <div
         className={cn(
@@ -68,8 +73,12 @@ function PlStatement({ window }: { window: IReportWindow }) {
     "flex items-baseline justify-between gap-3 py-1.5 text-[13.5px] [&>span:first-child]:min-w-0 [&>span:first-child]:line-clamp-2 [&>*:last-child]:flex-none [&>*:last-child]:whitespace-nowrap";
   return (
     <AdminCard className="px-5 py-4">
-      <div className="mb-2 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-        Profit &amp; loss
+      <div className="mb-2 flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+        <span className="min-w-0">Profit &amp; loss</span>
+        <HelpTip
+          label="What is the profit and loss statement?"
+          text="The whole period on one page: what you sold, what it cost, and what was left."
+        />
       </div>
       <div className={rowClass}>
         <span className="text-adm-ink">Revenue</span>
@@ -80,7 +89,11 @@ function PlStatement({ window }: { window: IReportWindow }) {
       <div className={cn(rowClass, "text-adm-muted")}>
         <span className="flex items-center gap-1.5">
           Cost of goods sold
-          {s?.hasEstimated ? <ToneBadge tone="harvest">Est.</ToneBadge> : null}
+          {s?.hasEstimated ? (
+            <HelpWrap text="Some of this cost is still an estimate, so the profit below it can move once the real figures land.">
+              <ToneBadge tone="harvest">Est.</ToneBadge>
+            </HelpWrap>
+          ) : null}
         </span>
         <Mono>
           <Money value={s?.costGhs ?? null} />
@@ -132,8 +145,12 @@ function AgentPerformance({
   return (
     <AdminCard className="px-5 py-4">
       <div className="mb-2 flex items-center justify-between">
-        <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-          Agent performance
+        <span className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+          <span className="min-w-0">Agent performance</span>
+          <HelpTip
+            label="What is agent performance?"
+            text="What each field agent bought for you in the period you picked, and what they paid per kilo."
+          />
         </span>
         <a href={exportHref} className="text-[12px] text-console hover:underline">
           Export CSV
@@ -157,10 +174,22 @@ function AgentPerformance({
             <thead>
               <tr className="text-left text-[11px] text-adm-muted uppercase">
                 <th className="py-1.5 pr-3">Agent</th>
-                <th className="py-1.5 pr-3">Buys</th>
+                <th className="py-1.5 pr-3">
+                  <HelpWrap text="How many separate purchases this agent recorded.">
+                    Buys
+                  </HelpWrap>
+                </th>
                 <th className="py-1.5 pr-3">Weight</th>
-                <th className="py-1.5 pr-3">Avg/kg</th>
-                <th className="py-1.5">Spent</th>
+                <th className="py-1.5 pr-3">
+                  <HelpWrap text="The average price this agent paid per kilo, across everything they bought.">
+                    Avg/kg
+                  </HelpWrap>
+                </th>
+                <th className="py-1.5">
+                  <HelpWrap text="How much of your money this agent has spent buying in this period.">
+                    Spent
+                  </HelpWrap>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -209,10 +238,11 @@ function CashComingIn() {
   const saleRows = f?.saleRows ?? [];
   const farmRows = f?.farmRows ?? [];
 
-  const kpi = (label: string, value: number | null) => (
+  const kpi = (label: string, hint: string, value: number | null) => (
     <div className="min-w-0 flex-1 rounded-[6px] border border-adm-hairline bg-adm-sunken px-3.5 py-2.5">
-      <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-        {label}
+      <div className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+        <span className="min-w-0">{label}</span>
+        <HelpTip label={`What does ${label} count?`} text={hint} />
       </div>
       <div className="font-adminmono mt-0.5 text-[17px] font-bold text-console tabular-nums">
         <Money value={value} compact />
@@ -230,8 +260,12 @@ function CashComingIn() {
   return (
     <AdminCard className="px-5 py-4">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-          Cash coming in
+        <span className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+          <span className="min-w-0">Cash coming in</span>
+          <HelpTip
+            label="What is cash coming in?"
+            text="Money you are expecting over the next stretch of days, from buyers and from outgrowers."
+          />
         </span>
         <div className="flex gap-1">
           {FORECAST_DAYS.map((d) => (
@@ -262,8 +296,16 @@ function CashComingIn() {
       ) : (
         <>
           <div className="mb-4 flex flex-col gap-2 min-[420px]:flex-row">
-            {kpi("Sales receivable", f?.salesReceivableGhs ?? null)}
-            {kpi("Farm dues", f?.farmDueGhs ?? null)}
+            {kpi(
+              "Sales receivable",
+              "What buyers are due to pay you inside the number of days you picked.",
+              f?.salesReceivableGhs ?? null,
+            )}
+            {kpi(
+              "Farm dues",
+              "What outgrowers owe back on inputs you advanced them, falling due in this window.",
+              f?.farmDueGhs ?? null,
+            )}
           </div>
 
           <div className="grid grid-cols-1 gap-x-8 gap-y-4 xl:grid-cols-2">
@@ -386,26 +428,35 @@ export function ReportsLive() {
       </div>
 
       <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
-        <ReportKpi label="Revenue" value={<Money value={s?.revenueGhs ?? null} />} />
+        <ReportKpi
+          label="Revenue"
+          hint="What the goods you sold in the period you picked were worth, before any costs."
+          value={<Money value={s?.revenueGhs ?? null} />}
+        />
         <ReportKpi
           label="Cost of goods"
+          hint="What the grain you sold cost you to buy in the first place."
           value={<Money value={s?.costGhs ?? null} />}
         />
         <ReportKpi
           label="Gross profit"
+          hint="Revenue less what the grain cost you, before running costs are taken off."
           value={<Money value={s?.grossProfitGhs ?? null} />}
         />
         <ReportKpi
           label="Expenses"
+          hint="Running costs in the period you picked: transport, loading, fees and the rest."
           value={<Money value={s?.expensesGhs ?? null} />}
         />
         <ReportKpi
           label="Net profit"
+          hint="What the business actually kept: gross profit after every running cost."
           value={<Money value={s?.netProfitGhs ?? null} />}
           accent
         />
         <ReportKpi
           label="Net margin"
+          hint="How many pesewas of every cedi sold you kept as profit."
           value={
             s?.netMarginPct === null || s?.netMarginPct === undefined
               ? "n/a"

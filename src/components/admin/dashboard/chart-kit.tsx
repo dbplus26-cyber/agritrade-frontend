@@ -1,5 +1,6 @@
 "use client";
 
+import { HelpTip } from "@/components/admin/help-tip";
 import { AdminCard } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
 
@@ -47,9 +48,18 @@ export const cedisTick = (v: number): string => {
 
 /** The uppercase micro-label header shared by every dashboard card. */
 export function CardHeader({
+  hint,
   title,
   right,
 }: {
+  /**
+   * One sentence on what the card is showing, on hover beside the heading.
+   *
+   * A chart's heading is three words at most and its axes are numbers: a
+   * reader who does not already know what "cashflow" counts has nowhere else
+   * on the card to find out. This is that place.
+   */
+  hint?: string;
   right?: React.ReactNode;
   title: string;
 }) {
@@ -63,8 +73,9 @@ export function CardHeader({
     // items-start, not centre: when the right-hand side wraps to two or three
     // lines, centring drags the heading down to float in the middle of them.
     <div className="mb-3 flex items-start justify-between gap-3">
-      <span className="flex-none pt-px text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+      <span className="flex-none pt-px inline-flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         {title}
+        {hint ? <HelpTip label={`What does ${title} show?`} text={hint} /> : null}
       </span>
       {right ? <span className="min-w-0 text-right">{right}</span> : null}
     </div>
@@ -75,17 +86,20 @@ export function CardHeader({
 export function WidgetCard({
   children,
   className,
+  hint,
   right,
   title,
 }: {
   children: React.ReactNode;
   className?: string;
+  /** Passed straight to CardHeader - one sentence on what the card shows. */
+  hint?: string;
   right?: React.ReactNode;
   title: string;
 }) {
   return (
     <AdminCard className={cn("min-w-0 px-5 py-4", className)}>
-      <CardHeader title={title} right={right} />
+      <CardHeader title={title} hint={hint} right={right} />
       {children}
     </AdminCard>
   );

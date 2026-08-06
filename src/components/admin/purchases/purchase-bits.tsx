@@ -1,3 +1,4 @@
+import { HelpWrap } from "@/components/admin/help-tip";
 import { ToneBadge, type Tone } from "@/components/admin/ui";
 import { formatDateTime } from "@/lib/format-date";
 import { formatCedis, MONEY_HIDDEN } from "@/lib/format-money";
@@ -22,11 +23,29 @@ export const PURCHASE_STATUS_TONE: Record<PurchaseStatus, Tone> = {
   [PurchaseStatus.VOIDED]: "slate",
 };
 
+/**
+ * What each state MEANS to the person reading the register, and what happens
+ * next. The word on the chip is short by necessity; this is the sentence it
+ * stands for.
+ */
+export const PURCHASE_STATUS_HELP: Record<PurchaseStatus, string> = {
+  [PurchaseStatus.RECORDED]:
+    "Bought and written down, but the grain has not reached a warehouse yet.",
+  [PurchaseStatus.IN_TRANSIT]:
+    "The grain has left the seller and is on its way to your warehouse.",
+  [PurchaseStatus.RECEIVED]:
+    "The grain arrived and has been added to warehouse stock.",
+  [PurchaseStatus.VOIDED]:
+    "Cancelled after it was recorded, so it no longer counts towards stock or cost.",
+};
+
 export function PurchaseStatusBadge({ status }: { status: PurchaseStatus }) {
   return (
-    <ToneBadge tone={PURCHASE_STATUS_TONE[status]}>
-      {PURCHASE_STATUS_LABEL[status]}
-    </ToneBadge>
+    <HelpWrap text={PURCHASE_STATUS_HELP[status]}>
+      <ToneBadge tone={PURCHASE_STATUS_TONE[status]}>
+        {PURCHASE_STATUS_LABEL[status]}
+      </ToneBadge>
+    </HelpWrap>
   );
 }
 
@@ -41,10 +60,18 @@ export function ApprovalOverlayBadge({
   approval: { status: string } | null;
 }) {
   if (approval?.status === "PENDING") {
-    return <ToneBadge tone="harvest">Needs approval</ToneBadge>;
+    return (
+      <HelpWrap text="This purchase is big enough to need the owner's sign-off, and is waiting for it.">
+        <ToneBadge tone="harvest">Needs approval</ToneBadge>
+      </HelpWrap>
+    );
   }
   if (approval?.status === "REJECTED") {
-    return <ToneBadge tone="slate">Approval rejected</ToneBadge>;
+    return (
+      <HelpWrap text="The owner did not sign this purchase off, so it should be voided.">
+        <ToneBadge tone="slate">Approval rejected</ToneBadge>
+      </HelpWrap>
+    );
   }
   return null;
 }

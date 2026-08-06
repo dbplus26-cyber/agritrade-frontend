@@ -139,12 +139,18 @@ export function DisbursementDetail({ id }: { id: string }) {
                   us what it actually took - before that they are honestly
                   absent rather than shown as zero. */}
               {d.chargesGhs !== null ? (
-                <DetailRow label="Hubtel charges">
+                <DetailRow
+                  hint="What the payment provider took on top of the amount, for moving the money."
+                  label="Hubtel charges"
+                >
                   <Money value={d.chargesGhs} />
                 </DetailRow>
               ) : null}
               {d.amountDebitedGhs !== null ? (
-                <DetailRow label="Total debited">
+                <DetailRow
+                  hint="What actually left your account: the amount sent plus the provider\u2019s charges."
+                  label="Total debited"
+                >
                   <Money value={d.amountDebitedGhs} />
                 </DetailRow>
               ) : null}
@@ -156,24 +162,36 @@ export function DisbursementDetail({ id }: { id: string }) {
             </TitledCard>
 
             <TitledCard title="What Hubtel said">
-              <DetailRow label="Our reference">
+              <DetailRow
+                hint="The code this console put on the payment, for tracing it back here."
+                label="Our reference"
+              >
                 <Mono>{d.clientReference}</Mono>
               </DetailRow>
-              <DetailRow label="Hubtel transaction">
+              <DetailRow
+                hint="The payment provider\u2019s own code for this payout: quote it when you call them."
+                label="Hubtel transaction"
+              >
                 {d.hubtelTransactionId ? (
                   <Mono>{d.hubtelTransactionId}</Mono>
                 ) : (
                   <span className="text-adm-faint">Not given</span>
                 )}
               </DetailRow>
-              <DetailRow label="Network reference">
+              <DetailRow
+                hint="The mobile network or bank\u2019s own code for the transfer, deeper than the provider\u2019s."
+                label="Network reference"
+              >
                 {d.externalTransactionId ? (
                   <Mono>{d.externalTransactionId}</Mono>
                 ) : (
                   <span className="text-adm-faint">Not given</span>
                 )}
               </DetailRow>
-              <DetailRow label="Response code">
+              <DetailRow
+                hint="The provider\u2019s short answer for what happened, useful when a payment is queried."
+                label="Response code"
+              >
                 {d.responseCode ? (
                   <Mono>{d.responseCode}</Mono>
                 ) : (
@@ -185,7 +203,10 @@ export function DisbursementDetail({ id }: { id: string }) {
         }
         aside={
           <TitledCard title="Trail">
-            <DetailRow label="Paid from">
+            <DetailRow
+              hint="Whose money this came out of: one person\u2019s float, or the company account directly."
+              label="Paid from"
+            >
               {d.holder
                 ? `${d.holder.name}'s float`
                 : "The company account directly"}
@@ -203,7 +224,10 @@ export function DisbursementDetail({ id }: { id: string }) {
                 <span className="text-adm-faint">Not yet</span>
               )}
             </DetailRow>
-            <DetailRow label="Settled">
+            <DetailRow
+              hint="When the provider gave a final answer on this payment, one way or the other."
+              label="Settled"
+            >
               {d.settledAt ? (
                 <DateTimeCell value={d.settledAt} />
               ) : (

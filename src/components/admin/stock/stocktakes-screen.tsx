@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ConsoleDataTable } from "@/components/admin/data-table";
+import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
@@ -86,7 +86,10 @@ export function StocktakesScreen() {
     () => [
       {
         id: "transactionNo",
-        header: "Stocktake #",
+        header: columnHelp(
+          "Stocktake #",
+          "The reference this count was filed under, for quoting it later.",
+        ),
         accessorFn: (s) => s.transactionNo,
         enableSorting: false,
         meta: columnMeta(),
@@ -123,7 +126,10 @@ export function StocktakesScreen() {
       },
       {
         id: "lines",
-        header: "Lines",
+        header: columnHelp(
+          "Lines",
+          "How many different commodities were counted on this sheet.",
+        ),
         accessorFn: (s) => s.lines.length,
         enableSorting: false,
         meta: columnMeta(),

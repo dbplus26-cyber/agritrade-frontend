@@ -8,6 +8,7 @@ import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
+import { HelpWrap } from "@/components/admin/help-tip";
 import { AdminCard, Mono, ToneBadge, type Tone } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -27,6 +28,13 @@ const STATUS_TONE: Record<NotifStatus, { label: string; tone: Tone }> = {
   FAILED: { label: "Failed", tone: "alert" },
   QUEUED: { label: "Queued", tone: "harvest" },
   SENT: { label: "Sent", tone: "leaf" },
+};
+
+/** What each state means for whether the person actually got the message. */
+const STATUS_HELP: Record<NotifStatus, string> = {
+  FAILED: "The message could not be delivered, so assume the person never saw it.",
+  QUEUED: "Written and waiting to go out; it has not been sent yet.",
+  SENT: "Handed to the network or email provider for delivery.",
 };
 
 /** Dotted event → human label. */
@@ -135,8 +143,12 @@ export function NotificationsScreen() {
         cell: ({ row }) => {
           const s = STATUS_TONE[row.original.status];
           return (
+            // The failure reason stays on `title`; the tooltip explains the
+            // STATE, which is a different question and always answerable.
             <span title={row.original.error ?? undefined}>
-              <ToneBadge tone={s.tone}>{s.label}</ToneBadge>
+              <HelpWrap text={STATUS_HELP[row.original.status]}>
+                <ToneBadge tone={s.tone}>{s.label}</ToneBadge>
+              </HelpWrap>
             </span>
           );
         },

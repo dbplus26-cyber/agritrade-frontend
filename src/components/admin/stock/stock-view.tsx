@@ -9,6 +9,7 @@ import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
+import { HelpTip } from "@/components/admin/help-tip";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -408,8 +409,12 @@ function WarehouseSections({
                 kg={w.subtotalKg}
                 className="block text-[15px] font-semibold text-adm-ink"
               />
-              <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                On hand
+              <span className="flex items-center justify-end gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+                <span className="min-w-0">On hand</span>
+                <HelpTip
+                  label="What does On hand count?"
+                  text="Everything this store is holding right now, added up across all its commodities."
+                />
               </span>
             </div>
           </div>

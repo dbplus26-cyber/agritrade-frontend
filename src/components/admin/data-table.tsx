@@ -26,7 +26,42 @@ import {
   DataTablePagination,
   PAGE_SIZE_OPTIONS,
 } from "@/components/ui/DataTablePagination";
+import { HelpTip } from "@/components/admin/help-tip";
 import { cn } from "@/lib/utils";
+
+/**
+ * A column heading that carries its own explanation.
+ *
+ * Half the console's headings are a single domain word - Basis, Float,
+ * Outstanding, Variance, Lot - and a word that short can only be understood by
+ * somebody who already knows it. Pass the sentence it stands for and the
+ * heading grows a help icon.
+ *
+ * The icon is withheld from the narrow-container CARD view on purpose. Down
+ * there the heading is repeated once per row, so an icon on each would put ten
+ * of them down a phone screen and make the list unreadable in exactly the way
+ * this is meant to prevent - the explanation is still there on hover, just
+ * without the affordance. `@2xl/table` is ConsoleDataTable's own container
+ * query, the same one that swaps cards for the real table.
+ *
+ * `HelpTip` rather than `HelpWrap` because a `<th>` in a sortable table is
+ * already clickable: HelpTip's handler stops the event, so reading the
+ * explanation never re-sorts the table underneath it.
+ */
+export function columnHelp(label: string, text: string) {
+  return function HelpHeader() {
+    return (
+      <span className="inline-flex items-center gap-1">
+        {label}
+        <HelpTip
+          className="hidden @2xl/table:inline-flex"
+          label={`What does the ${label} column show?`}
+          text={text}
+        />
+      </span>
+    );
+  };
+}
 
 /** Per-column console styling carried on TanStack column meta. */
 export interface ConsoleColumnMeta {

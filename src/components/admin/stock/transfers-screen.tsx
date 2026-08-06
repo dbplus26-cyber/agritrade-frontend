@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ConsoleDataTable } from "@/components/admin/data-table";
+import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleDateRange,
   ConsoleFilterBar,
@@ -174,7 +174,10 @@ export function TransfersScreen() {
     () => [
       {
         id: "transactionNo",
-        header: "Transfer #",
+        header: columnHelp(
+          "Transfer #",
+          "The reference this move was filed under, for quoting it later.",
+        ),
         accessorFn: (t) => t.transactionNo,
         enableSorting: false,
         meta: columnMeta(),
@@ -186,7 +189,10 @@ export function TransfersScreen() {
       },
       {
         id: "route",
-        header: "Route",
+        header: columnHelp(
+          "Route",
+          "Which of your warehouses the stock left, and which one it went into.",
+        ),
         accessorFn: (t) => `${t.fromWarehouse.name} → ${t.toWarehouse.name}`,
         enableSorting: false,
         meta: columnMeta({ stretch: true }),
@@ -224,7 +230,10 @@ export function TransfersScreen() {
       },
       {
         id: "moved",
-        header: "Moved",
+        header: columnHelp(
+          "Moved",
+          "The day the stock actually left one warehouse, which can differ from the day it was typed in.",
+        ),
         accessorFn: (t) => t.occurredAt,
         enableSorting: false,
         meta: columnMeta(),
@@ -527,6 +536,7 @@ function TransferDialog({
             <AdminField
               label="Moved on"
               optional
+              hint="The day the stock physically left, if that was not today."
               error={errors.occurredAt?.message}
             >
               <Input

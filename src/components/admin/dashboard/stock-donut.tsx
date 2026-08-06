@@ -25,7 +25,10 @@ export function StockDonut({ rows }: { rows: StockRow[] }) {
   }));
 
   return (
-    <WidgetCard title="Stock mix">
+    <WidgetCard
+      title="Stock mix"
+      hint="How the stock you are holding right now splits across the commodities you trade."
+    >
       {total <= 0 ? (
         <ChartNote>No stock on hand.</ChartNote>
       ) : (

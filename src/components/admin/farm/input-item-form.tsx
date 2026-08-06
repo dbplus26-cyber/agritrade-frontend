@@ -180,7 +180,11 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
               {...register("name")}
             />
           </AdminField>
-          <AdminField label="Unit" error={errors.unitLabel?.message}>
+          <AdminField
+            error={errors.unitLabel?.message}
+            hint="How this item is handed out and counted: a bag, a litre, a piece."
+            label="Unit"
+          >
             <Input
               placeholder="bag"
               disabled={readOnly}

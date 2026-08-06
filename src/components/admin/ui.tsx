@@ -28,18 +28,28 @@ import { cn } from "@/lib/utils";
 export function DetailRow({
   label,
   children,
+  hint,
   mono = false,
   strong = false,
 }: {
   children: React.ReactNode;
+  /**
+   * One sentence on what this fact IS, on hover beside the label.
+   *
+   * A detail page is a column of two-word labels - Basis, Float, Milestone,
+   * Outstanding - and two words cannot teach a term to somebody meeting it for
+   * the first time. The label keeps its brevity; the sentence sits behind it.
+   */
+  hint?: string;
   label: string;
   mono?: boolean;
   strong?: boolean;
 }) {
   return (
     <div className="flex flex-col gap-0.5 py-2 @min-[420px]:flex-row @min-[420px]:items-baseline @min-[420px]:justify-between @min-[420px]:gap-3">
-      <span className="flex-none text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-        {label}
+      <span className="flex flex-none items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+        <span className="min-w-0">{label}</span>
+        {hint ? <HelpTip label={`What is ${label}?`} text={hint} /> : null}
       </span>
       <span
         className={cn(
@@ -63,6 +73,7 @@ export function DetailItem({
   label,
   children,
   full = false,
+  hint,
   mono = false,
   strong = false,
   className,
@@ -80,6 +91,8 @@ export function DetailItem({
    * Same flag, same reason, as RecordFacts' `full`.
    */
   full?: boolean;
+  /** One sentence on what this fact IS, on hover beside the label. */
+  hint?: string;
   label: string;
   mono?: boolean;
   strong?: boolean;
@@ -93,8 +106,9 @@ export function DetailItem({
         className,
       )}
     >
-      <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-        {label}
+      <p className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+        <span className="min-w-0">{label}</span>
+        {hint ? <HelpTip label={`What is ${label}?`} text={hint} /> : null}
       </p>
       <div
         className={cn(

@@ -1,5 +1,6 @@
 "use client";
 
+import { HelpWrap } from "@/components/admin/help-tip";
 import { ToneBadge, type Tone } from "@/components/admin/ui";
 import { UserRole, type IUser } from "@/types/user.types";
 
@@ -22,9 +23,18 @@ export function userStatus(user: IUser): { label: string; tone: Tone } {
   return { label: "Active", tone: "leaf" };
 }
 
+/** What each account state means for whether the person can get in. */
+const USER_STATUS_HELP: Record<string, string> = {
+  Active: "Can sign in and use the console normally.",
+  Blocked: "Locked out and cannot sign in until an admin unblocks the account.",
+  Suspended: "Switched off, so they cannot sign in until it is switched back on.",
+};
+
 export function StatusBadge({ user }: { user: IUser }) {
   const s = userStatus(user);
-  return <ToneBadge tone={s.tone}>{s.label}</ToneBadge>;
+  const help = USER_STATUS_HELP[s.label];
+  const badge = <ToneBadge tone={s.tone}>{s.label}</ToneBadge>;
+  return help ? <HelpWrap text={help}>{badge}</HelpWrap> : badge;
 }
 
 /** The money-columns story in one word (list column "Visibility"). */

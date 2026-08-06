@@ -206,7 +206,11 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
                 {...register("weightKg")}
               />
             </AdminField>
-            <AdminField label="Rate per kg (GHS)" error={errors.ratePerKgGhs?.message}>
+            <AdminField
+              error={errors.ratePerKgGhs?.message}
+              hint="The price you are crediting this produce at, which sets how much it clears off the grant."
+              label="Rate per kg (GHS)"
+            >
               <Input
                 inputMode="decimal"
                 className={cn(adminInputClass, errors.ratePerKgGhs && "border-console-red")}

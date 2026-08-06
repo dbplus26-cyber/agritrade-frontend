@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { ChevronDown, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { HelpTip } from "@/components/admin/help-tip";
 import { cn } from "@/lib/utils";
 
 /**
@@ -26,6 +27,7 @@ export function ConsoleLabeledSelect({
   options,
   active = false,
   className,
+  hint,
 }: {
   label: string;
   value: string;
@@ -34,7 +36,32 @@ export function ConsoleLabeledSelect({
   /** True when the value is non-default — keeps the border half-lit. */
   active?: boolean;
   className?: string;
+  /**
+   * One sentence on what narrowing by this actually does, for the filters
+   * whose effect a reader cannot guess from the option names ("Source",
+   * "Rail", "Basis"). Most filters need nothing: "All statuses" says it.
+   *
+   * The icon sits OUTSIDE the `<label>` on purpose. Anything clicked inside a
+   * label is forwarded to that label's control, so a help button in there
+   * would open the select every time somebody asked what the filter meant.
+   */
+  hint?: string;
 }) {
+  if (hint) {
+    return (
+      <span className={cn("flex min-w-0 items-center gap-1", className)}>
+        <ConsoleLabeledSelect
+          label={label}
+          value={value}
+          onChange={onChange}
+          options={options}
+          active={active}
+          className="min-w-0 flex-1 lg:flex-none"
+        />
+        <HelpTip label={`What does the ${label} filter do?`} text={hint} />
+      </span>
+    );
+  }
   return (
     // A NATIVE select, not a rendered one.
     //

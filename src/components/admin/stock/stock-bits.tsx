@@ -1,3 +1,4 @@
+import { HelpWrap } from "@/components/admin/help-tip";
 import { ToneBadge, type Tone } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
 import { StockMoveType } from "@/types/stock.types";
@@ -22,8 +23,26 @@ export const MOVE_TYPE_TONE: Record<StockMoveType, Tone> = {
   [StockMoveType.FARM_REPAYMENT_RECEIPT]: "leaf",
 };
 
+/** Why this weight moved: every line in the ledger has exactly one reason. */
+export const MOVE_TYPE_HELP: Record<StockMoveType, string> = {
+  [StockMoveType.PURCHASE_RECEIPT]:
+    "Grain bought from a supplier or agent arriving at the warehouse.",
+  [StockMoveType.SHIPMENT_LOAD]:
+    "Stock going out of the warehouse onto a truck for a buyer.",
+  [StockMoveType.ADJUSTMENT]:
+    "A correction to the books made by hand, usually after a count or a loss.",
+  [StockMoveType.TRANSFER_IN]: "Stock arriving from another of your warehouses.",
+  [StockMoveType.TRANSFER_OUT]: "Stock leaving for another of your warehouses.",
+  [StockMoveType.FARM_REPAYMENT_RECEIPT]:
+    "Produce a farmer brought back against the inputs they were advanced.",
+};
+
 export function MoveTypeBadge({ type }: { type: StockMoveType }) {
-  return <ToneBadge tone={MOVE_TYPE_TONE[type]}>{MOVE_TYPE_LABEL[type]}</ToneBadge>;
+  return (
+    <HelpWrap text={MOVE_TYPE_HELP[type]}>
+      <ToneBadge tone={MOVE_TYPE_TONE[type]}>{MOVE_TYPE_LABEL[type]}</ToneBadge>
+    </HelpWrap>
+  );
 }
 
 /** Exact kg figure for `title` tooltips next to a compacted value. */

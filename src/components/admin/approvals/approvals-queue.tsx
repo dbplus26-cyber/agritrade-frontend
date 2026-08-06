@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { flexRender, type Table } from "@tanstack/react-table";
+import { HelpTip } from "@/components/admin/help-tip";
 import { formatCedis } from "@/lib/format-money";
 import { cn } from "@/lib/utils";
 import type { IApproval } from "@/types/approval.types";
@@ -169,7 +170,10 @@ export function ApprovalDetailPanel({
           <Field label="Warehouse">{approval.warehouse}</Field>
         ) : null}
         {approval.limit !== null ? (
-          <Field label="Limit breached">
+          <Field
+            label="Limit breached"
+            hint="The most staff may commit on their own before this has to come to you."
+          >
             <span className="font-adminmono tabular-nums">
               {formatCedis(approval.limit)}
             </span>
@@ -182,7 +186,10 @@ export function ApprovalDetailPanel({
           </Field>
         ) : null}
         {overage ? (
-          <Field label="Overage">
+          <Field
+            label="Overage"
+            hint="How far past the limit this one goes, in money and as a percentage."
+          >
             <span className="font-adminmono tabular-nums">{overage}</span>
           </Field>
         ) : null}
@@ -198,15 +205,21 @@ export function ApprovalDetailPanel({
 }
 
 function Field({
+  hint,
   label,
   children,
 }: {
+  /** One sentence on what the fact is, on hover beside its label. */
+  hint?: string;
   label: string;
   children: React.ReactNode;
 }) {
   return (
     <div>
-      <dt className={cn(apFieldKey, "mb-[3px]")}>{label}</dt>
+      <dt className={cn(apFieldKey, "mb-[3px]", "flex items-center gap-1")}>
+        <span className="min-w-0">{label}</span>
+        {hint ? <HelpTip label={`What is ${label}?`} text={hint} /> : null}
+      </dt>
       <dd className="text-[13px] leading-[1.5] text-[var(--ap-ink)] [overflow-wrap:anywhere]">
         {children}
       </dd>

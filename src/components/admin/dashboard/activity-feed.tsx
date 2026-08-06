@@ -40,7 +40,10 @@ export function ActivityFeed() {
   const rows = data?.data ?? [];
 
   return (
-    <WidgetCard title="Recent activity">
+    <WidgetCard
+      title="Recent activity"
+      hint="The latest things recorded in the console, whoever recorded them."
+    >
       {isLoading ? (
         <div className="flex flex-col gap-2.5">
           {Array.from({ length: 5 }).map((_, i) => (

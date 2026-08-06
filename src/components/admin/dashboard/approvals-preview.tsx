@@ -32,7 +32,11 @@ export function ApprovalsPreview() {
   );
 
   return (
-    <WidgetCard title="Awaiting approval" right={link}>
+    <WidgetCard
+      title="Awaiting approval"
+      hint="Requests staff have raised that only you can sign off, oldest first."
+      right={link}
+    >
       {isLoading ? (
         <div className="flex flex-col gap-2.5">
           {Array.from({ length: 3 }).map((_, i) => (

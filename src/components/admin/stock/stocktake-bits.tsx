@@ -9,6 +9,7 @@ import {
   ToneBadge,
   type Tone,
 } from "@/components/admin/ui";
+import { HelpWrap } from "@/components/admin/help-tip";
 import { Input } from "@/components/ui/input";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -29,9 +30,23 @@ const STOCKTAKE_STATUS: Record<StocktakeStatus, { label: string; tone: Tone }> =
     [StocktakeStatus.CANCELLED]: { label: "Cancelled", tone: "slate" },
   };
 
+/** What the count is doing at each stage, and what approving it will do. */
+const STOCKTAKE_STATUS_HELP: Record<StocktakeStatus, string> = {
+  [StocktakeStatus.DRAFT]:
+    "The count sheet is still being filled in and changes nothing yet.",
+  [StocktakeStatus.SUBMITTED]:
+    "The count is in and compared against the books; it is waiting on approval.",
+  [StocktakeStatus.APPROVED]:
+    "The count was accepted, and stock has been corrected to match what was there.",
+  [StocktakeStatus.CANCELLED]:
+    "The count was abandoned, and stock was left exactly as it was.",
+};
+
 export function StocktakeStatusBadge({ status }: { status: StocktakeStatus }) {
   const s = STOCKTAKE_STATUS[status] ?? { label: status, tone: "slate" as Tone };
-  return <ToneBadge tone={s.tone}>{s.label}</ToneBadge>;
+  const help = STOCKTAKE_STATUS_HELP[status];
+  const badge = <ToneBadge tone={s.tone}>{s.label}</ToneBadge>;
+  return help ? <HelpWrap text={help}>{badge}</HelpWrap> : badge;
 }
 
 export const STOCKTAKE_STATUS_FILTER_OPTIONS = [

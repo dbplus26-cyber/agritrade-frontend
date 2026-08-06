@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ConsoleDataTable } from "@/components/admin/data-table";
+import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleDateRange,
   ConsoleFilterBar,
@@ -117,7 +117,10 @@ export function GrantsRegister() {
       },
       {
         id: "value",
-        header: "Value",
+        header: columnHelp(
+          "Value",
+          "What these inputs were worth in cash, which is what the farmer owes back.",
+        ),
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
@@ -128,7 +131,10 @@ export function GrantsRegister() {
       },
       {
         id: "granted",
-        header: "Granted",
+        header: columnHelp(
+          "Granted",
+          "The day the farmer actually took the inputs, not the day it was typed in here.",
+        ),
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => <DateTimeCell value={row.original.grantedAt} />,

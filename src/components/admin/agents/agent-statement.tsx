@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { AdminButton, AdminPageHeader, Mono } from "@/components/admin/ui";
 import { ConsoleDateRange } from "@/components/admin/filter-bar";
+import { HelpWrap } from "@/components/admin/help-tip";
 import { DocumentSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -216,8 +217,19 @@ export function AgentStatement({ id }: { id: string }) {
               <tr className="border-y border-adm-strong align-bottom text-left text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
                 <th className="py-2">Date</th>
                 <th className="py-2">Detail</th>
-                <th className="py-2 text-right">In / out</th>
-                <th className="py-2 text-right">Balance</th>
+                {/* HelpWrap, not HelpTip: this sheet is a facsimile of a
+                    printed statement the agent signs, and a row of help icons
+                    across its rule would stop it reading as one. */}
+                <th className="py-2 text-right">
+                  <HelpWrap text="Whether this line put money into the agent's hand or took it back out.">
+                    In / out
+                  </HelpWrap>
+                </th>
+                <th className="py-2 text-right">
+                  <HelpWrap text="The running total left in the agent's hand after each line above it.">
+                    Balance
+                  </HelpWrap>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -229,7 +241,9 @@ export function AgentStatement({ id }: { id: string }) {
                     {formatDateOnly(from)}
                   </td>
                   <td className="py-1.5 align-top text-adm-muted">
-                    Balance brought forward
+                    <HelpWrap text="What the agent was already holding on the day this period starts.">
+                      Balance brought forward
+                    </HelpWrap>
                   </td>
                   <td className="py-1.5 text-right align-top text-adm-muted">-</td>
                   <td className="py-1.5 align-top">
@@ -314,7 +328,11 @@ export function AgentStatement({ id }: { id: string }) {
                   carried in, so it stays a period total even though the
                   balance column now starts from the opening balance. */}
               <div className="flex items-baseline justify-between gap-4 border-t border-adm-line py-1.5 text-[12.5px]">
-                <span className="text-adm-muted">Net over period</span>
+                <span className="text-adm-muted">
+                  <HelpWrap text="Everything handed to the agent in these dates, less everything they spent or sent.">
+                    Net over period
+                  </HelpWrap>
+                </span>
                 <Figure
                   value={netOverPeriod}
                   className={cn(
@@ -336,7 +354,17 @@ export function AgentStatement({ id }: { id: string }) {
             </>
           ) : null}
           <div className="flex items-baseline justify-between gap-4 border-t-2 border-adm-strong py-2 text-[12px] font-bold tracking-[0.08em] uppercase">
-            <span>{windowed ? "Current float" : "Closing balance"}</span>
+            <span>
+              <HelpWrap
+                text={
+                  windowed
+                    ? "What the agent is holding today, including anything after the dates chosen above."
+                    : "What the agent is holding today, after every line on this statement."
+                }
+              >
+                {windowed ? "Current float" : "Closing balance"}
+              </HelpWrap>
+            </span>
             <Figure value={balance} className="text-[16px] font-bold normal-case" />
           </div>
         </div>

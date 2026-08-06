@@ -1,5 +1,6 @@
 "use client";
 
+import { HelpTip } from "@/components/admin/help-tip";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { AdminCard, Mono } from "@/components/admin/ui";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -16,6 +17,7 @@ import { TrendBadge } from "./trend-badge";
 
 /** One windowed stat tile: label, mono value, optional sub + trend. */
 function Tile({
+  hint,
   inverse = false,
   label,
   sub,
@@ -23,6 +25,8 @@ function Tile({
   value,
   valueText,
 }: {
+  /** One sentence on what the figure counts, on hover beside the label. */
+  hint?: string;
   inverse?: boolean;
   label: string;
   sub?: React.ReactNode;
@@ -36,8 +40,9 @@ function Tile({
       {/* The label owns its own line. Sharing a row with the trend badge made
           them collide at 280px ("PURCHASE▲33.8%"), and the badge reads better
           beside the figure it describes anyway. */}
-      <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-        {label}
+      <div className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+        <span className="min-w-0">{label}</span>
+        {hint ? <HelpTip label={`What does ${label} count?`} text={hint} /> : null}
       </div>
       <div className="mt-1 flex items-baseline justify-between gap-1.5">
         <Mono
@@ -83,6 +88,7 @@ export function PeriodSummary({ window }: { window: IReportWindow }) {
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <Tile
             label="Purchases out"
+            hint="What you spent buying grain in the period you picked, agents and suppliers together."
             value={<Money compact value={s.purchasesGhs} />}
             valueText={formatCedisCompact(s.purchasesGhs)}
             sub={`${formatKg(s.purchasesKg)} · ${String(s.purchaseCount)} buys`}
@@ -91,12 +97,14 @@ export function PeriodSummary({ window }: { window: IReportWindow }) {
           />
           <Tile
             label="Payments in"
+            hint="Money buyers actually paid you in the period you picked, not what they agreed to pay."
             value={<Money compact value={s.paymentsInGhs} />}
             valueText={formatCedisCompact(s.paymentsInGhs)}
             trend={s.paymentsInTrend}
           />
           <Tile
             label="Sales confirmed"
+            hint="What buyers agreed to pay on orders confirmed in the period you picked."
             value={<Money compact value={s.salesConfirmedGhs} />}
             valueText={formatCedisCompact(s.salesConfirmedGhs)}
             sub={`${String(s.salesConfirmedCount)} sales`}
@@ -104,6 +112,7 @@ export function PeriodSummary({ window }: { window: IReportWindow }) {
           />
           <Tile
             label="Expenses"
+            hint="Running costs recorded in the period you picked: transport, loading, fees and the rest."
             value={<Money compact value={s.expensesGhs} />}
             valueText={formatCedisCompact(s.expensesGhs)}
             inverse

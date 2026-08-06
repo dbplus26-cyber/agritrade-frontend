@@ -4,8 +4,9 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ConsoleDataTable } from "@/components/admin/data-table";
+import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import { DateTimeCell } from "@/components/admin/date-cell";
+import { HelpTip } from "@/components/admin/help-tip";
 import {
   ConsoleDateField,
   ConsoleFilterBar,
@@ -48,15 +49,19 @@ const OUTSTANDING_OPTIONS = [
 /** A headline stat tile in the sales strip. */
 function StatTile({
   label,
+  hint,
   children,
 }: {
   label: string;
+  /** One sentence on what this figure counts, shown on hover by the label. */
+  hint?: string;
   children: React.ReactNode;
 }) {
   return (
     <AdminCard className="px-4 py-3">
-      <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-        {label}
+      <div className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+        <span className="min-w-0">{label}</span>
+        {hint ? <HelpTip label={`What does ${label} count?`} text={hint} /> : null}
       </div>
       <div className="mt-1 text-[19px] font-bold text-adm-ink">{children}</div>
     </AdminCard>
@@ -68,16 +73,32 @@ function SalesStats() {
   const stats = data?.data;
   return (
     <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
-      <StatTile label="In progress">{stats?.salesInProgress ?? "-"}</StatTile>
-      <StatTile label="Agreed (live)">
+      <StatTile
+        label="In progress"
+        hint="Orders agreed with a buyer but not yet delivered and paid off."
+      >
+        {stats?.salesInProgress ?? "-"}
+      </StatTile>
+      <StatTile
+        label="Agreed (live)"
+        hint="What the buyers on those in-progress orders have agreed to pay you in total."
+      >
         <Money value={stats?.agreedValueLiveGhs ?? null} />
       </StatTile>
-      <StatTile label="Outstanding">
+      <StatTile
+        label="Outstanding"
+        hint="Money buyers still owe you across every order that is not paid off."
+      >
         <span className="text-console-red">
           <Money value={stats?.outstandingGhs ?? null} />
         </span>
       </StatTile>
-      <StatTile label="Debtors">{stats?.debtorSaleCount ?? "-"}</StatTile>
+      <StatTile
+        label="Debtors"
+        hint="How many orders still have something left to pay on them."
+      >
+        {stats?.debtorSaleCount ?? "-"}
+      </StatTile>
     </div>
   );
 }
@@ -157,7 +178,10 @@ export function SalesRegister() {
       },
       {
         id: "agreed",
-        header: "Agreed",
+        header: columnHelp(
+          "Agreed",
+          "The full price the buyer agreed to pay for this order.",
+        ),
         enableSorting: false,
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
@@ -168,7 +192,10 @@ export function SalesRegister() {
       },
       {
         id: "balance",
-        header: "Balance",
+        header: columnHelp(
+          "Balance",
+          "What the buyer still owes you on this order after everything they have paid.",
+        ),
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => {
@@ -229,6 +256,7 @@ export function SalesRegister() {
         className="lg:w-[160px]"
       />
       <ConsoleLabeledSelect
+        hint="Narrows to orders a buyer still owes money on, so you can chase only those."
         label="Balance"
         value={outstanding}
         onChange={(v) => setFilter("outstanding", v)}

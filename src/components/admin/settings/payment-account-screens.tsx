@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ConsoleDataTable } from "@/components/admin/data-table";
+import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
@@ -189,7 +189,10 @@ export function PaymentAccountTable() {
       },
       {
         id: "printed",
-        header: "On invoices",
+        header: columnHelp(
+          "On invoices",
+          "Whether this account is printed on invoices for customers to pay into, or kept internal.",
+        ),
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) =>
@@ -453,7 +456,11 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
               {...register("label")}
             />
           </AdminField>
-          <AdminField label="Kind" error={errors.kind?.message}>
+          <AdminField
+            label="Kind"
+            hint="What sort of account this is: a bank account, or a mobile money wallet."
+            error={errors.kind?.message}
+          >
             <select
               className={cn(
                 adminInputClass,

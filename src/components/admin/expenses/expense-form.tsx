@@ -113,7 +113,11 @@ export function ExpenseFormDialog({
           onSubmit={(e) => void handleSubmit(onSubmit)(e)}
           noValidate
         >
-          <AdminField label="Category" error={errors.categoryId?.message}>
+          <AdminField
+            label="Category"
+            hint="The heading this cost is filed under, so spending can be grouped in reports."
+            error={errors.categoryId?.message}
+          >
             <select
               id="expense-category"
               className={adminSelectClass}
@@ -138,7 +142,11 @@ export function ExpenseFormDialog({
             />
           </AdminField>
 
-          <AdminField label="Date incurred" error={errors.incurredAt?.message}>
+          <AdminField
+            label="Date incurred"
+            hint="The day the cost was actually run up, not the day it is being typed in."
+            error={errors.incurredAt?.message}
+          >
             <input
               id="expense-date"
               type="date"

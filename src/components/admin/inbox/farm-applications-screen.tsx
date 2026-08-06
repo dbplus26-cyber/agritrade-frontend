@@ -47,12 +47,36 @@ function FarmApplicationStats() {
   const stats = data?.data;
   return (
     <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
-      <InboxStatTile label="Total" value={stats?.total} />
-      <InboxStatTile label="New" value={stats?.new} />
-      <InboxStatTile label="Reviewing" value={stats?.reviewing} />
-      <InboxStatTile label="Approved" value={stats?.approved} />
-      <InboxStatTile label="Rejected" value={stats?.rejected} />
-      <InboxStatTile label="Converted" value={stats?.converted} />
+      <InboxStatTile
+        label="Total"
+        hint="Everyone who has ever applied to join the outgrower scheme."
+        value={stats?.total}
+      />
+      <InboxStatTile
+        label="New"
+        hint="Applicants nobody has looked at yet."
+        value={stats?.new}
+      />
+      <InboxStatTile
+        label="Reviewing"
+        hint="Applicants somebody is checking, with no decision made yet."
+        value={stats?.reviewing}
+      />
+      <InboxStatTile
+        label="Approved"
+        hint="Applicants accepted into the scheme but not yet set up as farmers here."
+        value={stats?.approved}
+      />
+      <InboxStatTile
+        label="Rejected"
+        hint="Applicants turned down for the scheme."
+        value={stats?.rejected}
+      />
+      <InboxStatTile
+        label="Converted"
+        hint="Applicants now signed up as farmers, with their own record for grants and repayments."
+        value={stats?.converted}
+      />
     </div>
   );
 }

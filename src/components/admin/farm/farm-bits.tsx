@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { HelpWrap } from "@/components/admin/help-tip";
 import { Mono, ToneBadge } from "@/components/admin/ui";
 import { FilePicker } from "@/components/ui/FilePicker";
 import { SignaturePad } from "@/components/ui/SignaturePad";
@@ -23,9 +24,13 @@ export const ACTIVE_FILTER_OPTIONS = [
 
 export function ActiveBadge({ active }: { active: boolean }) {
   return active ? (
-    <ToneBadge tone="leaf">Active</ToneBadge>
+    <HelpWrap text="In use, so it still appears wherever this is chosen.">
+      <ToneBadge tone="leaf">Active</ToneBadge>
+    </HelpWrap>
   ) : (
-    <ToneBadge tone="slate">Inactive</ToneBadge>
+    <HelpWrap text="Kept for old records but no longer offered when creating new ones.">
+      <ToneBadge tone="slate">Inactive</ToneBadge>
+    </HelpWrap>
   );
 }
 
@@ -40,11 +45,23 @@ export function GrantApprovalBadge({
 }) {
   if (!status) return null;
   if (status === "PENDING")
-    return <ToneBadge tone="harvest">Approval pending</ToneBadge>;
+    return (
+      <HelpWrap text="The inputs have gone out, but their value is above what staff may give without the owner's sign-off.">
+        <ToneBadge tone="harvest">Approval pending</ToneBadge>
+      </HelpWrap>
+    );
   if (status === "APPROVED")
-    return <ToneBadge tone="leaf">Acknowledged</ToneBadge>;
+    return (
+      <HelpWrap text="The owner has signed off on the value of what this farmer was given.">
+        <ToneBadge tone="leaf">Acknowledged</ToneBadge>
+      </HelpWrap>
+    );
   if (status === "REJECTED")
-    return <ToneBadge tone="alert">Rejected</ToneBadge>;
+    return (
+      <HelpWrap text="The owner did not sign this off, so the grant should be reduced or reversed.">
+        <ToneBadge tone="alert">Rejected</ToneBadge>
+      </HelpWrap>
+    );
   return <ToneBadge tone="slate">{status}</ToneBadge>;
 }
 

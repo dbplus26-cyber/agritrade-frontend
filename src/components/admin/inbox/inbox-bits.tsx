@@ -1,4 +1,5 @@
 import { AdminCard, Mono, ToneBadge, type Tone } from "@/components/admin/ui";
+import { HelpTip, HelpWrap } from "@/components/admin/help-tip";
 import { Absent } from "@/components/admin/registry/registry-bits";
 import type {
   EnquiryStatus,
@@ -46,27 +47,46 @@ export const FARM_APPLICATION_STATUS_META: Record<
   CONVERTED: { label: "Converted", tone: "forest" },
 };
 
+/**
+ * Only the states whose name does not already say it. "New" and "Rejected"
+ * explain themselves; "Approved" and "Converted" are two different things and
+ * the difference is the whole point of the queue.
+ */
+const FARM_APPLICATION_HELP: Partial<Record<FarmApplicationStatus, string>> = {
+  APPROVED:
+    "Accepted into the outgrower scheme, but not yet set up as a farmer here.",
+  CONVERTED:
+    "Signed up as a farmer, so they now have their own record for grants and repayments.",
+  REVIEWING: "Somebody is looking into this applicant; no decision yet.",
+};
+
 export function FarmApplicationStatusBadge({
   status,
 }: {
   status: FarmApplicationStatus;
 }) {
   const meta = FARM_APPLICATION_STATUS_META[status];
-  return <ToneBadge tone={meta.tone}>{meta.label}</ToneBadge>;
+  const help = FARM_APPLICATION_HELP[status];
+  const badge = <ToneBadge tone={meta.tone}>{meta.label}</ToneBadge>;
+  return help ? <HelpWrap text={help}>{badge}</HelpWrap> : badge;
 }
 
 /** A headline stat tile; the value stays absent until the stats land. */
 export function InboxStatTile({
+  hint,
   label,
   value,
 }: {
+  /** One sentence on what this figure counts, on hover beside the label. */
+  hint?: string;
   label: string;
   value: number | undefined;
 }) {
   return (
     <AdminCard className="px-4 py-3">
-      <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-        {label}
+      <div className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+        <span className="min-w-0">{label}</span>
+        {hint ? <HelpTip label={`What does ${label} count?`} text={hint} /> : null}
       </div>
       <div className="mt-1 text-[19px] font-bold text-adm-ink">
         {value === undefined ? <Absent /> : <Mono>{value}</Mono>}

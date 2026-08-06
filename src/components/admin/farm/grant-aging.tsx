@@ -3,7 +3,8 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ConsoleDataTable } from "@/components/admin/data-table";
+import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
+import { HelpTip } from "@/components/admin/help-tip";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { DateOnlyCell } from "@/components/admin/date-cell";
 import { AdminCard, Mono, ToneBadge } from "@/components/admin/ui";
@@ -24,31 +25,43 @@ import type { GrantAgingBucket, IGrantAgingRow } from "@/types/ops.types";
 const BUCKETS: {
   key: GrantAgingBucket;
   label: string;
+  /** What this bucket holds, in the reader's words - see HelpTip. */
+  hint: string;
   cardClass: string;
   valueClass: string;
 }[] = [
-  { key: "current", label: "Current", cardClass: "", valueClass: "text-adm-ink" },
+  {
+    key: "current",
+    label: "Current",
+    hint: "Money farmers owe that is not late yet: its due date has not passed.",
+    cardClass: "",
+    valueClass: "text-adm-ink",
+  },
   {
     key: "1-30",
     label: "1-30 days",
+    hint: "Money farmers owe that went past its due date within the last month.",
     cardClass: "bg-console-gold/10",
     valueClass: "text-adm-ink",
   },
   {
     key: "31-60",
     label: "31-60 days",
+    hint: "Money farmers owe that has been past its due date for one to two months.",
     cardClass: "bg-console-gold/25",
     valueClass: "text-adm-ink",
   },
   {
     key: "61-90",
     label: "61-90 days",
+    hint: "Money farmers owe that has been past its due date for two to three months.",
     cardClass: "border-console-red/30 bg-console-red/10",
     valueClass: "text-console-red",
   },
   {
     key: "90+",
     label: "Over 90 days",
+    hint: "Money farmers owe that has been late more than three months: chase these first.",
     cardClass: "border-console-red/50 bg-console-red/20",
     valueClass: "text-console-red",
   },
@@ -109,7 +122,10 @@ export function GrantAging() {
       },
       {
         id: "invested",
-        header: "Invested",
+        header: columnHelp(
+          "Invested",
+          "What the seed, fertiliser and tools this farmer took were worth.",
+        ),
         accessorFn: (r) => r.investedGhs ?? 0,
         enableSorting: false,
         meta: columnMeta({ wide: true }),
@@ -121,7 +137,10 @@ export function GrantAging() {
       },
       {
         id: "recovered",
-        header: "Recovered",
+        header: columnHelp(
+          "Recovered",
+          "What this farmer has paid back so far, in produce or in cash.",
+        ),
         accessorFn: (r) => r.recoveredGhs ?? 0,
         enableSorting: false,
         meta: columnMeta({ wide: true }),
@@ -133,7 +152,10 @@ export function GrantAging() {
       },
       {
         id: "outstanding",
-        header: "Outstanding",
+        header: columnHelp(
+          "Outstanding",
+          "What this farmer still owes you: what they took, less what they have paid back.",
+        ),
         accessorFn: (r) => r.outstandingGhs ?? 0,
         enableSorting: false,
         meta: columnMeta(),
@@ -145,7 +167,10 @@ export function GrantAging() {
       },
       {
         id: "due",
-        header: "Due",
+        header: columnHelp(
+          "Due",
+          "The date this farmer was meant to have paid the grant back by.",
+        ),
         accessorFn: (r) => r.dueDate ?? "",
         enableSorting: false,
         meta: columnMeta(),
@@ -153,7 +178,10 @@ export function GrantAging() {
       },
       {
         id: "overdue",
-        header: "Overdue",
+        header: columnHelp(
+          "Overdue",
+          "How long this balance has been sitting past its due date.",
+        ),
         accessorFn: (r) => r.daysOverdue,
         enableSorting: false,
         meta: columnMeta(),
@@ -189,8 +217,9 @@ export function GrantAging() {
           <div className="mb-4 grid grid-cols-2 gap-2 @lg/main:grid-cols-3 @3xl/main:grid-cols-5">
             {BUCKETS.map((b) => (
               <AdminCard key={b.key} className={cn("px-3 py-2.5", b.cardClass)}>
-                <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                  {b.label}
+                <div className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+                  <span className="min-w-0">{b.label}</span>
+                  <HelpTip label={`What is in ${b.label}?`} text={b.hint} />
                 </div>
                 <div
                   className={cn(

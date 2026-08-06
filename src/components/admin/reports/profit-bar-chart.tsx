@@ -87,6 +87,7 @@ export function ProfitBarChart({
   return (
     <WidgetCard
       title="Profit by commodity"
+      hint="What each crop earned you after what it cost to buy, on sales shipped in the period you picked."
       right={rows.length > 0 && !redacted ? legend : undefined}
     >
       {rows.length === 0 ? (

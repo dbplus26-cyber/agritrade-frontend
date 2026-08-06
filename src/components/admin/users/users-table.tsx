@@ -6,7 +6,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { ConsoleDataTable } from "@/components/admin/data-table";
+import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
@@ -207,7 +207,10 @@ export function UsersTable() {
       {
         id: "role",
         accessorFn: (u) => ROLE_LABEL[u.role],
-        header: "Role",
+        header: columnHelp(
+          "Role",
+          "What this person is allowed to do: agents only ever see their own float and purchases.",
+        ),
         enableSorting: false,
         meta: columnMeta({ at: "lg" }),
         cell: ({ row }) => (
@@ -231,7 +234,10 @@ export function UsersTable() {
       {
         id: "visibility",
         accessorFn: visibilityLabel,
-        header: "Visibility",
+        header: columnHelp(
+          "Visibility",
+          "How much of the money on screen this person is allowed to see.",
+        ),
         enableSorting: false,
         meta: columnMeta({ at: "xl" }),
         cell: ({ row }) => (
@@ -243,7 +249,10 @@ export function UsersTable() {
       {
         id: "lastActive",
         accessorFn: lastActiveLabel,
-        header: "Last active",
+        header: columnHelp(
+          "Last active",
+          "The last time this person signed in, so you can spot accounts nobody uses.",
+        ),
         enableSorting: false,
         meta: columnMeta({ at: "xl" }),
         cell: ({ row }) => (

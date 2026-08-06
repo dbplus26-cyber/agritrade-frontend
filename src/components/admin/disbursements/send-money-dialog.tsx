@@ -216,6 +216,7 @@ export function SendMoneyDialog({
           <AdminField
             label="Recipient's name"
             error={form.formState.errors.recipientName?.message}
+            hint="Write it as their account shows it: the number below is what the money actually follows."
           >
             <Input
               className={adminInputClass}

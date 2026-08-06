@@ -148,6 +148,7 @@ export function LandAcquisitionForm() {
             </AdminField>
             <AdminField
               label="Agreed cost (GHS)"
+              hint="The whole price settled with the seller, whatever you have paid so far."
               error={errors.agreedCostGhs?.message}
             >
               <Input
@@ -181,7 +182,12 @@ export function LandAcquisitionForm() {
                 {...register("sizeText")}
               />
             </AdminField>
-            <AdminField label="Acres" optional error={errors.sizeAcres?.message}>
+            <AdminField
+              error={errors.sizeAcres?.message}
+              hint="The same size as a plain number, so plots can be compared and priced per acre."
+              label="Acres"
+              optional
+            >
               <Input
                 inputMode="decimal"
                 className={cn(

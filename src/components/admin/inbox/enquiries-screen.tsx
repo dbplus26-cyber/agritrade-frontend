@@ -48,10 +48,26 @@ function EnquiryStats() {
   const stats = data?.data;
   return (
     <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
-      <InboxStatTile label="Total" value={stats?.total} />
-      <InboxStatTile label="New" value={stats?.new} />
-      <InboxStatTile label="In progress" value={stats?.inProgress} />
-      <InboxStatTile label="Resolved" value={stats?.resolved} />
+      <InboxStatTile
+        label="Total"
+        hint="Every message the website contact form has ever sent you."
+        value={stats?.total}
+      />
+      <InboxStatTile
+        label="New"
+        hint="Messages nobody has picked up yet."
+        value={stats?.new}
+      />
+      <InboxStatTile
+        label="In progress"
+        hint="Messages somebody is dealing with but has not finished."
+        value={stats?.inProgress}
+      />
+      <InboxStatTile
+        label="Resolved"
+        hint="Messages that have been answered and closed off."
+        value={stats?.resolved}
+      />
     </div>
   );
 }

@@ -30,7 +30,10 @@ export function ExpenseDonut({ summary }: { summary?: IExpenseSummary }) {
   const sum = slices.reduce((a, s) => a + s.amount, 0);
 
   return (
-    <WidgetCard title="Expenses by category">
+    <WidgetCard
+      title="Expenses by category"
+      hint="Where your running costs went in the period you picked, grouped under the headings you file them by."
+    >
       {cats.length === 0 ? (
         <ChartNote>No expenses recorded in this period.</ChartNote>
       ) : redacted ? (

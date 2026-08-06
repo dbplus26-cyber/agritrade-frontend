@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ConsoleDataTable } from "@/components/admin/data-table";
+import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import {
   ConsoleDateRange,
@@ -103,7 +103,10 @@ export function AuditTable() {
       },
       {
         id: "actor",
-        header: "Actor",
+        header: columnHelp(
+          "Actor",
+          "Who did it: the person signed in at the time, or the system itself.",
+        ),
         enableSorting: false,
         meta: columnMeta({ stretch: true }),
         cell: ({ row }) => {
@@ -125,7 +128,7 @@ export function AuditTable() {
       },
       {
         id: "action",
-        header: "Action",
+        header: columnHelp("Action", "What they did, in plain words."),
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
@@ -136,7 +139,10 @@ export function AuditTable() {
       },
       {
         id: "record",
-        header: "Record",
+        header: columnHelp(
+          "Record",
+          "Which thing in the system was touched, and its reference.",
+        ),
         enableSorting: false,
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
@@ -157,7 +163,10 @@ export function AuditTable() {
       },
       {
         id: "ip",
-        header: "IP",
+        header: columnHelp(
+          "IP",
+          "The internet address they were connecting from, useful for spotting a sign-in from somewhere odd.",
+        ),
         enableSorting: false,
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (

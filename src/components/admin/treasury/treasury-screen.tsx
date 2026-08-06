@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ConsoleDataTable } from "@/components/admin/data-table";
+import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import {
   Money,
@@ -81,7 +81,10 @@ export function TreasuryScreen() {
       {
         id: "reference",
         accessorFn: (t) => t.transactionNo,
-        header: "Reference",
+        header: columnHelp(
+          "Reference",
+          "The number Hubtel gives this movement, so you can trace it with them.",
+        ),
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => <Mono>{row.original.transactionNo}</Mono>,

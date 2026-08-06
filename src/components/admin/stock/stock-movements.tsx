@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ConsoleDataTable } from "@/components/admin/data-table";
+import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleDateRange,
   ConsoleFilterBar,
@@ -78,7 +78,10 @@ export function StockMovements({
     () => [
       {
         id: "entry",
-        header: "Entry",
+        header: columnHelp(
+          "Entry",
+          "One line of the stock ledger: which commodity moved, and at which warehouse.",
+        ),
         enableSorting: false,
         meta: columnMeta({ className: "py-2", stretch: true }),
         // Commodity leads, its warehouse sits underneath as the quiet second
@@ -102,7 +105,10 @@ export function StockMovements({
       },
       {
         id: "delta",
-        header: "Change",
+        header: columnHelp(
+          "Change",
+          "How much weight this line added to the warehouse or took out of it.",
+        ),
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => <SignedKg kg={row.original.deltaKg} />,
@@ -116,7 +122,10 @@ export function StockMovements({
       },
       {
         id: "reason",
-        header: "Reason / source",
+        header: columnHelp(
+          "Reason / source",
+          "Why the weight moved, or the record it came from, such as the purchase it was received against.",
+        ),
         enableSorting: false,
         // A secondary column, hidden below xl - so it keeps a fixed cap rather
         // than a share. Only the always-visible primary column stretches.

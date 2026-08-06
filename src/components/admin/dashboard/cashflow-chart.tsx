@@ -84,7 +84,11 @@ export function CashflowChart({ window }: { window: IReportWindow }) {
   );
 
   return (
-    <WidgetCard title="Cashflow" right={legend}>
+    <WidgetCard
+      title="Cashflow"
+      hint="Money buyers paid you against money you spent buying grain, day by day over the period you picked."
+      right={legend}
+    >
       {isLoading ? (
         <Skeleton className="h-[220px] w-full rounded-[6px]" />
       ) : redacted ? (

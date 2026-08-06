@@ -6,7 +6,7 @@ import { useMoneyVisibility } from "@/hooks/use-money-visibility";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ConsoleDataTable } from "@/components/admin/data-table";
+import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleFilterBar,
   ConsoleDateRange,
@@ -150,7 +150,10 @@ export function PurchasesTable() {
       {
         id: "total",
         accessorFn: (p) => p.totalGhs,
-        header: "Total",
+        header: columnHelp(
+          "Total",
+          "What the whole lot cost you: the weight bought times the price per kg.",
+        ),
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
@@ -170,7 +173,10 @@ export function PurchasesTable() {
       {
         id: "price",
         accessorFn: (p) => p.unitPriceGhs,
-        header: "Price/kg",
+        header: columnHelp(
+          "Price/kg",
+          "What you paid for one kilogram of this commodity on this purchase.",
+        ),
         enableSorting: false,
         meta: columnMeta({ at: "xl" }),
         cell: ({ row }) => (
@@ -248,6 +254,7 @@ export function PurchasesTable() {
             className="lg:w-[150px]"
           />
           <ConsoleLabeledSelect
+            hint="Who the grain came from: an individual farmer, a company, or one of your own agents."
             label="Source"
             value={source}
             onChange={(v) => setFilter("source", v)}

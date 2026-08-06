@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
 import { DateOnlyCell } from "@/components/admin/date-cell";
+import { HelpTip } from "@/components/admin/help-tip";
 import {
   Absent,
   ActiveBadge,
@@ -72,12 +73,22 @@ const accountDelta = (m: IAccountMovement): number | null =>
       : -m.amountGhs;
 
 /** One all-time flow tile (in / out / net), compact like the KPI tiles. */
-function FlowTile({ label, value }: { label: string; value: number | null }) {
+function FlowTile({
+  hint,
+  label,
+  value,
+}: {
+  /** One sentence on what the figure counts, on hover beside the label. */
+  hint?: string;
+  label: string;
+  value: number | null;
+}) {
   const text = formatCedisCompact(value);
   return (
     <AdminCard className="min-w-0 px-3 py-2.5">
-      <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-        {label}
+      <div className="flex min-w-0 items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+        <span className="min-w-0">{label}</span>
+        {hint ? <HelpTip label={`What does ${label} count?`} text={hint} /> : null}
       </div>
       <div className="mt-1">
         <Mono
@@ -266,9 +277,21 @@ export function PaymentAccountDetail({ id }: { id: string }) {
       {/* The account's position: what it has received, what left it, and
           where that nets out - over the WHOLE history, not the page. */}
       <div className="mb-4 grid grid-cols-1 gap-3 min-[420px]:grid-cols-3">
-        <FlowTile label="Money in" value={data.summary.inGhs} />
-        <FlowTile label="Money out" value={data.summary.outGhs} />
-        <FlowTile label="Net" value={data.summary.netGhs} />
+        <FlowTile
+          hint="Everything ever paid into this account, counting all of its history rather than this page."
+          label="Money in"
+          value={data.summary.inGhs}
+        />
+        <FlowTile
+          hint="Everything ever refunded or reversed back out of this account."
+          label="Money out"
+          value={data.summary.outGhs}
+        />
+        <FlowTile
+          hint="What this account has actually taken in: everything in, less everything back out."
+          label="Net"
+          value={data.summary.netGhs}
+        />
       </div>
 
       {/* The facts a caller quotes down the phone. */}

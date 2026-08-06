@@ -10,6 +10,7 @@ import {
   Mono,
   ToneBadge,
 } from "@/components/admin/ui";
+import { HelpTip } from "@/components/admin/help-tip";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { BackButton } from "@/components/ui/BackButton";
 import { DetailSkeleton } from "@/components/admin/skeletons";
@@ -173,8 +174,12 @@ export function RepaymentDetail({ id }: { id: string }) {
         }
         aside={
           <AdminCard className="px-5 py-4">
-            <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-              Value credited
+            <p className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+              <span className="min-w-0">Value credited</span>
+              <HelpTip
+                label="What is Value credited?"
+                text="What this produce was worth when it came in, and so how much it takes off what the farmer owes."
+              />
             </p>
             <p className="font-adminmono mt-1 text-[26px] font-bold text-console tabular-nums">
               <Money value={r.valueGhs} />

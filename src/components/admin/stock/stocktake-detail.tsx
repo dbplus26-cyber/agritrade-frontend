@@ -11,6 +11,7 @@ import {
   Mono,
 } from "@/components/admin/ui";
 import { Absent } from "@/components/admin/registry/registry-bits";
+import { HelpTip } from "@/components/admin/help-tip";
 import { BackButton } from "@/components/ui/BackButton";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -59,9 +60,33 @@ function LinesCard({ lines }: { lines: IStocktakeLine[] }) {
                     this the four columns split evenly and the commodity - the
                     only one that can run long - got a quarter of the table. */}
                 <th className="w-full px-5 py-2.5">Commodity</th>
-                <th className="px-5 py-2.5 text-right whitespace-nowrap">Counted</th>
-                <th className="px-5 py-2.5 text-right whitespace-nowrap">Book</th>
-                <th className="px-5 py-2.5 text-right whitespace-nowrap">Difference</th>
+                <th className="px-5 py-2.5 text-right whitespace-nowrap">
+                  <span className="inline-flex items-center gap-1 align-middle">
+                    Counted
+                    <HelpTip
+                      label="What is the counted weight?"
+                      text="What was physically found on the warehouse floor when the sheet was filled in."
+                    />
+                  </span>
+                </th>
+                <th className="px-5 py-2.5 text-right whitespace-nowrap">
+                  <span className="inline-flex items-center gap-1 align-middle">
+                    Book
+                    <HelpTip
+                      label="What is the book weight?"
+                      text="What the system expected to be there, worked out from every purchase, load and transfer."
+                    />
+                  </span>
+                </th>
+                <th className="px-5 py-2.5 text-right whitespace-nowrap">
+                  <span className="inline-flex items-center gap-1 align-middle">
+                    Difference
+                    <HelpTip
+                      label="What is the difference?"
+                      text="The gap between what was counted and what the books expected; approving the sheet corrects the books by it."
+                    />
+                  </span>
+                </th>
               </tr>
             </thead>
             <tbody>

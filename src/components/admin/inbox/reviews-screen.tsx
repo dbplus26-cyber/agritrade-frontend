@@ -78,10 +78,26 @@ function ReviewStats() {
   const stats = data?.data;
   return (
     <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
-      <InboxStatTile label="Total" value={stats?.total} />
-      <InboxStatTile label="Pending" value={stats?.pending} />
-      <InboxStatTile label="Published" value={stats?.published} />
-      <InboxStatTile label="Rejected" value={stats?.rejected} />
+      <InboxStatTile
+        label="Total"
+        hint="Every review customers have left, whatever you decided about it."
+        value={stats?.total}
+      />
+      <InboxStatTile
+        label="Pending"
+        hint="Reviews waiting on you to decide whether they go on the website."
+        value={stats?.pending}
+      />
+      <InboxStatTile
+        label="Published"
+        hint="Reviews live on the public website for customers to read."
+        value={stats?.published}
+      />
+      <InboxStatTile
+        label="Rejected"
+        hint="Reviews you turned down, kept on file but never shown publicly."
+        value={stats?.rejected}
+      />
     </div>
   );
 }

@@ -17,6 +17,7 @@ import {
   type Tone,
 } from "@/components/admin/ui";
 import { DateTimeCell } from "@/components/admin/date-cell";
+import { HelpTip } from "@/components/admin/help-tip";
 import { BackButton } from "@/components/ui/BackButton";
 import { DetailSkeleton, LedgerSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -152,16 +153,20 @@ function SignedAmount({ amount }: { amount: number | null }) {
 
 /** One line of the float summary: label left, figure hard right. */
 function FigureLine({
+  hint,
   label,
   children,
 }: {
+  /** One sentence on what the figure is, on hover beside the label. */
+  hint?: string;
   label: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="flex items-baseline justify-between gap-3 border-b border-adm-hairline py-1.5 last:border-b-0">
-      <dt className="flex-none text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-        {label}
+      <dt className="flex min-w-0 flex-none items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+        <span className="min-w-0">{label}</span>
+        {hint ? <HelpTip label={`What is ${label}?`} text={hint} /> : null}
       </dt>
       <dd className="font-adminmono text-[12.5px] whitespace-nowrap text-adm-ink tabular-nums">
         {children}
@@ -175,10 +180,25 @@ function LedgerHead({ withBalance }: { withBalance: boolean }) {
   return (
     <div className="grid grid-cols-[24px_minmax(0,1fr)_minmax(124px,max-content)] items-baseline gap-x-3 border-b-[1.5px] border-adm-line pb-1.5 text-[9.5px] font-bold tracking-[0.12em] text-adm-faint uppercase @md/ledger:grid-cols-[24px_minmax(0,1fr)_minmax(124px,max-content)_minmax(124px,max-content)]">
       <span aria-hidden="true" />
-      <span>Entry</span>
+      <span className="inline-flex min-w-0 items-center gap-1">
+        <span className="min-w-0">Entry</span>
+        <HelpTip
+          label="What is an entry?"
+          text="One movement of money in or out of this agent's float: a top-up, a purchase, an expense or a correction."
+        />
+      </span>
       <span className="text-right">Amount</span>
       {withBalance ? (
-        <span className="hidden text-right @md/ledger:block">Balance after</span>
+        <span className="hidden text-right @md/ledger:block">
+          <span className="inline-flex items-center gap-1">
+            <span className="min-w-0">Balance after</span>
+            <HelpTip
+              label="What is the balance after?"
+              text="What the agent was holding once this line had been counted in."
+              side="left"
+            />
+          </span>
+        </span>
       ) : null}
     </div>
   );
@@ -659,8 +679,12 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
         main={
           <AdminCard className="@container/ledger px-5 py-3.5">
             <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-              <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                Float ledger
+              <p className="flex min-w-0 items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+                <span className="min-w-0">Float ledger</span>
+                <HelpTip
+                  label="What is the float ledger?"
+                  text="Every movement in and out of this agent's money, newest first, so a balance can always be traced."
+                />
               </p>
               {totalTx > 0 ? (
                 <Mono className="text-[11px] text-adm-faint">
@@ -732,8 +756,12 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
                   supporting numbers as ruled label/value lines sharing a right
                   edge - previously these were three loose sentences and the
                   eye had to hunt for the money in each one. */}
-              <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                Cash in hand
+              <p className="flex min-w-0 items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+                <span className="min-w-0">Cash in hand</span>
+                <HelpTip
+                  label="What is cash in hand?"
+                  text="What the ledger says this agent still holds of your money, after every top-up and everything they have spent."
+                />
               </p>
               <p
                 className={cn(
@@ -756,7 +784,10 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
                 <FigureLine label="Ledger entries">
                   <Mono>{totalTx}</Mono>
                 </FigureLine>
-                <FigureLine label="Last counted">
+                <FigureLine
+                  hint="The cash actually counted in front of you at the most recent sit-down count."
+                  label="Last counted"
+                >
                   {agent.lastReconciliation ? (
                     <Mono>
                       {formatCedis(agent.lastReconciliation.countedGhs)}
@@ -775,8 +806,12 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
 
             {(recons.data?.data.length ?? 0) > 0 ? (
               <AdminCard className="px-5 py-3">
-                <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                  Reconciliations
+                <p className="mb-1 flex min-w-0 items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+                  <span className="min-w-0">Reconciliations</span>
+                  <HelpTip
+                    label="What is a reconciliation?"
+                    text="A sit-down cash count: what the books expected against what was actually in the agent's hand."
+                  />
                 </p>
                 {(recons.data?.data ?? []).map((r) => (
                   <div

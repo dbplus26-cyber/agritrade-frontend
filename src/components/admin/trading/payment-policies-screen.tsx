@@ -13,6 +13,7 @@ import {
   adminInputClass,
   adminSelectClass,
 } from "@/components/admin/ui";
+import { HelpTip } from "@/components/admin/help-tip";
 import { CardGridSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -162,8 +163,12 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
           </AdminField>
 
           <div className="flex flex-col gap-2">
-            <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-              Milestones
+            <span className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+              <span className="min-w-0">Milestones</span>
+              <HelpTip
+                label="What is a milestone?"
+                text="One stage of paying: a share of the price, and the moment the buyer has to hand it over."
+              />
             </span>
             {fields.map((field, i) => (
               <div

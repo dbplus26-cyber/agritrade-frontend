@@ -60,14 +60,17 @@ const LIST = "/admin/land-sales";
 function Row({
   label,
   children,
+  hint,
   strong = false,
 }: {
   children: React.ReactNode;
+  /** One sentence on what the figure IS, on hover beside its label. */
+  hint?: string;
   label: string;
   strong?: boolean;
 }) {
   return (
-    <DetailRow label={label} mono strong={strong}>
+    <DetailRow hint={hint} label={label} mono strong={strong}>
       {children}
     </DetailRow>
   );
@@ -398,11 +401,18 @@ export function LandSaleDetail({ id }: { id: string }) {
             {/* Which plot, to whom - what the heading used to carry. */}
             <Row label="Plot">{s.plot.reference}</Row>
             <Row label="Buyer">{s.buyer.name}</Row>
-            <Row label="Agreed price" strong>
+            <Row
+              hint="The price the buyer agreed to pay for this plot, before anything is paid."
+              label="Agreed price"
+              strong
+            >
               <Money value={s.agreedPriceGhs} />
             </Row>
             <div className="border-t border-adm-hairline">
-              <Row label="Paid">
+              <Row
+                hint="Everything the buyer has handed over on this plot so far."
+                label="Paid"
+              >
                 <Money value={s.paidGhs} />
               </Row>
             </div>
@@ -411,7 +421,11 @@ export function LandSaleDetail({ id }: { id: string }) {
                 reads as an unresolved debt and would be chased as one. */}
             {s.status === "CANCELLED" ? (
               <div className="border-t border-adm-hairline">
-                <Row label="Deposit kept" strong>
+                <Row
+                  hint="What the business keeps out of the deposit now that the sale is off."
+                  label="Deposit kept"
+                  strong
+                >
                   {s.forfeitedGhs === null ? (
                     <span className="text-adm-muted">Refunded in full</span>
                   ) : (
@@ -423,7 +437,11 @@ export function LandSaleDetail({ id }: { id: string }) {
               </div>
             ) : (
               <div className="border-t border-adm-hairline">
-                <Row label="Balance" strong>
+                <Row
+                  hint="What the buyer still owes: the agreed price less everything paid."
+                  label="Balance"
+                  strong
+                >
                   <span
                     className={cn(
                       s.balanceGhs === 0 ? "text-console" : "text-console-red",
@@ -439,7 +457,10 @@ export function LandSaleDetail({ id }: { id: string }) {
               </div>
             )}
             <div className="border-t border-adm-hairline">
-              <Row label="Margin">
+              <Row
+                hint="What the business makes on this plot: the agreed price less what the land cost you."
+                label="Margin"
+              >
                 <Money value={s.marginGhs} />
               </Row>
             </div>

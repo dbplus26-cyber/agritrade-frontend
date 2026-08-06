@@ -14,6 +14,7 @@ import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
+import { HelpTip } from "@/components/admin/help-tip";
 import { AdminPageHeader } from "@/components/admin/ui";
 import { ListPagination } from "@/components/ui/ListPagination";
 import {
@@ -323,7 +324,12 @@ export function ApprovalsScreen() {
       },
       {
         id: "amount",
-        header: () => "Amount",
+        header: () => (
+          <QueueHeading
+            label="Amount"
+            text="The figure that tripped the rule: money for a purchase or grant, weight for a stock change."
+          />
+        ),
         cell: ({ row }) => (
           <>
             <span className="block font-adminmono text-[15px] leading-[1.3] font-semibold tracking-[-0.01em] tabular-nums text-[var(--ap-ink)] [overflow-wrap:anywhere]">
@@ -356,7 +362,12 @@ export function ApprovalsScreen() {
       },
       {
         id: "rule",
-        header: () => "Rule",
+        header: () => (
+          <QueueHeading
+            label="Rule"
+            text="Which limit was crossed, and therefore why this needs a decision at all."
+          />
+        ),
         cell: ({ row }) => <RuleBadge action={row.original.action} />,
       },
       {
@@ -375,7 +386,12 @@ export function ApprovalsScreen() {
       },
       {
         id: "decision",
-        header: () => "Decision",
+        header: () => (
+          <QueueHeading
+            label="Decision"
+            text="Approving applies the change straight away; rejecting leaves the record exactly as it is."
+          />
+        ),
         cell: ({ row }) => (
           <DecisionCell
             approval={row.original}
@@ -566,6 +582,23 @@ const ghostBarButton =
   "cursor-pointer rounded-[6px] border border-white/35 bg-transparent px-3 py-[5px] text-[12.5px] leading-[1.4] font-[550] text-white " +
   "hover:bg-white/12 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white " +
   "disabled:cursor-not-allowed disabled:opacity-50";
+
+/**
+ * A queue column heading with its explanation attached.
+ *
+ * The header row is the one part of this grid with normal pointer events: the
+ * ROWS sit on `pointer-events: none` so a click anywhere on them reaches the
+ * expand button underneath, which would swallow a tooltip trigger whole. So
+ * the column heading is where a rule gets explained, not the chip in the row.
+ */
+function QueueHeading({ label, text }: { label: string; text: string }) {
+  return (
+    <span className="inline-flex items-center gap-1">
+      {label}
+      <HelpTip label={`What does the ${label} column show?`} text={text} />
+    </span>
+  );
+}
 
 /** What this approval is, in one phrase, for dialogs and aria labels. */
 function describe(approval: IApproval): string {

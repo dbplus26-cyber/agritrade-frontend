@@ -85,7 +85,11 @@ export function VolumeChart({ window }: { window: IReportWindow }) {
   );
 
   return (
-    <WidgetCard title="Volume bought (t)" right={hasVolume ? legend : undefined}>
+    <WidgetCard
+      title="Volume bought (t)"
+      hint="How much you bought in the period you picked, in tonnes, split by commodity."
+      right={hasVolume ? legend : undefined}
+    >
       {isLoading ? (
         <Skeleton className="h-[220px] w-full rounded-[6px]" />
       ) : !hasVolume ? (

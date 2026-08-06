@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ConsoleDataTable } from "@/components/admin/data-table";
+import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
@@ -128,7 +128,10 @@ export function CommodityTable() {
       {
         id: "grade",
         accessorFn: (c) => c.qualityGrade ?? "",
-        header: "Grade",
+        header: columnHelp(
+          "Grade",
+          "The quality this crop is bought and sold at, in the words buyers use for it.",
+        ),
         enableSorting: false,
         meta: columnMeta({ at: "xl" }),
         cell: ({ row }) =>
@@ -143,7 +146,10 @@ export function CommodityTable() {
       {
         id: "bagWeight",
         accessorFn: (c) => c.bagWeightKg ?? "",
-        header: "Bag",
+        header: columnHelp(
+          "Bag",
+          "What one standard bag of this crop weighs, so bags can be turned into kilograms.",
+        ),
         enableSorting: false,
         meta: columnMeta({ at: "xl" }),
         cell: ({ row }) =>

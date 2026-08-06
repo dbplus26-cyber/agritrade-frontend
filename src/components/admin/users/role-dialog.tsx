@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { HelpTip } from "@/components/admin/help-tip";
 import { AdminButton, adminSelectClass } from "@/components/admin/ui";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useChangeUserRoleMutation } from "@/redux/users/users-api";
@@ -85,8 +86,12 @@ export function RoleChangeDialog({
         </ResponsiveDialogHeader>
 
         <div className="grid gap-1 py-1">
-          <span className="text-[10.5px] font-bold uppercase tracking-[0.08em] text-adm-faint">
-            Access level
+          <span className="flex items-center gap-1 text-[10.5px] font-bold uppercase tracking-[0.08em] text-adm-faint">
+            <span className="min-w-0">Access level</span>
+            <HelpTip
+              label="What is access level?"
+              text="What this person may see and do: a field agent sees only their own work, a super admin sees everything."
+            />
           </span>
           <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
             <SelectTrigger className={cn(adminSelectClass, "w-full")}>

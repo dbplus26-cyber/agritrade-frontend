@@ -14,6 +14,7 @@ import {
   ToneBadge,
   adminInputClass,
 } from "@/components/admin/ui";
+import { HelpTip } from "@/components/admin/help-tip";
 import { BackButton } from "@/components/ui/BackButton";
 import { DateOnlyCell } from "@/components/admin/date-cell";
 import { DetailSkeleton } from "@/components/admin/skeletons";
@@ -57,17 +58,21 @@ const LIST = "/admin/sales";
 
 function SummaryRow({
   label,
+  hint,
   children,
   strong = false,
 }: {
   label: string;
+  /** One sentence on what this figure is, shown on hover beside the label. */
+  hint?: string;
   children: React.ReactNode;
   strong?: boolean;
 }) {
   return (
     <div className="flex items-baseline justify-between gap-3 py-2">
-      <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-        {label}
+      <span className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+        <span className="min-w-0">{label}</span>
+        {hint ? <HelpTip label={`What is ${label}?`} text={hint} /> : null}
       </span>
       <span
         className={cn(
@@ -290,16 +295,27 @@ export function SaleDetail({
         {/* Which buyer. The heading names the page, so the record has to
             name the counterparty. */}
         <SummaryRow label="Buyer">{sale.buyer.name}</SummaryRow>
-        <SummaryRow label="Agreed total" strong>
+        <SummaryRow
+          label="Agreed total"
+          hint="The full price the buyer agreed to pay for everything on this order."
+          strong
+        >
           <Money value={sale.agreedTotalGhs} />
         </SummaryRow>
         <div className="border-t border-adm-hairline">
-          <SummaryRow label="Paid">
+          <SummaryRow
+            label="Paid"
+            hint="Everything the buyer has actually handed over so far on this order."
+          >
             <Money value={sale.paidGhs} />
           </SummaryRow>
         </div>
         <div className="border-t border-adm-hairline">
-          <SummaryRow label="Balance" strong>
+          <SummaryRow
+            label="Balance"
+            hint="What the buyer still owes you: the agreed total less everything paid."
+            strong
+          >
             <span
               className={cn(
                 sale.balanceGhs === 0 ? "text-console" : "text-console-red",
@@ -351,8 +367,12 @@ export function SaleDetail({
       {/* Milestone schedule (once confirmed) */}
       {sale.milestones.length > 0 ? (
         <AdminCard className="px-5 py-3">
-          <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-            Payment schedule
+          <div className="mb-1 flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+            <span className="min-w-0">Payment schedule</span>
+            <HelpTip
+              label="What is the payment schedule?"
+              text="The milestones this buyer pays in: how much is due at each stage, and what triggers it."
+            />
           </div>
           {sale.milestones.map((m, i) => (
             <div
@@ -373,8 +393,12 @@ export function SaleDetail({
           {/* The gate that decides whether this sale may board a truck - the
               computed figure, so nobody works it out in their head. */}
           <div className="mt-2 flex flex-wrap items-baseline justify-between gap-2 border-t-[1.5px] border-adm-line pt-2">
-            <span className="text-[12px] font-semibold text-adm-ink">
-              Required before loading
+            <span className="flex items-center gap-1 text-[12px] font-semibold text-adm-ink">
+              <span className="min-w-0">Required before loading</span>
+              <HelpTip
+                label="What is required before loading?"
+                text="How much this buyer must have paid before a truck may be loaded for them."
+              />
             </span>
             <span className="flex items-baseline gap-2">
               <Mono className="text-[13px] text-adm-ink">

@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ConsoleDataTable } from "@/components/admin/data-table";
+import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleDateField,
   ConsoleFilterBar,
@@ -99,7 +99,10 @@ export function LandSalesRegister() {
       },
       {
         id: "agreed",
-        header: "Agreed",
+        header: columnHelp(
+          "Agreed",
+          "The price the buyer agreed to pay for the plot, before anything was paid.",
+        ),
         enableSorting: false,
         meta: columnMeta({ at: "xl" }),
         cell: ({ row }) => (
@@ -110,7 +113,10 @@ export function LandSalesRegister() {
       },
       {
         id: "balance",
-        header: "Balance",
+        header: columnHelp(
+          "Balance",
+          "What the buyer still owes you on this plot after the payments made so far.",
+        ),
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => {

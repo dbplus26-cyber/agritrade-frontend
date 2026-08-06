@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ConsoleDataTable } from "@/components/admin/data-table";
+import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
@@ -81,7 +81,10 @@ export function InputItemsRegister() {
       },
       {
         id: "unit",
-        header: "Unit",
+        header: columnHelp(
+          "Unit",
+          "How this item is handed out and counted: a bag, a litre, a piece.",
+        ),
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (

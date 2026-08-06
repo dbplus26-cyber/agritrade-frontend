@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ConsoleDataTable } from "@/components/admin/data-table";
+import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleDateRange,
   ConsoleFilterBar,
@@ -257,7 +257,10 @@ export function SupplierTable() {
       {
         id: "source",
         accessorFn: (s) => SOURCE_LABEL[s.sourceType],
-        header: "Source",
+        header: columnHelp(
+          "Source",
+          "What kind of seller this is: an individual farmer, a company, or one of your own agents.",
+        ),
         enableSorting: false,
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
@@ -310,6 +313,7 @@ export function SupplierTable() {
           }
         >
           <ConsoleLabeledSelect
+            hint="What kind of seller to show: individual farmers, companies, or your own agents."
             label="Source"
             value={sourceFilter}
             onChange={(v) => setFilter("source", v)}

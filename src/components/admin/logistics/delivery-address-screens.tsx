@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ConsoleDataTable } from "@/components/admin/data-table";
+import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleDateRange,
   ConsoleFilterBar,
@@ -149,7 +149,10 @@ export function DeliveryAddressTable() {
       {
         id: "shop",
         accessorFn: (a) => a.shopName ?? "",
-        header: "Shop",
+        header: columnHelp(
+          "Shop",
+          "The name of the business at this drop-off point, for a driver asking directions.",
+        ),
         enableSorting: false,
         meta: columnMeta({ at: "xl" }),
         cell: ({ row }) =>

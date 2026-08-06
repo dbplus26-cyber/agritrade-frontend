@@ -17,6 +17,7 @@ import {
   Mono,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
+import { HelpTip } from "@/components/admin/help-tip";
 import { BackButton } from "@/components/ui/BackButton";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -449,8 +450,12 @@ export function PurchaseDetail({ id }: { id: string }) {
         main={
           <div className="flex flex-col gap-4">
             <AdminCard className="px-5 py-3">
-              <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                Weights & variance
+              <p className="mb-1 flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+                <span className="min-w-0">Weights &amp; variance</span>
+                <HelpTip
+                  label="What is weight variance?"
+                  text="Variance is the gap between the weight written down at the village and the weight the warehouse scale gave."
+                />
               </p>
               <DetailGrid>
                 {/* What was bought - the heading names the page now. */}
@@ -558,8 +563,12 @@ export function PurchaseDetail({ id }: { id: string }) {
         aside={
           <div className="flex flex-col gap-4">
             <AdminCard className="px-5 py-4">
-              <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                Purchase total
+              <p className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+                <span className="min-w-0">Purchase total</span>
+                <HelpTip
+                  label="What is the purchase total?"
+                  text="What this whole load cost you: the weight bought times the price per kg."
+                />
               </p>
               <p className="font-adminmono mt-1 text-[26px] font-bold text-adm-ink tabular-nums">
                 {formatCedis(p.totalGhs)}

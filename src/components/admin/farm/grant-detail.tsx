@@ -8,6 +8,7 @@ import {
   DetailItem,
   DetailShell,
 } from "@/components/admin/ui";
+import { HelpTip } from "@/components/admin/help-tip";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { BackButton } from "@/components/ui/BackButton";
 import { DetailSkeleton } from "@/components/admin/skeletons";
@@ -166,8 +167,12 @@ export function GrantDetail({ id }: { id: string }) {
           <div className="flex flex-col gap-4">
             {/* Grant value */}
             <AdminCard className="px-5 py-4">
-              <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                Grant value
+              <p className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+                <span className="min-w-0">Grant value</span>
+                <HelpTip
+                  label="What is Grant value?"
+                  text="What the inputs handed to this farmer were worth, and so what they owe back on it."
+                />
               </p>
               <p className="font-adminmono mt-1 text-[26px] font-bold text-adm-ink tabular-nums">
                 <Money value={g.valueGhs} />
@@ -186,15 +191,28 @@ export function GrantDetail({ id }: { id: string }) {
                 {g.farmer.name}&apos;s running balance for {g.season.name}.
               </p>
               <DetailGrid columns={2}>
-                <DetailItem label="Invested" mono>
+                <DetailItem
+                  hint="What the seed, fertiliser and tools this farmer took this season were worth."
+                  label="Invested"
+                  mono
+                >
                   <Money value={g.seasonBalance.investedGhs} />
                 </DetailItem>
-                <DetailItem label="Recovered" mono>
+                <DetailItem
+                  hint="What this farmer has paid back so far, in produce or in cash."
+                  label="Recovered"
+                  mono
+                >
                   <span className="text-console">
                     <Money value={g.seasonBalance.recoveredGhs} />
                   </span>
                 </DetailItem>
-                <DetailItem label="Outstanding" mono strong>
+                <DetailItem
+                  hint="What this farmer still owes: what they took, less what they have paid back."
+                  label="Outstanding"
+                  mono
+                  strong
+                >
                   <Money value={g.seasonBalance.outstandingGhs} />
                 </DetailItem>
               </DetailGrid>

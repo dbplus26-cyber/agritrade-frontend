@@ -62,14 +62,17 @@ const LIST = "/admin/land-acquisitions";
 function Row({
   label,
   children,
+  hint,
   strong = false,
 }: {
   children: React.ReactNode;
+  /** One sentence on what the figure IS, on hover beside its label. */
+  hint?: string;
   label: string;
   strong?: boolean;
 }) {
   return (
-    <DetailRow label={label} mono strong={strong}>
+    <DetailRow hint={hint} label={label} mono strong={strong}>
       {children}
     </DetailRow>
   );
@@ -432,16 +435,27 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
             {/* Which plot, from whom - what the heading used to carry. */}
             <Row label="Reference">{a.reference}</Row>
             <Row label="Seller">{a.seller.name}</Row>
-            <Row label="Agreed cost" strong>
+            <Row
+              hint="What you agreed to pay the seller for this land, before anything is paid."
+              label="Agreed cost"
+              strong
+            >
               <Money value={a.agreedCostGhs} />
             </Row>
             <div className="border-t border-adm-hairline">
-              <Row label="Paid to seller">
+              <Row
+                hint="Everything handed to the seller against this land so far."
+                label="Paid to seller"
+              >
                 <Money value={a.paidGhs} />
               </Row>
             </div>
             <div className="border-t border-adm-hairline">
-              <Row label="Balance owed" strong>
+              <Row
+                hint="What you still owe the seller: the agreed cost less everything paid."
+                label="Balance owed"
+                strong
+              >
                 <span
                   className={cn(
                     a.balanceGhs === 0 ? "text-console" : "text-console-red",

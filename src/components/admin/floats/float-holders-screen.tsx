@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ConsoleDataTable } from "@/components/admin/data-table";
+import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {
   Money,
   useIdempotencyKey,
@@ -140,7 +140,10 @@ export function FloatHoldersScreen() {
         id: "float",
         accessorFn: (h) =>
           !h.accountId ? "Not funded yet" : h.accountActive ? "Active" : "Suspended",
-        header: "Float",
+        header: columnHelp(
+          "Float",
+          "Whether this person has been given company money to spend, and whether they can still spend it.",
+        ),
         enableSorting: false,
         meta: columnMeta({ at: "md" }),
         cell: ({ row }) => <HolderState holder={row.original} />,
@@ -153,7 +156,10 @@ export function FloatHoldersScreen() {
       base.push({
         id: "balance",
         accessorFn: (h) => h.balanceGhs ?? 0,
-        header: "Balance",
+        header: columnHelp(
+          "Balance",
+          "What is left of the money handed to this person, after everything they have spent or sent.",
+        ),
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
@@ -215,6 +221,7 @@ export function FloatHoldersScreen() {
         />
         <ConsoleLabeledSelect
           active={filters.funded !== "all"}
+          hint="Narrows to the people actually holding company money right now, or those holding none."
           label="Funded"
           onChange={(v) => setFilter("funded", v)}
           options={FUNDED_FILTER_OPTIONS}

@@ -197,7 +197,11 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
                 {...register("quantity")}
               />
             </AdminField>
-            <AdminField label="Value (GHS)" error={errors.valueGhs?.message}>
+            <AdminField
+              error={errors.valueGhs?.message}
+              hint="What these inputs are worth in cash, which is what the farmer owes back."
+              label="Value (GHS)"
+            >
               <Input
                 inputMode="decimal"
                 className={cn(adminInputClass, errors.valueGhs && "border-console-red")}
@@ -237,7 +241,12 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
             />
           </AdminField>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <AdminField label="Due date" optional error={errors.dueDate?.message}>
+            <AdminField
+              error={errors.dueDate?.message}
+              hint="The day the farmer is meant to have paid this back by, in produce or cash."
+              label="Due date"
+              optional
+            >
               <Input
                 type="date"
                 className={cn(adminInputClass, errors.dueDate && "border-console-red")}

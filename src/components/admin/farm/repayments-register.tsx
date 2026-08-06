@@ -4,12 +4,13 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ConsoleDataTable } from "@/components/admin/data-table";
+import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleDateRange,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
+import { HelpWrap } from "@/components/admin/help-tip";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { TextCell, TitleCell } from "@/components/admin/table-cells";
 import { AdminCard, Mono, ToneBadge } from "@/components/admin/ui";
@@ -114,7 +115,10 @@ export function RepaymentsRegister() {
       },
       {
         id: "value",
-        header: "Value",
+        header: columnHelp(
+          "Value",
+          "What this produce was credited at, which is how much it takes off what the farmer owes.",
+        ),
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
@@ -125,7 +129,10 @@ export function RepaymentsRegister() {
       },
       {
         id: "received",
-        header: "Received",
+        header: columnHelp(
+          "Received",
+          "The day the produce actually came in, not the day it was typed in here.",
+        ),
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => <DateTimeCell value={row.original.receivedAt} />,
@@ -146,7 +153,9 @@ export function RepaymentsRegister() {
         meta: columnMeta(),
         cell: ({ row }) =>
           row.original.intoStock ? (
-            <ToneBadge tone="sky">Into stock</ToneBadge>
+            <HelpWrap text="This produce was added to warehouse stock, not just credited against the grant.">
+              <ToneBadge tone="sky">Into stock</ToneBadge>
+            </HelpWrap>
           ) : null,
       },
     ],

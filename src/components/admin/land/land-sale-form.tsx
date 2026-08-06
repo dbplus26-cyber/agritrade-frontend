@@ -126,7 +126,11 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
               )}
             />
           </AdminField>
-          <AdminField label="Agreed price (GHS)" error={errors.agreedPriceGhs?.message}>
+          <AdminField
+            error={errors.agreedPriceGhs?.message}
+            hint="The whole price the buyer is taking the plot at, before any deposit."
+            label="Agreed price (GHS)"
+          >
             <Input
               inputMode="decimal"
               className={cn(adminInputClass, errors.agreedPriceGhs && "border-console-red")}

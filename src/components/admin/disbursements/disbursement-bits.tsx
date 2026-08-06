@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
+import { HelpWrap } from "@/components/admin/help-tip";
 import { AdminCard, ToneBadge, type Tone } from "@/components/admin/ui";
 import { formatCedis } from "@/lib/format-money";
 import { cn } from "@/lib/utils";
@@ -38,6 +39,23 @@ const STATUS_LABEL: Record<DisbursementStatus, string> = {
   SUCCESS: "Sent",
 };
 
+/**
+ * The same honesty as the labels, spelled out: a reader who sees "With Hubtel"
+ * needs to know it is not yet proof the money moved.
+ */
+const STATUS_HELP: Record<DisbursementStatus, string> = {
+  FAILED: "The payment did not go through, so no money left the account.",
+  PENDING:
+    "Nobody has confirmed yet whether this money left the account: do not send it again until you know.",
+  SUBMITTED:
+    "The payment provider has taken the request but has not confirmed the money moved.",
+  SUCCESS: "Confirmed: the money reached the person it was sent to.",
+};
+
+/** The one state a person has to do something about. */
+const NEEDS_CHECKING_HELP =
+  "This payment has been unclear for too long: check with the provider before sending it again.";
+
 export function DisbursementStatusBadge({
   needsAttention,
   status,
@@ -48,9 +66,17 @@ export function DisbursementStatusBadge({
   // Needing a human outranks the underlying status in the list: it is the one
   // state somebody has to act on.
   if (needsAttention) {
-    return <ToneBadge tone="alert">Needs checking</ToneBadge>;
+    return (
+      <HelpWrap text={NEEDS_CHECKING_HELP}>
+        <ToneBadge tone="alert">Needs checking</ToneBadge>
+      </HelpWrap>
+    );
   }
-  return <ToneBadge tone={STATUS_TONE[status]}>{STATUS_LABEL[status]}</ToneBadge>;
+  return (
+    <HelpWrap text={STATUS_HELP[status]}>
+      <ToneBadge tone={STATUS_TONE[status]}>{STATUS_LABEL[status]}</ToneBadge>
+    </HelpWrap>
+  );
 }
 
 const TRANSFER_TONE: Record<BalanceTransferStatus, Tone> = {
@@ -67,6 +93,15 @@ const TRANSFER_LABEL: Record<BalanceTransferStatus, string> = {
   SUCCESS: "Moved",
 };
 
+const TRANSFER_HELP: Record<BalanceTransferStatus, string> = {
+  FAILED: "The move did not go through, so both balances are unchanged.",
+  PENDING:
+    "Nobody has confirmed yet whether this money moved between your accounts.",
+  SUBMITTED:
+    "The payment provider has taken the request but has not confirmed the move.",
+  SUCCESS: "Confirmed: the money is now in the account you moved it to.",
+};
+
 export function TransferStatusBadge({
   needsAttention,
   status,
@@ -75,10 +110,18 @@ export function TransferStatusBadge({
   status: BalanceTransferStatus;
 }) {
   if (needsAttention) {
-    return <ToneBadge tone="alert">Needs checking</ToneBadge>;
+    return (
+      <HelpWrap text={NEEDS_CHECKING_HELP}>
+        <ToneBadge tone="alert">Needs checking</ToneBadge>
+      </HelpWrap>
+    );
   }
   return (
-    <ToneBadge tone={TRANSFER_TONE[status]}>{TRANSFER_LABEL[status]}</ToneBadge>
+    <HelpWrap text={TRANSFER_HELP[status]}>
+      <ToneBadge tone={TRANSFER_TONE[status]}>
+        {TRANSFER_LABEL[status]}
+      </ToneBadge>
+    </HelpWrap>
   );
 }
 

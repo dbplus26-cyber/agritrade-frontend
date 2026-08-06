@@ -1,5 +1,6 @@
 "use client";
 
+import { HelpWrap } from "@/components/admin/help-tip";
 import { ToneBadge, type Tone } from "@/components/admin/ui";
 import { formatDateTime } from "@/lib/format-date";
 import {
@@ -21,9 +22,25 @@ const SALE_STATUS: Record<SaleStatus, { label: string; tone: Tone }> = {
   FULFILLED: { label: "Fulfilled", tone: "leaf" },
 };
 
+/** What each state means for the order, and what has to happen next. */
+const SALE_STATUS_HELP: Record<SaleStatus, string> = {
+  CANCELLED:
+    "Called off, so it no longer counts towards sales or money owed to you.",
+  COMPLETED: "Delivered and paid in full, so nothing is left to do on it.",
+  CONFIRMED:
+    "Agreed with the buyer: payment terms now apply and it can be loaded.",
+  DRAFT: "Still being put together, so the buyer owes nothing on it yet.",
+  FULFILLED:
+    "Everything ordered has gone out; only payment may still be outstanding.",
+};
+
 export function SaleStatusBadge({ status }: { status: SaleStatus }) {
   const s = SALE_STATUS[status];
-  return <ToneBadge tone={s.tone}>{s.label}</ToneBadge>;
+  return (
+    <HelpWrap text={SALE_STATUS_HELP[status]}>
+      <ToneBadge tone={s.tone}>{s.label}</ToneBadge>
+    </HelpWrap>
+  );
 }
 
 export const SALE_STATUS_FILTER_OPTIONS = [

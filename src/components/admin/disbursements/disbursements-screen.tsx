@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { ConsoleDataTable } from "@/components/admin/data-table";
+import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import {
   ConsoleFilterBar,
@@ -99,7 +99,10 @@ export function DisbursementsScreen() {
       {
         id: "reference",
         accessorFn: (d) => d.transactionNo,
-        header: "Reference",
+        header: columnHelp(
+          "Reference",
+          "The number Hubtel gives this payout, so you can trace it with them.",
+        ),
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => <Mono>{row.original.transactionNo}</Mono>,
@@ -127,7 +130,10 @@ export function DisbursementsScreen() {
       {
         id: "rail",
         accessorFn: (d) => RAIL_LABEL[d.rail],
-        header: "Rail",
+        header: columnHelp(
+          "Rail",
+          "How the money travelled: mobile money to a phone number, or a transfer to a bank account.",
+        ),
         enableSorting: false,
         meta: columnMeta({ wide: true }),
       },
@@ -144,7 +150,10 @@ export function DisbursementsScreen() {
         // Null means the owner sent it straight from the company account
         // rather than out of anybody's allocation.
         accessorFn: (d) => d.holder?.name ?? "Company account",
-        header: "Paid from",
+        header: columnHelp(
+          "Paid from",
+          "Whose money this came out of: one person's float, or the company account directly.",
+        ),
         enableSorting: false,
         meta: columnMeta({ wide: true }),
       },
@@ -225,6 +234,7 @@ export function DisbursementsScreen() {
             />
             <ConsoleLabeledSelect
               active={filters.rail !== "all"}
+              hint="How the money travelled: mobile money to a phone, or a transfer to a bank account."
               label="Rail"
               onChange={(v) => setFilter("rail", v)}
               options={RAIL_FILTER_OPTIONS}
@@ -232,6 +242,7 @@ export function DisbursementsScreen() {
             />
             <ConsoleLabeledSelect
               active={filters.attention !== "all"}
+              hint="Narrows to payments nobody has confirmed either way, which are the ones to chase."
               label="Attention"
               onChange={(v) => setFilter("attention", v)}
               options={ATTENTION_FILTER_OPTIONS}

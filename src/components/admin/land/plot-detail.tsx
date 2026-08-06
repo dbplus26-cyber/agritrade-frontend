@@ -205,17 +205,33 @@ export function PlotDetail({ id }: { id: string }) {
           {p.reference}
         </DetailItem>
         <DetailItem label="Size">{p.sizeText}</DetailItem>
-        <DetailItem label="Asking price" mono strong>
+        <DetailItem
+          hint="What you are offering this plot for, before any haggling with a buyer."
+          label="Asking price"
+          mono
+          strong
+        >
           <Money value={p.askingPriceGhs} />
         </DetailItem>
-        <DetailItem label="Purchase cost" mono>
+        <DetailItem
+          hint="What this plot cost you to buy from its seller."
+          label="Purchase cost"
+          mono
+        >
           <Money value={p.purchaseCostGhs} />
         </DetailItem>
-        <DetailItem label="Margin" mono>
+        <DetailItem
+          hint="What you would make at the asking price: that price less what the land cost you."
+          label="Margin"
+          mono
+        >
           <Money value={p.marginGhs} />
         </DetailItem>
         {p.use ? <DetailItem label="Use">{p.use}</DetailItem> : null}
-        <DetailItem label="Price on site">
+        <DetailItem
+          hint="Whether the public website shows this plot\u2019s price, or only that it is for sale."
+          label="Price on site"
+        >
           {p.showPriceOnWebsite ? "Shown" : "Hidden"}
         </DetailItem>
       </DetailGrid>

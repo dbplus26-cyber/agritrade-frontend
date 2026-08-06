@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { HelpWrap } from "@/components/admin/help-tip";
 import { ToneBadge } from "@/components/admin/ui";
 import { PurchaseSource } from "@/types/registry.types";
 
@@ -16,17 +17,25 @@ export const SOURCE_LABEL: Record<PurchaseSource, string> = {
 
 export function ActiveBadge({ isActive }: { isActive: boolean }) {
   return isActive ? (
-    <ToneBadge tone="leaf">Active</ToneBadge>
+    <HelpWrap text="In use, so it still appears wherever this is chosen.">
+      <ToneBadge tone="leaf">Active</ToneBadge>
+    </HelpWrap>
   ) : (
-    <ToneBadge tone="slate">Inactive</ToneBadge>
+    <HelpWrap text="Kept for old records but no longer offered when creating new ones.">
+      <ToneBadge tone="slate">Inactive</ToneBadge>
+    </HelpWrap>
   );
 }
 
 export function PublishedBadge({ published }: { published: boolean }) {
   return published ? (
-    <ToneBadge tone="harvest">On website</ToneBadge>
+    <HelpWrap text="Showing on the public website, where customers can see it.">
+      <ToneBadge tone="harvest">On website</ToneBadge>
+    </HelpWrap>
   ) : (
-    <ToneBadge tone="slate">Not published</ToneBadge>
+    <HelpWrap text="Held back from the public website; only this console shows it.">
+      <ToneBadge tone="slate">Not published</ToneBadge>
+    </HelpWrap>
   );
 }
 
