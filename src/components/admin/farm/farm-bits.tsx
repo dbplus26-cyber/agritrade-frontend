@@ -94,9 +94,12 @@ export function FarmDocumentsSection({
   const onRemoveClick = async (doc: IGrantDocument) => {
     const ok = await confirm({
       title: "Remove this document?",
-      description: `"${doc.name}" will no longer be downloadable from this record.`,
+      description: `"${doc.name}" will no longer be downloadable from this record. Type the document's name to confirm.`,
       confirmText: "Remove",
       isDestructive: true,
+      // A signed agreement is evidence. Typing its name is the difference
+      // between deciding to delete it and mis-clicking an X beside it.
+      requireExactMatch: doc.name,
     });
     if (!ok) return;
     try {
@@ -135,7 +138,7 @@ export function FarmDocumentsSection({
               <button
                 type="button"
                 onClick={() => void onRemoveClick(doc)}
-                className="text-[12px] text-console-red"
+                className="cursor-pointer text-[12px] text-console-red"
                 aria-label={`Remove ${doc.name}`}
               >
                 ✕

@@ -71,6 +71,40 @@ export function PlotDetail({ id }: { id: string }) {
     }
   };
 
+  // An ownership document is the paper behind the plot, so removing one is
+  // gated on typing its name. The X sits beside a download link and used to
+  // delete the file on a single click with nothing asked.
+  const onRemoveDocument = async (doc: { id: string; name: string }) => {
+    const ok = await confirm({
+      title: "Remove this document?",
+      description: `"${doc.name}" will no longer be downloadable from this plot's file. Type the document's name to confirm.`,
+      confirmText: "Remove",
+      isDestructive: true,
+      requireExactMatch: doc.name,
+    });
+    if (!ok) return;
+    await run(
+      () => removeDoc({ documentId: doc.id, id: p.id }).unwrap(),
+      "Document removed",
+    );
+  };
+
+  // A photo is replaceable and has no name to type, so it asks rather than
+  // demands - but it still asks.
+  const onRemovePhoto = async (photoId: string) => {
+    const ok = await confirm({
+      title: "Remove this photograph?",
+      description: "It comes off the plot's page on the public site as well.",
+      confirmText: "Remove",
+      isDestructive: true,
+    });
+    if (!ok) return;
+    await run(
+      () => removePhoto({ id: p.id, photoId }).unwrap(),
+      "Photo removed",
+    );
+  };
+
   const onPublish = async () => {
     try {
       await requestPublish(p.id).unwrap();
@@ -148,13 +182,9 @@ export function PlotDetail({ id }: { id: string }) {
       </a>
       <button
         type="button"
-        onClick={() =>
-          void run(
-            () => removePhoto({ id: p.id, photoId: ph.id }).unwrap(),
-            "Photo removed",
-          )
-        }
-        className="absolute right-1 top-1 rounded bg-black/60 px-1.5 text-[11px] text-white"
+        aria-label="Remove photo"
+        onClick={() => void onRemovePhoto(ph.id)}
+        className="absolute right-1 top-1 cursor-pointer rounded bg-black/60 px-1.5 text-[11px] text-white hover:bg-black/80"
       >
         ✕
       </button>
@@ -321,13 +351,9 @@ export function PlotDetail({ id }: { id: string }) {
                     </Mono>
                     <button
                       type="button"
-                      onClick={() =>
-                        void run(
-                          () => removeDoc({ documentId: doc.id, id: p.id }).unwrap(),
-                          "Document removed",
-                        )
-                      }
-                      className="text-[12px] text-console-red"
+                      aria-label={`Remove ${doc.name}`}
+                      onClick={() => void onRemoveDocument(doc)}
+                      className="cursor-pointer text-[12px] text-console-red hover:underline"
                     >
                       ✕
                     </button>

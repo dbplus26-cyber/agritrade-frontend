@@ -372,6 +372,9 @@ export function LandSaleDetail({ id }: { id: string }) {
   };
 
   const canAct = s.status === "DRAFT" || s.status === "CONFIRMED";
+  // Confirm is refused without a deposit, so it only reads as the primary
+  // action once there is one - until then the payment button is the way on.
+  const hasPayments = s.payments.length > 0;
 
   return (
     <div className="max-w-[1120px]">
@@ -439,21 +442,28 @@ export function LandSaleDetail({ id }: { id: string }) {
             {canAct ? (
               <div className="mt-3 border-t border-adm-hairline pt-3.5">
                 <div className="flex flex-wrap gap-2 xl:flex-col">
-                  {s.status === "DRAFT" ? (
-                    <AdminButton
-                      className="h-9 px-4"
-                      disabled={confirmState.isLoading}
-                      onClick={() => void onConfirm()}
-                    >
-                      {confirmState.isLoading ? "Confirming…" : "Confirm sale"}
-                    </AdminButton>
-                  ) : null}
-                  {s.status === "CONFIRMED" ? (
+                  {/* A DRAFT is PAYABLE, and has to be: confirming one is
+                      refused until a deposit is on it (PAYMENT_REQUIRED), so
+                      offering only "Confirm sale" here was a dead end - the
+                      button told you to record a payment and the screen gave
+                      you nowhere to record it. The deposit comes first, so it
+                      leads; confirm follows it. */}
+                  {s.status === "DRAFT" || s.status === "CONFIRMED" ? (
                     <AdminButton
                       className="h-9 px-4"
                       onClick={() => setPayOpen(true)}
                     >
                       Record payment
+                    </AdminButton>
+                  ) : null}
+                  {s.status === "DRAFT" ? (
+                    <AdminButton
+                      variant={hasPayments ? "primary" : "outline"}
+                      className="h-9 px-4"
+                      disabled={confirmState.isLoading}
+                      onClick={() => void onConfirm()}
+                    >
+                      {confirmState.isLoading ? "Confirming…" : "Confirm sale"}
                     </AdminButton>
                   ) : null}
                   <AdminButton

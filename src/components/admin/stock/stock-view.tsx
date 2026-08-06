@@ -333,21 +333,26 @@ export function StockView() {
             </AdminCard>
           ) : (
             <AdminCard className="overflow-hidden">
-              {/* Dual render off the same matrix: a warehouse-by-commodity
-                  table when the console is wide enough for column groups,
-                  compact per-warehouse ledger sections below that. */}
-              <div className="hidden @4xl/main:block">
-                <BalancesMatrix
-                  warehouses={matrix.warehouses}
-                  commodities={matrix.commodities}
-                />
-              </div>
-              <div className="@4xl/main:hidden">
-                <WarehouseSections
-                  warehouses={matrix.warehouses}
-                  commodities={matrix.commodities}
-                />
-              </div>
+              {/* Warehouses STACK, they do not become columns.
+                  This was a matrix - commodities down, one column per
+                  warehouse across - which cannot hold: warehouses are a CRUD
+                  register, so the table grew a column every time the office
+                  opened a store, and the only way to read the tenth one was a
+                  long horizontal scroll that took the commodity names off
+                  screen with it. Capping the headings just truncated the names
+                  instead; letting them through made the scroll worse. A
+                  column per row of data is the wrong axis for a list that
+                  grows.
+
+                  Sections stack instead, so a hundred warehouses cost height
+                  rather than width and nothing ever scrolls sideways. Each one
+                  carries its own subtotal, and the commodity list inside runs
+                  two-up once there is room - which is how a wide console
+                  earns its width here, rather than by adding columns. */}
+              <WarehouseSections
+                warehouses={matrix.warehouses}
+                commodities={matrix.commodities}
+              />
             </AdminCard>
           )}
         </>
@@ -363,121 +368,6 @@ export function StockView() {
   );
 }
 
-/** Dim marker for a (warehouse, commodity) cell holding nothing. */
-function NoStock() {
-  return (
-    <>
-      <span aria-hidden="true" className="text-adm-faint">
-        &middot;
-      </span>
-      <span className="sr-only">none</span>
-    </>
-  );
-}
-
-/**
- * Wide presentation: one ledger table, commodities as rows and warehouses as
- * column groups, kg in mono right-aligned, a rule-topped subtotal row at the
- * foot. Scrolls inside the card if the warehouses outgrow it.
- */
-function BalancesMatrix({
-  warehouses,
-  commodities,
-}: {
-  warehouses: MatrixWarehouse[];
-  commodities: MatrixCommodity[];
-}) {
-  return (
-    <div className="overflow-x-auto">
-      <table className="w-full border-collapse text-[13px]">
-        <thead>
-          <tr className="border-b-[1.5px] border-adm-line bg-adm-sunken">
-            {/* The identity column takes whatever the figures do not.
-                A matrix has no single 40% column to give away - the warehouse
-                count decides how many there are - so the rule that applies
-                here is the one behind it: the named thing gets the slack and
-                the numbers, which are short and fixed, size to themselves.
-                `w-full` on one cell of a table does exactly that. */}
-            <th
-              scope="col"
-              className="w-full px-4 py-2.5 text-left text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted"
-            >
-              Commodity
-            </th>
-            {warehouses.map((w) => (
-              <th
-                key={w.id}
-                scope="col"
-                className="px-4 py-2.5 text-right text-[10.5px] font-bold whitespace-nowrap uppercase tracking-[0.09em]"
-              >
-                <Link
-                  href={`/admin/warehouses/${w.id}`}
-                  className="ml-auto block max-w-[90%] truncate text-console underline-offset-2 hover:underline"
-                  title={w.name}
-                >
-                  {w.name}
-                </Link>
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {commodities.map((c) => (
-            <tr key={c.id} className="border-b border-adm-hairline">
-              <th
-                scope="row"
-                className="px-4 py-1.5 text-left font-medium text-adm-ink"
-              >
-                <span className="block max-w-[95%] truncate" title={c.name}>
-                  {c.name}
-                </span>
-              </th>
-              {warehouses.map((w) => {
-                const kg = w.byCommodity.get(c.id);
-                return (
-                  <td
-                    key={w.id}
-                    className="whitespace-nowrap px-4 py-1.5 text-right"
-                  >
-                    {kg === undefined || kg === 0 ? (
-                      <NoStock />
-                    ) : (
-                      <Kg kg={kg} className="font-semibold text-adm-ink" />
-                    )}
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
-        <tfoot>
-          <tr className="border-t-[1.5px] border-adm-line bg-adm-sunken">
-            <th
-              scope="row"
-              className="px-4 py-2 text-left text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted"
-            >
-              Warehouse total
-            </th>
-            {warehouses.map((w) => (
-              <td
-                key={w.id}
-                className="whitespace-nowrap px-4 py-2 text-right"
-              >
-                <Kg kg={w.subtotalKg} className="font-bold text-adm-ink" />
-              </td>
-            ))}
-          </tr>
-        </tfoot>
-      </table>
-    </div>
-  );
-}
-
-/**
- * Narrow presentation: compact per-warehouse sections - subtotal in the
- * section head, dense commodity | kg rows joined by dotted ledger leaders,
- * two-up once the section has the room.
- */
 function WarehouseSections({
   warehouses,
   commodities,
@@ -505,7 +395,7 @@ function WarehouseSections({
               className="flex-none text-[12px] font-bold text-adm-ink"
             />
           </div>
-          <div className="px-4 py-1.5 @xl/main:columns-2 @xl/main:gap-8">
+          <div className="px-4 py-1.5 @xl/main:columns-2 @xl/main:gap-8 @4xl/main:columns-3">
             {commodities
               .filter((c) => w.byCommodity.has(c.id))
               .map((c) => {

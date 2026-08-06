@@ -12,10 +12,17 @@ import { cn } from "@/lib/utils";
  */
 
 /**
- * A label/value row for detail pages. On narrow screens it stacks (label on
- * top, value below) so long values like notes or addresses never get squeezed
- * into a shared row; from ~480px it sits side-by-side (label left, value
- * right). `mono` sets the numeric face; `strong` enlarges/bolds the value.
+ * A label/value row for detail pages. Stacks (label above value) until there
+ * is genuinely room to sit side by side.
+ *
+ * Measured against its CONTAINER, not the viewport. These rows live mostly in
+ * the 340px side rail, and a viewport query is always satisfied on a desktop -
+ * so a note or a warehouse name was pushed into a narrow right-hand column
+ * while its label sat alone at the top of a cell several lines deep. The pair
+ * read as broken, which is exactly the complaint. Sized by the rail, a long
+ * value takes the row under its label instead.
+ *
+ * `mono` sets the numeric face; `strong` enlarges/bolds the value.
  */
 export function DetailRow({
   label,
@@ -29,13 +36,13 @@ export function DetailRow({
   strong?: boolean;
 }) {
   return (
-    <div className="flex flex-col gap-0.5 py-2 min-[480px]:flex-row min-[480px]:items-baseline min-[480px]:justify-between min-[480px]:gap-3">
+    <div className="flex flex-col gap-0.5 py-2 @min-[420px]:flex-row @min-[420px]:items-baseline @min-[420px]:justify-between @min-[420px]:gap-3">
       <span className="flex-none text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         {label}
       </span>
       <span
         className={cn(
-          "min-w-0 text-[13.5px] text-adm-ink [overflow-wrap:anywhere] min-[480px]:text-right",
+          "min-w-0 text-[13.5px] text-adm-ink [overflow-wrap:anywhere] @min-[420px]:text-right",
           mono && "font-adminmono tabular-nums",
           strong && "text-[15px] font-bold",
         )}
@@ -175,7 +182,10 @@ export function DetailShell({
       </div>
       <div
         className={cn(
-          "min-w-0 self-start xl:sticky xl:top-[70px] xl:order-2",
+          // @container so DetailRow (and anything else inside) sizes against
+          // the RAIL rather than the viewport - the rail is 340px however wide
+          // the screen is.
+          "@container min-w-0 self-start xl:sticky xl:top-[70px] xl:order-2",
           asideFirstOnStack && "order-1",
         )}
       >

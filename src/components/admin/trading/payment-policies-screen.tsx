@@ -195,7 +195,7 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
                   <button
                     type="button"
                     onClick={() => remove(i)}
-                    className="text-[12px] text-console-red"
+                    className="cursor-pointer text-[12px] text-console-red"
                   >
                     ✕
                   </button>

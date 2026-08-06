@@ -6,8 +6,8 @@ import {
   AdminButton,
   AdminCard,
   AdminPageHeader,
-  DetailRow,
-  DetailShell,
+  DetailGrid,
+  DetailItem,
   Mono,
 } from "@/components/admin/ui";
 import { Absent } from "@/components/admin/registry/registry-bits";
@@ -44,13 +44,7 @@ function Delta({ deltaKg }: { deltaKg: number | null }) {
 /** The count lines, dual-rendered off this card's own container width. */
 function LinesCard({ lines }: { lines: IStocktakeLine[] }) {
   return (
-    // h-full so the sheet ends where the rail beside it does. A stocktake of
-    // one or two lines left a short card at the top of the left column with
-    // the rail running past it to the bottom of the page - two columns that
-    // start together and end nowhere near each other read as broken rather
-    // than as a short list. Filling puts the slack inside the card, below the
-    // rows, where on a count sheet it reads as room for more.
-    <AdminCard className="flex h-full flex-col overflow-hidden">
+    <AdminCard className="overflow-hidden">
       <div className="border-b border-adm-hairline px-4 py-3 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase sm:px-5">
         Count lines
       </div>
@@ -241,99 +235,105 @@ export function StocktakeDetail({ id }: { id: string }) {
           />
         </div>
       ) : (
-        <DetailShell
-          main={<LinesCard lines={st.lines} />}
-          aside={
-            <AdminCard className="px-5 py-4">
-              <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                Sheet
-              </div>
-              <div className="mt-1 divide-y divide-adm-hairline">
-                <DetailRow label="Warehouse">
-                  <Link
-                    href={`/admin/warehouses/${st.warehouse.id}`}
-                    className="text-console underline-offset-2 hover:underline"
-                  >
-                    {st.warehouse.name}
-                  </Link>
-                </DetailRow>
-                <DetailRow label="Lines" mono>
-                  {st.lines.length}
-                </DetailRow>
-                <DetailRow label="Created">
-                  {formatDateTime(st.createdAt)}
-                </DetailRow>
-                <DetailRow label="Submitted">
-                  {st.submittedAt ? formatDateTime(st.submittedAt) : <Absent />}
-                </DetailRow>
-                <DetailRow label="Decided">
-                  {st.decidedAt ? formatDateTime(st.decidedAt) : <Absent />}
-                </DetailRow>
-                {st.notes ? (
-                  <DetailRow label="Notes">{st.notes}</DetailRow>
-                ) : null}
-              </div>
+        // ONE COLUMN, not a rail. A stocktake is a warehouse, a date and a
+        // list of counts - the list is short by nature (a warehouse holds a
+        // handful of commodities, not a hundred), so pairing it with a rail
+        // guaranteed a stunted left column beside a tall right one. Stretching
+        // the sheet to match only moved the empty space inside it.
+        //
+        // The facts read across the top where they take one line each, the
+        // actions sit under them, and the counts get the full width - which is
+        // where the width was wanted anyway, since that is the table with four
+        // columns in it. Balanced at one line or twenty, because there is no
+        // second column left to be out of step with.
+        <div className="flex flex-col gap-4">
+          <AdminCard className="@container p-5">
+            <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+              Sheet
+            </div>
+            <DetailGrid className="mt-1">
+              <DetailItem label="Warehouse">
+                <Link
+                  href={`/admin/warehouses/${st.warehouse.id}`}
+                  className="text-console underline-offset-2 hover:underline"
+                >
+                  {st.warehouse.name}
+                </Link>
+              </DetailItem>
+              <DetailItem label="Lines" mono>
+                {st.lines.length}
+              </DetailItem>
+              <DetailItem label="Created">
+                {formatDateTime(st.createdAt)}
+              </DetailItem>
+              <DetailItem label="Submitted">
+                {st.submittedAt ? formatDateTime(st.submittedAt) : <Absent />}
+              </DetailItem>
+              <DetailItem label="Decided">
+                {st.decidedAt ? formatDateTime(st.decidedAt) : <Absent />}
+              </DetailItem>
+              {/* Notes take the row. A count sheet's note is a sentence about
+                  what was found, and beside a one-line fact it left the label
+                  stranded at the top of a deep cell. */}
+              {st.notes ? (
+                <DetailItem full label="Notes">
+                  {st.notes}
+                </DetailItem>
+              ) : null}
+            </DetailGrid>
 
-              {st.status === StocktakeStatus.DRAFT ? (
-                <div className="mt-4 flex flex-col gap-2">
-                  <AdminButton
-                    className="w-full"
-                    disabled={busy}
-                    onClick={() => void onSubmit()}
-                  >
-                    {submitState.isLoading ? "Submitting…" : "Submit"}
+            {st.status === StocktakeStatus.DRAFT ? (
+              <div className="mt-4 flex flex-wrap gap-2 border-t border-adm-hairline pt-4">
+                <AdminButton disabled={busy} onClick={() => void onSubmit()}>
+                  {submitState.isLoading ? "Submitting…" : "Submit"}
+                </AdminButton>
+                <AdminButton
+                  variant="secondary"
+                  disabled={busy}
+                  onClick={() => setEditing(true)}
+                >
+                  Edit counts
+                </AdminButton>
+                <AdminButton
+                  variant="outline"
+                  className="text-console-red hover:text-console-red"
+                  disabled={busy}
+                  onClick={() => void onCancel()}
+                >
+                  {cancelState.isLoading ? "Cancelling…" : "Cancel stocktake"}
+                </AdminButton>
+              </div>
+            ) : st.status === StocktakeStatus.SUBMITTED ? (
+              <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-adm-hairline pt-4">
+                {isSuperAdmin ? (
+                  <AdminButton disabled={busy} onClick={() => void onApprove()}>
+                    {approveState.isLoading ? "Approving…" : "Approve"}
                   </AdminButton>
-                  <AdminButton
-                    variant="secondary"
-                    className="w-full"
-                    disabled={busy}
-                    onClick={() => setEditing(true)}
-                  >
-                    Edit counts
-                  </AdminButton>
-                  <AdminButton
-                    variant="outline"
-                    className="w-full text-console-red hover:text-console-red"
-                    disabled={busy}
-                    onClick={() => void onCancel()}
-                  >
-                    {cancelState.isLoading ? "Cancelling…" : "Cancel stocktake"}
-                  </AdminButton>
-                </div>
-              ) : st.status === StocktakeStatus.SUBMITTED ? (
-                <div className="mt-4 flex flex-col gap-2">
-                  {isSuperAdmin ? (
-                    <AdminButton
-                      className="w-full"
-                      disabled={busy}
-                      onClick={() => void onApprove()}
-                    >
-                      {approveState.isLoading ? "Approving…" : "Approve"}
-                    </AdminButton>
-                  ) : (
-                    <p className="text-[12.5px] text-adm-muted">
-                      Waiting for the owner to approve or cancel this sheet.
-                    </p>
-                  )}
-                  <AdminButton
-                    variant="outline"
-                    className="w-full text-console-red hover:text-console-red"
-                    disabled={busy}
-                    onClick={() => void onCancel()}
-                  >
-                    {cancelState.isLoading ? "Cancelling…" : "Cancel stocktake"}
-                  </AdminButton>
-                </div>
-              ) : (
-                <p className="mt-4 text-[12.5px] text-adm-muted">
-                  {st.status === StocktakeStatus.APPROVED
-                    ? `Approved ${st.decidedAt ? formatDateTime(st.decidedAt) : ""} - every difference posted as a stock adjustment.`
-                    : `Cancelled ${st.decidedAt ? formatDateTime(st.decidedAt) : ""} - nothing posted from this sheet.`}
-                </p>
-              )}
-            </AdminCard>
-          }
-        />
+                ) : (
+                  <p className="text-[12.5px] text-adm-muted">
+                    Waiting for the owner to approve or cancel this sheet.
+                  </p>
+                )}
+                <AdminButton
+                  variant="outline"
+                  className="text-console-red hover:text-console-red"
+                  disabled={busy}
+                  onClick={() => void onCancel()}
+                >
+                  {cancelState.isLoading ? "Cancelling…" : "Cancel stocktake"}
+                </AdminButton>
+              </div>
+            ) : (
+              <p className="mt-4 border-t border-adm-hairline pt-4 text-[12.5px] text-adm-muted">
+                {st.status === StocktakeStatus.APPROVED
+                  ? `Approved ${st.decidedAt ? formatDateTime(st.decidedAt) : ""} - every difference posted as a stock adjustment.`
+                  : `Cancelled ${st.decidedAt ? formatDateTime(st.decidedAt) : ""} - nothing posted from this sheet.`}
+              </p>
+            )}
+          </AdminCard>
+
+          <LinesCard lines={st.lines} />
+        </div>
       )}
 
       {confirmationDialog}

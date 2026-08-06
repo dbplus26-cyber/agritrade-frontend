@@ -115,8 +115,19 @@ export function SearchableSelect({
                 <span className="min-w-0 flex-1 text-adm-ink [overflow-wrap:anywhere]">
                   {o.label}
                 </span>
+                {/* The hint has to be able to GIVE WAY.
+                    It was flex-none, so a long one took whatever width it
+                    wanted and squeezed the label beside it - and the label
+                    wraps with `overflow-wrap: anywhere`, whose min-content is
+                    a single character. A plot reference next to a long
+                    location came out as one letter per line, reading
+                    vertically down the row. Capped at 40% and truncating, the
+                    label always keeps the greater share. */}
                 {o.hint ? (
-                  <span className="ml-auto flex-none pl-2 text-right text-[12px] text-adm-muted/80">
+                  <span
+                    className="ml-auto max-w-[40%] flex-none truncate pl-2 text-right text-[12px] text-adm-muted/80"
+                    title={o.hint}
+                  >
                     {o.hint}
                   </span>
                 ) : null}

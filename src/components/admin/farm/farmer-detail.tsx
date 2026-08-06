@@ -99,6 +99,24 @@ export function FarmerDetail({ id }: { id: string }) {
     setDocName("");
   };
 
+  // An agreement document is evidence, so removing one is gated on typing its
+  // name - the X sits inches from a download link, and a mis-click used to
+  // delete the file outright with nothing asked.
+  const onRemoveDocument = async (doc: { id: string; name: string }) => {
+    const ok = await confirm({
+      title: "Remove this document?",
+      description: `"${doc.name}" will no longer be downloadable from this farmer's record. Type the document's name to confirm.`,
+      confirmText: "Remove",
+      isDestructive: true,
+      requireExactMatch: doc.name,
+    });
+    if (!ok) return;
+    await run(
+      () => removeDoc({ documentId: doc.id, id: f.id }).unwrap(),
+      "Document removed",
+    );
+  };
+
   const onRemoveGuarantor = async (g: IFarmerGuarantor) => {
     const ok = await confirm({
       title: "Remove this guarantor?",
@@ -328,13 +346,9 @@ export function FarmerDetail({ id }: { id: string }) {
                     </Mono>
                     <button
                       type="button"
-                      onClick={() =>
-                        void run(
-                          () => removeDoc({ documentId: doc.id, id: f.id }).unwrap(),
-                          "Document removed",
-                        )
-                      }
-                      className="text-[12px] text-console-red"
+                      aria-label={`Remove ${doc.name}`}
+                      onClick={() => void onRemoveDocument(doc)}
+                      className="cursor-pointer text-[12px] text-console-red hover:underline"
                     >
                       ✕
                     </button>

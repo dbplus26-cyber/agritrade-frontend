@@ -674,9 +674,10 @@ export function ShipmentDetail({ id }: { id: string }) {
   const onRemoveDocument = async (documentId: string, name: string) => {
     const ok = await confirm({
       title: "Remove this document?",
-      description: `"${name}" will be deleted from the shipment's file. Removal is only possible before dispatch.`,
+      description: `"${name}" will be deleted from the shipment's file. Removal is only possible before dispatch. Type the document's name to confirm.`,
       confirmText: "Remove",
       isDestructive: true,
+      requireExactMatch: name,
     });
     if (!ok) return;
     try {
@@ -837,7 +838,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                         onClick={() =>
                           void onRemoveSale(sale.id, sale.transactionNo)
                         }
-                        className="text-[12px] text-console-red"
+                        className="cursor-pointer text-[12px] text-console-red"
                         aria-label={`Remove ${sale.transactionNo} from this shipment`}
                       >
                         ✕
@@ -1030,7 +1031,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                   <button
                     type="button"
                     onClick={() => void onRemoveDocument(doc.id, doc.name)}
-                    className="text-[12px] text-console-red"
+                    className="cursor-pointer text-[12px] text-console-red"
                     aria-label={`Remove ${doc.name}`}
                   >
                     ✕
