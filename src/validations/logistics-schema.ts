@@ -34,6 +34,8 @@ export const driverSchema = z.object({
   licenseNo: optionalText(50),
   idNumber: optionalText(50),
   notes: optionalText(1000),
+  /** This driver's standing haulage terms. "" means the system default. */
+  paymentPolicyId: z.string().optional(),
 });
 export type DriverValues = z.infer<typeof driverSchema>;
 

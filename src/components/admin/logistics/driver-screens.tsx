@@ -19,6 +19,7 @@ import {
   AdminPageHeader,
   EditableFormActions,
   adminInputClass,
+  adminSelectClass,
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
 import { BackButton } from "@/components/ui/BackButton";
@@ -63,6 +64,7 @@ import {
   type StatusFilter,
 } from "@/components/admin/registry/registry-bits";
 import { TextCell } from "@/components/admin/table-cells";
+import { useGetDriverPaymentPoliciesQuery } from "@/redux/driver-settlement/driver-settlement-api";
 import {
   RecordTimestamps,
   RegistryAvatar,
@@ -330,8 +332,12 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
       licenseNo: driver?.licenseNo ?? "",
       idNumber: driver?.idNumber ?? "",
       notes: driver?.notes ?? "",
+      paymentPolicyId: driver?.paymentPolicyId ?? "",
     },
   });
+  // The owner-maintained policy register is a handful of rows, so one page is
+  // the whole register and a native select over it is honest.
+  const policies = useGetDriverPaymentPoliciesQuery({ isActive: true, limit: 100 });
   const watchedName = useWatch({ control, name: "name" });
   const avatarName = watchedName || driver?.name || "";
 
@@ -618,6 +624,28 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
             />
           </AdminField>
         </div>
+        {/* What this driver is normally paid on. The middle of the
+            resolution order: a trip can override it, and a driver without one
+            falls through to the system default. */}
+        <AdminField
+          error={errors.paymentPolicyId?.message}
+          hint="Used when a trip does not set its own. Leave as the default if this driver has no special terms."
+          label="Payment terms"
+          optional
+        >
+          <select
+            className={cn(adminSelectClass, roCls)}
+            disabled={readOnly}
+            {...register("paymentPolicyId")}
+          >
+            <option value="">Use the system default</option>
+            {(policies.data?.data ?? []).map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+        </AdminField>
         <AdminField label="Notes" optional error={errors.notes?.message}>
           <textarea
             rows={4}

@@ -20,6 +20,7 @@ import {
 import { BackButton } from "@/components/ui/BackButton";
 import { DateOnlyCell, DateTimeCell } from "@/components/admin/date-cell";
 import { DetailSkeleton } from "@/components/admin/skeletons";
+import { DriverSettlementCard } from "@/components/admin/drivers/driver-settlement-card";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { FilePicker } from "@/components/ui/FilePicker";
 import { SignaturePad } from "@/components/ui/SignaturePad";
@@ -981,6 +982,16 @@ export function ShipmentDetail({ id }: { id: string }) {
           ) : null}
         </DetailGrid>
       </AdminCard>
+
+      {/* What the driver is owed.
+          Its own card rather than another block inside Trip: this is money,
+          it has its own actions, and it is the one thing on this page an
+          owner comes back to after the truck has gone. A cancelled trip owes
+          nobody, so the card refuses to price or pay against one. */}
+      <DriverSettlementCard
+        canManage={s.status !== "CANCELLED"}
+        shipmentId={s.id}
+      />
 
       {/* Allocations */}
       <AdminCard className="p-5">

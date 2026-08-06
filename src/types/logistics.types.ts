@@ -17,6 +17,8 @@ export interface IDriver {
   licenseNo: string | null;
   idNumber: string | null;
   notes: string | null;
+  /** This driver's standing haulage terms, or null for the system default. */
+  paymentPolicyId: string | null;
   photoUrl: string | null;
   isActive: boolean;
   createdAt: string;

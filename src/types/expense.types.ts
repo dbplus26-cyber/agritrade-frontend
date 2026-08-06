@@ -21,6 +21,12 @@ export interface IExpense {
   };
   /** Human-readable voucher number, e.g. "EXP-2026-00156". */
   transactionNo: string;
+  /**
+   * Set when this voucher was voided. Deliberately NOT money, so it survives
+   * redaction: a voided cost has to read as voided for every user.
+   */
+  voidedAt: null | string;
+  voidReason: null | string;
 }
 
 export interface IExpenseResponse {

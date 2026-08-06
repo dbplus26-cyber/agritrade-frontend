@@ -13,6 +13,7 @@ import {
   PdfLink,
 } from "@/components/admin/ui";
 import { DateOnlyCell, DateTimeCell } from "@/components/admin/date-cell";
+import { ExpenseSettlementCard } from "@/components/admin/expenses/expense-settlement-card";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useAuthRole } from "@/hooks/use-auth-role";
 import { useMoneyVisibility } from "@/hooks/use-money-visibility";
@@ -145,6 +146,15 @@ export function ExpenseDetail({ id }: { id: string }) {
           )}
         </div>
       </AdminCard>
+
+      {/* Whether the money has actually gone out. Directly under the figure
+          because "we owe this" and "we have paid this" are one thought, and
+          the page used to answer only the first half of it. */}
+      <ExpenseSettlementCard
+        amountGhs={showMoney ? expense.amountGhs : null}
+        expenseId={expense.id}
+        isVoided={expense.voidedAt !== null}
+      />
 
       {/* Only when the cost belongs to a trip. An "Operating cost" card
           saying nothing more than "not attached to anything" is a reserved
