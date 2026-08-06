@@ -22,9 +22,9 @@ import { RecordFacts } from "@/components/admin/record-facts";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/button";
 import {
-  CardGridSkeleton,
   ConsoleTableSkeleton,
   FormSkeleton,
+  LedgerSkeleton,
 } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ListPagination } from "@/components/ui/ListPagination";
@@ -526,25 +526,36 @@ export function ExpenseCategoryCreate() {
  * The expenses filed under this category - proof of what the bucket actually
  * holds, with the whole-window total the backend aggregates server-side.
  */
-function ExpenseVoucherCard({ expense }: { expense: IExpense }) {
+/**
+ * One cost, as a statement line.
+ *
+ * What it says leads, because that is what anybody reading this list is
+ * looking for; the voucher number and the date follow as the quiet line that
+ * lets it be found on paper; and the amount holds the right edge, never
+ * truncating and never wrapping, so a column of figures stays a column.
+ */
+function ExpenseLine({ expense }: { expense: IExpense }) {
   const showMoney = useMoneyVisibility();
   return (
-    <AdminCard className="flex h-full flex-col px-4 py-3">
-      <div className="flex items-baseline justify-between gap-3">
-        <Mono className="text-[12px] text-adm-muted/80">{expense.transactionNo}</Mono>
-        {showMoney ? (
-          <Mono className="text-[14px] font-bold whitespace-nowrap text-adm-ink">
-            {formatCedis(expense.amountGhs)}
-          </Mono>
-        ) : null}
+    <li className="flex items-start justify-between gap-4 px-4 py-3">
+      <div className="min-w-0 flex-1">
+        <p className="text-[13px] leading-[1.45] text-adm-ink [overflow-wrap:anywhere]">
+          {expense.description ?? <Absent />}
+        </p>
+        <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11.5px] text-adm-muted">
+          <Mono className="text-[11.5px]">{expense.transactionNo}</Mono>
+          <span aria-hidden="true" className="text-adm-faint">
+            ·
+          </span>
+          <DateOnlyCell value={expense.incurredAt} muted />
+        </p>
       </div>
-      <p className="mt-1.5 flex-1 text-[13px] leading-snug text-adm-ink [overflow-wrap:anywhere]">
-        {expense.description ?? <Absent />}
-      </p>
-      <div className="mt-2 border-t border-adm-hairline pt-1.5">
-        <DateOnlyCell value={expense.incurredAt} muted />
-      </div>
-    </AdminCard>
+      {showMoney ? (
+        <Mono className="flex-none text-[13.5px] font-semibold tabular-nums text-adm-ink">
+          {formatCedis(expense.amountGhs)}
+        </Mono>
+      ) : null}
+    </li>
   );
 }
 
@@ -552,9 +563,17 @@ function ExpenseVoucherCard({ expense }: { expense: IExpense }) {
  * The expenses filed under this category - proof of what the bucket actually
  * holds, with the whole-window total the backend aggregates server-side.
  *
- * A grid of vouchers rather than a table: the rows are four short facts each,
- * so a table stacked them in one narrow column and left the right two thirds
- * of a wide console empty. Cards tile out to three across instead.
+ * A STATEMENT, not a gallery. These were voucher tiles in a two-or-three
+ * column grid, which reads fine at twelve and badly at one: a category with a
+ * single expense put one small tile in the first cell and left the other two
+ * columns empty, next to a side rail three times its height. The gap was the
+ * layout telling the truth about a grid with nothing to fill it.
+ *
+ * A costs list is a ledger, and a ledger is rows. One row spans the full
+ * width, so one expense looks deliberate and twelve look like a statement;
+ * the figures line up in a single right-hand column where they can be
+ * compared, which tiles never allowed; and the count no longer changes the
+ * shape of the page.
  */
 function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
   const showMoney = useMoneyVisibility();
@@ -585,7 +604,12 @@ function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
       </div>
 
       {isLoading ? (
-        <CardGridSkeleton cards={6} />
+        // A ledger skeleton, matching what actually arrives. A card-grid
+        // skeleton here promised tiles and then delivered rows, which is a
+        // visible jump on every load.
+        <AdminCard className="overflow-hidden px-4">
+          <LedgerSkeleton rows={6} />
+        </AdminCard>
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}
@@ -601,20 +625,22 @@ function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
         </AdminCard>
       ) : (
         <>
-          {/* Container-relative columns: this grid sits in the detail shell's
-              main track, which is ~340px narrower than the page whenever the
-              side rail shows, so viewport breakpoints would over-count. */}
-          <div
-            className={cn(
-              "grid gap-2.5 transition-opacity @lg/main:grid-cols-2 @4xl/main:grid-cols-3",
-              isFetching && "pointer-events-none opacity-60",
-            )}
-            aria-busy={isFetching || undefined}
-          >
-            {rows.map((expense) => (
-              <ExpenseVoucherCard key={expense.id} expense={expense} />
-            ))}
-          </div>
+          <AdminCard className="overflow-hidden">
+            {/* divide-y, not a border per row: the hairline belongs BETWEEN
+                lines, so the last one has no rule under it running into the
+                card's own edge. */}
+            <ul
+              className={cn(
+                "divide-y divide-adm-hairline transition-opacity",
+                isFetching && "pointer-events-none opacity-60",
+              )}
+              aria-busy={isFetching || undefined}
+            >
+              {rows.map((expense) => (
+                <ExpenseLine key={expense.id} expense={expense} />
+              ))}
+            </ul>
+          </AdminCard>
           <ListPagination
             page={page}
             totalPages={totalPages}
