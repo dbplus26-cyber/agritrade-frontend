@@ -174,7 +174,7 @@ function FarmApplicationDetailBody({
                   {application.phone}
                 </a>
               </DetailItem>
-              <DetailItem className="col-span-full" label="Email">
+              <DetailItem full label="Email">
                 {application.email ? (
                   <a
                     href={`mailto:${application.email}`}
@@ -189,7 +189,7 @@ function FarmApplicationDetailBody({
               <DetailItem label="Community">
                 {orAbsent(application.community)}
               </DetailItem>
-              <DetailItem className="col-span-full" label="Address">
+              <DetailItem full label="Address">
                 {orAbsent(application.address)}
               </DetailItem>
             </SectionCard>
@@ -205,16 +205,16 @@ function FarmApplicationDetailBody({
                   <Absent />
                 )}
               </DetailItem>
-              <DetailItem className="col-span-full" label="Crops">
+              <DetailItem full label="Crops">
                 {orAbsent(application.crops)}
               </DetailItem>
-              <DetailItem className="col-span-full" label="Previous experience">
+              <DetailItem full label="Previous experience">
                 {orAbsent(application.previousExperience)}
               </DetailItem>
             </SectionCard>
 
             <SectionCard title="Request">
-              <DetailItem className="col-span-full" label="Items needed">
+              <DetailItem full label="Items needed">
                 {orAbsent(application.itemsNeeded)}
               </DetailItem>
               <DetailItem label="Expected yield" mono>

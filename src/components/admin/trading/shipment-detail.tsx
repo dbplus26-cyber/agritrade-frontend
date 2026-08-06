@@ -11,6 +11,7 @@ import {
   AdminPageHeader,
   DetailGrid,
   DetailItem,
+  DetailRow,
   DetailShell,
   Mono,
   adminInputClass,
@@ -760,11 +761,33 @@ export function ShipmentDetail({ id }: { id: string }) {
 
   const main = (
     <div className="flex flex-col gap-4">
+      {/* HOW FULL THE TRUCK IS, first and on its own.
+          This lived inside the sales card and only rendered before dispatch,
+          which is backwards: it is the one thing about a shipment that reads
+          at a glance, and it is just as worth seeing after the truck has gone
+          as before. No card around it - it is a figure, not a section, and a
+          sixth bordered sheet was part of what made this page hard to scan. */}
+      {s.truckCapacityKg !== null || plannedKg > 0 ? (
+        <div>
+          <LoadMeter
+            loadedKg={plannedKg}
+            capacityKg={s.truckCapacityKg}
+            loadedLabel={beforeDispatch ? "Planned" : "Loaded"}
+          />
+          {beforeDispatch && underFilled ? (
+            <p className="mt-1.5 text-[12.5px] text-adm-muted">
+              This truck has {formatKg(roomLeftKg)} of room left. Add another
+              sale before it rolls, or send it part-loaded if that is the plan.
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+
       {/* Sales on this trip. Payment terms are settled BEFORE a sale can
           board a truck, so there is nothing to pay here - the sale page owns
           later payments. Each sale is its own bordered sub-card so a
           multi-sale trip reads as distinct orders, not one run-on list. */}
-      <AdminCard className="px-5 py-3">
+      <AdminCard className="p-5">
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
             Sales on this trip · {s.salesCount} sale
@@ -780,25 +803,6 @@ export function ShipmentDetail({ id }: { id: string }) {
             </AdminButton>
           ) : null}
         </div>
-        {/* How full the truck actually is against the capacity that was
-            booked - allocated lots alone would read empty on a truck that is
-            planned but not yet loaded. */}
-        {beforeDispatch && (s.truckCapacityKg !== null || plannedKg > 0) ? (
-          <div className="mb-2.5">
-            <LoadMeter
-              loadedKg={plannedKg}
-              capacityKg={s.truckCapacityKg}
-              loadedLabel="Planned"
-            />
-            {underFilled ? (
-              <p className="mt-1.5 text-[12.5px] font-medium text-adm-muted">
-                This truck has {formatKg(roomLeftKg)} of room left. Add another
-                sale before it rolls, or send it part-loaded if that is the
-                plan.
-              </p>
-            ) : null}
-          </div>
-        ) : null}
         <div className="grid gap-2.5 pb-2 md:grid-cols-2">
           {s.sales.map((sale, index) => {
             // Removal only where nothing would be silently thrown away: a sale
@@ -873,26 +877,32 @@ export function ShipmentDetail({ id }: { id: string }) {
       </AdminCard>
 
       {/* Logistics */}
-      <AdminCard className="px-5 py-3">
-        <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-          Logistics
+      {/* ONE card for the trip and the person driving it, not two.
+          Logistics and Driver were separate sheets of four short facts each,
+          which put two headings and two borders around what a reader treats
+          as a single question: what is this truck, and who has it. They keep
+          their own labels inside, so the grouping survives without the second
+          frame.
+
+          The truck registration and the route are NOT repeated here - the
+          page header is "REG - destination" and its subtitle names the origin,
+          so stating them again was the third time on one screen. */}
+      <AdminCard className="p-5">
+        <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+          Trip
         </p>
-        <DetailGrid>
+        <DetailGrid className="mt-1">
           <DetailItem label="Waybill no" mono>
             {s.transactionNo}
           </DetailItem>
-          <DetailItem label="Truck">{s.truckReg}</DetailItem>
+          <DetailItem label="Total weight" mono>
+            {formatKg(s.totalWeightKg)}
+          </DetailItem>
           {s.truckCapacityKg !== null ? (
             <DetailItem label="Truck capacity" mono>
               {formatKg(s.truckCapacityKg)}
             </DetailItem>
           ) : null}
-          <DetailItem className="col-span-full" label="Route">
-            {s.originWarehouse.name} → {s.destination}
-          </DetailItem>
-          <DetailItem label="Total weight" mono>
-            {formatKg(s.totalWeightKg)}
-          </DetailItem>
           {/* Expected arrival is planned on a date picker - there is no time
               to show. Departure and arrival are stamped by the system at the
               moment they happen, and on a trip that runs overnight the hour
@@ -913,28 +923,20 @@ export function ShipmentDetail({ id }: { id: string }) {
             </DetailItem>
           ) : null}
           {s.notes ? (
-            <DetailItem className="col-span-full" label="Notes">
+            <DetailItem full label="Notes">
               {s.notes}
             </DetailItem>
           ) : null}
         </DetailGrid>
-      </AdminCard>
 
-      {/* Driver */}
-      <AdminCard className="px-5 py-3">
-        <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+        <p className="mt-4 border-t border-adm-hairline pt-3 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
           Driver
         </p>
-        <DetailGrid>
+        <DetailGrid className="mt-1">
           <DetailItem label="Name">{s.driverName}</DetailItem>
           {s.driverPhone ? (
             <DetailItem label="Phone" mono>
               {s.driverPhone}
-            </DetailItem>
-          ) : null}
-          {s.driverEmail ? (
-            <DetailItem className="col-span-full" label="Email">
-              {s.driverEmail}
             </DetailItem>
           ) : null}
           <DetailItem label="Company">
@@ -953,11 +955,16 @@ export function ShipmentDetail({ id }: { id: string }) {
               {s.driverIdNumber}
             </DetailItem>
           ) : null}
+          {s.driverEmail ? (
+            <DetailItem full label="Email">
+              {s.driverEmail}
+            </DetailItem>
+          ) : null}
         </DetailGrid>
       </AdminCard>
 
       {/* Allocations */}
-      <AdminCard className="px-5 py-3">
+      <AdminCard className="p-5">
         <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
           Loaded lots
         </div>
@@ -991,7 +998,7 @@ export function ShipmentDetail({ id }: { id: string }) {
       </AdminCard>
 
       {/* Documents */}
-      <AdminCard className="px-5 py-3">
+      <AdminCard className="p-5">
         <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
           Documents (private)
         </div>
@@ -1085,7 +1092,7 @@ export function ShipmentDetail({ id }: { id: string }) {
       </AdminCard>
 
       {/* Expenses */}
-      <AdminCard className="px-5 py-3">
+      <AdminCard className="p-5">
         <div className="mb-1 flex items-center justify-between">
           <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
             Expenses
@@ -1148,25 +1155,30 @@ export function ShipmentDetail({ id }: { id: string }) {
     </div>
   );
 
+  // The ANSWER first, its workings under it. This was a 2x2 grid where profit
+  // sat in the fourth cell carrying the same weight as the three figures it is
+  // derived from - so the one number the owner opened the page for had to be
+  // found among its own inputs. Profit leads at display size now; revenue,
+  // cost and expenses follow as the quiet lines that explain it.
   const aside = (
-    <AdminCard className="px-5 py-3">
-      <div className="mb-1 flex items-center gap-2 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+    <AdminCard className="p-5">
+      <div className="flex items-center gap-2 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         Profit <CostBasisBadge basis={s.profit.costBasis} />
       </div>
-      <DetailGrid columns={2}>
-        <DetailItem label="Revenue" mono>
+      <Mono className="mt-1 block text-[26px] leading-[1.15] font-semibold tabular-nums text-adm-ink">
+        <Money value={s.profit.profitGhs} />
+      </Mono>
+      <div className="mt-3 border-t border-adm-hairline pt-1">
+        <DetailRow label="Revenue" mono>
           <Money value={s.profit.revenueGhs} />
-        </DetailItem>
-        <DetailItem label="Lot cost" mono>
+        </DetailRow>
+        <DetailRow label="Lot cost" mono>
           <Money value={s.profit.costGhs} />
-        </DetailItem>
-        <DetailItem label="Expenses" mono>
+        </DetailRow>
+        <DetailRow label="Expenses" mono>
           <Money value={s.profit.expensesGhs} />
-        </DetailItem>
-        <DetailItem label="Profit" mono strong>
-          <Money value={s.profit.profitGhs} />
-        </DetailItem>
-      </DetailGrid>
+        </DetailRow>
+      </div>
       <div className="mt-3 border-t border-adm-hairline pt-3.5">{actions}</div>
     </AdminCard>
   );
