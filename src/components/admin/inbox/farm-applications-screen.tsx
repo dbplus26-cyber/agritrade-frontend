@@ -187,6 +187,7 @@ export function FarmApplicationsScreen() {
     <div>
       <AdminPageHeader
         title="Farm applications"
+        hint="Farmers applying to join the outgrower scheme."
         sub="People applying to join the farming programme through the website"
       />
 

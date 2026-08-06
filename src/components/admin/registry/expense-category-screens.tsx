@@ -519,6 +519,7 @@ export function ExpenseCategoryCreate() {
       <BackButton href={LIST} label="All categories" className="mb-2" />
       <AdminPageHeader
         title="Add expense category"
+        hint="A heading costs are filed under, so spending can be grouped."
         sub="A bucket expenses are filed under in reports"
       />
       <ExpenseCategoryFormFields />
@@ -747,6 +748,7 @@ export function ExpenseCategoryEdit({ id }: { id: string }) {
       <BackButton href={LIST} label="All categories" className="mb-2" />
       <AdminPageHeader
         title="Expense category details"
+        hint="One heading, and every cost filed under it."
         sub="What this heading covers, and every cost filed under it"
       />
       {/* The record is two short fields; the spend under it is the page's

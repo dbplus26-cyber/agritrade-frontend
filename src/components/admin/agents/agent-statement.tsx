@@ -137,6 +137,7 @@ export function AgentStatement({ id }: { id: string }) {
         </Link>
         <AdminPageHeader
           title="Agent float statement"
+          hint="Every movement in and out of this agent's money, in order."
           sub="Every top-up, purchase and expense against the cash this agent holds, ready to print and sign"
           actions={
               // No server-rendered PDF for a statement: the API's receipt

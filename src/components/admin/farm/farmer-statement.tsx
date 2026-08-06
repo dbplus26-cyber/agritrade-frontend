@@ -59,6 +59,7 @@ export function FarmerStatement({
         </Link>
         <AdminPageHeader
           title="Farmer statement"
+          hint="Everything advanced to this farmer and everything repaid, in order."
           sub="Every grant and repayment with a running balance, ready to print and sign"
           actions={
               // No server-rendered PDF for a statement: the API's receipt

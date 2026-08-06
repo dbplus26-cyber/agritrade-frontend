@@ -99,6 +99,7 @@ export function ExpensesRegister() {
         // column that decided how wide this table got.
         cell: ({ row }) => (
           <TitleCell
+            href={`${LIST}/${row.original.id}`}
             meta={row.original.description}
             title={row.original.category.name}
             stretch
@@ -194,6 +195,7 @@ export function ExpensesRegister() {
       <div>
         <AdminPageHeader
           title="Expenses"
+          hint="Costs the business has incurred, and whether they have been paid."
           sub="Operating costs and per-trip spend"
         />
         <AdminCard className="overflow-hidden">
@@ -218,7 +220,8 @@ export function ExpensesRegister() {
 
   return (
     <div>
-      <AdminPageHeader title="Expenses" sub="Operating costs and per-trip spend" />
+      <AdminPageHeader title="Expenses"
+      hint="Costs the business has incurred, and whether they have been paid." sub="Operating costs and per-trip spend" />
 
       {isError && !search && activeFilterCount === 0 ? null : (
         <ConsoleFilterBar

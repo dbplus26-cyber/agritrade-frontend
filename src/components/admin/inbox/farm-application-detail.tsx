@@ -155,6 +155,7 @@ function FarmApplicationDetailBody({
       <BackButton href={LIST} label="All applications" className="mb-2" />
       <AdminPageHeader
         title="Application details"
+        hint="One farmer applying to join the outgrower scheme."
         sub={`Application ${application.reference} · received ${formatDateTime(application.createdAt)}`}
         actions={<FarmApplicationStatusBadge status={application.status} />}
       />

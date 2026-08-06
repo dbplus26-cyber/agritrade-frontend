@@ -703,6 +703,7 @@ export function UserDetail({ id }: { id: string }) {
       <BackButton href="/admin/users" label="All users" className="mb-2" />
       <AdminPageHeader
         title="User details"
+        hint="One person's access: their role and what they are allowed to do."
       />
 
       <DetailShell

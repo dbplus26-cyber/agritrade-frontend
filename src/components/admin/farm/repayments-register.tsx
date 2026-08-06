@@ -93,6 +93,7 @@ export function RepaymentsRegister() {
         // column: context for the row, not something anybody scans down.
         cell: ({ row }) => (
           <TitleCell
+            href={`${LIST}/${row.original.id}`}
             meta={row.original.season.name}
             stretch
             title={row.original.farmer.name}

@@ -230,6 +230,7 @@ export function FarmerDetail({ id }: { id: string }) {
       <BackButton href={LIST} label="All farmers" className="mb-2" />
       <AdminPageHeader
         title="Farmer details"
+        hint="One outgrower: what they were advanced and what they have brought back."
         actions={<ActiveBadge active={f.isActive} />}
       />
 

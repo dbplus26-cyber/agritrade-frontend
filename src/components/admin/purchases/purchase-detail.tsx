@@ -412,6 +412,7 @@ export function PurchaseDetail({ id }: { id: string }) {
       <BackButton href={LIST} label="All purchases" className="mb-2" />
       <AdminPageHeader
         title="Purchase details"
+        hint="One load bought: the weight, the price and where it was stored."
         sub={`${SOURCE_LABEL[p.source]} purchase from ${purchaseCounterparty(p)}`}
         actions={
           <span className="flex flex-wrap items-center gap-1.5">

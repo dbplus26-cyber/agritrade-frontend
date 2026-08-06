@@ -139,6 +139,7 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
         <BackButton href={LIST} label="All items" className="mb-2" />
         <AdminPageHeader
           title="Input item details"
+          hint="One thing you advance to farmers, such as seed or fertiliser."
           sub={"An input the programme grants to farmers - what it is, and the unit it is issued in"}
           actions={<ActiveBadge active={item.isActive} />}
         />

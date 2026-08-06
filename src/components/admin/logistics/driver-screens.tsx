@@ -659,7 +659,8 @@ export function DriverCreate() {
       backHref={LIST}
       backLabel="All drivers"
       header={
-        <AdminPageHeader title="Add driver" sub="A trucker the shipments module can pick from" />
+        <AdminPageHeader title="Add driver"
+        hint="A haulier who moves your goods. Their payment terms can be set here." sub="A trucker the shipments module can pick from" />
       }
     >
       <DriverFormFields />

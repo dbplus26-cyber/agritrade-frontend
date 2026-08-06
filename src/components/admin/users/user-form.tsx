@@ -142,6 +142,7 @@ export function UserForm() {
       <BackButton href="/admin/users" label="All users" className="mb-2" />
       <AdminPageHeader
         title="Add user"
+        hint="Someone who can sign in, and what they are allowed to do."
         sub="Create a console account and hand over its first password"
       />
       <AdminCard className="px-5 py-[18px]">

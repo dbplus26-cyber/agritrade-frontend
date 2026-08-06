@@ -243,6 +243,7 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
       <BackButton href={LIST} label="All shipments" className="mb-2" />
       <AdminPageHeader
         title="Plan shipment"
+        hint="Set up a truck: who drives, what it carries and where it is going."
         sub="Book a truck and driver against confirmed sales - nothing leaves the warehouse until you dispatch"
       />
 

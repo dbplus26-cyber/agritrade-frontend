@@ -217,6 +217,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
       />
       <AdminPageHeader
         title="Allocate lots"
+        hint="Choose which stock goes on this truck. Cost is taken from the lots you pick."
         sub={`Which warehouse lots fill each sale on ${shipment.truckReg} · ${shipment.originWarehouse.name} → ${shipment.destination}`}
       />
 

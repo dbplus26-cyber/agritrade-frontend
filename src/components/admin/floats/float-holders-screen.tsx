@@ -114,6 +114,15 @@ export function FloatHoldersScreen() {
         meta: columnMeta({ stretch: true }),
         cell: ({ row }) => (
           <TitleCell
+            // A field agent has a profile page holding their float ledger and
+            // their reconciliations; office staff do not, so only the agent's
+            // name is a link. TitleCell turns that same signal into the right
+            // hover text, so an unlinked staff row still shows the full value.
+            href={
+              row.original.role === UserRole.AGENT
+                ? `/admin/agents/${row.original.userId}`
+                : undefined
+            }
             meta={row.original.email}
             title={`${row.original.firstName} ${row.original.lastName}`}
           />
@@ -186,6 +195,7 @@ export function FloatHoldersScreen() {
     <div className="space-y-5">
       <AdminPageHeader
         title="Floats"
+        hint="Money handed to agents to buy with, and what each still holds."
         sub="Who is holding company money to spend, and how much is left"
       />
 

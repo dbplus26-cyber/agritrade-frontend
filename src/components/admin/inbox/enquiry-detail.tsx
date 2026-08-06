@@ -97,6 +97,7 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
       <BackButton href={LIST} label="All enquiries" className="mb-2" />
       <AdminPageHeader
         title="Enquiry details"
+        hint="One website message and the replies sent back."
         sub={`Enquiry ${enquiry.reference}`}
         actions={<EnquiryStatusBadge status={enquiry.status} />}
       />

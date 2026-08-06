@@ -127,6 +127,7 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
       <BackButton href={LIST} label="All repayments" className="mb-2" />
       <AdminPageHeader
         title="Record produce repayment"
+        hint="Take produce back from a farmer against what they were advanced."
         sub="Produce a farmer brought back against their grant - optionally received into a warehouse"
       />
 

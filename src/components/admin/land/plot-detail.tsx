@@ -270,6 +270,7 @@ export function PlotDetail({ id }: { id: string }) {
       <BackButton href={LIST} label="All plots" className="mb-2" />
       <AdminPageHeader
         title="Plot details"
+        hint="One piece of land you own, and whether it is listed publicly."
         actions={
           <span className="flex flex-wrap items-center gap-1.5">
             {p.publishToWebsite ? <ToneBadge tone="sky">Live</ToneBadge> : null}

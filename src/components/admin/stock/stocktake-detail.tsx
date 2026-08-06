@@ -218,6 +218,7 @@ export function StocktakeDetail({ id }: { id: string }) {
       <BackButton href={LIST} label="All stocktakes" className="mb-2" />
       <AdminPageHeader
         title="Stocktake details"
+        hint="One physical count, and the difference from what the system expected."
         actions={<StocktakeStatusBadge status={st.status} />}
       />
 

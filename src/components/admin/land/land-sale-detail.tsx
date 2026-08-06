@@ -382,6 +382,7 @@ export function LandSaleDetail({ id }: { id: string }) {
       <BackButton href={LIST} label="All land sales" className="mb-2" />
       <AdminPageHeader
         title="Land sale details"
+        hint="One plot sold: the buyer, the price and what they still owe."
         actions={<LandSaleStatusBadge status={s.status} />}
       />
 

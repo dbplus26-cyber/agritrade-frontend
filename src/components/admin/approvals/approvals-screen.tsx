@@ -437,6 +437,7 @@ export function ApprovalsScreen() {
           the largest heading in the console; every other page titles at 19px. */}
       <AdminPageHeader
         title="Approvals"
+        hint="Requests waiting on your decision. Approving applies the change straight away."
         sub="Decisions waiting on you. Approving applies the change, rejecting leaves everything as it stands."
       />
 

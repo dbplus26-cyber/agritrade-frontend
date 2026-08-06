@@ -52,6 +52,7 @@ export function RepaymentDetail({ id }: { id: string }) {
       <BackButton href={LIST} label="All repayments" className="mb-2" />
       <AdminPageHeader
         title="Repayment details"
+        hint="One delivery of produce from a farmer against their advance."
         sub={`Recorded ${formatDateTime(r.createdAt)}`}
         actions={
           r.intoStock ? <ToneBadge tone="sky">Taken into stock</ToneBadge> : null

@@ -11,6 +11,15 @@ export interface AdminNavItem {
   href: string;
   /** Show the pending-approvals badge on this item. */
   badge?: "approvals";
+  /**
+   * One sentence on what this section holds, shown on hover in the rail.
+   *
+   * The rail is where the console's vocabulary is first met - float,
+   * stocktake, allocation, milestone - and a label alone teaches none of it.
+   * Written for somebody who runs the business, not somebody who built the
+   * software: say what the section is FOR, in their words.
+   */
+  hint?: string;
   /** Owner-only entry (hidden from staff, who would only hit a 403). */
   ownerOnly?: boolean;
 }
@@ -25,10 +34,12 @@ export const ADMIN_HOME = "/admin";
 const item = (
   key: string,
   label: string,
+  hint: string,
   opts?: { badge?: "approvals"; ownerOnly?: boolean },
 ): AdminNavItem => ({
   key,
   label,
+  hint,
   href: key === "dashboard" ? ADMIN_HOME : `${ADMIN_HOME}/${key}`,
   badge: opts?.badge,
   ownerOnly: opts?.ownerOnly,
@@ -44,26 +55,26 @@ export const adminNavGroups: AdminNavGroup[] = [
   {
     label: "Overview",
     items: [
-      item("dashboard", "Dashboard"),
-      item("approvals", "Approvals", { badge: "approvals" }),
-      item("reports", "Reports"),
+      item("dashboard", "Dashboard", "Today at a glance: what came in, what went out, and what needs you."),
+      item("approvals", "Approvals", "Requests waiting on your decision. Approving applies the change straight away.", { badge: "approvals" }),
+      item("reports", "Reports", "Profit, cash and volume over a period you choose."),
     ],
   },
   {
     label: "Trading",
     items: [
-      item("purchases", "Purchases"),
-      item("sales", "Sales"),
-      item("shipments", "Shipments"),
-      item("stock", "Stock"),
-      item("transfers", "Transfers"),
-      item("stocktakes", "Stocktakes"),
-      item("commodities", "Commodities"),
-      item("warehouses", "Warehouses"),
-      item("agents", "Agents"),
-      item("expenses", "Expenses"),
-      item("expense-categories", "Expense Categories"),
-      item("payment-policies", "Payment Policies", { ownerOnly: true }),
+      item("purchases", "Purchases", "Grain you have bought from suppliers and agents, and what it cost."),
+      item("sales", "Sales", "Orders you have agreed with buyers, and what they have paid so far."),
+      item("shipments", "Shipments", "Trucks carrying orders out: who is driving, what is on board, where it is going."),
+      item("stock", "Stock", "How much of each commodity is sitting in each warehouse right now."),
+      item("transfers", "Transfers", "Stock moved from one warehouse to another."),
+      item("stocktakes", "Stocktakes", "Physical counts. Approving one corrects the system to match what was actually there."),
+      item("commodities", "Commodities", "The list of crops you trade in. Used everywhere a commodity is chosen."),
+      item("warehouses", "Warehouses", "Your storage locations. Stock is counted per warehouse."),
+      item("agents", "Agents", "Field buyers who hold your money to buy on your behalf."),
+      item("expenses", "Expenses", "Costs the business has incurred, and whether they have been paid."),
+      item("expense-categories", "Expense Categories", "The headings costs are filed under, so spending can be grouped."),
+      item("payment-policies", "Payment Policies", "When a buyer has to pay you: the deposit and balance split.", { ownerOnly: true }),
     ],
   },
   {
@@ -71,57 +82,57 @@ export const adminNavGroups: AdminNavGroup[] = [
     items: [
       // Staff see only their own sends; the whole register and the company's
       // bank position are the owner's business.
-      item("my-sends", "My sends"),
-      item("disbursements", "Money sent", { ownerOnly: true }),
-      item("floats", "Floats"),
-      item("treasury", "Company account", { ownerOnly: true }),
+      item("my-sends", "My sends", "Money you personally have sent out, and whether it arrived."),
+      item("disbursements", "Money sent", "Every mobile money and bank transfer sent from the business.", { ownerOnly: true }),
+      item("floats", "Floats", "Money handed to agents to buy with, and what each still holds."),
+      item("treasury", "Company account", "The company's own balance, and moving money between its accounts.", { ownerOnly: true }),
     ],
   },
   {
     label: "Land",
     items: [
-      item("plots", "Land Plots", { ownerOnly: true }),
-      item("land-acquisitions", "Acquisitions", { ownerOnly: true }),
-      item("land-sellers", "Sellers", { ownerOnly: true }),
-      item("land-sales", "Land Sales", { ownerOnly: true }),
+      item("plots", "Land Plots", "Land the business owns and can sell.", { ownerOnly: true }),
+      item("land-acquisitions", "Acquisitions", "Land being bought from a seller, and what has been paid for it.", { ownerOnly: true }),
+      item("land-sellers", "Sellers", "People and families you buy land from.", { ownerOnly: true }),
+      item("land-sales", "Land Sales", "Land sold to a buyer, and what they still owe.", { ownerOnly: true }),
     ],
   },
   {
     label: "Farm",
     items: [
-      item("seasons", "Seasons", { ownerOnly: true }),
-      item("farmers", "Farmers", { ownerOnly: true }),
-      item("input-items", "Input Items", { ownerOnly: true }),
-      item("grants", "Grants", { ownerOnly: true }),
-      item("repayments", "Repayments", { ownerOnly: true }),
+      item("seasons", "Seasons", "Planting cycles. Grants and repayments are recorded against one.", { ownerOnly: true }),
+      item("farmers", "Farmers", "Outgrowers you advance inputs to and take produce back from.", { ownerOnly: true }),
+      item("input-items", "Input Items", "Seed, fertiliser and tools you advance to farmers.", { ownerOnly: true }),
+      item("grants", "Grants", "Inputs advanced to a farmer, to be recovered in produce or cash.", { ownerOnly: true }),
+      item("repayments", "Repayments", "Produce a farmer has brought back against what they were advanced.", { ownerOnly: true }),
     ],
   },
   {
     label: "Directory",
     items: [
-      item("suppliers", "Suppliers"),
-      item("buyers", "Buyers"),
-      item("drivers", "Drivers"),
-      item("delivery-addresses", "Delivery Addresses"),
+      item("suppliers", "Suppliers", "People and co-ops you buy grain from."),
+      item("buyers", "Buyers", "Companies and people who buy from you."),
+      item("drivers", "Drivers", "Hauliers who move your goods, and the terms they are paid on."),
+      item("delivery-addresses", "Delivery Addresses", "Saved drop-off points, so a driver can actually find the place."),
       // Staff read these to quote an account down the phone; only the owner
       // can change one, which the backend enforces.
-      item("payment-accounts", "Payment Accounts"),
+      item("payment-accounts", "Payment Accounts", "Your bank and mobile money accounts that customers pay into."),
     ],
   },
   {
     label: "Website",
     items: [
-      item("enquiries", "Enquiries"),
-      item("reviews", "Reviews"),
-      item("farm-applications", "Applications", { ownerOnly: true }),
+      item("enquiries", "Enquiries", "Messages sent through the public website."),
+      item("reviews", "Reviews", "Customer reviews waiting to be published or already live."),
+      item("farm-applications", "Applications", "Farmers applying to join the outgrower scheme.", { ownerOnly: true }),
     ],
   },
   {
     label: "Admin",
     items: [
-      item("users", "Users", { ownerOnly: true }),
-      item("audit", "Audit Log", { ownerOnly: true }),
-      item("notifications", "Notifications", { ownerOnly: true }),
+      item("users", "Users", "Who can sign in, and what each of them is allowed to do.", { ownerOnly: true }),
+      item("audit", "Audit Log", "A record of who changed what, and when.", { ownerOnly: true }),
+      item("notifications", "Notifications", "Every email and text the system has tried to send.", { ownerOnly: true }),
       // "My profile" and "Settings" deliberately absent: both live behind
       // the navbar avatar menu (dms-frontend convention), not the rail.
     ],

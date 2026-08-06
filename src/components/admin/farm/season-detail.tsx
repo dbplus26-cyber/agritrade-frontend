@@ -103,6 +103,7 @@ export function SeasonDetail({ id }: { id: string }) {
       <BackButton href={LIST} label="All seasons" className="mb-2" />
       <AdminPageHeader
         title="Season details"
+        hint="One planting cycle. Grants and repayments are recorded against it."
         sub={`${formatFarmDate(s.startsOn)}${
           s.endsOn ? ` - ${formatFarmDate(s.endsOn)}` : ""
         }`}

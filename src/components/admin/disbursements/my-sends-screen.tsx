@@ -54,6 +54,7 @@ export function MySendsScreen({
     <div className="space-y-5">
       <AdminPageHeader
         title="My sends"
+        hint="Money you personally have sent out, and whether it arrived."
         sub="Money you have sent, and what Hubtel said about each one"
         actions={
           <AdminButton onClick={() => setSending(true)} type="button">

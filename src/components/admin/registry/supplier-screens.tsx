@@ -901,6 +901,7 @@ export function SupplierCreate() {
       header={
         <AdminPageHeader
           title="Add supplier"
+          hint="Someone you buy grain from."
           sub="A person or company the business buys from"
         />
       }
@@ -933,6 +934,7 @@ export function SupplierEdit({ id }: { id: string }) {
       header={
         <AdminPageHeader
           title="Supplier details"
+          hint="One person or co-op you buy from, and everything bought from them."
         />
       }
       aside={

@@ -79,6 +79,7 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
       <BackButton href={LIST} label="All land sales" className="mb-2" />
       <AdminPageHeader
         title="New land sale"
+        hint="Sell a plot to a buyer and set what they owe."
         sub="Agree a plot and price with a buyer - the plot is only reserved once you confirm the sale"
       />
 

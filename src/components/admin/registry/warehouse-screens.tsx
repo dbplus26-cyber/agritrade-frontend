@@ -502,6 +502,7 @@ export function WarehouseCreate() {
       <BackButton href={LIST} label="All warehouses" className="mb-2" />
       <AdminPageHeader
         title="Add warehouse"
+        hint="A storage location. Stock is counted separately per warehouse."
         sub="A storage location goods are received into and loaded out of"
       />
       <WarehouseFormFields />
@@ -532,6 +533,7 @@ export function WarehouseEdit({ id }: { id: string }) {
       header={
         <AdminPageHeader
           title="Warehouse details"
+          hint="One storage location and what is currently in it."
           sub="Warehouse record and current stock"
         />
       }

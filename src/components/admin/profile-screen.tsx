@@ -733,6 +733,7 @@ export function ProfileScreen() {
     <div className="w-full max-w-[1120px]">
       <AdminPageHeader
         title="My profile"
+        hint="Your own account: name, photo, password and sign-in security."
         sub="Your account, security and sign-in settings"
       />
       <DetailShell

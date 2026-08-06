@@ -480,6 +480,7 @@ export function SaleDetail({
       <BackButton href={LIST} label="All sales" className="mb-2" />
       <AdminPageHeader
         title="Sale details"
+        hint="One order: what was agreed, what has shipped and what is still owed."
         sub={`Drafted ${formatSaleDate(sale.createdAt)}`}
         actions={
           <span className="flex flex-wrap items-center gap-1.5">

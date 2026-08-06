@@ -419,6 +419,7 @@ export function CommodityCreate() {
       <BackButton href={LIST} label="All commodities" className="mb-2" />
       <AdminPageHeader
         title="Add commodity"
+        hint="A crop you trade in. It then appears wherever a commodity is chosen."
         sub="Name, variety and grade - how this commodity appears everywhere"
       />
       <CommodityFormFields />
@@ -465,6 +466,7 @@ export function CommodityEdit({ id }: { id: string }) {
       <BackButton href={LIST} label="All commodities" className="mb-2" />
       <AdminPageHeader
         title="Commodity details"
+        hint="One crop, and whether it is shown on the public website."
         sub="Edit the commodity, its website visibility and lifecycle"
       />
       <CommodityFormFields commodity={commodity} />

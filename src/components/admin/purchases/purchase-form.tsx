@@ -150,6 +150,7 @@ export function PurchaseCreate() {
       <BackButton href={LIST} label="All purchases" className="mb-2" />
       <AdminPageHeader
         title="Record purchase"
+        hint="Buy a load from a supplier or agent and take it into stock."
         sub="Goods bought and paid for - an agent-paid purchase debits their float immediately"
       />
       <AdminCard className="px-5 py-[18px]">

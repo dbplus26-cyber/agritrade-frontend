@@ -87,6 +87,7 @@ export function DisbursementDetail({ id }: { id: string }) {
       <BackButton href={LIST} label="Money sent" />
       <AdminPageHeader
         title="Payout details"
+        hint="One transfer sent out: where it went and whether it arrived."
         sub={`${RAIL_LABEL[d.rail]} · ${d.transactionNo}`}
         actions={
           settled ? null : (

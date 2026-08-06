@@ -43,6 +43,7 @@ export function TransferDetail({ id }: { id: string }) {
       header={
         <AdminPageHeader
           title="Transfer details"
+          hint="One movement of stock from one warehouse to another."
           sub={`Transfer ${t.transactionNo}`}
         />
       }

@@ -465,6 +465,7 @@ export function ReviewsScreen() {
     <div>
       <AdminPageHeader
         title="Reviews"
+        hint="Customer reviews waiting to be published or already live."
         sub="Moderate what the website shows the world"
       />
 

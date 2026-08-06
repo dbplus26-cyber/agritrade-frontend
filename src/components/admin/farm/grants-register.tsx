@@ -96,6 +96,7 @@ export function GrantsRegister() {
         // of the columns forcing this table off the side of the screen.
         cell: ({ row }) => (
           <TitleCell
+            href={`${LIST}/${row.original.id}`}
             meta={row.original.season.name}
             title={row.original.farmer.name}
             stretch

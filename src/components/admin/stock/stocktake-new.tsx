@@ -50,6 +50,7 @@ export function StocktakeNew() {
       <BackButton href={LIST} label="All stocktakes" className="mb-2" />
       <AdminPageHeader
         title="New stocktake"
+        hint="Count what is physically in a warehouse. Approving corrects the system to match."
         sub="Count what is physically on the floor; the book is compared at submit"
       />
 

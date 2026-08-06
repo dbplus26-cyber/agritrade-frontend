@@ -117,6 +117,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
       <BackButton href={LIST} label="All grants" className="mb-2" />
       <AdminPageHeader
         title="New input grant"
+        hint="Advance seed, fertiliser or tools to a farmer against this season."
         sub="Inputs handed to a farmer, valued in cedis and owed back at harvest"
       />
 

@@ -10,6 +10,13 @@ const nextConfig: NextConfig = {
     // are allowed.
     remotePatterns: [
       { protocol: "https", hostname: "commons.wikimedia.org" },
+      // Demo-fixture photography (prisma/demo/kit.ts). Picsum serves a stable
+      // image per seed string, which is what lets the seeded console be
+      // screenshotted twice and look the same. Harmless in production: nothing
+      // the app writes ever points here.
+      { protocol: "https", hostname: "picsum.photos" },
+      // Picsum redirects to this CDN host to serve the actual bytes.
+      { protocol: "https", hostname: "fastly.picsum.photos" },
       { protocol: "https", hostname: "upload.wikimedia.org" },
       // Commodity photos uploaded from the console (Cloudinary).
       //

@@ -619,6 +619,7 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
       <BackButton href={LIST} label="All agents" className="mb-2" />
       <AdminPageHeader
         title="Agent details"
+        hint="One field buyer: the money they hold, what they spent it on, and the last count."
         actions={
           <div className="flex flex-wrap gap-2">
             {/* Statement is a read - anyone with agent access can print it. */}

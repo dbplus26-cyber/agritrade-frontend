@@ -67,6 +67,7 @@ export function ExpenseDetail({ id }: { id: string }) {
       header={
         <AdminPageHeader
           title="Expense details"
+          hint="One cost: what it was for, and what has been paid against it."
           actions={
             <div className="flex flex-wrap items-center gap-2">
               <PdfLink

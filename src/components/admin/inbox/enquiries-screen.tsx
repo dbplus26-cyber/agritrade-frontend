@@ -171,6 +171,7 @@ export function EnquiriesScreen() {
     <div>
       <AdminPageHeader
         title="Enquiries"
+        hint="Messages sent through the public website."
         sub="Messages sent through the website contact form"
       />
 

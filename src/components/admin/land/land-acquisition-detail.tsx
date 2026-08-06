@@ -403,6 +403,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
       <BackButton href={LIST} label="All acquisitions" className="mb-2" />
       <AdminPageHeader
         title="Acquisition details"
+        hint="One piece of land being bought: the seller, the agreed price and what has been paid."
         actions={<LandAcquisitionStatusBadge status={a.status} />}
       />
 

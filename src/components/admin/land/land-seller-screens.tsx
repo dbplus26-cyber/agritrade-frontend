@@ -461,6 +461,7 @@ export function LandSellerCreate() {
       header={
         <AdminPageHeader
           title="Add seller"
+          hint="Someone you buy land from."
           sub="A landowner the business acquires plots from"
         />
       }

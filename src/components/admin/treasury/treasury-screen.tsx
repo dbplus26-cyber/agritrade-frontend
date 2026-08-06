@@ -162,7 +162,8 @@ export function TreasuryScreen() {
   if (overview && !overview.configured) {
     return (
       <div className="space-y-5">
-        <AdminPageHeader title="Company account" />
+        <AdminPageHeader title="Company account"
+        hint="The business's own balance, and moving money between its accounts." />
         <EmptyState
           title="Hubtel is not connected"
           description="This server has no Hubtel credentials, so balances cannot be read and no money can be sent. Whoever administers the server needs to set them."
@@ -175,6 +176,7 @@ export function TreasuryScreen() {
     <div className="space-y-5">
       <AdminPageHeader
         title="Company account"
+        hint="The business's own balance, and moving money between its accounts."
         sub="What the business holds at Hubtel, and moving it where it is needed"
         actions={
           <div className="flex flex-wrap gap-2">

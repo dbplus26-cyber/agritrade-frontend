@@ -643,6 +643,7 @@ export function PaymentAccountCreate() {
       <BackButton href={LIST} label="All accounts" className="mb-2" />
       <AdminPageHeader
         title="Add payment account"
+        hint="A bank or mobile money account your customers pay into."
         sub="A destination customers send money to"
       />
       <PaymentAccountFormFields />
@@ -676,6 +677,7 @@ export function PaymentAccountEdit({ id }: { id: string }) {
       header={
         <AdminPageHeader
           title="Payment account details"
+          hint="One account customers pay into, and everything received through it."
         />
       }
       aside={

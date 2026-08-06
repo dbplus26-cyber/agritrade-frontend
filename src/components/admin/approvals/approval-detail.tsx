@@ -55,6 +55,7 @@ export function ApprovalDetail({ id }: { id: string }) {
       <BackButton href={LIST} label="All approvals" className="mb-2" />
       <AdminPageHeader
         title="Approval details"
+        hint="One request waiting on a decision, with what it would change."
         sub={ACTION_LABEL[approval.action] ?? approval.action}
       />
 

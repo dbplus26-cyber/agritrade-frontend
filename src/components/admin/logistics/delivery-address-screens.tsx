@@ -584,7 +584,8 @@ export function DeliveryAddressCreate() {
       backHref={LIST}
       backLabel="All addresses"
       header={
-        <AdminPageHeader title="Add delivery address" sub="A destination trucks deliver to, saved for reuse" />
+        <AdminPageHeader title="Add delivery address"
+        hint="A saved drop-off point, with directions so a driver can find it." sub="A destination trucks deliver to, saved for reuse" />
       }
     >
       <DeliveryAddressFormFields />

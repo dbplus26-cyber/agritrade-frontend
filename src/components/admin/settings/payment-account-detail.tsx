@@ -248,6 +248,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
       <BackButton href={LIST} label="All accounts" className="mb-2" />
       <AdminPageHeader
         title="Payment account details"
+        hint="One account customers pay into, and everything received through it."
         actions={
           <span className="flex flex-wrap items-center gap-2">
             <ActiveBadge isActive={account.isActive} />

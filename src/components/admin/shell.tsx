@@ -47,6 +47,7 @@ import {
   adminNavGroups,
   screenTitle,
 } from "@/static-data/admin/nav";
+import { HelpWrap } from "@/components/admin/help-tip";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { usePendingApprovalsCount } from "@/hooks/use-pending-approvals";
 import { useConfirm } from "@/hooks/use-confirm";
@@ -411,7 +412,16 @@ function ConsoleSidebar({ activeKey }: { activeKey: string }) {
                           href={item.href}
                           onClick={() => setOpenMobile(false)}
                         >
-                          <span className="whitespace-nowrap">{item.label}</span>
+                          {/* HelpWrap (a span), not HelpTip (a button): a
+                              button nested inside an anchor is invalid HTML
+                              and browsers handle it inconsistently. */}
+                          <HelpWrap
+                            className="cursor-pointer whitespace-nowrap"
+                            side="right"
+                            text={item.hint ?? item.label}
+                          >
+                            {item.label}
+                          </HelpWrap>
                           {item.badge === "approvals" && pendingApprovals > 0 ? (
                             <NavBadge count={pendingApprovals} />
                           ) : null}

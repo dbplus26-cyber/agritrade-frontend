@@ -49,6 +49,7 @@ export function GrantDetail({ id }: { id: string }) {
       <BackButton href={LIST} label="All grants" className="mb-2" />
       <AdminPageHeader
         title="Grant details"
+        hint="Inputs advanced to one farmer, and the terms for getting them back."
         sub={`Recorded ${formatDateTime(g.createdAt)}`}
         actions={<GrantApprovalBadge status={g.approval?.status} />}
       />

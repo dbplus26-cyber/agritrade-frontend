@@ -1207,6 +1207,7 @@ export function ShipmentDetail({ id }: { id: string }) {
       <BackButton href={LIST} label="All shipments" className="mb-2" />
       <AdminPageHeader
         title="Shipment details"
+        hint="One truck: its load, its trip, its costs and what the driver is owed."
         actions={
           <span className="flex flex-wrap items-center gap-1.5">
             <ShipmentStatusBadge status={s.status} />

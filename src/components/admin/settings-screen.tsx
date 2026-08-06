@@ -293,6 +293,7 @@ export function SettingsScreen() {
     <div>
       <AdminPageHeader
         title="Settings"
+        hint="System-wide rules: approval limits, company details and notifications."
         sub="Thresholds, switches and company details the whole system reads"
       />
       {isLoading ? (

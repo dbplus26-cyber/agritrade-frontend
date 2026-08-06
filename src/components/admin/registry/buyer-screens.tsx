@@ -750,6 +750,7 @@ export function BuyerCreate() {
       header={
         <AdminPageHeader
           title="Add buyer"
+          hint="Someone who buys from you. Their payment terms can be set here too."
           sub="A customer the business sells to"
         />
       }

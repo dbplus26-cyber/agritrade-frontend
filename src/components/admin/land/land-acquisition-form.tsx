@@ -100,6 +100,7 @@ export function LandAcquisitionForm() {
       <BackButton href={LIST} label="All acquisitions" className="mb-2" />
       <AdminPageHeader
         title="New land acquisition"
+        hint="Record land you are buying, and the price agreed with the seller."
         sub="Buying a plot from a seller. It enters the plot register once completed."
       />
 

@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { HelpTip } from "@/components/admin/help-tip";
 import { cn } from "@/lib/utils";
 
 /**
@@ -272,11 +273,17 @@ export function AdminPageHeader({
   sub,
   actions,
   className,
+  hint,
 }: {
   title: string;
   sub?: string;
   actions?: React.ReactNode;
   className?: string;
+  /**
+   * One sentence on what this screen is for, shown on hover beside the title.
+   * The sub-line says what is ON the page; this says why you would come here.
+   */
+  hint?: string;
 }) {
   return (
     <div
@@ -298,6 +305,13 @@ export function AdminPageHeader({
       <div className="min-w-0 flex-1">
         <h1 className="line-clamp-2 text-[19px] leading-[1.3] font-bold text-adm-ink">
           {title}
+          {hint ? (
+            <HelpTip
+              className="ml-1.5 translate-y-[-1px]"
+              label={`What is the ${title} page for?`}
+              text={hint}
+            />
+          ) : null}
         </h1>
         {sub ? (
           <p className="mt-0.5 line-clamp-2 text-[13px] text-adm-muted" title={sub}>

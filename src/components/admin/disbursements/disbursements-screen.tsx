@@ -193,6 +193,7 @@ export function DisbursementsScreen() {
     <div className="space-y-5">
       <AdminPageHeader
         title="Money sent"
+        hint="Every mobile money and bank transfer sent from the business."
         sub="Every payout made through Hubtel, by the owner, staff or an agent in the field"
         actions={
           <AdminButton onClick={() => setSending(true)} type="button">

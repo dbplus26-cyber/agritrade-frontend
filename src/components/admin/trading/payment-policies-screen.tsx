@@ -434,6 +434,7 @@ export function PaymentPoliciesScreen() {
     <div>
       <AdminPageHeader
         title="Payment Policies"
+        hint="When a buyer has to pay you: the deposit and balance split."
         sub="The payment terms sales resolve against (sale > buyer > default)"
         actions={
           <AdminButton className="h-9 px-4" onClick={() => setCreateOpen(true)}>

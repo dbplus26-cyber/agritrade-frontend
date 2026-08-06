@@ -89,12 +89,29 @@ const titleClamp = (stretch?: boolean, avatar?: boolean): string =>
 export type CellWidth = keyof typeof CELL_WIDTHS;
 
 /**
+ * What a truncated cell says on hover.
+ *
+ * Two different answers, because the reader needs two different things.
+ *
+ * When the row HAS a detail page, dumping the full value into a tooltip is the
+ * wrong help: it hands back one field of a record whose other twenty fields
+ * are one click away, and it teaches the reader that hovering is how you read
+ * this table. So a linked cell says what to do instead.
+ *
+ * When the row has NO detail page the tooltip is the only place the full value
+ * exists, so it shows the value. Removing it there would genuinely lose
+ * information.
+ *
+ * `href` is the signal for which case applies, so the two can never drift
+ * apart: a cell is linked exactly when there is somewhere to go.
+ */
+const CLICK_THROUGH = "Click to view the full details";
+
+/**
  * The identity cell: a truncating title, with an optional description or
  * secondary fact on a quieter second line.
  *
- * `title` on both lines gives the untruncated text on hover, so nothing is
- * actually lost by clamping - it is one hover away rather than one horizontal
- * scroll away.
+ * Clamped text is never lost - see CLICK_THROUGH above for where it goes.
  */
 export function TitleCell({
   avatar = false,
@@ -127,7 +144,7 @@ export function TitleCell({
       className={cn(clamp, "block truncate font-medium text-adm-ink hover:underline")}
       href={href}
       onClick={(e) => e.stopPropagation()}
-      title={title}
+      title={CLICK_THROUGH}
     >
       {title}
     </Link>
@@ -159,7 +176,7 @@ export function TitleCell({
             // A little more than the title, preserving the hierarchy above.
             stretch && "max-w-[96%]",
           )}
-          title={meta}
+          title={href ? CLICK_THROUGH : meta}
         >
           {meta}
         </span>
@@ -175,6 +192,7 @@ export function TitleCell({
 export function TextCell({
   className,
   fallback = "-",
+  linked = false,
   mono = false,
   stretch = false,
   value,
@@ -183,6 +201,11 @@ export function TextCell({
   className?: string;
   /** Shown when there is nothing, so the column never looks broken. */
   fallback?: string;
+  /**
+   * True when this row opens a detail page. The hover then points there
+   * instead of repeating the value - see CLICK_THROUGH.
+   */
+  linked?: boolean;
   mono?: boolean;
   /** This cell is in the table's stretch column - see TitleCell.stretch. */
   stretch?: boolean;
@@ -200,7 +223,7 @@ export function TextCell({
         mono && "font-adminmono tabular-nums",
         className,
       )}
-      title={value}
+      title={linked ? CLICK_THROUGH : value}
     >
       {value}
     </span>
