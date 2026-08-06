@@ -10,12 +10,7 @@ import {
   ShieldCheck,
   UserCog,
 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { PhotoViewDialog } from "@/components/admin/photo-view";
 import { cn } from "@/lib/utils";
 import type { IUser } from "@/types/user.types";
 
@@ -75,34 +70,6 @@ export function IdentityAvatar({
 }
 
 /** Full-size square view of a profile photo, opened from the avatar. */
-export function PhotoViewDialog({
-  src,
-  name,
-  open,
-  onOpenChange,
-}: {
-  src: string;
-  name: string;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}) {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[420px] gap-3 border-adm-line p-4">
-        <DialogHeader>
-          <DialogTitle className="text-[14px] font-semibold text-adm-ink">
-            {name}
-          </DialogTitle>
-        </DialogHeader>
-        <div className="aspect-square w-full overflow-hidden rounded-[8px] bg-adm-sunken">
-          {/* eslint-disable-next-line @next/next/no-img-element -- full-view photo */}
-          <img src={src} alt={name} className="h-full w-full object-cover" />
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
 /** One labelled fact in the identity grid. */
 function Fact({
   label,

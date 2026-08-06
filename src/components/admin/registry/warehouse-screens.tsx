@@ -531,7 +531,7 @@ export function WarehouseEdit({ id }: { id: string }) {
       backLabel="All warehouses"
       header={
         <AdminPageHeader
-          title={warehouse.name}
+          title="Warehouse details"
           sub="Warehouse record and current stock"
         />
       }

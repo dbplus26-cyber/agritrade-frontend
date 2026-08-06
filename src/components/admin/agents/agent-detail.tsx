@@ -17,7 +17,6 @@ import {
   type Tone,
 } from "@/components/admin/ui";
 import { DateTimeCell } from "@/components/admin/date-cell";
-import { RegistryAvatar } from "@/components/admin/registry/supplier-screens";
 import { BackButton } from "@/components/ui/BackButton";
 import { DetailSkeleton, LedgerSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -45,6 +44,7 @@ import { useConfirm } from "@/hooks/use-confirm";
 import { formatDateTime } from "@/lib/format-date";
 import { formatCedis, MONEY_HIDDEN } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
+import { ViewablePhoto } from "@/components/admin/photo-view";
 import { cn } from "@/lib/utils";
 import {
   FloatTxType,
@@ -595,8 +595,7 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
     <div className="max-w-[1120px]">
       <BackButton href={LIST} label="All agents" className="mb-2" />
       <AdminPageHeader
-        title={name}
-        sub={agent.region ?? agent.email}
+        title="Agent details"
         actions={
           <div className="flex flex-wrap gap-2">
             {/* Statement is a read - anyone with agent access can print it. */}
@@ -691,10 +690,10 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
               )}
             >
               <div className="mb-3 flex items-center gap-3 border-b border-adm-hairline pb-3">
-                <RegistryAvatar
+                <ViewablePhoto
                   name={name}
-                  photoUrl={agent.profilePicture}
                   size={56}
+                  src={agent.profilePicture}
                 />
                 <div className="min-w-0">
                   <p className="min-w-0 text-[14px] font-bold text-adm-ink line-clamp-1 [overflow-wrap:anywhere]">

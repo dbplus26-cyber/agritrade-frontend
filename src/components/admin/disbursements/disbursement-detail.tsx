@@ -86,7 +86,7 @@ export function DisbursementDetail({ id }: { id: string }) {
     <div className="space-y-5">
       <BackButton href={LIST} label="Money sent" />
       <AdminPageHeader
-        title={d.recipientName}
+        title="Payout details"
         sub={`${RAIL_LABEL[d.rail]} · ${d.transactionNo}`}
         actions={
           settled ? null : (

@@ -678,7 +678,7 @@ export function ExpenseCategoryEdit({ id }: { id: string }) {
     <div className="max-w-[1180px]">
       <BackButton href={LIST} label="All categories" className="mb-2" />
       <AdminPageHeader
-        title={category.name}
+        title="Expense category details"
         sub="What this heading covers, and every cost filed under it"
       />
       {/* The record is two short fields; the spend under it is the page's

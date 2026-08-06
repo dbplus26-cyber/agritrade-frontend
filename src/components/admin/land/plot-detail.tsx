@@ -261,8 +261,7 @@ export function PlotDetail({ id }: { id: string }) {
     <div className="max-w-[1120px]">
       <BackButton href={LIST} label="All plots" className="mb-2" />
       <AdminPageHeader
-        title={p.locationText}
-        sub={`Plot ${p.reference} · ${p.sizeText}`}
+        title="Plot details"
         actions={
           <span className="flex flex-wrap items-center gap-1.5">
             {p.publishToWebsite ? <ToneBadge tone="sky">Live</ToneBadge> : null}

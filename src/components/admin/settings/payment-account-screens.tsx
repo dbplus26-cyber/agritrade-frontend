@@ -675,8 +675,7 @@ export function PaymentAccountEdit({ id }: { id: string }) {
       backLabel="Account details"
       header={
         <AdminPageHeader
-          title={account.label}
-          sub="Payment account record"
+          title="Payment account details"
         />
       }
       aside={

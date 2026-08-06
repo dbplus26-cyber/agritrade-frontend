@@ -12,6 +12,7 @@ import {
   Mono,
 } from "@/components/admin/ui";
 import { Absent } from "@/components/admin/registry/registry-bits";
+import { ViewablePhoto } from "@/components/admin/photo-view";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { BackButton } from "@/components/ui/BackButton";
 import { DetailSkeleton } from "@/components/admin/skeletons";
@@ -31,7 +32,6 @@ import {
 } from "@/redux/farm/farmers-api";
 import { useGetGrantsQuery } from "@/redux/farm/grants-api";
 import { useGetRepaymentsQuery } from "@/redux/farm/repayments-api";
-import { avatarOf } from "@/lib/avatar";
 import type { IFarmerGuarantor } from "@/types/farm.types";
 import {
   ActiveBadge,
@@ -72,7 +72,6 @@ export function FarmerDetail({ id }: { id: string }) {
     );
 
   const f = data.data.farmer;
-  const a = avatarOf(f.name);
 
   const run = async (fn: () => Promise<unknown>, ok: string) => {
     try {
@@ -138,21 +137,7 @@ export function FarmerDetail({ id }: { id: string }) {
   const aside = (
     <AdminCard className="px-5 py-5">
       <div className="flex flex-col items-center text-center">
-        {f.photoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element -- Cloudinary
-          <img
-            src={f.photoUrl}
-            alt={f.name}
-            className="h-24 w-24 rounded-full object-cover"
-          />
-        ) : (
-          <span
-            className="flex h-24 w-24 items-center justify-center rounded-full text-[28px] font-bold"
-            style={{ background: a.bg, color: a.fg }}
-          >
-            {a.init}
-          </span>
-        )}
+        <ViewablePhoto name={f.name} size={96} src={f.photoUrl} />
       </div>
       {/* One button per row at every width. Three buttons wrapping inside a
           340px rail broke into a ragged two-then-one, and each one's label was
@@ -185,8 +170,7 @@ export function FarmerDetail({ id }: { id: string }) {
     <div className="max-w-[1120px]">
       <BackButton href={LIST} label="All farmers" className="mb-2" />
       <AdminPageHeader
-        title={f.name}
-        sub={[f.community, f.phone].filter(Boolean).join(" · ") || undefined}
+        title="Farmer details"
         actions={<ActiveBadge active={f.isActive} />}
       />
 
@@ -199,13 +183,22 @@ export function FarmerDetail({ id }: { id: string }) {
               <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Profile
               </div>
-              {/* Phone and community are NOT repeated here - the page header
-                  carries both, and a fact stated twice on one screen makes the
-                  reader check whether they are the same fact. The short,
-                  comparable values run first; the two free-text fields take
-                  whole rows at the end, where a paragraph cannot strand a
-                  one-line value beside it. */}
+              {/* The identifying facts lead, because the page heading no
+                  longer carries them: it says WHICH KIND of record this is,
+                  and the record itself says which one. The short, comparable
+                  values follow; the two free-text fields take whole rows at
+                  the end, where a paragraph cannot strand a one-line value
+                  beside it. */}
               <DetailGrid>
+                <DetailItem label="Name" strong>
+                  {f.name}
+                </DetailItem>
+                <DetailItem label="Phone">
+                  {f.phone ? <Mono>{f.phone}</Mono> : <Absent />}
+                </DetailItem>
+                <DetailItem label="Community">
+                  {f.community ? f.community : <Absent />}
+                </DetailItem>
                 <DetailItem label="Date of birth">
                   {f.dateOfBirth ? formatDateOnly(f.dateOfBirth) : <Absent />}
                 </DetailItem>

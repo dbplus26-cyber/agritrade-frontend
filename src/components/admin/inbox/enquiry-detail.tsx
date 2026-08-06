@@ -96,7 +96,7 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
     <div>
       <BackButton href={LIST} label="All enquiries" className="mb-2" />
       <AdminPageHeader
-        title={enquiry.fullName}
+        title="Enquiry details"
         sub={`Enquiry ${enquiry.reference}`}
         actions={<EnquiryStatusBadge status={enquiry.status} />}
       />

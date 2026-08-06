@@ -154,7 +154,7 @@ function FarmApplicationDetailBody({
     <div>
       <BackButton href={LIST} label="All applications" className="mb-2" />
       <AdminPageHeader
-        title={application.name}
+        title="Application details"
         sub={`Application ${application.reference} · received ${formatDateTime(application.createdAt)}`}
         actions={<FarmApplicationStatusBadge status={application.status} />}
       />

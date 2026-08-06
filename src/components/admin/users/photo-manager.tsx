@@ -7,7 +7,8 @@ import { cn } from "@/lib/utils";
 import { notify } from "@/lib/notify";
 import { optimizeImage } from "@/lib/optimize-image";
 import type { IUser } from "@/types/user.types";
-import { IdentityAvatar, PhotoViewDialog } from "./user-identity";
+import { PhotoViewDialog } from "@/components/admin/photo-view";
+import { IdentityAvatar } from "./user-identity";
 
 /**
  * The profile-photo control, shared by the self-service profile and the

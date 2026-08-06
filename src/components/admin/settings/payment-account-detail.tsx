@@ -247,7 +247,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
     <div className="max-w-[1120px]">
       <BackButton href={LIST} label="All accounts" className="mb-2" />
       <AdminPageHeader
-        title={account.label}
+        title="Payment account details"
         sub={`${account.accountName} · ${account.accountNumber}`}
         actions={
           <span className="flex flex-wrap items-center gap-2">

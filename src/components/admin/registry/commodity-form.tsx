@@ -464,7 +464,7 @@ export function CommodityEdit({ id }: { id: string }) {
     <div className="max-w-[560px]">
       <BackButton href={LIST} label="All commodities" className="mb-2" />
       <AdminPageHeader
-        title={commodity.name}
+        title="Commodity details"
         sub="Edit the commodity, its website visibility and lifecycle"
       />
       <CommodityFormFields commodity={commodity} />

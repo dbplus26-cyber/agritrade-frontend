@@ -102,7 +102,7 @@ export function SeasonDetail({ id }: { id: string }) {
     <div className="max-w-[1120px]">
       <BackButton href={LIST} label="All seasons" className="mb-2" />
       <AdminPageHeader
-        title={s.name}
+        title="Season details"
         sub={`${formatFarmDate(s.startsOn)}${
           s.endsOn ? ` - ${formatFarmDate(s.endsOn)}` : ""
         }`}

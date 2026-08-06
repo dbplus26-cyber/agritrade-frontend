@@ -36,7 +36,10 @@ import {
   useGetDriversQuery,
   useUpdateDriverMutation,
 } from "@/redux/drivers/drivers-api";
-import { PhotoViewDialog } from "@/components/admin/users/user-identity";
+import {
+  PhotoViewDialog,
+  ViewablePhoto,
+} from "@/components/admin/photo-view";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
 import { DateTimeCell } from "@/components/admin/date-cell";
@@ -411,6 +414,25 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
   if (isEdit && !isEditing && driver) {
     return (
       <AdminCard className="px-5 py-[18px]">
+        {/* The photograph belongs on the READ view, not only behind Edit.
+            It was rendered inside the form, so at rest - which is how this
+            page is nearly always seen - the record showed no picture at all,
+            and the only way to look at one was to start editing. */}
+        <div className="mb-4 flex items-center gap-3.5 border-b border-adm-hairline pb-4">
+          <ViewablePhoto
+            name={driver.name}
+            size={64}
+            src={driver.photoUrl}
+          />
+          <div className="min-w-0">
+            <div className="text-[15px] font-semibold text-adm-ink [overflow-wrap:anywhere]">
+              {driver.name}
+            </div>
+            <div className="text-[12px] text-adm-muted">
+              {driver.photoUrl ? "Tap the photo to see it in full" : "No photo on file"}
+            </div>
+          </div>
+        </div>
         <RecordFacts
           facts={[
             { label: "Name", value: driver.name },

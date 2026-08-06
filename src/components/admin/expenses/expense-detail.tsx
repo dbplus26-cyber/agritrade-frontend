@@ -66,8 +66,7 @@ export function ExpenseDetail({ id }: { id: string }) {
       backLabel="All expenses"
       header={
         <AdminPageHeader
-          title={expense.category.name}
-          sub="A cost recorded against this heading"
+          title="Expense details"
           actions={
             <div className="flex flex-wrap items-center gap-2">
               <PdfLink

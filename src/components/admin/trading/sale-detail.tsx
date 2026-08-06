@@ -476,7 +476,7 @@ export function SaleDetail({
     <div className="max-w-[1120px]">
       <BackButton href={LIST} label="All sales" className="mb-2" />
       <AdminPageHeader
-        title={sale.buyer.name}
+        title="Sale details"
         sub={`Drafted ${formatSaleDate(sale.createdAt)}`}
         actions={
           <span className="flex flex-wrap items-center gap-1.5">
