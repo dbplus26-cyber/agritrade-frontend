@@ -558,11 +558,17 @@ function Crumbs() {
 /**
  * The console's closing rule: who owns the system and who built it. Sits under
  * the scrolling content rather than pinned, so it never competes with the work
- * on screen. Hidden behind the mobile tab bar's clearance on small screens.
+ * on screen.
+ *
+ * Desktop only. On a phone or tablet the credit line is dead weight at the end
+ * of every scroll, and below `md` it sat on top of the tab bar's clearance as
+ * well. `hidden` is display:none, so the manuru link leaves the tab order with
+ * it - nothing to trap focus. The tab-bar clearance it used to carry now lives
+ * on SidebarInset, which is the element that still needs it.
  */
 function ConsoleFooter() {
   return (
-    <footer className="mt-auto border-t border-adm-hairline px-4 pb-[calc(env(safe-area-inset-bottom)+72px)] pt-4 md:pb-5 lg:px-[26px]">
+    <footer className="mt-auto hidden border-t border-adm-hairline px-4 pb-5 pt-4 lg:block lg:px-[26px]">
       <div className="mx-auto flex w-full max-w-[1360px] flex-col items-center gap-2 text-center sm:flex-row sm:justify-between sm:text-left">
         <div className="flex items-center gap-2.5">
           <Image
@@ -612,7 +618,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <ConsoleSidebar activeKey={activeKey} />
       </div>
 
-      <SidebarInset className="min-w-0 bg-transparent pb-[62px] md:pb-0 print:pb-0">
+      {/* The bottom padding clears the fixed tab bar, which is 62px tall plus
+          its own safe-area inset - the footer used to add that inset on top,
+          and it is desktop-only now, so the full clearance belongs here. */}
+      <SidebarInset className="min-w-0 bg-transparent pb-[calc(env(safe-area-inset-bottom)+62px)] md:pb-0 print:pb-0">
         <header className="sticky top-0 z-40 flex h-[54px] flex-none items-center gap-3 border-b border-adm-line bg-adm-card px-4 lg:px-[26px] print:hidden">
           {/* Collapse/expand the rail (sheet on mobile) - dms behaviour in the
               console skin, living on the topbar's left edge. */}

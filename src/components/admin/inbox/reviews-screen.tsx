@@ -18,13 +18,13 @@ import {
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogDescription,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+} from "@/components/ui/responsive-dialog";
 import { CardGridSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -263,15 +263,15 @@ function AddReviewDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={close}>
-      <DialogContent className="max-w-[440px]">
-        <DialogHeader>
-          <DialogTitle>Record a review</DialogTitle>
-          <DialogDescription>
+    <ResponsiveDialog open={open} onOpenChange={close}>
+      <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[440px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>Record a review</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
             For reviews taken by phone or on paper. It publishes immediately,
             marked as recorded by the office - never as verified.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
@@ -355,7 +355,7 @@ function AddReviewDialog({
               {...register("text")}
             />
           </AdminField>
-          <DialogFooter className="mt-1 gap-2">
+          <ResponsiveDialogFooter className="mt-1 gap-2">
             <AdminButton
               type="button"
               variant="outline"
@@ -368,10 +368,10 @@ function AddReviewDialog({
             <AdminButton type="submit" disabled={isLoading}>
               {isLoading ? "Recording…" : "Record review"}
             </AdminButton>
-          </DialogFooter>
+          </ResponsiveDialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   );
 }
 

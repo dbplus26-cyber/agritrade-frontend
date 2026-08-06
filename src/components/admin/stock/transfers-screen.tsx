@@ -21,13 +21,13 @@ import {
 } from "@/components/admin/ui";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogDescription,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+} from "@/components/ui/responsive-dialog";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -467,14 +467,14 @@ function TransferDialog({
   });
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && close()}>
-      <DialogContent className="max-w-[440px]">
-        <DialogHeader>
-          <DialogTitle>New warehouse transfer</DialogTitle>
-          <DialogDescription>
+    <ResponsiveDialog open={open} onOpenChange={(o) => !o && close()}>
+      <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[440px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>New warehouse transfer</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
             Posts immediately: an out at the source, an in at the destination.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
         <form
           onSubmit={(e) => void onSubmit(e)}
           className="@container grid gap-3.5"
@@ -557,13 +557,13 @@ function TransferDialog({
           {serverError ? (
             <p
               role="alert"
-              className="rounded-[6px] border border-console-red/40 bg-console-red/5 px-3 py-2 text-[12.5px] font-medium text-console-red"
+              className="min-w-0 rounded-[6px] border border-console-red/40 bg-console-red/5 px-3 py-2 text-[12.5px] font-medium text-console-red [overflow-wrap:anywhere]"
             >
               {serverError}
             </p>
           ) : null}
 
-          <DialogFooter className="gap-2">
+          <ResponsiveDialogFooter className="gap-2">
             <Button
               type="button"
               variant="outline"
@@ -580,9 +580,9 @@ function TransferDialog({
             >
               {isLoading ? "Posting…" : "Post transfer"}
             </Button>
-          </DialogFooter>
+          </ResponsiveDialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   );
 }

@@ -20,13 +20,13 @@ import { DateOnlyCell } from "@/components/admin/date-cell";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogDescription,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+} from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import { useAuthRole } from "@/hooks/use-auth-role";
 import { useConfirm } from "@/hooks/use-confirm";
@@ -119,15 +119,15 @@ function CancelDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-[420px]">
-        <DialogHeader>
-          <DialogTitle>Cancel this sale?</DialogTitle>
-          <DialogDescription>
+    <ResponsiveDialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <ResponsiveDialogContent className="sm:max-w-[420px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>Cancel this sale?</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
             Cancelling is only possible while nothing has been paid. A reason is
             kept on the record.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
@@ -140,7 +140,7 @@ function CancelDialog({
               {...register("reason")}
             />
           </AdminField>
-          <DialogFooter className="gap-2">
+          <ResponsiveDialogFooter className="gap-2">
             <AdminButton
               type="button"
               variant="outline"
@@ -157,10 +157,10 @@ function CancelDialog({
             >
               {isLoading ? "Cancelling…" : "Cancel sale"}
             </AdminButton>
-          </DialogFooter>
+          </ResponsiveDialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   );
 }
 

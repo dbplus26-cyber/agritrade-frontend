@@ -23,13 +23,13 @@ import { DetailSkeleton, LedgerSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { ListPagination } from "@/components/ui/ListPagination";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogDescription,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+} from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import {
   useCreateReconciliationMutation,
@@ -337,14 +337,16 @@ function TopUpDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-[400px]">
-        <DialogHeader>
-          <DialogTitle>Top up {agentName}&apos;s float</DialogTitle>
-          <DialogDescription>
+    <ResponsiveDialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <ResponsiveDialogContent className="sm:max-w-[400px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle className="[overflow-wrap:anywhere]">
+            Top up {agentName}&apos;s float
+          </ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
             Cash or mobile money handed to the agent for village purchases.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
@@ -374,18 +376,18 @@ function TopUpDialog({
               {...register("reason")}
             />
           </AdminField>
-          <DialogFooter className="gap-2">
+          <ResponsiveDialogFooter className="gap-2">
             <AdminButton type="button" variant="outline" className="h-9 px-3.5" onClick={onClose}>
               Cancel
             </AdminButton>
             <AdminButton type="submit" disabled={isLoading} className="h-9 px-4">
               {isLoading ? "Topping up…" : "Top up float"}
             </AdminButton>
-          </DialogFooter>
+          </ResponsiveDialogFooter>
         </form>
-      </DialogContent>
+      </ResponsiveDialogContent>
       {confirmationDialog}
-    </Dialog>
+    </ResponsiveDialog>
   );
 }
 
@@ -457,16 +459,18 @@ function ReconcileDialog({
   );
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[560px]">
-        <DialogHeader>
-          <DialogTitle>Reconcile {agentName}&apos;s float</DialogTitle>
-          <DialogDescription>
+    <ResponsiveDialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[560px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle className="[overflow-wrap:anywhere]">
+            Reconcile {agentName}&apos;s float
+          </ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
             The computation below is what the ledger says should be in hand.
             Count the cash together, enter it, and any difference posts as a
             signed adjustment - the ledger is never rewritten.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
 
         {preview.isLoading ? (
           <p className="py-2 text-[13px] text-adm-muted">Computing…</p>
@@ -552,7 +556,7 @@ function ReconcileDialog({
                   {...register("notes")}
                 />
               </AdminField>
-              <DialogFooter className="gap-2">
+              <ResponsiveDialogFooter className="gap-2">
                 <AdminButton
                   type="button"
                   variant="outline"
@@ -568,12 +572,12 @@ function ReconcileDialog({
                 >
                   {isLoading ? "Posting…" : "Post reconciliation"}
                 </AdminButton>
-              </DialogFooter>
+              </ResponsiveDialogFooter>
             </form>
           </>
         )}
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   );
 }
 

@@ -15,6 +15,7 @@ import {
   DetailShell,
   Mono,
   adminInputClass,
+  adminLinkClass,
   adminSelectClass,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
@@ -24,14 +25,6 @@ import { DriverSettlementCard } from "@/components/admin/drivers/driver-settleme
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { FilePicker } from "@/components/ui/FilePicker";
 import { SignaturePad } from "@/components/ui/SignaturePad";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
@@ -147,15 +140,15 @@ function ExpenseDialog({
   };
 
   return (
-    <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-[420px]">
-        <DialogHeader>
-          <DialogTitle>Add a shipment expense</DialogTitle>
-          <DialogDescription>
+    <ResponsiveDialog open onOpenChange={(o) => !o && onClose()}>
+      <ResponsiveDialogContent className="sm:max-w-[420px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>Add a shipment expense</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
             Transport, loading and the like - it feeds this shipment&apos;s
             profit.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
@@ -184,7 +177,7 @@ function ExpenseDialog({
           <AdminField label="Description" optional>
             <Input className={adminInputClass} {...register("description")} />
           </AdminField>
-          <DialogFooter className="gap-2">
+          <ResponsiveDialogFooter className="gap-2">
             <AdminButton
               type="button"
               variant="outline"
@@ -196,10 +189,10 @@ function ExpenseDialog({
             <AdminButton type="submit" disabled={isLoading} className="h-9 px-4">
               {isLoading ? "Adding…" : "Add expense"}
             </AdminButton>
-          </DialogFooter>
+          </ResponsiveDialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   );
 }
 
@@ -380,14 +373,14 @@ function CancelDialog({
     }
   };
   return (
-    <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-[420px]">
-        <DialogHeader>
-          <DialogTitle>Cancel this shipment?</DialogTitle>
-          <DialogDescription>
+    <ResponsiveDialog open onOpenChange={(o) => !o && onClose()}>
+      <ResponsiveDialogContent className="sm:max-w-[420px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>Cancel this shipment?</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
             Only possible before dispatch, while no stock has moved.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
@@ -399,7 +392,7 @@ function CancelDialog({
               {...register("reason")}
             />
           </AdminField>
-          <DialogFooter className="gap-2">
+          <ResponsiveDialogFooter className="gap-2">
             <AdminButton
               type="button"
               variant="outline"
@@ -416,10 +409,10 @@ function CancelDialog({
             >
               {isLoading ? "Cancelling…" : "Cancel shipment"}
             </AdminButton>
-          </DialogFooter>
+          </ResponsiveDialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   );
 }
 
@@ -462,11 +455,11 @@ function VoidExpenseDialog({
     }
   };
   return (
-    <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-[420px]">
-        <DialogHeader>
-          <DialogTitle>Void this expense?</DialogTitle>
-          <DialogDescription>
+    <ResponsiveDialog open onOpenChange={(o) => !o && onClose()}>
+      <ResponsiveDialogContent className="sm:max-w-[420px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>Void this expense?</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
             {expense.category.name}
             {expense.amountGhs !== null ? " · " : ""}
             {expense.amountGhs !== null ? (
@@ -476,8 +469,8 @@ function VoidExpenseDialog({
             ) : null}
             . The voucher is struck out with your reason, never erased, and the
             trip&apos;s profit moves accordingly.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
@@ -489,7 +482,7 @@ function VoidExpenseDialog({
               {...register("reason")}
             />
           </AdminField>
-          <DialogFooter className="gap-2">
+          <ResponsiveDialogFooter className="gap-2">
             <AdminButton
               type="button"
               variant="outline"
@@ -506,10 +499,10 @@ function VoidExpenseDialog({
             >
               {isLoading ? "Voiding…" : "Void expense"}
             </AdminButton>
-          </DialogFooter>
+          </ResponsiveDialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   );
 }
 
@@ -825,7 +818,10 @@ export function ShipmentDetail({ id }: { id: string }) {
                 <div className="flex items-start justify-between gap-2.5">
                   <Link
                     href={`/admin/sales/${sale.id}`}
-                    className="font-adminmono min-w-0 text-[12.5px] font-semibold text-console tabular-nums hover:underline"
+                    className={cn(
+                      adminLinkClass,
+                      "font-adminmono min-w-0 text-[12.5px] font-semibold tabular-nums",
+                    )}
                   >
                     {sale.transactionNo}
                   </Link>
@@ -846,9 +842,15 @@ export function ShipmentDetail({ id }: { id: string }) {
                   </span>
                 </div>
 
-                <div className="mt-2 min-w-0 text-[14px] leading-[1.35] font-semibold text-adm-ink [overflow-wrap:anywhere]">
+                <Link
+                  className={cn(
+                    adminLinkClass,
+                    "mt-2 block min-w-0 text-[14px] leading-[1.35] font-semibold [overflow-wrap:anywhere]",
+                  )}
+                  href={`/admin/buyers/${sale.buyer.id}`}
+                >
                   {sale.buyer.name}
-                </div>
+                </Link>
                 {sale.buyer.phone ? (
                   <Mono className="mt-0.5 block text-[12px] text-adm-muted">
                     {sale.buyer.phone}
@@ -913,7 +915,13 @@ export function ShipmentDetail({ id }: { id: string }) {
             {s.truckReg}
           </DetailItem>
           <DetailItem full label="Route">
-            {s.originWarehouse.name} → {s.destination}
+            <Link
+              className={adminLinkClass}
+              href={`/admin/warehouses/${s.originWarehouse.id}`}
+            >
+              {s.originWarehouse.name}
+            </Link>{" "}
+            → {s.destination}
           </DetailItem>
           <DetailItem label="Total weight" mono>
             {formatKg(s.totalWeightKg)}
@@ -953,6 +961,11 @@ export function ShipmentDetail({ id }: { id: string }) {
           Driver
         </p>
         <DetailGrid className="mt-1">
+          {/* The driver block is a SNAPSHOT taken when the trip was booked -
+              name, phone, licence and the rest are copied onto the shipment
+              and editable here without touching the directory. Linking the
+              name would promise the reader that the record they land on says
+              what this page says, and on an old trip it will not. */}
           <DetailItem label="Name">{s.driverName}</DetailItem>
           {s.driverPhone ? (
             <DetailItem label="Phone" mono>
@@ -1010,14 +1023,25 @@ export function ShipmentDetail({ id }: { id: string }) {
               className="flex items-baseline justify-between gap-3 border-b border-adm-hairline py-2 last:border-b-0"
             >
               <div className="min-w-0">
-                <span className="font-medium text-adm-ink">{a.commodity.name}</span>
+                <Link
+                  className={cn(adminLinkClass, "font-medium")}
+                  href={`/admin/commodities/${a.commodity.id}`}
+                >
+                  {a.commodity.name}
+                </Link>
                 <Mono className="ml-2 text-[12px] text-adm-muted">
                   {formatKg(a.weightKg)} @{" "}
                   <Money value={a.unitCostSnapshotGhs} />
                 </Mono>
-                <Mono className="ml-2 text-[11.5px] text-console">
+                <Link
+                  className={cn(
+                    adminLinkClass,
+                    "font-adminmono ml-2 text-[11.5px] tabular-nums",
+                  )}
+                  href={`/admin/sales/${a.sale.id}`}
+                >
                   {a.sale.transactionNo}
-                </Mono>
+                </Link>
               </div>
               <Mono className="whitespace-nowrap text-[13px] text-adm-ink">
                 <Money value={a.lineCostGhs} />
@@ -1048,7 +1072,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                 href={shipmentDocumentUrl(s.id, doc.id)}
                 target="_blank"
                 rel="noreferrer"
-                className="min-w-0 text-console [overflow-wrap:anywhere] hover:underline"
+                className={cn(adminLinkClass, "min-w-0 [overflow-wrap:anywhere]")}
               >
                 {doc.name}
               </a>
@@ -1149,9 +1173,12 @@ export function ShipmentDetail({ id }: { id: string }) {
                   buried the amounts the list exists to show. The full text
                   stays one hover away. */}
               <div className="min-w-0">
-                <span className="block truncate text-adm-ink">
+                <Link
+                  className={cn(adminLinkClass, "block truncate")}
+                  href={`/admin/expense-categories/${e.category.id}`}
+                >
                   {e.category.name}
-                </span>
+                </Link>
                 {e.description ? (
                   <span
                     className="mt-0.5 line-clamp-2 text-[12px] text-adm-muted"

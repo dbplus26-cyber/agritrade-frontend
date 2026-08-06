@@ -150,7 +150,7 @@ function PayDialog({
 
   return (
     <ResponsiveDialog open onOpenChange={onClose}>
-      <ResponsiveDialogContent className="max-w-[460px]">
+      <ResponsiveDialogContent className="sm:max-w-[460px]">
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Pay this cost</ResponsiveDialogTitle>
           <ResponsiveDialogDescription>

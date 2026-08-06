@@ -18,13 +18,13 @@ import { CardGridSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogDescription,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+} from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import { useAuthRole } from "@/hooks/use-auth-role";
 import { useConfirm } from "@/hooks/use-confirm";
@@ -141,18 +141,18 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-[480px]">
-        <DialogHeader>
-          <DialogTitle>New payment policy</DialogTitle>
-          <DialogDescription>
+    <ResponsiveDialog open onOpenChange={(o) => !o && onClose()}>
+      <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[480px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>New payment policy</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
             Milestone percentages must add up to 100.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-3"
+          className="@container flex flex-col gap-3"
         >
           <AdminField label="Name" error={errors.name?.message}>
             <Input
@@ -173,40 +173,50 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
             {fields.map((field, i) => (
               <div
                 key={field.id}
-                className="grid grid-cols-[1fr_70px_130px_auto] gap-2"
+                // Stacked until the form itself is 520px wide, which on a
+                // phone drawer it never is: label, percent and trigger on one
+                // row would leave each about 70px at 375px and overflow at
+                // 280px. The label takes its own line, the rest share the next.
+                className="grid grid-cols-1 gap-2 @min-[520px]:grid-cols-[minmax(0,1fr)_70px_130px_auto] @min-[520px]:items-center"
               >
                 <Input
-                  className={adminInputClass}
+                  aria-label={`Milestone ${String(i + 1)} label`}
+                  className={cn(adminInputClass, "min-w-0")}
                   placeholder="Label"
                   {...register(`milestones.${i}.label`)}
                 />
-                <Input
-                  className={adminInputClass}
-                  inputMode="decimal"
-                  placeholder="%"
-                  {...register(`milestones.${i}.percent`)}
-                />
-                <select
-                  className={cn(adminSelectClass, "w-full")}
-                  {...register(`milestones.${i}.trigger`)}
-                >
-                  {TRIGGER_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
-                {fields.length > 1 ? (
-                  <button
-                    type="button"
-                    onClick={() => remove(i)}
-                    className="cursor-pointer text-[12px] text-console-red"
+                <div className="grid grid-cols-[70px_minmax(0,1fr)_auto] items-center gap-2 @min-[520px]:contents">
+                  <Input
+                    aria-label={`Milestone ${String(i + 1)} percent`}
+                    className={cn(adminInputClass, "min-w-0")}
+                    inputMode="decimal"
+                    placeholder="%"
+                    {...register(`milestones.${i}.percent`)}
+                  />
+                  <select
+                    aria-label={`Milestone ${String(i + 1)} trigger`}
+                    className={cn(adminSelectClass, "w-full min-w-0")}
+                    {...register(`milestones.${i}.trigger`)}
                   >
-                    ✕
-                  </button>
-                ) : (
-                  <span />
-                )}
+                    {TRIGGER_OPTIONS.map((o) => (
+                      <option key={o.value} value={o.value}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
+                  {fields.length > 1 ? (
+                    <button
+                      type="button"
+                      aria-label={`Remove milestone ${String(i + 1)}`}
+                      onClick={() => remove(i)}
+                      className="cursor-pointer px-1 text-[12px] text-console-red"
+                    >
+                      ✕
+                    </button>
+                  ) : (
+                    <span />
+                  )}
+                </div>
               </div>
             ))}
             {errors.milestones?.message ? (
@@ -231,7 +241,7 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
             Make this the default policy
           </label>
 
-          <DialogFooter className="gap-2">
+          <ResponsiveDialogFooter className="gap-2">
             <AdminButton
               type="button"
               variant="outline"
@@ -243,10 +253,10 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
             <AdminButton type="submit" disabled={isLoading} className="h-9 px-4">
               {isLoading ? "Creating…" : "Create policy"}
             </AdminButton>
-          </DialogFooter>
+          </ResponsiveDialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   );
 }
 

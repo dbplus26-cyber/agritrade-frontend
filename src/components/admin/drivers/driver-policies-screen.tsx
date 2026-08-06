@@ -17,13 +17,13 @@ import {
   adminSelectClass,
 } from "@/components/admin/ui";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogDescription,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+} from "@/components/ui/responsive-dialog";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
@@ -131,17 +131,21 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-[560px]">
-        <DialogHeader>
-          <DialogTitle>New driver payment policy</DialogTitle>
-          <DialogDescription>
+    <ResponsiveDialog open onOpenChange={onClose}>
+      <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[560px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>New driver payment policy</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
             How a haulier gets paid for a trip. The shares must add up to 100.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
 
         <form
-          className="flex flex-col gap-4"
+          // The milestone rows below query this element's width, not the
+          // viewport's - the dialog is portaled out of the console's
+          // `@container/main`, so without a container here the `@min-` rules
+          // never resolve and the row stays stacked even on a wide screen.
+          className="@container flex flex-col gap-4"
           noValidate
           onSubmit={handleSubmit(onSubmit)}
         >
@@ -243,17 +247,17 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
             />
           </label>
 
-          <DialogFooter className="gap-2">
+          <ResponsiveDialogFooter className="gap-2">
             <AdminButton onClick={onClose} type="button" variant="ghost">
               Cancel
             </AdminButton>
             <AdminButton disabled={isLoading} type="submit">
               {isLoading ? "Creating…" : "Create policy"}
             </AdminButton>
-          </DialogFooter>
+          </ResponsiveDialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   );
 }
 

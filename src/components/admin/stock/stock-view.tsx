@@ -12,13 +12,13 @@ import {
 import { HelpTip } from "@/components/admin/help-tip";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogDescription,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+} from "@/components/ui/responsive-dialog";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -516,15 +516,15 @@ function AdjustmentDialog({
   });
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && close()}>
-      <DialogContent className="max-w-[440px]">
-        <DialogHeader>
-          <DialogTitle>Request a stock adjustment</DialogTitle>
-          <DialogDescription>
+    <ResponsiveDialog open={open} onOpenChange={(o) => !o && close()}>
+      <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[440px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>Request a stock adjustment</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
             Nothing moves yet - the adjustment applies only once it is
             approved from the approvals inbox.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
         <form onSubmit={(e) => void onSubmit(e)} className="grid gap-3.5">
           <AdminField label="Warehouse" error={errors.warehouseId?.message}>
             <select
@@ -604,7 +604,7 @@ function AdjustmentDialog({
               {...register("reason")}
             />
           </AdminField>
-          <DialogFooter className="gap-2">
+          <ResponsiveDialogFooter className="gap-2">
             <Button
               type="button"
               variant="outline"
@@ -621,9 +621,9 @@ function AdjustmentDialog({
             >
               {isLoading ? "Filing…" : "File for approval"}
             </Button>
-          </DialogFooter>
+          </ResponsiveDialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   );
 }

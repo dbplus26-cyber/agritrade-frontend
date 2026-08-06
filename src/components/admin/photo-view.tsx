@@ -35,7 +35,7 @@ export function PhotoViewDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[420px] gap-3 border-adm-line p-4">
+      <DialogContent className="sm:max-w-[420px] gap-3 border-adm-line p-4">
         <DialogHeader>
           <DialogTitle className="text-[14px] font-semibold text-adm-ink [overflow-wrap:anywhere]">
             {name}

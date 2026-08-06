@@ -106,7 +106,7 @@ export function DriverFeeDialog({
 
   return (
     <ResponsiveDialog open onOpenChange={onClose}>
-      <ResponsiveDialogContent className="max-w-[440px]">
+      <ResponsiveDialogContent className="sm:max-w-[440px]">
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>
             {currentFeeGhs === null ? "Agree the driver fee" : "Change the fee"}
@@ -232,7 +232,7 @@ export function DriverPaymentDialog({
 
   return (
     <ResponsiveDialog open onOpenChange={onClose}>
-      <ResponsiveDialogContent className="max-w-[460px]">
+      <ResponsiveDialogContent className="sm:max-w-[460px]">
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Pay the driver</ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
@@ -380,7 +380,7 @@ export function ReverseReasonDialog({
 
   return (
     <ResponsiveDialog open onOpenChange={onClose}>
-      <ResponsiveDialogContent className="max-w-[440px]">
+      <ResponsiveDialogContent className="sm:max-w-[440px]">
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Reverse {subject}?</ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
