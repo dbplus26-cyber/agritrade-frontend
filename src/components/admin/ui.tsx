@@ -54,18 +54,37 @@ export function DetailRow({
 export function DetailItem({
   label,
   children,
+  full = false,
   mono = false,
   strong = false,
   className,
 }: {
   children: React.ReactNode;
+  /**
+   * Long prose - terms, notes, directions, an address - takes the whole row.
+   *
+   * Without it a paragraph and a date share a row, and because grid items
+   * stretch to the tallest in their row, the date is left stranded at the top
+   * of a cell several lines deep with nothing under it. The pair reads as
+   * broken rather than as two facts. Prose has no natural width, so it gets
+   * the row; everything short shares the one above or below it.
+   *
+   * Same flag, same reason, as RecordFacts' `full`.
+   */
+  full?: boolean;
   label: string;
   mono?: boolean;
   strong?: boolean;
   className?: string;
 }) {
   return (
-    <div className={cn("min-w-0 border-b border-adm-hairline py-2", className)}>
+    <div
+      className={cn(
+        "min-w-0 border-b border-adm-hairline py-2",
+        full && "col-span-full",
+        className,
+      )}
+    >
       <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         {label}
       </p>

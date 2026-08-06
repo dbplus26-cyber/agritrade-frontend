@@ -129,11 +129,14 @@ export function GrantDetail({ id }: { id: string }) {
                 Never shown publicly; downloads are logged.
               </p>
               <DetailGrid>
-                <DetailItem label="Agreed terms">
-                  {g.agreedTerms ?? <NotRecorded />}
-                </DetailItem>
+                {/* Date first, terms full-width under it. Side by side, a
+                    paragraph of terms stretched the row several lines deep
+                    and left the date stranded at the top of its cell. */}
                 <DetailItem label="Due date">
                   {g.dueDate ? formatDateOnly(g.dueDate) : <NotRecorded />}
+                </DetailItem>
+                <DetailItem full label="Agreed terms">
+                  {g.agreedTerms ?? <NotRecorded />}
                 </DetailItem>
               </DetailGrid>
               <div className="mt-2 border-t border-adm-hairline pt-1">

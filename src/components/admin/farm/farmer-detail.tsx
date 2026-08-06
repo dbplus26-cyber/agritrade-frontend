@@ -113,6 +113,10 @@ export function FarmerDetail({ id }: { id: string }) {
     );
   };
 
+  // The rail carries the portrait and the three things you can DO. It used to
+  // repeat the name under the photo and the phone under that, both of which
+  // the page header already says one column to the left - so the reader met
+  // the same two facts twice before reaching anything new.
   const aside = (
     <AdminCard className="px-5 py-5">
       <div className="flex flex-col items-center text-center">
@@ -131,21 +135,17 @@ export function FarmerDetail({ id }: { id: string }) {
             {a.init}
           </span>
         )}
-        <div className="mt-3 text-[15px] font-semibold text-adm-ink">{f.name}</div>
-        {f.phone ? (
-          <div className="text-[12.5px] text-adm-muted">{f.phone}</div>
-        ) : null}
       </div>
-      <div className="mt-4 flex flex-wrap justify-center gap-2 border-t border-adm-hairline pt-4 xl:flex-col">
+      {/* One button per row at every width. Three buttons wrapping inside a
+          340px rail broke into a ragged two-then-one, and each one's label was
+          fighting the padding for the room to stay on one line. Full width
+          also gives them a single left edge to read down. */}
+      <div className="mt-5 flex flex-col gap-2 border-t border-adm-hairline pt-4 [&>*]:w-full">
         <AdminButton className="h-9 px-4" asChild>
           <Link href={`${LIST}/${f.id}/statement`}>Statement</Link>
         </AdminButton>
         <AdminButton variant="outline" className="h-9 px-4" asChild>
-          {/* ?edit=1 opens the form already unlocked. Arriving from a detail
-              page is an explicit intent to edit, so making the user press
-              "Edit farmer" again on the form is a second click for nothing.
-              The bare /edit URL still opens read-only. */}
-          <Link href={`${LIST}/${f.id}/edit?edit=1`}>Edit</Link>
+          <Link href={`${LIST}/${f.id}/edit`}>Edit</Link>
         </AdminButton>
         <AdminButton
           variant="outline"
@@ -181,35 +181,35 @@ export function FarmerDetail({ id }: { id: string }) {
               <div className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Profile
               </div>
+              {/* Phone and community are NOT repeated here - the page header
+                  carries both, and a fact stated twice on one screen makes the
+                  reader check whether they are the same fact. The short,
+                  comparable values run first; the two free-text fields take
+                  whole rows at the end, where a paragraph cannot strand a
+                  one-line value beside it. */}
               <DetailGrid>
-                <DetailItem label="Phone">
-                  {f.phone ? <Mono>{f.phone}</Mono> : <Absent />}
-                </DetailItem>
-                <DetailItem label="Community">
-                  {f.community ? f.community : <Absent />}
-                </DetailItem>
-                <DetailItem label="Address">
-                  {f.address ? f.address : <Absent />}
-                </DetailItem>
                 <DetailItem label="Date of birth">
                   {f.dateOfBirth ? formatDateOnly(f.dateOfBirth) : <Absent />}
                 </DetailItem>
                 <DetailItem label="ID">
                   {pairOrAbsent(f.idType, f.idNumber)}
                 </DetailItem>
-                <DetailItem label="Farm location">
-                  {f.farmLocation ? f.farmLocation : <Absent />}
+                <DetailItem label="MoMo number">
+                  {f.momoNumber ? <Mono>{f.momoNumber}</Mono> : <Absent />}
                 </DetailItem>
                 <DetailItem label="Farm size">
                   {f.farmSizeAcres != null ? `${f.farmSizeAcres} acres` : <Absent />}
                 </DetailItem>
+                <DetailItem label="Farm location">
+                  {f.farmLocation ? f.farmLocation : <Absent />}
+                </DetailItem>
                 <DetailItem label="Next of kin">
                   {pairOrAbsent(f.nextOfKinName, f.nextOfKinPhone)}
                 </DetailItem>
-                <DetailItem label="MoMo number">
-                  {f.momoNumber ? <Mono>{f.momoNumber}</Mono> : <Absent />}
+                <DetailItem full label="Address">
+                  {f.address ? f.address : <Absent />}
                 </DetailItem>
-                <DetailItem label="Notes" className="sm:col-span-2 xl:col-span-3">
+                <DetailItem full label="Notes">
                   {f.notes ? f.notes : <span className="text-adm-muted">No notes.</span>}
                 </DetailItem>
               </DetailGrid>
@@ -237,10 +237,15 @@ export function FarmerDetail({ id }: { id: string }) {
               {f.guarantors.length === 0 ? (
                 <p className="px-5 py-4 text-[13px] text-adm-muted">No guarantors yet.</p>
               ) : (
-                <ul className="divide-y divide-soil/10">
+                <ul className="divide-y divide-adm-hairline">
                   {f.guarantors.map((g) => (
                     <li key={g.id} className="px-5 py-3 text-[13px]">
-                      <div className="flex items-start justify-between gap-3">
+                      {/* Stacked below sm. A guarantor's details are free text
+                          - name, relationship, address, notes - and sharing a
+                          row with two action links squeezed them into a
+                          sliver on a phone. The actions drop to their own row
+                          instead of competing for the width. */}
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
                         <div className="min-w-0">
                           <div className="font-semibold text-adm-ink [overflow-wrap:anywhere]">
                             {g.name}
@@ -273,7 +278,7 @@ export function FarmerDetail({ id }: { id: string }) {
                             </div>
                           ) : null}
                         </div>
-                        <div className="flex flex-none items-center gap-3">
+                        <div className="flex flex-none items-center gap-3 sm:justify-end">
                           <button
                             type="button"
                             onClick={() => setGuarantorDialog(g)}
@@ -372,7 +377,7 @@ export function FarmerDetail({ id }: { id: string }) {
                 {(grants.data?.data ?? []).length === 0 ? (
                   <p className="px-5 py-4 text-[13px] text-adm-muted">No grants yet.</p>
                 ) : (
-                  <ul className="divide-y divide-soil/10">
+                  <ul className="divide-y divide-adm-hairline">
                     {(grants.data?.data ?? []).map((g) => (
                       <li key={g.id} className="px-5 py-2.5 text-[13px]">
                         <div className="flex items-center justify-between gap-2">
@@ -408,7 +413,7 @@ export function FarmerDetail({ id }: { id: string }) {
                 {(repayments.data?.data ?? []).length === 0 ? (
                   <p className="px-5 py-4 text-[13px] text-adm-muted">No repayments yet.</p>
                 ) : (
-                  <ul className="divide-y divide-soil/10">
+                  <ul className="divide-y divide-adm-hairline">
                     {(repayments.data?.data ?? []).map((r) => (
                       <li key={r.id} className="px-5 py-2.5 text-[13px]">
                         <div className="flex items-center justify-between gap-2">

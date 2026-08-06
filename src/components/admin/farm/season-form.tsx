@@ -1,6 +1,5 @@
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,7 +10,6 @@ import {
   AdminPageHeader,
   adminInputClass,
 } from "@/components/admin/ui";
-import { RecordFacts } from "@/components/admin/record-facts";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -41,42 +39,25 @@ const toFormValues = (season?: ISeason): SeasonValues =>
       }
     : { description: "", endsOn: "", name: "", startsOn: "" };
 
-export function SeasonForm({
-  season,
-  startEditing = false,
-}: {
-  season?: ISeason;
-  /** Set by the edit route when the detail page's Edit button sent the user
-   * here, so the form opens unlocked instead of asking for a second click. */
-  startEditing?: boolean;
-}) {
+export function SeasonForm({ season }: { season?: ISeason }) {
   const router = useRouter();
   const [createSeason, createState] = useCreateSeasonMutation();
   const [updateSeason, updateState] = useUpdateSeasonMutation();
   const saving = createState.isLoading || updateState.isLoading;
 
-  // Edit opens READ-ONLY; the Edit button unlocks the inputs. Create is
-  // always editable.
-  const [isEditing, setIsEditing] = useState(season === undefined || startEditing);
-  const readOnly = !isEditing;
-  // Keep disabled inputs legible as a read view rather than a greyed-out form.
-  const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
+  // Always editable. This route is reached from the season's own detail page,
+  // which is where the record is READ - so opening the form locked, on top of
+  // a read-only copy of facts the reader has just come from, asked for a
+  // second click to do the one thing the page is for.
 
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm<SeasonValues>({
     resolver: zodResolver(seasonSchema),
     defaultValues: toFormValues(season),
   });
-
-  // A background refetch can bump the record. Track the fresh values while
-  // reading, but never clobber an in-progress edit.
-  useEffect(() => {
-    if (season && !isEditing) reset(toFormValues(season));
-  }, [season, isEditing, reset]);
 
   const onSubmit = async (values: SeasonValues) => {
     const description = values.description?.trim() ?? "";
@@ -109,38 +90,6 @@ export function SeasonForm({
     }
   };
 
-  // At rest an existing record READS; the form appears only on Edit.
-  if (season && !isEditing) {
-    return (
-      <div className="max-w-[520px]">
-        <BackButton href={LIST} label="All seasons" className="mb-2" />
-        <AdminPageHeader
-          title={season.name}
-          sub="The planting season that grants and repayments are booked against"
-        />
-        <AdminCard className="px-5 py-4">
-          <RecordFacts
-            facts={[
-              { label: "Name", value: season.name },
-              { label: "Starts on", value: season.startsOn.slice(0, 10) },
-              { label: "Ends on", value: season.endsOn?.slice(0, 10) ?? null },
-              {
-                full: true,
-                label: "Description",
-                value: season.description,
-              },
-            ]}
-          />
-          <div className="mt-4 flex justify-end">
-            <AdminButton onClick={() => setIsEditing(true)} type="button">
-              Edit season
-            </AdminButton>
-          </div>
-        </AdminCard>
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-[520px]">
       <BackButton href={LIST} label="All seasons" className="mb-2" />
@@ -154,8 +103,7 @@ export function SeasonForm({
           <AdminField label="Name" error={errors.name?.message}>
             <Input
               placeholder="2026 Wet Season"
-              disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
+              className={cn(adminInputClass, errors.name && "border-console-red")}
               {...register("name")}
             />
           </AdminField>
@@ -170,10 +118,8 @@ export function SeasonForm({
             <textarea
               rows={4}
               placeholder="What this season covers"
-              disabled={readOnly}
               className={cn(
                 adminInputClass,
-                roCls,
                 "h-auto min-h-[62px] w-full resize-y py-2",
                 errors.description && "border-console-red",
               )}
@@ -184,11 +130,9 @@ export function SeasonForm({
             <AdminField label="Starts on" error={errors.startsOn?.message}>
               <Input
                 type="date"
-                disabled={readOnly}
-                className={cn(
+                  className={cn(
                   adminInputClass,
-                  roCls,
-                  errors.startsOn && "border-console-red",
+                    errors.startsOn && "border-console-red",
                 )}
                 {...register("startsOn")}
               />
@@ -196,11 +140,9 @@ export function SeasonForm({
             <AdminField label="Ends on" optional error={errors.endsOn?.message}>
               <Input
                 type="date"
-                disabled={readOnly}
-                className={cn(
+                  className={cn(
                   adminInputClass,
-                  roCls,
-                  errors.endsOn && "border-console-red",
+                    errors.endsOn && "border-console-red",
                 )}
                 {...register("endsOn")}
               />
@@ -208,56 +150,20 @@ export function SeasonForm({
           </div>
         </AdminCard>
 
-        {/* This row keeps its own markup rather than EditableFormActions
-            because it is right-aligned and puts Cancel before the primary
-            button. The key on every branch is still load-bearing: an unkeyed
-            branch lets React reuse the same <button> DOM node across the
-            swap, so clicking "Edit season" would flip that very element to
-            type="submit" before the browser ran the click's default action
-            and the form would PATCH itself while still locked. */}
+        {/* Cancel returns to where the record is read rather than locking
+            the form back down - there is no locked state any more. */}
         <div className="flex justify-end gap-2">
-          {!season ? (
-            <Fragment key="create">
-              <AdminButton
-                type="button"
-                variant="outline"
-                className="h-10 px-4"
-                onClick={() => router.push(LIST)}
-              >
-                Cancel
-              </AdminButton>
-              <AdminButton type="submit" disabled={saving} className="h-10 px-5">
-                {saving ? "Saving…" : "Create season"}
-              </AdminButton>
-            </Fragment>
-          ) : isEditing ? (
-            <Fragment key="editing">
-              <AdminButton
-                type="button"
-                variant="outline"
-                className="h-10 px-4"
-                onClick={() => {
-                  reset();
-                  setIsEditing(false);
-                }}
-              >
-                Cancel
-              </AdminButton>
-              <AdminButton type="submit" disabled={saving} className="h-10 px-5">
-                {saving ? "Saving…" : "Save changes"}
-              </AdminButton>
-            </Fragment>
-          ) : (
-            <AdminButton
-              key="locked"
-              type="button"
-              variant="gold"
-              className="h-10 px-5"
-              onClick={() => setIsEditing(true)}
-            >
-              Edit season
-            </AdminButton>
-          )}
+          <AdminButton
+            type="button"
+            variant="outline"
+            className="h-10 px-4"
+            onClick={() => router.push(season ? `${LIST}/${season.id}` : LIST)}
+          >
+            Cancel
+          </AdminButton>
+          <AdminButton type="submit" disabled={saving} className="h-10 px-5">
+            {saving ? "Saving…" : season ? "Save changes" : "Create season"}
+          </AdminButton>
         </div>
       </form>
     </div>

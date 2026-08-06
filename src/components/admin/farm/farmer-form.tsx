@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,7 +11,6 @@ import {
   AdminPageHeader,
   adminInputClass,
 } from "@/components/admin/ui";
-import { RecordFacts } from "@/components/admin/record-facts";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -60,15 +59,7 @@ const toFormValues = (farmer?: IFarmer): FarmerValues => ({
   phone: farmer?.phone ?? "",
 });
 
-export function FarmerForm({
-  farmer,
-  startEditing = false,
-}: {
-  farmer?: IFarmer;
-  /** Open an existing farmer unlocked - set when the caller already knows the
-   * user means to edit (the detail page's Edit button). */
-  startEditing?: boolean;
-}) {
+export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
   const router = useRouter();
   const [createFarmer, createState] = useCreateFarmerMutation();
   const [updateFarmer, updateState] = useUpdateFarmerMutation();
@@ -83,35 +74,19 @@ export function FarmerForm({
   );
   const preview = stagedUrl ?? farmer?.photoUrl ?? null;
 
-  // Edit opens READ-ONLY; the Edit button unlocks the whole form. Create is
-  // always editable, and so is an edit the caller has already asked to unlock.
-  const [isEditing, setIsEditing] = useState(
-    farmer === undefined || startEditing,
-  );
-  const readOnly = !isEditing;
-  // Keep disabled inputs legible as a read view rather than a greyed-out form.
-  const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
-
-  const clearPhotoState = () => {
-    setPhoto(undefined);
-    if (photoInput.current) photoInput.current.value = "";
-  };
+  // Always editable. This route is reached from the farmer's own detail page,
+  // which is where the record is READ - so opening locked, on top of a
+  // read-only copy of facts the reader has just come from, asked for a second
+  // click to do the one thing the page is for.
 
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm<FarmerValues>({
     resolver: zodResolver(farmerSchema),
     defaultValues: toFormValues(farmer),
   });
-
-  // A background refetch can bump the record. Track the fresh values while
-  // reading, but never clobber an in-progress edit.
-  useEffect(() => {
-    if (farmer && !isEditing) reset(toFormValues(farmer));
-  }, [farmer, isEditing, reset]);
 
   const onPick = (file: File | undefined) => {
     if (!file) return;
@@ -163,61 +138,6 @@ export function FarmerForm({
     }
   };
 
-  // At rest an existing record READS; the form appears only on Edit.
-  if (farmer && !isEditing) {
-    return (
-      <div className="max-w-[600px]">
-        <BackButton href={LIST} label="All farmers" className="mb-2" />
-        <AdminPageHeader
-          title={farmer.name}
-          sub="The outgrower's identity, community and guarantors - every input grant is booked against this record"
-        />
-        <AdminCard className="px-5 py-4">
-          <RecordFacts
-            facts={[
-              { label: "Name", value: farmer.name },
-              { label: "Phone", mono: true, value: farmer.phone },
-              {
-                label: "Date of birth",
-                value: farmer.dateOfBirth?.slice(0, 10) ?? null,
-              },
-              { label: "ID type", value: farmer.idType },
-              { label: "ID number", mono: true, value: farmer.idNumber },
-              { label: "Community", value: farmer.community },
-              { label: "Farm location", value: farmer.farmLocation },
-              {
-                label: "Farm size",
-                mono: true,
-                value:
-                  farmer.farmSizeAcres === null
-                    ? null
-                    : `${String(farmer.farmSizeAcres)} acres`,
-              },
-              { label: "Next of kin", value: farmer.nextOfKinName },
-              {
-                label: "Next of kin phone",
-                mono: true,
-                value: farmer.nextOfKinPhone,
-              },
-              {
-                label: "Mobile money",
-                mono: true,
-                value: farmer.momoNumber,
-              },
-              { full: true, label: "Address", value: farmer.address },
-              { full: true, label: "Notes", value: farmer.notes },
-            ]}
-          />
-          <div className="mt-4 flex justify-end">
-            <AdminButton onClick={() => setIsEditing(true)} type="button">
-              Edit farmer
-            </AdminButton>
-          </div>
-        </AdminCard>
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-[600px]">
       <BackButton href={LIST} label="All farmers" className="mb-2" />
@@ -242,16 +162,14 @@ export function FarmerForm({
                 No photo
               </div>
             )}
-            {isEditing ? (
-              <AdminButton
-                type="button"
-                variant="outline"
-                className="h-9 px-4"
-                onClick={() => photoInput.current?.click()}
-              >
-                {preview ? "Change photo" : "Add photo"}
-              </AdminButton>
-            ) : null}
+            <AdminButton
+              type="button"
+              variant="outline"
+              className="h-9 px-4"
+              onClick={() => photoInput.current?.click()}
+            >
+              {preview ? "Change photo" : "Add photo"}
+            </AdminButton>
             <input
               ref={photoInput}
               type="file"
@@ -265,8 +183,7 @@ export function FarmerForm({
             <AdminField label="Name" error={errors.name?.message}>
               <Input
                 placeholder="Abukari Yakubu"
-                disabled={readOnly}
-                className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
+                className={cn(adminInputClass, errors.name && "border-console-red")}
                 {...register("name")}
               />
             </AdminField>
@@ -274,8 +191,7 @@ export function FarmerForm({
               <Input
                 inputMode="tel"
                 placeholder="024 000 0000"
-                disabled={readOnly}
-                className={cn(adminInputClass, roCls, errors.phone && "border-console-red")}
+                className={cn(adminInputClass, errors.phone && "border-console-red")}
                 {...register("phone")}
               />
             </AdminField>
@@ -286,10 +202,8 @@ export function FarmerForm({
             >
               <Input
                 type="date"
-                disabled={readOnly}
                 className={cn(
                   adminInputClass,
-                  roCls,
                   errors.dateOfBirth && "border-console-red",
                 )}
                 {...register("dateOfBirth")}
@@ -299,8 +213,7 @@ export function FarmerForm({
               <Input
                 list="farmer-id-types"
                 placeholder="Ghana Card, Voter ID…"
-                disabled={readOnly}
-                className={cn(adminInputClass, roCls, errors.idType && "border-console-red")}
+                className={cn(adminInputClass, errors.idType && "border-console-red")}
                 {...register("idType")}
               />
               <datalist id="farmer-id-types">
@@ -312,10 +225,8 @@ export function FarmerForm({
             <AdminField label="ID number" optional error={errors.idNumber?.message}>
               <Input
                 placeholder="GHA-000000000-0"
-                disabled={readOnly}
                 className={cn(
                   adminInputClass,
-                  roCls,
                   errors.idNumber && "border-console-red",
                 )}
                 {...register("idNumber")}
@@ -330,10 +241,8 @@ export function FarmerForm({
             <AdminField label="Community" optional error={errors.community?.message}>
               <Input
                 placeholder="Kumbungu"
-                disabled={readOnly}
                 className={cn(
                   adminInputClass,
-                  roCls,
                   errors.community && "border-console-red",
                 )}
                 {...register("community")}
@@ -346,10 +255,8 @@ export function FarmerForm({
             >
               <Input
                 placeholder="Near the Bontanga dam"
-                disabled={readOnly}
                 className={cn(
                   adminInputClass,
-                  roCls,
                   errors.farmLocation && "border-console-red",
                 )}
                 {...register("farmLocation")}
@@ -363,10 +270,8 @@ export function FarmerForm({
               <Input
                 inputMode="decimal"
                 placeholder="2.5"
-                disabled={readOnly}
                 className={cn(
                   adminInputClass,
-                  roCls,
                   errors.farmSizeAcres && "border-console-red",
                 )}
                 {...register("farmSizeAcres")}
@@ -376,10 +281,8 @@ export function FarmerForm({
           <AdminField label="Address" optional error={errors.address?.message}>
             <textarea
               rows={4}
-              disabled={readOnly}
               className={cn(
                 adminInputClass,
-                roCls,
                 "h-auto min-h-[60px] w-full resize-y py-2",
                 errors.address && "border-console-red",
               )}
@@ -397,10 +300,8 @@ export function FarmerForm({
               error={errors.nextOfKinName?.message}
             >
               <Input
-                disabled={readOnly}
                 className={cn(
                   adminInputClass,
-                  roCls,
                   errors.nextOfKinName && "border-console-red",
                 )}
                 {...register("nextOfKinName")}
@@ -414,10 +315,8 @@ export function FarmerForm({
               <Input
                 inputMode="tel"
                 placeholder="024 000 0000"
-                disabled={readOnly}
                 className={cn(
                   adminInputClass,
-                  roCls,
                   errors.nextOfKinPhone && "border-console-red",
                 )}
                 {...register("nextOfKinPhone")}
@@ -431,10 +330,8 @@ export function FarmerForm({
               <Input
                 inputMode="tel"
                 placeholder="024 000 0000"
-                disabled={readOnly}
                 className={cn(
                   adminInputClass,
-                  roCls,
                   errors.momoNumber && "border-console-red",
                 )}
                 {...register("momoNumber")}
@@ -446,64 +343,26 @@ export function FarmerForm({
         <AdminCard className="px-5 py-4">
           <AdminField label="Notes" optional error={errors.notes?.message}>
             <Input
-              disabled={readOnly}
-              className={cn(adminInputClass, roCls)}
+              className={adminInputClass}
               {...register("notes")}
             />
           </AdminField>
         </AdminCard>
 
-        {/* This row keeps its own markup rather than EditableFormActions
-            because it is right-aligned and puts Cancel before the primary
-            button. The key on every branch is still load-bearing: an unkeyed
-            branch lets React reuse the same <button> DOM node across the
-            swap, so clicking "Edit farmer" would flip that very element to
-            type="submit" before the browser ran the click's default action
-            and the form would PATCH itself while still locked. */}
+        {/* Cancel returns to where the record is read rather than locking
+            the form back down - there is no locked state any more. */}
         <div className="flex justify-end gap-2">
-          {!farmer ? (
-            <Fragment key="create">
-              <AdminButton
-                type="button"
-                variant="outline"
-                className="h-10 px-4"
-                onClick={() => router.push(LIST)}
-              >
-                Cancel
-              </AdminButton>
-              <AdminButton type="submit" disabled={saving} className="h-10 px-5">
-                {saving ? "Saving…" : "Add farmer"}
-              </AdminButton>
-            </Fragment>
-          ) : isEditing ? (
-            <Fragment key="editing">
-              <AdminButton
-                type="button"
-                variant="outline"
-                className="h-10 px-4"
-                onClick={() => {
-                  reset();
-                  clearPhotoState();
-                  setIsEditing(false);
-                }}
-              >
-                Cancel
-              </AdminButton>
-              <AdminButton type="submit" disabled={saving} className="h-10 px-5">
-                {saving ? "Saving…" : "Save changes"}
-              </AdminButton>
-            </Fragment>
-          ) : (
-            <AdminButton
-              key="locked"
-              type="button"
-              variant="gold"
-              className="h-10 px-5"
-              onClick={() => setIsEditing(true)}
-            >
-              Edit farmer
-            </AdminButton>
-          )}
+          <AdminButton
+            type="button"
+            variant="outline"
+            className="h-10 px-4"
+            onClick={() => router.push(farmer ? `${LIST}/${farmer.id}` : LIST)}
+          >
+            Cancel
+          </AdminButton>
+          <AdminButton type="submit" disabled={saving} className="h-10 px-5">
+            {saving ? "Saving…" : farmer ? "Save changes" : "Add farmer"}
+          </AdminButton>
         </div>
       </form>
     </div>

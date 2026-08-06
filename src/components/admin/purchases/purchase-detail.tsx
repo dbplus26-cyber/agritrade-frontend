@@ -534,7 +534,9 @@ export function PurchaseDetail({ id }: { id: string }) {
                   </DetailItem>
                 ) : null}
                 {p.voidedAt ? (
-                  <DetailItem label="Void reason">{p.voidReason}</DetailItem>
+                  <DetailItem full label="Void reason">
+                    {p.voidReason}
+                  </DetailItem>
                 ) : null}
                 {p.notes ? (
                   <DetailItem
