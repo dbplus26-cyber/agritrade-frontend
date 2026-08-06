@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { AdminPageHeader, PdfLink } from "@/components/admin/ui";
+import { AdminButton, AdminPageHeader, PdfLink } from "@/components/admin/ui";
 import { DocumentSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -45,10 +45,17 @@ export function Waybill({ id }: { id: string }) {
           title={`Waybill ${s.transactionNo}`}
           sub={`What ${s.truckReg} is carrying to ${s.destination} - print it and have the driver sign`}
           actions={
-            // One action, not two pointing at the same document. This screen
-            // offered "Download PDF" AND "Print" - the first fetched the real
-            // waybill, the second printed the web page it was rendered on.
-            <PdfLink href={shipmentWaybillPdfUrl(s.id)}>Waybill PDF</PdfLink>
+            // Two genuinely different artefacts, not one action twice over.
+            // Print reproduces the sheet below EXACTLY - same measure, same
+            // frame, same padding, since it no longer strips them for paper.
+            // The PDF is the server's own rendering, which is the copy to
+            // send someone rather than the one to hold against the goods.
+            <span className="flex flex-wrap items-center gap-2">
+              <PdfLink href={shipmentWaybillPdfUrl(s.id)}>Waybill PDF</PdfLink>
+              <AdminButton className="h-9 px-4" onClick={() => window.print()}>
+                Print
+              </AdminButton>
+            </span>
           }
         />
       </div>
@@ -56,7 +63,7 @@ export function Waybill({ id }: { id: string }) {
       {/* Left-aligned like every other console page - the sheet keeps its own
           720px measure so it still reads as a piece of paper. Squared and
           1.5px-bordered to match AdminCard. */}
-      <div className="max-w-[720px] border border-adm-line bg-white p-8 text-adm-ink print:max-w-none print:border-0 print:p-0">
+      <div className="max-w-[720px] border border-adm-line bg-white p-8 text-adm-ink">
         <div className="flex items-start justify-between border-b-2 border-adm-strong pb-3">
           <div>
             <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">

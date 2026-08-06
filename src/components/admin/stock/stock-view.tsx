@@ -382,20 +382,38 @@ function WarehouseSections({
           key={w.id}
           className={cn(index > 0 && "border-t-[1.5px] border-adm-hairline")}
         >
-          <div className="flex items-baseline justify-between gap-3 bg-adm-sunken px-4 py-2">
-            <Link
-              href={`/admin/warehouses/${w.id}`}
-              className="min-w-0 truncate text-[11px] font-bold uppercase tracking-[0.09em] text-console underline-offset-2 hover:underline"
-              title={w.name}
-            >
-              {w.name}
-            </Link>
-            <Kg
-              kg={w.subtotalKg}
-              className="flex-none text-[12px] font-bold text-adm-ink"
-            />
+          {/* THREE LEVELS, and they have to look like three.
+              The warehouse was set in the same 11px micro-caps the console
+              uses for section labels, while the commodities under it were
+              13px - so the parent read smaller than its children and the eye
+              had nothing to climb. The place is a heading now, the goods are
+              rows, and every quantity lands in one right-hand column where
+              they can be compared down the page. */}
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-adm-hairline bg-adm-sunken px-4 py-3">
+            <div className="min-w-0">
+              <Link
+                href={`/admin/warehouses/${w.id}`}
+                className="block truncate text-[14px] font-semibold text-adm-ink underline-offset-2 hover:text-console hover:underline"
+                title={w.name}
+              >
+                {w.name}
+              </Link>
+              <span className="text-[11.5px] text-adm-muted">
+                {w.byCommodity.size}{" "}
+                {w.byCommodity.size === 1 ? "commodity" : "commodities"}
+              </span>
+            </div>
+            <div className="flex-none text-right">
+              <Kg
+                kg={w.subtotalKg}
+                className="block text-[15px] font-semibold text-adm-ink"
+              />
+              <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+                On hand
+              </span>
+            </div>
           </div>
-          <div className="px-4 py-1.5 @xl/main:columns-2 @xl/main:gap-8 @4xl/main:columns-3">
+          <div className="px-4 py-1 @xl/main:columns-2 @xl/main:gap-x-10 @4xl/main:columns-3">
             {commodities
               .filter((c) => w.byCommodity.has(c.id))
               .map((c) => {
@@ -403,18 +421,14 @@ function WarehouseSections({
                 return (
                   <div
                     key={c.id}
-                    className="flex items-baseline gap-2 py-1.5 break-inside-avoid"
+                    className="flex break-inside-avoid items-baseline justify-between gap-4 border-b border-adm-hairline py-2 last:border-b-0"
                   >
                     <span
-                      className="min-w-0 truncate text-[13px] font-medium text-adm-ink"
+                      className="min-w-0 truncate text-[13px] text-adm-body"
                       title={c.name}
                     >
                       {c.name}
                     </span>
-                    <span
-                      aria-hidden="true"
-                      className="flex-1 border-b border-dotted border-adm-line"
-                    />
                     <Kg
                       kg={kg}
                       className={cn(

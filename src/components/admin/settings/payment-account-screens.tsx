@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -12,14 +12,12 @@ import {
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
 import {
-  AdminButton,
   AdminCard,
   AdminField,
   AdminPageHeader,
   EditableFormActions,
   adminInputClass,
 } from "@/components/admin/ui";
-import { RecordFacts } from "@/components/admin/record-facts";
 import {
   RailCard,
   RailStatus,
@@ -315,17 +313,13 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
   const [updateAccount, updateState] = useUpdatePaymentAccountMutation();
   const saving = createState.isLoading || updateState.isLoading;
 
-  // Edit screens open READ-ONLY; the Edit button unlocks the inputs. An
-  // account number is the one field where a slip redirects every future
-  // payment, so it is never a click away from being changed.
-  const [isEditing, setIsEditing] = useState(!isEdit);
-  const readOnly = !isEditing;
-  const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
+  // Always editable. The account has a detail page of its own, so this route
+  // showing a locked copy of it first was a second click before the page would
+  // do the one thing it is for.
 
   const {
     register,
     handleSubmit,
-    reset,
     setError,
     watch,
     formState: { errors },
@@ -381,7 +375,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
           },
         }).unwrap();
         notify.success("Payment account updated");
-        setIsEditing(false);
+        router.push(`${LIST}/${account.id}`);
       } else {
         const res = await createAccount({
           label: values.label,
@@ -437,39 +431,6 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
     }
   };
 
-  // At rest an existing record READS. The form is what you get after
-  // pressing Edit, not a greyed-out copy of the page you were already on.
-  if (isEdit && !isEditing && account) {
-    return (
-      <AdminCard className="px-5 py-[18px]">
-        <RecordFacts
-          facts={[
-            { label: "Label", value: account.label },
-            { label: "Kind", value: account.kind },
-            { label: "Account name", value: account.accountName },
-            { label: "Account number", mono: true, value: account.accountNumber },
-            { label: "Bank", value: account.bankName },
-            { label: "Branch", value: account.branch },
-            { label: "Sort code", mono: true, value: account.sortCode },
-            { label: "SWIFT", mono: true, value: account.swiftCode },
-            { label: "Network", value: account.provider },
-            { label: "Order", value: String(account.sortOrder) },
-            {
-              label: "On invoices",
-              value: account.showOnInvoice ? "Printed" : "Internal only",
-            },
-            { full: true, label: "Instructions", value: account.instructions },
-          ]}
-        />
-        <div className="mt-4 flex justify-end">
-          <AdminButton onClick={() => setIsEditing(true)} type="button">
-            Edit account
-          </AdminButton>
-        </div>
-      </AdminCard>
-    );
-  }
-
   return (
     <AdminCard className="px-5 py-[18px]">
       <form
@@ -485,10 +446,8 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
           >
             <Input
               placeholder="e.g. Ecobank - main operating"
-              disabled={readOnly}
               className={cn(
                 adminInputClass,
-                roCls,
                 errors.label && "border-console-red",
               )}
               {...register("label")}
@@ -496,10 +455,8 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
           </AdminField>
           <AdminField label="Kind" error={errors.kind?.message}>
             <select
-              disabled={readOnly}
               className={cn(
                 adminInputClass,
-                roCls,
                 errors.kind && "border-console-red",
               )}
               {...register("kind")}
@@ -520,10 +477,8 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
         >
           <Input
             placeholder="e.g. DB Plus Trading Ltd"
-            disabled={readOnly}
             className={cn(
               adminInputClass,
-              roCls,
               errors.accountName && "border-console-red",
             )}
             {...register("accountName")}
@@ -537,10 +492,8 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
           <Input
             inputMode={isMomo ? "tel" : "numeric"}
             placeholder={isMomo ? "024 000 0000" : "1234567890123"}
-            disabled={readOnly}
             className={cn(
               adminInputClass,
-              roCls,
               "font-adminmono",
               errors.accountNumber && "border-console-red",
             )}
@@ -554,10 +507,8 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
               <AdminField label="Bank" error={errors.bankName?.message}>
                 <Input
                   placeholder="e.g. Ecobank Ghana"
-                  disabled={readOnly}
                   className={cn(
                     adminInputClass,
-                    roCls,
                     errors.bankName && "border-console-red",
                   )}
                   {...register("bankName")}
@@ -570,10 +521,8 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
               >
                 <Input
                   placeholder="e.g. Tamale Main"
-                  disabled={readOnly}
                   className={cn(
                     adminInputClass,
-                    roCls,
                     errors.branch && "border-console-red",
                   )}
                   {...register("branch")}
@@ -587,10 +536,8 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
                 error={errors.sortCode?.message}
               >
                 <Input
-                  disabled={readOnly}
                   className={cn(
                     adminInputClass,
-                    roCls,
                     "font-adminmono",
                     errors.sortCode && "border-console-red",
                   )}
@@ -604,10 +551,8 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
                 error={errors.swiftCode?.message}
               >
                 <Input
-                  disabled={readOnly}
                   className={cn(
                     adminInputClass,
-                    roCls,
                     "font-adminmono",
                     errors.swiftCode && "border-console-red",
                   )}
@@ -622,10 +567,8 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
           <AdminField label="Network" error={errors.provider?.message}>
             <Input
               placeholder="e.g. MTN"
-              disabled={readOnly}
               className={cn(
                 adminInputClass,
-                roCls,
                 errors.provider && "border-console-red",
               )}
               {...register("provider")}
@@ -642,10 +585,8 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
           <textarea
             rows={4}
             placeholder="e.g. Transfers only, no cash deposits at the counter."
-            disabled={readOnly}
             className={cn(
               adminInputClass,
-              roCls,
               "h-auto min-h-[64px] w-full resize-y py-2",
               errors.instructions && "border-console-red",
             )}
@@ -661,10 +602,8 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
           <Input
             type="number"
             min={0}
-            disabled={readOnly}
             className={cn(
               adminInputClass,
-              roCls,
               "max-w-[120px]",
               errors.sortOrder && "border-console-red",
             )}
@@ -672,49 +611,26 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
           />
         </AdminField>
 
-        <label
-          className={cn(
-            "flex items-center gap-2 text-[13px] text-adm-ink",
-            readOnly && "cursor-default",
-          )}
-        >
-          <input
-            type="checkbox"
-            disabled={readOnly}
-            className={roCls}
-            {...register("showOnInvoice")}
-          />
+        <label className="flex items-center gap-2 text-[13px] text-adm-ink">
+          <input type="checkbox" {...register("showOnInvoice")} />
           Print this account on invoices and statements
         </label>
-        <label
-          className={cn(
-            "flex items-center gap-2 text-[13px] text-adm-ink",
-            readOnly && "cursor-default",
-          )}
-        >
-          <input
-            type="checkbox"
-            disabled={readOnly}
-            className={roCls}
-            {...register("isActive")}
-          />
+        <label className="flex items-center gap-2 text-[13px] text-adm-ink">
+          <input type="checkbox" {...register("isActive")} />
           Active
         </label>
 
+        {/* Never "locked" - there is no locked state on this route any more.
+            Cancel returns to the record, which is where it is read. */}
         <EditableFormActions
-          mode={!isEdit ? "create" : isEditing ? "editing" : "locked"}
+          mode={isEdit ? "editing" : "create"}
           saving={saving}
           createLabel="Save account"
           editLabel="Edit account"
-          onEdit={() => setIsEditing(true)}
-          onCancel={() => {
-            if (!isEdit) {
-              router.push(LIST);
-              return;
-            }
-            reset();
-            setIsEditing(false);
-          }}
+          onEdit={() => undefined}
+          onCancel={() =>
+            router.push(isEdit && account ? `${LIST}/${account.id}` : LIST)
+          }
         />
       </form>
     </AdminCard>

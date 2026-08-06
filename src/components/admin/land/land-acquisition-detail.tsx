@@ -162,7 +162,8 @@ function PaymentDialog({
             method={method}
             direction="out"
             error={errors.paymentAccountId?.message}
-            registration={register("paymentAccountId")}
+            onChange={(v) => setValue("paymentAccountId", v)}
+            value={watch("paymentAccountId") ?? ""}
           />
           <AdminField label="Reference" optional>
             <Input className={adminInputClass} {...register("reference")} />

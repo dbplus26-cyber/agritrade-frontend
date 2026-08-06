@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,42 +38,24 @@ const toFormValues = (plot: ILandPlot): PlotValues => ({
   use: plot.use ?? "",
 });
 
-export function PlotForm({
-  plot,
-  startEditing = false,
-}: {
-  plot?: ILandPlot;
-  /** Set by the edit route when the detail page's Edit button sent the user
-   * here, so the form opens unlocked instead of asking for a second click. */
-  startEditing?: boolean;
-}) {
+export function PlotForm({ plot }: { plot?: ILandPlot }) {
   const router = useRouter();
   const [createPlot, createState] = useCreatePlotMutation();
   const [updatePlot, updateState] = useUpdatePlotMutation();
   const saving = createState.isLoading || updateState.isLoading;
 
-  // Edit opens READ-ONLY; the Edit button unlocks the inputs. Create is
-  // always editable.
-  const [isEditing, setIsEditing] = useState(plot === undefined || startEditing);
-  const readOnly = !isEditing;
-  // Keep disabled inputs legible as a read view rather than a greyed-out form.
-  const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
+  // Always editable. The plot has a detail page of its own, so opening the
+  // form locked on top of a read-only copy of what the reader just came from
+  // asked for a second click to do the one thing this route is for.
 
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm<PlotValues>({
     resolver: zodResolver(plotSchema),
     defaultValues: plot ? toFormValues(plot) : { showPriceOnWebsite: false },
   });
-
-  // A background refetch can bump the record. Track the fresh values while
-  // reading, but never clobber an in-progress edit.
-  useEffect(() => {
-    if (plot && !isEditing) reset(toFormValues(plot));
-  }, [plot, isEditing, reset]);
 
   const onSubmit = async (values: PlotValues) => {
     const body = {
@@ -125,7 +107,7 @@ export function PlotForm({
       hint?: string;
     },
   ) => {
-    const disabled = readOnly || opts?.locked === true;
+    const disabled = opts?.locked === true;
     return (
       <AdminField
         label={label}
@@ -185,17 +167,9 @@ export function PlotForm({
         <AdminCard className="flex flex-col gap-3 px-5 py-4">
           {field("description", "Description", { optional: true })}
           <label
-            className={cn(
-              "flex items-center gap-2 text-[13px] text-adm-ink",
-              readOnly && "cursor-default",
-            )}
+            className="flex items-center gap-2 text-[13px] text-adm-ink"
           >
-            <input
-              type="checkbox"
-              disabled={readOnly}
-              className={roCls}
-              {...register("showPriceOnWebsite")}
-            />
+            <input type="checkbox" {...register("showPriceOnWebsite")} />
             Show the asking price on the public listing
           </label>
         </AdminCard>
@@ -222,16 +196,13 @@ export function PlotForm({
                 {saving ? "Saving…" : "Create plot"}
               </AdminButton>
             </Fragment>
-          ) : isEditing ? (
+          ) : (
             <Fragment key="editing">
               <AdminButton
                 type="button"
                 variant="outline"
                 className="h-10 px-4"
-                onClick={() => {
-                  reset();
-                  setIsEditing(false);
-                }}
+                onClick={() => router.push(plot ? `${LIST}/${plot.id}` : LIST)}
               >
                 Cancel
               </AdminButton>
@@ -239,16 +210,6 @@ export function PlotForm({
                 {saving ? "Saving…" : "Save changes"}
               </AdminButton>
             </Fragment>
-          ) : (
-            <AdminButton
-              key="locked"
-              type="button"
-              variant="gold"
-              className="h-10 px-5"
-              onClick={() => setIsEditing(true)}
-            >
-              Edit plot
-            </AdminButton>
           )}
         </div>
       </form>

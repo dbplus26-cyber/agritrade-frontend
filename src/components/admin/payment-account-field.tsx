@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import type { UseFormRegisterReturn } from "react-hook-form";
-import { AdminField, adminSelectClass } from "@/components/admin/ui";
+import { AdminField } from "@/components/admin/ui";
+import { SearchableSelect } from "@/components/admin/searchable-select";
 import { cn } from "@/lib/utils";
 import { useGetPaymentAccountsQuery } from "@/redux/payment-accounts/payment-accounts-api";
 import type { PaymentAccountKind } from "@/types/payment-account.types";
@@ -38,14 +38,16 @@ export function PaymentAccountField({
   method,
   direction,
   error,
-  registration,
+  onChange,
+  value,
 }: {
   method: "BANK" | "CASH" | "MOMO";
   /** "in": money received into the account; "out": paid out of it. */
   direction: "in" | "out";
   error?: string;
-  /** `register("paymentAccountId")` from the owning form. */
-  registration: UseFormRegisterReturn;
+  /** Controlled: pair with react-hook-form's `Controller`. */
+  value: string;
+  onChange: (value: string) => void;
 }) {
   const { data, isLoading, isError } = useGetPaymentAccountsQuery({
     isActive: true,
@@ -75,24 +77,29 @@ export function PaymentAccountField({
       hint={hint}
       error={error}
     >
-      <select
-        disabled={isLoading}
-        className={cn(adminSelectClass, "w-full", error && "border-console-red")}
-        {...registration}
-      >
-        <option value="">
-          {isLoading
+      {/* Not a native <select>. Its popup is drawn by the operating system at
+          the width of the longest option, which CSS cannot touch - so an
+          account named at any length opened a list wider than the dialog
+          containing it. This one is ours: the panel matches the control, and a
+          long name wraps inside it instead of widening it. */}
+      <SearchableSelect
+        value={value}
+        onChange={onChange}
+        options={accounts.map((a) => ({
+          value: a.id,
+          label: a.label,
+          hint: maskAccountNumber(a.accountNumber),
+        }))}
+        placeholder={
+          isLoading
             ? "Loading accounts…"
             : optional
               ? "Cash till (no account)"
-              : "Select the account…"}
-        </option>
-        {accounts.map((a) => (
-          <option key={a.id} value={a.id}>
-            {a.label} · {maskAccountNumber(a.accountNumber)}
-          </option>
-        ))}
-      </select>
+              : "Select the account…"
+        }
+        disabled={isLoading}
+        className={cn(error && "border-console-red")}
+      />
     </AdminField>
   );
 }

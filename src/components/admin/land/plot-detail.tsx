@@ -230,7 +230,7 @@ export function PlotDetail({ id }: { id: string }) {
             </AdminButton>
           ) : null}
           <AdminButton variant="outline" className="h-9 px-4" asChild>
-            <Link href={`${LIST}/${p.id}/edit?edit=1`}>Edit</Link>
+            <Link href={`${LIST}/${p.id}/edit`}>Edit</Link>
           </AdminButton>
           {p.publishToWebsite ? (
             <AdminButton

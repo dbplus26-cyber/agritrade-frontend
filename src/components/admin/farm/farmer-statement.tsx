@@ -97,7 +97,7 @@ export function FarmerStatement({
 
       {/* Left-aligned like every other console page - the sheet keeps its own
           720px measure so it still reads as a piece of paper. */}
-      <div className="max-w-[720px] border border-adm-line bg-white p-8 text-adm-ink print:max-w-none print:border-0 print:p-0">
+      <div className="max-w-[720px] border border-adm-line bg-white p-8 text-adm-ink">
         <div className="flex items-start justify-between border-b-2 border-adm-strong pb-3">
           <div>
             <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">

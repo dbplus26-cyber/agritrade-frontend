@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { AdminPageHeader,
+import { AdminButton, AdminPageHeader,
   PdfLink,
 } from "@/components/admin/ui";
 import { DocumentSkeleton } from "@/components/admin/skeletons";
@@ -119,9 +119,17 @@ export function SaleInvoice({ id }: { id: string }) {
             // The server renders this same document as a real PDF, so the
             // action fetches it rather than asking the browser to print a web
             // page that happens to look like one.
-            <PdfLink href={saleInvoicePdfUrl(s.id)}>
-              {isReceipt ? "Receipt PDF" : "Invoice PDF"}
-            </PdfLink>
+            <span className="flex flex-wrap items-center gap-2">
+              <PdfLink href={saleInvoicePdfUrl(s.id)}>
+                {isReceipt ? "Receipt PDF" : "Invoice PDF"}
+              </PdfLink>
+              {/* Print now reproduces the sheet below exactly; it used to
+                  strip the sheet's width, border and padding for paper, which
+                  is why a printed invoice looked nothing like the screen. */}
+              <AdminButton className="h-9 px-4" onClick={() => window.print()}>
+                Print
+              </AdminButton>
+            </span>
           }
         />
       </div>
@@ -129,7 +137,7 @@ export function SaleInvoice({ id }: { id: string }) {
       {/* Left-aligned like every other console page - the sheet keeps its own
           720px measure so it still reads as a piece of paper. Squared and
           1.5px-bordered to match AdminCard. */}
-      <div className="max-w-[720px] border border-adm-line bg-white p-8 text-adm-ink print:max-w-none print:border-0 print:p-0">
+      <div className="max-w-[720px] border border-adm-line bg-white p-8 text-adm-ink">
         <div className="flex items-start justify-between border-b-2 border-adm-strong pb-3">
           <div>
             <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">
