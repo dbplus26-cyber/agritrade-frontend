@@ -109,7 +109,7 @@ export function FarmApplicationsScreen() {
         enableSorting: false,
         meta: columnMeta({ stretch: true }),
         cell: ({ row }) => (
-          <span className="block min-w-[8rem] max-w-[90%]">
+          <span className="block min-w-0 max-w-[90%]">
             <span className="block truncate font-medium text-adm-ink">
               {row.original.name}
             </span>

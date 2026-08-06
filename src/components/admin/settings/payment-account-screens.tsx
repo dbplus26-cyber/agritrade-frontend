@@ -141,7 +141,7 @@ export function PaymentAccountTable() {
           return (
             <Link
               href={`${LIST}/${a.id}`}
-              className="block min-w-[9rem] max-w-[90%] outline-none focus-visible:underline"
+              className="block min-w-0 max-w-[90%] outline-none focus-visible:underline"
               onClick={(e) => e.stopPropagation()}
             >
               <span className="block truncate font-medium text-adm-ink">

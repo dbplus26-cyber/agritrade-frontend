@@ -146,7 +146,7 @@ export function SalesRegister() {
         cell: ({ row }) => (
           <Link
             href={`/admin/sales/${row.original.id}`}
-            className="block min-w-[9rem] w-full outline-none focus-visible:underline"
+            className="block w-full min-w-0 outline-none focus-visible:underline"
             onClick={(e) => { e.stopPropagation(); }}
           >
             <div className="max-w-[90%] truncate font-semibold text-adm-ink">

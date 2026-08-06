@@ -52,6 +52,14 @@ export interface ConsoleColumnMeta {
    * `max-w-0` on the td is what makes the percentage authoritative. Without it
    * the cell's min-content width wins over `w-2/5` and the column grows again.
    *
+   * NEVER put a `min-w-[…]` on anything inside a stretch cell. A minimum and a
+   * share are contradictory instructions, and CSS resolves the contradiction in
+   * the minimum's favour: `min-width` beats `max-width`, so the content keeps
+   * the floor's width however narrow the column gets, `truncate` then clips
+   * against the FLOOR rather than the cell, and the text runs out over the
+   * next column. The transfers register did exactly that with a
+   * `md:min-w-[11rem]` route. `min-w-0` is right; a floor never is.
+   *
    * Exactly one column per table. Mark the one that says WHICH row this is.
    */
   stretch?: boolean;

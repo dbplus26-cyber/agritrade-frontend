@@ -76,7 +76,7 @@ export function LandSalesRegister() {
         cell: ({ row }) => (
           <Link
             href={`/admin/land-sales/${row.original.id}`}
-            className="block min-w-[9rem] max-w-[90%] outline-none focus-visible:underline"
+            className="block min-w-0 max-w-[90%] outline-none focus-visible:underline"
             onClick={(e) => { e.stopPropagation(); }}
           >
             <Mono className="text-[12.5px] font-semibold text-console">
