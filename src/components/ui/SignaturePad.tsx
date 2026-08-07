@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { adminLinkClass } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
 
 /**
@@ -120,7 +121,7 @@ export function SignaturePad({
             type="button"
             onClick={clear}
             disabled={!hasInk}
-            className="cursor-pointer text-[12px] font-semibold text-soil underline-offset-2 hover:underline disabled:cursor-default disabled:opacity-50"
+            className={cn(adminLinkClass, "cursor-pointer text-[12.5px] font-semibold disabled:cursor-default disabled:opacity-50")}
           >
             Clear
           </button>
@@ -128,7 +129,7 @@ export function SignaturePad({
             type="button"
             onClick={capture}
             disabled={!hasInk}
-            className="cursor-pointer text-[12px] font-semibold text-console underline-offset-2 hover:underline disabled:cursor-default disabled:opacity-50"
+            className={cn(adminLinkClass, "cursor-pointer text-[12.5px] font-semibold disabled:cursor-default disabled:opacity-50")}
           >
             Use signature
           </button>

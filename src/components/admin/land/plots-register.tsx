@@ -6,8 +6,7 @@ import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
-import { AdminCard, Mono, ToneBadge } from "@/components/admin/ui";
-import { Button } from "@/components/ui/button";
+import { AdminButton, AdminCard, Mono, ToneBadge } from "@/components/admin/ui";
 import { RecordCardGridSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -77,9 +76,9 @@ export function PlotsRegister() {
           activeCount={activeFilterCount}
           onClear={resetFilters}
           action={
-            <Button asChild variant="harvest" className="h-8 px-3.5 text-[13px]">
+            <AdminButton asChild>
               <Link href={`${LIST}/new`}>+ Add plot</Link>
-            </Button>
+            </AdminButton>
           }
         >
           <ConsoleLabeledSelect
@@ -140,7 +139,7 @@ export function PlotsRegister() {
               )}
               <div className="px-4 py-3">
                 <div className="mb-1 flex items-center justify-between gap-2">
-                  <Mono className="text-[12.5px] font-semibold text-console">
+                  <Mono className="font-semibold text-console">
                     {p.reference}
                   </Mono>
                   <span className="flex items-center gap-1">

@@ -95,6 +95,11 @@ export interface IShipment {
   sales: IShipmentSale[];
   salesCount: number;
   originWarehouse: { id: string; name: string };
+  /**
+   * Every shed this truck calls at to take loads, origin first. Always has
+   * at least one entry (the origin, for plans made before multi-shed).
+   */
+  loadingWarehouses: { id: string; name: string }[];
   destination: string;
   /** The saved delivery address the destination came from, if any. */
   deliveryAddress: IShipmentDeliveryAddress | null;
@@ -143,6 +148,8 @@ export interface IShipment {
 }
 
 export interface IAvailableLot {
+  /** The shed the lot sits in - the picker groups by it. */
+  warehouse: { id: string; name: string };
   id: string;
   commodity: { id: string; name: string };
   remainingKg: number;
@@ -226,8 +233,35 @@ export interface ICreateShipmentInput {
   driverLicenseNo?: string;
   driverIdNumber?: string;
   truckCapacityKg?: number;
+  /** Further sheds the truck also loads at, beyond the origin (max 10). */
+  loadingWarehouseIds?: string[];
   expectedArrivalAt?: string;
   notes?: string;
+}
+
+/**
+ * Edit a PLANNED/LOADING shipment. Mirrors the backend's
+ * updateShipmentSchema: everything optional; `deliveryAddressId`/`driverId`
+ * accept null to detach; `loadingWarehouseIds` replaces the shed list
+ * (the origin is always kept).
+ */
+export interface IUpdateShipmentInput {
+  id: string;
+  destination?: string;
+  deliveryAddressId?: string | null;
+  truckReg?: string;
+  driverId?: string | null;
+  driverName?: string;
+  driverPhone?: string;
+  driverEmail?: string;
+  driverCompany?: string;
+  driverCity?: string;
+  driverLicenseNo?: string;
+  driverIdNumber?: string;
+  truckCapacityKg?: number | null;
+  loadingWarehouseIds?: string[];
+  expectedArrivalAt?: string | null;
+  notes?: string | null;
 }
 
 /** Attach further confirmed sales to a shipment that has not dispatched. */

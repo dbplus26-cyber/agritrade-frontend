@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Warehouse as WarehouseIcon } from "lucide-react";
 import {
   AdminButton,
   AdminCard,
@@ -302,9 +303,38 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
   const visibleLots = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return lots;
-    return lots.filter((l) => l.commodity.name.toLowerCase().includes(q));
+    return lots.filter(
+      (l) =>
+        l.commodity.name.toLowerCase().includes(q) ||
+        l.warehouse.name.toLowerCase().includes(q),
+    );
   }, [lots, search]);
   const filtering = search.trim().length > 0;
+
+  // The lots grouped under the shed holding them: the trip's planned sheds
+  // first, in route order, then any other warehouse with a usable lot - the
+  // backend deliberately offers those too, for when the plan falls short.
+  const lotGroups = useMemo(() => {
+    const groups = new Map<
+      string,
+      { lots: IAvailableLot[]; name: string; planned: boolean }
+    >();
+    for (const w of shipment.loadingWarehouses)
+      groups.set(w.id, { lots: [], name: w.name, planned: true });
+    for (const l of visibleLots) {
+      const existing = groups.get(l.warehouse.id);
+      if (existing) existing.lots.push(l);
+      else
+        groups.set(l.warehouse.id, {
+          lots: [l],
+          name: l.warehouse.name,
+          planned: false,
+        });
+    }
+    return [...groups.entries()]
+      .filter(([, g]) => g.lots.length > 0)
+      .map(([id, g]) => ({ id, ...g }));
+  }, [visibleLots, shipment.loadingWarehouses]);
 
   const activeRows = rows[activeSaleId];
   const activeSale = shipment.sales.find((s) => s.id === activeSaleId);
@@ -651,7 +681,6 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
               <AdminButton
                 type="button"
                 variant="outline"
-                className="h-9 px-3"
                 onClick={() => runAutoAllocate("CHEAPEST")}
               >
                 Cheapest lots first
@@ -659,7 +688,6 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
               <AdminButton
                 type="button"
                 variant="outline"
-                className="h-9 px-3"
                 onClick={() => runAutoAllocate("COSTLIEST")}
               >
                 Costliest lots first
@@ -680,7 +708,6 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                 <AdminButton
                   type="button"
                   variant="outline"
-                  className="h-9 px-3"
                   onClick={clearActiveSale}
                 >
                   Clear this sale
@@ -698,7 +725,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                   <AdminButton
                     type="button"
                     variant="ghost"
-                    className="h-9 px-3 whitespace-nowrap"
+                    className="whitespace-nowrap"
                     onClick={applyBalance}
                   >
                     Balance from{" "}
@@ -726,8 +753,8 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search commodity…"
-              aria-label="Search lots by commodity"
+              placeholder="Search commodity or warehouse…"
+              aria-label="Search lots by commodity or warehouse"
               className={cn(adminInputClass, "h-10")}
             />
             {filtering ? (
@@ -743,9 +770,30 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
             </p>
           ) : (
             /* No inner scroller: the page scrolls, so a phone has one thumb
-               target and every lot is reachable. */
-            <AdminCard className="flex flex-col gap-2 px-4 py-3">
-              {visibleLots.map((l) => {
+               target and every lot is reachable. Lots sit under the shed
+               holding them, so "load these at Shed B" is readable as a list,
+               not deduced lot by lot. */
+            <AdminCard className="flex flex-col gap-3 px-4 py-3">
+              {lotGroups.map((g) => (
+              <div key={g.id} className="flex flex-col gap-2">
+              {/* A filled band, not a hairline: the shed boundary is the fact
+                  this list is organised by, so it has to read from across the
+                  room. Full-bleed against the card's padding so it reads as a
+                  section divider rather than another row. */}
+              <div className="-mx-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-0.5 border-y border-adm-line bg-[#EFF3E7] px-4 py-2">
+                <span className="flex min-w-0 items-center gap-1.5 text-[11.5px] font-bold uppercase tracking-[0.09em] text-console">
+                  <WarehouseIcon className="h-3.5 w-3.5 flex-none" />
+                  <span className="min-w-0 [overflow-wrap:anywhere]">
+                    {g.name}
+                  </span>
+                </span>
+                <span className="flex-none text-[11px] font-medium text-adm-muted">
+                  {g.planned
+                    ? `${g.lots.length} ${g.lots.length === 1 ? "lot" : "lots"}`
+                    : "not on this trip's plan"}
+                </span>
+              </div>
+              {g.lots.map((l) => {
                 const weight = activeRows?.[l.id] ?? "";
                 const onThisSaleKg = activeCommodityKg[l.commodity.id] ?? 0;
                 // Weight this lot carries for the OTHER sales on the truck.
@@ -806,6 +854,8 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                   </div>
                 );
               })}
+              </div>
+              ))}
             </AdminCard>
           )}
 
@@ -831,7 +881,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
               <AdminButton
                 type="button"
                 variant="outline"
-                className="h-10 px-4"
+                size="lg"
                 onClick={() => router.push(`${LIST}/${shipment.id}`)}
               >
                 Cancel
@@ -839,7 +889,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
               <AdminButton
                 type="button"
                 disabled={saving}
-                className="h-10 px-5"
+                size="lg"
                 onClick={() => void submit()}
               >
                 {saving ? "Saving…" : "Save allocations"}

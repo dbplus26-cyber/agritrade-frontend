@@ -12,8 +12,7 @@ import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
-import { AdminCard, Mono } from "@/components/admin/ui";
-import { Button } from "@/components/ui/button";
+import { AdminButton, AdminCard, Mono } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -185,7 +184,7 @@ export function SalesRegister() {
         enableSorting: false,
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-adm-ink">
+          <Mono className="whitespace-nowrap text-adm-ink">
             <Money value={row.original.agreedTotalGhs} />
           </Mono>
         ),
@@ -203,7 +202,7 @@ export function SalesRegister() {
           return (
             <Mono
               className={cn(
-                "whitespace-nowrap text-[12.5px] font-semibold",
+                "whitespace-nowrap font-semibold",
                 b === null
                   ? "text-adm-faint"
                   : b === 0
@@ -242,9 +241,9 @@ export function SalesRegister() {
       activeCount={activeFilterCount}
       onClear={resetFilters}
       action={
-        <Button asChild variant="harvest" className="h-8 px-3.5 text-[13px]">
+        <AdminButton asChild>
           <Link href={`${LIST}/new`}>+ New sale</Link>
-        </Button>
+        </AdminButton>
       }
     >
       <ConsoleLabeledSelect
@@ -366,7 +365,7 @@ export function SalesRegister() {
                       <SaleStatusBadge status={s.status} />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[12px] text-adm-muted">Balance</span>
+                      <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">Balance</span>
                       <Mono
                         className={cn(
                           "text-[14px] font-bold",

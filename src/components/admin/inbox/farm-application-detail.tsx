@@ -314,7 +314,7 @@ function FarmApplicationDetailBody({
                   type="button"
                   disabled={!dirty || saving}
                   onClick={() => void onSave()}
-                  className="h-[38px] px-[18px]"
+                  size="lg"
                 >
                   {saving ? "Saving…" : "Save changes"}
                 </AdminButton>
@@ -330,7 +330,7 @@ function FarmApplicationDetailBody({
                   <AdminButton
                     asChild
                     variant="gold"
-                    className="mt-2.5 h-9 px-4"
+                    className="mt-2.5"
                   >
                     <Link
                       href={`/admin/farmers/${application.convertedFarmerId}`}
@@ -349,7 +349,7 @@ function FarmApplicationDetailBody({
                     type="button"
                     disabled={converting}
                     onClick={() => void onConvert()}
-                    className="mt-2.5 h-9 px-4"
+                    className="mt-2.5"
                   >
                     {converting ? "Converting…" : "Convert to farmer"}
                   </AdminButton>
@@ -387,7 +387,7 @@ function FarmApplicationDetailBody({
                 variant="danger"
                 disabled={deleting}
                 onClick={() => void onDelete()}
-                className="mt-2.5 h-9 px-4"
+                className="mt-2.5"
               >
                 {deleting ? "Deleting…" : "Delete application"}
               </AdminButton>

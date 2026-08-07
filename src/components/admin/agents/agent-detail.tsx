@@ -378,10 +378,10 @@ function TopUpDialog({
             />
           </AdminField>
           <ResponsiveDialogFooter className="gap-2">
-            <AdminButton type="button" variant="outline" className="h-9 px-3.5" onClick={onClose}>
+            <AdminButton type="button" variant="outline" size="lg" onClick={onClose}>
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={isLoading} className="h-9 px-4">
+            <AdminButton type="submit" disabled={isLoading} size="lg">
               {isLoading ? "Topping up…" : "Top up float"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -561,7 +561,7 @@ function ReconcileDialog({
                 <AdminButton
                   type="button"
                   variant="outline"
-                  className="h-9 px-3.5"
+                  size="lg"
                   onClick={onClose}
                 >
                   Cancel
@@ -569,7 +569,7 @@ function ReconcileDialog({
                 <AdminButton
                   type="submit"
                   disabled={isLoading}
-                  className="h-9 px-4"
+                  size="lg"
                 >
                   {isLoading ? "Posting…" : "Post reconciliation"}
                 </AdminButton>
@@ -648,7 +648,7 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
         actions={
           <div className="flex flex-wrap gap-2">
             {/* Statement is a read - anyone with agent access can print it. */}
-            <AdminButton variant="secondary" className="h-9 px-3.5" asChild>
+            <AdminButton variant="secondary" asChild>
               <Link href={`/admin/agents/${agentUserId}/statement`}>
                 Statement
               </Link>
@@ -660,13 +660,11 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
               <>
                 <AdminButton
                   variant="secondary"
-                  className="h-9 px-3.5"
                   onClick={() => setReconcileOpen(true)}
                 >
                   Reconcile
                 </AdminButton>
                 <AdminButton
-                  className="h-9 px-4"
                   onClick={() => setTopUpOpen(true)}
                 >
                   Top up float

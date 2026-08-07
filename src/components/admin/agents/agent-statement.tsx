@@ -12,7 +12,13 @@ import { ConsoleDateRange } from "@/components/admin/filter-bar";
 import { HelpWrap } from "@/components/admin/help-tip";
 import { DocumentSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import {
+  AuthorisedSignature,
+  DocumentLogo,
+  InkSignatureLine,
+} from "@/components/admin/document-marks";
 import { extractApiError } from "@/lib/extract-api-error";
+import { receiptPdfUrl } from "@/lib/receipt-pdf-url";
 import { formatDateOnly, formatDateTime } from "@/lib/format-date";
 import { formatCedis, MONEY_HIDDEN } from "@/lib/format-money";
 import { cn } from "@/lib/utils";
@@ -146,13 +152,17 @@ export function AgentStatement({ id }: { id: string }) {
           hint="Every movement in and out of this agent's money, in order."
           sub="Every top-up, purchase and expense against the cash this agent holds, ready to print and sign"
           actions={
-              // No server-rendered PDF for a statement: the API's receipt
-              // types cover single documents (a voucher, an invoice, a
-              // waybill), not a ledger over a period. So this one really does
-              // print the page - which is now only the sheet, since the shell
-              // hides itself for print.
-            <AdminButton className="h-9 px-4" onClick={() => window.print()}>
-              Print
+            // The server renders this ledger as a paginated A4 PDF, window
+            // and all - printing happens from the viewer, which previews the
+            // sheet true to size instead of the browser dialog's guesswork.
+            <AdminButton asChild>
+              <a
+                href={receiptPdfUrl("agent-statement", id, { from, to })}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View PDF
+              </a>
             </AdminButton>
           }
         />
@@ -168,7 +178,6 @@ export function AgentStatement({ id }: { id: string }) {
           {windowed ? (
             <AdminButton
               variant="outline"
-              className="h-8 px-3"
               onClick={() => {
                 setFrom("");
                 setTo("");
@@ -184,12 +193,15 @@ export function AgentStatement({ id }: { id: string }) {
           720px measure so it still reads as a piece of paper. */}
       <div className="max-w-[720px] rounded-[8px] border border-adm-line bg-white p-8 text-adm-ink">
         <div className="flex items-start justify-between gap-4 border-b-2 border-adm-strong pb-3">
-          <div>
-            <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">
-              DB PLUS
-            </div>
-            <div className="text-[11px] tracking-[0.06em] text-adm-muted uppercase">
-              Trading · Tamale
+          <div className="flex items-center gap-3">
+            <DocumentLogo />
+            <div>
+              <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">
+                DB PLUS
+              </div>
+              <div className="text-[11px] tracking-[0.06em] text-adm-muted uppercase">
+                Trading · Tamale
+              </div>
             </div>
           </div>
           <div className="text-right">
@@ -374,9 +386,14 @@ export function AgentStatement({ id }: { id: string }) {
           </div>
         </div>
 
-        <div className="mt-12 grid grid-cols-2 gap-8 text-[12px]">
-          <div className="border-t border-adm-strong pt-1">Agent&apos;s signature</div>
-          <div className="border-t border-adm-strong pt-1">Owner&apos;s signature</div>
+        {/* The counterparty signs in ink; the owner's saved signature is
+            already on their line, same as the PDF. */}
+        <div className="mt-12 flex flex-wrap items-end gap-x-8 gap-y-6 text-[12px]">
+          <InkSignatureLine
+            label="Agent's signature"
+            className="flex-1 basis-[160px]"
+          />
+          <AuthorisedSignature className="flex-1 basis-[160px]" />
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image, { type ImageProps } from "next/image";
+import { bypassOptimizer } from "@/lib/photo-src";
 import { cn } from "@/lib/utils";
 
 /**
@@ -61,6 +62,7 @@ export function Photo({
     <Image
       {...props}
       alt={alt}
+      unoptimized={bypassOptimizer(src) || props.unoptimized}
       onError={() => {
         setFailedSrc(src);
         if (src !== null) onFailed?.(src);

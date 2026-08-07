@@ -41,11 +41,11 @@ export default function AdminErrorBoundary({
           </p>
         ) : null}
         <div className="mt-4 flex flex-wrap gap-2">
-          <AdminButton className="h-9 px-4" onClick={reset}>
+          <AdminButton onClick={reset}>
             <RefreshCw aria-hidden="true" data-slot="icon" />
             Try again
           </AdminButton>
-          <AdminButton asChild variant="outline" className="h-9 px-3.5">
+          <AdminButton asChild variant="outline">
             <Link href="/admin">Back to the dashboard</Link>
           </AdminButton>
         </div>

@@ -14,9 +14,13 @@ import {
 } from "@/components/admin/ui";
 import { FormSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { FilePicker } from "@/components/ui/FilePicker";
+import { SignaturePad } from "@/components/ui/SignaturePad";
 import {
   useGetSettingsQuery,
+  useRemoveDocumentSignatureMutation,
   useUpdateSettingsMutation,
+  useUploadDocumentSignatureMutation,
 } from "@/redux/settings/settings-api";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
@@ -89,8 +93,10 @@ function SettingsForm({
   });
 
   const onSubmit = async (values: SettingsValues) => {
-    // Send only the keys whose value actually changed.
-    const next: ISystemSettings = {
+    // Send only the keys whose value actually changed. (This screen owns the
+    // system settings; the statement-settings screen owns the statement*
+    // keys, so `next` is deliberately a subset of ISystemSettings.)
+    const next: IUpdateSettingsInput = {
       purchaseApprovalThresholdGhs: Number(values.purchaseApprovalThresholdGhs),
       lowFloatThresholdGhs: Number(values.lowFloatThresholdGhs),
       companyContactPhone: values.companyContactPhone.trim(),
@@ -125,7 +131,7 @@ function SettingsForm({
     <form
       noValidate
       onSubmit={handleSubmit(onSubmit)}
-      className="flex max-w-[560px] flex-col gap-4"
+      className="flex max-w-[640px] flex-col gap-4"
     >
       <AdminCard className="px-5 py-[18px]">
         <SectionHeading hint="The figures the console checks a purchase or a float against before it asks anyone to approve it.">
@@ -247,14 +253,14 @@ function SettingsForm({
             <AdminButton
               type="submit"
               disabled={saving || !isDirty}
-              className="h-[38px] px-[18px]"
+              size="lg"
             >
               {saving ? "Saving…" : "Save settings"}
             </AdminButton>
             <AdminButton
               type="button"
               variant="outline"
-              className="h-[38px] px-3.5"
+              size="lg"
               onClick={() => {
                 reset(toFormValues(settings));
                 setIsEditing(false);
@@ -268,7 +274,7 @@ function SettingsForm({
             key="locked"
             type="button"
             variant="gold"
-            className="h-[38px] px-[18px]"
+            size="lg"
             onClick={() => setIsEditing(true)}
           >
             Edit settings
@@ -276,6 +282,137 @@ function SettingsForm({
         )}
       </div>
     </form>
+  );
+}
+
+/**
+ * The owner's signature: uploaded as an image or drawn on the pad, kept
+ * once, and stamped by the server on every receipt, waybill and statement
+ * certificate - so documents leave the system already signed instead of
+ * waiting for the same hand on every page.
+ */
+function SignatureCard({ settings }: { settings: ISystemSettings }) {
+  const [uploadSignature, uploadState] = useUploadDocumentSignatureMutation();
+  const [removeSignature, removeState] = useRemoveDocumentSignatureMutation();
+  const [padOpen, setPadOpen] = useState(false);
+  // What was just drawn or picked, shown IMMEDIATELY: the Cloudinary
+  // round-trip plus the settings refetch takes seconds, and a preview that
+  // sits unchanged that long reads as "it did not work". The local copy is
+  // pixel-identical to what the server stores, so it simply stays until the
+  // fresh URL arrives with the next settings payload.
+  const [pendingUrl, setPendingUrl] = useState<null | string>(null);
+
+  const onUpload = async (file: null | File) => {
+    if (!file) return;
+    const localUrl = URL.createObjectURL(file);
+    setPendingUrl(localUrl);
+    try {
+      await uploadSignature(file).unwrap();
+      notify.success("Signature saved", {
+        description:
+          "It now prints on every receipt, waybill and statement certificate.",
+      });
+      setPadOpen(false);
+    } catch (err) {
+      // Not saved - the stand-in must not keep claiming it was.
+      URL.revokeObjectURL(localUrl);
+      setPendingUrl(null);
+      notify.error("Couldn't save the signature", {
+        description: extractApiError(err).message,
+      });
+      throw err; // keep the picker's preview for a retry
+    }
+  };
+
+  const onRemove = async () => {
+    try {
+      await removeSignature().unwrap();
+      setPendingUrl(null);
+      notify.success("Signature removed", {
+        description: "Documents now print an empty line for ink.",
+      });
+    } catch (err) {
+      notify.error("Couldn't remove the signature", {
+        description: extractApiError(err).message,
+      });
+    }
+  };
+
+  const shownUrl = pendingUrl ?? (settings.documentSignatureUrl || null);
+  const hasSignature = shownUrl !== null;
+  return (
+    <AdminCard className="px-5 py-[18px]">
+      <SectionHeading hint="Stamped over the authorised-signature line on receipts, waybills and the statement book's certificate - signed once, printed everywhere.">
+        Owner&apos;s signature
+      </SectionHeading>
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-wrap items-center gap-4">
+          {shownUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element -- Cloudinary preview
+            <img
+              src={shownUrl}
+              alt="Saved signature"
+              className="h-16 w-40 flex-none rounded-[6px] border border-adm-line bg-white object-contain px-2"
+            />
+          ) : (
+            <div className="flex h-16 w-40 flex-none items-center justify-center rounded-[6px] border border-dashed border-adm-strong/60 text-[9px] font-bold tracking-[0.08em] text-adm-faint uppercase">
+              No signature
+            </div>
+          )}
+          <p className="min-w-0 flex-1 text-[12.5px] leading-[1.5] text-adm-muted">
+            {uploadState.isLoading
+              ? "Saving the signature…"
+              : hasSignature
+                ? "This signature prints on every document that needs one."
+                : "No signature saved - documents print an empty line to sign by hand."}
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <AdminButton
+            type="button"
+            variant="secondary"
+            aria-expanded={padOpen}
+            onClick={() => setPadOpen((v) => !v)}
+          >
+            {padOpen ? "Hide signature pad" : "Sign digitally"}
+          </AdminButton>
+          <FilePicker
+            accept="image/png,image/jpeg"
+            busy={uploadState.isLoading}
+            confirmLabel="Save signature"
+            hint="PNG or JPEG, up to 2MB - a dark signature on a plain background prints best"
+            onConfirm={onUpload}
+            triggerLabel={hasSignature ? "Replace with image" : "Upload image"}
+          />
+          {hasSignature ? (
+            <AdminButton
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={removeState.isLoading}
+              onClick={() => void onRemove()}
+            >
+              {removeState.isLoading ? "Removing…" : "Remove"}
+            </AdminButton>
+          ) : null}
+        </div>
+      </div>
+      {padOpen ? (
+        // The same inline pad the shipment page uses for the driver's
+        // signature - drawn in normal document flow, where canvas sizing
+        // just works. "Use signature" feeds the drawn PNG straight into the
+        // same upload path a scanned image takes.
+        <div className="mt-3">
+          <SignaturePad
+            onCapture={(file) => {
+              // The pad closes from onUpload's SUCCESS, not here - closing
+              // instantly left seconds of silence while the upload ran.
+              void onUpload(file).catch(() => undefined);
+            }}
+          />
+        </div>
+      ) : null}
+    </AdminCard>
   );
 }
 
@@ -301,11 +438,14 @@ export function SettingsScreen() {
           onRetry={() => void refetch()}
         />
       ) : (
-        <SettingsForm
-          key={JSON.stringify(data.data.settings)}
-          settings={data.data.settings}
-          descriptions={data.data.descriptions}
-        />
+        <div className="flex max-w-[640px] flex-col gap-4">
+          <SettingsForm
+            key={JSON.stringify(data.data.settings)}
+            settings={data.data.settings}
+            descriptions={data.data.descriptions}
+          />
+          <SignatureCard settings={data.data.settings} />
+        </div>
       )}
     </div>
   );

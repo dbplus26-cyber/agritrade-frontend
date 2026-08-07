@@ -110,14 +110,14 @@ export function RoleChangeDialog({
         <ResponsiveDialogFooter className="flex-row justify-end gap-2">
           <AdminButton
             variant="outline"
-            className="h-[34px] px-3.5 text-[13px]"
+            size="lg"
             disabled={isLoading}
             onClick={() => close(false)}
           >
             Cancel
           </AdminButton>
           <AdminButton
-            className="h-[34px] px-4 text-[13px]"
+            size="lg"
             disabled={isLoading || role === user.role}
             onClick={() => void apply()}
           >

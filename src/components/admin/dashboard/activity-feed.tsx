@@ -65,11 +65,11 @@ export function ActivityFeed() {
                 style={{ background: TONES[toneForAction(row.action)].dot }}
               />
               <div className="min-w-0 flex-1">
-                <div className="truncate text-[13px] text-adm-ink">
+                <div className="[overflow-wrap:anywhere] md:truncate text-[13px] text-adm-ink">
                   {humanizeAction(row.action)}
                   <span className="text-adm-faint"> · {row.entity}</span>
                 </div>
-                <div className="truncate text-[11.5px] text-adm-muted">
+                <div className="[overflow-wrap:anywhere] md:truncate text-[11.5px] text-adm-muted">
                   {row.actorName} · {shortWhen(row.at)}
                 </div>
               </div>

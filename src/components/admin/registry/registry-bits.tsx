@@ -69,7 +69,12 @@ export const columnMeta = (opts?: {
   wide?: boolean;
 }) => ({
   className: cn(
-    "px-4 py-0 text-[13px]",
+    // No font size here. The shared table body is 14px (data-table.tsx td);
+    // a `text-[13px]` in this meta silently overrode it on every register
+    // that used columnMeta while screens without it stayed at 14px - and the
+    // phone card view (which ignores meta) stayed at 14px everywhere. One
+    // table, two sizes, depending on how wide your screen was.
+    "px-4 py-0",
     opts?.at
       ? REVEAL_AT[opts.at]
       : opts?.wide

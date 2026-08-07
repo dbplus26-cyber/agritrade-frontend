@@ -11,8 +11,7 @@ import {
 } from "@/components/admin/filter-bar";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { DateTimeCell } from "@/components/admin/date-cell";
-import { adminLinkClass, AdminCard, Mono } from "@/components/admin/ui";
-import { Button } from "@/components/ui/button";
+import { AdminButton, adminLinkClass, AdminCard, Mono } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -95,7 +94,7 @@ export function StocktakesScreen() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-adm-ink">
+          <Mono className="whitespace-nowrap text-adm-ink">
             {row.original.transactionNo}
           </Mono>
         ),
@@ -112,7 +111,7 @@ export function StocktakesScreen() {
           <Link
             className={cn(
               adminLinkClass,
-              "block min-w-0 max-w-[90%] text-[13px] font-medium line-clamp-1 whitespace-normal [overflow-wrap:anywhere]",
+              "block min-w-0 max-w-[90%] font-medium line-clamp-1 whitespace-normal [overflow-wrap:anywhere]",
             )}
             href={`/admin/warehouses/${row.original.warehouse.id}`}
             onClick={(e) => e.stopPropagation()}
@@ -142,7 +141,7 @@ export function StocktakesScreen() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <Mono className="text-[12.5px] text-adm-ink">
+          <Mono className="text-adm-ink">
             {row.original.lines.length}
           </Mono>
         ),
@@ -179,13 +178,9 @@ export function StocktakesScreen() {
           activeCount={activeFilterCount}
           onClear={resetFilters}
           action={
-            <Button
-              asChild
-              variant="default"
-              className="h-[34px] rounded-[6px] bg-console px-3.5 text-[13px] font-semibold text-white shadow-none hover:translate-x-0 hover:translate-y-0 hover:bg-console-hover hover:shadow-none"
-            >
+            <AdminButton asChild>
               <Link href={`${LIST}/new`}>+ New stocktake</Link>
-            </Button>
+            </AdminButton>
           }
         >
           <ConsoleLabeledSelect

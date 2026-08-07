@@ -145,7 +145,7 @@ function CancelDialog({
             <AdminButton
               type="button"
               variant="outline"
-              className="h-9 px-3.5"
+              size="lg"
               onClick={onClose}
             >
               Keep sale
@@ -154,7 +154,7 @@ function CancelDialog({
               type="submit"
               variant="danger"
               disabled={isLoading}
-              className="h-9 px-4"
+              size="lg"
             >
               {isLoading ? "Cancelling…" : "Cancel sale"}
             </AdminButton>
@@ -247,24 +247,23 @@ export function SaleDetail({
       {isDraft ? (
         <>
           <AdminButton
-            className="h-9 px-4"
             disabled={confirmState.isLoading}
             onClick={() => void onConfirm()}
           >
             {confirmState.isLoading ? "Confirming…" : "Confirm sale"}
           </AdminButton>
-          <AdminButton variant="outline" className="h-9 px-4" asChild>
+          <AdminButton variant="outline" asChild>
             <Link href={`${LIST}/${sale.id}/edit`}>Edit draft</Link>
           </AdminButton>
         </>
       ) : null}
       {canPay ? (
-        <AdminButton className="h-9 px-4" onClick={() => setPayOpen(true)}>
+        <AdminButton onClick={() => setPayOpen(true)}>
           Record payment
         </AdminButton>
       ) : null}
       {sale.status === "CONFIRMED" ? (
-        <AdminButton variant="outline" className="h-9 px-4" asChild>
+        <AdminButton variant="outline" asChild>
           <Link href={`/admin/shipments/new?saleId=${sale.id}`}>
             Ship goods
           </Link>
@@ -273,14 +272,15 @@ export function SaleDetail({
       {canCancel ? (
         <AdminButton
           variant="outline"
-          className="h-9 px-4"
           onClick={() => setCancelOpen(true)}
         >
           Cancel sale
         </AdminButton>
       ) : null}
-      {sale.status !== "DRAFT" && sale.status !== "CANCELLED" ? (
-        <AdminButton variant="outline" className="h-9 px-4" asChild>
+      {/* A draft's invoice is the proforma the buyer confirms against, so
+          it exists from day one; only a cancelled sale has no document. */}
+      {sale.status !== "CANCELLED" ? (
+        <AdminButton variant="outline" asChild>
           <Link href={`${LIST}/${sale.id}/invoice`}>
             {sale.balanceGhs === 0 ? "Receipt" : "Invoice"}
           </Link>
@@ -448,7 +448,8 @@ export function SaleDetail({
                   <AdminButton
                     type="button"
                     variant="outline"
-                    className="h-[26px] flex-none px-2 text-[11.5px]"
+                    size="sm"
+                    className="flex-none"
                     onClick={() => void reverseOne(p.id, p.amountGhs)}
                   >
                     Reverse

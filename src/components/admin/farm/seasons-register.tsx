@@ -10,8 +10,7 @@ import {
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
-import { AdminCard } from "@/components/admin/ui";
-import { Button } from "@/components/ui/button";
+import { AdminButton, AdminCard } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -129,9 +128,9 @@ export function SeasonsRegister() {
           activeCount={activeFilterCount}
           onClear={resetFilters}
           action={
-            <Button asChild variant="harvest" className="h-8 px-3.5 text-[13px]">
+            <AdminButton asChild>
               <Link href={`${LIST}/new`}>+ New season</Link>
-            </Button>
+            </AdminButton>
           }
         >
           <ConsoleLabeledSelect

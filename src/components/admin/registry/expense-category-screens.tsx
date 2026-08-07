@@ -26,7 +26,6 @@ import {
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
 import { BackButton } from "@/components/ui/BackButton";
-import { Button } from "@/components/ui/button";
 import {
   ConsoleTableSkeleton,
   FormSkeleton,
@@ -175,15 +174,10 @@ function CreateCategoryDialog({
             />
           </AdminField>
           <ResponsiveDialogFooter className="gap-2">
-            <AdminButton
-              type="button"
-              variant="outline"
-              className="h-9 px-3.5"
-              onClick={close}
-            >
+            <AdminButton type="button" variant="outline" size="lg" onClick={close}>
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={isLoading} className="h-9 px-4">
+            <AdminButton type="submit" disabled={isLoading} size="lg">
               {isLoading ? "Saving…" : "Create category"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -250,6 +244,20 @@ export function ExpenseCategoryTable() {
         ),
       },
       {
+        id: "expenses",
+        accessorFn: (c) => c.expenseCount ?? 0,
+        header: "Expenses filed",
+        enableSorting: false,
+        meta: columnMeta(),
+        // The register used to be three thin columns of name/date/badge -
+        // nothing said whether a heading was a workhorse or an empty bucket.
+        cell: ({ row }) => (
+          <Mono className="tabular-nums">
+            {row.original.expenseCount ?? 0}
+          </Mono>
+        ),
+      },
+      {
         id: "added",
         accessorFn: (c) => c.createdAt,
         header: "Added",
@@ -288,13 +296,9 @@ export function ExpenseCategoryTable() {
           onClear={resetFilters}
           action={
             isSuperAdmin ? (
-              <Button
-                variant="default"
-                className="h-[34px] rounded-[6px] bg-console px-3.5 text-[13px] font-semibold text-white shadow-none hover:translate-x-0 hover:translate-y-0 hover:bg-console-hover hover:shadow-none"
-                onClick={() => setCreateOpen(true)}
-              >
+              <AdminButton onClick={() => setCreateOpen(true)}>
                 + Add category
-              </Button>
+              </AdminButton>
             ) : null
           }
         >
@@ -546,15 +550,15 @@ function ExpenseLine({ expense }: { expense: IExpense }) {
   return (
     <li className="flex items-start justify-between gap-4 px-4 py-3">
       <div className="min-w-0 flex-1">
-        <p className="text-[13px] leading-[1.45] text-adm-ink [overflow-wrap:anywhere]">
+        <p className="text-[13.5px] leading-[1.45] text-adm-ink [overflow-wrap:anywhere]">
           {expense.description ?? <Absent />}
         </p>
-        <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11.5px] text-adm-muted">
+        <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[12px] text-adm-muted">
           {/* The voucher number is the line's handle: the description can be
               empty, the number never is, so it carries the link to the cost's
               own page. */}
           <Link
-            className={cn(adminLinkClass, "font-adminmono text-[11.5px] tabular-nums")}
+            className={cn(adminLinkClass, "font-adminmono text-[12px] tabular-nums")}
             href={`/admin/expenses/${expense.id}`}
           >
             {expense.transactionNo}
@@ -652,7 +656,7 @@ function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
               <span className="text-[11px] font-bold tracking-[0.08em] text-adm-muted uppercase">
                 {filtered ? "Matched" : "Total"}
               </span>
-              <Mono className="text-[14px] font-bold text-adm-ink">
+              <Mono className="text-[16px] font-bold text-adm-ink">
                 {formatCedis(windowTotal)}
               </Mono>
             </span>
@@ -664,8 +668,14 @@ function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
 
       {/* Searching and the date window are the server's job here. Filtering
           12 rows in the browser would answer only for the page in hand, and
-          silently miss every voucher on the pages behind it. */}
+          silently miss every voucher on the pages behind it.
+
+          fullWidthSearch: this toolbar lives in the LEFT column of a split
+          page, so the search owns the column's whole width and the date
+          window files underneath it, instead of a stubby 30% box with the
+          filters wrapping into the leftover. */}
       <ConsoleFilterBar
+        fullWidthSearch
         search={search}
         onSearch={setSearch}
         searchPlaceholder="Search voucher no. or description…"

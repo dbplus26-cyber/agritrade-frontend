@@ -36,6 +36,7 @@ import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
+import { receiptPdfUrl } from "@/lib/receipt-pdf-url";
 import { cn } from "@/lib/utils";
 import {
   useAgreeLandAcquisitionMutation,
@@ -184,12 +185,12 @@ function PaymentDialog({
             <AdminButton
               type="button"
               variant="outline"
-              className="h-9 px-3.5"
+              size="lg"
               onClick={onClose}
             >
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={isLoading} className="h-9 px-4">
+            <AdminButton type="submit" disabled={isLoading} size="lg">
               {isLoading ? "Recording..." : "Record payment"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -250,7 +251,7 @@ function CancelDialog({
             <AdminButton
               type="button"
               variant="outline"
-              className="h-9 px-3.5"
+              size="lg"
               onClick={onClose}
             >
               Keep it
@@ -259,7 +260,7 @@ function CancelDialog({
               type="submit"
               variant="danger"
               disabled={isLoading}
-              className="h-9 px-4"
+              size="lg"
             >
               {isLoading ? "Cancelling..." : "Cancel acquisition"}
             </AdminButton>
@@ -368,7 +369,6 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
         <div className="flex flex-wrap gap-2 xl:flex-col">
           {a.status === "NEGOTIATING" ? (
             <AdminButton
-              className="h-9 px-4"
               disabled={agreeState.isLoading}
               onClick={() => void onAgree()}
             >
@@ -376,14 +376,13 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
             </AdminButton>
           ) : null}
           {canPay ? (
-            <AdminButton className="h-9 px-4" onClick={() => setPayOpen(true)}>
+            <AdminButton onClick={() => setPayOpen(true)}>
               Record payment
             </AdminButton>
           ) : null}
           {a.status === "AGREED" ? (
             <AdminButton
               variant="outline"
-              className="h-9 px-4"
               disabled={completeState.isLoading}
               onClick={() => void onComplete()}
             >
@@ -393,7 +392,6 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
           {canCancel ? (
             <AdminButton
               variant="outline"
-              className="h-9 px-4"
               onClick={() => setCancelOpen(true)}
             >
               Cancel
@@ -409,7 +407,22 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
       <AdminPageHeader
         title="Acquisition details"
         hint="One piece of land being bought: the seller, the agreed price and what has been paid."
-        actions={<LandAcquisitionStatusBadge status={a.status} />}
+        actions={
+          <span className="flex flex-wrap items-center gap-1.5">
+            <LandAcquisitionStatusBadge status={a.status} />
+            {/* The whole record on paper: seller, plot facts and every
+                payment made so far, PAID-stamped once settled. */}
+            <AdminButton variant="outline" asChild>
+              <a
+                href={receiptPdfUrl("land-acquisition", a.id)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View PDF
+              </a>
+            </AdminButton>
+          </span>
+        }
       />
 
       {a.status === "COMPLETED" && a.plot ? (
@@ -533,7 +546,8 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
                       <AdminButton
                         type="button"
                         variant="outline"
-                        className="h-[26px] flex-none px-2 text-[11.5px]"
+                        size="sm"
+                        className="flex-none"
                         onClick={() => void reverseOne(p.id, p.amountGhs)}
                       >
                         Reverse

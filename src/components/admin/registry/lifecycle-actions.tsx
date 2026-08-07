@@ -85,7 +85,6 @@ export function LifecycleActions({
       <AdminButton
         type="button"
         variant="outline"
-        className="h-[34px] px-3 text-[12.5px]"
         onClick={() => void toggleActive()}
       >
         {isActive ? "Deactivate" : "Activate"}
@@ -93,7 +92,7 @@ export function LifecycleActions({
       <AdminButton
         type="button"
         variant="outline"
-        className="h-[34px] border-console-red/40 px-3 text-[12.5px] text-console-red hover:bg-console-red/5"
+        className="border-console-red/40 text-console-red hover:bg-console-red/5"
         onClick={() => void remove()}
       >
         Delete

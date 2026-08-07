@@ -3,12 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
+  AdminButton,
   adminLinkClass,
   AdminCard,
   AdminPageHeader,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
-import { Button } from "@/components/ui/button";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useGetApprovalQuery } from "@/redux/approvals/approvals-api";
@@ -152,20 +152,21 @@ export function ApprovalDetail({ id }: { id: string }) {
         {/* 5. Footer: the decision itself, while there is one to make. */}
         {pending ? (
           <div className="mt-4 flex justify-end gap-2">
-            <Button
-              variant="harvest"
-              className="h-9 flex-1 sm:flex-none sm:px-6"
+            <AdminButton
+              size="lg"
+              className="flex-1 sm:flex-none"
               onClick={() => setDecision({ approval, kind: "approve" })}
             >
               Approve
-            </Button>
-            <Button
-              variant="outline"
-              className="h-9 flex-1 text-console-red hover:text-console-red sm:flex-none sm:px-6"
+            </AdminButton>
+            <AdminButton
+              variant="danger"
+              size="lg"
+              className="flex-1 sm:flex-none"
               onClick={() => setDecision({ approval, kind: "reject" })}
             >
               Reject
-            </Button>
+            </AdminButton>
           </div>
         ) : null}
       </AdminCard>

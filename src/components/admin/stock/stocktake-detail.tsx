@@ -41,7 +41,7 @@ const LIST = "/admin/stocktakes";
 function Delta({ deltaKg }: { deltaKg: number | null }) {
   if (deltaKg === null) return <Absent />;
   if (deltaKg === 0)
-    return <Mono className="text-[13px] text-adm-muted">0 kg</Mono>;
+    return <Mono className="text-adm-muted">0 kg</Mono>;
   return <SignedKg kg={deltaKg} />;
 }
 
@@ -57,7 +57,7 @@ function LinesCard({ lines }: { lines: IStocktakeLine[] }) {
       <div className="@container/lines">
         {/* Wide: the real four-column table. */}
         <div className="hidden overflow-x-auto @xl/lines:block">
-          <table className="w-full text-[13px]">
+          <table className="w-full text-[14px]">
             <thead>
               <tr className="bg-adm-sunken text-left text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted">
                 {/* The named column takes the slack; Counted, Book and Difference

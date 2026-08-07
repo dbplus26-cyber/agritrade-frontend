@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import {
+  BookOpenCheck,
   BookUser,
   ChevronDown,
   ChevronRight,
@@ -262,6 +263,9 @@ const GROUP_ICON: Record<string, LucideIcon> = {
   "Money out": HandCoins,
   Land: MapPin,
   Farm: Sprout,
+  // The statement books: generated, printed, signed and stamped - a book
+  // with a check for "the accounts, done".
+  Books: BookOpenCheck,
   Directory: BookUser,
   // The public site: everything here arrived through it - enquiries, reviews,
   // applications - so the group is named for the door, not the post.

@@ -1,9 +1,14 @@
 import { ReviewCard } from "@/components/reviews/review-card";
 import { ReviewForm } from "@/components/reviews/review-form";
+import { RegisterPager } from "@/components/ui/RegisterPager";
 import { StencilLabel } from "@/components/ui/StencilLabel";
 import { Reveal } from "@/components/ui/Reveal";
-import { fetchPublicReviews } from "@/lib/public-reviews";
+import { fetchPublicReviewsPage } from "@/lib/public-reviews";
+import { routes } from "@/lib/routes";
 import { pageMetadata } from "@/lib/seo";
+
+/** Three rows of the 3-up review grid per server page. */
+const REVIEW_PAGE_SIZE = 9;
 
 export const metadata = pageMetadata({
   title: "Reviews",
@@ -17,11 +22,23 @@ export const metadata = pageMetadata({
   ],
 });
 
-export default async function ReviewsPage() {
-  // Approved reviews only, cached under the `reviews` tag (API caps at 50).
-  // None on file (or the API briefly down) renders the honest empty ledger
-  // line - never stand-in testimonials.
-  const reviews = (await fetchPublicReviews(50)) ?? [];
+export default async function ReviewsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  // Approved reviews only, cached under the `reviews` tag, paged on the
+  // SERVER: `?page=N` fetches that window of the newest-50 register with the
+  // register-wide meta driving the pager. None on file (or the API briefly
+  // down) renders the honest empty ledger line - never stand-in testimonials.
+  const { page: rawPage } = await searchParams;
+  const page = Math.max(1, Number(rawPage) || 1);
+  const windowed = await fetchPublicReviewsPage({
+    limit: REVIEW_PAGE_SIZE,
+    page,
+  });
+  const reviews = windowed?.reviews ?? [];
+  const totalPages = windowed?.meta.totalPages ?? 1;
 
   return (
     <div className="texture-grain bg-surface">
@@ -56,6 +73,13 @@ export default async function ReviewsPage() {
                 <ReviewCard key={review.id} review={review} />
               ))}
             </div>
+            <RegisterPager
+              basePath={routes.reviews}
+              className="mt-8 lg:mt-10"
+              label="Review pages"
+              page={page}
+              totalPages={totalPages}
+            />
           </Reveal>
         )}
       </section>

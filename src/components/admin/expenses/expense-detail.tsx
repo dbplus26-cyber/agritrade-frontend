@@ -81,7 +81,6 @@ export function ExpenseDetail({ id }: { id: string }) {
               </PdfLink>
               {isSuperAdmin ? (
                 <AdminButton
-                  className="h-9 px-4"
                   onClick={() => setEditing(true)}
                   type="button"
                 >

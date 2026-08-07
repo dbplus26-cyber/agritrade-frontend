@@ -10,8 +10,7 @@ import {
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
-import { AdminCard } from "@/components/admin/ui";
-import { Button } from "@/components/ui/button";
+import { AdminButton, AdminCard } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -47,7 +46,7 @@ function FarmerCell({ farmer }: { farmer: IFarmer }) {
           {farmer.name}
         </div>
         {farmer.phone ? (
-          <div className="text-[12px] text-adm-muted">{farmer.phone}</div>
+          <div className="text-[12.5px] text-adm-muted">{farmer.phone}</div>
         ) : null}
       </div>
     </Link>
@@ -102,7 +101,7 @@ export function FarmersRegister() {
         enableSorting: false,
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
-          <span className="text-[12.5px] text-adm-muted">
+          <span className="text-adm-muted">
             {row.original.community ?? "-"}
           </span>
         ),
@@ -145,9 +144,9 @@ export function FarmersRegister() {
           activeCount={activeFilterCount}
           onClear={resetFilters}
           action={
-            <Button asChild variant="harvest" className="h-8 px-3.5 text-[13px]">
+            <AdminButton asChild>
               <Link href={`${LIST}/new`}>+ Add farmer</Link>
-            </Button>
+            </AdminButton>
           }
         >
           <ConsoleLabeledSelect

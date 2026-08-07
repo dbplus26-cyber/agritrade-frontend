@@ -143,7 +143,7 @@ export function EnquiriesScreen() {
             <span className="block truncate font-medium text-adm-ink">
               {row.original.fullName}
             </span>
-            <Mono className="block text-[11px] text-adm-faint">
+            <Mono className="block text-[12.5px] text-adm-faint">
               {row.original.reference}
             </Mono>
           </Link>
@@ -156,7 +156,7 @@ export function EnquiriesScreen() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-adm-muted">
+          <Mono className="whitespace-nowrap text-adm-muted">
             {row.original.phone}
           </Mono>
         ),

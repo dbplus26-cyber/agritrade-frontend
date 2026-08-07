@@ -139,7 +139,7 @@ export function UserForm() {
   };
 
   return (
-    <div className="max-w-[560px]">
+    <div className="max-w-[640px]">
       <BackButton href="/admin/users" label="All users" className="mb-2" />
       <AdminPageHeader
         title="Add user"
@@ -251,7 +251,8 @@ export function UserForm() {
                 <AdminButton
                   type="button"
                   variant="secondary"
-                  className="h-[38px] flex-none px-3 text-[12.5px]"
+                  size="lg"
+                  className="flex-none"
                   onClick={() =>
                     setValue("password", generatePassword(), {
                       shouldValidate: true,
@@ -313,14 +314,14 @@ export function UserForm() {
             <AdminButton
               type="submit"
               disabled={isLoading}
-              className="h-[38px] px-[18px]"
+              size="lg"
             >
               {isLoading ? "Creating…" : "Create user"}
             </AdminButton>
             <AdminButton
               type="button"
               variant="outline"
-              className="h-[38px] px-3.5"
+              size="lg"
               onClick={() => router.push("/admin/users")}
             >
               Cancel

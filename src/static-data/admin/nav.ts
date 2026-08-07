@@ -109,6 +109,15 @@ export const adminNavGroups: AdminNavGroup[] = [
     ],
   },
   {
+    label: "Books",
+    items: [
+      item("statements", "Financial Statements", "The complete statement book - generated from the records, printed for signature and stamp.", { ownerOnly: true }),
+      item("fixed-assets", "Fixed Assets", "The equipment, vehicles and buildings the statements depreciate.", { ownerOnly: true }),
+      item("drawings", "Drawings", "Money the proprietor takes for personal use - it reduces capital, not profit.", { ownerOnly: true }),
+      item("statement-settings", "Statement Settings", "The names, logo and blocks printed on the books' cover and certificate.", { ownerOnly: true }),
+    ],
+  },
+  {
     label: "Directory",
     items: [
       item("suppliers", "Suppliers", "People and co-ops you buy grain from."),

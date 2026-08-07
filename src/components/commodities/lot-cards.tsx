@@ -1,15 +1,15 @@
-"use client";
-
-import { useRef, useState } from "react";
 import Link from "next/link";
 import { DocCard } from "@/components/ui/DocCard";
+import { RegisterPager } from "@/components/ui/RegisterPager";
 import { CommodityPlaceholder } from "@/components/ui/CommodityPlaceholder";
 import { Photo } from "@/components/ui/Photo";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { routes } from "@/lib/routes";
 import type { PublicLot } from "@/lib/public-commodities";
 
-const PAGE_SIZE = 9;
+/** Rows per server page of the register - the page.tsx fetch and the backend
+ * meta both speak this number. */
+export const LOT_PAGE_SIZE = 9;
 
 /**
  * The slot a thumbnail lives in, used for the photo AND for both no-photo
@@ -118,31 +118,25 @@ function LotCard({ lot }: { lot: PublicLot }) {
 /**
  * The compact tail of the commodities register. The first lots keep the rich
  * full-bleed file treatment in `LotFiles`; everything after them files here
- * as DocCard thumbnails in a 1/2/3-column grid, client-side paginated once
- * the register grows past 9 (stencilled PAGE X OF Y between square PREV/NEXT
- * blocks, in the site's ledger idiom).
+ * as DocCard thumbnails in a 1/2/3-column grid, server-paginated once the
+ * register grows past a page (stencilled PAGE X OF Y between square PREV/NEXT
+ * blocks, in the site's ledger idiom): `lots` is ONE server page, and the
+ * pager's links carry `?page=N` back to the route.
  */
-export function LotCards({ lots }: { lots: PublicLot[] }) {
-  const [page, setPage] = useState(1);
-  const topRef = useRef<HTMLElement>(null);
-  const totalPages = Math.max(1, Math.ceil(lots.length / PAGE_SIZE));
-  const pageLots = lots.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  const goTo = (next: number) => {
-    const clamped = Math.min(totalPages, Math.max(1, next));
-    if (clamped === page) return;
-    setPage(clamped);
-    // The pager sits under the grid - bring the new page's first cards back
-    // into view instead of leaving the reader staring at the pager.
-    topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
-  const pagerButton =
-    "stencil cursor-pointer whitespace-nowrap rounded-[2px] border-[1.5px] border-forest/45 px-3 py-2.5 text-[12px] leading-none tracking-[0.16em] text-forest transition-colors hover:bg-forest/5 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent sm:px-4";
-
+export function LotCards({
+  basePath,
+  lots,
+  page,
+  totalPages,
+}: {
+  /** The route the pager links back into, e.g. routes.commodities. */
+  basePath: string;
+  lots: PublicLot[];
+  page: number;
+  totalPages: number;
+}) {
   return (
     <section
-      ref={topRef}
       aria-label="The register"
       className="mx-auto max-w-[1312px] scroll-mt-24 px-5 pb-14 lg:px-8 lg:pb-[88px]"
     >
@@ -154,52 +148,16 @@ export function LotCards({ lots }: { lots: PublicLot[] }) {
         className="mb-8 lg:mb-10"
       />
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {pageLots.map((lot) => (
+        {lots.map((lot) => (
           <LotCard key={lot.id} lot={lot} />
         ))}
       </div>
-      {totalPages > 1 ? (
-        <nav
-          aria-label="Register pages"
-          className="mt-8 flex items-center justify-between gap-2 sm:gap-3 lg:mt-10"
-        >
-          <button
-            type="button"
-            onClick={() => {
-              goTo(page - 1);
-            }}
-            disabled={page <= 1}
-            className={pagerButton}
-          >
-            {/* Arrow glyphs are sm+ decoration - at fold widths they cost the
-                row the space the PAGE label needs. */}
-            <span aria-hidden="true" className="hidden sm:inline">
-              ←{" "}
-            </span>
-            PREV
-          </button>
-          <span
-            aria-live="polite"
-            className="stencil text-center text-[11px] leading-[1.5] tracking-[0.12em] text-soil sm:tracking-[0.2em]"
-          >
-            PAGE {page} OF {totalPages}
-          </span>
-          <button
-            type="button"
-            onClick={() => {
-              goTo(page + 1);
-            }}
-            disabled={page >= totalPages}
-            className={pagerButton}
-          >
-            NEXT
-            <span aria-hidden="true" className="hidden sm:inline">
-              {" "}
-              →
-            </span>
-          </button>
-        </nav>
-      ) : null}
+      <RegisterPager
+        basePath={basePath}
+        className="mt-8 lg:mt-10"
+        page={page}
+        totalPages={totalPages}
+      />
     </section>
   );
 }

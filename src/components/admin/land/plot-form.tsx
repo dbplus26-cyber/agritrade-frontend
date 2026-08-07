@@ -223,18 +223,18 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
             swap, so clicking "Edit plot" would flip that very element to
             type="submit" before the browser ran the click's default action
             and the form would PATCH itself while still locked. */}
-        <div className="flex justify-end gap-2">
+        <div className="flex flex-wrap justify-end gap-2">
           {!plot ? (
             <Fragment key="create">
               <AdminButton
                 type="button"
                 variant="outline"
-                className="h-10 px-4"
+                size="lg"
                 onClick={() => router.push(LIST)}
               >
                 Cancel
               </AdminButton>
-              <AdminButton type="submit" disabled={saving} className="h-10 px-5">
+              <AdminButton type="submit" disabled={saving} size="lg">
                 {saving ? "Saving…" : "Create plot"}
               </AdminButton>
             </Fragment>
@@ -243,12 +243,12 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
               <AdminButton
                 type="button"
                 variant="outline"
-                className="h-10 px-4"
+                size="lg"
                 onClick={() => router.push(plot ? `${LIST}/${plot.id}` : LIST)}
               >
                 Cancel
               </AdminButton>
-              <AdminButton type="submit" disabled={saving} className="h-10 px-5">
+              <AdminButton type="submit" disabled={saving} size="lg">
                 {saving ? "Saving…" : "Save changes"}
               </AdminButton>
             </Fragment>

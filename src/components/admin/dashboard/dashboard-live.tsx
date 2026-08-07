@@ -242,7 +242,7 @@ export function DashboardLive() {
             label="Sales in progress"
             hint="Orders agreed with buyers that are not yet delivered and paid off."
             value={d.salesInProgress}
-            sub={<Money value={d.salesInProgressAgreedGhs} />}
+            sub={<Money compact value={d.salesInProgressAgreedGhs} />}
             href="/admin/sales"
           />
           <Kpi

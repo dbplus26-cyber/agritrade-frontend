@@ -114,7 +114,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
   };
 
   return (
-    <div className="max-w-[560px]">
+    <div className="max-w-[640px]">
       <BackButton href={LIST} label="All grants" className="mb-2" />
       <AdminPageHeader
         title="New input grant"
@@ -309,16 +309,16 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
           flagged for approval.
         </p>
 
-        <div className="flex justify-end gap-2">
+        <div className="flex flex-wrap justify-end gap-2">
           <AdminButton
             type="button"
             variant="outline"
-            className="h-10 px-4"
+            size="lg"
             onClick={() => router.push(LIST)}
           >
             Cancel
           </AdminButton>
-          <AdminButton type="submit" disabled={saving} className="h-10 px-5">
+          <AdminButton type="submit" disabled={saving} size="lg">
             {saving ? "Saving…" : "Record grant"}
           </AdminButton>
         </div>

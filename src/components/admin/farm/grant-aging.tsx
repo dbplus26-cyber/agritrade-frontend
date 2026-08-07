@@ -106,7 +106,7 @@ export function GrantAging() {
               {row.original.farmer.name}
             </Link>
             {row.original.farmer.phone ? (
-              <div className="truncate text-[12px] text-adm-muted">
+              <div className="truncate text-[12.5px] text-adm-muted">
                 {row.original.farmer.phone}
               </div>
             ) : null}
@@ -121,7 +121,7 @@ export function GrantAging() {
         meta: columnMeta(),
         cell: ({ row }) => (
           <Link
-            className={cn(adminLinkClass, "text-[12.5px]")}
+            className={adminLinkClass}
             href={`/admin/seasons/${row.original.season.id}`}
             onClick={(e) => e.stopPropagation()}
           >
@@ -139,7 +139,7 @@ export function GrantAging() {
         enableSorting: false,
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-adm-muted">
+          <Mono className="whitespace-nowrap text-adm-muted">
             <Money value={row.original.investedGhs} compact />
           </Mono>
         ),
@@ -154,7 +154,7 @@ export function GrantAging() {
         enableSorting: false,
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-adm-muted">
+          <Mono className="whitespace-nowrap text-adm-muted">
             <Money value={row.original.recoveredGhs} compact />
           </Mono>
         ),
@@ -169,7 +169,7 @@ export function GrantAging() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] font-semibold text-adm-ink">
+          <Mono className="whitespace-nowrap font-semibold text-adm-ink">
             <Money value={row.original.outstandingGhs} compact />
           </Mono>
         ),

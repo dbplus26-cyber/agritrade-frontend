@@ -422,7 +422,7 @@ export function ExpenseSettlementCard({
 
       {canPay ? (
         <div className="mt-5">
-          <AdminButton className="h-9 px-4" onClick={() => setPayOpen(true)}>
+          <AdminButton onClick={() => setPayOpen(true)}>
             Record a payment
           </AdminButton>
         </div>

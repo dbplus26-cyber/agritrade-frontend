@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { AdminButton } from "@/components/admin/ui";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -131,14 +131,12 @@ export function DateRangeSelector({
             aria-label="To date"
             className="h-9 w-full text-[13px] sm:w-[148px]"
           />
-          <Button
-            type="button"
+          <AdminButton
             onClick={applyCustom}
             disabled={!customFrom || !customTo}
-            className="h-9"
           >
             Apply
-          </Button>
+          </AdminButton>
         </div>
       ) : null}
     </div>

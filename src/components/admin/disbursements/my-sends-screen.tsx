@@ -105,7 +105,7 @@ function SendCard({ send }: { send: IDisbursement }) {
     <TitledCard title={RAIL_LABEL[send.rail]}>
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-1">
         <div className="min-w-0">
-          <p className="truncate text-[14px] font-medium text-adm-ink">
+          <p className="[overflow-wrap:anywhere] md:truncate text-[14px] font-medium text-adm-ink">
             {send.recipientName}
           </p>
           <p className="font-adminmono truncate text-[11.5px] text-adm-faint">

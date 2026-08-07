@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { notify } from "@/lib/notify";
 import { optimizeImage } from "@/lib/optimize-image";
 import type { IUser } from "@/types/user.types";
+import { AdminButton } from "@/components/admin/ui";
 import { PhotoViewDialog } from "@/components/admin/photo-view";
 import { IdentityAvatar } from "./user-identity";
 
@@ -141,49 +142,45 @@ export function PhotoManager({
             Preview - not saved yet
           </span>
           <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => void save()}
-              disabled={isSaving}
-              className="inline-flex cursor-pointer items-center gap-1.5 rounded-[6px] bg-console px-3 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-console-deep disabled:opacity-50"
-            >
+            <AdminButton size="sm" onClick={() => void save()} disabled={isSaving}>
               <Check className="h-3.5 w-3.5" aria-hidden="true" />
               {isSaving ? "Saving…" : "Save photo"}
-            </button>
-            <button
-              type="button"
+            </AdminButton>
+            <AdminButton
+              variant="outline"
+              size="sm"
               onClick={dropPreview}
               disabled={isSaving}
-              className="inline-flex cursor-pointer items-center gap-1 rounded-[6px] border border-adm-line bg-adm-card px-2.5 py-1.5 text-[12px] font-semibold text-adm-muted transition-colors hover:border-console-red hover:text-console-red disabled:opacity-50"
             >
               <X className="h-3.5 w-3.5" aria-hidden="true" />
               Decline
-            </button>
+            </AdminButton>
           </div>
         </div>
       ) : (
         <>
           <div className="flex items-center gap-1.5">
-            <button
-              type="button"
+            <AdminButton
+              variant="outline"
+              size="sm"
               onClick={() => fileInput.current?.click()}
               disabled={isSaving}
-              className="inline-flex cursor-pointer items-center gap-1.5 rounded-[6px] border border-adm-line bg-adm-card px-2.5 py-1.5 text-[12px] font-semibold text-adm-muted transition-colors hover:border-console hover:text-console disabled:opacity-50"
             >
               <Camera className="h-3.5 w-3.5" aria-hidden="true" />
               {user.profilePicture ? "Change" : "Add photo"}
-            </button>
+            </AdminButton>
             {user.profilePicture ? (
-              <button
-                type="button"
+              <AdminButton
+                variant="outline"
+                size="sm"
                 onClick={() => void remove()}
                 disabled={isSaving}
                 aria-label="Remove photo"
                 title="Remove photo"
-                className="flex h-[30px] w-[30px] cursor-pointer items-center justify-center rounded-[6px] border border-adm-line bg-adm-card text-adm-faint transition-colors hover:border-console-red hover:text-console-red disabled:opacity-50"
+                className="w-7 px-0"
               >
                 <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
-              </button>
+              </AdminButton>
             ) : null}
           </div>
           <span className="text-[11px] text-adm-faint">JPG or PNG</span>

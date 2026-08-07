@@ -9,8 +9,7 @@ import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
-import { AdminCard, Mono } from "@/components/admin/ui";
-import { Button } from "@/components/ui/button";
+import { AdminButton, AdminCard, Mono } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -116,7 +115,7 @@ export function CommodityTable() {
                   <span className="block truncate font-medium text-adm-ink">
                     {c.name}
                   </span>
-                  <span className="block truncate text-[11.5px] text-adm-faint">
+                  <span className="block truncate text-[12.5px] text-adm-faint">
                     {c.variety ?? "No variety"}
                   </span>
                 </span>
@@ -210,13 +209,9 @@ export function CommodityTable() {
           onClear={resetFilters}
           action={
             isSuperAdmin ? (
-              <Button
-                asChild
-                variant="default"
-                className="h-[34px] rounded-[6px] bg-console px-3.5 text-[13px] font-semibold text-white shadow-none hover:translate-x-0 hover:translate-y-0 hover:bg-console-hover hover:shadow-none"
-              >
+              <AdminButton asChild>
                 <Link href="/admin/commodities/new">+ Add commodity</Link>
-              </Button>
+              </AdminButton>
             ) : null
           }
         >

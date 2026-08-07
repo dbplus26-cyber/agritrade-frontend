@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { AdminButton } from "@/components/admin/ui";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -12,7 +12,6 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
-import { cn } from "@/lib/utils";
 
 export interface ConfirmationDialogProps {
   open: boolean;
@@ -88,18 +87,17 @@ export function ConfirmationDialog({
         ) : null}
 
         <ResponsiveDialogFooter className="justify-end gap-2">
-          <Button variant="outline" onClick={() => handleOpenChange(false)}>
+          <AdminButton variant="outline" size="lg" onClick={() => handleOpenChange(false)}>
             {cancelText}
-          </Button>
-          <Button
+          </AdminButton>
+          <AdminButton
+            variant={isDestructive ? "danger" : "primary"}
+            size="lg"
             onClick={onConfirm}
             disabled={confirmDisabled}
-            className={cn(
-              isDestructive && "bg-error text-surface hover:bg-error/90",
-            )}
           >
             {confirmText}
-          </Button>
+          </AdminButton>
         </ResponsiveDialogFooter>
       </ResponsiveDialogContent>
     </ResponsiveDialog>

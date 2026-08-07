@@ -92,7 +92,7 @@ export function SeasonForm({ season }: { season?: ISeason }) {
   };
 
   return (
-    <div className="max-w-[520px]">
+    <div className="max-w-[640px]">
       <BackButton href={LIST} label="All seasons" className="mb-2" />
       <AdminPageHeader
         title={season ? "Edit season" : "New season"}
@@ -172,16 +172,16 @@ export function SeasonForm({ season }: { season?: ISeason }) {
 
         {/* Cancel returns to where the record is read rather than locking
             the form back down - there is no locked state any more. */}
-        <div className="flex justify-end gap-2">
+        <div className="flex flex-wrap justify-end gap-2">
           <AdminButton
             type="button"
             variant="outline"
-            className="h-10 px-4"
+            size="lg"
             onClick={() => router.push(season ? `${LIST}/${season.id}` : LIST)}
           >
             Cancel
           </AdminButton>
-          <AdminButton type="submit" disabled={saving} className="h-10 px-5">
+          <AdminButton type="submit" disabled={saving} size="lg">
             {saving ? "Saving…" : season ? "Save changes" : "Create season"}
           </AdminButton>
         </div>

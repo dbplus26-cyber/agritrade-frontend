@@ -64,7 +64,11 @@ export function EmptyState({
           {description}
         </p>
         {actionLabel && onAction ? (
-          <Button onClick={onAction} variant="outline" className="mt-5 h-9 px-4 text-[13px]">
+          <Button
+            onClick={onAction}
+            variant="outline"
+            className="state-action mt-5 h-9 px-4 text-[13px]"
+          >
             {actionLabel}
           </Button>
         ) : null}
@@ -91,7 +95,7 @@ export function EmptyState({
           {description}
         </p>
         {actionLabel && onAction ? (
-          <Button onClick={onAction} className="mt-6">
+          <Button onClick={onAction} className="state-action mt-6">
             {actionLabel}
           </Button>
         ) : null}

@@ -484,7 +484,6 @@ export function DriverSettlementCard({
         <div className="mt-5 flex flex-wrap gap-2">
           {dispatched && settlement.hasFee ? (
             <AdminButton
-              className="h-9 px-4"
               onClick={() => setAdjustOpen(true)}
               variant="ghost"
             >
@@ -492,7 +491,6 @@ export function DriverSettlementCard({
             </AdminButton>
           ) : (
             <AdminButton
-              className="h-9 px-4"
               onClick={() => setFeeOpen(true)}
               variant={settlement.hasFee ? "ghost" : "primary"}
             >
@@ -500,7 +498,7 @@ export function DriverSettlementCard({
             </AdminButton>
           )}
           {settlement.hasFee && settlement.status !== "SETTLED" ? (
-            <AdminButton className="h-9 px-4" onClick={() => setPayOpen(true)}>
+            <AdminButton onClick={() => setPayOpen(true)}>
               Record a payment
             </AdminButton>
           ) : null}

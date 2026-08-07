@@ -761,9 +761,9 @@ function QueueSkeleton() {
       {Array.from({ length: 6 }, (_, i) => (
         <div
           key={i}
-          className="grid h-[62px] grid-cols-[34px_190px_1fr] items-center gap-3.5 border-b border-[var(--ap-hair-soft)] px-4 last:border-b-0"
+          className="grid h-[62px] grid-cols-[110px_1fr] items-center gap-3.5 border-b border-[var(--ap-hair-soft)] px-4 last:border-b-0 @min-[900px]/main:grid-cols-[34px_190px_1fr]"
         >
-          <span />
+          <span className="hidden @min-[900px]/main:block" />
           <span className="block h-3.5 w-[120px] rounded-[6px] bg-[var(--ap-track)]" />
           <span className="block h-3.5 w-[60%] rounded-[6px] bg-[var(--ap-track)]" />
         </div>

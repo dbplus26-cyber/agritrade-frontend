@@ -262,7 +262,12 @@ export function ConsoleDateRange({
   return (
     <div
       className={cn(
-        "col-span-1 grid grid-cols-1 gap-2 @min-[320px]/main:col-span-2 @min-[320px]/main:grid-cols-2",
+        // UNNAMED container queries: inside ConsoleFilterBar the nearest
+        // container is the toolbar itself (right - the pair must stay in step
+        // with the toolbar's own grid); on the statement screens, which drop
+        // this straight into a document header, it falls back to the shell's
+        // main container and still pairs up wherever there is room.
+        "col-span-1 grid grid-cols-1 gap-2 @min-[320px]:col-span-2 @min-[320px]:grid-cols-2",
         // Same reason as the toolbar grid: the pair owns its own widths so the
         // two bounds always match each other and the filters beside them.
         "[&>*]:w-full!",
@@ -317,6 +322,7 @@ export function ConsoleFilterBar({
   onSearch,
   searchPlaceholder = "Search…",
   hideSearch = false,
+  fullWidthSearch = false,
   activeCount = 0,
   onClear,
   action,
@@ -327,6 +333,17 @@ export function ConsoleFilterBar({
   searchPlaceholder?: string;
   /** Screens with nothing meaningful to search (stock) drop the box. */
   hideSearch?: boolean;
+  /**
+   * Search takes the toolbar's whole width instead of the ~30% band.
+   *
+   * For toolbars embedded in a SPLIT page (the expense-category statement,
+   * anything living in one column of a DetailShell): the 30% band is sized
+   * for a register that owns the full content width, and inside a half-width
+   * column it left a stubby box with the filters wrapping awkwardly beside
+   * the gap. Full width lets the search own its row and the filters file
+   * underneath it.
+   */
+  fullWidthSearch?: boolean;
   /** Number of non-default filters, shown on the toggle. */
   activeCount?: number;
   /** Resets every filter (rendered only while any is active). */
@@ -345,9 +362,10 @@ export function ConsoleFilterBar({
         boxField(search.length > 0),
         "gap-1.5 px-2.5",
         // Band one on a wide toolbar: "a little long", about 30% of the
-        // content width, floored so it never collapses to a stub on a
+        // toolbar's width, floored so it never collapses to a stub on a
         // half-width content area and it keeps its placeholder readable.
-        "@min-[680px]/main:w-[30%] @min-[680px]/main:min-w-[240px] @min-[680px]/main:flex-none",
+        !fullWidthSearch &&
+          "@min-[680px]/toolbar:w-[30%] @min-[680px]/toolbar:min-w-[240px] @min-[680px]/toolbar:flex-none",
       )}
     >
       <svg
@@ -399,11 +417,14 @@ export function ConsoleFilterBar({
     ) : null;
 
   return (
-    <div className="mb-3">
+    // Its OWN container. These queries used to point at the shell's /main,
+    // which is the full content width - so a toolbar embedded in one column
+    // of a split page was laid out for room it did not have.
+    <div className="@container/toolbar mb-3">
       {/* ── Band one: search left, the page's action at the right edge ───── */}
-      <div className="flex flex-col gap-2 @min-[680px]/main:flex-row @min-[680px]/main:items-center">
+      <div className="flex flex-col gap-2 @min-[680px]/toolbar:flex-row @min-[680px]/toolbar:items-center">
         {searchField}
-        <div className="flex items-center gap-2 @min-[680px]/main:ml-auto">
+        <div className="flex items-center gap-2 @min-[680px]/toolbar:ml-auto">
           {hasFilters ? (
             <button
               type="button"
@@ -415,7 +436,7 @@ export function ConsoleFilterBar({
               // always on screen, so a control claiming to expand them would
               // be describing something that never happens.
               className={cn(
-                "inline-flex h-8 cursor-pointer items-center gap-2 rounded-[6px] border bg-adm-card px-2.5 text-[10.5px] tracking-[0.14em] whitespace-nowrap uppercase transition-colors @min-[680px]/main:hidden",
+                "inline-flex h-8 cursor-pointer items-center gap-2 rounded-[6px] border bg-adm-card px-2.5 text-[10.5px] tracking-[0.14em] whitespace-nowrap uppercase transition-colors @min-[680px]/toolbar:hidden",
                 open
                   ? "border-console text-console"
                   : "border-adm-line text-adm-muted hover:text-console",
@@ -445,13 +466,13 @@ export function ConsoleFilterBar({
         <div
           id="console-filters"
           className={cn(
-            "mt-2 grid grid-cols-1 gap-2 @min-[320px]/main:grid-cols-2 @min-[520px]/main:grid-cols-3",
+            "mt-2 grid grid-cols-1 gap-2 @min-[320px]/toolbar:grid-cols-2 @min-[520px]/toolbar:grid-cols-3",
             // Wide: fixed 190px tracks instead of equal fractions. Equal
             // fractions stretch three filters across a 1300px console into
             // 430px boxes, which is not the compact register control this is
             // meant to be; auto-fill keeps them 190px, aligned in columns, and
             // simply leaves the remainder of the row empty.
-            "@min-[680px]/main:grid-cols-[repeat(auto-fill,minmax(150px,190px))]",
+            "@min-[680px]/toolbar:grid-cols-[repeat(auto-fill,minmax(150px,190px))]",
             // The toolbar owns the widths, hence `!`. Callers still pass
             // `lg:w-[150px]`-style hints from the old wrapping row; left alone
             // those fire on VIEWPORT width and hand a filter a width narrower
@@ -459,7 +480,7 @@ export function ConsoleFilterBar({
             // (pinned to the cell) hanging outside the control's visible box.
             "[&>*]:w-full!",
             // Closed on a narrow toolbar, always open once there is room.
-            open ? "grid" : "hidden @min-[680px]/main:grid",
+            open ? "grid" : "hidden @min-[680px]/toolbar:grid",
           )}
         >
           {children}

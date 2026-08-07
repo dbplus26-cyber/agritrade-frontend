@@ -39,7 +39,7 @@ export function BalanceCell({ amount }: { amount: number | null }) {
   return (
     <Mono
       className={cn(
-        "whitespace-nowrap text-[12.5px]",
+        "whitespace-nowrap",
         amount === null && "text-adm-faint",
         amount !== null && amount < 0 && "font-semibold text-console-red",
         amount !== null && amount >= 0 && "text-adm-ink",
@@ -108,7 +108,7 @@ export function AgentsTable() {
                 <span className="block truncate font-medium text-adm-ink">
                   {a.firstName} {a.lastName}
                 </span>
-                <span className="block truncate text-[11.5px] text-adm-faint">
+                <span className="block truncate text-[12.5px] text-adm-faint">
                   {a.region ?? a.email}
                 </span>
               </span>
@@ -135,7 +135,7 @@ export function AgentsTable() {
         meta: columnMeta({ wide: true }),
         cell: ({ row }) =>
           row.original.phone ? (
-            <Mono className="whitespace-nowrap text-[12.5px] text-adm-muted">
+            <Mono className="whitespace-nowrap text-adm-muted">
               {row.original.phone}
             </Mono>
           ) : (

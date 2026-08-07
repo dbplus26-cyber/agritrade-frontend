@@ -427,7 +427,7 @@ export function PaymentDialog({
             <AdminButton
               type="button"
               variant="outline"
-              className="h-10 px-4"
+              size="lg"
               onClick={onClose}
             >
               Cancel
@@ -435,7 +435,7 @@ export function PaymentDialog({
             <AdminButton
               type="submit"
               disabled={isLoading}
-              className="h-10 px-5"
+              size="lg"
             >
               {isLoading ? "Recording…" : "Record payment"}
             </AdminButton>

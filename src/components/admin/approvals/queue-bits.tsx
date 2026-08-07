@@ -1,6 +1,10 @@
 "use client";
 
-import { formatCedis, MONEY_HIDDEN } from "@/lib/format-money";
+import {
+  formatCedis,
+  formatCedisCompact,
+  MONEY_HIDDEN,
+} from "@/lib/format-money";
 import { cn } from "@/lib/utils";
 import { ApprovalAction, ApprovalStatus, type IApproval } from "@/types/approval.types";
 
@@ -140,7 +144,10 @@ const MONETARY = new Set<ApprovalAction>([
  * facts and a ledger may not blur them.
  */
 export function headlineFigure(a: IApproval): string {
-  if (a.amount !== null) return formatCedis(a.amount);
+  // Compact at scale: the queue cell is ~130px on a phone, and a full
+  // eight-figure amount broke mid-number across two lines - the one way a
+  // money figure must never fail. The expanded panel prints it exactly.
+  if (a.amount !== null) return formatCedisCompact(a.amount);
   if (a.quantityLabel) return a.quantityLabel;
   return MONETARY.has(a.action) ? MONEY_HIDDEN : "-";
 }

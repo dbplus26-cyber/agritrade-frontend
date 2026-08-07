@@ -20,6 +20,11 @@ import {
   adminSelectClass,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
+import {
+  AttachmentEmpty,
+  AttachmentList,
+  AttachmentTile,
+} from "@/components/admin/attachments";
 import { HelpTip, HelpWrap } from "@/components/admin/help-tip";
 import { DateOnlyCell, DateTimeCell } from "@/components/admin/date-cell";
 import { DetailSkeleton } from "@/components/admin/skeletons";
@@ -183,12 +188,12 @@ function ExpenseDialog({
             <AdminButton
               type="button"
               variant="outline"
-              className="h-9 px-3.5"
+              size="lg"
               onClick={onClose}
             >
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={isLoading} className="h-9 px-4">
+            <AdminButton type="submit" disabled={isLoading} size="lg">
               {isLoading ? "Adding…" : "Add expense"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -324,7 +329,7 @@ function AddSalesDialog({
           <AdminButton
             type="button"
             variant="outline"
-            className="h-9 px-3.5"
+            size="lg"
             onClick={onClose}
           >
             Cancel
@@ -332,7 +337,7 @@ function AddSalesDialog({
           <AdminButton
             type="button"
             disabled={isLoading || picked.length === 0}
-            className="h-9 px-4"
+            size="lg"
             onClick={() => void onSubmit()}
           >
             {isLoading
@@ -398,7 +403,7 @@ function CancelDialog({
             <AdminButton
               type="button"
               variant="outline"
-              className="h-9 px-3.5"
+              size="lg"
               onClick={onClose}
             >
               Keep it
@@ -407,7 +412,7 @@ function CancelDialog({
               type="submit"
               variant="danger"
               disabled={isLoading}
-              className="h-9 px-4"
+              size="lg"
             >
               {isLoading ? "Cancelling…" : "Cancel shipment"}
             </AdminButton>
@@ -488,7 +493,7 @@ function VoidExpenseDialog({
             <AdminButton
               type="button"
               variant="outline"
-              className="h-9 px-3.5"
+              size="lg"
               onClick={onClose}
             >
               Keep it
@@ -497,7 +502,7 @@ function VoidExpenseDialog({
               type="submit"
               variant="danger"
               disabled={isLoading}
-              className="h-9 px-4"
+              size="lg"
             >
               {isLoading ? "Voiding…" : "Void expense"}
             </AdminButton>
@@ -706,7 +711,7 @@ export function ShipmentDetail({ id }: { id: string }) {
             text="Pick which stock lots fill each sale, so the trip is costed on the goods you actually load."
           >
             <AdminButton
-              className="h-9 px-4 xl:w-full"
+              className="xl:w-full"
               variant="secondary"
               asChild
             >
@@ -715,10 +720,18 @@ export function ShipmentDetail({ id }: { id: string }) {
           </HelpWrap>
           <HelpWrap
             className="inline-flex flex-none xl:w-full"
+            text="Change the truck, driver, destination or the warehouses this trip loads at - possible until it dispatches."
+          >
+            <AdminButton className="xl:w-full" variant="secondary" asChild>
+              <Link href={`${LIST}/${s.id}/edit`}>Edit plan</Link>
+            </AdminButton>
+          </HelpWrap>
+          <HelpWrap
+            className="inline-flex flex-none xl:w-full"
             text="Sends the truck: stock comes out of the warehouse on the record, and dispatch cannot be undone."
           >
             <AdminButton
-              className="h-9 px-4 xl:w-full"
+              className="xl:w-full"
               disabled={dispatchState.isLoading}
               onClick={() => void onDispatch()}
             >
@@ -734,7 +747,7 @@ export function ShipmentDetail({ id }: { id: string }) {
           >
             <AdminButton
               variant="danger"
-              className="h-9 px-4 xl:w-full"
+              className="xl:w-full"
               onClick={() => setCancelOpen(true)}
             >
               Cancel
@@ -748,7 +761,7 @@ export function ShipmentDetail({ id }: { id: string }) {
           text="Records that the truck reached the buyer, so the signed delivery note can be filed against the trip."
         >
           <AdminButton
-            className="h-9 px-4 xl:w-full"
+            className="xl:w-full"
             disabled={arriveState.isLoading}
             onClick={() => void onArrive()}
           >
@@ -762,7 +775,7 @@ export function ShipmentDetail({ id }: { id: string }) {
           text="Marks the trip finished now that it is delivered and settled, leaving its profit as the final figure."
         >
           <AdminButton
-            className="h-9 px-4 xl:w-full"
+            className="xl:w-full"
             disabled={closeState.isLoading}
             onClick={() => void onClose()}
           >
@@ -781,7 +794,7 @@ export function ShipmentDetail({ id }: { id: string }) {
           >
             <AdminButton
               variant="secondary"
-              className="h-9 px-4 xl:w-full"
+              className="xl:w-full"
               asChild
             >
               <Link href={`${LIST}/${s.id}/waybill`}>Waybill</Link>
@@ -793,7 +806,7 @@ export function ShipmentDetail({ id }: { id: string }) {
             className="inline-flex flex-none xl:w-full"
             text="Opens that same waybill as a PDF in a new tab, ready to print or send to the driver."
           >
-            <AdminButton variant="ghost" className="h-9 px-4 xl:w-full" asChild>
+            <AdminButton variant="ghost" className="xl:w-full" asChild>
               <a
                 href={shipmentWaybillPdfUrl(s.id)}
                 target="_blank"
@@ -850,7 +863,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                 >
                   <AdminButton
                     variant="ghost"
-                    className="h-7 px-2.5 text-[12px]"
+                    size="sm"
                     onClick={() => setAddSalesOpen(true)}
                   >
                     + Add sales
@@ -874,23 +887,20 @@ export function ShipmentDetail({ id }: { id: string }) {
             );
             const removable =
               beforeDispatch && s.sales.length > 1 && !hasAllocations;
-            // WHAT THIS SALE WEIGHS. Only a sale whose payment terms are met
-            // can be planned onto a truck at all, so by the time an order
-            // shows up here the money is settled and the kilos are what the
-            // trip turns on: whether it fits, and what has to come off if it
-            // does not. `agreedKg` is the sale's own ordered weight (across
-            // trucks, should one ever be split), which is the sale's total
-            // load - not to be confused with `plannedWeightKg`, the truck's.
-            const saleLoadKg = sale.lines.reduce(
+            // WHAT THIS SALE WEIGHS, AND WHAT IS ON THE TRUCK SO FAR. Money
+            // has no business on this card - the sale page owns payments;
+            // this screen is loading. `agreedKg` is the order's own weight
+            // (across trucks, should one ever be split); `allocatedKg` is
+            // what has been keyed onto THIS truck.
+            const saleNeedsKg = sale.lines.reduce(
               (sum, l) => sum + l.agreedKg,
               0,
             );
+            const saleLoadedKg = sale.lines.reduce(
+              (sum, l) => sum + l.allocatedKg,
+              0,
+            );
             return (
-              /* The three money figures were one mono sentence - "Agreed X ·
-                 Paid Y · Balance Z" - which is the least comparable way to
-                 show three related numbers. They are a labelled trio now, so
-                 the eye reads down a column instead of parsing a line. The
-                 buyer's phone drops to its own line for the same reason. */
               <div
                 key={sale.id}
                 className="flex h-full flex-col rounded-[6px] border border-adm-line bg-adm-card p-3.5"
@@ -942,75 +952,76 @@ export function ShipmentDetail({ id }: { id: string }) {
                   </Mono>
                 ) : null}
 
-                {/* The load leads the foot of the card, at the size the money
-                    trio used to own alone: it is the fact this screen is for.
-                    It never depends on financial visibility - weight is not
-                    money, and a loader who cannot see prices still has to
-                    know what is going on the truck. */}
+                {/* The loading picture leads the foot of the card: what the
+                    order needs on the truck, and what has been put on so
+                    far. It never depends on financial visibility - weight is
+                    not money, and a loader who cannot see prices still has
+                    to know what is going on the truck. */}
                 <div className="mt-auto border-t border-dotted border-adm-line pt-3">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <HelpWrap
-                      className="min-w-0 text-[10px] font-bold tracking-[0.08em] text-adm-muted uppercase"
-                      text="The weight this whole order is due to move - what decides whether it fits on the truck."
-                    >
-                      Load
-                    </HelpWrap>
-                    <Mono className="flex-none text-[17px] leading-none font-semibold tabular-nums text-adm-ink">
-                      {formatKg(saleLoadKg)}
-                    </Mono>
-                  </div>
-                  {/* What the load actually IS. The per-commodity kilos only
-                      appear on a mixed order: on a single-commodity sale they
-                      would just restate the total beside them. */}
-                  {sale.lines.length > 0 ? (
-                    <p className="mt-1 min-w-0 text-[11.5px] leading-[1.5] text-adm-muted [overflow-wrap:anywhere]">
-                      {sale.lines.map((l, i) => (
-                        <span key={l.commodityId}>
-                          {i > 0 ? " · " : ""}
-                          {l.commodityName}
-                          {sale.lines.length > 1 ? (
-                            <>
-                              {" "}
-                              <Mono className="whitespace-nowrap">
-                                {formatKg(l.agreedKg)}
-                              </Mono>
-                            </>
-                          ) : null}
-                        </span>
-                      ))}
-                    </p>
-                  ) : null}
-                </div>
-
-                <dl className="mt-3 grid grid-cols-3 gap-x-3 border-t border-dotted border-adm-line pt-3">
-                  {(
-                    [
-                      ["Agreed", sale.agreedTotalGhs, ""],
-                      ["Paid", sale.paidGhs, ""],
-                      [
-                        "Balance",
-                        sale.balanceGhs,
-                        sale.balanceGhs !== null && sale.balanceGhs !== 0
-                          ? "text-console-red"
-                          : "text-console",
-                      ],
-                    ] as const
-                  ).map(([label, value, tone]) => (
-                    <div key={label} className="min-w-0">
-                      <dt className="text-[10px] font-bold tracking-[0.08em] text-adm-muted uppercase">
-                        {label}
+                  <dl className="grid grid-cols-2 gap-x-3">
+                    <div className="min-w-0">
+                      <dt className="min-w-0 text-[10px] font-bold tracking-[0.08em] text-adm-muted uppercase">
+                        <HelpWrap text="The weight this whole order is due to move - what decides whether it fits on the truck.">
+                          Load needed
+                        </HelpWrap>
                       </dt>
-                      <dd
-                        className={cn(
-                          "font-adminmono mt-0.5 text-[12.5px] font-semibold tabular-nums text-adm-ink",
-                          tone,
-                        )}
-                      >
-                        <Money compact value={value} />
+                      <dd className="mt-0.5">
+                        <Mono className="text-[17px] leading-none font-semibold tabular-nums text-adm-ink">
+                          {formatKg(saleNeedsKg)}
+                        </Mono>
                       </dd>
                     </div>
-                  ))}
-                </dl>
+                    <div className="min-w-0">
+                      <dt className="min-w-0 text-[10px] font-bold tracking-[0.08em] text-adm-muted uppercase">
+                        <HelpWrap text="What has been allocated onto this truck for the order so far. Green once the order is fully covered.">
+                          Loaded now
+                        </HelpWrap>
+                      </dt>
+                      <dd className="mt-0.5">
+                        <Mono
+                          className={cn(
+                            "text-[17px] leading-none font-semibold tabular-nums",
+                            saleLoadedKg >= saleNeedsKg && saleNeedsKg > 0
+                              ? "text-console"
+                              : "text-adm-ink",
+                          )}
+                        >
+                          {formatKg(saleLoadedKg)}
+                        </Mono>
+                      </dd>
+                    </div>
+                  </dl>
+                  {/* What the load actually IS: one aligned row per
+                      commodity, loaded over needed, so a mixed order reads
+                      as a checklist rather than a run-on sentence. Only on a
+                      mixed order - on a single-commodity sale it would
+                      restate the totals above it. */}
+                  {sale.lines.length > 1 ? (
+                    <ul className="mt-2 flex flex-col gap-1 border-t border-dotted border-adm-line pt-2">
+                      {sale.lines.map((l) => {
+                        const covered = l.allocatedKg >= l.agreedKg;
+                        return (
+                          <li
+                            key={l.commodityId}
+                            className="flex items-baseline justify-between gap-2 text-[11.5px]"
+                          >
+                            <span className="min-w-0 text-adm-muted [overflow-wrap:anywhere]">
+                              {l.commodityName}
+                            </span>
+                            <Mono
+                              className={cn(
+                                "flex-none tabular-nums",
+                                covered ? "text-console" : "text-adm-ink",
+                              )}
+                            >
+                              {formatKg(l.allocatedKg)} / {formatKg(l.agreedKg)}
+                            </Mono>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ) : null}
+                </div>
               </div>
             );
           })}
@@ -1040,12 +1051,19 @@ export function ShipmentDetail({ id }: { id: string }) {
             {s.truckReg}
           </DetailItem>
           <DetailItem full label="Route">
-            <Link
-              className={adminLinkClass}
-              href={`/admin/warehouses/${s.originWarehouse.id}`}
-            >
-              {s.originWarehouse.name}
-            </Link>{" "}
+            {/* Every shed the truck calls at, in loading order, then the
+                drop. One stop is the common case and reads as before. */}
+            {s.loadingWarehouses.map((w, i) => (
+              <span key={w.id}>
+                {i > 0 ? " → " : ""}
+                <Link
+                  className={adminLinkClass}
+                  href={`/admin/warehouses/${w.id}`}
+                >
+                  {w.name}
+                </Link>
+              </span>
+            ))}{" "}
             → {s.destination}
           </DetailItem>
           <DetailItem label="Total weight" mono>
@@ -1197,43 +1215,23 @@ export function ShipmentDetail({ id }: { id: string }) {
           copy before dispatch. Downloads are logged.
         </p>
         {s.documents.length === 0 ? (
-          <p className="py-1 text-[13px] text-adm-muted">No documents on file.</p>
+          <AttachmentEmpty text="No documents on file." />
         ) : (
-          s.documents.map((doc) => (
-            <div
-              key={doc.id}
-              className="flex items-center justify-between gap-3 border-b border-adm-hairline py-2 text-[13px] last:border-b-0"
-            >
-              <a
+          <AttachmentList>
+            {s.documents.map((doc) => (
+              <AttachmentTile
+                key={doc.id}
+                createdAt={doc.createdAt}
                 href={shipmentDocumentUrl(s.id, doc.id)}
-                target="_blank"
-                rel="noreferrer"
-                className={cn(adminLinkClass, "min-w-0 [overflow-wrap:anywhere]")}
-              >
-                {doc.name}
-              </a>
-              <div className="flex flex-none items-center gap-3">
-                <Mono className="text-right text-[12px] text-adm-muted">
-                  <DateTimeCell value={doc.createdAt} muted />
-                </Mono>
-                {beforeDispatch ? (
-                  <HelpWrap
-                    className="inline-flex"
-                    text="Deletes this file from the shipment's record. Only possible while the truck has not left."
-                  >
-                    <button
-                      type="button"
-                      onClick={() => void onRemoveDocument(doc.id, doc.name)}
-                      className="cursor-pointer text-[12px] text-console-red"
-                      aria-label={`Remove ${doc.name}`}
-                    >
-                      ✕
-                    </button>
-                  </HelpWrap>
-                ) : null}
-              </div>
-            </div>
-          ))
+                name={doc.name}
+                onRemove={
+                  beforeDispatch
+                    ? () => void onRemoveDocument(doc.id, doc.name)
+                    : undefined
+                }
+              />
+            ))}
+          </AttachmentList>
         )}
         {s.status !== "CANCELLED" && s.status !== "CLOSED" ? (
           <>
@@ -1243,7 +1241,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                 onChange={(e) => setDocName(e.target.value)}
                 placeholder="Document name"
                 aria-label="Document name"
-                className="h-8 min-w-[160px] flex-1 rounded border border-adm-line bg-adm-card px-2.5 text-[13px]"
+                className="h-8 min-w-[160px] flex-1 rounded-[6px] border border-adm-line bg-adm-card px-2.5 text-[13px] outline-none transition-colors placeholder:text-adm-faint focus:border-console"
               />
               <FilePicker
                 accept="image/*,application/pdf"
@@ -1270,7 +1268,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                 <button
                   type="button"
                   onClick={() => setSigning((v) => !v)}
-                  className="cursor-pointer text-[12px] font-semibold text-console underline-offset-2 hover:underline"
+                  className={cn(adminLinkClass, "cursor-pointer text-[12.5px] font-semibold")}
                   aria-expanded={signing}
                 >
                   {signing ? "Hide signature pad" : "Or sign on this screen"}
@@ -1309,7 +1307,7 @@ export function ShipmentDetail({ id }: { id: string }) {
             >
               <AdminButton
                 variant="ghost"
-                className="h-7 px-2.5 text-[12px]"
+                size="sm"
                 onClick={() => setExpenseOpen(true)}
               >
                 + Add
@@ -1363,7 +1361,8 @@ export function ShipmentDetail({ id }: { id: string }) {
                     <AdminButton
                       type="button"
                       variant="danger"
-                      className="h-[26px] flex-none px-2 text-[11.5px]"
+                      size="sm"
+                      className="flex-none"
                       onClick={() => setVoidingExpense(e)}
                     >
                       Void

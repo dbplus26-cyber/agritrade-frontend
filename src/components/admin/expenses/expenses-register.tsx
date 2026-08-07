@@ -87,14 +87,14 @@ export function ExpensesRegister() {
           "The console\u2019s own number for this cost, so a paper receipt can be matched to it.",
         ),
         cell: ({ row }) => <Mono>{row.original.transactionNo}</Mono>,
-        meta: { className: "px-4 text-[13px]" },
+        meta: { className: "px-4" },
       },
       {
         accessorFn: (r) => r.incurredAt,
         id: "incurredAt",
         header: "Date",
         cell: ({ row }) => <DateOnlyCell value={row.original.incurredAt} />,
-        meta: { className: "px-4 text-[13px] whitespace-nowrap" },
+        meta: { className: "px-4 whitespace-nowrap" },
       },
       {
         accessorFn: (r) => r.category.name,
@@ -111,7 +111,7 @@ export function ExpensesRegister() {
             stretch
           />
         ),
-        meta: { stretch: true, className: "px-4 text-[13px]" },
+        meta: { stretch: true, className: "px-4" },
       },
       {
         accessorFn: (r) => r.shipment?.transactionNo ?? "",
@@ -131,7 +131,7 @@ export function ExpensesRegister() {
             <Link
               className={cn(
                 adminLinkClass,
-                "font-adminmono block max-w-[12rem] truncate text-[12px]",
+                "font-adminmono block max-w-[12rem] truncate text-[12.5px]",
               )}
               href={`/admin/shipments/${row.original.shipment.id}`}
               onClick={(e) => e.stopPropagation()}
@@ -146,7 +146,7 @@ export function ExpensesRegister() {
         // td - `headerClassName` reaches only the header, which would hide the
         // heading while leaving its cells in place and shift every column after
         // it out of alignment.
-        meta: { className: "hidden px-4 text-[13px] 2xl:table-cell" },
+        meta: { className: "hidden px-4 2xl:table-cell" },
       },
       {
         id: "actions",
@@ -156,7 +156,7 @@ export function ExpensesRegister() {
             <AdminButton
               type="button"
               variant="ghost"
-              className="h-7 px-2 text-[12px]"
+              size="sm"
               onClick={(e) => {
                 e.stopPropagation();
                 setEditing(row.original);
@@ -187,7 +187,7 @@ export function ExpensesRegister() {
               cell: ({ row }: { row: { original: IExpense } }) => (
                 <Mono>{formatCedis(row.original.amountGhs)}</Mono>
               ),
-              meta: { className: "px-4 text-[13px]" },
+              meta: { className: "px-4" },
             } as ColumnDef<IExpense, unknown>,
           ]
         : []),
@@ -248,7 +248,6 @@ export function ExpensesRegister() {
           onClear={resetFilters}
           action={
             <AdminButton
-              className="h-8 px-3.5 text-[13px]"
               onClick={() => { setCreating(true); }}
             >
               + Record expense
@@ -305,7 +304,7 @@ export function ExpensesRegister() {
               does not change as you page. */}
           {showMoney && windowTotal !== null && windowTotal !== undefined ? (
             <div className="mb-3 flex items-baseline gap-2">
-              <span className="text-[11px] font-bold tracking-[0.08em] text-adm-muted uppercase">
+              <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Total for this view
               </span>
               <Mono className="text-[16px] font-bold text-adm-ink">

@@ -112,7 +112,7 @@ function IdentityCard() {
             <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
               <h2
                 title={`${user.firstName} ${user.lastName}`}
-                className="line-clamp-2 max-w-full break-words text-[17px] font-bold tracking-[-0.01em] text-adm-ink sm:text-[20px]"
+                className="line-clamp-2 max-w-full break-words text-[19px] leading-[1.3] font-bold tracking-[-0.01em] text-adm-ink"
               >
                 {user.firstName} {user.lastName}
               </h2>
@@ -136,7 +136,7 @@ function IdentityCard() {
           {!editing ? (
             <AdminButton
               variant="secondary"
-              className="h-[34px] flex-none px-3.5 text-[13px] whitespace-nowrap sm:mb-2"
+              className="flex-none whitespace-nowrap sm:mb-2"
               onClick={() => setEditing(true)}
             >
               <Pencil className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
@@ -268,7 +268,7 @@ function ProfileEditForm({
         <AdminButton
           type="submit"
           disabled={isLoading}
-          className="h-[36px] px-4 text-[13px]"
+          size="lg"
         >
           {isLoading ? "Saving…" : "Save changes"}
         </AdminButton>
@@ -276,7 +276,7 @@ function ProfileEditForm({
           type="button"
           variant="outline"
           disabled={isLoading}
-          className="h-[36px] px-3.5 text-[13px]"
+          size="lg"
           onClick={onClose}
         >
           Cancel
@@ -393,14 +393,14 @@ function PasswordCard() {
             <AdminButton
               type="submit"
               disabled={isLoading}
-              className="h-[36px] px-4 text-[13px]"
+              size="lg"
             >
               {isLoading ? "Updating…" : "Update password"}
             </AdminButton>
             <AdminButton
               type="button"
               variant="outline"
-              className="h-[36px] px-3.5 text-[13px]"
+              size="lg"
               onClick={close}
             >
               Cancel
@@ -419,7 +419,7 @@ function PasswordCard() {
           </div>
           <AdminButton
             variant="secondary"
-            className="h-[34px] flex-none px-3.5 text-[13px] whitespace-nowrap"
+            className="flex-none whitespace-nowrap"
             onClick={() => setOpen(true)}
           >
             Change password
@@ -465,14 +465,12 @@ function RecoveryCodesPanel({
       <div className="mt-3 flex gap-2">
         <AdminButton
           variant="secondary"
-          className="h-[32px] px-3 text-[12.5px]"
           onClick={copyAll}
         >
           Copy all
         </AdminButton>
         <AdminButton
           variant="outline"
-          className="h-[32px] px-3 text-[12.5px]"
           onClick={onDismiss}
         >
           I&apos;ve saved them
@@ -587,7 +585,7 @@ function TwoFactorCard() {
           <div className="flex flex-none flex-wrap gap-2">
             <AdminButton
               variant="secondary"
-              className="h-[32px] px-3 text-[12.5px] whitespace-nowrap"
+              className="whitespace-nowrap"
               onClick={() => {
                 setStep(step === "regen" ? "idle" : "regen");
                 setPassword("");
@@ -597,7 +595,7 @@ function TwoFactorCard() {
             </AdminButton>
             <AdminButton
               variant="ghost"
-              className="h-[32px] px-3 text-[12.5px] whitespace-nowrap text-console-red hover:text-console-red"
+              className="whitespace-nowrap text-console-red hover:text-console-red"
               onClick={() => {
                 setStep(step === "disable" ? "idle" : "disable");
                 setPassword("");
@@ -608,7 +606,7 @@ function TwoFactorCard() {
           </div>
         ) : (
           <AdminButton
-            className="h-[32px] flex-none px-3.5 text-[12.5px] whitespace-nowrap"
+            className="flex-none whitespace-nowrap"
             disabled={isRequesting || step === "confirm"}
             onClick={begin}
           >
@@ -632,7 +630,6 @@ function TwoFactorCard() {
           </AdminField>
           <div className="flex gap-2">
             <AdminButton
-              className="h-[34px] px-3.5 text-[12.5px]"
               disabled={isConfirming || !/^\d{6}$/.test(code.trim())}
               onClick={confirmCode}
             >
@@ -640,7 +637,6 @@ function TwoFactorCard() {
             </AdminButton>
             <AdminButton
               variant="ghost"
-              className="h-[34px] px-3 text-[12.5px]"
               onClick={() => {
                 setStep("idle");
                 setCode("");
@@ -671,11 +667,7 @@ function TwoFactorCard() {
           </AdminField>
           <div className="flex gap-2">
             <AdminButton
-              className={cn(
-                "h-[34px] px-3.5 text-[12.5px]",
-                step === "disable" &&
-                  "bg-console-red hover:bg-console-red-deep",
-              )}
+              variant={step === "disable" ? "danger" : "primary"}
               disabled={
                 (step === "disable" ? isDisabling : isRegenerating) ||
                 password.length === 0
@@ -692,7 +684,6 @@ function TwoFactorCard() {
             </AdminButton>
             <AdminButton
               variant="outline"
-              className="h-[34px] px-3 text-[12.5px]"
               onClick={() => {
                 setStep("idle");
                 setPassword("");

@@ -7,8 +7,7 @@ import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
-import { AdminCard, Mono } from "@/components/admin/ui";
-import { Button } from "@/components/ui/button";
+import { AdminButton, AdminCard, Mono } from "@/components/admin/ui";
 import { RecordCardGridSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -85,9 +84,9 @@ export function ShipmentsRegister() {
           activeCount={activeFilterCount}
           onClear={resetFilters}
           action={
-            <Button asChild variant="harvest" className="h-8 px-3.5 text-[13px]">
+            <AdminButton asChild>
               <Link href={`${LIST}/new`}>+ Plan shipment</Link>
-            </Button>
+            </AdminButton>
           }
         >
           <ConsoleDateField
@@ -166,7 +165,7 @@ export function ShipmentsRegister() {
                 className="flex h-full flex-col rounded-[6px] border border-adm-line bg-adm-card p-4 shadow-[0_1px_2px_rgba(16,24,40,0.05)] transition-colors hover:border-adm-strong"
               >
                 <div className="flex items-start justify-between gap-2.5">
-                  <Mono className="text-[12px] text-adm-muted">
+                  <Mono className="text-[12.5px] text-adm-muted">
                     {sh.truckReg}
                   </Mono>
                   <span className="flex-none">
@@ -186,13 +185,13 @@ export function ShipmentsRegister() {
 
                 <div className="mt-auto pt-3">
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-dotted border-adm-line pt-3">
-                    <Mono className="text-[12.5px] font-semibold text-adm-ink">
+                    <Mono className="font-semibold text-adm-ink">
                       {sh.totalWeightKg > 0 ? formatKg(sh.totalWeightKg) : "-"}
                     </Mono>
                     <span className="text-[12.5px] text-adm-muted">
                       {sh.salesCount} sale{sh.salesCount === 1 ? "" : "s"}
                     </span>
-                    <span className="ml-auto text-[12px] whitespace-nowrap text-adm-faint">
+                    <span className="ml-auto text-[12.5px] whitespace-nowrap text-adm-faint">
                       {sh.departedAt
                         ? `Departed ${formatShipmentDate(sh.departedAt)}`
                         : `Planned ${formatShipmentDate(sh.createdAt)}`}

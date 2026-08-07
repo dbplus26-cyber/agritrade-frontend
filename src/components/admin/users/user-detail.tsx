@@ -116,7 +116,7 @@ function IdentityCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
             <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
               <h2
                 title={`${user.firstName} ${user.lastName}`}
-                className="line-clamp-2 max-w-full break-words text-[17px] font-bold tracking-[-0.01em] text-adm-ink sm:text-[20px]"
+                className="line-clamp-2 max-w-full break-words text-[19px] leading-[1.3] font-bold tracking-[-0.01em] text-adm-ink"
               >
                 {user.firstName} {user.lastName}
               </h2>
@@ -145,7 +145,7 @@ function IdentityCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
           {!editing ? (
             <AdminButton
               variant="secondary"
-              className="h-[34px] flex-none px-3.5 text-[13px] whitespace-nowrap sm:mb-2"
+              className="flex-none whitespace-nowrap sm:mb-2"
               onClick={() => setEditing(true)}
             >
               <Pencil className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
@@ -355,7 +355,7 @@ function EditDetailsForm({
         <AdminButton
           type="submit"
           disabled={isLoading}
-          className="h-[36px] px-4 text-[13px]"
+          size="lg"
         >
           {isLoading ? "Saving…" : "Save changes"}
         </AdminButton>
@@ -363,7 +363,7 @@ function EditDetailsForm({
           type="button"
           variant="outline"
           disabled={isLoading}
-          className="h-[36px] px-3.5 text-[13px]"
+          size="lg"
           onClick={onClose}
         >
           Cancel
@@ -397,7 +397,7 @@ function RoleCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
           {!isSelf ? (
             <AdminButton
               variant="secondary"
-              className="h-[34px] flex-none px-3.5 text-[13px] whitespace-nowrap"
+              className="flex-none whitespace-nowrap"
               onClick={() => setDialogOpen(true)}
             >
               Change role
@@ -592,7 +592,7 @@ function ActionsCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
           <AdminButton
             variant={row.destructive ? "danger" : "secondary"}
             disabled={row.busy}
-            className="h-[32px] flex-none px-3 text-[12.5px] whitespace-nowrap"
+            className="flex-none whitespace-nowrap"
             onClick={() =>
               void row.run().catch(onApiError(`Couldn't ${row.button.toLowerCase()}`))
             }

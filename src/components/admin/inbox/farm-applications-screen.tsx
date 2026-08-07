@@ -147,7 +147,7 @@ export function FarmApplicationsScreen() {
             <span className="block truncate font-medium text-adm-ink">
               {row.original.name}
             </span>
-            <Mono className="block text-[11px] text-adm-faint">
+            <Mono className="block text-[12.5px] text-adm-faint">
               {row.original.reference}
             </Mono>
           </Link>
@@ -160,7 +160,7 @@ export function FarmApplicationsScreen() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-adm-muted">
+          <Mono className="whitespace-nowrap text-adm-muted">
             {row.original.phone}
           </Mono>
         ),
@@ -188,7 +188,7 @@ export function FarmApplicationsScreen() {
         meta: columnMeta(),
         cell: ({ row }) =>
           row.original.farmSizeAcres !== null ? (
-            <Mono className="whitespace-nowrap text-[12.5px] text-adm-muted">
+            <Mono className="whitespace-nowrap text-adm-muted">
               {row.original.farmSizeAcres} acres
             </Mono>
           ) : (

@@ -10,8 +10,7 @@ import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
-import { adminLinkClass, AdminCard, Mono } from "@/components/admin/ui";
-import { Button } from "@/components/ui/button";
+import { adminLinkClass, AdminButton, AdminCard, Mono } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -78,10 +77,10 @@ export function LandSalesRegister() {
             className="block min-w-0 max-w-[90%] outline-none focus-visible:underline"
             onClick={(e) => { e.stopPropagation(); }}
           >
-            <Mono className="text-[12.5px] font-semibold text-console">
+            <Mono className="font-semibold text-console">
               {row.original.plot.reference}
             </Mono>
-            <div className="truncate text-[12px] text-adm-muted">
+            <div className="truncate text-[12.5px] text-adm-muted">
               {row.original.plot.locationText}
             </div>
           </Link>
@@ -95,7 +94,7 @@ export function LandSalesRegister() {
         // The row navigates to the sale, so the buyer stops the click first.
         cell: ({ row }) => (
           <Link
-            className={cn(adminLinkClass, "block min-w-0 truncate text-[13px]")}
+            className={cn(adminLinkClass, "block min-w-0 truncate")}
             href={`/admin/buyers/${row.original.buyer.id}`}
             onClick={(e) => e.stopPropagation()}
             title={row.original.buyer.name}
@@ -113,7 +112,7 @@ export function LandSalesRegister() {
         enableSorting: false,
         meta: columnMeta({ at: "xl" }),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-adm-ink">
+          <Mono className="whitespace-nowrap text-adm-ink">
             <Money value={row.original.agreedPriceGhs} />
           </Mono>
         ),
@@ -131,7 +130,7 @@ export function LandSalesRegister() {
           return (
             <Mono
               className={cn(
-                "whitespace-nowrap text-[12.5px] font-semibold",
+                "whitespace-nowrap font-semibold",
                 b === 0 ? "text-console" : "text-console-red",
               )}
             >
@@ -177,9 +176,9 @@ export function LandSalesRegister() {
           activeCount={activeFilterCount}
           onClear={resetFilters}
           action={
-            <Button asChild variant="harvest" className="h-8 px-3.5 text-[13px]">
+            <AdminButton asChild>
               <Link href={`${LIST}/new`}>+ New land sale</Link>
-            </Button>
+            </AdminButton>
           }
         >
           <ConsoleLabeledSelect

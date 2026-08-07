@@ -138,10 +138,18 @@ export function TitleCell({
   title: string;
   width?: CellWidth;
 }) {
+  // Truncation is a TABLE behaviour: a column must hold its width. In the
+  // card view (below @2xl of the table's own container) there is no column
+  // to hold and no hover to reveal the rest on touch, so the text wraps in
+  // full instead - a phone user with no detail page must never be left
+  // guessing what an ellipsis hides.
   const clamp = titleClamp(stretch, avatar);
   const titleNode = href ? (
     <Link
-      className={cn(clamp, "block truncate font-medium text-adm-ink hover:underline")}
+      className={cn(
+        clamp,
+        "block font-medium text-adm-ink [overflow-wrap:anywhere] hover:underline @2xl/table:truncate",
+      )}
       href={href}
       onClick={(e) => e.stopPropagation()}
       title={CLICK_THROUGH}
@@ -150,7 +158,10 @@ export function TitleCell({
     </Link>
   ) : (
     <span
-      className={cn(clamp, "block truncate font-medium text-adm-ink")}
+      className={cn(
+        clamp,
+        "block font-medium text-adm-ink [overflow-wrap:anywhere] @2xl/table:truncate",
+      )}
       title={title}
     >
       {title}
@@ -172,7 +183,7 @@ export function TitleCell({
       {meta ? (
         <span
           className={cn(
-            "block truncate text-[12.5px] text-adm-faint",
+            "block text-[12.5px] text-adm-faint [overflow-wrap:anywhere] @2xl/table:truncate",
             // A little more than the title, preserving the hierarchy above.
             stretch && "max-w-[96%]",
           )}
@@ -219,7 +230,9 @@ export function TextCell({
     <span
       className={cn(
         stretch ? cn("w-full min-w-0", STRETCH_CLAMP) : CELL_WIDTHS[width],
-        "block truncate text-left",
+        // Truncate only where there is a column to hold (the table view);
+        // the card view wraps in full - see TitleCell.
+        "block text-left [overflow-wrap:anywhere] @2xl/table:truncate",
         mono && "font-adminmono tabular-nums",
         className,
       )}

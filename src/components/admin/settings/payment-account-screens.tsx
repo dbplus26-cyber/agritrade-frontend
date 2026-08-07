@@ -12,6 +12,7 @@ import {
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
 import {
+  AdminButton,
   AdminCard,
   AdminField,
   AdminPageHeader,
@@ -25,7 +26,6 @@ import {
   RecordShell,
 } from "@/components/admin/record-shell";
 import { BackButton } from "@/components/ui/BackButton";
-import { Button } from "@/components/ui/button";
 import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -146,7 +146,7 @@ export function PaymentAccountTable() {
               <span className="block truncate font-medium text-adm-ink">
                 {a.label}
               </span>
-              <span className="block truncate text-[11.5px] text-adm-faint">
+              <span className="block truncate text-[12.5px] text-adm-faint">
                 {a.accountName}
               </span>
             </Link>
@@ -160,7 +160,7 @@ export function PaymentAccountTable() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <span className="font-adminmono block truncate text-[12.5px] text-adm-ink">
+          <span className="font-adminmono block truncate text-adm-ink">
             {row.original.accountNumber}
           </span>
         ),
@@ -177,10 +177,10 @@ export function PaymentAccountTable() {
           if (!where) return <Absent />;
           return (
             <span className="block min-w-[8rem] max-w-[20rem]">
-              <span className="block truncate text-[12.5px] text-adm-ink">
+              <span className="block truncate text-adm-ink">
                 {where}
               </span>
-              <span className="block truncate text-[11.5px] text-adm-faint">
+              <span className="block truncate text-[12.5px] text-adm-faint">
                 {KIND_LABEL[a.kind]}
                 {a.branch ? ` · ${a.branch}` : ""}
               </span>
@@ -198,9 +198,9 @@ export function PaymentAccountTable() {
         meta: columnMeta(),
         cell: ({ row }) =>
           row.original.showOnInvoice ? (
-            <span className="text-[12.5px] text-adm-ink">Printed</span>
+            <span className="text-adm-ink">Printed</span>
           ) : (
-            <span className="text-[12.5px] text-adm-faint">Internal only</span>
+            <span className="text-adm-faint">Internal only</span>
           ),
       },
       {
@@ -233,9 +233,9 @@ export function PaymentAccountTable() {
           activeCount={activeFilterCount}
           onClear={resetFilters}
           action={
-            <Button asChild variant="harvest" className="h-8 px-3.5 text-[13px]">
+            <AdminButton asChild>
               <Link href={`${LIST}/new`}>+ Add account</Link>
-            </Button>
+            </AdminButton>
           }
         >
           <ConsoleLabeledSelect
@@ -436,7 +436,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
   };
 
   return (
-    <AdminCard className="px-5 py-[18px]">
+    <AdminCard className="max-w-[640px] px-5 py-[18px]">
       {/* Field pairs measure against this form, not the viewport: the console
           shell keeps a ~225px rail beside it, so `sm:` paired fields up while
           the column was still too narrow to carry two of them. */}

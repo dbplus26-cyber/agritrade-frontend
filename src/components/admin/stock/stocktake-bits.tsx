@@ -304,14 +304,14 @@ export function StocktakeCountSheet({
         <AdminButton
           type="button"
           variant="outline"
-          className="h-10 px-4"
+          size="lg"
           onClick={onCancel}
         >
           Cancel
         </AdminButton>
         <AdminButton
           type="button"
-          className="h-10 px-5"
+          size="lg"
           disabled={saving}
           onClick={save}
         >

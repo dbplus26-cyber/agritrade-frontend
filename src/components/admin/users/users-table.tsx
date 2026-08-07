@@ -11,8 +11,7 @@ import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
-import { AdminCard } from "@/components/admin/ui";
-import { Button } from "@/components/ui/button";
+import { AdminButton, AdminCard } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -187,7 +186,7 @@ export function UsersTable() {
                     className="h-6 w-6 flex-none rounded-full object-cover"
                   />
                 ) : (
-                  <span className="font-adminmono inline-flex h-6 w-6 flex-none items-center justify-center rounded-full bg-console/10 text-[10px] font-bold text-console">
+                  <span className="font-adminmono inline-flex h-6 w-6 flex-none items-center justify-center rounded-full bg-console/10 text-[11px] font-bold text-console">
                     {initialsOf(u)}
                   </span>
                 )}
@@ -195,7 +194,7 @@ export function UsersTable() {
                   <span className="block truncate font-medium text-adm-ink">
                     {u.firstName} {u.lastName}
                   </span>
-                  <span className="block truncate text-[11.5px] text-adm-faint">
+                  <span className="block truncate text-[12.5px] text-adm-faint">
                     {u.email}
                   </span>
                 </span>
@@ -315,9 +314,9 @@ export function UsersTable() {
         activeCount={activeFilterCount}
         onClear={resetFilters}
         action={
-          <Button asChild variant="harvest" className="h-8 px-3.5 text-[13px]">
+          <AdminButton asChild>
             <Link href="/admin/users/new">+ Add user</Link>
-          </Button>
+          </AdminButton>
         }
       >
         <ConsoleLabeledSelect
@@ -387,13 +386,13 @@ export function UsersTable() {
             }}
             enableSelection
             renderBulkActions={(selected, clear) => (
-              <button
-                type="button"
+              <AdminButton
+                variant="danger"
+                size="sm"
                 onClick={() => void deleteSelected(selected, clear)}
-                className="inline-flex h-7 cursor-pointer items-center gap-1.5 rounded-[6px] bg-console-red px-2.5 text-[12px] font-semibold text-white hover:bg-console-red-deep"
               >
                 Delete selected
-              </button>
+              </AdminButton>
             )}
             rowHref={(u) => `/admin/users/${u.id}`}
             rowClassName={() => "h-12 hover:bg-adm-sunken"}

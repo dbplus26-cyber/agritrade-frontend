@@ -245,13 +245,13 @@ export function GuarantorDialog({
             <AdminButton
               type="button"
               variant="outline"
-              className="h-9 px-3.5"
+              size="lg"
               disabled={saving}
               onClick={onClose}
             >
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={saving} className="h-9 px-4">
+            <AdminButton type="submit" disabled={saving} size="lg">
               {saving
                 ? "Saving…"
                 : guarantor

@@ -10,8 +10,7 @@ import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
-import { adminLinkClass, AdminCard, Mono } from "@/components/admin/ui";
-import { Button } from "@/components/ui/button";
+import { adminLinkClass, AdminButton, AdminCard, Mono } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -87,14 +86,14 @@ export function LandAcquisitionsRegister() {
         meta: columnMeta({ stretch: true }),
         cell: ({ row }) => (
           <div className="min-w-0 max-w-[90%]">
-            <Mono className="text-[12.5px] font-semibold text-console">
+            <Mono className="font-semibold text-console">
               {row.original.reference}
             </Mono>
-            <div className="truncate text-[12px] text-adm-muted">
+            <div className="truncate text-[12.5px] text-adm-muted">
               {/* The row navigates to the acquisition, so the seller has to
                   stop the click reaching it. */}
               <Link
-                className={cn(adminLinkClass, "text-[12px]")}
+                className={adminLinkClass}
                 href={`/admin/land-sellers/${row.original.seller.id}`}
                 onClick={(e) => e.stopPropagation()}
               >
@@ -114,7 +113,7 @@ export function LandAcquisitionsRegister() {
         enableSorting: false,
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-adm-ink">
+          <Mono className="whitespace-nowrap text-adm-ink">
             <Money value={row.original.agreedCostGhs} />
           </Mono>
         ),
@@ -132,7 +131,7 @@ export function LandAcquisitionsRegister() {
           return (
             <Mono
               className={cn(
-                "whitespace-nowrap text-[12.5px] font-semibold",
+                "whitespace-nowrap font-semibold",
                 b === 0 ? "text-console" : "text-console-red",
               )}
             >
@@ -180,9 +179,9 @@ export function LandAcquisitionsRegister() {
           activeCount={activeFilterCount}
           onClear={resetFilters}
           action={
-            <Button asChild variant="harvest" className="h-8 px-3.5 text-[13px]">
+            <AdminButton asChild>
               <Link href={`${LIST}/new`}>+ New acquisition</Link>
-            </Button>
+            </AdminButton>
           }
         >
           <ConsoleLabeledSelect

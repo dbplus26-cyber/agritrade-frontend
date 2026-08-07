@@ -14,6 +14,11 @@ import {
   SectionHeading,
 } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
+import {
+  AttachmentEmpty,
+  AttachmentList,
+  AttachmentTile,
+} from "@/components/admin/attachments";
 import { Absent } from "@/components/admin/registry/registry-bits";
 import { ViewablePhoto } from "@/components/admin/photo-view";
 import { Money } from "@/components/admin/trading/sale-bits";
@@ -53,6 +58,30 @@ const RAIL_PAGE_SIZE = 8;
 function pairOrAbsent(...parts: (string | null)[]) {
   const joined = parts.filter(Boolean).join(" · ");
   return joined ? joined : <Absent />;
+}
+
+/** One labelled fact inside a guarantor's row: micro-cap label over a plain
+ * value, the same grammar DetailItem uses, one size down for a nested list. */
+function GuarantorFact({
+  children,
+  full = false,
+  label,
+}: {
+  children: React.ReactNode;
+  /** Prose (address, notes) takes the whole row of the fact grid. */
+  full?: boolean;
+  label: string;
+}) {
+  return (
+    <div className={cn("min-w-0", full && "col-span-full")}>
+      <dt className="text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
+        {label}
+      </dt>
+      <dd className="mt-0.5 min-w-0 text-[13px] text-adm-ink [overflow-wrap:anywhere]">
+        {children}
+      </dd>
+    </div>
+  );
 }
 
 /**
@@ -206,15 +235,14 @@ export function FarmerDetail({ id }: { id: string }) {
           fighting the padding for the room to stay on one line. Full width
           also gives them a single left edge to read down. */}
       <div className="mt-5 flex flex-col gap-2 border-t border-adm-hairline pt-4 [&>*]:w-full">
-        <AdminButton className="h-9 px-4" asChild>
+        <AdminButton asChild>
           <Link href={`${LIST}/${f.id}/statement`}>Statement</Link>
         </AdminButton>
-        <AdminButton variant="outline" className="h-9 px-4" asChild>
+        <AdminButton variant="outline" asChild>
           <Link href={`${LIST}/${f.id}/edit`}>Edit</Link>
         </AdminButton>
         <AdminButton
           variant="outline"
-          className="h-9 px-4"
           onClick={() =>
             void run(
               () => setActive({ active: !f.isActive, id: f.id }).unwrap(),
@@ -298,7 +326,10 @@ export function FarmerDetail({ id }: { id: string }) {
                     <button
                       type="button"
                       onClick={() => setGuarantorDialog("new")}
-                      className="text-[12.5px] whitespace-nowrap text-console hover:underline"
+                      className={cn(
+                        adminLinkClass,
+                        "cursor-pointer text-[12.5px] font-semibold whitespace-nowrap",
+                      )}
                     >
                       + Add guarantor
                     </button>
@@ -315,62 +346,68 @@ export function FarmerDetail({ id }: { id: string }) {
               ) : (
                 <ul className="divide-y divide-adm-hairline">
                   {f.guarantors.map((g) => (
-                    <li key={g.id} className="px-5 py-3 text-[13px]">
-                      {/* Stacked below sm. A guarantor's details are free text
-                          - name, relationship, address, notes - and sharing a
-                          row with two action links squeezed them into a
-                          sliver on a phone. The actions drop to their own row
-                          instead of competing for the width. */}
+                    <li key={g.id} className="px-5 py-4">
+                      {/* Name row first, actions on the same line only from sm
+                          - free text and controls never compete for width on a
+                          phone. The details go into a LABELLED grid rather
+                          than a stack of look-alike grey lines: five kinds of
+                          fact (phone, ID, address, occupation, notes) used to
+                          render in the same 12px muted grey, so nothing said
+                          which line was which. */}
                       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
                         <div className="min-w-0">
-                          <div className="font-semibold text-adm-ink [overflow-wrap:anywhere]">
+                          <p className="text-[14px] font-semibold text-adm-ink [overflow-wrap:anywhere]">
                             {g.name}
-                          </div>
+                          </p>
                           {g.relationship || g.occupation ? (
-                            <div className="text-[12px] text-adm-muted [overflow-wrap:anywhere]">
+                            <p className="mt-0.5 text-[12.5px] text-adm-muted [overflow-wrap:anywhere]">
                               {[g.relationship, g.occupation]
                                 .filter(Boolean)
                                 .join(" · ")}
-                            </div>
-                          ) : null}
-                          {g.phone ? (
-                            <Mono className="block text-[12px] text-adm-ink">
-                              {g.phone}
-                            </Mono>
-                          ) : null}
-                          {g.address ? (
-                            <div className="text-[12px] text-adm-muted [overflow-wrap:anywhere]">
-                              {g.address}
-                            </div>
-                          ) : null}
-                          {g.idType || g.idNumber ? (
-                            <div className="text-[12px] text-adm-muted [overflow-wrap:anywhere]">
-                              {[g.idType, g.idNumber].filter(Boolean).join(" · ")}
-                            </div>
-                          ) : null}
-                          {g.notes ? (
-                            <div className="text-[12px] text-adm-muted italic [overflow-wrap:anywhere]">
-                              {g.notes}
-                            </div>
+                            </p>
                           ) : null}
                         </div>
                         <div className="flex flex-none items-center gap-3 sm:justify-end">
                           <button
                             type="button"
                             onClick={() => setGuarantorDialog(g)}
-                            className="text-[12px] text-console hover:underline"
+                            className={cn(adminLinkClass, "cursor-pointer text-[12.5px] font-semibold")}
                           >
                             Edit
                           </button>
                           <button
                             type="button"
                             onClick={() => void onRemoveGuarantor(g)}
-                            className="text-[12px] text-console-red hover:underline"
+                            className="cursor-pointer rounded-[2px] text-[12.5px] font-semibold text-console-red underline-offset-2 hover:underline"
                           >
                             Remove
                           </button>
                         </div>
                       </div>
+                      {g.phone || g.idType || g.idNumber || g.address || g.notes ? (
+                        <dl className="mt-2.5 grid grid-cols-[repeat(auto-fit,minmax(min(100%,170px),1fr))] gap-x-6 gap-y-2">
+                          {g.phone ? (
+                            <GuarantorFact label="Phone">
+                              <Mono>{g.phone}</Mono>
+                            </GuarantorFact>
+                          ) : null}
+                          {g.idType || g.idNumber ? (
+                            <GuarantorFact label="ID">
+                              {[g.idType, g.idNumber].filter(Boolean).join(" · ")}
+                            </GuarantorFact>
+                          ) : null}
+                          {g.address ? (
+                            <GuarantorFact full label="Address">
+                              {g.address}
+                            </GuarantorFact>
+                          ) : null}
+                          {g.notes ? (
+                            <GuarantorFact full label="Notes">
+                              {g.notes}
+                            </GuarantorFact>
+                          ) : null}
+                        </dl>
+                      ) : null}
                     </li>
                   ))}
                 </ul>
@@ -385,40 +422,27 @@ export function FarmerDetail({ id }: { id: string }) {
               <p className="mb-2 text-[12px] text-adm-muted">
                 Never shown publicly. Downloads are logged.
               </p>
-              {f.documents.map((doc) => (
-                <div
-                  key={doc.id}
-                  className="flex items-center justify-between border-b border-adm-hairline py-2 text-[13px] last:border-b-0"
-                >
-                  <a
-                    href={farmerDocumentUrl(f.id, doc.id)}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={adminLinkClass}
-                  >
-                    {doc.name}
-                  </a>
-                  <div className="flex items-center gap-3">
-                    <Mono className="text-[12px] text-adm-muted">
-                      {formatFarmDate(doc.createdAt)}
-                    </Mono>
-                    <button
-                      type="button"
-                      aria-label={`Remove ${doc.name}`}
-                      onClick={() => void onRemoveDocument(doc)}
-                      className="cursor-pointer text-[12px] text-console-red hover:underline"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                </div>
-              ))}
+              {f.documents.length === 0 ? (
+                <AttachmentEmpty text="No documents filed yet." />
+              ) : (
+                <AttachmentList>
+                  {f.documents.map((doc) => (
+                    <AttachmentTile
+                      key={doc.id}
+                      createdAt={doc.createdAt}
+                      href={farmerDocumentUrl(f.id, doc.id)}
+                      name={doc.name}
+                      onRemove={() => void onRemoveDocument(doc)}
+                    />
+                  ))}
+                </AttachmentList>
+              )}
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <input
                   value={docName}
                   onChange={(e) => setDocName(e.target.value)}
                   placeholder="Document name (e.g. Grant agreement)"
-                  className="h-8 flex-1 rounded border border-adm-line bg-adm-card px-2.5 text-[13px]"
+                  className="h-8 min-w-0 flex-1 rounded-[6px] border border-adm-line bg-adm-card px-2.5 text-[13px] outline-none transition-colors placeholder:text-adm-faint focus:border-console"
                 />
                 <FilePicker
                   accept="image/*,application/pdf,.doc,.docx"

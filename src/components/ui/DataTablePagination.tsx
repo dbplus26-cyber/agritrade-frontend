@@ -24,12 +24,16 @@ const microLabel =
 const pad = (n: number, width: number) => String(n).padStart(width, "0");
 
 /**
- * The one table-pagination footer, in the DB Plus ledger idiom: a diamond
- * count marker with mono figures, a dashed-underline rows-per-page control,
- * the showing range in micro-label + mono, and round ghost nav around a
- * zero-padded page readout with a progress track showing how far through the
- * ledger you are. Driven by plain props so it works for client-side tables
- * today and server-paginated ones later.
+ * The one table-pagination footer, in the DB Plus ledger idiom: the showing
+ * range in micro-label + mono on the left, a dashed-underline rows-per-page
+ * control, and round ghost nav around a zero-padded page readout with a
+ * progress track showing how far through the ledger you are. The range
+ * ("Showing 1-20 of 214") is the ONLY place the total prints - a second
+ * count marker restated the same figure a hand-width away. On phones the
+ * footer is one row: range left, prev/next right; the rows-per-page control
+ * (a wide-screen convenience) and first/last jumps wait for the room.
+ * Driven by plain props so it works for client-side tables today and
+ * server-paginated ones later.
  */
 export function DataTablePagination({
   totalCount,
@@ -58,47 +62,42 @@ export function DataTablePagination({
   const padWidth = Math.max(2, String(totalPages).length);
 
   const navButton =
-    "flex h-7 w-7 flex-none cursor-pointer items-center justify-center rounded-full text-soil transition-colors hover:bg-console/10 hover:text-console disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-soil";
+    "flex h-8 w-8 flex-none cursor-pointer items-center justify-center rounded-full text-soil transition-colors hover:bg-console/10 hover:text-console disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-soil";
 
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center justify-center gap-x-6 gap-y-2.5 border-t border-soil/25 bg-surface-alt/60 px-4 py-2.5 text-soil lg:justify-between",
+        "flex items-center justify-between gap-x-4 border-t border-soil/25 bg-surface-alt/60 px-4 py-2.5 text-soil",
         className,
       )}
     >
-      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
-        <span className="flex items-center gap-2 whitespace-nowrap">
-          <span
-            aria-hidden="true"
-            className={cn(
-              "h-1.5 w-1.5 flex-none rotate-45",
-              isSelected ? "bg-console" : "bg-console/40",
-            )}
-          />
+      <div className="flex min-w-0 flex-wrap items-center gap-x-5 gap-y-2">
+        <span className="flex items-baseline gap-1.5 whitespace-nowrap">
           {isSelected ? (
             <>
-              <span className="font-adminmono text-[13px] font-bold text-console">
+              <span className="font-adminmono text-[12.5px] font-bold text-console">
                 {selectedCount.toLocaleString()}
               </span>
-              <span className={microLabel}>selected</span>
-              <span aria-hidden="true" className="h-3 w-px bg-soil/20" />
-              <span className="font-adminmono text-[13px] font-semibold text-soil">
-                {totalCount.toLocaleString()}
-              </span>
-              <span className={microLabel}>total</span>
+              <span className={microLabel}>selected of</span>
             </>
           ) : (
             <>
-              <span className="font-adminmono text-[13px] font-bold text-ink">
-                {totalCount.toLocaleString()}
+              <span className={cn(microLabel, "hidden min-[400px]:inline")}>
+                Showing
               </span>
-              <span className={microLabel}>{itemNoun}</span>
+              <span className="font-adminmono text-[12.5px] font-semibold text-soil">
+                {startItem.toLocaleString()}–{endItem.toLocaleString()}
+              </span>
+              <span className={microLabel}>of</span>
             </>
           )}
+          <span className="font-adminmono text-[12.5px] font-semibold text-soil">
+            {totalCount.toLocaleString()}
+          </span>
+          <span className={cn(microLabel, "hidden sm:inline")}>{itemNoun}</span>
         </span>
 
-        <label className="flex items-center gap-1.5 whitespace-nowrap">
+        <label className="hidden items-center gap-1.5 whitespace-nowrap sm:flex">
           <span className={microLabel}>Rows</span>
           <Select
             value={String(pageSize)}
@@ -106,7 +105,7 @@ export function DataTablePagination({
           >
             <SelectTrigger
               aria-label="Rows per page"
-              className="font-adminmono h-7 w-auto min-w-0 cursor-pointer gap-1 rounded-none border-0 border-b border-dashed border-soil/35 bg-transparent px-0.5 text-[12.5px] font-bold text-soil shadow-none transition-colors hover:border-console hover:text-console focus:ring-0 focus-visible:ring-0"
+              className="font-adminmono h-7 w-auto min-w-0 cursor-pointer gap-1 rounded-none border-0 border-b border-dashed border-soil/35 bg-transparent px-0.5 text-[12.5px] font-bold whitespace-nowrap text-soil shadow-none transition-colors hover:border-console hover:text-console focus:ring-0 focus-visible:ring-0 [&>span]:whitespace-nowrap"
             >
               <SelectValue />
             </SelectTrigger>
@@ -125,19 +124,7 @@ export function DataTablePagination({
         </label>
       </div>
 
-      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
-        <span className="flex items-baseline gap-1.5 whitespace-nowrap">
-          <span className={microLabel}>Showing</span>
-          <span className="font-adminmono text-[12.5px] font-semibold text-soil">
-            {startItem.toLocaleString()}–{endItem.toLocaleString()}
-          </span>
-          <span className={microLabel}>of</span>
-          <span className="font-adminmono text-[12.5px] font-semibold text-soil">
-            {totalCount.toLocaleString()}
-          </span>
-        </span>
-
-        <nav className="flex items-center gap-0.5" aria-label="Pagination">
+      <nav className="flex flex-none items-center gap-0.5" aria-label="Pagination">
           <button
             type="button"
             className={cn(navButton, "hidden md:flex")}
@@ -164,7 +151,7 @@ export function DataTablePagination({
             </span>
             <span
               aria-hidden="true"
-              className="h-[3px] w-16 overflow-hidden rounded-full bg-soil/20"
+              className="h-[3px] w-10 overflow-hidden rounded-full bg-soil/20 sm:w-16"
             >
               <span
                 className="block h-full rounded-full bg-console transition-all duration-300"
@@ -191,7 +178,6 @@ export function DataTablePagination({
             <ChevronsRight className="h-4 w-4" aria-hidden="true" />
           </button>
         </nav>
-      </div>
     </div>
   );
 }

@@ -2,8 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AdminField, adminInputClass } from "@/components/admin/ui";
-import { Button } from "@/components/ui/button";
+import { AdminButton, AdminField, adminInputClass } from "@/components/admin/ui";
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
@@ -87,22 +86,12 @@ export function RejectNoteDialog({
             />
           </AdminField>
           <ResponsiveDialogFooter className="gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="h-9"
-              onClick={() => close(false)}
-            >
+            <AdminButton variant="outline" size="lg" onClick={() => close(false)}>
               Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="outline"
-              className="h-9 text-console-red hover:text-console-red"
-              disabled={submitting}
-            >
+            </AdminButton>
+            <AdminButton type="submit" variant="danger" size="lg" disabled={submitting}>
               {submitting ? "Working…" : "Reject request"}
-            </Button>
+            </AdminButton>
           </ResponsiveDialogFooter>
         </form>
       </ResponsiveDialogContent>

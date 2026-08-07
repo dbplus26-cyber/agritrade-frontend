@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
@@ -18,13 +18,6 @@ import {
 import { HelpTip } from "@/components/admin/help-tip";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { SearchableSelect } from "@/components/admin/searchable-select";
 import { useGetAgentsQuery } from "@/redux/agents/agents-api";
 import { useGetCommoditiesQuery } from "@/redux/commodities/commodities-api";
@@ -68,15 +61,7 @@ export function PurchaseCreate() {
 
   const commodities = useGetCommoditiesQuery({ limit: 100, isActive: true });
   const warehouses = useGetWarehousesQuery({ limit: 100, isActive: true });
-  // Suppliers is an open register - a firm keeps adding them and never
-  // removes the old ones - so the picker asks the server rather than
-  // filtering a fetched page. See useRemoteSearch.
   const supplierSearch = useRemoteSearch();
-  const suppliers = useGetSuppliersQuery({
-    isActive: true,
-    limit: 20,
-    search: supplierSearch.query,
-  });
   const agents = useGetAgentsQuery({ limit: 100, isActive: true });
   // Only agents with an opened float can pay for a purchase.
   const agentOptions = (agents.data?.data ?? []).filter((a) => a.profileId);
@@ -86,6 +71,7 @@ export function PurchaseCreate() {
     control,
     handleSubmit,
     setError,
+    setValue,
     watch,
     formState: { errors },
   } = useForm<PurchaseValues>({
@@ -104,6 +90,25 @@ export function PurchaseCreate() {
   });
 
   const source = watch("source");
+  // Suppliers is an open register - a firm keeps adding them and never
+  // removes the old ones - so the picker asks the server rather than
+  // filtering a fetched page (see useRemoteSearch), and it asks only for
+  // suppliers of the KIND the source already names: picking "Company" and
+  // then scrolling past every farm-gate farmer answered a question the form
+  // had already been told.
+  const suppliers = useGetSuppliersQuery({
+    isActive: true,
+    limit: 20,
+    search: supplierSearch.query,
+    sourceType: source,
+  });
+  // A supplier picked under one source is not valid under another - the list
+  // itself changes kind - so switching the source clears the pick rather
+  // than silently carrying a farmer onto a company purchase.
+  useEffect(() => {
+    setValue("supplierId", "");
+  }, [source, setValue]);
+
   const weightKg = Number(watch("weightKg")) || 0;
   const unitPriceGhs = Number(watch("unitPriceGhs")) || 0;
   // Display only - the server recomputes the authoritative total.
@@ -173,24 +178,23 @@ export function PurchaseCreate() {
                 hint="Who you bought from: an individual farmer, a company, or one of your own field agents."
                 error={errors.source?.message}
               >
-                <Controller
-                  control={control}
-                  name="source"
-                  render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className={cn(adminSelectClass, "w-full")}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {SOURCE_OPTIONS.map((s) => (
-                          <SelectItem key={s} value={s}>
-                            {SOURCE_LABEL[s]}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                {/* Native, like every other fixed-option select in the
+                    console - the styled dropdown sat alone here and read as
+                    a different control. */}
+                <select
+                  className={cn(
+                    adminSelectClass,
+                    "w-full",
+                    errors.source && "border-console-red",
                   )}
-                />
+                  {...register("source")}
+                >
+                  {SOURCE_OPTIONS.map((s) => (
+                    <option key={s} value={s}>
+                      {SOURCE_LABEL[s]}
+                    </option>
+                  ))}
+                </select>
               </AdminField>
               <AdminField label="Commodity" error={errors.commodityId?.message}>
                 <Controller
@@ -236,12 +240,16 @@ export function PurchaseCreate() {
                   )}
                 />
               </AdminField>
-            ) : (
-              <AdminField
-                label="Supplier"
-                optional
-                hint="Who the goods were bought from."
-              >
+            ) : null}
+            {/* The seller is recordable whatever the source - an agent buys
+                FROM someone too, and a purchase with no counterparty has no
+                paper trail when a load turns out short. The list carries only
+                suppliers of the kind the source names. */}
+            <AdminField
+              label="Supplier"
+              optional
+              hint={`Who the goods were bought from - only ${SOURCE_LABEL[source].toLowerCase()} suppliers are listed.`}
+            >
                 <Controller
                   control={control}
                   name="supplierId"
@@ -264,7 +272,6 @@ export function PurchaseCreate() {
                   )}
                 />
               </AdminField>
-            )}
           </section>
 
           <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
@@ -400,7 +407,6 @@ export function PurchaseCreate() {
                   <AdminButton
                     type="button"
                     variant="secondary"
-                    className="h-8 px-3 text-[12.5px]"
                     onClick={() => fileInput.current?.click()}
                   >
                     {previewUrl ? "Replace photo" : "Choose photo"}
@@ -409,7 +415,6 @@ export function PurchaseCreate() {
                     <AdminButton
                       type="button"
                       variant="outline"
-                      className="h-8 px-3 text-[12.5px]"
                       onClick={() => setPhotoFile(null)}
                     >
                       Remove
@@ -438,14 +443,14 @@ export function PurchaseCreate() {
             <AdminButton
               type="submit"
               disabled={saving}
-              className="h-[38px] px-[18px]"
+              size="lg"
             >
               {saving ? "Recording…" : "Record purchase"}
             </AdminButton>
             <AdminButton
               type="button"
               variant="outline"
-              className="h-[38px] px-3.5"
+              size="lg"
               onClick={() => router.push(LIST)}
             >
               Cancel

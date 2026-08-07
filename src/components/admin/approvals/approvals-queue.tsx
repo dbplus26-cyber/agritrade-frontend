@@ -46,7 +46,7 @@ import {
  * Narrow is the base case; the full grid is the enhancement.
  */
 const GRID =
-  "grid grid-cols-[26px_1fr] items-start gap-[14px] gap-y-2.5 " +
+  "grid grid-cols-1 items-start gap-[14px] gap-y-2.5 " +
   "@min-[900px]/main:grid-cols-[34px_190px_1fr_150px_118px_190px_26px] " +
   "@min-[900px]/main:items-center @min-[900px]/main:gap-y-[14px]";
 
@@ -117,11 +117,12 @@ export function ApprovalsQueue({ table }: { table: Table<IApproval> }) {
                     key={cell.id}
                     className={cn(
                       "min-w-0",
-                      // Narrow: the checkbox keeps column 1 and everything
-                      // else stacks under it in column 2. Without the explicit
-                      // start, auto-placement drops every other cell back into
-                      // the 26px checkbox column.
-                      cellIndex > 0 && "col-start-2 @min-[900px]/main:col-start-auto",
+                      // Narrow: the checkbox column disappears - bulk select
+                      // is a wide-screen workflow, and its 26px column plus
+                      // the grid gap squeezed every stacked cell 40px off the
+                      // row edge on a phone. The cells own the full width;
+                      // the checkbox returns with the full grid.
+                      cellIndex === 0 && "hidden @min-[900px]/main:block",
                       cell.column.columnDef.meta?.className,
                     )}
                   >

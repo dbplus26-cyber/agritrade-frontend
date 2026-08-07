@@ -18,7 +18,12 @@ import {
 import { env } from "@/lib/env";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatDateTime } from "@/lib/format-date";
-import { formatKg } from "@/lib/format-money";
+import {
+  formatCedis,
+  formatCedisCompact,
+  formatKg,
+  statValueCls,
+} from "@/lib/format-money";
 import { toQueryString } from "@/lib/to-query-string";
 import { cn } from "@/lib/utils";
 import {
@@ -37,32 +42,45 @@ import { ProfitBarChart } from "./profit-bar-chart";
 
 const EXPORTS = `${env.SERVER_URI}/api/v1/admin/reports/exports`;
 
-/** A KPI tile on the reports header. */
+/**
+ * A KPI tile on the reports header. Money is compacted at scale (GH¢ 12.3M)
+ * with the exact figure on hover, and the type size adapts to the figure's
+ * length - a phone tile is ~130px wide, and a fixed 18px eight-digit amount
+ * was the one stat row in the console that could still overflow it.
+ */
 function ReportKpi({
   accent = false,
   hint,
   label,
-  value,
+  text,
+  value = null,
 }: {
   accent?: boolean;
   /** One sentence on what the figure counts, on hover beside the label. */
   hint?: string;
   label: string;
-  value: React.ReactNode;
+  /** A non-money figure printed verbatim (the margin percentage). */
+  text?: string;
+  /** Money in GHS; null prints the redaction placeholder. */
+  value?: number | null;
 }) {
+  const display =
+    text ?? (value === null ? null : formatCedisCompact(value));
   return (
-    <AdminCard className="px-4 py-3">
+    <AdminCard className="h-full px-4 py-3">
       <div className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         <span className="min-w-0">{label}</span>
         {hint ? <HelpTip label={`What does ${label} count?`} text={hint} /> : null}
       </div>
       <div
         className={cn(
-          "mt-1 text-[18px] font-bold",
+          "mt-1 min-w-0 font-bold",
+          display ? statValueCls(display) : "text-[18px]",
           accent ? "text-console" : "text-adm-ink",
         )}
+        title={text === undefined && value !== null ? formatCedis(value) : undefined}
       >
-        {value}
+        {display ?? <Money value={null} />}
       </div>
     </AdminCard>
   );
@@ -89,7 +107,7 @@ function PlStatement({ window }: { window: IReportWindow }) {
       <div className={rowClass}>
         <span className="text-adm-ink">Revenue</span>
         <Mono className="text-adm-ink">
-          <Money value={s?.revenueGhs ?? null} />
+          <Money compact value={s?.revenueGhs ?? null} />
         </Mono>
       </div>
       <div className={cn(rowClass, "text-adm-muted")}>
@@ -102,7 +120,7 @@ function PlStatement({ window }: { window: IReportWindow }) {
           ) : null}
         </span>
         <Mono>
-          <Money value={s?.costGhs ?? null} />
+          <Money compact value={s?.costGhs ?? null} />
         </Mono>
       </div>
       <div
@@ -113,14 +131,14 @@ function PlStatement({ window }: { window: IReportWindow }) {
       >
         <span>Gross profit</span>
         <Mono>
-          <Money value={s?.grossProfitGhs ?? null} />
+          <Money compact value={s?.grossProfitGhs ?? null} />
         </Mono>
       </div>
       {cats.map((c) => (
         <div key={c.categoryId} className={cn(rowClass, "pl-3 text-adm-muted")}>
           <span>{c.categoryName}</span>
           <Mono>
-            <Money value={c.amountGhs} />
+            <Money compact value={c.amountGhs} />
           </Mono>
         </div>
       ))}
@@ -132,7 +150,7 @@ function PlStatement({ window }: { window: IReportWindow }) {
       >
         <span>Net profit</span>
         <Mono>
-          <Money value={s?.netProfitGhs ?? null} />
+          <Money compact value={s?.netProfitGhs ?? null} />
         </Mono>
       </div>
     </AdminCard>
@@ -169,7 +187,7 @@ function AgentPerformance({
           {/* Declared widths so the figures are never the columns that give
               way: an agent name has no natural limit and, left to size
               itself, took the whole row and wrapped every number beside it. */}
-          <table className="w-full min-w-[560px] table-fixed text-[13px]">
+          <table className="w-full min-w-[560px] table-fixed text-[14px]">
             <colgroup>
               <col className="w-[38%]" />
               <col className="w-[4.5rem]" />
@@ -178,7 +196,7 @@ function AgentPerformance({
               <col className="w-[9rem]" />
             </colgroup>
             <thead>
-              <tr className="text-left text-[11px] text-adm-muted uppercase">
+              <tr className="text-left text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted">
                 <th className="py-1.5 pr-3">Agent</th>
                 <th className="py-1.5 pr-3">
                   <HelpWrap text="How many separate purchases this agent recorded.">
@@ -213,10 +231,10 @@ function AgentPerformance({
                     {formatKg(r.weightKg)}
                   </td>
                   <td className="py-1.5 pr-3 whitespace-nowrap text-adm-muted">
-                    <Money value={r.avgPriceGhs} />
+                    <Money compact value={r.avgPriceGhs} />
                   </td>
                   <td className="py-1.5 whitespace-nowrap text-adm-ink">
-                    <Money value={r.spentGhs} />
+                    <Money compact value={r.spentGhs} />
                   </td>
                 </tr>
               ))}
@@ -250,7 +268,7 @@ function CashComingIn() {
         <span className="min-w-0">{label}</span>
         <HelpTip label={`What does ${label} count?`} text={hint} />
       </div>
-      <div className="font-adminmono mt-0.5 text-[17px] font-bold text-console tabular-nums">
+      <div className="font-adminmono mt-0.5 text-[18px] font-bold text-console tabular-nums">
         <Money value={value} compact />
       </div>
     </div>
@@ -440,7 +458,7 @@ export function ReportsLive() {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <DateRangeSelector onChange={setWindow} />
-          <AdminButton variant="outline" className="h-9 px-3 text-[13px]" asChild>
+          <AdminButton variant="outline" asChild>
             <a href={`${EXPORTS}/commodity-profit.csv${windowQs}`}>Profit CSV</a>
           </AdminButton>
         </div>
@@ -450,33 +468,33 @@ export function ReportsLive() {
         <ReportKpi
           label="Revenue"
           hint="What the goods you sold in the period you picked were worth, before any costs."
-          value={<Money value={s?.revenueGhs ?? null} />}
+          value={s?.revenueGhs ?? null}
         />
         <ReportKpi
           label="Cost of goods"
           hint="What the grain you sold cost you to buy in the first place."
-          value={<Money value={s?.costGhs ?? null} />}
+          value={s?.costGhs ?? null}
         />
         <ReportKpi
           label="Gross profit"
           hint="Revenue less what the grain cost you, before running costs are taken off."
-          value={<Money value={s?.grossProfitGhs ?? null} />}
+          value={s?.grossProfitGhs ?? null}
         />
         <ReportKpi
           label="Expenses"
           hint="Running costs in the period you picked: transport, loading, fees and the rest."
-          value={<Money value={s?.expensesGhs ?? null} />}
+          value={s?.expensesGhs ?? null}
         />
         <ReportKpi
           label="Net profit"
           hint="What the business actually kept: gross profit after every running cost."
-          value={<Money value={s?.netProfitGhs ?? null} />}
+          value={s?.netProfitGhs ?? null}
           accent
         />
         <ReportKpi
           label="Net margin"
           hint="How many pesewas of every cedi sold you kept as profit."
-          value={
+          text={
             s?.netMarginPct === null || s?.netMarginPct === undefined
               ? "n/a"
               : `${s.netMarginPct.toLocaleString("en-GH", { maximumFractionDigits: 1 })}%`

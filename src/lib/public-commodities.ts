@@ -25,6 +25,14 @@ export interface PublicCommodity {
   available: boolean;
 }
 
+/** The backend's list meta - mirrors `buildPaginationMeta`. */
+export interface PublicListMeta {
+  limit: number;
+  page: number;
+  total: number;
+  totalPages: number;
+}
+
 /** Fetches the published commodities, or null when the API is unreachable. */
 export async function fetchPublicCommodities(): Promise<
   PublicCommodity[] | null
@@ -38,6 +46,33 @@ export async function fetchPublicCommodities(): Promise<
       data?: { commodities?: PublicCommodity[] };
     };
     return body.data?.commodities ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * One SERVER page of the published commodities, with the meta that says how
+ * big the whole register is. The board's pager follows this rather than
+ * slicing a full download in the browser, so the page holds whatever the
+ * register grows to. Same cache tag as the full fetch - one purge moves both.
+ */
+export async function fetchPublicCommoditiesPage(window: {
+  limit: number;
+  page: number;
+}): Promise<{ commodities: PublicCommodity[]; meta: PublicListMeta } | null> {
+  try {
+    const res = await fetch(
+      `${env.SERVER_URI}/api/v1/public/commodities?page=${String(window.page)}&limit=${String(window.limit)}`,
+      { next: { revalidate: 3600, tags: [CACHE_TAGS.COMMODITIES] } },
+    );
+    if (!res.ok) return null;
+    const body = (await res.json()) as {
+      data?: { commodities?: PublicCommodity[] };
+      meta?: PublicListMeta;
+    };
+    if (!body.data?.commodities || !body.meta) return null;
+    return { commodities: body.data.commodities, meta: body.meta };
   } catch {
     return null;
   }
@@ -101,14 +136,19 @@ export interface PublicLot {
  * nothing published returns [] - the page renders the empty register, not
  * stand-in files.
  */
-export function toLots(commodities: PublicCommodity[] | null): PublicLot[] {
+export function toLots(
+  commodities: PublicCommodity[] | null,
+  /** First row's position in the WHOLE register (server page offset), so a
+   * windowed page numbers its lots where the register left off. */
+  offset = 0,
+): PublicLot[] {
   if (!commodities || commodities.length === 0) return [];
   return commodities.map((c, i) => ({
     id: c.id,
     name: c.name,
     // Lot numbers follow the live feed's order, so they stay stable for a
     // given register and never collide.
-    lotNo: `LOT-${String(i + 1).padStart(2, "0")}`,
+    lotNo: `LOT-${String(offset + i + 1).padStart(2, "0")}`,
     slug: slugify(c.name),
     ghost: c.name.toUpperCase(),
     variety: c.variety,

@@ -77,9 +77,13 @@ const policyFormSchema = z
           percent: z
             .string()
             .trim()
-            .refine((v) => Number(v) > 0 && Number(v) <= 100, {
-              message: "1–100",
-            }),
+            // Zero is allowed: "0 before loading / 100 on arrival" is the
+            // credit-sale shape.
+            .refine(
+              (v) =>
+                v !== "" && Number(v) >= 0 && Number(v) <= 100 && !Number.isNaN(Number(v)),
+              { message: "0–100" },
+            ),
           trigger: z.enum(["BEFORE_LOADING", "ON_ARRIVAL", "ON_DEMAND"]),
         }),
       )
@@ -227,7 +231,7 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
             <AdminButton
               type="button"
               variant="outline"
-              className="h-8 w-fit px-3 text-[12.5px]"
+              className="w-fit"
               onClick={() =>
                 append({ label: "", percent: "", trigger: "ON_ARRIVAL" })
               }
@@ -245,12 +249,12 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
             <AdminButton
               type="button"
               variant="outline"
-              className="h-9 px-3.5"
+              size="lg"
               onClick={onClose}
             >
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={isLoading} className="h-9 px-4">
+            <AdminButton type="submit" disabled={isLoading} size="lg">
               {isLoading ? "Creating…" : "Create policy"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -452,7 +456,7 @@ export function PaymentPoliciesScreen() {
         hint="When a buyer has to pay you: the deposit and balance split."
         sub="The payment terms sales resolve against (sale > buyer > default)"
         actions={
-          <AdminButton className="h-9 px-4" onClick={() => setCreateOpen(true)}>
+          <AdminButton onClick={() => setCreateOpen(true)}>
             + New policy
           </AdminButton>
         }

@@ -12,9 +12,8 @@ import {
 } from "@/components/admin/filter-bar";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { TextCell, TitleCell } from "@/components/admin/table-cells";
-import { AdminCard, Mono } from "@/components/admin/ui";
+import { AdminButton, AdminCard, Mono } from "@/components/admin/ui";
 import { Money } from "@/components/admin/trading/sale-bits";
-import { Button } from "@/components/ui/button";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -80,7 +79,7 @@ export function GrantsRegister() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-adm-ink">
+          <Mono className="whitespace-nowrap text-adm-ink">
             {row.original.transactionNo}
           </Mono>
         ),
@@ -124,7 +123,7 @@ export function GrantsRegister() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-adm-ink">
+          <Mono className="whitespace-nowrap text-adm-ink">
             <Money value={row.original.valueGhs} />
           </Mono>
         ),
@@ -178,16 +177,12 @@ export function GrantsRegister() {
           onClear={resetFilters}
           action={
             <span className="flex items-center gap-2">
-              <Button
-                asChild
-                variant="outline"
-                className="h-8 border border-adm-line px-3 text-[13px] text-adm-muted shadow-none hover:bg-adm-sunken"
-              >
+              <AdminButton asChild variant="ghost">
                 <Link href={`${LIST}/aging`}>Aging</Link>
-              </Button>
-              <Button asChild variant="harvest" className="h-8 px-3.5 text-[13px]">
+              </AdminButton>
+              <AdminButton asChild>
                 <Link href={`${LIST}/new`}>+ New grant</Link>
-              </Button>
+              </AdminButton>
             </span>
           }
         >

@@ -37,6 +37,7 @@ import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
+import { receiptPdfUrl } from "@/lib/receipt-pdf-url";
 import { cn } from "@/lib/utils";
 import {
   useCancelLandSaleMutation,
@@ -167,10 +168,10 @@ function PaymentDialog({
             <Input type="date" className={adminInputClass} {...register("paidAt")} />
           </AdminField>
           <ResponsiveDialogFooter className="gap-2">
-            <AdminButton type="button" variant="outline" className="h-9 px-3.5" onClick={onClose}>
+            <AdminButton type="button" variant="outline" size="lg" onClick={onClose}>
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={isLoading} className="h-9 px-4">
+            <AdminButton type="submit" disabled={isLoading} size="lg">
               {isLoading ? "Recording…" : "Record payment"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -300,10 +301,10 @@ function CancelDialog({
             />
           </AdminField>
           <ResponsiveDialogFooter className="gap-2">
-            <AdminButton type="button" variant="outline" className="h-9 px-3.5" onClick={onClose}>
+            <AdminButton type="button" variant="outline" size="lg" onClick={onClose}>
               Keep sale
             </AdminButton>
-            <AdminButton type="submit" variant="danger" disabled={isLoading} className="h-9 px-4">
+            <AdminButton type="submit" variant="danger" disabled={isLoading} size="lg">
               {isLoading ? "Cancelling…" : "Cancel sale"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -390,7 +391,25 @@ export function LandSaleDetail({ id }: { id: string }) {
       <AdminPageHeader
         title="Land sale details"
         hint="One plot sold: the buyer, the price and what they still owe."
-        actions={<LandSaleStatusBadge status={s.status} />}
+        actions={
+          <span className="flex flex-wrap items-center gap-1.5">
+            <LandSaleStatusBadge status={s.status} />
+            {/* The server titles it for its state: a sale still owing prints
+                as the agreement (with every payment listed), a settled one
+                as the receipt. */}
+            {s.status !== "CANCELLED" ? (
+              <AdminButton variant="outline" asChild>
+                <a
+                  href={receiptPdfUrl("land-sale", s.id)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {s.balanceGhs === 0 ? "Receipt" : "Agreement"} PDF
+                </a>
+              </AdminButton>
+            ) : null}
+          </span>
+        }
       />
 
       {s.status === "CANCELLED" && s.cancelReason ? (
@@ -490,7 +509,6 @@ export function LandSaleDetail({ id }: { id: string }) {
                       leads; confirm follows it. */}
                   {s.status === "DRAFT" || s.status === "CONFIRMED" ? (
                     <AdminButton
-                      className="h-9 px-4"
                       onClick={() => setPayOpen(true)}
                     >
                       Record payment
@@ -499,7 +517,6 @@ export function LandSaleDetail({ id }: { id: string }) {
                   {s.status === "DRAFT" ? (
                     <AdminButton
                       variant={hasPayments ? "primary" : "outline"}
-                      className="h-9 px-4"
                       disabled={confirmState.isLoading}
                       onClick={() => void onConfirm()}
                     >
@@ -508,7 +525,6 @@ export function LandSaleDetail({ id }: { id: string }) {
                   ) : null}
                   <AdminButton
                     variant="outline"
-                    className="h-9 px-4"
                     onClick={() => setCancelOpen(true)}
                   >
                     Cancel sale
@@ -561,7 +577,8 @@ export function LandSaleDetail({ id }: { id: string }) {
                       <AdminButton
                         type="button"
                         variant="outline"
-                        className="h-[26px] flex-none px-2 text-[11.5px]"
+                        size="sm"
+                        className="flex-none"
                         onClick={() => void reverseOne(p.id, p.amountGhs)}
                       >
                         Reverse

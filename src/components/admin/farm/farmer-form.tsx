@@ -132,7 +132,7 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
   };
 
   return (
-    <div className="max-w-[600px]">
+    <div className="max-w-[640px]">
       <BackButton href={LIST} label="All farmers" className="mb-2" />
       <AdminPageHeader
         title={farmer ? "Edit farmer" : "Add farmer"}
@@ -177,7 +177,6 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
               <AdminButton
                 type="button"
                 variant="outline"
-                className="h-9 px-4"
                 onClick={() => photoInput.current?.click()}
               >
                 {preview ? "Change photo" : "Add photo"}
@@ -383,16 +382,16 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
 
         {/* Cancel returns to where the record is read rather than locking
             the form back down - there is no locked state any more. */}
-        <div className="flex justify-end gap-2">
+        <div className="flex flex-wrap justify-end gap-2">
           <AdminButton
             type="button"
             variant="outline"
-            className="h-10 px-4"
+            size="lg"
             onClick={() => router.push(farmer ? `${LIST}/${farmer.id}` : LIST)}
           >
             Cancel
           </AdminButton>
-          <AdminButton type="submit" disabled={saving} className="h-10 px-5">
+          <AdminButton type="submit" disabled={saving} size="lg">
             {saving ? "Saving…" : farmer ? "Save changes" : "Add farmer"}
           </AdminButton>
         </div>

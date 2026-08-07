@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { bypassOptimizer } from "@/lib/photo-src";
 import { cn } from "@/lib/utils";
 
 /**
@@ -42,6 +43,7 @@ export function PhotoFrame({
         priority={priority}
         sizes={sizes}
         src={src}
+        unoptimized={bypassOptimizer(src)}
       />
     </div>
   );

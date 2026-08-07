@@ -209,7 +209,6 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
                     </AdminField>
                     <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
                       <AdminButton
-                        className="h-9 px-4"
                         disabled={replying || replyBody.trim().length === 0}
                         onClick={() => void onReply()}
                         variant="gold"
@@ -324,7 +323,7 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
                   type="button"
                   disabled={!dirty || saving}
                   onClick={() => void onSave()}
-                  className="h-[38px] px-[18px]"
+                  size="lg"
                 >
                   {saving ? "Saving…" : "Save changes"}
                 </AdminButton>
@@ -341,7 +340,7 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
                   variant="danger"
                   disabled={deleting}
                   onClick={() => void onDelete()}
-                  className="mt-2.5 h-9 px-4"
+                  className="mt-2.5"
                 >
                   {deleting ? "Deleting…" : "Delete enquiry"}
                 </AdminButton>

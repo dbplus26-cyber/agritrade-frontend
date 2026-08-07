@@ -28,7 +28,7 @@ export function DateTimeCell({ value, muted }: IDateCellProps) {
     <span className="block leading-[1.35]">
       <span
         className={cn(
-          "block whitespace-nowrap text-[12.5px]",
+          "block whitespace-nowrap text-[13px]",
           muted && "text-adm-muted",
         )}
       >
@@ -45,7 +45,7 @@ export function DateTimeCell({ value, muted }: IDateCellProps) {
 export function DateOnlyCell({ value, muted }: IDateCellProps) {
   if (isInvalid(value)) return <Absent />;
   return (
-    <span className={cn("whitespace-nowrap text-[12.5px]", muted && "text-adm-muted")}>
+    <span className={cn("whitespace-nowrap text-[13px]", muted && "text-adm-muted")}>
       {formatTableDate(value)}
     </span>
   );

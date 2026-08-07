@@ -1,21 +1,29 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Public_Sans, Stardos_Stencil } from "next/font/google";
+import {
+  Barlow_Condensed,
+  Barlow_Semi_Condensed,
+  Stardos_Stencil,
+} from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { StoreProvider } from "@/redux/store-provider";
 import { siteConfig, siteUrl } from "@/lib/site";
 import "./globals.css";
 
-// Display face: Archivo replaces the design file's Bricolage Grotesque - same
-// utilitarian grotesque character, but a taller x-height so headlines don't
-// read squat at size.
-const archivo = Archivo({
-  variable: "--font-archivo",
+// Display face: Barlow Condensed - the TALL grotesque of crate markings and
+// shipping manifests, which is exactly the paperwork world this site is drawn
+// from. It replaced Archivo (and the design file's Bricolage before it): both
+// read squat at size where this one carries headlines upright.
+const barlowCondensed = Barlow_Condensed({
+  variable: "--font-barlow-condensed",
   subsets: ["latin"],
   weight: ["500", "600", "700"],
 });
 
-const publicSans = Public_Sans({
-  variable: "--font-public-sans",
+// Body face: the semi-condensed cut of the same family - the tall vertical
+// rhythm without squeezing running prose past comfort, and one family across
+// the whole site means display and body can never drift apart.
+const barlowSemi = Barlow_Semi_Condensed({
+  variable: "--font-barlow-semi",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
@@ -62,7 +70,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${archivo.variable} ${publicSans.variable} ${stardos.variable} h-full antialiased`}
+      className={`${barlowCondensed.variable} ${barlowSemi.variable} ${stardos.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
         <StoreProvider>

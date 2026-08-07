@@ -11,6 +11,7 @@ import {
   Mono,
   ToneBadge,
   adminInputClass,
+  adminLinkClass,
   adminSelectClass,
   SectionHeading,
 } from "@/components/admin/ui";
@@ -149,7 +150,7 @@ function ReviewModCard({
           onClick={() => {
             setExpanded((e) => !e);
           }}
-          className="mt-1 self-start cursor-pointer text-[12px] font-semibold text-console hover:underline"
+          className={cn(adminLinkClass, "mt-1 self-start cursor-pointer text-[12.5px] font-semibold")}
         >
           {expanded ? "Show less" : "Show more"}
         </button>
@@ -182,7 +183,6 @@ function ReviewModCard({
                   onClick={() => {
                     onPublish(review);
                   }}
-                  className="h-8 px-3.5 text-[12.5px]"
                 >
                   Publish
                 </AdminButton>
@@ -193,7 +193,6 @@ function ReviewModCard({
                   onClick={() => {
                     onReject(review);
                   }}
-                  className="h-8 px-3.5 text-[12.5px]"
                 >
                   Reject
                 </AdminButton>
@@ -207,7 +206,7 @@ function ReviewModCard({
                 onClick={() => {
                   onDelete(review);
                 }}
-                className="ml-auto h-8 px-2.5 text-[12.5px] text-console-red hover:text-console-red"
+                className="ml-auto text-console-red hover:text-console-red"
               >
                 Delete
               </AdminButton>
@@ -265,7 +264,9 @@ function AddReviewDialog({
 
   return (
     <ResponsiveDialog open={open} onOpenChange={close}>
-      <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[440px]">
+      {/* Wider on large screens so the whole form fits without the inner
+          scrollbar - fields pair up 2-up in the extra room. */}
+      <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[440px] lg:max-w-[640px]">
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Record a review</ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
@@ -280,32 +281,36 @@ function AddReviewDialog({
         >
           <section className="flex flex-col gap-3">
             <SectionHeading className="mb-0">Who reviewed us</SectionHeading>
-            <AdminField
-              label="Reviewer's name"
-              error={errors.authorName?.message}
-            >
-              <input
-                maxLength={REVIEWER_NAME_MAX}
-                placeholder="e.g. Amina Alhassan"
-                className={cn(
-                  adminInputClass,
-                  errors.authorName && "border-console-red",
-                )}
-                {...register("authorName")}
-              />
-            </AdminField>
-            <AdminField
-              label="They dealt with us as"
-              error={errors.role?.message}
-            >
-              <select className={adminSelectClass} {...register("role")}>
-                {REVIEW_ROLES.map((r) => (
-                  <option key={r} value={r}>
-                    {REVIEW_ROLE_LABELS[r]}
-                  </option>
-                ))}
-              </select>
-            </AdminField>
+            {/* Paired in the dialog's wide (lg) form, stacked below - two
+                short fields on one row is what buys back the inner scroll. */}
+            <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+              <AdminField
+                label="Reviewer's name"
+                error={errors.authorName?.message}
+              >
+                <input
+                  maxLength={REVIEWER_NAME_MAX}
+                  placeholder="e.g. Amina Alhassan"
+                  className={cn(
+                    adminInputClass,
+                    errors.authorName && "border-console-red",
+                  )}
+                  {...register("authorName")}
+                />
+              </AdminField>
+              <AdminField
+                label="They dealt with us as"
+                error={errors.role?.message}
+              >
+                <select className={adminSelectClass} {...register("role")}>
+                  {REVIEW_ROLES.map((r) => (
+                    <option key={r} value={r}>
+                      {REVIEW_ROLE_LABELS[r]}
+                    </option>
+                  ))}
+                </select>
+              </AdminField>
+            </div>
           </section>
 
           <section className="flex flex-col gap-3 border-t border-adm-hairline pt-5">
@@ -518,22 +523,16 @@ export function ReviewsScreen() {
           {/* Status tabs - the default is what needs deciding. */}
           <div className="mb-4 flex gap-1.5">
             {REVIEW_STATUSES.map((value) => (
-              <button
+              <AdminButton
                 key={value}
-                type="button"
+                variant={filters.status === value ? "primary" : "secondary"}
                 onClick={() => {
                   setFilter("status", value);
                 }}
                 aria-pressed={filters.status === value}
-                className={cn(
-                  "cursor-pointer rounded-[6px] border px-3.5 py-1.5 text-[13px] font-semibold transition-colors",
-                  filters.status === value
-                    ? "border-console bg-console text-white"
-                    : "border-adm-line bg-adm-card text-adm-muted hover:border-console/60",
-                )}
               >
                 {REVIEW_STATUS_META[value].label}
-              </button>
+              </AdminButton>
             ))}
           </div>
 
@@ -545,7 +544,6 @@ export function ReviewsScreen() {
             onClear={resetFilters}
             action={
               <AdminButton
-                className="h-8 px-3.5 text-[13px]"
                 onClick={() => {
                   setAdding(true);
                 }}

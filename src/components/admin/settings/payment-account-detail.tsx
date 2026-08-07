@@ -14,6 +14,7 @@ import { RecordFacts } from "@/components/admin/record-facts";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { Money } from "@/components/admin/trading/sale-bits";
 import {
+  AdminButton,
   AdminCard,
   AdminPageHeader,
   DetailGrid,
@@ -25,7 +26,6 @@ import {
   adminLinkClass,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
-import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -125,7 +125,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         header: "Date",
         enableSorting: false,
         cell: ({ row }) => <DateOnlyCell value={row.original.paidAt} />,
-        meta: { className: "px-4 text-[13px] whitespace-nowrap" },
+        meta: { className: "px-4 whitespace-nowrap" },
       },
       {
         accessorFn: (m) => m.transactionNo,
@@ -134,7 +134,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         enableSorting: false,
         cell: ({ row }) => (
           <span className="flex min-w-0 flex-wrap items-center justify-end gap-1.5 @2xl/table:justify-start">
-            <Mono className="text-[12.5px] text-adm-ink">
+            <Mono className="text-adm-ink">
               {row.original.transactionNo}
             </Mono>
             {row.original.isReversal ? (
@@ -142,7 +142,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
             ) : null}
           </span>
         ),
-        meta: { className: "px-4 text-[13px]" },
+        meta: { className: "px-4" },
       },
       {
         accessorFn: (m) => m.source,
@@ -153,7 +153,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
           const s = SOURCE[row.original.source];
           return <ToneBadge tone={s.tone}>{s.label}</ToneBadge>;
         },
-        meta: { className: "px-4 text-[13px]" },
+        meta: { className: "px-4" },
       },
       {
         accessorFn: (m) => m.counterparty,
@@ -165,7 +165,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
             {row.original.counterparty}
           </span>
         ),
-        meta: { stretch: true, className: "px-4 text-[13px]" },
+        meta: { stretch: true, className: "px-4" },
       },
       {
         accessorFn: (m) => m.parentNo,
@@ -178,13 +178,13 @@ export function PaymentAccountDetail({ id }: { id: string }) {
             <Link
               href={SOURCE[m.source].href(m.parentId)}
               onClick={(e) => e.stopPropagation()}
-              className={cn(adminLinkClass, "font-adminmono text-[12.5px] tabular-nums")}
+              className={cn(adminLinkClass, "font-adminmono tabular-nums")}
             >
               {m.parentNo}
             </Link>
           );
         },
-        meta: { className: "px-4 text-[13px]" },
+        meta: { className: "px-4" },
       },
       {
         accessorFn: (m) => m.method,
@@ -192,9 +192,9 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         header: "Method",
         enableSorting: false,
         cell: ({ row }) => (
-          <span className="text-[12.5px] text-adm-ink">{row.original.method}</span>
+          <span className="text-adm-ink">{row.original.method}</span>
         ),
-        meta: { className: "px-4 text-[13px]" },
+        meta: { className: "px-4" },
       },
       {
         accessorFn: (m) => m.reference ?? "",
@@ -203,7 +203,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         enableSorting: false,
         cell: ({ row }) =>
           row.original.reference ? (
-            <Mono className="block max-w-[19rem] truncate text-[12px] text-adm-muted">
+            <Mono className="block max-w-[19rem] truncate text-adm-muted">
               {row.original.reference}
             </Mono>
           ) : (
@@ -212,7 +212,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         // Reconciliation detail: only in genuinely wide containers. The empty
         // accessor value also drops the row from the mobile card when there is
         // no reference to show.
-        meta: { className: "hidden px-4 text-[13px] 2xl:table-cell" },
+        meta: { className: "hidden px-4 2xl:table-cell" },
       },
       {
         accessorFn: (m) => accountDelta(m) ?? 0,
@@ -224,7 +224,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
           return (
             <Mono
               className={cn(
-                "whitespace-nowrap text-[13px] font-semibold",
+                "whitespace-nowrap font-semibold",
                 delta === null
                   ? "text-adm-muted"
                   : delta < 0
@@ -237,7 +237,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
             </Mono>
           );
         },
-        meta: { className: "px-4 text-[13px]" },
+        meta: { className: "px-4" },
       },
     ],
     [],
@@ -265,13 +265,9 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         actions={
           <span className="flex flex-wrap items-center gap-2">
             <ActiveBadge isActive={account.isActive} />
-            <Button
-              asChild
-              variant="outline"
-              className="h-8 px-3 text-[12.5px]"
-            >
+            <AdminButton asChild variant="outline">
               <Link href={`${LIST}/${id}/edit`}>Edit account</Link>
-            </Button>
+            </AdminButton>
           </span>
         }
       />

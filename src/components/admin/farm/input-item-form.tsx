@@ -240,7 +240,8 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
               <AdminButton
                 type="button"
                 variant="outline"
-                className="mr-auto h-10 px-4 text-console-red"
+                size="lg"
+                className="mr-auto text-console-red"
                 disabled={deleteState.isLoading}
                 onClick={() => void onDelete()}
               >
@@ -249,7 +250,7 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
               <AdminButton
                 type="button"
                 variant="outline"
-                className="h-10 px-4"
+                size="lg"
                 onClick={() =>
                   void run(
                     () => setActive({ active: !item.isActive, id: item.id }).unwrap(),
@@ -262,7 +263,7 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
               <AdminButton
                 type="button"
                 variant="gold"
-                className="h-10 px-5"
+                size="lg"
                 onClick={() => setIsEditing(true)}
               >
                 Edit item
@@ -273,7 +274,7 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
               <AdminButton
                 type="button"
                 variant="outline"
-                className="h-10 px-4"
+                size="lg"
                 onClick={() => {
                   reset();
                   setIsEditing(false);
@@ -281,7 +282,7 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
               >
                 Cancel
               </AdminButton>
-              <AdminButton type="submit" disabled={saving} className="h-10 px-5">
+              <AdminButton type="submit" disabled={saving} size="lg">
                 {saving ? "Saving…" : "Save changes"}
               </AdminButton>
             </Fragment>
@@ -290,7 +291,7 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
               key="create"
               type="submit"
               disabled={saving}
-              className="h-10 px-5"
+              size="lg"
             >
               {saving ? "Saving…" : "Create item"}
             </AdminButton>

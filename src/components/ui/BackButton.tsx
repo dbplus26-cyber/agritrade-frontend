@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { adminLinkClass } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
 
 /**
@@ -33,7 +34,8 @@ export function BackButton({
       type="button"
       onClick={goBack}
       className={cn(
-        "inline-flex cursor-pointer items-center gap-1 whitespace-nowrap text-[13px] font-semibold text-console hover:underline",
+        adminLinkClass,
+        "inline-flex cursor-pointer items-center gap-1 whitespace-nowrap text-[13px] font-semibold",
         className,
       )}
     >

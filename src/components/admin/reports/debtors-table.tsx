@@ -86,7 +86,45 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
               : "No outstanding balances. Everyone is paid up."}
         </p>
       ) : (
-        <div className="overflow-x-auto">
+        <>
+        {/* Phones get a row list, messaging-app style: buyer and the balance
+            owed on line one, book/ref/paid on line two. The 720px table only
+            offered a 300px window onto itself down here, with the Balance -
+            the whole point of the section - always off-screen. */}
+        <ul className="flex flex-col md:hidden">
+          {rows.map((r) => (
+            <li
+              key={r.id}
+              className="border-t border-adm-hairline py-2.5 first:border-t-0"
+            >
+              <div className="flex items-baseline justify-between gap-3">
+                <Link
+                  className={cn(
+                    adminLinkClass,
+                    "min-w-0 text-[13.5px] font-semibold line-clamp-1 whitespace-normal [overflow-wrap:anywhere]",
+                  )}
+                  href={`/admin/buyers/${r.buyer.id}`}
+                >
+                  {r.buyer.name}
+                </Link>
+                <Mono className="flex-none text-[13.5px] font-semibold text-console-red">
+                  <Money compact value={r.balanceGhs} />
+                </Mono>
+              </div>
+              <div className="mt-0.5 flex items-baseline justify-between gap-3 text-[12px] text-adm-muted">
+                <span className="min-w-0 truncate">
+                  {r.kind === "LAND" ? "Land" : "Commodity"} ·{" "}
+                  <Mono>{r.subject}</Mono>
+                </span>
+                <span className="flex-none whitespace-nowrap">
+                  paid <Mono><Money compact value={r.paidGhs} /></Mono> of{" "}
+                  <Mono><Money compact value={r.agreedGhs} /></Mono>
+                </span>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <div className="hidden overflow-x-auto md:block">
           {/* Fixed layout with declared column widths. Left to itself the
               browser sized every column from its content, so the buyer name -
               the one unbounded value here - took roughly three quarters of
@@ -94,7 +132,7 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
               "GHS 59,377.38" wrapped. The figures are why this table exists;
               they get the room they need first, and the name takes what is
               left and wraps to at most two lines. */}
-          <table className="w-full min-w-[720px] table-fixed text-[13px]">
+          <table className="w-full min-w-[720px] table-fixed text-[14px]">
             <colgroup>
               <col className="w-[30%]" />
               <col className="w-[9rem]" />
@@ -104,7 +142,7 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
               <col className="w-[8rem]" />
             </colgroup>
             <thead>
-              <tr className="text-left text-[11px] text-adm-muted uppercase">
+              <tr className="text-left text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted">
                 <th className="py-1.5 pr-3">Buyer</th>
                 <th className="py-1.5 pr-3">
                   <HelpWrap text="Which side of the business the debt sits on: a grain order, or a plot of land.">
@@ -147,7 +185,7 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
                       {r.buyer.name}
                     </Link>
                     {r.buyer.phone ? (
-                      <div className="font-adminmono truncate text-[11.5px] text-adm-muted">
+                      <div className="font-adminmono truncate text-[12.5px] text-adm-muted">
                         {r.buyer.phone}
                       </div>
                     ) : null}
@@ -162,20 +200,24 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
                       <Mono className="text-adm-muted">{r.subject}</Mono>
                     </span>
                   </td>
+                  {/* Compact at scale: an eight-figure exact amount is wider
+                      than the 8rem column and spilled into its neighbour. The
+                      exact figure rides the hover title. */}
                   <td className="py-1.5 pr-3 whitespace-nowrap text-adm-muted">
-                    <Money value={r.agreedGhs} />
+                    <Money compact value={r.agreedGhs} />
                   </td>
                   <td className="py-1.5 pr-3 whitespace-nowrap text-adm-muted">
-                    <Money value={r.paidGhs} />
+                    <Money compact value={r.paidGhs} />
                   </td>
                   <td className="py-1.5 font-semibold whitespace-nowrap text-console-red">
-                    <Money value={r.balanceGhs} />
+                    <Money compact value={r.balanceGhs} />
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        </>
       )}
 
       {meta && meta.totalPages > 1 ? (

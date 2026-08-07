@@ -14,13 +14,13 @@ import { Absent, columnMeta } from "@/components/admin/registry/registry-bits";
 import { TextCell } from "@/components/admin/table-cells";
 import { DateOnlyCell, DateTimeCell } from "@/components/admin/date-cell";
 import {
+  AdminButton,
   AdminCard,
   AdminField,
   adminInputClass,
   Mono,
   SectionHeading,
 } from "@/components/admin/ui";
-import { Button } from "@/components/ui/button";
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
@@ -81,7 +81,7 @@ function Route({ from, to }: { from: string; to: string }) {
     // widen the page.
     <span
       aria-label={`${from} to ${to}`}
-      className="block max-w-[90%] min-w-0 truncate text-[13px] text-adm-ink"
+      className="block max-w-[90%] min-w-0 truncate text-adm-ink"
       title={`${from} -> ${to}`}
     >
       <span aria-hidden="true">
@@ -183,7 +183,7 @@ export function TransfersScreen() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-adm-ink">
+          <Mono className="whitespace-nowrap text-adm-ink">
             {row.original.transactionNo}
           </Mono>
         ),
@@ -225,7 +225,7 @@ export function TransfersScreen() {
         cell: ({ row }) => (
           <Kg
             kg={row.original.weightKg}
-            className="text-[12.5px] font-semibold text-adm-ink"
+            className="font-semibold text-adm-ink"
           />
         ),
       },
@@ -298,13 +298,9 @@ export function TransfersScreen() {
           onClear={resetFilters}
           action={
             isSuperAdmin ? (
-              <Button
-                variant="default"
-                className="h-[34px] rounded-[6px] bg-console px-3.5 text-[13px] font-semibold text-white shadow-none hover:translate-x-0 hover:translate-y-0 hover:bg-console-hover hover:shadow-none"
-                onClick={() => setDialogOpen(true)}
-              >
+              <AdminButton onClick={() => setDialogOpen(true)}>
                 + New transfer
-              </Button>
+              </AdminButton>
             ) : undefined
           }
         >
@@ -576,22 +572,12 @@ function TransferDialog({
           ) : null}
 
           <ResponsiveDialogFooter className="gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="h-9"
-              onClick={close}
-            >
+            <AdminButton variant="outline" size="lg" onClick={close}>
               Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="harvest"
-              className="h-9"
-              disabled={isLoading}
-            >
+            </AdminButton>
+            <AdminButton type="submit" size="lg" disabled={isLoading}>
               {isLoading ? "Posting…" : "Post transfer"}
-            </Button>
+            </AdminButton>
           </ResponsiveDialogFooter>
         </form>
       </ResponsiveDialogContent>

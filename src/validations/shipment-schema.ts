@@ -18,6 +18,11 @@ export const shipmentSchema = z
   .object({
     saleIds: z.array(z.string()).min(1, "Choose at least one sale"),
     originWarehouseId: z.string().min(1, "Choose the origin warehouse"),
+    /** Further sheds the truck also calls at; the origin is always included. */
+    loadingWarehouseIds: z
+      .array(z.string())
+      .max(10, "A trip can call at 10 warehouses at most")
+      .optional(),
     /** A saved delivery address; "" means "enter the destination manually". */
     deliveryAddressId: z.string().optional(),
     /** Required only when no saved address is chosen (backend contract). */

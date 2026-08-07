@@ -109,7 +109,10 @@ function DialogFooter({
     <div
       data-slot="dialog-footer"
       className={cn(
-        "-mx-4 -mb-4 flex flex-col-reverse gap-2 border-t border-dotted border-soil/40 bg-surface-alt/60 p-4 sm:flex-row sm:justify-end",
+        // A row on every size, wrapping only when the labels genuinely run
+        // out of room - stacked full-width buttons on a phone spent three
+        // rows on what fits in one.
+        "-mx-4 -mb-4 flex flex-row flex-wrap justify-end gap-2 border-t border-dotted border-soil/40 bg-surface-alt/60 p-4",
         className
       )}
       {...props}

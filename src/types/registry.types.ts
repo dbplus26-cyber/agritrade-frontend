@@ -97,6 +97,9 @@ export interface IExpenseCategory {
   name: string;
   /** What belongs under this heading, so two staff file a cost the same way. */
   description: string | null;
+  /** How many expenses are filed under it (list responses only - mirrors
+   * the backend ExpenseCategoryDTO's optional relation count). */
+  expenseCount?: number;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;

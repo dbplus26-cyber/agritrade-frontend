@@ -399,9 +399,21 @@ export function Mono({
  * (Cancel and friends) · danger red · gold warn · ghost. */
 export function AdminButton({
   variant = "primary",
+  size = "md",
   className,
   ...props
-}: Omit<React.ComponentProps<typeof Button>, "variant"> & {
+}: Omit<React.ComponentProps<typeof Button>, "size" | "variant"> & {
+  /**
+   * The console's THREE button heights, and the only three.
+   *
+   * An audit found eight different pixel heights across the screens, spelled
+   * eleven ways (`h-9` beside `h-[36px]`, `h-8` beside `h-[32px]`…), because
+   * every screen was picking its own number via className. Sizes are now
+   * semantic: `md` (34px) is every standing action - toolbars, rails, inline;
+   * `lg` (38px, matching the 38px inputs it sits under) is the commit row of
+   * a form or dialog; `sm` (28px) is a compact affordance inside a dense row.
+   */
+  size?: "lg" | "md" | "sm";
   variant?: "danger" | "ghost" | "gold" | "outline" | "primary" | "secondary";
 }) {
   return (
@@ -422,7 +434,10 @@ export function AdminButton({
         // Meridian controls: 34px, 6px radius, no offset shadow anywhere. The
         // console's buttons used to shift on hover like a stamped plate, which
         // is charming once and tiring on the fortieth click of a working day.
-        "h-[34px] gap-1.5 rounded-[6px] px-3.5 text-[13.5px] font-semibold shadow-none transition-colors hover:translate-x-0 hover:translate-y-0 hover:shadow-none",
+        "gap-1.5 rounded-[6px] font-semibold shadow-none transition-colors hover:translate-x-0 hover:translate-y-0 hover:shadow-none",
+        size === "md" && "h-[34px] px-3.5 text-[13.5px]",
+        size === "lg" && "h-[38px] px-[18px] text-[13.5px]",
+        size === "sm" && "h-7 px-2.5 text-[12.5px]",
         variant === "primary" &&
           "bg-console text-white hover:bg-console-hover",
         (variant === "secondary" || variant === "outline") &&
@@ -571,13 +586,14 @@ export function EditableFormActions({
   if (mode === "create") {
     return (
       <div key="create" className="mt-1 flex gap-2">
-        <AdminButton type="submit" disabled={saving} className="h-[38px] px-[18px]">
+        <AdminButton type="submit" disabled={saving} size="lg">
           {saving ? "Saving…" : createLabel}
         </AdminButton>
         <AdminButton
           type="button"
           variant="outline"
-          className="h-[38px] px-3.5"
+          size="lg"
+          className="px-3.5"
           onClick={onCancel}
         >
           Cancel
@@ -589,13 +605,14 @@ export function EditableFormActions({
   if (mode === "editing") {
     return (
       <div key="editing" className="mt-1 flex gap-2">
-        <AdminButton type="submit" disabled={saving} className="h-[38px] px-[18px]">
+        <AdminButton type="submit" disabled={saving} size="lg">
           {saving ? "Saving…" : "Save changes"}
         </AdminButton>
         <AdminButton
           type="button"
           variant="outline"
-          className="h-[38px] px-3.5"
+          size="lg"
+          className="px-3.5"
           onClick={onCancel}
         >
           Cancel
@@ -606,12 +623,7 @@ export function EditableFormActions({
 
   return (
     <div key="locked" className="mt-1 flex gap-2">
-      <AdminButton
-        type="button"
-        variant="gold"
-        className="h-[38px] px-[18px]"
-        onClick={onEdit}
-      >
+      <AdminButton type="button" variant="gold" size="lg" onClick={onEdit}>
         {editLabel}
       </AdminButton>
     </div>

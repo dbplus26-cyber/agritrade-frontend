@@ -295,33 +295,6 @@ export function DriverPaymentDialog({
                   placeholder="0.00"
                   {...register("amountGhs")}
                 />
-                {/* The two amounts anyone actually types here. A haulier is
-                    paid an advance and then the balance, so making those one
-                    tap each removes the arithmetic - and the mistyped figure
-                    that comes with doing it in your head. Hidden when the
-                    balance is redacted, since there would be no figure to
-                    put on the button. */}
-                {quickAmounts.length > 0 ? (
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {quickAmounts.map((q) => (
-                      <AdminButton
-                        className="h-8 px-3 text-[12.5px]"
-                        key={q.label}
-                        onClick={() => {
-                          // shouldValidate so a prior "enter the amount"
-                          // error clears the moment the field is filled.
-                          setValue("amountGhs", q.value.toFixed(2), {
-                            shouldDirty: true,
-                            shouldValidate: true,
-                          });
-                        }}
-                        variant="ghost"
-                      >
-                        {q.label} · {formatCedis(q.value)}
-                      </AdminButton>
-                    ))}
-                  </div>
-                ) : null}
               </AdminField>
               <AdminField error={errors.paidAt?.message} label="Paid on">
                 <Input
@@ -331,6 +304,35 @@ export function DriverPaymentDialog({
                 />
               </AdminField>
             </div>
+            {/* The two amounts anyone actually types here. A haulier is paid
+                an advance and then the balance, so making those one tap each
+                removes the arithmetic - and the mistyped figure that comes
+                with doing it in your head. Hidden when the balance is
+                redacted, since there would be no figure to put on the button.
+                A full-width row of its own: squeezed under the half-width
+                amount field the pills stacked one per line at every size. */}
+            {quickAmounts.length > 0 ? (
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <span className="text-[11.5px] text-adm-muted">Fill:</span>
+                {quickAmounts.map((q) => (
+                  <AdminButton
+                    key={q.label}
+                    size="sm"
+                    onClick={() => {
+                      // shouldValidate so a prior "enter the amount"
+                      // error clears the moment the field is filled.
+                      setValue("amountGhs", q.value.toFixed(2), {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      });
+                    }}
+                    variant="outline"
+                  >
+                    {q.label} · {formatCedis(q.value)}
+                  </AdminButton>
+                ))}
+              </div>
+            ) : null}
           </div>
 
           <AdminField label="How it was paid">

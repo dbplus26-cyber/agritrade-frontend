@@ -175,12 +175,11 @@ export function SeasonDetail({ id }: { id: string }) {
             </DetailGrid>
             <div className="mt-3 border-t border-adm-hairline pt-3.5">
               <div className="flex flex-wrap gap-2 xl:flex-col">
-                <AdminButton variant="outline" className="h-9 px-4" asChild>
+                <AdminButton variant="outline" asChild>
                   <Link href={`${LIST}/${s.id}/edit`}>Edit</Link>
                 </AdminButton>
                 <AdminButton
                   variant="outline"
-                  className="h-9 px-4"
                   onClick={() =>
                     void run(
                       () => setActive({ active: !s.isActive, id: s.id }).unwrap(),
@@ -192,7 +191,7 @@ export function SeasonDetail({ id }: { id: string }) {
                 </AdminButton>
                 <AdminButton
                   variant="outline"
-                  className="h-9 px-4 text-console-red"
+                  className="text-console-red"
                   disabled={deleteState.isLoading}
                   onClick={() => void onDelete()}
                 >
@@ -275,11 +274,11 @@ export function SeasonDetail({ id }: { id: string }) {
                 description="Grants and repayments booked to this season appear here."
               />
             ) : (
-              <table className="w-full border-collapse text-[13px]">
+              <table className="w-full border-collapse text-[14px]">
                 <thead>
-                  <tr className="border-b border-adm-hairline text-left text-[11px] uppercase tracking-[0.06em] text-adm-muted">
-                    <th className="px-5 py-2 font-semibold">Farmer</th>
-                    <th className="px-5 py-2 text-right font-semibold">
+                  <tr className="border-b border-adm-hairline text-left text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted">
+                    <th className="px-5 py-2">Farmer</th>
+                    <th className="px-5 py-2 text-right">
                       <span className="inline-flex items-center gap-1">
                         Invested
                         <HelpTip
@@ -288,7 +287,7 @@ export function SeasonDetail({ id }: { id: string }) {
                         />
                       </span>
                     </th>
-                    <th className="px-5 py-2 text-right font-semibold">
+                    <th className="px-5 py-2 text-right">
                       <span className="inline-flex items-center gap-1">
                         Recovered
                         <HelpTip
@@ -297,7 +296,7 @@ export function SeasonDetail({ id }: { id: string }) {
                         />
                       </span>
                     </th>
-                    <th className="px-5 py-2 text-right font-semibold">
+                    <th className="px-5 py-2 text-right">
                       <span className="inline-flex items-center gap-1">
                         Outstanding
                         <HelpTip

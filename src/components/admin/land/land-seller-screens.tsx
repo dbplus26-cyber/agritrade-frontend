@@ -22,7 +22,6 @@ import {
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
 import { BackButton } from "@/components/ui/BackButton";
-import { Button } from "@/components/ui/button";
 import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -118,7 +117,7 @@ export function LandSellerTable() {
                 <span className="block truncate font-medium text-adm-ink">
                   {s.name}
                 </span>
-                <span className="block truncate text-[11.5px] text-adm-faint">
+                <span className="block truncate text-[12.5px] text-adm-faint">
                   {s.community ?? "No community"}
                 </span>
               </span>
@@ -134,7 +133,7 @@ export function LandSellerTable() {
         meta: columnMeta({ wide: true }),
         cell: ({ row }) =>
           row.original.phone ? (
-            <span className="font-adminmono whitespace-nowrap text-[12.5px] text-adm-muted">
+            <span className="font-adminmono whitespace-nowrap text-adm-muted">
               {row.original.phone}
             </span>
           ) : (
@@ -179,9 +178,9 @@ export function LandSellerTable() {
           activeCount={activeFilterCount}
           onClear={resetFilters}
           action={
-            <Button asChild variant="harvest" className="h-8 px-3.5 text-[13px]">
+            <AdminButton asChild>
               <Link href={`${LIST}/new`}>+ Add seller</Link>
-            </Button>
+            </AdminButton>
           }
         >
           <ConsoleLabeledSelect
@@ -348,7 +347,7 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
   // pressing Edit, not a greyed-out copy of the page you were already on.
   if (isEdit && !isEditing && seller) {
     return (
-      <AdminCard className="px-5 py-[18px]">
+      <AdminCard className="max-w-[640px] px-5 py-[18px]">
         <RecordFacts
           facts={[
             { label: "Name", value: seller.name },
@@ -368,7 +367,7 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
   }
 
   return (
-    <AdminCard className="px-5 py-[18px]">
+    <AdminCard className="max-w-[640px] px-5 py-[18px]">
       {/* Field pairs measure against this form, not the viewport: the console
           shell keeps a ~225px rail beside it, so `sm:` paired fields up while
           the column was still too narrow to carry two of them. */}

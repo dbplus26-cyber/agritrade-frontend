@@ -44,6 +44,7 @@ import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis, formatKg } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
+import { receiptPdfUrl } from "@/lib/receipt-pdf-url";
 import { cn } from "@/lib/utils";
 import {
   PurchaseStatus,
@@ -224,7 +225,7 @@ function ReceiveDialog({
               <AdminButton
                 type="button"
                 variant="outline"
-                className="h-9 px-3.5"
+                size="lg"
                 onClick={onClose}
               >
                 Cancel
@@ -232,7 +233,7 @@ function ReceiveDialog({
               <AdminButton
                 type="submit"
                 disabled={isLoading}
-                className="h-9 px-4"
+                size="lg"
               >
                 {isLoading ? "Receiving…" : "Receive stock"}
               </AdminButton>
@@ -316,7 +317,7 @@ function VoidDialog({
             <AdminButton
               type="button"
               variant="outline"
-              className="h-9 px-3.5"
+              size="lg"
               onClick={onClose}
             >
               Cancel
@@ -325,7 +326,7 @@ function VoidDialog({
               type="submit"
               variant="danger"
               disabled={isLoading}
-              className="h-9 px-4"
+              size="lg"
             >
               {isLoading ? "Voiding…" : "Void purchase"}
             </AdminButton>
@@ -386,7 +387,6 @@ export function PurchaseDetail({ id }: { id: string }) {
         {canTransit ? (
           <AdminButton
             variant="secondary"
-            className="h-9 px-4"
             disabled={transitState.isLoading}
             onClick={() => void onMarkInTransit()}
           >
@@ -394,14 +394,13 @@ export function PurchaseDetail({ id }: { id: string }) {
           </AdminButton>
         ) : null}
         {canReceive ? (
-          <AdminButton className="h-9 px-4" onClick={() => setReceiveOpen(true)}>
+          <AdminButton onClick={() => setReceiveOpen(true)}>
             Receive into warehouse
           </AdminButton>
         ) : null}
         {canVoid ? (
           <AdminButton
             variant="danger"
-            className="h-9 px-4"
             onClick={() => setVoidOpen(true)}
           >
             Void purchase
@@ -421,6 +420,15 @@ export function PurchaseDetail({ id }: { id: string }) {
           <span className="flex flex-wrap items-center gap-1.5">
             <PurchaseStatusBadge status={p.status} />
             <ApprovalOverlayBadge approval={p.approval} />
+            <AdminButton variant="outline" asChild>
+              <a
+                href={receiptPdfUrl("purchase", p.id)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View PDF
+              </a>
+            </AdminButton>
           </span>
         }
       />

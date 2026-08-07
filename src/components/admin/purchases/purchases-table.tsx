@@ -12,9 +12,8 @@ import {
   ConsoleDateRange,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
-import { adminLinkClass, AdminCard, Mono } from "@/components/admin/ui";
+import { adminLinkClass, AdminButton, AdminCard, Mono } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -136,11 +135,11 @@ export function PurchasesTable() {
               <span className="block min-w-0 max-w-[90%]">
                 <span className="block truncate font-medium text-adm-ink">
                   {p.commodity.name}
-                  <Mono className="ml-1.5 text-[12px] text-adm-muted">
+                  <Mono className="ml-1.5 text-[12.5px] text-adm-muted">
                     {formatKg(p.weightKg)}
                   </Mono>
                 </span>
-                <span className="block truncate text-[11.5px] text-adm-faint">
+                <span className="block truncate text-[12.5px] text-adm-faint">
                   {purchaseCounterparty(p)}
                 </span>
               </span>
@@ -158,7 +157,7 @@ export function PurchasesTable() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-adm-ink">
+          <Mono className="whitespace-nowrap text-adm-ink">
             <CompactCedis amount={row.original.totalGhs} />
           </Mono>
         ),
@@ -181,7 +180,7 @@ export function PurchasesTable() {
         enableSorting: false,
         meta: columnMeta({ at: "xl" }),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-adm-muted">
+          <Mono className="whitespace-nowrap text-adm-muted">
             <CompactCedis amount={row.original.unitPriceGhs} />
           </Mono>
         ),
@@ -247,9 +246,9 @@ export function PurchasesTable() {
           activeCount={activeFilterCount}
           onClear={resetFilters}
           action={
-            <Button asChild variant="harvest" className="h-8 px-3.5 text-[13px]">
+            <AdminButton asChild>
               <Link href={`${LIST}/new`}>+ Record purchase</Link>
-            </Button>
+            </AdminButton>
           }
         >
           <ConsoleLabeledSelect

@@ -2,10 +2,13 @@
 
 import Link from "next/link";
 import { AdminButton, AdminPageHeader,
-  PdfLink,
   adminLinkClass,
 } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
+import {
+  AuthorisedSignature,
+  DocumentLogo,
+} from "@/components/admin/document-marks";
 import { DocumentSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -118,20 +121,19 @@ export function SaleInvoice({ id }: { id: string }) {
               : `What ${s.buyer.name} still owes on this sale, and where to pay it`
           }
           actions={
-            // The server renders this same document as a real PDF, so the
-            // action fetches it rather than asking the browser to print a web
-            // page that happens to look like one.
-            <span className="flex flex-wrap items-center gap-2">
-              <PdfLink href={saleInvoicePdfUrl(s.id)}>
-                {isReceipt ? "Receipt PDF" : "Invoice PDF"}
-              </PdfLink>
-              {/* Print now reproduces the sheet below exactly; it used to
-                  strip the sheet's width, border and padding for paper, which
-                  is why a printed invoice looked nothing like the screen. */}
-              <AdminButton className="h-9 px-4" onClick={() => window.print()}>
-                Print
-              </AdminButton>
-            </span>
+            // The server renders this same document as a real A4 PDF, so the
+            // one action opens that - the viewer previews it true to size and
+            // printing happens from there. The browser's own print dialog
+            // placed the sheet top-left with dead space around it.
+            <AdminButton asChild>
+              <a
+                href={saleInvoicePdfUrl(s.id)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View PDF
+              </a>
+            </AdminButton>
           }
         />
       </div>
@@ -141,7 +143,9 @@ export function SaleInvoice({ id }: { id: string }) {
           1.5px-bordered to match AdminCard. */}
       <div className="max-w-[720px] border border-adm-line bg-white p-8 text-adm-ink">
         <div className="flex items-start justify-between border-b-2 border-adm-strong pb-3">
-          <div>
+          <div className="flex items-start gap-3">
+            <DocumentLogo />
+            <div>
             <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">
               DB PLUS
             </div>
@@ -165,6 +169,7 @@ export function SaleInvoice({ id }: { id: string }) {
                 {company.companyContactEmail}
               </div>
             ) : null}
+            </div>
           </div>
           <div className="text-right">
             <div className="text-[16px] font-bold">
@@ -281,7 +286,12 @@ export function SaleInvoice({ id }: { id: string }) {
           </p>
         ) : null}
 
-        <p className="mt-8 text-[11px] text-adm-muted">
+        {/* Signed the moment it is issued, same as the PDF. */}
+        <div className="mt-8 flex justify-end">
+          <AuthorisedSignature />
+        </div>
+
+        <p className="mt-6 text-[11px] text-adm-muted">
           Thank you for trading with DB Plus.
         </p>
       </div>

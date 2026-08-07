@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { HelpWrap } from "@/components/admin/help-tip";
-import { adminLinkClass, Mono, ToneBadge } from "@/components/admin/ui";
+import { adminLinkClass, ToneBadge } from "@/components/admin/ui";
+import {
+  AttachmentEmpty,
+  AttachmentList,
+  AttachmentTile,
+} from "@/components/admin/attachments";
 import { cn } from "@/lib/utils";
 import { FilePicker } from "@/components/ui/FilePicker";
 import { SignaturePad } from "@/components/ui/SignaturePad";
@@ -134,43 +139,26 @@ export function FarmDocumentsSection({
   return (
     <>
       {documents.length === 0 ? (
-        <p className="py-2 text-[13px] text-adm-muted">No documents yet.</p>
+        <AttachmentEmpty text="No documents filed yet." />
       ) : (
-        documents.map((doc) => (
-          <div
-            key={doc.id}
-            className="flex items-center justify-between gap-3 border-b border-adm-hairline py-2 text-[13px] last:border-b-0"
-          >
-            <a
+        <AttachmentList>
+          {documents.map((doc) => (
+            <AttachmentTile
+              key={doc.id}
+              createdAt={doc.createdAt}
               href={urlOf(doc.id)}
-              target="_blank"
-              rel="noreferrer"
-              className={cn(adminLinkClass, "min-w-0 [overflow-wrap:anywhere]")}
-            >
-              {doc.name}
-            </a>
-            <div className="flex flex-none items-center gap-3">
-              <Mono className="text-[12px] whitespace-nowrap text-adm-muted">
-                {formatFarmDate(doc.createdAt)}
-              </Mono>
-              <button
-                type="button"
-                onClick={() => void onRemoveClick(doc)}
-                className="cursor-pointer text-[12px] text-console-red"
-                aria-label={`Remove ${doc.name}`}
-              >
-                ✕
-              </button>
-            </div>
-          </div>
-        ))
+              name={doc.name}
+              onRemove={() => void onRemoveClick(doc)}
+            />
+          ))}
+        </AttachmentList>
       )}
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <input
           value={docName}
           onChange={(e) => setDocName(e.target.value)}
           placeholder={`Document name (default: ${defaultName})`}
-          className="h-8 min-w-0 flex-1 rounded border border-adm-line bg-adm-card px-2.5 text-[13px]"
+          className="h-8 min-w-0 flex-1 rounded-[6px] border border-adm-line bg-adm-card px-2.5 text-[13px] outline-none transition-colors placeholder:text-adm-faint focus:border-console"
         />
         <FilePicker
           accept="image/*,application/pdf,.doc,.docx"

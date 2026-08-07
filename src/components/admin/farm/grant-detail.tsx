@@ -3,6 +3,7 @@
 import Link from "next/link";
 import {
   adminLinkClass,
+  AdminButton,
   AdminCard,
   AdminPageHeader,
   DetailGrid,
@@ -10,6 +11,7 @@ import {
   DetailShell,
   SectionHeading,
 } from "@/components/admin/ui";
+import { receiptPdfUrl } from "@/lib/receipt-pdf-url";
 import { cn } from "@/lib/utils";
 import { HelpTip } from "@/components/admin/help-tip";
 import { Money } from "@/components/admin/trading/sale-bits";
@@ -54,7 +56,20 @@ export function GrantDetail({ id }: { id: string }) {
         title="Grant details"
         hint="Inputs advanced to one farmer, and the terms for getting them back."
         sub={`Recorded ${formatDateTime(g.createdAt)}`}
-        actions={<GrantApprovalBadge status={g.approval?.status} />}
+        actions={
+          <span className="flex flex-wrap items-center gap-1.5">
+            <GrantApprovalBadge status={g.approval?.status} />
+            <AdminButton variant="outline" asChild>
+              <a
+                href={receiptPdfUrl("grant", g.id)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View PDF
+              </a>
+            </AdminButton>
+          </span>
+        }
       />
 
       <DetailShell

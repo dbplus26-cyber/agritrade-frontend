@@ -4,13 +4,12 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AdminCard, AdminField, adminInputClass } from "@/components/admin/ui";
+import { AdminButton, AdminCard, AdminField, adminInputClass } from "@/components/admin/ui";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
 import { HelpTip } from "@/components/admin/help-tip";
-import { Button } from "@/components/ui/button";
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
@@ -169,13 +168,9 @@ export function StockView() {
             stored number
           </p>
         </div>
-        <Button
-          variant="harvest"
-          className="h-8 px-3.5 text-[13px]"
-          onClick={() => setAdjustOpen(true)}
-        >
+        <AdminButton onClick={() => setAdjustOpen(true)}>
           + Request adjustment
-        </Button>
+        </AdminButton>
       </div>
 
       {/* Section toggle - balances / movements. */}
@@ -192,7 +187,7 @@ export function StockView() {
             onClick={() => setSection(key)}
             aria-pressed={section === key}
             className={cn(
-              "cursor-pointer rounded-[6px] border px-3.5 py-1.5 text-[13px] font-semibold transition-colors",
+              "cursor-pointer rounded-[6px] border px-3.5 py-[7px] text-[13px] font-semibold transition-colors",
               section === key
                 ? "border-console bg-console text-white"
                 : "border-adm-line bg-adm-card text-adm-muted hover:border-console/60",
@@ -225,7 +220,7 @@ export function StockView() {
                   <AdminCard key={t.commodityId} className="px-3 py-2.5">
                     <div className="flex items-baseline justify-between gap-2">
                       <span
-                        className="min-w-0 truncate text-[10.5px] font-bold uppercase tracking-[0.08em] text-adm-muted"
+                        className="min-w-0 [overflow-wrap:anywhere] md:truncate text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted"
                         title={t.commodityName}
                       >
                         {t.commodityName}
@@ -436,7 +431,7 @@ function WarehouseSections({
                     className="flex break-inside-avoid items-baseline justify-between gap-4 border-b border-adm-hairline py-2 last:border-b-0"
                   >
                     <span
-                      className="min-w-0 truncate text-[13px] text-adm-body"
+                      className="min-w-0 [overflow-wrap:anywhere] md:truncate text-[13px] text-adm-body"
                       title={c.name}
                     >
                       {c.name}
@@ -573,7 +568,7 @@ function AdjustmentDialog({
                       setValue("direction", value, { shouldValidate: true })
                     }
                     className={cn(
-                      "cursor-pointer rounded-[6px] border px-3 py-[7px] text-[13px] font-semibold transition-colors",
+                      "cursor-pointer rounded-[6px] border px-3.5 py-[7px] text-[13px] font-semibold transition-colors",
                       direction === value
                         ? value === "REMOVE"
                           ? "border-console-red bg-console-red text-white"
@@ -605,22 +600,12 @@ function AdjustmentDialog({
             />
           </AdminField>
           <ResponsiveDialogFooter className="gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="h-9"
-              onClick={close}
-            >
+            <AdminButton variant="outline" size="lg" onClick={close}>
               Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="harvest"
-              className="h-9"
-              disabled={isLoading}
-            >
+            </AdminButton>
+            <AdminButton type="submit" size="lg" disabled={isLoading}>
               {isLoading ? "Filing…" : "File for approval"}
-            </Button>
+            </AdminButton>
           </ResponsiveDialogFooter>
         </form>
       </ResponsiveDialogContent>

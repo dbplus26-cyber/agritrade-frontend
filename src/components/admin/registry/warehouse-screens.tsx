@@ -19,8 +19,8 @@ import {
   adminLinkClass,
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
+import { TitleCell } from "@/components/admin/table-cells";
 import { BackButton } from "@/components/ui/BackButton";
-import { Button } from "@/components/ui/button";
 import { ConsoleTableSkeleton, DetailSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -112,13 +112,11 @@ export function WarehouseTable() {
         enableSorting: false,
         meta: columnMeta({ stretch: true }),
         cell: ({ row }) => (
-          <Link
+          <TitleCell
             href={`${LIST}/${row.original.id}`}
-            className="block max-w-[90%] truncate font-medium text-adm-ink outline-none focus-visible:underline"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {row.original.name}
-          </Link>
+            title={row.original.name}
+            stretch
+          />
         ),
       },
       {
@@ -173,9 +171,9 @@ export function WarehouseTable() {
           onClear={resetFilters}
           action={
             isSuperAdmin ? (
-              <Button asChild variant="harvest" className="h-8 px-3.5 text-[13px]">
+              <AdminButton asChild>
                 <Link href={`${LIST}/new`}>+ Add warehouse</Link>
-              </Button>
+              </AdminButton>
             ) : null
           }
         >
@@ -435,96 +433,119 @@ function WarehouseStockSection({ warehouseId }: { warehouseId: string }) {
   );
   const rows = data?.data ?? [];
   const totalKg = rows.reduce((sum, row) => sum + row.balanceKg, 0);
+  // The largest holding sets the scale for the meter under each row, so the
+  // list also READS as a distribution rather than a bare column of figures.
+  const maxKg = rows.reduce((max, row) => Math.max(max, row.balanceKg), 0);
 
   return (
-    <div className="mt-6">
-      <SectionHeading
-        className="mb-2"
-        actions={
-          <Link
-            href="/admin/stock"
-            className={cn(
-              adminLinkClass,
-              "whitespace-nowrap text-[12.5px] font-semibold",
-            )}
-          >
-            Full stock view
-          </Link>
-        }
-      >
-        Commodities in this warehouse
-      </SectionHeading>
+    // One filed card, not a floating heading over a bare list - the heading
+    // rides in the card's own header band, the way the farmer page files its
+    // guarantors, so the section holds together as a single object.
+    <AdminCard className="overflow-hidden">
+      <div className="border-b border-adm-hairline px-5 py-3">
+        <SectionHeading
+          className="mb-0"
+          actions={
+            <Link
+              href="/admin/stock"
+              className={cn(
+                adminLinkClass,
+                "whitespace-nowrap text-[12.5px] font-semibold",
+              )}
+            >
+              Full stock view
+            </Link>
+          }
+        >
+          Commodities in this warehouse
+        </SectionHeading>
+        <p className="mt-0.5 text-[12px] text-adm-muted">
+          {isLoading
+            ? "Loading current balances…"
+            : rows.length === 0
+              ? "Derived from purchases, transfers and loadings."
+              : `${String(rows.length)} ${rows.length === 1 ? "commodity" : "commodities"} currently held here.`}
+        </p>
+      </div>
 
       {isLoading ? (
-        <AdminCard className="px-4 py-3.5">
-          <div className="flex flex-col gap-3">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="flex items-center justify-between gap-3">
-                <Skeleton className="h-3.5 w-32" />
-                <Skeleton className="h-3.5 w-16" />
-              </div>
-            ))}
-          </div>
-        </AdminCard>
+        <div className="flex flex-col gap-3 px-5 py-4">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="flex items-center justify-between gap-3">
+              <Skeleton className="h-3.5 w-32" />
+              <Skeleton className="h-3.5 w-16" />
+            </div>
+          ))}
+        </div>
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}
           onRetry={() => void refetch()}
         />
       ) : rows.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          <EmptyState
-            variant="plain"
-            title="Nothing in stock here yet"
-            description="Stock appears here the moment a purchase is received into this warehouse."
-          />
-        </AdminCard>
+        <EmptyState
+          variant="plain"
+          title="Nothing in stock here yet"
+          description="Stock appears here the moment a purchase is received into this warehouse."
+        />
       ) : (
-        <AdminCard className="overflow-hidden">
-          <ul>
+        <>
+          <ul className="divide-y divide-adm-hairline">
             {rows.map((row) => (
-              <li
-                key={row.commodityId}
-                className="flex items-center justify-between gap-3 border-b border-adm-hairline px-4 py-2.5"
-              >
-                <Link
-                  className={cn(
-                    adminLinkClass,
-                    "min-w-0 truncate text-[13.5px] font-medium",
-                  )}
-                  href={`/admin/commodities/${row.commodityId}`}
+              <li key={row.commodityId} className="px-5 py-2.5">
+                <div className="flex items-center justify-between gap-3">
+                  <Link
+                    className={cn(
+                      adminLinkClass,
+                      "min-w-0 truncate text-[13.5px] font-medium",
+                    )}
+                    href={`/admin/commodities/${row.commodityId}`}
+                  >
+                    {row.commodityName}
+                  </Link>
+                  <span
+                    className="font-adminmono flex-none text-[13.5px] font-semibold tabular-nums text-adm-ink"
+                    title={`${row.balanceKg.toLocaleString("en-GH")} kg`}
+                  >
+                    {formatKg(row.balanceKg)}
+                  </span>
+                </div>
+                {/* Share-of-shed meter. aria-hidden: the figure beside it is
+                    the fact; this is only its shape. */}
+                <div
+                  aria-hidden="true"
+                  className="mt-1.5 h-1 overflow-hidden rounded-full bg-adm-sunken"
                 >
-                  {row.commodityName}
-                </Link>
-                <span
-                  className="font-adminmono flex-none text-[13.5px] font-semibold text-adm-ink"
-                  title={`${row.balanceKg.toLocaleString("en-GH")} kg`}
-                >
-                  {formatKg(row.balanceKg)}
-                </span>
+                  <div
+                    className="h-full rounded-full bg-console/60"
+                    style={{
+                      width: `${String(maxKg > 0 ? Math.max(2, (row.balanceKg / maxKg) * 100) : 0)}%`,
+                    }}
+                  />
+                </div>
               </li>
             ))}
           </ul>
-          <div className="flex items-center justify-between gap-3 bg-adm-sunken px-4 py-2.5">
+          <div className="flex items-center justify-between gap-3 border-t border-adm-hairline bg-adm-sunken px-5 py-2.5">
             <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-adm-muted">
               Total on hand
             </span>
             <span
-              className="font-adminmono flex-none text-[13.5px] font-bold text-adm-ink"
+              className="font-adminmono flex-none text-[14px] font-bold tabular-nums text-adm-ink"
               title={`${totalKg.toLocaleString("en-GH")} kg`}
             >
               {formatKg(totalKg)}
             </span>
           </div>
-        </AdminCard>
+        </>
       )}
-    </div>
+    </AdminCard>
   );
 }
 
 export function WarehouseCreate() {
   return (
-    <div className="max-w-[560px]">
+    <div className="max-w-[640px]">
       <BackButton href={LIST} label="All warehouses" className="mb-2" />
       <AdminPageHeader
         title="Add warehouse"

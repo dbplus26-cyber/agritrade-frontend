@@ -115,11 +115,20 @@ export function AuditTable() {
             return <span className="text-adm-faint">System</span>;
           }
           return (
+            // Full values on hover, and full wrap in the card view: audit
+            // rows have no detail page, so an ellipsis on touch would leave
+            // the reader with no way to the rest of a name or email.
             <div className="min-w-0 w-full">
-              <div className="max-w-[90%] truncate font-medium text-adm-ink">
+              <div
+                className="max-w-[90%] font-medium text-adm-ink [overflow-wrap:anywhere] @2xl/table:truncate"
+                title={actor.name}
+              >
                 {actor.name}
               </div>
-              <div className="max-w-[90%] truncate text-[11.5px] text-adm-faint">
+              <div
+                className="max-w-[90%] text-[12.5px] text-adm-faint [overflow-wrap:anywhere] @2xl/table:truncate"
+                title={actor.email}
+              >
                 {actor.email}
               </div>
             </div>
@@ -170,7 +179,7 @@ export function AuditTable() {
         enableSorting: false,
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12px] text-adm-muted">
+          <Mono className="whitespace-nowrap text-adm-muted">
             {row.original.ip ?? "—"}
           </Mono>
         ),

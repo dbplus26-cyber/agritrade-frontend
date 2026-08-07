@@ -50,7 +50,7 @@ export function ErrorMessage({
           {description}
         </p>
         {onRetry ? (
-          <Button onClick={onRetry} variant="outline" className="mt-6">
+          <Button onClick={onRetry} variant="outline" className="state-action mt-6">
             <RefreshCw aria-hidden="true" data-slot="icon" />
             {retryLabel}
           </Button>

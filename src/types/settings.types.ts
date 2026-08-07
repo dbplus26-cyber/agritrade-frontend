@@ -9,8 +9,17 @@ export interface ISystemSettings {
   companyContactEmail: string;
   companyContactPhone: string;
   companyContactWhatsapp: string;
+  documentSignatureUrl: string;
   lowFloatThresholdGhs: number;
   purchaseApprovalThresholdGhs: number;
+  statementAccountantsBlock: string;
+  statementBankersBlock: string;
+  statementBusinessName: string;
+  statementLogoFallbackToSite: boolean;
+  statementLogoUrl: string;
+  statementPrincipalActivity: string;
+  statementProprietorAddress: string;
+  statementProprietorName: string;
 }
 
 export type SettingKey = keyof ISystemSettings;

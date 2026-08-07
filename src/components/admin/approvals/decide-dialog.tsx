@@ -2,8 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AdminField, adminInputClass } from "@/components/admin/ui";
-import { Button } from "@/components/ui/button";
+import { AdminButton, AdminField, adminInputClass } from "@/components/admin/ui";
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
@@ -161,18 +160,13 @@ export function DecideDialog({
             />
           </AdminField>
           <ResponsiveDialogFooter className="gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="h-9"
-              onClick={close}
-            >
+            <AdminButton variant="outline" size="lg" onClick={close}>
               Cancel
-            </Button>
-            <Button
+            </AdminButton>
+            <AdminButton
               type="submit"
-              variant={isReject ? "outline" : "harvest"}
-              className={cn("h-9", isReject && "text-console-red hover:text-console-red")}
+              variant={isReject ? "danger" : "primary"}
+              size="lg"
               disabled={approving || rejecting}
             >
               {approving || rejecting
@@ -180,7 +174,7 @@ export function DecideDialog({
                 : isReject
                   ? "Reject request"
                   : "Approve and apply"}
-            </Button>
+            </AdminButton>
           </ResponsiveDialogFooter>
         </form>
       </ResponsiveDialogContent>

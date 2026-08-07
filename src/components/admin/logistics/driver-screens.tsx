@@ -24,7 +24,6 @@ import {
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
 import { BackButton } from "@/components/ui/BackButton";
-import { Button } from "@/components/ui/button";
 import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -134,7 +133,7 @@ export function DriverTable() {
                 <span className="block truncate font-medium text-adm-ink">
                   {d.name}
                 </span>
-                <span className="block truncate text-[11.5px] text-adm-faint">
+                <span className="block truncate text-[12.5px] text-adm-faint">
                   {d.company ?? "Independent"}
                 </span>
               </span>
@@ -149,7 +148,7 @@ export function DriverTable() {
         enableSorting: false,
         meta: columnMeta({ at: "lg" }),
         cell: ({ row }) => (
-          <span className="font-adminmono whitespace-nowrap text-[12.5px] text-adm-muted">
+          <span className="font-adminmono whitespace-nowrap text-adm-muted">
             {row.original.phone}
           </span>
         ),
@@ -205,9 +204,9 @@ export function DriverTable() {
           activeCount={activeFilterCount}
           onClear={resetFilters}
           action={
-            <Button asChild variant="harvest" className="h-8 px-3.5 text-[13px]">
+            <AdminButton asChild>
               <Link href={`${LIST}/new`}>+ Add driver</Link>
-            </Button>
+            </AdminButton>
           }
         >
           <ConsoleLabeledSelect
@@ -420,7 +419,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
   // pressing Edit, not a greyed-out copy of the page you were already on.
   if (isEdit && !isEditing && driver) {
     return (
-      <AdminCard className="px-5 py-[18px]">
+      <AdminCard className="max-w-[640px] px-5 py-[18px]">
         {/* The photograph belongs on the READ view, not only behind Edit.
             It was rendered inside the form, so at rest - which is how this
             page is nearly always seen - the record showed no picture at all,
@@ -461,7 +460,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
   }
 
   return (
-    <AdminCard className="px-5 py-[18px]">
+    <AdminCard className="max-w-[640px] px-5 py-[18px]">
       {/* Field pairs measure against this form, not the viewport: the console
           shell keeps a ~225px rail beside it, so `sm:` paired fields up while
           the column was still too narrow to carry two of them. */}
@@ -502,7 +501,6 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
                   <AdminButton
                     type="button"
                     variant="secondary"
-                    className="h-[32px] px-3 text-[12.5px]"
                     onClick={() => fileInput.current?.click()}
                   >
                     {previewUrl ? "Change photo" : "Add photo"}
@@ -511,7 +509,6 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
                     <AdminButton
                       type="button"
                       variant="outline"
-                      className="h-[32px] px-3 text-[12.5px]"
                       onClick={() => {
                         setPhotoFile(null);
                         setRemovePhoto(true);

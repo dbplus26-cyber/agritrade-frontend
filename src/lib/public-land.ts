@@ -50,6 +50,29 @@ export function plotSlug(plot: PublicLandPlot): string {
   return slugify(plot.reference);
 }
 
+/**
+ * A plot's photos in register order, cover-photo fallback included. Lives in
+ * this lib (not a component file) because both server pages (the plot detail)
+ * and the client register grid read it - a client module cannot export a
+ * plain function to a server component.
+ */
+export function plotPhotos(
+  plot: PublicLandPlot,
+): { alt: null | string; url: string }[] {
+  if (plot.photos?.length) {
+    return plot.photos.map((photo) => ({ alt: photo.alt ?? null, url: photo.url }));
+  }
+  return plot.photo ? [{ alt: plot.photoAlt, url: plot.photo }] : [];
+}
+
+/** The backend's list meta - mirrors `buildPaginationMeta`. */
+export interface PublicListMeta {
+  limit: number;
+  page: number;
+  total: number;
+  totalPages: number;
+}
+
 /** Fetches the published plots, or null when the API is unreachable. */
 export async function fetchPublicLandPlots(): Promise<PublicLandPlot[] | null> {
   try {
@@ -61,6 +84,32 @@ export async function fetchPublicLandPlots(): Promise<PublicLandPlot[] | null> {
       data?: { plots?: PublicLandPlot[] };
     };
     return body.data?.plots ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * One SERVER page of the published plots, with the register-wide meta. The
+ * /land pager follows this rather than slicing a full download client-side,
+ * so the page holds whatever the register grows to.
+ */
+export async function fetchPublicLandPlotsPage(window: {
+  limit: number;
+  page: number;
+}): Promise<{ meta: PublicListMeta; plots: PublicLandPlot[] } | null> {
+  try {
+    const res = await fetch(
+      `${env.SERVER_URI}/api/v1/public/land-plots?page=${String(window.page)}&limit=${String(window.limit)}`,
+      { next: { revalidate: 3600, tags: [CACHE_TAGS.LAND_PLOTS] } },
+    );
+    if (!res.ok) return null;
+    const body = (await res.json()) as {
+      data?: { plots?: PublicLandPlot[] };
+      meta?: PublicListMeta;
+    };
+    if (!body.data?.plots || !body.meta) return null;
+    return { meta: body.meta, plots: body.data.plots };
   } catch {
     return null;
   }

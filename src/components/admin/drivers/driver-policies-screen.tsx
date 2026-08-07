@@ -14,6 +14,7 @@ import {
   AdminPageHeader,
   ToneBadge,
   adminInputClass,
+  adminLinkClass,
   adminSelectClass,
 } from "@/components/admin/ui";
 import {
@@ -66,9 +67,13 @@ const policyFormSchema = z
           percent: z
             .string()
             .trim()
-            .refine((v) => Number(v) > 0 && Number(v) <= 100, {
-              message: "1-100",
-            }),
+            // Zero is allowed: "0 at loading / 100 on delivery" pays the
+            // haulier after the goods land.
+            .refine(
+              (v) =>
+                v !== "" && Number(v) >= 0 && Number(v) <= 100 && !Number.isNaN(Number(v)),
+              { message: "0-100" },
+            ),
           trigger: z.enum(["AT_LOADING", "ON_DELIVERY", "ON_DEMAND"]),
         }),
       )
@@ -224,7 +229,7 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
             ) : null}
 
             <button
-              className="mt-2.5 cursor-pointer text-[12.5px] font-semibold text-console transition-colors hover:text-console-deep"
+              className={cn(adminLinkClass, "mt-2.5 cursor-pointer text-[12.5px] font-semibold")}
               onClick={() => {
                 append({ label: "", percent: "", trigger: "ON_DELIVERY" });
               }}
@@ -413,7 +418,7 @@ export function DriverPoliciesScreen() {
     <div>
       <AdminPageHeader
         actions={
-          <AdminButton className="h-9 px-4" onClick={() => setCreateOpen(true)}>
+          <AdminButton onClick={() => setCreateOpen(true)}>
             + New policy
           </AdminButton>
         }

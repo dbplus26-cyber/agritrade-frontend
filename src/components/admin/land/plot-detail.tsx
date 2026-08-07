@@ -3,19 +3,21 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  adminLinkClass,
   AdminButton,
   AdminCard,
   AdminPageHeader,
   DetailGrid,
   DetailItem,
   DetailShell,
-  Mono,
   SectionHeading,
   ToneBadge,
 } from "@/components/admin/ui";
+import {
+  AttachmentEmpty,
+  AttachmentList,
+  AttachmentTile,
+} from "@/components/admin/attachments";
 import { BackButton } from "@/components/ui/BackButton";
-import { DateTimeCell } from "@/components/admin/date-cell";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { FilePicker } from "@/components/ui/FilePicker";
@@ -238,7 +240,7 @@ export function PlotDetail({ id }: { id: string }) {
       <div className="mt-3 border-t border-adm-hairline pt-3.5">
         <div className="flex flex-wrap gap-2 xl:flex-col">
           {p.status === "AVAILABLE" ? (
-            <AdminButton className="h-9 px-4" asChild>
+            <AdminButton asChild>
               <Link href={`/admin/land-sales/new?plotId=${p.id}`}>
                 Sell plot
               </Link>
@@ -246,20 +248,18 @@ export function PlotDetail({ id }: { id: string }) {
           ) : null}
           {canPublish ? (
             <AdminButton
-              className="h-9 px-4"
               disabled={publishState.isLoading}
               onClick={() => void onPublish()}
             >
               {publishState.isLoading ? "Requesting…" : "Publish to website"}
             </AdminButton>
           ) : null}
-          <AdminButton variant="outline" className="h-9 px-4" asChild>
+          <AdminButton variant="outline" asChild>
             <Link href={`${LIST}/${p.id}/edit`}>Edit</Link>
           </AdminButton>
           {p.publishToWebsite ? (
             <AdminButton
               variant="outline"
-              className="h-9 px-4"
               onClick={() =>
                 void run(() => unpublish(p.id).unwrap(), "Removed from website")
               }
@@ -270,7 +270,6 @@ export function PlotDetail({ id }: { id: string }) {
           {p.status === "AVAILABLE" || p.status === "ARCHIVED" ? (
             <AdminButton
               variant="outline"
-              className="h-9 px-4"
               onClick={() => void onArchive()}
             >
               {p.status === "ARCHIVED" ? "Restore" : "Archive"}
@@ -354,44 +353,27 @@ export function PlotDetail({ id }: { id: string }) {
               <p className="mb-2 text-[12px] text-adm-muted">
                 Never shown on the website. Downloads are logged.
               </p>
-              {p.documents.map((doc) => (
-                <div
-                  key={doc.id}
-                  className="flex items-center justify-between border-b border-adm-hairline py-2 text-[13px] last:border-b-0"
-                >
-                  <a
-                    href={plotDocumentUrl(p.id, doc.id)}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={adminLinkClass}
-                  >
-                    {doc.name}
-                  </a>
-                  <div className="flex items-center gap-3">
-                    {/* An upload stamp: when the title document reached the
-                        office is the fact being recorded, hour included. */}
-                    <Mono className="text-right text-[12px] text-adm-muted">
-                      <DateTimeCell value={doc.createdAt} muted />
-                    </Mono>
-                    <button
-                      type="button"
-                      aria-label={`Remove ${doc.name}`}
-                      onClick={() => void onRemoveDocument(doc)}
-                      className="cursor-pointer text-[12px] text-console-red hover:underline"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                </div>
-              ))}
+              {p.documents.length === 0 ? (
+                <AttachmentEmpty text="No documents filed yet." />
+              ) : (
+                <AttachmentList>
+                  {p.documents.map((doc) => (
+                    <AttachmentTile
+                      key={doc.id}
+                      createdAt={doc.createdAt}
+                      href={plotDocumentUrl(p.id, doc.id)}
+                      name={doc.name}
+                      onRemove={() => void onRemoveDocument(doc)}
+                    />
+                  ))}
+                </AttachmentList>
+              )}
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <input
                   value={docName}
                   onChange={(e) => setDocName(e.target.value)}
                   placeholder="Document name (e.g. Indenture)"
-                  className={cn(
-                    "h-8 flex-1 rounded border border-adm-line bg-adm-card px-2.5 text-[13px]",
-                  )}
+                  className="h-8 min-w-0 flex-1 rounded-[6px] border border-adm-line bg-adm-card px-2.5 text-[13px] outline-none transition-colors placeholder:text-adm-faint focus:border-console"
                 />
                 <FilePicker
                   accept="image/*,application/pdf,.doc,.docx"

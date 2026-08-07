@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Check } from "lucide-react";
 import {
   AdminButton,
   AdminCard,
@@ -20,16 +21,18 @@ import { Input } from "@/components/ui/input";
 import {
   useCreateShipmentMutation,
   useGetEligibleSalesQuery,
+  useUpdateShipmentMutation,
 } from "@/redux/shipments/shipments-api";
 import { useGetDriversQuery } from "@/redux/drivers/drivers-api";
 import { useGetDeliveryAddressesQuery } from "@/redux/delivery-addresses/delivery-addresses-api";
+import { useGetStockBalancesQuery } from "@/redux/stock/stock-api";
 import { useGetWarehousesQuery } from "@/redux/warehouses/warehouses-api";
 import { useRemoteSearch } from "@/hooks/use-remote-search";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatKg } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
-import type { IDeliveryAddress, IDriver } from "@/types/logistics.types";
+import type { IShipment } from "@/types/admin-shipment.types";
 import {
   shipmentSchema,
   type ShipmentValues,
@@ -37,8 +40,69 @@ import {
 import { LoadMeter } from "./load-meter";
 
 const LIST = "/admin/shipments";
-/** Stable fallback so a transient undefined watch can't churn memo deps. */
+/** Stable fallbacks so a transient undefined watch can't churn memo deps. */
 const NO_SALES: string[] = [];
+const NO_SHEDS: string[] = [];
+
+/**
+ * A card's heading: a numbered step, a title, one quiet line of guidance.
+ * Planning really is a sequence - what goes, from where, on what truck,
+ * with whom - so the numbering carries information, and every per-field
+ * hint the number replaces is one less line crowding the controls.
+ */
+function StepHead({
+  hint,
+  step,
+  title,
+}: {
+  hint?: string;
+  step: number;
+  title: string;
+}) {
+  return (
+    <div className="border-b border-adm-hairline pb-3">
+      <div className="flex items-center gap-2.5">
+        <span className="flex h-[22px] w-[22px] flex-none items-center justify-center rounded-full bg-[#155744] text-[11px] font-bold text-white">
+          {step}
+        </span>
+        <h2 className="min-w-0 text-[14.5px] font-bold text-adm-ink">
+          {title}
+        </h2>
+      </div>
+      {hint ? (
+        <p className="mt-1.5 text-[12.5px] leading-[1.55] text-adm-muted">
+          {hint}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+/**
+ * The picked directory records, held as the fields the form actually shows.
+ * In edit mode they are rebuilt from the shipment's snapshot (the original
+ * directory rows may be off whatever page a search last loaded), so the
+ * types name only what both sources carry - `IDriver`/`IDeliveryAddress`
+ * satisfy them structurally.
+ */
+interface PickedDriver {
+  id: string;
+  name: string;
+  phone: string;
+  company: string | null;
+  city: string | null;
+}
+interface PickedAddress {
+  id: string;
+  label: string;
+  city: string;
+  area: string | null;
+  shopName: string | null;
+  digitalAddress: string | null;
+  landmark: string | null;
+  contactName: string | null;
+  contactPhone: string | null;
+}
 
 /** A trimmed value, or nothing - empty optional fields are omitted entirely. */
 const opt = <K extends string>(key: K, value: string | undefined) =>
@@ -48,6 +112,7 @@ const opt = <K extends string>(key: K, value: string | undefined) =>
 const FIELD_NAMES = [
   "saleIds",
   "originWarehouseId",
+  "loadingWarehouseIds",
   "deliveryAddressId",
   "destination",
   "truckReg",
@@ -64,16 +129,33 @@ const FIELD_NAMES = [
   "notes",
 ] as const;
 
-/** Plan a shipment. `saleId` may be pre-filled from a sale's "Ship" action. */
-export function ShipmentForm({ saleId }: { saleId?: string }) {
+/**
+ * Plan a shipment, or edit a plan that has not dispatched. `saleId` may be
+ * pre-filled from a sale's "Ship" action; passing `shipment` switches to
+ * edit mode, where the sales themselves are managed on the shipment page.
+ */
+export function ShipmentForm({
+  saleId,
+  shipment,
+}: {
+  saleId?: string;
+  shipment?: IShipment;
+}) {
   const router = useRouter();
-  const [createShipment, { isLoading: saving }] = useCreateShipmentMutation();
+  const editing = Boolean(shipment);
+  const [createShipment, { isLoading: creating }] = useCreateShipmentMutation();
+  const [updateShipment, { isLoading: updating }] = useUpdateShipmentMutation();
+  const saving = creating || updating;
   const [saleSearch, setSaleSearch] = useState("");
 
   // Only sales the backend deems shippable appear: CONFIRMED, payment terms
-  // met, unshipped weight left, and not already on an active truck.
-  const eligible = useGetEligibleSalesQuery();
+  // met, unshipped weight left, and not already on an active truck. (In edit
+  // mode the trip's sales are fixed here, so the pool isn't fetched.)
+  const eligible = useGetEligibleSalesQuery(undefined, { skip: editing });
   const warehouses = useGetWarehousesQuery({ limit: 100, isActive: true });
+  // Live shed balances feed the per-warehouse figures on the shed list and
+  // the "is there enough in the selected sheds" advisory below it.
+  const stock = useGetStockBalancesQuery();
   // Both directories are open registers: a haulier keeps adding drivers and
   // depots and never removes the old ones. Fetching a page and filtering it
   // in the browser meant everything past the limit was invisible AND
@@ -102,27 +184,57 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
     formState: { errors },
   } = useForm<ShipmentValues>({
     resolver: zodResolver(shipmentSchema),
-    defaultValues: {
-      deliveryAddressId: "",
-      destination: "",
-      driverCity: "",
-      driverCompany: "",
-      driverEmail: "",
-      driverId: "",
-      driverIdNumber: "",
-      driverLicenseNo: "",
-      driverName: "",
-      driverPhone: "",
-      expectedArrivalAt: "",
-      notes: "",
-      originWarehouseId: "",
-      saleIds: saleId ? [saleId] : [],
-      truckCapacityKg: "",
-      truckReg: "",
-    },
+    defaultValues: shipment
+      ? {
+          deliveryAddressId: shipment.deliveryAddress?.id ?? "",
+          destination: shipment.deliveryAddress ? "" : shipment.destination,
+          driverCity: shipment.driverCity ?? "",
+          driverCompany: shipment.driverCompany ?? "",
+          driverEmail: shipment.driverEmail ?? "",
+          driverId: shipment.driverId ?? "",
+          driverIdNumber: shipment.driverIdNumber ?? "",
+          driverLicenseNo: shipment.driverLicenseNo ?? "",
+          driverName: shipment.driverName,
+          driverPhone: shipment.driverPhone ?? "",
+          expectedArrivalAt: shipment.expectedArrivalAt?.slice(0, 10) ?? "",
+          loadingWarehouseIds: shipment.loadingWarehouses
+            .filter((w) => w.id !== shipment.originWarehouse.id)
+            .map((w) => w.id),
+          notes: shipment.notes ?? "",
+          originWarehouseId: shipment.originWarehouse.id,
+          saleIds: shipment.sales.map((s) => s.id),
+          truckCapacityKg:
+            shipment.truckCapacityKg != null
+              ? String(shipment.truckCapacityKg)
+              : "",
+          truckReg: shipment.truckReg,
+        }
+      : {
+          deliveryAddressId: "",
+          destination: "",
+          driverCity: "",
+          driverCompany: "",
+          driverEmail: "",
+          driverId: "",
+          driverIdNumber: "",
+          driverLicenseNo: "",
+          driverName: "",
+          driverPhone: "",
+          expectedArrivalAt: "",
+          loadingWarehouseIds: [],
+          notes: "",
+          originWarehouseId: "",
+          saleIds: saleId ? [saleId] : [],
+          truckCapacityKg: "",
+          truckReg: "",
+        },
   });
 
   const selected = useWatch({ control, name: "saleIds" }) ?? NO_SALES;
+  const originWarehouseId =
+    useWatch({ control, name: "originWarehouseId" }) ?? "";
+  const extraShedIds =
+    useWatch({ control, name: "loadingWarehouseIds" }) ?? NO_SHEDS;
   const driverId = useWatch({ control, name: "driverId" }) ?? "";
   const deliveryAddressId =
     useWatch({ control, name: "deliveryAddressId" }) ?? "";
@@ -142,9 +254,19 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
   // would then find nothing: the driver summary would vanish, and the
   // address summary vanishing would silently swap the form back to a
   // free-text destination while deliveryAddressId was still set.
-  const [pickedDriver, setPickedDriver] = useState<IDriver | null>(null);
-  const [pickedAddress, setPickedAddress] = useState<IDeliveryAddress | null>(
-    null,
+  const [pickedDriver, setPickedDriver] = useState<PickedDriver | null>(() =>
+    shipment?.driverId
+      ? {
+          city: shipment.driverCity,
+          company: shipment.driverCompany,
+          id: shipment.driverId,
+          name: shipment.driverName,
+          phone: shipment.driverPhone ?? "",
+        }
+      : null,
+  );
+  const [pickedAddress, setPickedAddress] = useState<PickedAddress | null>(
+    shipment?.deliveryAddress ?? null,
   );
 
   const toggleSale = (id: string) => {
@@ -152,6 +274,14 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
       ? selected.filter((s) => s !== id)
       : [...selected, id];
     setValue("saleIds", next, { shouldValidate: true });
+  };
+
+  const toggleShed = (id: string) => {
+    const next = extraShedIds.includes(id)
+      ? extraShedIds.filter((s) => s !== id)
+      : [...extraShedIds, id];
+    setValue("loadingWarehouseIds", next, { shouldValidate: false });
+    clearErrors("loadingWarehouseIds");
   };
 
   const allSales = useMemo(() => eligible.data?.data.sales ?? [], [eligible.data]);
@@ -165,20 +295,79 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
     );
   }, [allSales, saleSearch]);
 
-  // The live load meter: selected sales' remaining weight vs the capacity.
+  // What this trip must load, per commodity. In edit mode the shipment's own
+  // sale lines carry the figures; when planning it is the selected eligible
+  // sales' unshipped remainders.
+  const needed = useMemo(() => {
+    const m = new Map<string, { name: string; kg: number }>();
+    const add = (id: string, name: string, kg: number) => {
+      const row = m.get(id) ?? { kg: 0, name };
+      row.kg += kg;
+      m.set(id, row);
+    };
+    if (shipment) {
+      for (const s of shipment.sales)
+        for (const l of s.lines)
+          add(l.commodityId, l.commodityName, l.outstandingKg);
+    } else {
+      for (const s of allSales)
+        if (selected.includes(s.id))
+          for (const l of s.lines) add(l.commodityId, l.commodityName, l.remainingKg);
+    }
+    return m;
+  }, [shipment, allSales, selected]);
+
+  // The live load meter: the trip's remaining weight vs the capacity.
   const selectedKg = useMemo(
-    () =>
-      allSales
-        .filter((s) => selected.includes(s.id))
-        .reduce((sum, s) => sum + s.totalRemainingKg, 0),
-    [allSales, selected],
+    () => [...needed.values()].reduce((sum, r) => sum + r.kg, 0),
+    [needed],
   );
+
+  // Every shed the truck calls at: the origin plus the ticked extras.
+  const shedIds = useMemo(
+    () => [...new Set([originWarehouseId, ...extraShedIds].filter(Boolean))],
+    [originWarehouseId, extraShedIds],
+  );
+  const balances = useMemo(() => stock.data?.data ?? [], [stock.data]);
+
+  /** kg of the commodities this load needs that a shed holds - its row figure. */
+  const relevantStockIn = (warehouseId: string) =>
+    balances
+      .filter((b) => b.warehouseId === warehouseId && needed.has(b.commodityId))
+      .reduce((sum, b) => sum + b.balanceKg, 0);
+
+  // Needed vs on hand across the selected sheds, per commodity. Advisory
+  // only - the backend re-checks against actual lot remainders and refuses
+  // with INSUFFICIENT_WAREHOUSE_STOCK if the ledger disagrees.
+  const shortfalls = useMemo(() => {
+    if (needed.size === 0 || shedIds.length === 0 || !stock.data) return [];
+    const rows: { availableKg: number; name: string; neededKg: number }[] = [];
+    for (const [commodityId, row] of needed) {
+      if (row.kg <= 0) continue;
+      const availableKg = balances
+        .filter(
+          (b) =>
+            b.commodityId === commodityId && shedIds.includes(b.warehouseId),
+        )
+        .reduce((sum, b) => sum + b.balanceKg, 0);
+      if (availableKg < row.kg)
+        rows.push({ availableKg, name: row.name, neededKg: row.kg });
+    }
+    return rows;
+  }, [needed, shedIds, stock.data, balances]);
+
   const capacityKg = Number(capacityRaw);
   const hasCapacity = capacityRaw.trim() !== "" && capacityKg > 0;
   const overCapacity = hasCapacity && selectedKg > capacityKg;
 
   const driverList = drivers.data?.data ?? [];
   const addressList = addresses.data?.data ?? [];
+  // The sheds offered as extra stops - every active warehouse but the origin.
+  const otherWarehouses = useMemo(
+    () =>
+      (warehouses.data?.data ?? []).filter((w) => w.id !== originWarehouseId),
+    [warehouses.data, originWarehouseId],
+  );
 
   // "The register is empty" and "this search found nothing" are different
   // answers. Only the unfiltered first page can say the book is empty, so a
@@ -225,11 +414,49 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
       });
       return;
     }
+    // The ticked extras, minus the origin should a stale tick linger after
+    // the origin select was changed to the same shed.
+    const extraSheds = (values.loadingWarehouseIds ?? []).filter(
+      (id) => id !== values.originWarehouseId,
+    );
     try {
+      if (editing && shipment) {
+        await updateShipment({
+          id: shipment.id,
+          loadingWarehouseIds: extraSheds,
+          truckReg: values.truckReg,
+          // A saved address carries the destination; free text otherwise
+          // (null detaches an address picked earlier).
+          ...(values.deliveryAddressId
+            ? { deliveryAddressId: values.deliveryAddressId }
+            : {
+                deliveryAddressId: null,
+                ...opt("destination", values.destination),
+              }),
+          // Re-point (or detach) the directory driver; typed overrides win.
+          driverId: values.driverId || null,
+          ...opt("driverName", values.driverName),
+          ...opt("driverPhone", values.driverPhone),
+          ...opt("driverEmail", values.driverEmail),
+          ...opt("driverCompany", values.driverCompany),
+          ...opt("driverCity", values.driverCity),
+          ...opt("driverLicenseNo", values.driverLicenseNo),
+          ...opt("driverIdNumber", values.driverIdNumber),
+          truckCapacityKg: values.truckCapacityKg?.trim()
+            ? Number(values.truckCapacityKg)
+            : null,
+          expectedArrivalAt: values.expectedArrivalAt || null,
+          notes: values.notes?.trim() || null,
+        }).unwrap();
+        notify.success("Shipment plan updated");
+        router.push(`${LIST}/${shipment.id}`);
+        return;
+      }
       const res = await createShipment({
         originWarehouseId: values.originWarehouseId,
         saleIds: values.saleIds,
         truckReg: values.truckReg,
+        ...(extraSheds.length ? { loadingWarehouseIds: extraSheds } : {}),
         // A saved address carries the destination; free text otherwise.
         ...(values.deliveryAddressId
           ? { deliveryAddressId: values.deliveryAddressId }
@@ -265,6 +492,8 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
       // Business refusals land on the field that can fix them.
       if (code === "OVER_CAPACITY") {
         setError("truckCapacityKg", { message });
+      } else if (code === "INSUFFICIENT_WAREHOUSE_STOCK") {
+        setError("loadingWarehouseIds", { message });
       } else if (
         code === "SALE_BELOW_MILESTONE" ||
         code === "SALE_ALREADY_PLANNED" ||
@@ -272,31 +501,78 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
       ) {
         setError("saleIds", { message });
       }
-      notify.error("Couldn't plan the shipment", { description: message });
+      notify.error(
+        editing ? "Couldn't update the plan" : "Couldn't plan the shipment",
+        { description: message },
+      );
     }
   };
 
   return (
-    <div className="max-w-[640px]">
-      <BackButton href={LIST} label="All shipments" className="mb-2" />
+    <div className="max-w-[760px]">
+      <BackButton
+        href={editing && shipment ? `${LIST}/${shipment.id}` : LIST}
+        label={editing ? "Back to shipment" : "All shipments"}
+        className="mb-2"
+      />
       <AdminPageHeader
-        title="Plan shipment"
-        hint="Set up a truck: who drives, what it carries and where it is going."
-        sub="Book a truck and driver against confirmed sales - nothing leaves the warehouse until you dispatch"
+        title={editing ? "Edit shipment plan" : "Plan shipment"}
+        hint={
+          editing
+            ? "Change the truck, driver, destination or the warehouses it loads at - until it dispatches."
+            : "Set up a truck: who drives, what it carries and where it is going."
+        }
+        sub={
+          editing && shipment
+            ? `${shipment.transactionNo} · nothing moves until you dispatch`
+            : "Book a truck and driver against confirmed sales - nothing leaves the warehouse until you dispatch"
+        }
       />
 
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col gap-4"
+        className="flex flex-col gap-5"
       >
-        <AdminCard className="flex flex-col gap-3 px-5 py-4">
+        <AdminCard className="flex flex-col gap-4 p-5">
+          <StepHead
+            step={1}
+            title="Sales on this trip"
+            hint={
+              editing
+                ? "The orders this truck carries. Add or remove them on the shipment page."
+                : "One truck can serve several orders. Each shows the weight still to ship."
+            }
+          />
           {/* Not an AdminField: its Label wrapper would nest the row labels
               (invalid HTML) and steal clicks for the first control. */}
+          {editing && shipment ? (
+            <div>
+              <div className="rounded-[6px] border border-adm-line bg-[#FBFCF7]">
+                {shipment.sales.map((s) => (
+                  <div
+                    key={s.id}
+                    className="border-b border-adm-hairline px-3 py-2 last:border-b-0"
+                  >
+                    <div className="flex items-baseline justify-between gap-2">
+                      <Mono className="text-[12.5px] text-console">
+                        {s.transactionNo}
+                      </Mono>
+                      <Mono className="flex-none text-[12.5px] font-bold text-adm-ink">
+                        {formatKg(
+                          s.lines.reduce((kg, l) => kg + l.outstandingKg, 0),
+                        )}
+                      </Mono>
+                    </div>
+                    <p className="min-w-0 text-[13px] text-adm-ink [overflow-wrap:anywhere]">
+                      {s.buyer.name}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
           <div>
-            <span className="mb-[7px] block text-[11px] uppercase tracking-[0.14em] text-adm-muted">
-              Sales on this trip
-            </span>
             <div
               className={cn(
                 "rounded-[6px] border border-adm-line bg-[#FBFCF7]",
@@ -330,7 +606,13 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
                   {visibleSales.map((s) => (
                     <label
                       key={s.id}
-                      className="flex cursor-pointer items-start gap-2.5 border-b border-adm-hairline px-3 py-2 last:border-b-0 hover:bg-adm-sunken"
+                      className={cn(
+                        "flex cursor-pointer items-start gap-2.5 border-b border-adm-hairline border-l-2 border-l-transparent px-3 py-2 last:border-b-0 hover:bg-adm-sunken",
+                        // A ticked sale reads as picked from across the room:
+                        // green rail, tinted row, not just a 16px checkbox.
+                        selected.includes(s.id) &&
+                          "border-l-[#155744] bg-[#F1F6EE] hover:bg-[#EBF2E7]",
+                      )}
                     >
                       <input
                         type="checkbox"
@@ -340,7 +622,12 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
                       />
                       <span className="min-w-0 flex-1">
                         <span className="flex items-baseline justify-between gap-2">
-                          <Mono className="block text-[12.5px] text-console">
+                          <Mono
+                            className={cn(
+                              "block text-[12.5px] text-console",
+                              selected.includes(s.id) && "font-bold",
+                            )}
+                          >
                             {s.transactionNo}
                           </Mono>
                           <Mono className="flex-none text-[12.5px] font-bold text-adm-ink">
@@ -383,40 +670,155 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
               >
                 {errors.saleIds.message}
               </span>
-            ) : (
-              <span className="mt-1 block text-[12.5px] text-adm-muted">
-                One truck can serve several sales. Each shows the weight still
-                to ship.
-              </span>
-            )}
+            ) : null}
           </div>
-          <AdminField
-            label="Origin warehouse"
-            hint="The store the goods are loaded out of; its stock is what this truck can be filled from."
-            error={errors.originWarehouseId?.message}
-          >
-            <select
-              className={cn(
-                adminSelectClass,
-                "w-full",
-                errors.originWarehouseId && "border-console-red",
-              )}
-              {...register("originWarehouseId")}
-            >
-              <option value="">Choose the warehouse</option>
-              {(warehouses.data?.data ?? []).map((w) => (
-                <option key={w.id} value={w.id}>
-                  {w.name}
-                </option>
-              ))}
-            </select>
-          </AdminField>
+          )}
         </AdminCard>
 
-        <AdminCard className="flex flex-col gap-3 px-5 py-4">
-          <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-            Truck &amp; destination
+        <AdminCard className="flex flex-col gap-4 p-5">
+          <StepHead
+            step={2}
+            title="Loading warehouses"
+            hint="Where the truck takes its loads. Start at the origin, then tick every other shed it will call at."
+          />
+          {editing && shipment ? (
+            <AdminField
+              label="Origin warehouse"
+              hint="Fixed once planned - tick more sheds below instead."
+            >
+              <p className="rounded-[6px] border border-adm-line bg-adm-sunken px-3 py-2 text-[13.5px] font-medium text-adm-ink">
+                {shipment.originWarehouse.name}
+              </p>
+            </AdminField>
+          ) : (
+            <AdminField
+              label="Origin warehouse"
+              error={errors.originWarehouseId?.message}
+            >
+              <select
+                className={cn(
+                  adminSelectClass,
+                  "w-full",
+                  errors.originWarehouseId && "border-console-red",
+                )}
+                {...register("originWarehouseId")}
+              >
+                <option value="">Choose the warehouse</option>
+                {(warehouses.data?.data ?? []).map((w) => (
+                  <option key={w.id} value={w.id}>
+                    {w.name}
+                  </option>
+                ))}
+              </select>
+            </AdminField>
+          )}
+          {/* The other sheds the truck also calls at. Each row carries how
+              much of THIS load's commodities the shed holds, so picking the
+              next stop is a glance, not a stock-report expedition. */}
+          <div>
+            <span className="mb-[7px] block text-[11px] uppercase tracking-[0.14em] text-adm-muted">
+              Also loads at{" "}
+              <span className="normal-case tracking-normal">(optional)</span>
+            </span>
+            {otherWarehouses.length === 0 ? (
+              <p className="text-[12.5px] text-adm-muted">
+                {originWarehouseId
+                  ? "There are no other active warehouses to take loads from."
+                  : "Choose the origin warehouse first."}
+              </p>
+            ) : (
+              <div
+                className={cn(
+                  "rounded-[6px] border border-adm-line bg-[#FBFCF7]",
+                  errors.loadingWarehouseIds && "border-console-red",
+                )}
+              >
+                {otherWarehouses.map((w) => {
+                  const ticked = extraShedIds.includes(w.id);
+                  const heldKg = relevantStockIn(w.id);
+                  return (
+                    <label
+                      key={w.id}
+                      className={cn(
+                        "flex cursor-pointer items-center gap-2.5 border-b border-adm-hairline border-l-2 border-l-transparent px-3 py-2 last:border-b-0 hover:bg-adm-sunken",
+                        ticked &&
+                          "border-l-[#155744] bg-[#F1F6EE] hover:bg-[#EBF2E7]",
+                      )}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={ticked}
+                        onChange={() => toggleShed(w.id)}
+                        className="h-4 w-4 flex-none accent-[#155744]"
+                      />
+                      <span
+                        className={cn(
+                          "min-w-0 flex-1 text-[13px] text-adm-ink [overflow-wrap:anywhere]",
+                          ticked && "font-medium",
+                        )}
+                      >
+                        {w.name}
+                      </span>
+                      {needed.size > 0 && stock.data ? (
+                        <Mono className="flex-none text-[12px] text-adm-muted">
+                          {formatKg(heldKg)} of this load&apos;s goods
+                        </Mono>
+                      ) : null}
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+            {errors.loadingWarehouseIds ? (
+              <span
+                role="alert"
+                className="mt-1 block text-[12px] font-medium text-console-red"
+              >
+                {errors.loadingWarehouseIds.message}
+              </span>
+            ) : null}
           </div>
+          {/* Live sufficiency check: needed vs on hand across every selected
+              shed. The backend re-checks against actual lot remainders. */}
+          {needed.size > 0 && shedIds.length > 0 && stock.data ? (
+            shortfalls.length > 0 ? (
+              <div
+                role="alert"
+                className="rounded-[6px] border border-[#B45309]/40 bg-[#FFFBEB] px-3 py-2.5 text-[12.5px] text-[#92400E]"
+              >
+                <p className="font-semibold">
+                  There isn&apos;t enough goods in the selected warehouses to
+                  load these sales.
+                </p>
+                <ul className="mt-1 flex flex-col gap-0.5">
+                  {shortfalls.map((s) => (
+                    <li key={s.name}>
+                      {s.name}: needs <Mono>{formatKg(s.neededKg)}</Mono>, on
+                      hand <Mono>{formatKg(s.availableKg)}</Mono>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-1">
+                  Select more warehouses to take loads from, or plan a smaller
+                  load.
+                </p>
+              </div>
+            ) : (
+              <p className="flex items-center gap-1.5 text-[12.5px] font-medium text-console">
+                <Check className="h-3.5 w-3.5 flex-none" />
+                The selected warehouse{shedIds.length === 1 ? " holds" : "s hold"}{" "}
+                enough of every commodity for this load.
+              </p>
+            )
+          ) : null}
+        </AdminCard>
+
+        <AdminCard className="flex flex-col gap-4 p-5">
+          <StepHead
+            step={3}
+            title="Truck & destination"
+            hint="What carries the goods and where they are going."
+          />
           {/* Always rendered, even with an empty book. Hiding the picker when
               nothing is saved yet makes the directory look like it does not
               exist, so staff retype the same depot onto every waybill. */}
@@ -468,7 +870,10 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
             )}
           </AdminField>
           {pickedAddress ? (
-            <div className="rounded-[6px] border border-adm-line bg-adm-sunken px-3 py-2 text-[12.5px] text-adm-muted">
+            <div className="rounded-[6px] border border-[#155744]/45 bg-[#F1F6EE] px-3 py-2 text-[12.5px] text-adm-muted">
+              <p className="mb-0.5 flex items-center gap-1 text-[10.5px] font-bold uppercase tracking-[0.09em] text-console">
+                <Check className="h-3 w-3 flex-none" /> Delivering to
+              </p>
               <p className="min-w-0 font-medium text-adm-ink [overflow-wrap:anywhere]">
                 {pickedAddress.label} · {pickedAddress.city}
                 {pickedAddress.area ? `, ${pickedAddress.area}` : ""}
@@ -527,7 +932,7 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
             <AdminField
               label="Truck capacity (kg)"
               optional
-              hint="The most this truck may carry; fill it in and the load meter warns you when you go over."
+              hint="The load meter warns you past this."
               error={errors.truckCapacityKg?.message}
             >
               <Input
@@ -555,19 +960,17 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
           ) : null}
         </AdminCard>
 
-        <AdminCard className="flex flex-col gap-3 px-5 py-4">
-          <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-            Driver
-          </div>
+        <AdminCard className="flex flex-col gap-4 p-5">
+          <StepHead
+            step={4}
+            title="Driver"
+            hint="Who has the truck. Pick from the directory or enter the trip's driver by hand."
+          />
           {/* Same rule as the destination: the directory stays visible even
               when it is empty, so its existence is discoverable. */}
           <AdminField
             label="Driver"
-            hint={
-              driverBookEmpty
-                ? undefined
-                : "Type to search the directory, or enter the trip's driver by hand."
-            }
+            hint={driverBookEmpty ? undefined : "Type to search the directory."}
             error={errors.driverId?.message}
           >
             {!driverBookEmpty ? (
@@ -608,8 +1011,11 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
             )}
           </AdminField>
           {pickedDriver && !showDriverOverrides ? (
-            <div className="flex flex-wrap items-center justify-between gap-2 rounded-[6px] border border-adm-line bg-adm-sunken px-3 py-2">
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-[6px] border border-[#155744]/45 bg-[#F1F6EE] px-3 py-2">
               <div className="min-w-0 text-[12.5px] text-adm-muted">
+                <p className="mb-0.5 flex items-center gap-1 text-[10.5px] font-bold uppercase tracking-[0.09em] text-console">
+                  <Check className="h-3 w-3 flex-none" /> Driving this trip
+                </p>
                 <p className="min-w-0 font-medium text-adm-ink [overflow-wrap:anywhere]">
                   {ovName || pickedDriver.name}
                 </p>
@@ -622,7 +1028,8 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
               <AdminButton
                 type="button"
                 variant="outline"
-                className="h-[30px] flex-none px-2.5 text-[12px]"
+                size="sm"
+                className="flex-none"
                 onClick={() => setShowDriverOverrides(true)}
               >
                 Edit details
@@ -692,21 +1099,29 @@ export function ShipmentForm({ saleId }: { saleId?: string }) {
           )}
         </AdminCard>
 
-        <div className="flex justify-end gap-2">
+        <div className="flex flex-wrap justify-end gap-2">
           <AdminButton
             type="button"
             variant="outline"
-            className="h-10 px-4"
-            onClick={() => router.push(LIST)}
+            size="lg"
+            onClick={() =>
+              router.push(editing && shipment ? `${LIST}/${shipment.id}` : LIST)
+            }
           >
             Cancel
           </AdminButton>
           <AdminButton
             type="submit"
             disabled={saving || overCapacity}
-            className="h-10 px-5"
+            size="lg"
           >
-            {saving ? "Planning…" : "Plan shipment"}
+            {editing
+              ? saving
+                ? "Saving…"
+                : "Save changes"
+              : saving
+                ? "Planning…"
+                : "Plan shipment"}
           </AdminButton>
         </div>
       </form>

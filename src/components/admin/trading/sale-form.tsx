@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,7 +34,10 @@ import { saleSchema, type SaleValues } from "@/validations/sale-schema";
 
 const LIST = "/admin/sales";
 
-const emptyLine = { commodityId: "", unitPriceGhs: "", weightKg: "" };
+const emptyEntry = { commodityId: "", unitPriceGhs: "", weightKg: "" };
+
+/** What the entry panel holds before "Add to goods" files it. */
+type LineEntry = typeof emptyEntry;
 
 /** Draft (create) or edit a sale. In edit mode only DRAFT sales are editable. */
 export function SaleForm({ sale }: { sale?: ISaleDetail }) {
@@ -71,11 +74,42 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
             weightKg: String(l.weightKg),
           })),
         }
-      : { buyerId: "", lines: [{ ...emptyLine }], notes: "", paymentPolicyId: "" },
+      : { buyerId: "", lines: [], notes: "", paymentPolicyId: "" },
   });
 
   const { fields, append, remove } = useFieldArray({ control, name: "lines" });
   const watchedLines = watch("lines");
+
+  // The ENTRY panel: a line is typed here and only joins the sale when "Add
+  // to goods" files it - so the goods list only ever holds complete lines,
+  // and the agreed total under it is always the real running figure.
+  const [entry, setEntry] = useState<LineEntry>({ ...emptyEntry });
+  const [entryError, setEntryError] = useState<null | string>(null);
+
+  const entryWeight = Number(entry.weightKg) || 0;
+  const entryPrice = Number(entry.unitPriceGhs) || 0;
+  const entryTotal = entryWeight * entryPrice;
+  const entryTouched =
+    entry.commodityId !== "" || entry.weightKg !== "" || entry.unitPriceGhs !== "";
+
+  const commitEntry = (): boolean => {
+    if (!entry.commodityId) {
+      setEntryError("Choose the commodity first.");
+      return false;
+    }
+    if (!(entryWeight > 0)) {
+      setEntryError("Enter the weight in kilograms.");
+      return false;
+    }
+    if (!(entryPrice > 0)) {
+      setEntryError("Enter the price per kilogram.");
+      return false;
+    }
+    append({ ...entry });
+    setEntry({ ...emptyEntry });
+    setEntryError(null);
+    return true;
+  };
 
   const agreedTotal = useMemo(
     () =>
@@ -88,6 +122,18 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
   );
 
   const onSubmit = async (values: SaleValues) => {
+    // A typed-but-not-added line is a decision the user has not finished
+    // making - refuse to guess whether it belongs on the sale.
+    if (entryTouched) {
+      setEntryError(
+        'This line is not on the sale yet - press "Add to goods", or clear it.',
+      );
+      notify.error("Add the typed line first", {
+        description:
+          'The goods entry still holds a line. Press "Add to goods" or clear it before saving.',
+      });
+      return;
+    }
     const body = {
       buyerId: values.buyerId,
       lines: values.lines.map((l) => ({
@@ -199,95 +245,170 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
         <AdminCard className="flex flex-col gap-3 px-5 py-4">
           <SectionHeading
             className="mb-0"
-            hint="One line per commodity. Weight times price per kg gives the agreed total below."
-            actions={
-              <AdminButton
-                type="button"
-                variant="outline"
-                className="h-8 px-3 text-[12.5px]"
-                onClick={() => append({ ...emptyLine })}
-              >
-                + Add line
-              </AdminButton>
-            }
+            hint="Type a line, add it to the goods, and the agreed total keeps up - all before anything is saved."
           >
             Goods
           </SectionHeading>
 
-          {fields.map((field, index) => (
-            <div
-              key={field.id}
-              className="grid grid-cols-1 gap-2 border-b border-adm-hairline pb-3 last:border-b-0 @min-[520px]:grid-cols-[1fr_100px_110px_auto]"
-            >
-              <AdminField
-                label="Commodity"
-                error={errors.lines?.[index]?.commodityId?.message}
-              >
-                <Controller
-                  control={control}
-                  name={`lines.${index}.commodityId`}
-                  render={({ field }) => (
-                    <SearchableSelect
-                      value={field.value}
-                      onChange={field.onChange}
-                      options={commodityOptions.map((c) => ({
-                        value: c.id,
-                        label: c.name,
-                      }))}
-                      placeholder="e.g. Maize"
-                      className={cn(
-                        errors.lines?.[index]?.commodityId && "border-console-red",
-                      )}
-                    />
-                  )}
+          {/* The entry panel: one line in the making. */}
+          <div
+            className={cn(
+              "rounded-[6px] border bg-adm-sunken/60 p-3",
+              entryError ? "border-console-red" : "border-adm-line",
+            )}
+          >
+            <div className="grid grid-cols-1 gap-2 @min-[520px]:grid-cols-[1fr_100px_110px]">
+              <AdminField label="Commodity">
+                <SearchableSelect
+                  value={entry.commodityId}
+                  onChange={(value) => {
+                    setEntry((e) => ({ ...e, commodityId: value }));
+                    setEntryError(null);
+                  }}
+                  options={commodityOptions.map((c) => ({
+                    value: c.id,
+                    label: c.name,
+                  }))}
+                  placeholder="e.g. Maize"
                 />
               </AdminField>
-              <AdminField
-                label="Weight (kg)"
-                error={errors.lines?.[index]?.weightKg?.message}
-              >
+              <AdminField label="Weight (kg)">
                 <Input
                   inputMode="decimal"
                   placeholder="e.g. 1200"
                   className={adminInputClass}
-                  {...register(`lines.${index}.weightKg`)}
+                  value={entry.weightKg}
+                  onChange={(e) => {
+                    setEntry((prev) => ({ ...prev, weightKg: e.target.value }));
+                    setEntryError(null);
+                  }}
                 />
               </AdminField>
-              <AdminField
-                label="Price/kg"
-                error={errors.lines?.[index]?.unitPriceGhs?.message}
-              >
+              <AdminField label="Price/kg">
                 <Input
                   inputMode="decimal"
                   placeholder="e.g. 4.60"
                   className={adminInputClass}
-                  {...register(`lines.${index}.unitPriceGhs`)}
+                  value={entry.unitPriceGhs}
+                  onChange={(e) => {
+                    setEntry((prev) => ({ ...prev, unitPriceGhs: e.target.value }));
+                    setEntryError(null);
+                  }}
                 />
               </AdminField>
-              <div className="flex items-end">
-                {fields.length > 1 ? (
+            </div>
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+              <span className="text-[12.5px] text-adm-muted">
+                {entryTotal > 0 ? (
+                  <>
+                    This line:{" "}
+                    <Mono className="font-semibold text-adm-ink">
+                      {formatCedis(entryTotal)}
+                    </Mono>
+                  </>
+                ) : (
+                  "Weight times price per kg."
+                )}
+              </span>
+              <div className="flex items-center gap-2">
+                {entryTouched ? (
                   <AdminButton
                     type="button"
                     variant="ghost"
-                    className="h-9 px-2 text-console-red"
-                    onClick={() => remove(index)}
+                    size="sm"
+                    onClick={() => {
+                      setEntry({ ...emptyEntry });
+                      setEntryError(null);
+                    }}
                   >
-                    Remove
+                    Clear
                   </AdminButton>
                 ) : null}
+                <AdminButton type="button" onClick={commitEntry}>
+                  + Add to goods
+                </AdminButton>
               </div>
             </div>
-          ))}
+            {entryError ? (
+              <p className="mt-1.5 text-[12.5px] font-medium text-console-red" role="alert">
+                {entryError}
+              </p>
+            ) : null}
+          </div>
 
-          <div className="flex items-baseline justify-between pt-1">
+          {/* The filed lines: complete, totalled, removable. */}
+          {fields.length === 0 ? (
+            <p
+              className={cn(
+                "rounded-[6px] border border-dashed px-3 py-3 text-[12.5px]",
+                errors.lines
+                  ? "border-console-red/60 text-console-red"
+                  : "border-adm-strong/60 text-adm-muted",
+              )}
+            >
+              {errors.lines
+                ? "Add at least one line - type it above and press \"Add to goods\"."
+                : "Nothing on the sale yet. Type the first line above and add it."}
+            </p>
+          ) : (
+            <ul className="divide-y divide-adm-hairline">
+              {fields.map((field, index) => {
+                const line = watchedLines?.[index];
+                const weight = Number(line?.weightKg) || 0;
+                const price = Number(line?.unitPriceGhs) || 0;
+                const name =
+                  commodityOptions.find((c) => c.id === line?.commodityId)?.name ??
+                  "Commodity";
+                return (
+                  <li
+                    key={field.id}
+                    className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2.5"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[13.5px] font-semibold text-adm-ink [overflow-wrap:anywhere]">
+                        {name}
+                      </p>
+                      <p className="text-[12.5px] text-adm-muted">
+                        <Mono>
+                          {weight.toLocaleString("en-GH")} kg × {formatCedis(price)}
+                          /kg
+                        </Mono>
+                      </p>
+                    </div>
+                    <div className="flex flex-none items-center gap-3">
+                      <Mono className="text-[14px] font-semibold tabular-nums text-adm-ink">
+                        {formatCedis(weight * price)}
+                      </Mono>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          remove(index);
+                        }}
+                        className="cursor-pointer text-[12.5px] font-semibold text-console-red underline-offset-2 hover:underline"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+
+          <div className="flex items-baseline justify-between border-t border-adm-line pt-2.5">
             <span className="flex items-center gap-1 text-[12px] text-adm-muted">
-              <span className="min-w-0">Agreed total</span>
+              <span className="min-w-0">
+                Agreed total
+                {fields.length > 0
+                  ? ` · ${String(fields.length)} ${fields.length === 1 ? "line" : "lines"}`
+                  : ""}
+              </span>
               <HelpTip
                 label="What is the agreed total?"
-                text="Every line added up: the full price this buyer is agreeing to pay."
+                text="Every added line summed: the full price this buyer is agreeing to pay. It updates as lines are added, before the sale is saved."
               />
             </span>
-            <Mono className="text-[16px] font-bold text-adm-ink">
+            <Mono className="text-[17px] font-bold text-adm-ink">
               {formatCedis(agreedTotal)}
             </Mono>
           </div>
@@ -304,16 +425,16 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
           </AdminField>
         </AdminCard>
 
-        <div className="flex justify-end gap-2">
+        <div className="flex flex-wrap justify-end gap-2">
           <AdminButton
             type="button"
             variant="outline"
-            className="h-10 px-4"
+            size="lg"
             onClick={() => router.push(LIST)}
           >
             Cancel
           </AdminButton>
-          <AdminButton type="submit" disabled={saving} className="h-10 px-5">
+          <AdminButton type="submit" disabled={saving} size="lg">
             {saving ? "Saving…" : sale ? "Save changes" : "Draft sale"}
           </AdminButton>
         </div>

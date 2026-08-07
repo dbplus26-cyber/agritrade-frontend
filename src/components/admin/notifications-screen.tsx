@@ -106,7 +106,7 @@ export function NotificationsScreen() {
               {EVENT_LABEL[row.original.event] ?? row.original.event}
             </div>
             {row.original.preview ? (
-              <div className="truncate text-[12px] text-adm-muted">
+              <div className="text-[12.5px] text-adm-muted [overflow-wrap:anywhere] md:truncate">
                 {row.original.preview}
               </div>
             ) : null}
@@ -119,7 +119,7 @@ export function NotificationsScreen() {
         enableSorting: false,
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
-          <Mono className="text-[12.5px] text-adm-muted">
+          <Mono className="text-adm-muted">
             {row.original.recipient}
           </Mono>
         ),

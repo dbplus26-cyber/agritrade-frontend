@@ -395,7 +395,6 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
                   <AdminButton
                     type="button"
                     variant="secondary"
-                    className="h-[32px] px-3 text-[12.5px]"
                     onClick={() => fileInput.current?.click()}
                   >
                     {previewUrl ? "Replace photo" : "Choose photo"}
@@ -404,7 +403,6 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
                     <AdminButton
                       type="button"
                       variant="outline"
-                      className="h-[32px] px-3 text-[12.5px]"
                       onClick={() => {
                         setPhotoFile(null);
                         setRemovePhoto(true);
@@ -461,7 +459,7 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
 /** Create screen. */
 export function CommodityCreate() {
   return (
-    <div className="max-w-[560px]">
+    <div className="max-w-[640px]">
       <BackButton href={LIST} label="All commodities" className="mb-2" />
       <AdminPageHeader
         title="Add commodity"
@@ -508,7 +506,7 @@ export function CommodityEdit({ id }: { id: string }) {
   };
 
   return (
-    <div className="max-w-[560px]">
+    <div className="max-w-[640px]">
       <BackButton href={LIST} label="All commodities" className="mb-2" />
       <AdminPageHeader
         title="Commodity details"

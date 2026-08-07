@@ -13,6 +13,7 @@ import type {
   IShipmentListResponse,
   IShipmentResponse,
   IRemoveShipmentSaleInput,
+  IUpdateShipmentInput,
 } from "@/types/admin-shipment.types";
 
 /** Authenticated download URL for a private shipment document (audited
@@ -73,6 +74,22 @@ export const shipmentsApi = apiSlice.injectEndpoints({
       invalidatesTags: [
         { type: "Shipments", id: "LIST" },
         { type: "EligibleSales", id: "LIST" },
+      ],
+    }),
+
+    /** Edit a plan that has not left: destination, driver, truck, ETA, and
+     * the sheds the truck loads at. Changing the sheds moves which lots the
+     * allocate screen offers first. */
+    updateShipment: builder.mutation<IShipmentResponse, IUpdateShipmentInput>({
+      query: ({ id, ...body }) => ({
+        url: `admin/shipments/${id}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: (_r, _e, { id }) => [
+        { type: "Shipments", id },
+        { type: "Shipments", id: "LIST" },
+        { type: "Shipments", id: `LOTS-${id}` },
       ],
     }),
 
@@ -256,6 +273,7 @@ export const {
   useGetAvailableLotsQuery,
   useGetEligibleSalesQuery,
   useCreateShipmentMutation,
+  useUpdateShipmentMutation,
   useAddShipmentSalesMutation,
   useRemoveShipmentSaleMutation,
   useSetAllocationsMutation,

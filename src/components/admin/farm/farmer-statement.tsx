@@ -12,7 +12,13 @@ import {
 import { Money } from "@/components/admin/trading/sale-bits";
 import { DocumentSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import {
+  AuthorisedSignature,
+  DocumentLogo,
+  InkSignatureLine,
+} from "@/components/admin/document-marks";
 import { extractApiError } from "@/lib/extract-api-error";
+import { receiptPdfUrl } from "@/lib/receipt-pdf-url";
 import { cn } from "@/lib/utils";
 import { useGetFarmerStatementQuery } from "@/redux/farm/farm-books-api";
 import { formatFarmDate } from "./farm-bits";
@@ -67,13 +73,21 @@ export function FarmerStatement({
           hint="Everything advanced to this farmer and everything repaid, in order."
           sub="Every grant and repayment with a running balance, ready to print and sign"
           actions={
-              // No server-rendered PDF for a statement: the API's receipt
-              // types cover single documents (a voucher, an invoice, a
-              // waybill), not a ledger over a period. So this one really does
-              // print the page - which is now only the sheet, since the shell
-              // hides itself for print.
-            <AdminButton className="h-9 px-4" onClick={() => window.print()}>
-              Print
+            // The server renders this ledger as a paginated A4 PDF, window
+            // and all - printing happens from the viewer, which previews the
+            // sheet true to size instead of the browser dialog's guesswork.
+            <AdminButton asChild>
+              <a
+                href={receiptPdfUrl("farmer-statement", id, {
+                  from,
+                  seasonId,
+                  to,
+                })}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View PDF
+              </a>
             </AdminButton>
           }
         />
@@ -89,7 +103,6 @@ export function FarmerStatement({
           {from || to ? (
             <AdminButton
               variant="outline"
-              className="h-8 px-3"
               onClick={() => {
                 setFrom("");
                 setTo("");
@@ -105,12 +118,15 @@ export function FarmerStatement({
           720px measure so it still reads as a piece of paper. */}
       <div className="max-w-[720px] border border-adm-line bg-white p-8 text-adm-ink">
         <div className="flex items-start justify-between border-b-2 border-adm-strong pb-3">
-          <div>
-            <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">
-              DB PLUS
-            </div>
-            <div className="text-[11px] tracking-[0.06em] text-adm-muted uppercase">
-              Trading · Tamale
+          <div className="flex items-center gap-3">
+            <DocumentLogo />
+            <div>
+              <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">
+                DB PLUS
+              </div>
+              <div className="text-[11px] tracking-[0.06em] text-adm-muted uppercase">
+                Trading · Tamale
+              </div>
             </div>
           </div>
           <div className="text-right">
@@ -195,9 +211,14 @@ export function FarmerStatement({
           <Money value={st.balanceGhs} />
         </div>
 
-        <div className="mt-12 grid grid-cols-2 gap-8 text-[12px]">
-          <div className="border-t border-adm-strong pt-1">Farmer&apos;s signature</div>
-          <div className="border-t border-adm-strong pt-1">Owner&apos;s signature</div>
+        {/* The counterparty signs in ink; the owner's saved signature is
+            already on their line, same as the PDF. */}
+        <div className="mt-12 flex flex-wrap items-end gap-x-8 gap-y-6 text-[12px]">
+          <InkSignatureLine
+            label="Farmer's signature"
+            className="flex-1 basis-[160px]"
+          />
+          <AuthorisedSignature className="flex-1 basis-[160px]" />
         </div>
       </div>
     </div>

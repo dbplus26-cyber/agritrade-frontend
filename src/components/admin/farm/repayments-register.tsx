@@ -13,9 +13,8 @@ import {
 import { HelpWrap } from "@/components/admin/help-tip";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { TextCell, TitleCell } from "@/components/admin/table-cells";
-import { AdminCard, Mono, ToneBadge } from "@/components/admin/ui";
+import { AdminButton, AdminCard, Mono, ToneBadge } from "@/components/admin/ui";
 import { Money } from "@/components/admin/trading/sale-bits";
-import { Button } from "@/components/ui/button";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -80,7 +79,7 @@ export function RepaymentsRegister() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-adm-ink">
+          <Mono className="whitespace-nowrap text-adm-ink">
             {row.original.transactionNo}
           </Mono>
         ),
@@ -122,7 +121,7 @@ export function RepaymentsRegister() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-[12.5px] text-console">
+          <Mono className="whitespace-nowrap text-console">
             <Money value={row.original.valueGhs} />
           </Mono>
         ),
@@ -178,9 +177,9 @@ export function RepaymentsRegister() {
           activeCount={activeFilterCount}
           onClear={resetFilters}
           action={
-            <Button asChild variant="harvest" className="h-8 px-3.5 text-[13px]">
+            <AdminButton asChild>
               <Link href={`${LIST}/new`}>+ Record repayment</Link>
-            </Button>
+            </AdminButton>
           }
         >
           <ConsoleLabeledSelect
