@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,6 +28,8 @@ import {
   usePublishCommodityMutation,
   useUpdateCommodityMutation,
 } from "@/redux/commodities/commodities-api";
+import { useEditableRecordForm } from "@/hooks/use-editable-record-form";
+import { usePhotoStaging } from "@/hooks/use-photo-staging";
 import { extractApiError } from "@/lib/extract-api-error";
 import { COMMODITY_DESCRIPTION_MAX, COMMODITY_NAME_MAX } from "@/lib/limits";
 import { notify } from "@/lib/notify";
@@ -64,29 +65,18 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
   const [updateCommodity, updateState] = useUpdateCommodityMutation();
   const saving = createState.isLoading || updateState.isLoading;
 
-  // Edit screens open READ-ONLY; the Edit button unlocks the inputs. Create is
-  // always editable.
-  const [isEditing, setIsEditing] = useState(!isEdit);
-  const readOnly = !isEditing;
-  // Keep disabled inputs legible as a read view rather than a greyed-out form.
-  const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
-
   // Photo travels WITH the save (multipart payload + file, the profile-photo
   // convention); `removePhoto` clears an existing one server-side.
-  const fileInput = useRef<HTMLInputElement>(null);
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [removePhoto, setRemovePhoto] = useState(false);
-  const previewUrl = photoFile
-    ? URL.createObjectURL(photoFile)
-    : !removePhoto
-      ? (commodity?.photo ?? null)
-      : null;
-
-  const clearPhotoState = () => {
-    setPhotoFile(null);
-    setRemovePhoto(false);
-    if (fileInput.current) fileInput.current.value = "";
-  };
+  const {
+    fileInputRef,
+    photoFile,
+    removePhoto,
+    previewUrl,
+    onSelectFile,
+    onRemove: onRemovePhoto,
+    reset: resetPhoto,
+    clearInput: clearPhotoInput,
+  } = usePhotoStaging(commodity?.photo);
 
   const {
     register,
@@ -99,18 +89,16 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
     defaultValues: toFormValues(commodity),
   });
 
-  // A background refetch can bump the record (the publish toggle on this very
-  // page, another tab). Track the fresh values while reading, but never
-  // clobber an in-progress edit - which is why the parent does not
-  // key-remount the form on updatedAt.
-  useEffect(() => {
-    if (!isEditing) {
+  // The sync callback tracks a record bumped by a background refetch (the
+  // publish toggle on this very page, another tab) while reading; the hook
+  // never runs it during an in-progress edit, which is why the parent does
+  // not key-remount the form on updatedAt. It also drops any staged file from
+  // the native input, so re-picking the same photo later still fires onChange.
+  const { isEditing, setIsEditing, readOnly, roCls, mode } =
+    useEditableRecordForm(commodity, () => {
       reset(toFormValues(commodity));
-      // Drop any staged file from the native input too, so re-picking the
-      // same photo later still fires onChange.
-      if (fileInput.current) fileInput.current.value = "";
-    }
-  }, [commodity, isEditing, reset]);
+      clearPhotoInput();
+    });
 
   const onSubmit = async (values: CommodityValues) => {
     // "" clears on edit (null) and is omitted on create.
@@ -132,7 +120,9 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
       ...(values.sortOrder?.trim()
         ? { sortOrder: Number(values.sortOrder) }
         : {}),
-      ...(isEdit && removePhoto && !photoFile ? { removePhoto: true } : {}),
+      ...(isEdit && removePhoto && !photoFile
+        ? { removePhoto: true }
+        : {}),
     };
 
     try {
@@ -142,10 +132,9 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
           body,
           photo: photoFile ?? undefined,
         }).unwrap();
-        // Dropping back to read mode lets the sync effect adopt the fresh
-        // values and finish the photo-input cleanup.
-        setPhotoFile(null);
-        setRemovePhoto(false);
+        // Dropping back to read mode lets the sync callback adopt the fresh
+        // values.
+        resetPhoto();
         notify.success("Commodity updated");
         setIsEditing(false);
       } else {
@@ -395,7 +384,7 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
                   <AdminButton
                     type="button"
                     variant="secondary"
-                    onClick={() => fileInput.current?.click()}
+                    onClick={() => fileInputRef.current?.click()}
                   >
                     {previewUrl ? "Replace photo" : "Choose photo"}
                   </AdminButton>
@@ -403,11 +392,7 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
                     <AdminButton
                       type="button"
                       variant="outline"
-                      onClick={() => {
-                        setPhotoFile(null);
-                        setRemovePhoto(true);
-                        if (fileInput.current) fileInput.current.value = "";
-                      }}
+                      onClick={onRemovePhoto}
                     >
                       Remove
                     </AdminButton>
@@ -415,18 +400,13 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
                 </div>
               ) : null}
               <input
-                ref={fileInput}
+                ref={fileInputRef}
                 type="file"
                 accept="image/png,image/jpeg,image/webp"
                 className="hidden"
                 onChange={(e) => {
-                  const file = e.target.files?.[0] ?? null;
-                  if (file) {
-                    void optimizeImage(file).then((staged) => {
-                      setPhotoFile(staged);
-                      setRemovePhoto(false);
-                    });
-                  }
+                  const file = e.target.files?.[0];
+                  if (file) void optimizeImage(file).then(onSelectFile);
                 }}
               />
             </div>
@@ -435,7 +415,7 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
 
         <div className="border-t border-adm-hairline pt-5">
           <EditableFormActions
-            mode={!isEdit ? "create" : isEditing ? "editing" : "locked"}
+            mode={mode}
             saving={saving}
             createLabel="Create commodity"
             editLabel="Edit commodity"
@@ -446,7 +426,7 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
                 return;
               }
               reset();
-              clearPhotoState();
+              resetPhoto();
               setIsEditing(false);
             }}
           />

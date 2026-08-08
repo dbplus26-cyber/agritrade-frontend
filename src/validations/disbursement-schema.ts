@@ -14,7 +14,10 @@ const amountField = z
   .refine(
     (v) => /^\d+(\.\d{1,2})?$/.test(v),
     "Amounts are recorded to 2 decimal places (pesewas)",
-  );
+  )
+  // The backend's moneyField(10_000_000) ceiling, mirrored so a fat-fingered
+  // amount is refused at the field instead of by a server round-trip.
+  .refine((v) => Number(v) <= 10_000_000, "Amount is too large");
 
 export const disbursementSchema = z
   .object({

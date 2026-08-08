@@ -59,6 +59,16 @@ const SOURCE: Record<
     label: "Land purchase",
     tone: "harvest",
   },
+  DRIVER_PAYMENT: {
+    href: (id) => `/admin/shipments/${id}`,
+    label: "Driver pay",
+    tone: "slate",
+  },
+  EXPENSE_PAYMENT: {
+    href: (id) => `/admin/expenses/${id}`,
+    label: "Expense",
+    tone: "alert",
+  },
 };
 
 /**

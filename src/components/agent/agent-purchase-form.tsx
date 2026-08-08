@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -66,8 +66,15 @@ export function AgentPurchaseForm() {
   });
 
   // Persist every change (photo excluded - a File can't survive a reload).
+  // The ref gates the effect after success: react-hook-form re-renders once
+  // more before router.replace unmounts the form, and without the gate that
+  // re-render re-saved the cleared draft - with its SPENT idempotency key -
+  // so the next purchase submitted under it and was silently swallowed by
+  // the backend's replay lookup.
+  const submitted = useRef(false);
   const values = watch();
   useEffect(() => {
+    if (submitted.current) return;
     saveDraft(DRAFT_KEY, { key: idempotencyKey, values });
   }, [idempotencyKey, values]);
 
@@ -89,6 +96,7 @@ export function AgentPurchaseForm() {
         idempotencyKey,
         photo: photoFile ?? undefined,
       }).unwrap();
+      submitted.current = true;
       clearDraft(DRAFT_KEY);
       notify.success("Purchase recorded - your float has been charged");
       router.replace("/agent/purchases");

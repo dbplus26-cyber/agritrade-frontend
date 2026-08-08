@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -56,8 +56,14 @@ export function AgentExpenseForm() {
     },
   });
 
+  // Gated after success for the same reason as the purchase form: the last
+  // pre-unmount re-render otherwise re-saves the cleared draft with its
+  // SPENT idempotency key, and the next expense silently replays into this
+  // one on the backend.
+  const submitted = useRef(false);
   const values = watch();
   useEffect(() => {
+    if (submitted.current) return;
     saveDraft(DRAFT_KEY, { key: idempotencyKey, values });
   }, [idempotencyKey, values]);
 
@@ -75,6 +81,7 @@ export function AgentExpenseForm() {
         },
         idempotencyKey,
       }).unwrap();
+      submitted.current = true;
       clearDraft(DRAFT_KEY);
       notify.success("Expense recorded off your float");
       router.replace("/agent");

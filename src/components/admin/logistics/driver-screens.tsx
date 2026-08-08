@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
@@ -42,6 +42,8 @@ import {
   ViewablePhoto,
 } from "@/components/admin/photo-view";
 import { useTableQuery } from "@/hooks/use-table-query";
+import { useEditableRecordForm } from "@/hooks/use-editable-record-form";
+import { usePhotoStaging } from "@/hooks/use-photo-staging";
 import { extractApiError } from "@/lib/extract-api-error";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import { notify } from "@/lib/notify";
@@ -288,31 +290,23 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
   const [updateDriver, updateState] = useUpdateDriverMutation();
   const saving = createState.isLoading || updateState.isLoading;
 
-  // Edit screens open READ-ONLY; the Edit button unlocks the inputs. Create is
-  // always editable.
-  const [isEditing, setIsEditing] = useState(!isEdit);
-  const readOnly = !isEditing;
-  // Keep disabled inputs legible as a read view rather than a greyed-out form.
-  const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
+  // No sync callback here: this form is still key-remounted by the parent on
+  // updatedAt, so a background refetch replaces it wholesale instead.
+  const { isEditing, setIsEditing, readOnly, roCls, mode } =
+    useEditableRecordForm(driver);
 
   // Photo travels WITH the save (multipart payload + file, the profile-photo
   // convention); `removePhoto` clears an existing one server-side.
-  const fileInput = useRef<HTMLInputElement>(null);
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [removePhoto, setRemovePhoto] = useState(false);
+  const {
+    fileInputRef,
+    photoFile,
+    removePhoto,
+    previewUrl,
+    onSelectFile,
+    onRemove: onRemovePhoto,
+    reset: resetPhoto,
+  } = usePhotoStaging(driver?.photoUrl);
   const [viewPhoto, setViewPhoto] = useState(false);
-  const stagedUrl = useMemo(
-    () => (photoFile ? URL.createObjectURL(photoFile) : null),
-    [photoFile],
-  );
-  const previewUrl =
-    stagedUrl ?? (!removePhoto ? (driver?.photoUrl ?? null) : null);
-
-  const clearPhotoState = () => {
-    setPhotoFile(null);
-    setRemovePhoto(false);
-    if (fileInput.current) fileInput.current.value = "";
-  };
 
   const {
     register,
@@ -360,12 +354,13 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
             licenseNo: opt(values.licenseNo),
             idNumber: opt(values.idNumber),
             notes: opt(values.notes),
-            ...(removePhoto && !photoFile ? { removePhoto: true } : {}),
+            ...(removePhoto && !photoFile
+              ? { removePhoto: true }
+              : {}),
           },
           photo: photoFile ?? undefined,
         }).unwrap();
-        setPhotoFile(null);
-        setRemovePhoto(false);
+        resetPhoto();
         notify.success("Driver updated");
         setIsEditing(false);
       } else {
@@ -494,14 +489,18 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
                   />
                 </button>
               ) : (
-                <RegistryAvatar name={avatarName} photoUrl={previewUrl} size={64} />
+                <RegistryAvatar
+                  name={avatarName}
+                  photoUrl={previewUrl}
+                  size={64}
+                />
               )}
               {isEditing ? (
                 <div className="flex flex-wrap gap-2">
                   <AdminButton
                     type="button"
                     variant="secondary"
-                    onClick={() => fileInput.current?.click()}
+                    onClick={() => fileInputRef.current?.click()}
                   >
                     {previewUrl ? "Change photo" : "Add photo"}
                   </AdminButton>
@@ -509,11 +508,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
                     <AdminButton
                       type="button"
                       variant="outline"
-                      onClick={() => {
-                        setPhotoFile(null);
-                        setRemovePhoto(true);
-                        if (fileInput.current) fileInput.current.value = "";
-                      }}
+                      onClick={onRemovePhoto}
                     >
                       Remove photo
                     </AdminButton>
@@ -521,18 +516,13 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
                 </div>
               ) : null}
               <input
-                ref={fileInput}
+                ref={fileInputRef}
                 type="file"
                 accept="image/png,image/jpeg,image/webp"
                 className="hidden"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
-                  if (file) {
-                    void optimizeImage(file).then((staged) => {
-                      setPhotoFile(staged);
-                      setRemovePhoto(false);
-                    });
-                  }
+                  if (file) void optimizeImage(file).then(onSelectFile);
                 }}
               />
             </div>
@@ -696,7 +686,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
 
         <div className="border-t border-adm-hairline pt-5">
           <EditableFormActions
-            mode={!isEdit ? "create" : isEditing ? "editing" : "locked"}
+            mode={mode}
             saving={saving}
             createLabel="Add driver"
             editLabel="Edit driver"
@@ -707,7 +697,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
                 return;
               }
               reset();
-              clearPhotoState();
+              resetPhoto();
               setIsEditing(false);
             }}
           />

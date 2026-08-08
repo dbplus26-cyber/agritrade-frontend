@@ -159,7 +159,26 @@ export function SendMoneyDialog({
       notify.success(res.message);
       onClose();
     } catch (error) {
-      const { code, message } = extractApiError(error);
+      const { code, fieldErrors, hasFieldErrors, message } =
+        extractApiError(error);
+      // Server-side VALIDATION_ERROR lands on the offending field, same as
+      // grant-form: a toast alone left the sender hunting for which of eight
+      // inputs the backend refused.
+      if (hasFieldErrors && fieldErrors) {
+        for (const field of [
+          "amountGhs",
+          "description",
+          "rail",
+          "recipientName",
+          "channel",
+          "recipientMsisdn",
+          "bankAccountNumber",
+          "bankCode",
+        ] as const) {
+          if (fieldErrors[field])
+            form.setError(field, { message: fieldErrors[field] });
+        }
+      }
       notify.error(GUIDANCE[code ?? ""] ?? message);
     }
   };

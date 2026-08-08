@@ -97,12 +97,14 @@ export interface IPayableAccountsResponse {
 
 /** Which money ledger a movement row comes from. */
 export type AccountMovementSource =
+  | "DRIVER_PAYMENT"
+  | "EXPENSE_PAYMENT"
   | "LAND_ACQUISITION_PAYMENT"
   | "LAND_SALE_PAYMENT"
   | "SALE_PAYMENT";
 
 /**
- * One payment row (from any of the three money ledgers) that named this
+ * One payment row (from any of the five money ledgers) that named this
  * account, mirroring the backend `AccountMovementDTO`
  * (utils/mappers/payment-account.mapper.ts). Amounts keep their stored sign
  * (a reversal is negative) and are null when money is hidden - the row
