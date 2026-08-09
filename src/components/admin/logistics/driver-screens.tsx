@@ -47,7 +47,6 @@ import { usePhotoStaging } from "@/hooks/use-photo-staging";
 import { extractApiError } from "@/lib/extract-api-error";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import { notify } from "@/lib/notify";
-import { optimizeImage } from "@/lib/optimize-image";
 import { cn } from "@/lib/utils";
 import type { IDriver, IDriverListQuery } from "@/types/logistics.types";
 import { driverSchema, type DriverValues } from "@/validations/logistics-schema";
@@ -302,7 +301,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
     photoFile,
     removePhoto,
     previewUrl,
-    onSelectFile,
+    onPickFile,
     onRemove: onRemovePhoto,
     reset: resetPhoto,
   } = usePhotoStaging(driver?.photoUrl);
@@ -522,7 +521,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
                 className="hidden"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
-                  if (file) void optimizeImage(file).then(onSelectFile);
+                  if (file) void onPickFile(file);
                 }}
               />
             </div>

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FileText, Upload, X } from "lucide-react";
 import { AdminButton } from "@/components/admin/ui";
+import { MAX_UPLOAD_BYTES } from "@/lib/limits";
 import { notify } from "@/lib/notify";
 import { optimizeImage } from "@/lib/optimize-image";
 import { cn } from "@/lib/utils";
@@ -95,6 +96,19 @@ export function FilePicker({
     try {
       const isImage = file.type.startsWith("image/");
       const prepared = isImage && optimize ? await optimizeImage(file) : file;
+      // Checked AFTER downscaling, because that is what will actually be
+      // sent: a 12MB phone photo usually comes out of optimizeImage well
+      // under the cap, and rejecting it on its original size would refuse a
+      // file the API would have taken happily. A document is passed through
+      // untouched, so this is the check that catches the oversized scan -
+      // here, rather than after a minute of uploading it.
+      if (prepared.size > MAX_UPLOAD_BYTES) {
+        notify.error("That file is too large", {
+          description: `${fileSize(prepared.size)} is over the ${fileSize(MAX_UPLOAD_BYTES)} limit. Try a smaller file, or photograph the page instead of scanning it.`,
+        });
+        clear();
+        return;
+      }
       revoke();
       const url = isImage ? URL.createObjectURL(prepared) : null;
       objectUrl.current = url;

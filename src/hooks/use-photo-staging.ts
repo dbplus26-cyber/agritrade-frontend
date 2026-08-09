@@ -2,6 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { MAX_UPLOAD_BYTES } from "@/lib/limits";
+import { notify } from "@/lib/notify";
+import { optimizeImage } from "@/lib/optimize-image";
+
 interface StagedPhoto {
   file: File;
   url: string;
@@ -57,6 +61,36 @@ export function usePhotoStaging(existingUrl: string | null | undefined) {
     [swapLiveUrl],
   );
 
+  /**
+   * Downscale, size-check, then stage - the whole pick, in one place.
+   *
+   * Every record form used to spell this out itself as
+   * `optimizeImage(file).then(onSelectFile)`, four identical copies with no
+   * size check between them: an oversized file was uploaded in full and
+   * refused by the server, and the form could only report that something had
+   * gone wrong. The cap is checked AFTER downscaling because that is what
+   * actually gets sent.
+   */
+  const onPickFile = useCallback(
+    async (file: File) => {
+      try {
+        const prepared = await optimizeImage(file);
+        if (prepared.size > MAX_UPLOAD_BYTES) {
+          notify.error("That photo is too large", {
+            description: `It is over the ${String(MAX_UPLOAD_BYTES / (1024 * 1024))}MB limit even after resizing. Try another photo.`,
+          });
+          clearInput();
+          return;
+        }
+        onSelectFile(prepared);
+      } catch {
+        notify.error("Couldn't read that photo. Try another one.");
+        clearInput();
+      }
+    },
+    [clearInput, onSelectFile],
+  );
+
   const onRemove = useCallback(() => {
     swapLiveUrl(null);
     setStaged(null);
@@ -83,6 +117,7 @@ export function usePhotoStaging(existingUrl: string | null | undefined) {
     removePhoto,
     previewUrl,
     onSelectFile,
+    onPickFile,
     onRemove,
     reset,
     clearInput,

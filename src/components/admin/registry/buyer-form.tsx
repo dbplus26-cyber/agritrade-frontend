@@ -33,7 +33,6 @@ import { useEditableRecordForm } from "@/hooks/use-editable-record-form";
 import { usePhotoStaging } from "@/hooks/use-photo-staging";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
-import { optimizeImage } from "@/lib/optimize-image";
 import { cn } from "@/lib/utils";
 import type { IBuyer } from "@/types/registry.types";
 import { buyerSchema, type BuyerValues } from "@/validations/registry-schema";
@@ -76,7 +75,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
     photoFile,
     removePhoto,
     previewUrl,
-    onSelectFile,
+    onPickFile,
     onRemove: onRemovePhoto,
     reset: resetPhoto,
     clearInput: clearPhotoInput,
@@ -315,7 +314,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
                 className="hidden"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
-                  if (file) void optimizeImage(file).then(onSelectFile);
+                  if (file) void onPickFile(file);
                 }}
               />
             </div>

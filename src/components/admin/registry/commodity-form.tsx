@@ -33,7 +33,6 @@ import { usePhotoStaging } from "@/hooks/use-photo-staging";
 import { extractApiError } from "@/lib/extract-api-error";
 import { COMMODITY_DESCRIPTION_MAX, COMMODITY_NAME_MAX } from "@/lib/limits";
 import { notify } from "@/lib/notify";
-import { optimizeImage } from "@/lib/optimize-image";
 import { cn } from "@/lib/utils";
 import type {
   ICommodity,
@@ -72,7 +71,7 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
     photoFile,
     removePhoto,
     previewUrl,
-    onSelectFile,
+    onPickFile,
     onRemove: onRemovePhoto,
     reset: resetPhoto,
     clearInput: clearPhotoInput,
@@ -406,7 +405,7 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
                 className="hidden"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
-                  if (file) void optimizeImage(file).then(onSelectFile);
+                  if (file) void onPickFile(file);
                 }}
               />
             </div>

@@ -65,3 +65,20 @@ export const LAND_PLOT_TITLE_MAX = 120;
  * it IN FULL - a plot has no page of its own to carry the rest.
  */
 export const LAND_PLOT_DESCRIPTION_MAX = 1000;
+
+/**
+ * The largest file the API will accept, in bytes. Mirrors `fileSize` in the
+ * backend's `config/multer.ts`.
+ *
+ * Checked client-side so an oversized pick fails at the moment it is picked,
+ * naming the actual problem. Without it a field agent on a rural connection
+ * uploaded a 15MB scan for a minute before the server rejected it, and the
+ * only thing the app could say afterwards was that something went wrong.
+ * The server limit is still the one that counts - this just stops the wasted
+ * round trip, and it cannot be the only check.
+ *
+ * Images are usually downscaled below this before it applies (see
+ * `optimizeImage`); PDFs and other documents are sent as picked, so this is
+ * the check that actually catches them.
+ */
+export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
