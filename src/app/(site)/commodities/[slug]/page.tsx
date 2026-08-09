@@ -54,6 +54,11 @@ export async function generateMetadata({
         lot.inStock ? "In stock now." : "On order - ask us."
       } Call with tonnage and destination for a same-day quote.`,
     path: `/commodities/${lot.slug}`,
+    // The lot's own photograph is the share card. Without it every commodity
+    // shared into WhatsApp - which is how these actually circulate - carried
+    // the same generic site image, so three different lots looked like one
+    // link posted three times.
+    image: lot.photo ?? undefined,
     keywords: [lot.name, `${lot.name} Ghana`, `${lot.name} Tamale`],
   });
 }

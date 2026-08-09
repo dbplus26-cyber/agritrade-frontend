@@ -14,13 +14,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     fetchPublicCommodities().then(toLots),
     fetchPublicLandPlots().then((p) => p ?? []),
   ]);
-  // /pay is transactional (noindex) and /style-guide is internal - only the
-  // real content pages are listed.
+  // /style-guide is internal (noindex + robots-disallowed) and the console
+  // and field app are private - only the real public content is listed.
   return [
     { url: `${siteUrl}/`, lastModified: now, changeFrequency: "weekly", priority: 1 },
     { url: `${siteUrl}${routes.commodities}`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     { url: `${siteUrl}${routes.land}`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     { url: `${siteUrl}${routes.farmingInvestment}`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
+    // The apply page is indexable and is the one conversion page on the
+    // farming side - it was reachable from the site but absent from here.
+    { url: `${siteUrl}${routes.farmingApply}`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${siteUrl}${routes.about}`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${siteUrl}${routes.reviews}`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     { url: `${siteUrl}${routes.contact}`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },

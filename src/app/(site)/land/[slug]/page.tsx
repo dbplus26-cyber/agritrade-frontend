@@ -51,6 +51,9 @@ export async function generateMetadata({
       plot.description ??
       `${plot.sizeText}${plot.use ? ` ${plot.use}` : ""} plot at ${plot.name}, Tamale. Papers first: site plan and indenture checked and the boundary walked before any money changes hands.`,
     path: `/land/${plotSlug(plot)}`,
+    // The plot's cover photo, for the same reason as the commodity pages: a
+    // plot shared without its frontage is indistinguishable from any other.
+    image: plot.photo ?? undefined,
     keywords: [
       `${plot.name} plot`,
       "land for sale Tamale",
