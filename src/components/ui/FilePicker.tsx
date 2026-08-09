@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
  *
  *   default - the picker owns the action. Preview, then Save uploads it now.
  *             Used on detail screens where the file IS the change.
- *   stage   — the picker is a form FIELD. The chosen file goes into form state
+ *   stage   - the picker is a form FIELD. The chosen file goes into form state
  *             immediately so the form's own submit carries it, and the preview
  *             plus Clear are what let the user check and change their mind
  *             before that submit. A second "Save" here would be a button that

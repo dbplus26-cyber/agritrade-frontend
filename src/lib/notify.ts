@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 
 /**
- * The one toast door. Wraps sonner so call sites never import it directly —
+ * The one toast door. Wraps sonner so call sites never import it directly -
  * pairing naturally with `extractApiError`:
  *
  *   notify.error("Couldn't send your enquiry", {

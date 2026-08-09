@@ -3,7 +3,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   // Resolves the `@/` alias from tsconfig.json (no manual moduleNameMapper).
-  // Vitest 4 transforms TSX with the automatic JSX runtime out of the box —
+  // Vitest 4 transforms TSX with the automatic JSX runtime out of the box -
   // no babel/react plugin needed.
   plugins: [tsconfigPaths()],
   test: {

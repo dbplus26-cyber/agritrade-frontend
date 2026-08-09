@@ -51,7 +51,7 @@ const STATUS_FILTER_OPTIONS = [
 
 type StatusFilter = (typeof STATUS_FILTER_OPTIONS)[number]["value"];
 
-/** Stable defaults for the URL-synced table state (module const on purpose —
+/** Stable defaults for the URL-synced table state (module const on purpose -
  * the hook keys its effects on this identity). `size` is the page size. */
 const FILTER_DEFAULTS = { role: "all", status: "all", size: "10" };
 
@@ -226,7 +226,7 @@ export function UsersTable() {
         meta: columnMeta({ at: "xl" }),
         cell: ({ row }) => (
           <span className="whitespace-nowrap text-adm-muted">
-            {row.original.phone ?? "—"}
+            {row.original.phone ?? "-"}
           </span>
         ),
       },

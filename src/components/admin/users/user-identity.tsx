@@ -117,7 +117,7 @@ export function IdentityFacts({
       )}
     >
       <Fact label="Email" icon={Mail}>{user.email}</Fact>
-      <Fact label="Phone" icon={Phone}>{user.phone ?? "—"}</Fact>
+      <Fact label="Phone" icon={Phone}>{user.phone ?? "-"}</Fact>
       <Fact label="Role" icon={UserCog}>{ROLE_TITLE[user.role] ?? user.role}</Fact>
       <Fact label="Two-factor" icon={ShieldCheck}>
         {user.twoFactorEnabled ? (

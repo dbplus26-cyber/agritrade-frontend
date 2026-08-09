@@ -192,7 +192,7 @@ export function SiteHeader() {
                     <ChevronDown aria-hidden="true" className="size-2.5 self-center" strokeWidth={3.2} />
                   </DropdownMenuTrigger>
                 )}
-                {/* The plate chrome lives on the base DropdownMenuContent now —
+                {/* The plate chrome lives on the base DropdownMenuContent now -
                     every dropdown in the app wears this same services skin. */}
                 <DropdownMenuContent align="start" className="min-w-[236px]">
                   <DropdownMenuLabel className="stencil px-4 pb-1 pt-3 text-[9px] tracking-[0.26em] text-harvest-deep">

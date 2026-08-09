@@ -128,7 +128,7 @@ function IdentityCard() {
             </p>
             {user.pendingEmail ? (
               <p className="mt-1 text-[12px] font-medium text-console-gold">
-                Email change to {user.pendingEmail} awaiting confirmation —
+                Email change to {user.pendingEmail} awaiting confirmation -
                 check that inbox.
               </p>
             ) : null}

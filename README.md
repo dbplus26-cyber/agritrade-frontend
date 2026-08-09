@@ -1,4 +1,4 @@
-# DB Plus — web
+# DB Plus - web
 
 Three surfaces for **DB Plus Trading Ltd** (Tamale), served by one Next.js app
 against the `agritrade-backend` API:
@@ -65,7 +65,7 @@ reading numbers rather than selling.
   console is largely client-side (it is an authenticated app talking to RTK
   Query); the public site is server-rendered and cached.
 - **Data layer**: one `createApi` in `src/redux/api-slice.ts`. Features attach
-  via `injectEndpoints` — never a second slice. The store is a per-request
+  via `injectEndpoints` - never a second slice. The store is a per-request
   `makeStore()` factory mounted by `store-provider.tsx`.
 - **Auth**: httpOnly cookies issued by the API. `src/proxy.ts` is a cheap
   presence gate that bounces `/admin` and `/agent` to `/login` before the
@@ -92,7 +92,7 @@ reading numbers rather than selling.
 - **System states**: `LoadingScreen` (the plank-board loader),
   `ConsoleTableSkeleton`, `FormSkeleton`, `EmptyState` ("nothing on file"),
   `ErrorMessage` ("NOT PROCESSED" stamp), `ConfirmationDialog` +
-  `useConfirm()` — all on `/style-guide`.
+  `useConfirm()` - all on `/style-guide`.
 
 ## Environment
 

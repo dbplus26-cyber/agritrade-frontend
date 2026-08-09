@@ -87,7 +87,7 @@ function TurnstileInner({
   }, [onVerify]);
 
   // Track the wrapper's real width (it is overflow-hidden, so the 300px iframe
-  // can never inflate it or its grid column) and derive the scale from it —
+  // can never inflate it or its grid column) and derive the scale from it -
   // measured continuously, not once, so late layout or fold/rotate can't
   // leave the widget overflowing.
   useEffect(() => {

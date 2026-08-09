@@ -7,7 +7,7 @@ const SCHEME_PHOTO =
   "https://commons.wikimedia.org/wiki/Special:FilePath/The%20maize%20farm%20in%20Walewale%20Ghana.jpg?width=1000";
 
 /**
- * The scheme, on paper: a treated field photo beside a sample season ledger —
+ * The scheme, on paper: a treated field photo beside a sample season ledger -
  * what actually gets recorded for a farmer's package. Figures are
  * deliberately generic (stamped SAMPLE); real terms are always signed.
  */

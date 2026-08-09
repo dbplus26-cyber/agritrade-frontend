@@ -367,7 +367,7 @@ export function ConsoleDataTable<TData>({
                   {cells.map((cell) => {
                     const label = headerLabel.get(cell.column.id);
                     // Drop rows with nothing in them: a stack of
-                    // "DESCRIPTION —" placeholders is pure noise on a phone,
+                    // "DESCRIPTION -" placeholders is pure noise on a phone,
                     // and reserved slots that never fill are exactly the
                     // "unintentional negative space" to avoid.
                     const raw = cell.getValue();

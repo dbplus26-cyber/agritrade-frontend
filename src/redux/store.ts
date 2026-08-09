@@ -5,7 +5,7 @@ import authReducer from "./auth/auth-slice";
 
 /**
  * Builds a fresh store. The App Router runs Server Components per request, so
- * a module-singleton store would leak state across concurrent SSR requests —
+ * a module-singleton store would leak state across concurrent SSR requests -
  * the StoreProvider calls this once per request instead. Letting
  * `configureStore` infer its own type keeps `RootState`/`useSelector`
  * properly typed instead of collapsing to `any`.

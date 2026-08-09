@@ -104,7 +104,7 @@ export const statusToQuery = (
   return {};
 };
 
-/** "—" placeholder the console uses for absent optional values. */
+/** "-" placeholder the console uses for absent optional values. */
 export function Absent() {
-  return <span className="text-adm-faint">—</span>;
+  return <span className="text-adm-faint">-</span>;
 }

@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /**
- * DB Plus — "Pale Husk" palette v2.1 (from the Claude Design project).
+ * DB Plus - "Pale Husk" palette v2.1 (from the Claude Design project).
  * A trading-house paper aesthetic: husk surfaces, viridian bands, ochre-gold
  * tags, ledger rules and hard offset shadows. Light theme only by design.
  */
@@ -13,7 +13,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  /* Brand tokens — use these for page work; shadcn vars map onto them. */
+  /* Brand tokens - use these for page work; shadcn vars map onto them. */
   --color-surface: #eff1e8;
   --color-surface-alt: #e6eae0;
   --color-paper: #fbfcf7;
@@ -72,7 +72,7 @@
   --color-console-page: var(--color-adm-page);
   /* Explicit family fallbacks so portaled overlays (Radix dialogs render on
      <body>, outside the admin layout's next/font variable scope) keep the
-     console fonts — the @font-face family names are global and stable. */
+     console fonts - the @font-face family names are global and stable. */
   --font-admin: var(--font-hanken, "Hanken Grotesk", "Hanken Grotesk Fallback");
   --font-adminmono: var(--font-jetbrains, "JetBrains Mono", "JetBrains Mono Fallback");
 
@@ -115,24 +115,24 @@
 }
 
 :root {
-  --background: #eff1e8; /* surface — pale husk, ink text 14.2:1 */
+  --background: #eff1e8; /* surface - pale husk, ink text 14.2:1 */
   --foreground: #1f211c; /* ink */
   --card: #fbfcf7; /* paper */
   --card-foreground: #1f211c;
   --popover: #eff1e8;
   --popover-foreground: #1f211c;
-  --primary: #155744; /* forest — dark bands, primary actions */
+  --primary: #155744; /* forest - dark bands, primary actions */
   --primary-foreground: #eff1e8;
-  --secondary: #e6eae0; /* surface-alt — document tint */
+  --secondary: #e6eae0; /* surface-alt - document tint */
   --secondary-foreground: #155744;
   --muted: #e6eae0;
-  --muted-foreground: #59523b; /* soil — secondary text 6.8:1 */
-  --accent: #d89c2e; /* harvest — tags + CTAs, ink on gold 6.7:1 */
+  --muted-foreground: #59523b; /* soil - secondary text 6.8:1 */
+  --accent: #d89c2e; /* harvest - tags + CTAs, ink on gold 6.7:1 */
   --accent-foreground: #1f211c;
   --destructive: #9b3a22; /* validation errors and failed states only */
   --border: rgb(89 82 59 / 0.35); /* soil rules */
   --input: rgb(89 82 59 / 0.35);
-  --ring: #3e7d62; /* leaf — focus */
+  --ring: #3e7d62; /* leaf - focus */
   --chart-1: #155744;
   --chart-2: #d89c2e;
   --chart-3: #3e7d62;
@@ -233,7 +233,7 @@
   .texture-grain-dark {
     background-image: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22150%22%3E%3Cfilter id=%22m%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%222%22/%3E%3CfeColorMatrix values=%220 0 0 0 1 0 0 0 0 1 0 0 0 0 0.9 0 0 0 0.04 0%22/%3E%3C/filter%3E%3Crect width=%22150%22 height=%22150%22 filter=%22url(%23m)%22/%3E%3C/svg%3E");
   }
-  /* Hard offset "paperwork" shadows — the design never blurs card shadows.
+  /* Hard offset "paperwork" shadows - the design never blurs card shadows.
      Kept HARD (the signature), but slimmed: the old 5-6px offsets at heavy
      opacity read as a thick slab under every card, and with a page full of
      cards the effect stacked into visual noise. A 2px offset at lower opacity
@@ -260,7 +260,7 @@
     border-bottom: 1px solid rgb(89 82 59 / 0.3);
     height: 4px;
   }
-  /* Stencilled utility text — eyebrows, tags, stamps and ledger numerals.
+  /* Stencilled utility text - eyebrows, tags, stamps and ledger numerals.
      NEVER a title: names, headings and figures are set in the house display
      face. The rule of thumb is 15px, above which the stencil is only allowed
      inside a Stamp, a decorative ghost watermark, or on a bare numeral. Read

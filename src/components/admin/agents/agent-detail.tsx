@@ -269,7 +269,7 @@ function LedgerRow({
       {withBalanceColumn ? (
         <Mono className="hidden text-right text-[13px] whitespace-nowrap text-adm-ink @md/ledger:block">
           {balanceAfter === undefined ? (
-            <span className="text-adm-faint">—</span>
+            <span className="text-adm-faint">-</span>
           ) : (
             formatCedis(balanceAfter)
           )}

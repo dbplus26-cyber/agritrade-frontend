@@ -50,7 +50,7 @@ const actionLabel = (action: string): string => {
 // breakpoint other than xl, and a stretch column was not expressible at all.
 
 /**
- * The audit-log register (super-admin): server-driven like the users table —
+ * The audit-log register (super-admin): server-driven like the users table -
  * the debounced search, the category facet, the date window, the page and
  * page size all travel to GET /admin/audit-logs, with URL sync + session
  * memory from useTableQuery. Read-only: rows are records, not links.
@@ -180,7 +180,7 @@ export function AuditTable() {
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
           <Mono className="whitespace-nowrap text-adm-muted">
-            {row.original.ip ?? "—"}
+            {row.original.ip ?? "-"}
           </Mono>
         ),
       },
