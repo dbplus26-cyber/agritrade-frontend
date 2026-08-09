@@ -189,7 +189,6 @@ function CreateCategoryDialog({
 
 export function ExpenseCategoryTable() {
   const [createOpen, setCreateOpen] = useState(false);
-  const router = useRouter();
   const {
     page,
     search: searchInput,

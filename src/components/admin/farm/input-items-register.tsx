@@ -9,7 +9,7 @@ import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
-import { Absent, columnMeta } from "@/components/admin/registry/registry-bits";
+import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { TitleCell } from "@/components/admin/table-cells";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import { AdminButton, AdminCard } from "@/components/admin/ui";

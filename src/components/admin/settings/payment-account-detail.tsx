@@ -17,8 +17,6 @@ import {
   AdminButton,
   AdminCard,
   AdminPageHeader,
-  DetailGrid,
-  DetailItem,
   Mono,
   SectionHeading,
   ToneBadge,

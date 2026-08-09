@@ -23,7 +23,6 @@ import {
   adminSelectClass,
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
-import { BackButton } from "@/components/ui/BackButton";
 import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";

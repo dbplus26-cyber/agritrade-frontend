@@ -4,7 +4,6 @@ import { useMemo } from "react";
 import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
-import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {

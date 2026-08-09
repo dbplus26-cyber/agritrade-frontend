@@ -406,7 +406,6 @@ function ReconcileDialog({
 }) {
   const preview = useGetReconciliationPreviewQuery(agentUserId);
   const [reconcile, { isLoading }] = useCreateReconciliationMutation();
-  const { confirm, confirmationDialog } = useConfirm();
   const {
     register,
     handleSubmit,
