@@ -81,9 +81,15 @@ export const purchasesApi = apiSlice.injectEndpoints({
         method: "PATCH",
         body,
       }),
+      // Receiving is the STOCK event: the backend mints the lot and writes a
+      // PURCHASE_RECEIPT movement in the same transaction. Without these two
+      // the stock register and the movement log kept serving pre-receipt
+      // figures until something else happened to invalidate them.
       invalidatesTags: (_r, _e, { id }) => [
         { type: "Purchases", id },
         { type: "Purchases", id: "LIST" },
+        { type: "Stock", id: "LIST" },
+        { type: "StockMovements", id: "LIST" },
       ],
     }),
 
@@ -96,12 +102,16 @@ export const purchasesApi = apiSlice.injectEndpoints({
         method: "PATCH",
         body,
       }),
-      // Voiding compensates the paying float, so balances move too.
+      // Voiding compensates the paying float, so balances move too - and
+      // voiding a RECEIVED purchase also deletes its lot and writes the
+      // reversing stock movement, so the stock views move with it.
       invalidatesTags: (_r, _e, { id }) => [
         { type: "Purchases", id },
         { type: "Purchases", id: "LIST" },
         { type: "Agents", id: "LIST" },
         { type: "FloatLedger", id: "LIST" },
+        { type: "Stock", id: "LIST" },
+        { type: "StockMovements", id: "LIST" },
       ],
     }),
   }),
