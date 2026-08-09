@@ -19,7 +19,10 @@ export const makeStore = () => {
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware().concat(apiSlice.middleware),
   });
-  // refetchOnFocus/refetchOnReconnect behaviours for RTK Query.
+  // Wires the browser events RTK Query's refetch behaviours listen to. The
+  // slice opts into refetchOnReconnect only (see api-slice.ts for why focus
+  // refetch is deliberately left off); without this call that setting would
+  // never fire.
   setupListeners(store.dispatch);
   return store;
 };

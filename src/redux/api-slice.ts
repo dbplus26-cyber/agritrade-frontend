@@ -106,5 +106,18 @@ export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithReauth,
   tagTypes: apiSliceTags,
+  // Reconnect refetch, deliberately WITHOUT focus refetch.
+  //
+  // `setupListeners` was already wired in the store but neither behaviour was
+  // enabled anywhere, so it did nothing at all. Reconnect is the one that
+  // earns its keep here: field agents and the Tamale office drop off the
+  // network constantly, and coming back to a console showing pre-outage
+  // stock and balances is exactly how someone acts on a stale figure.
+  //
+  // Focus refetch stays OFF on purpose. Console users alt-tab between the
+  // app and a spreadsheet all day, and refetching every register on each
+  // return would multiply requests for data that changes a few times an
+  // hour. Mutations already invalidate precisely what they touch.
+  refetchOnReconnect: true,
   endpoints: () => ({}),
 });
