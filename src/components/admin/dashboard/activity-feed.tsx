@@ -4,7 +4,7 @@ import { TONES, type Tone } from "@/components/admin/ui";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetActivityQuery } from "@/redux/reports/reports-api";
 
-import { WidgetCard } from "./chart-kit";
+import { WidgetCard, WidgetError } from "./chart-kit";
 
 /** Humanise a dotted audit action, e.g. "float.topped_up" → "Float topped up". */
 const humanizeAction = (action: string): string => {
@@ -36,7 +36,9 @@ const shortWhen = (iso: string): string =>
  * mutating events, each with the acting user and when. Carries no money.
  */
 export function ActivityFeed() {
-  const { data, isLoading } = useGetActivityQuery({ limit: 8 });
+  const { data, isError, isLoading, refetch } = useGetActivityQuery({
+    limit: 8,
+  });
   const rows = data?.data ?? [];
 
   return (
@@ -44,7 +46,9 @@ export function ActivityFeed() {
       title="Recent activity"
       hint="The latest things recorded in the console, whoever recorded them."
     >
-      {isLoading ? (
+      {isError ? (
+        <WidgetError what="the activity feed" onRetry={() => void refetch()} />
+      ) : isLoading ? (
         <div className="flex flex-col gap-2.5">
           {Array.from({ length: 5 }).map((_, i) => (
             <Skeleton key={i} className="h-9 w-full rounded-[6px]" />

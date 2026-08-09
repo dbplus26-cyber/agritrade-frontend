@@ -14,7 +14,14 @@ import { formatCedis } from "@/lib/format-money";
 import { useGetCashflowQuery } from "@/redux/reports/reports-api";
 import type { IReportWindow } from "@/types/report.types";
 
-import { AXIS_TICK, ChartNote, GRID_STROKE, LegendItem, WidgetCard } from "./chart-kit";
+import {
+  AXIS_TICK,
+  ChartNote,
+  GRID_STROKE,
+  LegendItem,
+  WidgetCard,
+  WidgetError,
+} from "./chart-kit";
 
 const SALES = "#3E6B8C";
 const PURCHASES = "#B8860B";
@@ -65,7 +72,7 @@ function CashflowTooltip({
  * an honest "hidden" note rather than a chart of zeros.
  */
 export function CashflowChart({ window }: { window: IReportWindow }) {
-  const { data, isLoading } = useGetCashflowQuery(window);
+  const { data, isError, isLoading, refetch } = useGetCashflowQuery(window);
   const points = data?.data.points ?? [];
   const redacted =
     points.length > 0 && points.every((p) => p.salesInGhs === null);
@@ -89,7 +96,9 @@ export function CashflowChart({ window }: { window: IReportWindow }) {
       hint="Money buyers paid you against money you spent buying grain, day by day over the period you picked."
       right={legend}
     >
-      {isLoading ? (
+      {isError ? (
+        <WidgetError what="the cashflow" onRetry={() => void refetch()} />
+      ) : isLoading ? (
         <Skeleton className="h-[220px] w-full rounded-[6px]" />
       ) : redacted ? (
         <ChartNote>Cashflow figures are hidden for your role.</ChartNote>

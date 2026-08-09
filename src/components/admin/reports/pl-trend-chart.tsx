@@ -18,6 +18,7 @@ import {
   GRID_STROKE,
   LegendItem,
   WidgetCard,
+  WidgetError,
 } from "@/components/admin/dashboard/chart-kit";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -62,7 +63,7 @@ function TrendTooltip({
  */
 export function PlTrendChart() {
   const [months, setMonths] = useState<12 | 6>(6);
-  const { data, isLoading } = useGetTrendsQuery({ months });
+  const { data, isError, isLoading, refetch } = useGetTrendsQuery({ months });
   const points = data?.data ?? [];
 
   const redacted =
@@ -99,7 +100,9 @@ export function PlTrendChart() {
       hint="Money coming in from buyers set against money going out to sellers, month by month."
       right={toggle}
     >
-      {isLoading ? (
+      {isError ? (
+        <WidgetError what="the profit trend" onRetry={() => void refetch()} />
+      ) : isLoading ? (
         <Skeleton className="h-[240px] w-full rounded-[6px]" />
       ) : redacted ? (
         <ChartNote>Financial figures are hidden for your role.</ChartNote>

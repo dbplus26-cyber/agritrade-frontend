@@ -22,6 +22,7 @@ import {
   LegendItem,
   tonnesTick,
   WidgetCard,
+  WidgetError,
 } from "./chart-kit";
 
 type Row = Record<string, number | string> & { label: string };
@@ -60,7 +61,7 @@ function VolumeTooltip({
  * operational, so this is never redacted.
  */
 export function VolumeChart({ window }: { window: IReportWindow }) {
-  const { data, isLoading } = useGetVolumeQuery(window);
+  const { data, isError, isLoading, refetch } = useGetVolumeQuery(window);
   const commodities = data?.data.commodities ?? [];
   const points = data?.data.points ?? [];
 
@@ -90,7 +91,9 @@ export function VolumeChart({ window }: { window: IReportWindow }) {
       hint="How much you bought in the period you picked, in tonnes, split by commodity."
       right={hasVolume ? legend : undefined}
     >
-      {isLoading ? (
+      {isError ? (
+        <WidgetError what="the volume chart" onRetry={() => void refetch()} />
+      ) : isLoading ? (
         <Skeleton className="h-[220px] w-full rounded-[6px]" />
       ) : !hasVolume ? (
         <ChartNote>No purchases recorded in this period.</ChartNote>

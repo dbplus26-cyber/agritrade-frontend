@@ -22,7 +22,7 @@ import type { IReportWindow } from "@/types/report.types";
 import { ActivityFeed } from "./activity-feed";
 import { ApprovalsPreview } from "./approvals-preview";
 import { CashflowChart } from "./cashflow-chart";
-import { WidgetCard } from "./chart-kit";
+import { WidgetCard, WidgetError } from "./chart-kit";
 import { DateRangeSelector, DEFAULT_RANGE } from "./date-range-selector";
 import { PeriodSummary } from "./period-summary";
 import { StockDonut } from "./stock-donut";
@@ -185,7 +185,7 @@ function greetingFor(date: Date): string {
 
 export function DashboardLive() {
   const [window, setWindow] = useState<IReportWindow>(DEFAULT_RANGE);
-  const { data, isLoading } = useGetDashboardQuery();
+  const { data, isError, isLoading, refetch } = useGetDashboardQuery();
   const user = useCurrentUser();
   const d = data?.data;
   const greeting = greetingFor(new Date());
@@ -205,8 +205,14 @@ export function DashboardLive() {
         <DateRangeSelector onChange={setWindow} />
       </div>
 
-      {/* Snapshot KPIs - the state of the business right now. */}
-      {isLoading || !d ? (
+      {/* Snapshot KPIs - the state of the business right now. Error is its
+          own branch: `isLoading || !d` stays true forever after a failure,
+          so this used to pulse an empty skeleton with nothing to act on. */}
+      {isError ? (
+        <div className="mb-5">
+          <WidgetError what="the snapshot figures" onRetry={() => void refetch()} />
+        </div>
+      ) : isLoading || !d ? (
         <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-5">
           {Array.from({ length: 5 }).map((_, i) => (
             <Skeleton key={i} className="h-[86px] w-full rounded-[6px]" />

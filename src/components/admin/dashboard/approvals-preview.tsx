@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useGetApprovalsQuery } from "@/redux/approvals/approvals-api";
 import { ApprovalStatus } from "@/types/approval.types";
 
-import { WidgetCard } from "./chart-kit";
+import { WidgetCard, WidgetError } from "./chart-kit";
 
 /**
  * The four oldest pending approvals, previewed on the dashboard (design doc
@@ -21,7 +21,7 @@ import { WidgetCard } from "./chart-kit";
  * one, the mono headline with requester/detail beneath.
  */
 export function ApprovalsPreview() {
-  const { data, isLoading } = useGetApprovalsQuery({
+  const { data, isError, isLoading, refetch } = useGetApprovalsQuery({
     limit: 4,
     status: ApprovalStatus.PENDING,
   });
@@ -39,7 +39,12 @@ export function ApprovalsPreview() {
       hint="Requests staff have raised that only you can sign off, oldest first."
       right={link}
     >
-      {isLoading ? (
+      {isError ? (
+        <WidgetError
+          what="the approvals queue"
+          onRetry={() => void refetch()}
+        />
+      ) : isLoading ? (
         <div className="flex flex-col gap-2.5">
           {Array.from({ length: 3 }).map((_, i) => (
             <Skeleton key={i} className="h-12 w-full rounded-[6px]" />

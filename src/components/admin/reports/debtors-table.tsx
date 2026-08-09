@@ -12,10 +12,12 @@ import {
   Mono,
   ToneBadge,
 } from "@/components/admin/ui";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
 import { ListPagination } from "@/components/ui/ListPagination";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useGetDebtorsQuery } from "@/redux/reports/reports-api";
+import { extractApiError } from "@/lib/extract-api-error";
 import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 10;
@@ -29,7 +31,7 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
   const [search, setSearch] = useState("");
   const debounced = useDebounce(search.trim(), 400);
 
-  const { data, isFetching } = useGetDebtorsQuery({
+  const { data, error, isError, isFetching, refetch } = useGetDebtorsQuery({
     limit: PAGE_SIZE,
     page,
     search: debounced || undefined,
@@ -77,7 +79,19 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
         ) : null}
       </div>
 
-      {rows.length === 0 ? (
+      {/* A failed request must NEVER read as "everyone is paid up". This
+          used to fall through to the empty state, so a dropped connection
+          told the owner every debt on both books had been collected - on the
+          one screen that decision gets made from. Error is checked before
+          empty, and never conflated with it. */}
+      {isError ? (
+        <ErrorMessage
+          className="py-8"
+          title="Couldn't load the debtors list"
+          description={extractApiError(error).message}
+          onRetry={() => void refetch()}
+        />
+      ) : rows.length === 0 ? (
         <p className="py-4 text-[13px] text-adm-muted">
           {isFetching
             ? "Loading…"

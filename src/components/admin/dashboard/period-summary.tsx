@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { useGetPeriodSummaryQuery } from "@/redux/reports/reports-api";
 import type { IReportWindow, ITrend } from "@/types/report.types";
 
+import { WidgetError } from "./chart-kit";
 import { TrendBadge } from "./trend-badge";
 
 /** One windowed stat tile: label, mono value, optional sub + trend. */
@@ -70,7 +71,8 @@ function Tile({
  * Owns its own query so it loads independently of the rest of the board.
  */
 export function PeriodSummary({ window }: { window: IReportWindow }) {
-  const { data, isLoading } = useGetPeriodSummaryQuery(window);
+  const { data, isError, isLoading, refetch } =
+    useGetPeriodSummaryQuery(window);
   const s = data?.data;
 
   return (
@@ -78,7 +80,12 @@ export function PeriodSummary({ window }: { window: IReportWindow }) {
       <div className="mb-2 text-[11px] font-semibold tracking-[0.04em] text-adm-muted/80 uppercase">
         In selected period
       </div>
-      {isLoading || !s ? (
+      {isError ? (
+        <WidgetError
+          what="the period figures"
+          onRetry={() => void refetch()}
+        />
+      ) : isLoading || !s ? (
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-[74px] w-full rounded-[6px]" />

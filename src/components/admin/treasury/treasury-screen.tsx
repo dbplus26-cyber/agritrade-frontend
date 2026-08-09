@@ -213,7 +213,19 @@ export function TreasuryScreen() {
       </div>
 
       <TitledCard title="Money moved between the accounts">
-        {total === 0 && !transfers.isFetching ? (
+        {/* The transfers query has its own failure mode, separate from the
+            overview guarded above. Without this branch a failed load read as
+            "Nothing moved yet" - a treasury screen claiming no money has ever
+            been moved is a worse lie than any error message. */}
+        {transfers.error ? (
+          <div className="py-6">
+            <ErrorMessage
+              title="Couldn't load the transfers"
+              description={extractApiError(transfers.error).message}
+              onRetry={() => void transfers.refetch()}
+            />
+          </div>
+        ) : total === 0 && !transfers.isFetching ? (
           <div className="py-6">
             <EmptyState
               title="Nothing moved yet"

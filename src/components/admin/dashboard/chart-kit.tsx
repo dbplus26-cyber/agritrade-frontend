@@ -146,3 +146,38 @@ export function ChartNote({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+
+/**
+ * The failure state for a dashboard widget that owns its own query.
+ *
+ * These widgets all used to branch on `isLoading || !data`, which is TRUE
+ * forever once a request has failed - so a dead endpoint left a skeleton
+ * pulsing indefinitely, or worse, fell through to an empty state that read
+ * as a real zero. On a board of money figures, "we could not load this" and
+ * "this is nothing" must never look the same. Sized to sit inside a widget
+ * card without resizing the row it lives in.
+ */
+export function WidgetError({
+  onRetry,
+  what,
+}: {
+  onRetry: () => void;
+  /** What failed, lowercase, e.g. "the day's figures". */
+  what: string;
+}) {
+  return (
+    <div
+      role="alert"
+      className="flex min-h-[86px] flex-col items-center justify-center gap-1.5 rounded-[6px] border border-dashed border-console-red/35 bg-console-red/[0.03] px-4 py-4 text-center"
+    >
+      <p className="text-[12.5px] text-adm-muted">Couldn&apos;t load {what}.</p>
+      <button
+        type="button"
+        onClick={onRetry}
+        className="cursor-pointer text-[12.5px] font-semibold text-console-red underline underline-offset-2 hover:no-underline"
+      >
+        Try again
+      </button>
+    </div>
+  );
+}
