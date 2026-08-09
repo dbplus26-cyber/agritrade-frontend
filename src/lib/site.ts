@@ -38,17 +38,19 @@ export const siteConfig = {
    * backend settings block and are merged over these in `public-contact.ts`.
    * These stand in only while the settings block is blank or unreachable.
    *
-   * ⚠ PLACEHOLDERS - REPLACE BEFORE LAUNCH. They are deliberately dead ends
-   * rather than plausible details: 024 000 0000 is an unassigned line and
-   * `.example` is a reserved, undeliverable TLD, so a forgotten placeholder
-   * misses the office instead of sending a real customer to a stranger. They
-   * do render as the company's contact in the header, footer, hero and legal
-   * pages, so swap them for details the owner confirms - or, better, have the
-   * owner fill Admin → Settings, which overrides them everywhere with no
-   * deploy.
+   * BLANK until the owner confirms the real details, because every consumer
+   * already branches on `hasPhone`/`hasEmail` and degrades to "Contact us"
+   * pointing at the contact page. Dead-end placeholders were worse than
+   * nothing: an unassigned 024 000 0000 still rendered as a live `tel:` link
+   * in the header, footer, hero and legal pages, so the site stated a phone
+   * number for the business and dialling it reached silence. An absent
+   * number tells the truth and routes the customer somewhere that works.
+   *
+   * Fill these here, or better, have the owner fill Admin → Settings, which
+   * overrides them everywhere with no deploy.
    */
-  phone: "+233 24 000 0000",
-  email: "info@dbplus.example",
+  phone: "",
+  email: "",
   /**
    * Where the call/WhatsApp links point while no number is configured: the
    * contact page, never a `tel:`/`wa.me` that dials nobody.
@@ -63,14 +65,16 @@ export const siteConfig = {
    * line. A BLANK entry renders NO icon at all, never a link to a profile
    * that does not exist.
    *
-   * ⚠ PLACEHOLDERS - REPLACE BEFORE LAUNCH with the company's real profile
-   * URLs. Nobody has checked that these handles belong to DB Plus, so until
-   * they are confirmed each icon may well point at a stranger's page.
+   * BLANK until each handle is confirmed to belong to DB Plus. They were
+   * guessed from the trading name and never verified, so shipping them meant
+   * the company footer might link customers to a stranger's page - and a
+   * wrong social link is harder to notice, and does more damage, than a
+   * missing one. Fill in each URL as the owner confirms it.
    */
   social: {
-    facebook: "https://www.facebook.com/dbplustrading",
-    instagram: "https://www.instagram.com/dbplustrading",
-    tiktok: "https://www.tiktok.com/@dbplustrading",
+    facebook: "",
+    instagram: "",
+    tiktok: "",
   },
   address: "Industrial Area, off Bolgatanga Road, Tamale, Northern Region",
   hours: "Mon – Sat 7:00 – 17:00 · Sunday closed",
