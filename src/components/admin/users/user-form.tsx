@@ -192,10 +192,16 @@ export function UserForm() {
               optional
               error={errors.phone?.message}
             >
+              {/* A phone number has a known length; the 640px column it
+                  sits in does not have to be filled. */}
               <Input
                 type="tel"
                 placeholder="e.g. 024 000 0000"
-                className={cn(adminInputClass, errors.phone && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  "max-w-[20ch]",
+                  errors.phone && "border-console-red",
+                )}
                 {...register("phone")}
               />
             </AdminField>

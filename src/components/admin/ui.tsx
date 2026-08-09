@@ -1,3 +1,5 @@
+import React, { useId } from "react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -437,7 +439,13 @@ export function AdminButton({
         "gap-1.5 rounded-[6px] font-semibold shadow-none transition-colors hover:translate-x-0 hover:translate-y-0 hover:shadow-none",
         size === "md" && "h-[34px] px-3.5 text-[13.5px]",
         size === "lg" && "h-[38px] px-[18px] text-[13.5px]",
-        size === "sm" && "h-7 px-2.5 text-[12.5px]",
+        // 28px is a deliberate visual density for row and card actions, but a
+        // 28px TARGET is a miss on a phone - and these are the buttons that
+        // void a purchase or reverse a payment. The plate stays small; the
+        // touch area is padded out to 44px underneath it, which costs no
+        // layout because it is drawn as a pseudo-element.
+        size === "sm" &&
+          "relative h-7 px-2.5 text-[12.5px] before:absolute before:top-1/2 before:left-1/2 before:h-11 before:w-full before:min-w-11 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']",
         variant === "primary" &&
           "bg-console text-white hover:bg-console-hover",
         (variant === "secondary" || variant === "outline") &&
@@ -462,6 +470,11 @@ export function AdminButton({
 /** Field label + control wrapper for console forms (shadcn Label inside),
  * in the document idiom of the site's enquiry form: a micro-cap
  * label over the paper field, error/hint filed beneath. */
+interface AriaProps {
+  "aria-describedby"?: string;
+  "aria-invalid"?: boolean;
+}
+
 export function AdminField({
   label,
   hint,
@@ -478,6 +491,31 @@ export function AdminField({
   className?: string;
   children: React.ReactNode;
 }) {
+  const errorId = useId();
+  // Wire the invalid state onto the control itself rather than leaving it to
+  // each of the ~40 forms to remember.
+  //
+  // A field in error used to be signalled by RED TEXT ALONE: the control kept
+  // its normal border (the `aria-invalid:border-console-red` in
+  // adminInputClass had nothing setting aria-invalid to react to), and a
+  // screen reader moving back to the input announced a plain, valid-looking
+  // field with no hint that anything was wrong or what. Colour is not a
+  // status, and the error message is not much use if it is never associated
+  // with the thing it is about.
+  //
+  // Cloning here means every AdminField gets it - including the ones written
+  // before this existed - and a control that already sets either prop keeps
+  // its own value. Components that ignore the props are unharmed.
+  const control =
+    error && React.isValidElement(children)
+      ? React.cloneElement(children as React.ReactElement<AriaProps>, {
+          "aria-describedby":
+            (children.props as AriaProps)["aria-describedby"] ?? errorId,
+          "aria-invalid":
+            (children.props as AriaProps)["aria-invalid"] ?? true,
+        })
+      : children;
+
   return (
     <Label className={cn("block font-normal leading-normal", className)}>
       {/* Four kinds of text live in a field - the LABEL, the value you type,
@@ -505,9 +543,10 @@ export function AdminField({
           {hint}
         </span>
       ) : null}
-      {children}
+      {control}
       {error ? (
         <span
+          id={errorId}
           className="mt-1.5 block text-[12.5px] font-medium text-console-red"
           role="alert"
         >

@@ -61,8 +61,12 @@ export function DataTablePagination({
   const isSelected = selectedCount > 0;
   const padWidth = Math.max(2, String(totalPages).length);
 
+  // The visible circle stays 32px - the pager should not shout - but the
+  // TAPPABLE area is padded out to 44px, the smallest target a thumb hits
+  // reliably. `before:` draws the hit area rather than margin so the buttons
+  // keep sitting neatly beside each other.
   const navButton =
-    "flex h-8 w-8 flex-none cursor-pointer items-center justify-center rounded-full text-soil transition-colors hover:bg-console/10 hover:text-console disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-soil";
+    "relative flex h-8 w-8 flex-none cursor-pointer items-center justify-center rounded-full text-soil transition-colors before:absolute before:top-1/2 before:left-1/2 before:h-11 before:w-11 before:-translate-x-1/2 before:-translate-y-1/2 before:content-[''] hover:bg-console/10 hover:text-console disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-soil";
 
   return (
     <div
@@ -105,7 +109,7 @@ export function DataTablePagination({
           >
             <SelectTrigger
               aria-label="Rows per page"
-              className="font-adminmono h-7 w-auto min-w-0 cursor-pointer gap-1 rounded-none border-0 border-b border-dashed border-soil/35 bg-transparent px-0.5 text-[12.5px] font-bold whitespace-nowrap text-soil shadow-none transition-colors hover:border-console hover:text-console focus:ring-0 focus-visible:ring-0 [&>span]:whitespace-nowrap"
+              className="font-adminmono relative h-7 w-auto min-w-0 cursor-pointer gap-1 before:absolute before:top-1/2 before:left-1/2 before:h-11 before:w-[calc(100%+1.5rem)] before:-translate-x-1/2 before:-translate-y-1/2 before:content-[''] rounded-none border-0 border-b border-dashed border-soil/35 bg-transparent px-0.5 text-[12.5px] font-bold whitespace-nowrap text-soil shadow-none transition-colors hover:border-console hover:text-console focus:ring-0 focus-visible:ring-0 [&>span]:whitespace-nowrap"
             >
               <SelectValue />
             </SelectTrigger>

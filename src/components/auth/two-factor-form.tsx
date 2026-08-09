@@ -99,12 +99,16 @@ function CodeStep({
         <span className="font-semibold text-ink">{email}</span>. Enter it
         below to finish signing in.
       </p>
+      {/* Six digits, sized to six digits. Stretched across the whole card
+          the field read as "paste something long here" and the caret sat
+          alone in a wide empty box. */}
       <AuthField
         label="Verification code"
         inputMode="numeric"
         autoComplete="one-time-code"
         placeholder="123456"
         maxLength={6}
+        className="max-w-[11ch] tracking-[0.3em]"
         error={errors.code?.message}
         {...register("code")}
       />
