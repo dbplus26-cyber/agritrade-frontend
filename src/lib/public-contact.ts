@@ -6,8 +6,8 @@ import { siteConfig } from "@/lib/site";
  * The owner-editable company contact block, fetched from the backend under the
  * `contact` cache tag. The backend purges the tag after any settings write, so
  * the 1-hour ISR window is only the backstop for a lost purge. When a value is
- * blank or the API is unreachable, the static `siteConfig` value stands in, so
- * the site always shows a usable contact.
+ * blank or the API is unreachable, the static `siteConfig` placeholder stands
+ * in, so the public site always displays a full contact block.
  */
 
 /** Mirrors the backend `PublicContactDTO`. */
@@ -23,10 +23,10 @@ export interface ResolvedContact {
   address: string;
   email: string;
   /**
-   * Whether the owner has actually published each channel. There is no safe
-   * placeholder for a phone number - a fabricated one sends real customers to
-   * a stranger - so the values below are empty until settings carry them, and
-   * callers must render nothing rather than an empty label.
+   * Whether each channel has a value to render - from the backend settings
+   * when published, else the `siteConfig` placeholder. Callers branch on
+   * these so a channel with no value at all renders nothing rather than an
+   * empty label.
    */
   hasEmail: boolean;
   hasPhone: boolean;
@@ -88,7 +88,8 @@ function ghIntlDigits(raw: string): string {
  */
 export function resolveSiteContact(api: null | PublicContact): ResolvedContact {
   const phone = api?.phone?.trim() || siteConfig.phone;
-  const whatsapp = api?.whatsapp?.trim() || api?.phone?.trim() || phone;
+  const whatsapp =
+    api?.whatsapp?.trim() || api?.phone?.trim() || siteConfig.whatsapp;
   const email = api?.email?.trim() || siteConfig.email;
   const address = api?.address?.trim() || siteConfig.address;
   const phoneIntl = ghIntlDigits(phone);

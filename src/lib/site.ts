@@ -38,19 +38,13 @@ export const siteConfig = {
    * backend settings block and are merged over these in `public-contact.ts`.
    * These stand in only while the settings block is blank or unreachable.
    *
-   * BLANK until the owner confirms the real details, because every consumer
-   * already branches on `hasPhone`/`hasEmail` and degrades to "Contact us"
-   * pointing at the contact page. Dead-end placeholders were worse than
-   * nothing: an unassigned 024 000 0000 still rendered as a live `tel:` link
-   * in the header, footer, hero and legal pages, so the site stated a phone
-   * number for the business and dialling it reached silence. An absent
-   * number tells the truth and routes the customer somewhere that works.
-   *
-   * Fill these here, or better, have the owner fill Admin → Settings, which
-   * overrides them everywhere with no deploy.
+   * PLACEHOLDERS, pending the business's confirmed details - swap them for
+   * the real fallback values, or better, have the owner fill Admin →
+   * Settings, which overrides them everywhere with no deploy.
    */
-  phone: "",
-  email: "",
+  phone: "024 000 0000",
+  whatsapp: "024 000 0000",
+  email: "info@dbplus.com",
   /**
    * Where the call/WhatsApp links point while no number is configured: the
    * contact page, never a `tel:`/`wa.me` that dials nobody.
