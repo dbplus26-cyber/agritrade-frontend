@@ -54,11 +54,9 @@ export async function generateMetadata({
         lot.inStock ? "In stock now." : "On order - ask us."
       } Call with tonnage and destination for a same-day quote.`,
     path: `/commodities/${lot.slug}`,
-    // The lot's own photograph is the share card. Without it every commodity
-    // shared into WhatsApp - which is how these actually circulate - carried
-    // the same generic site image, so three different lots looked like one
-    // link posted three times.
-    image: lot.photo ?? undefined,
+    // No `image` here: the sibling opengraph-image.tsx generates this lot's
+    // share card - name, spec and the lot's own photograph on the brand frame
+    // - and a file-convention image outranks a metadata one anyway.
     keywords: [lot.name, `${lot.name} Ghana`, `${lot.name} Tamale`],
   });
 }

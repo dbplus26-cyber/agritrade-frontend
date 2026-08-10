@@ -30,20 +30,64 @@ const INK = "#1F211C";
 // about the offer and let the landing page carry the live contact.
 const DEFAULT_CTA = "Same-day quotes from the Tamale yard →";
 
+/**
+ * Fetch a photo for embedding in a card, as a data URI.
+ *
+ * The dynamic commodity/plot cards carry the record's own photograph, and
+ * Satori would fetch a remote URL itself - but a Cloudinary hiccup mid-render
+ * would then fail the whole card. Fetching here keeps the failure ours: any
+ * error, oversize body or non-image response returns undefined and the card
+ * renders in its text-only form instead of not at all.
+ */
+export async function fetchOgPhoto(
+  url: null | string | undefined,
+): Promise<string | undefined> {
+  if (!url) return undefined;
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(4000) });
+    if (!res.ok) return undefined;
+    const type = res.headers.get("content-type") ?? "";
+    if (!type.startsWith("image/")) return undefined;
+    const buf = Buffer.from(await res.arrayBuffer());
+    // Satori decodes the whole image in memory; past this size the photo is
+    // costing more than the card is worth.
+    if (buf.byteLength > 4_000_000) return undefined;
+    return `data:${type};base64,${buf.toString("base64")}`;
+  } catch {
+    return undefined;
+  }
+}
+
 export async function brandOgImage({
   eyebrow,
   title,
   subtitle,
   cta = DEFAULT_CTA,
+  photo,
 }: {
   eyebrow: string;
   title: string;
   subtitle: string;
   /** The conversion line on the card - tailor it per page. */
   cta?: string;
+  /**
+   * A data-URI photograph (see `fetchOgPhoto`) shown as a full-bleed panel on
+   * the card's right - the dynamic pages use it so a shared lot or plot still
+   * shows its own picture inside the brand frame.
+   */
+  photo?: string;
 }) {
-  // Scale the headline down as it gets longer so long titles never overflow.
-  const titleSize = title.length > 30 ? 62 : title.length > 18 ? 84 : 104;
+  // Scale the headline down as it gets longer so long titles never overflow;
+  // the photo panel narrows the text column, so its thresholds sit lower.
+  const titleSize = photo
+    ? title.length > 24
+      ? 54
+      : 72
+    : title.length > 30
+      ? 62
+      : title.length > 18
+        ? 84
+        : 104;
 
   const markSrc = `data:image/png;base64,${await readFile(
     join(process.cwd(), "public", "logo-mark.png"),
@@ -57,15 +101,21 @@ export async function brandOgImage({
           width: "100%",
           height: "100%",
           display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
           background: SURFACE,
           color: INK,
-          padding: "64px 80px",
           borderTop: `18px solid ${FOREST}`,
           fontFamily: "Georgia, serif",
         }}
       >
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            padding: photo ? "56px 48px 56px 72px" : "64px 80px",
+          }}
+        >
         <div
           style={{
             display: "flex",
@@ -127,10 +177,31 @@ export async function brandOgImage({
           >
             {cta}
           </div>
-          <div style={{ fontSize: 24, color: SOIL }}>
-            {`${siteConfig.legalName} · ${siteConfig.city}`}
-          </div>
+          {/* The photo panel narrows the column too far for the legal line;
+              the eyebrow and mark already carry the identity there. */}
+          {photo ? null : (
+            <div style={{ fontSize: 24, color: SOIL }}>
+              {`${siteConfig.legalName} · ${siteConfig.city}`}
+            </div>
+          )}
         </div>
+        </div>
+        {photo ? (
+          // Satori renders plain <img>; next/image does not exist in an OG card.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={photo}
+            width={420}
+            height={612}
+            alt=""
+            style={{
+              width: 420,
+              height: "100%",
+              objectFit: "cover",
+              borderLeft: `10px solid ${FOREST}`,
+            }}
+          />
+        ) : null}
       </div>
     ),
     { ...OG_SIZE },

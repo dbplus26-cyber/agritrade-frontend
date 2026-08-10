@@ -51,9 +51,9 @@ export async function generateMetadata({
       plot.description ??
       `${plot.sizeText}${plot.use ? ` ${plot.use}` : ""} plot at ${plot.name}, Tamale. Papers first: site plan and indenture checked and the boundary walked before any money changes hands.`,
     path: `/land/${plotSlug(plot)}`,
-    // The plot's cover photo, for the same reason as the commodity pages: a
-    // plot shared without its frontage is indistinguishable from any other.
-    image: plot.photo ?? undefined,
+    // No `image` here: the sibling opengraph-image.tsx generates this plot's
+    // share card - name, facts and the frontage photo on the brand frame -
+    // and a file-convention image outranks a metadata one anyway.
     keywords: [
       `${plot.name} plot`,
       "land for sale Tamale",
