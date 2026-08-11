@@ -151,7 +151,7 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
           // viewport's - the dialog is portaled out of the console's
           // `@container/main`, so without a container here the `@min-` rules
           // never resolve and the row stays stacked even on a wide screen.
-          className="@container flex flex-col gap-4"
+          className="@container flex flex-col gap-5"
           noValidate
           onSubmit={handleSubmit(onSubmit)}
         >

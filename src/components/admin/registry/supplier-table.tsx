@@ -16,6 +16,7 @@ import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useGetSuppliersQuery } from "@/redux/suppliers/suppliers-api";
 import { useTableQuery } from "@/hooks/use-table-query";
+import { usePermissions } from "@/hooks/use-permissions";
 import { extractApiError } from "@/lib/extract-api-error";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import { formatDateTime } from "@/lib/format-date";
@@ -116,6 +117,8 @@ const SOURCE_FILTER_OPTIONS = [
 /** The live Suppliers directory. */
 export function SupplierTable() {
   const router = useRouter();
+  const { has } = usePermissions();
+  const canManage = has("DIRECTORY_MANAGE");
   const {
     page,
     search: searchInput,
@@ -253,9 +256,11 @@ export function SupplierTable() {
             Who the business buys from at the farm gate and beyond
           </p>
         </div>
-        {<AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ Add supplier</Link>
-            </AdminButton>}
+        {canManage ? (
+          <AdminButton asChild>
+            <Link href={`${LIST}/new`}>+ Add supplier</Link>
+          </AdminButton>
+        ) : null}
       </div>
 
       {pristine || (isError && !filtered) ? null : (
@@ -306,8 +311,8 @@ export function SupplierTable() {
           filtered={filtered}
           noun="suppliers"
           description="Add the first person or company the business buys from."
-          actionLabel="Add your first supplier"
-          onAction={() => router.push(`${LIST}/new`)}
+          actionLabel={canManage ? "Add your first supplier" : undefined}
+          onAction={canManage ? () => router.push(`${LIST}/new`) : undefined}
           onClear={() => {
             setSearch("");
             resetFilters();

@@ -139,7 +139,7 @@ function PaymentDialog({
             plot sold.
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
-        <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
+        <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
           <AdminField label="Amount (GHS)" error={errors.amountGhs?.message}>
             <Input
               inputMode="decimal"
@@ -259,7 +259,7 @@ function CancelDialog({
               : ""}
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
-        <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
+        <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
           {hasMoney ? (
             <AdminField
               label={`Received so far: ${formatCedis(paid)}`}

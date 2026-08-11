@@ -19,7 +19,6 @@ import {
   AdminField,
   adminInputClass,
   Mono,
-  SectionHeading,
 } from "@/components/admin/ui";
 import {
   ResponsiveDialog,
@@ -35,6 +34,7 @@ import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
 import { SimpleSelect } from "@/components/ui/simple-select";
 import { useAuthRole } from "@/hooks/use-auth-role";
+import { usePermissions } from "@/hooks/use-permissions";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
@@ -97,6 +97,8 @@ function Route({ from, to }: { from: string; to: string }) {
 /** /admin/transfers - the posted warehouse-to-warehouse movements register. */
 export function TransfersScreen() {
   const { isSuperAdmin } = useAuthRole();
+  const { has } = usePermissions();
+  const canManage = isSuperAdmin || has("TRANSFERS_MANAGE");
   const [dialogOpen, setDialogOpen] = useState(false);
   const { page, filters, setFilter, setPage, resetFilters } = useTableQuery({
     defaults: FILTER_DEFAULTS,
@@ -290,7 +292,7 @@ export function TransfersScreen() {
             ledger
           </p>
         </div>
-        {isSuperAdmin ? (
+        {canManage ? (
               <AdminButton onClick={() => setDialogOpen(true)}>
                 + New transfer
               </AdminButton>
@@ -352,8 +354,8 @@ export function TransfersScreen() {
           noun="transfers"
           description="Stock moved between warehouses is recorded here."
           filteredDescription="Nothing matches this filter."
-          actionLabel={isSuperAdmin ? "+ New transfer" : undefined}
-          onAction={isSuperAdmin ? () => setDialogOpen(true) : undefined}
+          actionLabel={canManage ? "+ New transfer" : undefined}
+          onAction={canManage ? () => setDialogOpen(true) : undefined}
           onClear={resetFilters}
         />
       ) : (
@@ -463,7 +465,6 @@ function TransferDialog({
           className="@container grid gap-5"
         >
           <section className="grid gap-3.5">
-            <SectionHeading className="mb-0">Where it moves</SectionHeading>
             <AdminField
               label="From warehouse"
               error={errors.fromWarehouseId?.message}
@@ -508,8 +509,7 @@ function TransferDialog({
             </AdminField>
           </section>
 
-          <section className="grid gap-3.5 pt-3 sm:pt-6">
-            <SectionHeading className="mb-0">What, and how much</SectionHeading>
+          <section className="grid gap-3.5">
             <AdminField label="Commodity" error={errors.commodityId?.message}>
               <Controller
                 control={control}
@@ -552,8 +552,7 @@ function TransferDialog({
             </div>
           </section>
 
-          <section className="grid gap-3.5 pt-3 sm:pt-6">
-            <SectionHeading className="mb-0">Anything else</SectionHeading>
+          <section className="grid gap-3.5">
             <AdminField label="Notes" optional error={errors.notes?.message}>
               <Input
                 placeholder="e.g. Consolidating for loading"

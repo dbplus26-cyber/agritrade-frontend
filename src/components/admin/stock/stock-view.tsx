@@ -31,6 +31,7 @@ import {
 } from "@/redux/stock/stock-api";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
+import { usePermissions } from "@/hooks/use-permissions";
 import { cn } from "@/lib/utils";
 import {
   adjustmentFormSchema,
@@ -67,6 +68,8 @@ interface MatrixCommodity {
 export function StockView() {
   const [section, setSection] = useState<Section>("balances");
   const [adjustOpen, setAdjustOpen] = useState(false);
+  const { has } = usePermissions();
+  const canAdjust = has("STOCK_MANAGE");
   const [warehouseId, setWarehouseId] = useState("all");
   const [commodityId, setCommodityId] = useState("all");
   const [includeZero, setIncludeZero] = useState(false);
@@ -180,9 +183,11 @@ export function StockView() {
             stored number
           </p>
         </div>
-        <AdminButton onClick={() => setAdjustOpen(true)}>
-          + Request adjustment
-        </AdminButton>
+        {canAdjust ? (
+          <AdminButton onClick={() => setAdjustOpen(true)}>
+            + Request adjustment
+          </AdminButton>
+        ) : null}
       </div>
 
       {/* Section toggle - balances / movements. */}

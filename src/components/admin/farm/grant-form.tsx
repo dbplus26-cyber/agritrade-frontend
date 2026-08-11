@@ -10,7 +10,6 @@ import {
   AdminField,
   AdminPageHeader,
   adminInputClass,
-  SectionHeading,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
 import { BackButton } from "@/components/ui/BackButton";
@@ -132,16 +131,10 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
         onSubmit={handleSubmit(onSubmit, () => {
           if (!agreement) setAgreementError(AGREEMENT_MISSING);
         })}
-        className="@container flex flex-col gap-4"
+        className="@container flex flex-col gap-5"
       >
         <AdminCard className="flex flex-col gap-5 px-5 py-4">
-          <section className="flex flex-col gap-3">
-            <SectionHeading
-              className="mb-0"
-              hint="Who is being advanced inputs, against which season, and what they are worth."
-            >
-              Who and what
-            </SectionHeading>
+          <section className="flex flex-col gap-5">
             <AdminField label="Farmer" error={errors.farmerId?.message}>
               <Controller
                 control={control}
@@ -163,7 +156,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
                 )}
               />
             </AdminField>
-            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+            <div className="grid grid-cols-1 gap-5 @min-[440px]:grid-cols-2">
               <AdminField label="Season" error={errors.seasonId?.message}>
                 <Controller
                   control={control}
@@ -231,13 +224,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
             </AdminField>
           </section>
 
-          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
-            <SectionHeading
-              className="mb-0"
-              hint="The agreement the farmer signed becomes the binding record behind this grant - what was taken, and what was agreed in return."
-            >
-              Paperwork
-            </SectionHeading>
+          <section className="flex flex-col gap-5">
             <AdminField
               label="Agreed repayment terms"
               optional
@@ -254,7 +241,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
                 {...register("agreedTerms")}
               />
             </AdminField>
-            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+            <div className="grid grid-cols-1 gap-5 @min-[440px]:grid-cols-2">
               <AdminField
                 error={errors.dueDate?.message}
                 hint="The day the farmer is meant to have paid this back by, in produce or cash."

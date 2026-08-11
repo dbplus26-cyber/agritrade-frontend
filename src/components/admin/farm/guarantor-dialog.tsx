@@ -6,7 +6,6 @@ import {
   AdminButton,
   AdminField,
   adminInputClass,
-  SectionHeading,
 } from "@/components/admin/ui";
 import {
   ResponsiveDialog,
@@ -143,8 +142,7 @@ export function GuarantorDialog({
           onSubmit={handleSubmit(onSubmit)}
           className="@container flex flex-col gap-5"
         >
-          <section className="flex flex-col gap-3">
-            <SectionHeading className="mb-0">Who they are</SectionHeading>
+          <section className="flex flex-col gap-5">
             <AdminField label="Name" error={errors.name?.message}>
               <Input
                 placeholder="e.g. Fuseini Alhassan"
@@ -152,7 +150,7 @@ export function GuarantorDialog({
                 {...register("name")}
               />
             </AdminField>
-            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+            <div className="grid grid-cols-1 gap-5 @min-[440px]:grid-cols-2">
               <AdminField
                 label="Relationship"
                 optional
@@ -174,14 +172,8 @@ export function GuarantorDialog({
             </div>
           </section>
 
-          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
-            <SectionHeading
-              className="mb-0"
-              hint="The ID you checked, so the person vouching can be identified later."
-            >
-              Identification
-            </SectionHeading>
-            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+          <section className="flex flex-col gap-5">
+            <div className="grid grid-cols-1 gap-5 @min-[440px]:grid-cols-2">
               <AdminField label="ID type" optional error={errors.idType?.message}>
                 <Input
                   list="guarantor-id-types"
@@ -205,13 +197,7 @@ export function GuarantorDialog({
             </div>
           </section>
 
-          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
-            <SectionHeading
-              className="mb-0"
-              hint="How you would actually reach this person if repayment stalls."
-            >
-              How to reach them
-            </SectionHeading>
+          <section className="flex flex-col gap-5">
             <AdminField label="Phone" optional error={errors.phone?.message}>
               <Input
                 inputMode="tel"

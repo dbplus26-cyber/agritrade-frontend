@@ -151,7 +151,7 @@ function LogoCard({ settings }: { settings: ISystemSettings }) {
             </AdminButton>
           ) : null}
         </div>
-        <label className="flex cursor-pointer items-start gap-2.5 border-t border-adm-hairline pt-3 text-[13px] text-adm-body">
+        <label className="flex cursor-pointer items-start gap-2.5 pt-3 text-[13px] text-adm-body">
           <input
             type="checkbox"
             checked={settings.statementLogoFallbackToSite}
@@ -235,10 +235,7 @@ function StatementSettingsForm({
       className="flex max-w-[640px] flex-col gap-4"
     >
       <AdminCard className="px-5 py-[18px]">
-        <SectionHeading hint="The name and mark on the book's cover and every running header.">
-          The business on the cover
-        </SectionHeading>
-        <div className="flex flex-col gap-[13px]">
+        <div className="flex flex-col gap-5">
           <AdminField
             label="Business name"
             hint={descriptions.statementBusinessName}
@@ -276,10 +273,7 @@ function StatementSettingsForm({
       </AdminCard>
 
       <AdminCard className="px-5 py-[18px]">
-        <SectionHeading hint="Named on the corporate-information page and on the certificate the proprietor signs.">
-          Managing proprietor
-        </SectionHeading>
-        <div className="flex flex-col gap-[13px]">
+        <div className="flex flex-col gap-5">
           <AdminField
             label="Proprietor's name"
             hint={descriptions.statementProprietorName}
@@ -317,10 +311,7 @@ function StatementSettingsForm({
       </AdminCard>
 
       <AdminCard className="px-5 py-[18px]">
-        <SectionHeading hint="The professional parties on the corporate-information page - one line per row, as each should print.">
-          Bankers & accountants
-        </SectionHeading>
-        <div className="flex flex-col gap-[13px]">
+        <div className="flex flex-col gap-5">
           <AdminField
             label="Bankers"
             optional

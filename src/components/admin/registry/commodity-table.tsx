@@ -15,6 +15,7 @@ import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useGetCommoditiesQuery } from "@/redux/commodities/commodities-api";
 import { useTableQuery } from "@/hooks/use-table-query";
+import { usePermissions } from "@/hooks/use-permissions";
 import { useAuthRole } from "@/hooks/use-auth-role";
 import { extractApiError } from "@/lib/extract-api-error";
 import { DateTimeCell } from "@/components/admin/date-cell";
@@ -53,6 +54,8 @@ export function CommodityTable() {
   } = useTableQuery({ defaults: FILTER_DEFAULTS });
   // Only the owner edits this vocabulary (design doc 4).
   const { isSuperAdmin } = useAuthRole();
+  const { has } = usePermissions();
+  const canManage = isSuperAdmin || has("VOCABULARY_MANAGE");
 
   const statusFilter = filters.status as StatusFilter;
   const visibilityFilter = filters.visibility;
@@ -205,7 +208,7 @@ export function CommodityTable() {
             visibility
           </p>
         </div>
-        {isSuperAdmin ? (
+        {canManage ? (
               <AdminButton asChild>
                 <Link href="/admin/commodities/new">+ Add commodity</Link>
               </AdminButton>
@@ -251,9 +254,9 @@ export function CommodityTable() {
           filtered={filtered}
           noun="commodities"
           description="Add the first commodity the business trades - name, variety and grade."
-          actionLabel={isSuperAdmin ? "Add your first commodity" : undefined}
+          actionLabel={canManage ? "Add your first commodity" : undefined}
           onAction={
-            isSuperAdmin
+            canManage
               ? () => router.push("/admin/commodities/new")
               : undefined
           }

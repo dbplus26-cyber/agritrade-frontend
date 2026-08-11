@@ -215,9 +215,9 @@ function EditDetailsForm({
     <form
       noValidate
       onSubmit={handleSubmit(onSubmit)}
-      className="grid max-w-[560px] gap-[15px]"
+      className="grid max-w-[560px] gap-5"
     >
-      <div className="grid gap-[15px] sm:grid-cols-2">
+      <div className="grid gap-5 sm:grid-cols-2">
         <AdminField label="First name" error={errors.firstName?.message}>
           <Input
             placeholder="e.g. Amina"
@@ -299,8 +299,8 @@ function PermissionsCard({ user }: { user: IUser }) {
           narrowed.
         </p>
       ) : (
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="min-w-0">
+        <div className="flex flex-col items-start gap-2.5 @min-[300px]:flex-row @min-[300px]:items-center @min-[300px]:gap-3">
+          <div className="min-w-0 flex-1">
             <div className="text-[13.5px] font-semibold text-adm-ink">
               {state
                 ? `${String(state.effective.length)} permission${
@@ -341,8 +341,8 @@ function RoleCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
     <div id="role" className="scroll-mt-20">
       <AdminCard className="px-4 py-[18px] sm:px-6">
         <SectionHeading className="mb-3.5">Role</SectionHeading>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="min-w-0">
+        <div className="flex flex-col items-start gap-2.5 @min-[300px]:flex-row @min-[300px]:items-center @min-[300px]:gap-3">
+          <div className="min-w-0 flex-1">
             <div className="text-[13.5px] font-semibold text-adm-ink">
               {ROLE_TITLE[user.role] ?? user.role}
             </div>

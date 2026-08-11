@@ -17,7 +17,6 @@ import {
   AdminField,
   adminInputClass,
   adminSelectClass,
-  SectionHeading,
 } from "@/components/admin/ui";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
@@ -124,8 +123,7 @@ export function ExpenseFormDialog({
           onSubmit={(e) => void handleSubmit(onSubmit)(e)}
           noValidate
         >
-          <section className="grid gap-3">
-            <SectionHeading className="mb-0">What it was</SectionHeading>
+          <section className="grid gap-5">
             <AdminField
               label="Category"
               hint="The heading this cost is filed under, so spending can be grouped in reports."
@@ -160,9 +158,8 @@ export function ExpenseFormDialog({
             </AdminField>
           </section>
 
-          <section className="grid gap-3 pt-3 sm:pt-6">
-            <SectionHeading className="mb-0">How much, and when</SectionHeading>
-            <div className="grid gap-3 @min-[380px]:grid-cols-2">
+          <section className="grid gap-5">
+            <div className="grid gap-5 @min-[380px]:grid-cols-2">
               <AdminField label="Amount (GH₵)" error={errors.amountGhs?.message}>
                 <input
                   id="expense-amount"

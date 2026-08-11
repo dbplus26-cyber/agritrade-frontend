@@ -16,6 +16,7 @@ import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
+import { usePermissions } from "@/hooks/use-permissions";
 import { extractApiError } from "@/lib/extract-api-error";
 import { cn } from "@/lib/utils";
 import { useGetStocktakesQuery } from "@/redux/stocktakes/stocktakes-api";
@@ -33,6 +34,8 @@ const FILTER_DEFAULTS = { status: "all", warehouse: "all", size: "10" };
 /** /admin/stocktakes - the physical count sheets register. */
 export function StocktakesScreen() {
   const router = useRouter();
+  const { has } = usePermissions();
+  const canCount = has("STOCK_MANAGE");
   const { page, filters, setFilter, setPage, resetFilters } = useTableQuery({
     defaults: FILTER_DEFAULTS,
   });
@@ -170,9 +173,11 @@ export function StocktakesScreen() {
             as adjustments
           </p>
         </div>
-        {<AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ New stocktake</Link>
-            </AdminButton>}
+        {canCount ? (
+          <AdminButton asChild>
+            <Link href={`${LIST}/new`}>+ New stocktake</Link>
+          </AdminButton>
+        ) : null}
       </div>
 
       {pristine ? null : (
@@ -215,8 +220,8 @@ export function StocktakesScreen() {
           noun="stocktakes"
           description="Start a count sheet to check a warehouse against the book."
           filteredDescription="Nothing matches this filter."
-          actionLabel="New stocktake"
-          onAction={() => router.push(`${LIST}/new`)}
+          actionLabel={canCount ? "New stocktake" : undefined}
+          onAction={canCount ? () => router.push(`${LIST}/new`) : undefined}
           onClear={resetFilters}
         />
       ) : (

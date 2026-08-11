@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -50,12 +51,21 @@ export function AgentShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-surface text-ink">
       <header className="border-b border-soil/25 bg-paper">
         <div className="mx-auto flex h-14 max-w-[560px] items-center justify-between px-4">
-          <Link href="/agent" className="min-w-0">
-            <span className="block text-[15px] font-bold tracking-tight text-forest">
-              DB PLUS
-            </span>
-            <span className="block truncate text-[11px] text-soil">
-              Field agent{user ? ` · ${user.firstName}` : ""}
+          <Link href="/agent" className="flex min-w-0 items-center gap-2.5">
+            <Image
+              src="/logo-mark.png"
+              alt=""
+              width={64}
+              height={64}
+              className="h-8 w-8 shrink-0"
+            />
+            <span className="min-w-0">
+              <span className="block text-[15px] font-bold tracking-tight text-forest">
+                DB PLUS
+              </span>
+              <span className="block truncate text-[11px] text-soil">
+                Field agent{user ? ` · ${user.firstName}` : ""}
+              </span>
             </span>
           </Link>
           <div className="flex flex-none items-center gap-2">

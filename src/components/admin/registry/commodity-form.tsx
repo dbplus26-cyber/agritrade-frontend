@@ -11,7 +11,6 @@ import {
   AdminField,
   AdminPageHeader,
   EditableFormActions,
-  SectionHeading,
   adminInputClass,
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
@@ -218,8 +217,7 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
         onSubmit={handleSubmit(onSubmit)}
         className="@container flex flex-col gap-5"
       >
-        <section className="flex flex-col gap-[13px]">
-          <SectionHeading className="mb-0">What it is</SectionHeading>
+        <section className="flex flex-col gap-5">
           <AdminField label="Name" error={errors.name?.message}>
             <Input
               placeholder="e.g. White Maize"
@@ -229,7 +227,7 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
               {...register("name")}
             />
           </AdminField>
-          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+          <div className="grid gap-5 @min-[440px]:grid-cols-2">
             <AdminField
               label="Variety"
               optional
@@ -266,14 +264,8 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
           </div>
         </section>
 
-        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
-          <SectionHeading
-            className="mb-0"
-            hint="Conventions the console uses when it shows this commodity: nothing here changes how stock is counted."
-          >
-            Measurement and order
-          </SectionHeading>
-          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+        <section className="flex flex-col gap-5">
+          <div className="grid gap-5 @min-[440px]:grid-cols-2">
             <AdminField
               label="Bag weight (kg)"
               optional
@@ -315,13 +307,7 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
           </div>
         </section>
 
-        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
-          <SectionHeading
-            className="mb-0"
-            hint="What the public site shows for this commodity once it is published."
-          >
-            On the website
-          </SectionHeading>
+        <section className="flex flex-col gap-5">
           <AdminField
             label="Description"
             optional

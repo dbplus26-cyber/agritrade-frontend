@@ -50,6 +50,7 @@ import {
 } from "@/static-data/admin/nav";
 import { HelpWrap } from "@/components/admin/help-tip";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { usePermissions } from "@/hooks/use-permissions";
 import { usePendingApprovalsCount } from "@/hooks/use-pending-approvals";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useLogoutMutation } from "@/redux/auth/auth-api";
@@ -282,12 +283,19 @@ function ConsoleSidebar({ activeKey }: { activeKey: string }) {
   const collapsed = state === "collapsed";
   const pendingApprovals = usePendingApprovalsCount();
   const { isSuperAdmin } = useAuthRole();
-  // Owner-only entries are hidden from staff, who would only hit a 403; empty
-  // groups then drop out entirely so no bare heading is left behind.
+  const { has } = usePermissions();
+  // An entry someone cannot USE never renders: owner-only entries hide from
+  // staff, and permission-carrying entries hide until the permission is
+  // actually held - no tab whose whole answer is "you have no permission".
+  // Empty groups then drop out entirely so no bare heading is left behind.
   const groups = adminNavGroups
     .map((group) => ({
       ...group,
-      items: group.items.filter((i) => isSuperAdmin || !i.ownerOnly),
+      items: group.items.filter(
+        (i) =>
+          isSuperAdmin ||
+          (!i.ownerOnly && (!i.permission || has(i.permission))),
+      ),
     }))
     .filter((group) => group.items.length > 0);
 
@@ -457,12 +465,23 @@ const MOBILE_TABS = [
 function MobileTabs({ activeKey }: { activeKey: string }) {
   const { openMobile, setOpenMobile } = useSidebar();
   const pendingApprovals = usePendingApprovalsCount();
+  const { isSuperAdmin } = useAuthRole();
+  const { has } = usePermissions();
+  // Approvals is a decider's tab: for everyone else it opened onto a screen
+  // that could only refuse them, so it does not render at all.
+  const tabs = MOBILE_TABS.filter(
+    (t) =>
+      t.key !== "approvals" || isSuperAdmin || has("APPROVALS_DECIDE"),
+  );
   return (
     <nav
       aria-label="Console quick navigation"
-      className="fixed inset-x-0 bottom-0 z-[60] grid h-[62px] grid-cols-4 border-t border-adm-line bg-adm-card pb-[env(safe-area-inset-bottom)] md:hidden"
+      className={cn(
+        "fixed inset-x-0 bottom-0 z-[60] grid h-[62px] border-t border-adm-line bg-adm-card pb-[env(safe-area-inset-bottom)] md:hidden",
+        tabs.length === 3 ? "grid-cols-4" : "grid-cols-3",
+      )}
     >
-      {MOBILE_TABS.map((tab) => {
+      {tabs.map((tab) => {
         const active = activeKey === tab.key && !openMobile;
         return (
           <Link

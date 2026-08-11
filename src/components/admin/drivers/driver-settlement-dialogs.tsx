@@ -121,7 +121,7 @@ export function DriverFeeDialog({
         </ResponsiveDialogHeader>
 
         <form
-          className="flex flex-col gap-4"
+          className="flex flex-col gap-5"
           noValidate
           onSubmit={handleSubmit(onSubmit)}
         >
@@ -293,7 +293,7 @@ export function DriverPaymentDialog({
         </ResponsiveDialogHeader>
 
         <form
-          className="flex flex-col gap-4"
+          className="flex flex-col gap-5"
           noValidate
           onSubmit={handleSubmit(onSubmit)}
         >
@@ -463,7 +463,7 @@ export function ReverseReasonDialog({
         </ResponsiveDialogHeader>
 
         <form
-          className="flex flex-col gap-4"
+          className="flex flex-col gap-5"
           noValidate
           onSubmit={handleSubmit((v) => {
             onSubmit(v.reason);
@@ -579,7 +579,7 @@ export function DriverFeeAdjustDialog({
         </ResponsiveDialogHeader>
 
         <form
-          className="flex flex-col gap-4"
+          className="flex flex-col gap-5"
           noValidate
           onSubmit={handleSubmit(onSubmit)}
         >

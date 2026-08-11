@@ -13,7 +13,6 @@ import {
   AdminPageHeader,
   adminInputClass,
   adminSelectClass,
-  SectionHeading,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { useConfirm } from "@/hooks/use-confirm";
@@ -135,9 +134,8 @@ export function UserForm() {
           onSubmit={handleSubmit(onSubmit)}
           className="@container flex flex-col gap-5"
         >
-          <section className="flex flex-col gap-[13px]">
-            <SectionHeading className="mb-0">Who they are</SectionHeading>
-            <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+          <section className="flex flex-col gap-5">
+            <div className="grid gap-5 @min-[440px]:grid-cols-2">
               <AdminField label="First name" error={errors.firstName?.message}>
                 <Input
                   placeholder="e.g. Amina"
@@ -159,7 +157,7 @@ export function UserForm() {
                 />
               </AdminField>
             </div>
-            <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+            <div className="grid gap-5 @min-[440px]:grid-cols-2">
               <AdminField label="Email" error={errors.email?.message}>
                 <Input
                   type="email"
@@ -186,14 +184,8 @@ export function UserForm() {
             </div>
           </section>
 
-          <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
-            <SectionHeading
-              className="mb-0"
-              hint="What this account can reach, and the password you hand over to open it."
-            >
-              Access
-            </SectionHeading>
-            <div className="grid gap-[13px] @min-[520px]:grid-cols-2">
+          <section className="flex flex-col gap-5">
+            <div className="grid gap-5 @min-[520px]:grid-cols-2">
             <AdminField
               label="Role"
               hint="Agents only ever see their own float and purchases."
@@ -249,7 +241,7 @@ export function UserForm() {
             </div>
           </section>
 
-          <div className="flex justify-end gap-2 pt-3 sm:pt-6">
+          <div className="flex justify-end gap-2">
             <AdminButton
               type="button"
               variant="outline"

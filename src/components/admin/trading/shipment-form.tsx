@@ -459,7 +459,7 @@ export function ShipmentForm({
         className="flex flex-col gap-5"
       >
         <AdminCard className="flex flex-col gap-5 p-5">
-          <section className="flex flex-col gap-4">
+          <section className="flex flex-col gap-5">
             <StepHead
               step={1}
               title="Sales on this trip"
@@ -600,7 +600,7 @@ export function ShipmentForm({
             )}
           </section>
 
-          <section className="flex flex-col gap-4 pt-3 sm:pt-6">
+          <section className="flex flex-col gap-5 pt-3 sm:pt-6">
             <StepHead
               step={2}
               title="Loading warehouses"
@@ -743,7 +743,7 @@ export function ShipmentForm({
             ) : null}
           </section>
 
-          <section className="flex flex-col gap-4 pt-3 sm:pt-6">
+          <section className="flex flex-col gap-5 pt-3 sm:pt-6">
             <StepHead
               step={3}
               title="Truck & destination"
@@ -848,7 +848,7 @@ export function ShipmentForm({
                 />
               </AdminField>
             )}
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <AdminField
                 label="Truck registration"
                 error={errors.truckReg?.message}
@@ -890,7 +890,7 @@ export function ShipmentForm({
             ) : null}
           </section>
 
-          <section className="flex flex-col gap-4 pt-3 sm:pt-6">
+          <section className="flex flex-col gap-5 pt-3 sm:pt-6">
             <StepHead
               step={4}
               title="Driver"
@@ -966,7 +966,7 @@ export function ShipmentForm({
                 </AdminButton>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <AdminField label="Name" error={errors.driverName?.message}>
                   <Input
                     className={cn(

@@ -54,6 +54,7 @@ import {
 } from "@/redux/expense-categories/expense-categories-api";
 import { useGetExpensesQuery } from "@/redux/expenses/expenses-api";
 import { useAuthRole } from "@/hooks/use-auth-role";
+import { usePermissions } from "@/hooks/use-permissions";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { useMoneyVisibility } from "@/hooks/use-money-visibility";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -146,7 +147,7 @@ function CreateCategoryDialog({
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-[13px]"
+          className="flex flex-col gap-5"
         >
           <AdminField label="Name" error={errors.name?.message}>
             <Input
@@ -201,6 +202,8 @@ export function ExpenseCategoryTable() {
   } = useTableQuery({ defaults: FILTER_DEFAULTS });
   // Only the owner edits this vocabulary (design doc 4).
   const { isSuperAdmin } = useAuthRole();
+  const { has } = usePermissions();
+  const canManage = isSuperAdmin || has("VOCABULARY_MANAGE");
 
   const statusFilter = filters.status as StatusFilter;
   const pageSize = Number(filters.size) || 10;
@@ -291,7 +294,7 @@ export function ExpenseCategoryTable() {
             The vocabulary every recorded expense is filed under
           </p>
         </div>
-        {isSuperAdmin ? (
+        {canManage ? (
               <AdminButton onClick={() => setCreateOpen(true)}>
                 + Add category
               </AdminButton>
@@ -330,8 +333,8 @@ export function ExpenseCategoryTable() {
           noun="categories"
           title="No expense categories yet"
           description="Add the first category expenses will be filed under - transport, loading, commission."
-          actionLabel={isSuperAdmin ? "Add your first category" : undefined}
-          onAction={isSuperAdmin ? () => setCreateOpen(true) : undefined}
+          actionLabel={canManage ? "Add your first category" : undefined}
+          onAction={canManage ? () => setCreateOpen(true) : undefined}
           onClear={() => {
             setSearch("");
             resetFilters();
@@ -464,7 +467,7 @@ function ExpenseCategoryFormFields({
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col gap-[13px]"
+        className="flex flex-col gap-5"
       >
         <AdminField label="Name" error={errors.name?.message}>
           <Input

@@ -8,6 +8,9 @@ import { Money } from "@/components/admin/trading/sale-bits";
 import { adminLinkClass, AdminCard, Mono } from "@/components/admin/ui";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { useAuthRole } from "@/hooks/use-auth-role";
+import { useMoneyVisibility } from "@/hooks/use-money-visibility";
+import { usePermissions } from "@/hooks/use-permissions";
 import {
   formatCedisCompact,
   formatKg,
@@ -213,6 +216,10 @@ export function DashboardLive() {
   const [window, setWindow] = useState<IReportWindow>(DEFAULT_RANGE);
   const { data, isError, isLoading, refetch } = useGetDashboardQuery();
   const user = useCurrentUser();
+  const canSeeMoney = useMoneyVisibility();
+  const { isSuperAdmin } = useAuthRole();
+  const { has } = usePermissions();
+  const canDecide = isSuperAdmin || has("APPROVALS_DECIDE");
   const d = data?.data;
   const greeting = greetingFor(new Date());
 
@@ -245,7 +252,12 @@ export function DashboardLive() {
           ))}
         </div>
       ) : (
-        <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-5">
+        <div
+          className={cn(
+            "mb-5 grid grid-cols-2 gap-3",
+            canSeeMoney ? "lg:grid-cols-5" : "lg:grid-cols-3",
+          )}
+        >
           <Kpi
             label="Stock on hand"
             hint="Everything sitting in your warehouses right now, across every commodity."
@@ -254,49 +266,71 @@ export function DashboardLive() {
             sub={`${String(d.stockByCommodity.length)} commodities`}
             href="/admin/stock"
           />
-          <Kpi
-            label="Paid goods incoming"
-            hint="Grain you have already bought that has not reached a warehouse yet."
-            value={<Money compact value={d.incomingGhs} />}
-            valueText={formatCedisCompact(d.incomingGhs)}
-            sub={formatKg(d.incomingKg)}
-            href="/admin/purchases"
-          />
-          <Kpi
-            label="Cash with agents"
-            hint="Your money currently in field agents' hands, waiting to be spent or accounted for."
-            value={<Money compact value={d.cashWithAgentsGhs} />}
-            valueText={formatCedisCompact(d.cashWithAgentsGhs)}
-            sub={`${String(d.activeAgents)} active agents`}
-            href="/admin/agents"
-          />
+          {canSeeMoney ? (
+            <Kpi
+              label="Paid goods incoming"
+              hint="Grain you have already bought that has not reached a warehouse yet."
+              value={<Money compact value={d.incomingGhs} />}
+              valueText={formatCedisCompact(d.incomingGhs)}
+              sub={formatKg(d.incomingKg)}
+              href="/admin/purchases"
+            />
+          ) : (
+            <Kpi
+              label="Goods incoming"
+              hint="Grain already bought that has not reached a warehouse yet."
+              value={formatKg(d.incomingKg)}
+              valueText={formatKg(d.incomingKg)}
+              href="/admin/purchases"
+            />
+          )}
+          {canSeeMoney ? (
+            <Kpi
+              label="Cash with agents"
+              hint="Your money currently in field agents' hands, waiting to be spent or accounted for."
+              value={<Money compact value={d.cashWithAgentsGhs} />}
+              valueText={formatCedisCompact(d.cashWithAgentsGhs)}
+              sub={`${String(d.activeAgents)} active agents`}
+              href="/admin/agents"
+            />
+          ) : null}
           <Kpi
             label="Sales in progress"
             hint="Orders agreed with buyers that are not yet delivered and paid off."
             value={d.salesInProgress}
-            sub={<Money compact value={d.salesInProgressAgreedGhs} />}
+            sub={canSeeMoney ? <Money compact value={d.salesInProgressAgreedGhs} /> : undefined}
             href="/admin/sales"
           />
-          <Kpi
-            label="Balances due"
-            hint="What buyers still owe you across every order, right now."
-            value={<Money compact value={d.debtorsOutstandingGhs} />}
-            valueText={formatCedisCompact(d.debtorsOutstandingGhs)}
-            sub={`${String(d.debtorCount)} buyers`}
-            href="/admin/sales?outstanding=yes"
-            alert={(d.debtorsOutstandingGhs ?? 0) > 0}
-          />
+          {canSeeMoney ? (
+            <Kpi
+              label="Balances due"
+              hint="What buyers still owe you across every order, right now."
+              value={<Money compact value={d.debtorsOutstandingGhs} />}
+              valueText={formatCedisCompact(d.debtorsOutstandingGhs)}
+              sub={`${String(d.debtorCount)} buyers`}
+              href="/admin/sales?outstanding=yes"
+              alert={(d.debtorsOutstandingGhs ?? 0) > 0}
+            />
+          ) : null}
         </div>
       )}
 
-      {/* Windowed flow summary - driven by the date filter. */}
-      <div className="mb-5">
-        <PeriodSummary window={window} />
-      </div>
+      {/* Windowed flow summary and cashflow are MONEY panels: for someone
+          without money visibility they rendered as sheets of "Hidden", which
+          is a wall of nothing - so they simply do not render. */}
+      {canSeeMoney ? (
+        <div className="mb-5">
+          <PeriodSummary window={window} />
+        </div>
+      ) : null}
 
-      {/* Charts: cashflow (windowed) + current stock mix. */}
-      <div className="mb-5 grid grid-cols-1 gap-4 xl:grid-cols-[1.6fr_1fr]">
-        <CashflowChart window={window} />
+      <div
+        className={cn(
+          "mb-5 grid grid-cols-1 gap-4",
+          canSeeMoney && "xl:grid-cols-[1.6fr_1fr]",
+        )}
+      >
+        {canSeeMoney ? <CashflowChart window={window} /> : null}
         <StockDonut rows={d?.stockByCommodity ?? []} />
       </div>
 
@@ -304,12 +338,14 @@ export function DashboardLive() {
         <VolumeChart window={window} />
       </div>
 
-      {/* Operational panels - current state. */}
+      {/* Operational panels - current state. The approvals preview belongs
+          to people who can DECIDE; the floats card is balances, so it needs
+          money visibility. Neither renders a refusal in place of itself. */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <ActivityFeed />
-        <ApprovalsPreview />
+        {canDecide ? <ApprovalsPreview /> : null}
         <TrucksCard />
-        <AgentFloatsCard />
+        {canSeeMoney ? <AgentFloatsCard /> : null}
       </div>
     </div>
   );

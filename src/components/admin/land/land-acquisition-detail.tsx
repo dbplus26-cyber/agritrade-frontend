@@ -143,7 +143,7 @@ function PaymentDialog({
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-3"
+          className="flex flex-col gap-5"
         >
           <AdminField label="Amount (GHS)" error={errors.amountGhs?.message}>
             <Input
@@ -243,7 +243,7 @@ function CancelDialog({
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-3"
+          className="flex flex-col gap-5"
         >
           <AdminField label="Reason" error={errors.reason?.message}>
             <Input

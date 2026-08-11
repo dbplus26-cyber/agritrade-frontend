@@ -131,7 +131,7 @@ function AddAssetDialog({ onClose }: { onClose: () => void }) {
           <form
             noValidate
             onSubmit={assetForm.handleSubmit(onCreateAsset)}
-            className="flex flex-col gap-[13px]"
+            className="flex flex-col gap-5"
           >
             <AdminField label="Asset" error={errors.name?.message}>
               <Input
@@ -171,7 +171,7 @@ function AddAssetDialog({ onClose }: { onClose: () => void }) {
                 + New class
               </button>
             </AdminField>
-            <div className="grid gap-[13px] sm:grid-cols-2">
+            <div className="grid gap-5 sm:grid-cols-2">
               <AdminField label="Cost (GHS)" error={errors.costGhs?.message}>
                 <Input
                   inputMode="decimal"
@@ -203,7 +203,7 @@ function AddAssetDialog({ onClose }: { onClose: () => void }) {
           <form
             noValidate
             onSubmit={classForm.handleSubmit(onCreateClass)}
-            className="flex flex-col gap-[13px]"
+            className="flex flex-col gap-5"
           >
             <AdminField
               label="Class name"
@@ -216,7 +216,7 @@ function AddAssetDialog({ onClose }: { onClose: () => void }) {
                 {...classForm.register("name")}
               />
             </AdminField>
-            <div className="grid gap-[13px] sm:grid-cols-2">
+            <div className="grid gap-5 sm:grid-cols-2">
               <AdminField
                 label="Depreciation rate (%/yr)"
                 hint="Straight line, e.g. 10 writes the asset off over ten years."
@@ -321,9 +321,9 @@ function DisposeDialog({
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-[13px]"
+          className="flex flex-col gap-5"
         >
-          <div className="grid gap-[13px] sm:grid-cols-2">
+          <div className="grid gap-5 sm:grid-cols-2">
             <AdminField label="Disposed on" error={errors.disposedAt?.message}>
               <Input
                 type="date"

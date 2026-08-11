@@ -353,7 +353,7 @@ function TopUpDialog({
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-3"
+          className="flex flex-col gap-5"
         >
           <AdminField label="Amount (GH₵)" error={errors.amountGhs?.message}>
             <Input

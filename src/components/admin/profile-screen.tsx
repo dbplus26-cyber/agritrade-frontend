@@ -219,10 +219,10 @@ function ProfileEditForm({
     <form
       noValidate
       onSubmit={handleSubmit(onSubmit)}
-      className="@container grid max-w-[560px] gap-[15px]"
+      className="@container grid max-w-[560px] gap-5"
     >
       <SectionHeading className="mb-0">Your details</SectionHeading>
-      <div className="grid gap-[15px] @min-[440px]:grid-cols-2">
+      <div className="grid gap-5 @min-[440px]:grid-cols-2">
         <AdminField label="First name" error={errors.firstName?.message}>
           <Input
             placeholder="e.g. Abdul"
@@ -346,7 +346,7 @@ function PasswordCard() {
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="@container grid max-w-[560px] gap-[15px]"
+          className="@container grid max-w-[560px] gap-5"
         >
           <AdminField
             label="Current password"
@@ -362,7 +362,7 @@ function PasswordCard() {
               {...register("currentPassword")}
             />
           </AdminField>
-          <div className="grid gap-[15px] @min-[440px]:grid-cols-2">
+          <div className="grid gap-5 @min-[440px]:grid-cols-2">
             <AdminField label="New password" error={errors.newPassword?.message}>
               <PasswordInput
                 autoComplete="new-password"

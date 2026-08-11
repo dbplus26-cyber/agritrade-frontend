@@ -9,7 +9,6 @@ import {
   AdminField,
   AdminPageHeader,
   adminInputClass,
-  SectionHeading,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
@@ -105,11 +104,10 @@ export function SeasonForm({ season }: { season?: ISeason }) {
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        className="@container flex flex-col gap-4"
+        className="@container flex flex-col gap-5"
       >
         <AdminCard className="flex flex-col gap-5 px-5 py-4">
-          <section className="flex flex-col gap-3">
-            <SectionHeading className="mb-0">What the season is</SectionHeading>
+          <section className="flex flex-col gap-5">
             <AdminField label="Name" error={errors.name?.message}>
               <Input
                 placeholder="e.g. 2026 Wet Season"
@@ -138,14 +136,8 @@ export function SeasonForm({ season }: { season?: ISeason }) {
             </AdminField>
           </section>
 
-          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
-            <SectionHeading
-              className="mb-0"
-              hint="The window grants and repayments are booked against."
-            >
-              When it runs
-            </SectionHeading>
-            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+          <section className="flex flex-col gap-5">
+            <div className="grid grid-cols-1 gap-5 @min-[440px]:grid-cols-2">
               <AdminField label="Starts on" error={errors.startsOn?.message}>
                 <Input
                   type="date"

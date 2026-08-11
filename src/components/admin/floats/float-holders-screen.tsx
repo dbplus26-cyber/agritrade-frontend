@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/responsive-dialog";
 import { SimpleSelect } from "@/components/ui/simple-select";
 import { useConfirm } from "@/hooks/use-confirm";
+import { usePermissions } from "@/hooks/use-permissions";
 import { useMoneyVisibility } from "@/hooks/use-money-visibility";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -103,6 +104,8 @@ export function FloatHoldersScreen() {
   // list with no filters means a genuinely pristine register: show the empty
   // state alone - a filter bar filters nothing.
   const pristine = rows.length === 0 && !filtered;
+  const { has } = usePermissions();
+  const canManage = has("FLOATS_MANAGE");
 
   // Columns follow the register convention: an explicit `id` plus an
   // `accessorFn`, not the `accessorKey` shorthand. The mobile card renderer
@@ -182,17 +185,21 @@ export function FloatHoldersScreen() {
       });
     }
 
-    base.push({
-      id: "actions",
-      header: "",
-      enableSorting: false,
-      meta: columnMeta(),
-      cell: ({ row }) => (
-        <HolderActions holder={row.original} onTopUp={setToppingUp} />
-      ),
-    });
+    // Top-up / suspend belong to FLOATS_MANAGE holders; for everyone else
+    // the register is read-only and the actions column does not exist.
+    if (canManage) {
+      base.push({
+        id: "actions",
+        header: "",
+        enableSorting: false,
+        meta: columnMeta(),
+        cell: ({ row }) => (
+          <HolderActions holder={row.original} onTopUp={setToppingUp} />
+        ),
+      });
+    }
     return base;
-  }, [showMoney]);
+  }, [showMoney, canManage]);
 
   if (isLoading) return <ConsoleTableSkeleton />;
   if (error) {
@@ -395,7 +402,7 @@ function TopUpDialog({
         </ResponsiveDialogHeader>
 
         <form
-          className="space-y-4 px-4 pb-2 sm:px-0"
+          className="space-y-5 px-4 pb-2 sm:px-0"
           onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
         >
           <AdminField

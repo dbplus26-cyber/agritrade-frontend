@@ -5,12 +5,21 @@
  * shipments, approvals, reports, settings, notifications, profile) have their
  * own routes.
  */
+import type { Permission } from "@/types/permission.types";
+
 export interface AdminNavItem {
   key: string;
   label: string;
   href: string;
   /** Show the pending-approvals badge on this item. */
   badge?: "approvals";
+  /**
+   * The permission a NON-OWNER needs before this entry renders at all. An
+   * entry someone cannot use is never shown - no tab that answers "you have
+   * no permission", no register of "Hidden". Granting the permission on the
+   * Permissions screen makes the entry appear on their next session refresh.
+   */
+  permission?: Permission;
   /**
    * One sentence on what this section holds, shown on hover in the rail.
    *
@@ -35,7 +44,7 @@ const item = (
   key: string,
   label: string,
   hint: string,
-  opts?: { badge?: "approvals"; ownerOnly?: boolean },
+  opts?: { badge?: "approvals"; ownerOnly?: boolean; permission?: Permission },
 ): AdminNavItem => ({
   key,
   label,
@@ -43,6 +52,7 @@ const item = (
   href: key === "dashboard" ? ADMIN_HOME : `${ADMIN_HOME}/${key}`,
   badge: opts?.badge,
   ownerOnly: opts?.ownerOnly,
+  permission: opts?.permission,
 });
 
 /**
@@ -56,8 +66,8 @@ export const adminNavGroups: AdminNavGroup[] = [
     label: "Overview",
     items: [
       item("dashboard", "Dashboard", "Today at a glance: what came in, what went out, and what needs you."),
-      item("approvals", "Approvals", "Requests waiting on your decision. Approving applies the change straight away.", { badge: "approvals" }),
-      item("reports", "Reports", "Profit, cash and volume over a period you choose."),
+      item("approvals", "Approvals", "Requests waiting on your decision. Approving applies the change straight away.", { badge: "approvals", permission: "APPROVALS_DECIDE" }),
+      item("reports", "Reports", "Profit, cash and volume over a period you choose.", { permission: "MONEY_VIEW" }),
     ],
   },
   {
@@ -84,7 +94,7 @@ export const adminNavGroups: AdminNavGroup[] = [
       // Staff see only their own sends; the whole register and the company's
       // bank position are the owner's business.
       item("my-sends", "My sends", "Money you personally have sent out, and whether it arrived."),
-      item("disbursements", "Money sent", "Every mobile money and bank transfer sent from the business.", { ownerOnly: true }),
+      item("disbursements", "Money sent", "Every mobile money and bank transfer sent from the business.", { permission: "PAYOUTS_SEND" }),
       item("floats", "Floats", "Money handed to agents to buy with, and what each still holds."),
       item("treasury", "Company account", "The company's own balance, and moving money between its accounts.", { ownerOnly: true }),
     ],
@@ -92,20 +102,20 @@ export const adminNavGroups: AdminNavGroup[] = [
   {
     label: "Land",
     items: [
-      item("plots", "Land Plots", "Land the business owns and can sell.", { ownerOnly: true }),
-      item("land-acquisitions", "Acquisitions", "Land being bought from a seller, and what has been paid for it.", { ownerOnly: true }),
-      item("land-sellers", "Sellers", "People and families you buy land from.", { ownerOnly: true }),
-      item("land-sales", "Land Sales", "Land sold to a buyer, and what they still owe.", { ownerOnly: true }),
+      item("plots", "Land Plots", "Land the business owns and can sell.", { permission: "LAND_MANAGE" }),
+      item("land-acquisitions", "Acquisitions", "Land being bought from a seller, and what has been paid for it.", { permission: "LAND_MANAGE" }),
+      item("land-sellers", "Sellers", "People and families you buy land from.", { permission: "LAND_MANAGE" }),
+      item("land-sales", "Land Sales", "Land sold to a buyer, and what they still owe.", { permission: "LAND_MANAGE" }),
     ],
   },
   {
     label: "Farm",
     items: [
-      item("seasons", "Seasons", "Planting cycles. Grants and repayments are recorded against one.", { ownerOnly: true }),
-      item("farmers", "Farmers", "Outgrowers you advance inputs to and take produce back from.", { ownerOnly: true }),
-      item("input-items", "Input Items", "Seed, fertiliser and tools you advance to farmers.", { ownerOnly: true }),
-      item("grants", "Grants", "Inputs advanced to a farmer, to be recovered in produce or cash.", { ownerOnly: true }),
-      item("repayments", "Repayments", "Produce a farmer has brought back against what they were advanced.", { ownerOnly: true }),
+      item("seasons", "Seasons", "Planting cycles. Grants and repayments are recorded against one.", { permission: "FARM_MANAGE" }),
+      item("farmers", "Farmers", "Outgrowers you advance inputs to and take produce back from.", { permission: "FARM_MANAGE" }),
+      item("input-items", "Input Items", "Seed, fertiliser and tools you advance to farmers.", { permission: "FARM_MANAGE" }),
+      item("grants", "Grants", "Inputs advanced to a farmer, to be recovered in produce or cash.", { permission: "FARM_MANAGE" }),
+      item("repayments", "Repayments", "Produce a farmer has brought back against what they were advanced.", { permission: "FARM_MANAGE" }),
     ],
   },
   {
@@ -134,7 +144,7 @@ export const adminNavGroups: AdminNavGroup[] = [
     items: [
       item("enquiries", "Enquiries", "Messages sent through the public website."),
       item("reviews", "Reviews", "Customer reviews waiting to be published or already live."),
-      item("farm-applications", "Applications", "Farmers applying to join the outgrower scheme.", { ownerOnly: true }),
+      item("farm-applications", "Applications", "Farmers applying to join the outgrower scheme.", { permission: "FARM_MANAGE" }),
     ],
   },
   {

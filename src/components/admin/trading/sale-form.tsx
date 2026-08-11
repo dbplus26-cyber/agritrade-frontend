@@ -10,7 +10,6 @@ import {
   AdminField,
   AdminPageHeader,
   Mono,
-  SectionHeading,
   adminInputClass,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
@@ -183,16 +182,10 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        className="@container flex flex-col gap-4"
+        className="@container flex flex-col gap-5"
       >
         <AdminCard className="flex flex-col gap-5 px-5 py-4">
-          <section className="flex flex-col gap-3">
-            <SectionHeading
-              className="mb-0"
-              hint="Who is buying, and the terms they pay on."
-            >
-              Who and on what terms
-            </SectionHeading>
+          <section className="flex flex-col gap-5">
             <AdminField label="Buyer" error={errors.buyerId?.message}>
               <Controller
                 control={control}
@@ -243,13 +236,7 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
             </AdminField>
           </section>
 
-          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
-            <SectionHeading
-              className="mb-0"
-              hint="Type a line, add it to the goods, and the agreed total keeps up - all before anything is saved."
-            >
-              Goods
-            </SectionHeading>
+          <section className="flex flex-col gap-5">
 
             {/* The entry panel: one line in the making. */}
             <div
@@ -396,7 +383,7 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
               </ul>
             )}
 
-            <div className="flex items-baseline justify-between border-t border-adm-line pt-2.5">
+            <div className="flex items-baseline justify-between pt-2.5">
               <span className="flex items-center gap-1 text-[12px] text-adm-muted">
                 <span className="min-w-0">
                   Agreed total
@@ -415,8 +402,7 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
             </div>
           </section>
 
-          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
-            <SectionHeading className="mb-0">Anything else</SectionHeading>
+          <section className="flex flex-col gap-5">
             <AdminField label="Notes" optional>
               <Input
                 className={adminInputClass}

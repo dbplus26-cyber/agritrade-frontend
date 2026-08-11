@@ -29,6 +29,7 @@ import { FilePicker } from "@/components/ui/FilePicker";
 import { SignaturePad } from "@/components/ui/SignaturePad";
 import { Input } from "@/components/ui/input";
 import { useAuthRole } from "@/hooks/use-auth-role";
+import { usePermissions } from "@/hooks/use-permissions";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatKg } from "@/lib/format-money";
@@ -66,6 +67,7 @@ const UNDER_FILL_SHARE = 0.05;
 const Absent = () => <span className="text-adm-faint">Not provided</span>;
 
 export function ShipmentDetail({ id }: { id: string }) {
+  const { has } = usePermissions();
   const { data, isLoading, isError, error, refetch } = useGetShipmentQuery(id);
   const [dispatchShipment, dispatchState] = useDispatchShipmentMutation();
   const [arrive, arriveState] = useArriveShipmentMutation();
@@ -96,6 +98,7 @@ export function ShipmentDetail({ id }: { id: string }) {
 
   const s = data.data.shipment;
   const beforeDispatch = s.status === "PLANNED" || s.status === "LOADING";
+  const canManage = has("SHIPMENTS_MANAGE");
   const anyDriverExtra = Boolean(
     s.driverEmail ?? s.driverCity ?? s.driverLicenseNo ?? s.driverIdNumber,
   );
@@ -249,7 +252,7 @@ export function ShipmentDetail({ id }: { id: string }) {
      the wrapping span would stretch and the pill inside it would not. */
   const actions = (
     <div className="flex flex-wrap gap-2 xl:flex-col">
-      {beforeDispatch ? (
+      {beforeDispatch && canManage ? (
         <>
           {/* Exactly ONE primary action per state. Allocating and dispatching
               were both filled amber, so the rail offered two equally loud
@@ -307,7 +310,7 @@ export function ShipmentDetail({ id }: { id: string }) {
           </HelpWrap>
         </>
       ) : null}
-      {s.status === "DISPATCHED" ? (
+      {s.status === "DISPATCHED" && canManage ? (
         <HelpWrap
           className="inline-flex flex-none xl:w-full"
           text="Records that the truck reached the buyer, so the signed delivery note can be filed against the trip."
@@ -321,7 +324,7 @@ export function ShipmentDetail({ id }: { id: string }) {
           </AdminButton>
         </HelpWrap>
       ) : null}
-      {s.status === "ARRIVED" ? (
+      {s.status === "ARRIVED" && canManage ? (
         <HelpWrap
           className="inline-flex flex-none xl:w-full"
           text="Marks the trip finished now that it is delivered and settled, leaving its profit as the final figure."

@@ -10,7 +10,6 @@ import {
   AdminField,
   AdminPageHeader,
   adminInputClass,
-  SectionHeading,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
 import { BackButton } from "@/components/ui/BackButton";
@@ -142,16 +141,10 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
         onSubmit={handleSubmit(onSubmit, () => {
           if (!receipt) setReceiptError(RECEIPT_MISSING);
         })}
-        className="@container flex flex-col gap-4"
+        className="@container flex flex-col gap-5"
       >
         <AdminCard className="flex flex-col gap-5 px-5 py-4">
-          <section className="flex flex-col gap-3">
-            <SectionHeading
-              className="mb-0"
-              hint="Which farmer brought produce back, against which season, and what it is."
-            >
-              Who and what
-            </SectionHeading>
+          <section className="flex flex-col gap-5">
             <AdminField label="Farmer" error={errors.farmerId?.message}>
               <Controller
                 control={control}
@@ -173,7 +166,7 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
                 )}
               />
             </AdminField>
-            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+            <div className="grid grid-cols-1 gap-5 @min-[440px]:grid-cols-2">
               <AdminField label="Season" error={errors.seasonId?.message}>
                 <Controller
                   control={control}
@@ -213,14 +206,8 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
             </div>
           </section>
 
-          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
-            <SectionHeading
-              className="mb-0"
-              hint="How much came back and what you are crediting it at. Those two set the value cleared off the grant."
-            >
-              Weight and value
-            </SectionHeading>
-            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+          <section className="flex flex-col gap-5">
+            <div className="grid grid-cols-1 gap-5 @min-[440px]:grid-cols-2">
               <AdminField label="Weight (kg)" error={errors.weightKg?.message}>
                 <Input
                   inputMode="decimal"
@@ -252,13 +239,7 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
             </div>
           </section>
 
-          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
-            <SectionHeading
-              className="mb-0"
-              hint="Whether this produce also becomes stock you can sell on."
-            >
-              Where it goes
-            </SectionHeading>
+          <section className="flex flex-col gap-5">
             <AdminField
               label="Take into stock at"
               optional
@@ -293,14 +274,8 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
             </AdminField>
           </section>
 
-          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
-            <SectionHeading
-              className="mb-0"
-              hint="The signed receipt or weigh slip is what settles &quot;I already paid&quot; disputes - it stays on this record as the evidence."
-            >
-              Paperwork
-            </SectionHeading>
-            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+          <section className="flex flex-col gap-5">
+            <div className="grid grid-cols-1 gap-5 @min-[440px]:grid-cols-2">
               <AdminField
                 label="Received by"
                 optional

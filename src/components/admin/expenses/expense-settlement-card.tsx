@@ -30,6 +30,7 @@ import {
 import { SimpleSelect } from "@/components/ui/simple-select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthRole } from "@/hooks/use-auth-role";
+import { usePermissions } from "@/hooks/use-permissions";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
@@ -162,7 +163,7 @@ function PayDialog({
         </ResponsiveDialogHeader>
 
         <form
-          className="flex flex-col gap-4"
+          className="flex flex-col gap-5"
           noValidate
           onSubmit={handleSubmit(onSubmit)}
         >
@@ -260,6 +261,7 @@ export function ExpenseSettlementCard({
   isVoided: boolean;
 }) {
   const { isSuperAdmin } = useAuthRole();
+  const { has } = usePermissions();
   const [payOpen, setPayOpen] = useState(false);
   const [reversing, setReversing] = useState<IExpensePayment | null>(null);
   const [reverse, reverseState] = useReverseExpensePaymentMutation();
@@ -299,7 +301,10 @@ export function ExpenseSettlementCard({
 
   const { payments, settlement } = data.data;
   const tone = SETTLEMENT_TONE[settlement.status];
-  const canPay = isSuperAdmin && !isVoided && settlement.status !== "PAID";
+  const canPay =
+    (isSuperAdmin || has("EXPENSES_RECORD")) &&
+    !isVoided &&
+    settlement.status !== "PAID";
 
   return (
     <AdminCard className="@container/settle p-5">

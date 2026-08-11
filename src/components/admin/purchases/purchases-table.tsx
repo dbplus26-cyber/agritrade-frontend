@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 
 import { useMoneyVisibility } from "@/hooks/use-money-visibility";
+import { usePermissions } from "@/hooks/use-permissions";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -63,6 +64,8 @@ const MONEY_COLUMNS = new Set(["total", "price"]);
 
 export function PurchasesTable() {
   const router = useRouter();
+  const { has } = usePermissions();
+  const canRecord = has("PURCHASES_RECORD");
   const {
     page,
     search: searchInput,
@@ -238,9 +241,11 @@ export function PurchasesTable() {
             moment a purchase is recorded
           </p>
         </div>
-        {<AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ Record purchase</Link>
-            </AdminButton>}
+        {canRecord ? (
+          <AdminButton asChild>
+            <Link href={`${LIST}/new`}>+ Record purchase</Link>
+          </AdminButton>
+        ) : null}
       </div>
 
       {pristine || (isError && !search && activeFilterCount === 0) ? null : (
@@ -318,8 +323,8 @@ export function PurchasesTable() {
           filtered={Boolean(search) || activeFilterCount > 0}
           noun="purchases"
           description="Record the first goods bought from a village or supplier."
-          actionLabel="Record your first purchase"
-          onAction={() => router.push(`${LIST}/new`)}
+          actionLabel={canRecord ? "Record your first purchase" : undefined}
+          onAction={canRecord ? () => router.push(`${LIST}/new`) : undefined}
           onClear={() => {
             setSearch("");
             resetFilters();

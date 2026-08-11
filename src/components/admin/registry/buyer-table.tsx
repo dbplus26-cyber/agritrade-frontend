@@ -16,6 +16,7 @@ import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useGetBuyersQuery } from "@/redux/buyers/buyers-api";
 import { useTableQuery } from "@/hooks/use-table-query";
+import { usePermissions } from "@/hooks/use-permissions";
 import { extractApiError } from "@/lib/extract-api-error";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import type { IBuyer, IRegistryListQuery } from "@/types/registry.types";
@@ -35,6 +36,8 @@ const FILTER_DEFAULTS = { status: "all", size: "10", from: "", to: "" };
 /** The live Buyers directory. */
 export function BuyerTable() {
   const router = useRouter();
+  const { has } = usePermissions();
+  const canManage = has("DIRECTORY_MANAGE");
   const {
     page,
     search: searchInput,
@@ -162,9 +165,11 @@ export function BuyerTable() {
             Traders and companies the business sells to
           </p>
         </div>
-        {<AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ Add buyer</Link>
-            </AdminButton>}
+        {canManage ? (
+          <AdminButton asChild>
+            <Link href={`${LIST}/new`}>+ Add buyer</Link>
+          </AdminButton>
+        ) : null}
       </div>
 
       {pristine || (isError && !filtered) ? null : (
@@ -206,8 +211,8 @@ export function BuyerTable() {
           filtered={filtered}
           noun="buyers"
           description="Add the first trader or company the business sells to."
-          actionLabel="Add your first buyer"
-          onAction={() => router.push(`${LIST}/new`)}
+          actionLabel={canManage ? "Add your first buyer" : undefined}
+          onAction={canManage ? () => router.push(`${LIST}/new`) : undefined}
           onClear={() => {
             setSearch("");
             resetFilters();

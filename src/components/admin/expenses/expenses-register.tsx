@@ -21,6 +21,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { useTableQuery } from "@/hooks/use-table-query";
+import { usePermissions } from "@/hooks/use-permissions";
 import { useMoneyVisibility } from "@/hooks/use-money-visibility";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis } from "@/lib/format-money";
@@ -46,6 +47,8 @@ const DEFAULTS = { categoryId: "", from: "", scope: "", to: "" };
 export function ExpensesRegister() {
   const showMoney = useMoneyVisibility();
   const [creating, setCreating] = useState(false);
+  const { has } = usePermissions();
+  const canRecord = has("EXPENSES_RECORD");
   const [editing, setEditing] = useState<IExpense | null>(null);
   const {
     filters,
@@ -215,19 +218,19 @@ export function ExpensesRegister() {
           hint="Costs the business has incurred, and whether they have been paid."
           sub="Operating costs and per-trip spend"
           actions={
-            <AdminButton onClick={() => { setCreating(true); }}>
-              + Record expense
-            </AdminButton>
+            canRecord ? (
+              <AdminButton onClick={() => { setCreating(true); }}>
+                + Record expense
+              </AdminButton>
+            ) : undefined
           }
         />
         <RegisterEmpty
           filtered={false}
           noun="expenses"
           description="Record rent, salaries, fumigation and other running costs so the profit figure is honest."
-          actionLabel="+ Record expense"
-          onAction={() => {
-            setCreating(true);
-          }}
+          actionLabel={canRecord ? "+ Record expense" : undefined}
+          onAction={canRecord ? () => { setCreating(true); } : undefined}
         />
         <ExpenseFormDialog
           open={creating}
@@ -245,9 +248,11 @@ export function ExpensesRegister() {
         hint="Costs the business has incurred, and whether they have been paid."
         sub="Operating costs and per-trip spend"
         actions={
-          <AdminButton onClick={() => { setCreating(true); }}>
-            + Record expense
-          </AdminButton>
+          canRecord ? (
+            <AdminButton onClick={() => { setCreating(true); }}>
+              + Record expense
+            </AdminButton>
+          ) : undefined
         }
       />
 

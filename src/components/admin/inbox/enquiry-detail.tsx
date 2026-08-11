@@ -20,6 +20,7 @@ import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Absent } from "@/components/admin/registry/registry-bits";
 import { useAuthRole } from "@/hooks/use-auth-role";
+import { usePermissions } from "@/hooks/use-permissions";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatDateTime } from "@/lib/format-date";
@@ -43,6 +44,8 @@ const LIST = "/admin/enquiries";
 function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
   const router = useRouter();
   const { isSuperAdmin } = useAuthRole();
+  const { has } = usePermissions();
+  const canModerate = isSuperAdmin || has("WEBSITE_MODERATE");
   const { confirm, confirmationDialog } = useConfirm();
   const [updateEnquiry, { isLoading: saving }] = useUpdateEnquiryMutation();
   const [deleteEnquiry, { isLoading: deleting }] = useDeleteEnquiryMutation();
@@ -55,7 +58,7 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
   const dirty = statusDirty || notesDirty;
 
   const [replyBody, setReplyBody] = useState("");
-  const canReply = Boolean(enquiry.email);
+  const canReply = canModerate && Boolean(enquiry.email);
 
   /**
    * Sends the reply and records it.
@@ -318,14 +321,16 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
                     )}
                   />
                 </AdminField>
-                <AdminButton
-                  type="button"
-                  disabled={!dirty || saving}
-                  onClick={() => void onSave()}
-                  size="lg"
-                >
-                  {saving ? "Saving…" : "Save changes"}
-                </AdminButton>
+                {canModerate ? (
+                  <AdminButton
+                    type="button"
+                    disabled={!dirty || saving}
+                    onClick={() => void onSave()}
+                    size="lg"
+                  >
+                    {saving ? "Saving…" : "Save changes"}
+                  </AdminButton>
+                ) : null}
               </div>
             </AdminCard>
 

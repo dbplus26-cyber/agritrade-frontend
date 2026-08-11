@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { X } from "lucide-react";
+import { SlidersHorizontal, X } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -32,20 +32,19 @@ const boxField = (active: boolean) =>
   );
 
 /**
- * The label prefix riding inside a toolbar box ("STATUS", "ADDED FROM").
+ * The label ABOVE a toolbar box, in the form-field idiom (dms convention).
  *
- * It SHRINKS and truncates rather than holding its full width. The value is
- * what carries the meaning here ("All statuses" says it) and the prefix is
- * only a reminder of the dimension, so when a control gets tight the prefix
- * gives up its room first and the value keeps a readable floor. A `flex-none`
- * prefix instead pushed the value - and, on a date input, the browser's own
- * picker glyph - straight out of the box on a narrow column.
+ * It used to ride INSIDE the box as an uppercase prefix beside the value,
+ * and the two competed for the same 190px: long pairs ("SETTLEMENT" +
+ * "All statuses") cramped, wrapped, and left one filter taller than its
+ * neighbours. On top, each line owns its own room - the label names the
+ * dimension, the box carries only the value.
  */
-const fieldPrefix =
-  "min-w-0 shrink truncate text-[10px] font-semibold tracking-[0.06em] text-adm-faint uppercase";
+const fieldLabel =
+  "mb-1 flex items-center gap-1 text-[12px] font-semibold text-adm-ink";
 
-/** Dropdown filter in the console skin (aria-labelled; the value text -
- * "All roles", "Authentication" - carries the meaning, stock-register style). */
+/** Dropdown filter in the console skin: label on top, the value text alone
+ * in the box ("All roles", "Authentication" carries the meaning). */
 export function ConsoleLabeledSelect({
   label,
   value,
@@ -66,68 +65,43 @@ export function ConsoleLabeledSelect({
    * One sentence on what narrowing by this actually does, for the filters
    * whose effect a reader cannot guess from the option names ("Source",
    * "Rail", "Basis"). Most filters need nothing: "All statuses" says it.
-   *
-   * The icon sits OUTSIDE the `<label>` on purpose. Anything clicked inside a
-   * label is forwarded to that label's control, so a help button in there
-   * would open the select every time somebody asked what the filter meant.
+   * Shown as a tooltip beside the label, exactly like a form field's.
    */
   hint?: string;
 }) {
-  if (hint) {
-    return (
-      <span className={cn("flex min-w-0 items-center gap-1", className)}>
-        <ConsoleLabeledSelect
-          label={label}
-          value={value}
-          onChange={onChange}
-          options={options}
-          active={active}
-          className="min-w-0 flex-1"
-        />
-        <HelpTip label={`What does the ${label} filter do?`} text={hint} />
-      </span>
-    );
-  }
   return (
-    // A RENDERED select (ui/select), not a native one.
-    //
-    // This was native for a while because the rendered panel used to size
-    // itself to the longest option; ui/select now pins its panel to the
-    // trigger's exact width, so that reason is gone - and a native select's
-    // popup is drawn by the OS, which was the one dropdown in the console
-    // that could never match the account menu's panel. The rendered one
-    // opens the same squared sheet as every other dropdown.
-    //
-    // The label rides INSIDE the box as a flex-sibling prefix (see
-    // fieldPrefix): it shrinks and truncates first, so the value always
-    // keeps a readable floor.
-    <Select value={value} onValueChange={onChange}>
-      <SelectTrigger
-        unstyled
-        aria-label={`Filter by ${label.toLowerCase()}`}
-        className={cn(
-          boxField(active),
-          "cursor-pointer gap-1.5 pr-2 pl-2.5 text-[13px] font-normal text-adm-body [&_svg]:size-3.5 [&_svg]:text-adm-faint",
-          className,
-        )}
-      >
-        <span aria-hidden="true" className={fieldPrefix}>
-          {label}
-        </span>
-        {/* `grow shrink-0 basis-20`: the value claims a 5rem floor so a
-            tight box takes its room out of the prefix instead. */}
-        <span className="min-w-0 shrink-0 grow basis-20 truncate text-left">
-          <SelectValue />
-        </span>
-      </SelectTrigger>
-      <SelectContent>
-        {options.map((o) => (
-          <SelectItem key={o.value} value={o.value}>
-            {o.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className={cn("min-w-0", className)}>
+      <span className={fieldLabel}>
+        <span className="min-w-0 truncate">{label}</span>
+        {hint ? (
+          <HelpTip label={`What does the ${label} filter do?`} text={hint} />
+        ) : null}
+      </span>
+      {/* A RENDERED select (ui/select), not a native one: the rendered panel
+          pins to the trigger's width and opens the same squared sheet as
+          every other dropdown in the console. */}
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger
+          unstyled
+          aria-label={`Filter by ${label.toLowerCase()}`}
+          className={cn(
+            boxField(active),
+            "cursor-pointer justify-between gap-1.5 pr-2 pl-2.5 text-[13px] font-normal text-adm-body [&_svg]:size-3.5 [&_svg]:text-adm-faint",
+          )}
+        >
+          <span className="min-w-0 truncate text-left">
+            <SelectValue />
+          </span>
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((o) => (
+            <SelectItem key={o.value} value={o.value}>
+              {o.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 }
 
@@ -163,14 +137,12 @@ export function ConsoleDateField({
     // No width of its own: the toolbar row that holds it decides how wide it
     // is (see ConsoleFilterBar). A field that set its own desktop width sat
     // narrower than the grid cell it lived in and left the row ragged.
-    <label className={cn(boxField(Boolean(value)), "cursor-pointer", className)}>
-      <span aria-hidden="true" className={cn(fieldPrefix, "pr-1.5 pl-2.5")}>
-        {label}
+    <div className={cn("min-w-0", className)}>
+      <span className={fieldLabel}>
+        <span className="min-w-0 truncate">{label}</span>
       </span>
-      {/* Same floor-and-truncate split as the select: a rendered date needs
-          about 6rem for "mm/dd/yyyy", so it holds that and the prefix is what
-          gives way on a narrow column. */}
-      <span className="relative h-full min-w-0 shrink-0 grow basis-24">
+      <label className={cn(boxField(Boolean(value)), "cursor-pointer px-2.5")}>
+        <span className="relative h-full w-full min-w-0">
         <input
           type="date"
           value={value}
@@ -202,8 +174,9 @@ export function ConsoleDateField({
             {placeholder}
           </span>
         )}
-      </span>
-    </label>
+        </span>
+      </label>
+    </div>
   );
 }
 
@@ -397,7 +370,9 @@ export function ConsoleFilterBar({
       <button
         type="button"
         onClick={onClear}
-        className="cursor-pointer text-[10.5px] font-bold tracking-[0.1em] whitespace-nowrap text-console uppercase transition-colors hover:text-console-deep"
+        // The 34px line matches the filter boxes, so inside a cell whose
+        // neighbours are label-over-box stacks it sits level with the boxes.
+        className="flex h-[34px] cursor-pointer items-center text-[10.5px] font-bold tracking-[0.1em] whitespace-nowrap text-console uppercase transition-colors hover:text-console-deep"
       >
         Clear filters
       </button>
@@ -410,8 +385,11 @@ export function ConsoleFilterBar({
     <div className="@container/toolbar mb-3">
       {/* ── Band one: search left, the page's action at the right edge ───── */}
       <div className="flex flex-col gap-2 @min-[680px]/toolbar:flex-row @min-[680px]/toolbar:items-center">
-        {searchField}
-        <div className="flex items-center gap-2 @min-[680px]/toolbar:ml-auto">
+        {/* Narrow: search and the Filters toggle share ONE row - the box
+            shrinks (min-w-0) and the toggle keeps its width. Wide: the
+            wrapper dissolves (contents) so the original bands hold. */}
+        <div className="flex items-center gap-2 @min-[680px]/toolbar:contents">
+          {searchField}
           {hasFilters ? (
             <button
               type="button"
@@ -423,17 +401,17 @@ export function ConsoleFilterBar({
               // always on screen, so a control claiming to expand them would
               // be describing something that never happens.
               className={cn(
-                "inline-flex h-8 cursor-pointer items-center gap-2 rounded-none border bg-adm-card px-2.5 text-[10.5px] tracking-[0.14em] whitespace-nowrap uppercase transition-colors @min-[680px]/toolbar:hidden",
+                "inline-flex h-[34px] flex-none cursor-pointer items-center gap-1.5 rounded-none border bg-adm-card px-2.5 text-[10.5px] tracking-[0.14em] whitespace-nowrap uppercase transition-colors @min-[680px]/toolbar:hidden",
                 open
                   ? "border-console text-console"
                   : "border-adm-line text-adm-muted hover:text-console",
               )}
             >
-              <span
+              <SlidersHorizontal
                 aria-hidden="true"
                 className={cn(
-                  "h-1.5 w-1.5 flex-none rotate-45 transition-colors",
-                  activeCount > 0 || open ? "bg-console" : "bg-console/40",
+                  "size-3.5 flex-none transition-colors",
+                  activeCount > 0 || open ? "text-console" : "text-adm-faint",
                 )}
               />
               Filters
@@ -444,8 +422,12 @@ export function ConsoleFilterBar({
               ) : null}
             </button>
           ) : null}
-          {action ? <div className="ml-auto">{action}</div> : null}
         </div>
+        {action ? (
+          <div className="flex justify-end @min-[680px]/toolbar:ml-auto">
+            {action}
+          </div>
+        ) : null}
       </div>
 
       {/* ── Band two: the filters ────────────────────────────────────────── */}
@@ -474,7 +456,7 @@ export function ConsoleFilterBar({
           {/* Flows into the next free cell, so it sits beside the filters when
               the row has room and drops below them when it does not. */}
           {clearButton ? (
-            <div className="col-span-1 flex items-center">{clearButton}</div>
+            <div className="col-span-1 flex items-end">{clearButton}</div>
           ) : null}
         </div>
       ) : null}

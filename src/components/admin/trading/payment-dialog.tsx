@@ -8,7 +8,6 @@ import {
   AdminButton,
   AdminField,
   Mono,
-  SectionHeading,
   adminInputClass,
   adminSelectClass,
 } from "@/components/admin/ui";
@@ -220,7 +219,7 @@ export function PaymentDialog({
 
             {/* The schedule and the dispatch gate: supporting detail, so it
                 sits under a rule rather than competing with the balance. */}
-            <div className="flex flex-col gap-1 border-t border-adm-hairline px-3.5 py-2.5 text-[12.5px]">
+            <div className="flex flex-col gap-1 px-3.5 py-2.5 text-[12.5px]">
               {detail.paidGhs !== null ? (
                 <p className="flex items-baseline justify-between gap-3">
                   <span className="text-adm-muted">Paid so far</span>
@@ -288,8 +287,7 @@ export function PaymentDialog({
           onSubmit={handleSubmit(onSubmit)}
           className="@container flex flex-col gap-5"
         >
-          <section className="flex flex-col gap-3">
-            <SectionHeading className="mb-0">How much</SectionHeading>
+          <section className="flex flex-col gap-5">
             {/* The amount is what this dialog is FOR, so it is the one oversized
                 field: a mono figure at cheque size with the currency standing
                 outside it, not a 14px box like the reference beside it. */}
@@ -344,19 +342,13 @@ export function PaymentDialog({
 
           </section>
 
-          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
-            <SectionHeading
-              className="mb-0"
-              hint="How the money reached you, and the trail that proves it did."
-            >
-              How it arrived
-            </SectionHeading>
+          <section className="flex flex-col gap-5">
             {/* How it arrived and when - a pair of short fields, so they share
                 a row rather than each claiming one. */}
             {/* `justify-end` on both cells: "Payment date - optional" wraps to
                 two lines in a narrow column while "Method" does not, and without
                 it the two controls would sit at different heights. */}
-            <div className="grid gap-3 @min-[380px]:grid-cols-2">
+            <div className="grid gap-5 @min-[380px]:grid-cols-2">
               <AdminField
                 label="Method"
                 error={errors.method?.message}

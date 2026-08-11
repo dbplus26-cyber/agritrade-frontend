@@ -134,10 +134,7 @@ function SettingsForm({
       className="flex max-w-[640px] flex-col gap-4"
     >
       <AdminCard className="px-5 py-[18px]">
-        <SectionHeading hint="The figures the console checks a purchase or a float against before it asks anyone to approve it.">
-          Money thresholds
-        </SectionHeading>
-        <div className="flex flex-col gap-[13px]">
+        <div className="flex flex-col gap-5">
           <AdminField
             label="Purchase approval threshold"
             hint={descriptions.purchaseApprovalThresholdGhs}
@@ -166,10 +163,7 @@ function SettingsForm({
       </AdminCard>
 
       <AdminCard className="px-5 py-[18px]">
-        <SectionHeading hint="What the public site and outgoing documents show as the way to reach the business.">
-          Company contact
-        </SectionHeading>
-        <div className="flex flex-col gap-[13px]">
+        <div className="flex flex-col gap-5">
           <AdminField
             label="Phone (calls)"
             hint={descriptions.companyContactPhone}

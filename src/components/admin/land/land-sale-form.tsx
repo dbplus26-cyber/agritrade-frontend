@@ -9,7 +9,6 @@ import {
   AdminField,
   AdminPageHeader,
   adminInputClass,
-  SectionHeading,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
 import { BackButton } from "@/components/ui/BackButton";
@@ -84,10 +83,9 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
         sub="Agree a plot and price with a buyer - the plot is only reserved once you confirm the sale"
       />
 
-      <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
         <AdminCard className="flex flex-col gap-5 px-5 py-4">
-          <section className="flex flex-col gap-3">
-            <SectionHeading className="mb-0">Which plot, and to whom</SectionHeading>
+          <section className="flex flex-col gap-5">
             <AdminField label="Plot" error={errors.plotId?.message}>
               <Controller
                 control={control}
@@ -131,13 +129,7 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
             </AdminField>
           </section>
 
-          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
-            <SectionHeading
-              className="mb-0"
-              hint="What the buyer is taking the plot at. Deposits and instalments are recorded against the sale afterwards."
-            >
-              The price
-            </SectionHeading>
+          <section className="flex flex-col gap-5">
             <AdminField
               error={errors.agreedPriceGhs?.message}
               hint="The whole price the buyer is taking the plot at, before any deposit."

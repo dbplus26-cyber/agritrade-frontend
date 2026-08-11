@@ -119,7 +119,7 @@ export function ExpenseDialog({
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-3"
+          className="flex flex-col gap-5"
         >
           <AdminField label="Category" error={errors.categoryId?.message}>
             <Controller
@@ -356,7 +356,7 @@ export function CancelDialog({
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-3"
+          className="flex flex-col gap-5"
         >
           <AdminField label="Reason" error={errors.reason?.message}>
             <Input
@@ -446,7 +446,7 @@ export function VoidExpenseDialog({
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-3"
+          className="flex flex-col gap-5"
         >
           <AdminField label="Reason" error={errors.reason?.message}>
             <Input

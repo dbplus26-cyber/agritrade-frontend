@@ -18,6 +18,7 @@ import { BackButton } from "@/components/ui/BackButton";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useAuthRole } from "@/hooks/use-auth-role";
+import { usePermissions } from "@/hooks/use-permissions";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatDateTime } from "@/lib/format-date";
@@ -168,6 +169,8 @@ function LinesCard({ lines }: { lines: IStocktakeLine[] }) {
 
 export function StocktakeDetail({ id }: { id: string }) {
   const { isSuperAdmin } = useAuthRole();
+  const { has } = usePermissions();
+  const canCount = isSuperAdmin || has("STOCK_MANAGE");
   const { confirm, confirmationDialog } = useConfirm();
   const [editing, setEditing] = useState(false);
 
@@ -325,7 +328,7 @@ export function StocktakeDetail({ id }: { id: string }) {
               ) : null}
             </DetailGrid>
 
-            {st.status === StocktakeStatus.DRAFT ? (
+            {st.status === StocktakeStatus.DRAFT && canCount ? (
               <div className="mt-4 flex flex-wrap gap-2 border-t border-adm-hairline pt-4">
                 <AdminButton disabled={busy} onClick={() => void onSubmit()}>
                   {submitState.isLoading ? "Submitting…" : "Submit"}

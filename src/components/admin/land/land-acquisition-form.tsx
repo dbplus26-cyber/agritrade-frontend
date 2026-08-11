@@ -9,7 +9,6 @@ import {
   AdminField,
   AdminPageHeader,
   adminInputClass,
-  SectionHeading,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
 import { BackButton } from "@/components/ui/BackButton";
@@ -111,16 +110,10 @@ export function LandAcquisitionForm() {
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        className="@container flex flex-col gap-4"
+        className="@container flex flex-col gap-5"
       >
         <AdminCard className="flex flex-col gap-5 px-5 py-4">
-          <section className="flex flex-col gap-3">
-            <SectionHeading
-              className="mb-0"
-              hint="Who you are buying from, and what you agreed to pay."
-            >
-              Who and how much
-            </SectionHeading>
+          <section className="flex flex-col gap-5">
             <AdminField label="Seller" error={errors.sellerId?.message}>
               <Controller
                 control={control}
@@ -142,7 +135,7 @@ export function LandAcquisitionForm() {
                 )}
               />
             </AdminField>
-            <div className="grid gap-3 @min-[440px]:grid-cols-2">
+            <div className="grid gap-5 @min-[440px]:grid-cols-2">
               <AdminField
                 label="Register code"
                 hint="Becomes the plot's reference once the deal completes."
@@ -175,13 +168,7 @@ export function LandAcquisitionForm() {
             </div>
           </section>
 
-          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
-            <SectionHeading
-              className="mb-0"
-              hint="Where the land is and how big it is - what a buyer or a surveyor would ask first."
-            >
-              The plot itself
-            </SectionHeading>
+          <section className="flex flex-col gap-5">
             <AdminField label="Location" error={errors.locationText?.message}>
               <Input
                 placeholder="e.g. Kumbungu Road, Plot 21"
@@ -192,7 +179,7 @@ export function LandAcquisitionForm() {
                 {...register("locationText")}
               />
             </AdminField>
-            <div className="grid gap-3 @min-[440px]:grid-cols-2 @min-[620px]:grid-cols-3">
+            <div className="grid gap-5 @min-[440px]:grid-cols-2 @min-[620px]:grid-cols-3">
               <AdminField label="Size" error={errors.sizeText?.message}>
                 <Input
                   placeholder='e.g. 100 x 100 ft'
@@ -229,8 +216,7 @@ export function LandAcquisitionForm() {
             </div>
           </section>
 
-          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
-            <SectionHeading className="mb-0">Anything else</SectionHeading>
+          <section className="flex flex-col gap-5">
             <AdminField label="Description" optional>
               <textarea
                 rows={4}

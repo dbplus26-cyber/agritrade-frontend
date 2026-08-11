@@ -43,11 +43,24 @@ import { cn } from "@/lib/utils";
  */
 export function HelpTip({
   className,
+  inLabel = false,
   label,
   side = "top",
   text,
 }: {
   className?: string;
+  /**
+   * True when this tip sits INSIDE a `<label>` that implicitly labels its
+   * control (AdminField). A `<button>` there is fatal twice over: implicit
+   * association binds a label to its FIRST labelable descendant, so the
+   * label named the help icon and the field lost its name; and any
+   * aria-label echoing the field label made two elements answer to it. So
+   * in-label the trigger is a plain aria-hidden span - a pointer-and-touch
+   * affordance only - and the CALLER must expose the same text to assistive
+   * tech on the control itself (AdminField wires it via aria-describedby,
+   * exactly as it does the error).
+   */
+  inLabel?: boolean;
   /**
    * Screen-reader name. Defaults to naming the thing being explained, which
    * is better than every help icon on the page announcing itself as "help".
@@ -56,24 +69,32 @@ export function HelpTip({
   side?: "bottom" | "left" | "right" | "top";
   text: string;
 }) {
+  const triggerClass = cn(
+    "inline-flex size-4 flex-none cursor-help items-center justify-center rounded-full align-middle text-adm-faint transition-colors hover:text-console focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-console",
+    className,
+  );
+  const stop = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
   return (
     <TooltipProvider delayDuration={150}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <button
-            aria-label={label ?? `What is this? ${text}`}
-            className={cn(
-              "inline-flex size-4 flex-none cursor-help items-center justify-center rounded-full align-middle text-adm-faint transition-colors hover:text-console focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-console",
-              className,
-            )}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-            type="button"
-          >
-            <HelpCircle aria-hidden="true" className="size-3.5" />
-          </button>
+          {inLabel ? (
+            <span aria-hidden="true" className={triggerClass} onClick={stop}>
+              <HelpCircle className="size-3.5" />
+            </span>
+          ) : (
+            <button
+              aria-label={label ?? `What is this? ${text}`}
+              className={triggerClass}
+              onClick={stop}
+              type="button"
+            >
+              <HelpCircle aria-hidden="true" className="size-3.5" />
+            </button>
+          )}
         </TooltipTrigger>
         <TooltipContent
           className="max-w-[16rem] text-[12px] leading-[1.45]"

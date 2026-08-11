@@ -13,7 +13,6 @@ import {
   adminInputClass,
   adminSelectClass,
   Mono,
-  SectionHeading,
 } from "@/components/admin/ui";
 import { HelpTip } from "@/components/admin/help-tip";
 import { BackButton } from "@/components/ui/BackButton";
@@ -171,9 +170,8 @@ export function PurchaseCreate() {
           onSubmit={handleSubmit(onSubmit)}
           className="@container flex flex-col gap-5"
         >
-          <section className="flex flex-col gap-[13px]">
-            <SectionHeading className="mb-0">Who and what</SectionHeading>
-            <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+          <section className="flex flex-col gap-5">
+            <div className="grid gap-5 @min-[440px]:grid-cols-2">
               <AdminField
                 label="Source"
                 hint="Who you bought from: an individual farmer, a company, or one of your own field agents."
@@ -277,14 +275,8 @@ export function PurchaseCreate() {
               </AdminField>
           </section>
 
-          <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
-            <SectionHeading
-              className="mb-0"
-              hint="What the load weighs and what you agreed to pay for it. The total below is worked out from these two."
-            >
-              Weight and price
-            </SectionHeading>
-            <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+          <section className="flex flex-col gap-5">
+            <div className="grid gap-5 @min-[440px]:grid-cols-2">
               <AdminField label="Weight (kg)" error={errors.weightKg?.message}>
                 <Input
                   inputMode="decimal"
@@ -309,7 +301,7 @@ export function PurchaseCreate() {
               </AdminField>
             </div>
 
-            <div className="ledger-rule flex items-baseline justify-between px-0.5 py-1.5">
+            <div className="flex items-baseline justify-between px-0.5 py-1.5">
               <span className="flex items-center gap-1 text-[11px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 <span className="min-w-0">Total</span>
                 <HelpTip
@@ -323,9 +315,8 @@ export function PurchaseCreate() {
             </div>
           </section>
 
-          <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
-            <SectionHeading className="mb-0">Where it goes</SectionHeading>
-            <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+          <section className="flex flex-col gap-5">
+            <div className="grid gap-5 @min-[440px]:grid-cols-2">
               <AdminField
                 label="Destination warehouse"
                 optional
@@ -366,13 +357,7 @@ export function PurchaseCreate() {
             </div>
           </section>
 
-          <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
-            <SectionHeading
-              className="mb-0"
-              hint="What backs this record up if anyone questions it later."
-            >
-              Paperwork
-            </SectionHeading>
+          <section className="flex flex-col gap-5">
             <AdminField label="Notes" optional error={errors.notes?.message}>
               <textarea
                 rows={4}
@@ -442,7 +427,7 @@ export function PurchaseCreate() {
             </AdminField>
           </section>
 
-          <div className="mt-1 flex justify-end gap-2 pt-3 sm:pt-6">
+          <div className="mt-1 flex justify-end gap-2">
             <AdminButton
               type="button"
               variant="outline"

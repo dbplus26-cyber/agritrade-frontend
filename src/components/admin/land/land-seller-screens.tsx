@@ -17,7 +17,6 @@ import {
   AdminField,
   AdminPageHeader,
   EditableFormActions,
-  SectionHeading,
   adminInputClass,
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
@@ -368,13 +367,7 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
         onSubmit={handleSubmit(onSubmit)}
         className="@container flex flex-col gap-5"
       >
-        <section className="flex flex-col gap-[13px]">
-          <SectionHeading
-            className="mb-0"
-            hint="Who the landowner is, and how you get hold of them."
-          >
-            Who they are
-          </SectionHeading>
+        <section className="flex flex-col gap-5">
           <AdminField label="Name" error={errors.name?.message}>
             <Input
               placeholder="e.g. Alhaji Mahama"
@@ -383,7 +376,7 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
               {...register("name")}
             />
           </AdminField>
-          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+          <div className="grid gap-5 @min-[440px]:grid-cols-2">
             <AdminField label="Phone" optional error={errors.phone?.message}>
               <Input
                 type="tel"
@@ -423,8 +416,7 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
           </div>
         </section>
 
-        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
-          <SectionHeading className="mb-0">Anything else</SectionHeading>
+        <section className="flex flex-col gap-5">
           <AdminField label="Notes" optional error={errors.notes?.message}>
             <textarea
               rows={4}

@@ -10,7 +10,6 @@ import {
   AdminField,
   AdminPageHeader,
   EditableFormActions,
-  SectionHeading,
   adminInputClass,
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
@@ -208,7 +207,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
             It was rendered inside the form, so at rest - which is how this
             page is nearly always seen - the record showed no picture at all,
             and the only way to look at one was to start editing. */}
-        <div className="mb-4 flex items-center gap-3.5 border-b border-adm-hairline pb-4">
+        <div className="mb-4 flex items-center gap-3.5">
           <ViewablePhoto
             name={buyer.name}
             size={64}
@@ -256,8 +255,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
         onSubmit={handleSubmit(onSubmit)}
         className="@container flex flex-col gap-5"
       >
-        <section className="flex flex-col gap-[13px]">
-          <SectionHeading className="mb-0">Who they are</SectionHeading>
+        <section className="flex flex-col gap-5">
           {/* Not an AdminField: the control is a button, and a <label> around
               a button misroutes its clicks. Same label markup as AdminField so
               it stays in step with the fields under it. */}
@@ -337,14 +335,8 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
           </AdminField>
         </section>
 
-        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
-          <SectionHeading
-            className="mb-0"
-            hint="Every way of reaching this buyer, and where they take delivery."
-          >
-            How to reach them
-          </SectionHeading>
-          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+        <section className="flex flex-col gap-5">
+          <div className="grid gap-5 @min-[440px]:grid-cols-2">
             <AdminField label="Phone" optional error={errors.phone?.message}>
               <Input
                 type="tel"
@@ -406,14 +398,8 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
           </AdminField>
         </section>
 
-        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
-          <SectionHeading
-            className="mb-0"
-            hint="The registered company behind the buyer, and the person who answers for it."
-          >
-            Business
-          </SectionHeading>
-          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+        <section className="flex flex-col gap-5">
+          <div className="grid gap-5 @min-[440px]:grid-cols-2">
             <AdminField
               label="Business name"
               optional
@@ -483,8 +469,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
           </div>
         </section>
 
-        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
-          <SectionHeading className="mb-0">Anything else</SectionHeading>
+        <section className="flex flex-col gap-5">
           <AdminField label="Notes" optional error={errors.notes?.message}>
             <textarea
               rows={4}

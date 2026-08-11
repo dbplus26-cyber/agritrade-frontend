@@ -17,6 +17,7 @@ import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
+import { usePermissions } from "@/hooks/use-permissions";
 import { extractApiError } from "@/lib/extract-api-error";
 import { cn } from "@/lib/utils";
 import {
@@ -105,6 +106,8 @@ function SalesStats() {
 /** The live sales register. */
 export function SalesRegister() {
   const router = useRouter();
+  const { has } = usePermissions();
+  const canManage = has("SALES_MANAGE");
   const {
     page,
     filters,
@@ -286,9 +289,11 @@ export function SalesRegister() {
             Agreements with buyers, payments and balances
           </p>
         </div>
-        {<AdminButton asChild>
-          <Link href={`${LIST}/new`}>+ New sale</Link>
-        </AdminButton>}
+        {canManage ? (
+          <AdminButton asChild>
+            <Link href={`${LIST}/new`}>+ New sale</Link>
+          </AdminButton>
+        ) : null}
       </div>
 
       {pristine ? (
@@ -296,8 +301,8 @@ export function SalesRegister() {
           filtered={false}
           noun="sales"
           description="Draft your first sale to start tracking agreements and balances."
-          actionLabel="Draft your first sale"
-          onAction={() => router.push(`${LIST}/new`)}
+          actionLabel={canManage ? "Draft your first sale" : undefined}
+          onAction={canManage ? () => router.push(`${LIST}/new`) : undefined}
         />
       ) : (
         <>

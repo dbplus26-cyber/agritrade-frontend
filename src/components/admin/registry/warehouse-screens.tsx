@@ -38,6 +38,7 @@ import {
   useUpdateWarehouseMutation,
 } from "@/redux/warehouses/warehouses-api";
 import { useTableQuery } from "@/hooks/use-table-query";
+import { usePermissions } from "@/hooks/use-permissions";
 import { useAuthRole } from "@/hooks/use-auth-role";
 import { extractApiError } from "@/lib/extract-api-error";
 import { DateTimeCell } from "@/components/admin/date-cell";
@@ -83,6 +84,8 @@ export function WarehouseTable() {
   } = useTableQuery({ defaults: FILTER_DEFAULTS });
   // Only the owner edits this vocabulary (design doc 4).
   const { isSuperAdmin } = useAuthRole();
+  const { has } = usePermissions();
+  const canManage = isSuperAdmin || has("VOCABULARY_MANAGE");
 
   const statusFilter = filters.status as StatusFilter;
   const pageSize = Number(filters.size) || 10;
@@ -168,7 +171,7 @@ export function WarehouseTable() {
             Where goods are received into and loaded out of
           </p>
         </div>
-        {isSuperAdmin ? (
+        {canManage ? (
               <AdminButton asChild>
                 <Link href={`${LIST}/new`}>+ Add warehouse</Link>
               </AdminButton>
@@ -206,9 +209,9 @@ export function WarehouseTable() {
           filtered={filtered}
           noun="warehouses"
           description="Add the first storage location goods are received into."
-          actionLabel={isSuperAdmin ? "Add your first warehouse" : undefined}
+          actionLabel={canManage ? "Add your first warehouse" : undefined}
           onAction={
-            isSuperAdmin ? () => router.push(`${LIST}/new`) : undefined
+            canManage ? () => router.push(`${LIST}/new`) : undefined
           }
           onClear={() => {
             setSearch("");
@@ -348,9 +351,8 @@ function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
         onSubmit={handleSubmit(onSubmit)}
         className="@container flex flex-col gap-5"
       >
-        <section className="flex flex-col gap-[13px]">
-          <SectionHeading className="mb-0">Which shed</SectionHeading>
-          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+        <section className="flex flex-col gap-5">
+          <div className="grid gap-5 @min-[440px]:grid-cols-2">
             <AdminField label="Name" error={errors.name?.message}>
               <Input
                 placeholder="e.g. Main Warehouse - Tamale"
@@ -377,8 +379,7 @@ function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
         {/* What the shed is actually for - which commodities it holds, its
             capacity, whether it is fumigated. Operational detail that
             otherwise lives in one person's head. */}
-        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
-          <SectionHeading className="mb-0">What it holds</SectionHeading>
+        <section className="flex flex-col gap-5">
           <AdminField
             label="Description"
             optional

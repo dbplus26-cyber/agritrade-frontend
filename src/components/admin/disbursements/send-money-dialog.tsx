@@ -9,7 +9,6 @@ import {
   AdminField,
   adminInputClass,
   adminSelectClass,
-  SectionHeading,
 } from "@/components/admin/ui";
 import {
   ResponsiveDialog,
@@ -274,8 +273,7 @@ export function SendMoneyDialog({
           className="space-y-5 px-4 pb-2 sm:px-0"
           onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
         >
-          <section className="space-y-4">
-            <SectionHeading className="mb-0">How much, and how</SectionHeading>
+          <section className="space-y-5">
             <AdminField label="How are they being paid?">
               <Controller
                 control={form.control}
@@ -317,13 +315,7 @@ export function SendMoneyDialog({
 
           </section>
 
-          <section className="space-y-4 pt-3 sm:pt-6">
-            <SectionHeading
-              className="mb-0"
-              hint="The account the money actually lands in. Check the number, not the name."
-            >
-              Who is being paid
-            </SectionHeading>
+          <section className="space-y-5">
             <AdminField
               label="Recipient's name"
               error={form.formState.errors.recipientName?.message}
@@ -359,7 +351,6 @@ export function SendMoneyDialog({
                 <AdminField
                   label="Mobile money number"
                   error={form.formState.errors.recipientMsisdn?.message}
-                  hint="International format, e.g. 233249111411"
                 >
                   <Input
                     className={cn(adminInputClass, "font-adminmono")}
@@ -414,8 +405,7 @@ export function SendMoneyDialog({
 
           </section>
 
-          <section className="space-y-4 pt-3 sm:pt-6">
-            <SectionHeading className="mb-0">What it is for</SectionHeading>
+          <section className="space-y-5">
             <AdminField
               label="What is it for?"
               error={form.formState.errors.description?.message}

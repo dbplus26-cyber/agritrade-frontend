@@ -492,8 +492,9 @@ export function AdminField({
   children: React.ReactNode;
 }) {
   const errorId = useId();
-  // Wire the invalid state onto the control itself rather than leaving it to
-  // each of the ~40 forms to remember.
+  const hintId = useId();
+  // Wire the invalid state AND the hint onto the control itself rather than
+  // leaving it to each of the ~40 forms to remember.
   //
   // A field in error used to be signalled by RED TEXT ALONE: the control kept
   // its normal border (the `aria-invalid:border-console-red` in
@@ -503,16 +504,29 @@ export function AdminField({
   // status, and the error message is not much use if it is never associated
   // with the thing it is about.
   //
+  // The hint travels the same way: its visible affordance is a pointer-only
+  // tooltip icon (see HelpTip's inLabel note - a button or aria-label inside
+  // the label would hijack the field's own name), so the TEXT reaches
+  // assistive tech as the control's description instead.
+  //
   // Cloning here means every AdminField gets it - including the ones written
   // before this existed - and a control that already sets either prop keeps
   // its own value. Components that ignore the props are unharmed.
+  const describedBy =
+    [hint ? hintId : null, error ? errorId : null]
+      .filter(Boolean)
+      .join(" ") || undefined;
   const control =
-    error && React.isValidElement(children)
+    (hint ?? error) && React.isValidElement(children)
       ? React.cloneElement(children as React.ReactElement<AriaProps>, {
           "aria-describedby":
-            (children.props as AriaProps)["aria-describedby"] ?? errorId,
-          "aria-invalid":
-            (children.props as AriaProps)["aria-invalid"] ?? true,
+            (children.props as AriaProps)["aria-describedby"] ?? describedBy,
+          ...(error
+            ? {
+                "aria-invalid":
+                  (children.props as AriaProps)["aria-invalid"] ?? true,
+              }
+            : {}),
         })
       : children;
 
@@ -540,28 +554,24 @@ export function AdminField({
         className,
       )}
     >
-      {/* Four kinds of text live in a field - the LABEL, the value you type,
-          the HINT and the ERROR - and they used to sit within half a step of
-          each other in size and colour, all in the same muted grey. So a form
-          read as one flat wall and nothing said which line was the question
-          and which was the answer.
-
-          The label is now ink rather than muted and sentence case rather than
-          a wide-tracked micro-cap: it is the question being asked, so it reads
-          first and it reads as words. "Optional" stays faint, because it
-          qualifies the label rather than competing with it. */}
-      <span className="mb-1 block text-[13px] font-semibold text-adm-ink">
-        {label}
-        {optional ? (
-          <span className="font-normal text-adm-faint"> (optional)</span>
-        ) : null}
+      {/* ONE line of text per field: the label. A hint is a tooltip beside
+          it (hover on desktop, tap on mobile), never a paragraph of its own -
+          a form where every field carried a sentence of guidance read as a
+          wall of prose, and the reader could no longer tell the questions
+          from the commentary. The label is ink and sentence case: it is the
+          question being asked. "Optional" stays faint, because it qualifies
+          the label rather than competing with it. */}
+      <span className="mb-1 flex items-center gap-1 text-[13px] font-semibold text-adm-ink">
+        <span className="min-w-0">
+          {label}
+          {optional ? (
+            <span className="font-normal text-adm-faint"> (optional)</span>
+          ) : null}
+        </span>
+        {hint ? <HelpTip inLabel text={hint} /> : null}
       </span>
-      {/* The hint sits ABOVE the control, not under it. Guidance you only meet
-          after you have already answered is guidance that arrived too late,
-          and putting it under the input also stacked it in the same place the
-          error appears, so the two swapped in and out of one slot. */}
       {hint ? (
-        <span className="mb-1.5 block text-[12px] leading-[1.5] font-normal text-adm-muted">
+        <span id={hintId} className="sr-only">
           {hint}
         </span>
       ) : null}

@@ -86,9 +86,9 @@ function AddDrawingDialog({ onClose }: { onClose: () => void }) {
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-[13px]"
+          className="flex flex-col gap-5"
         >
-          <div className="grid gap-[13px] sm:grid-cols-2">
+          <div className="grid gap-5 sm:grid-cols-2">
             <AdminField label="Amount (GHS)" error={errors.amountGhs?.message}>
               <Input
                 autoFocus

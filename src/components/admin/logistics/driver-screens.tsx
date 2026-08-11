@@ -18,7 +18,6 @@ import {
   AdminField,
   AdminPageHeader,
   EditableFormActions,
-  SectionHeading,
   adminInputClass,
   adminSelectClass,
 } from "@/components/admin/ui";
@@ -42,6 +41,7 @@ import {
   ViewablePhoto,
 } from "@/components/admin/photo-view";
 import { useTableQuery } from "@/hooks/use-table-query";
+import { usePermissions } from "@/hooks/use-permissions";
 import { useEditableRecordForm } from "@/hooks/use-editable-record-form";
 import { usePhotoStaging } from "@/hooks/use-photo-staging";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -77,6 +77,8 @@ const FILTER_DEFAULTS = { status: "all", size: "10", from: "", to: "" };
 /** The live Drivers directory (supplier-shaped registry). */
 export function DriverTable() {
   const router = useRouter();
+  const { has } = usePermissions();
+  const canManage = has("DIRECTORY_MANAGE");
   const {
     page,
     search: searchInput,
@@ -201,9 +203,11 @@ export function DriverTable() {
             The trucking directory shipments pull their driver details from
           </p>
         </div>
-        {<AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ Add driver</Link>
-            </AdminButton>}
+        {canManage ? (
+          <AdminButton asChild>
+            <Link href={`${LIST}/new`}>+ Add driver</Link>
+          </AdminButton>
+        ) : null}
       </div>
 
       {pristine || (isError && !filtered) ? null : (
@@ -245,8 +249,8 @@ export function DriverTable() {
           filtered={filtered}
           noun="drivers"
           description="Add the drivers who haul the business's shipments."
-          actionLabel="Add your first driver"
-          onAction={() => router.push(`${LIST}/new`)}
+          actionLabel={canManage ? "Add your first driver" : undefined}
+          onAction={canManage ? () => router.push(`${LIST}/new`) : undefined}
           onClear={() => {
             setSearch("");
             resetFilters();
@@ -456,8 +460,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
         onSubmit={handleSubmit(onSubmit)}
         className="@container flex flex-col gap-5"
       >
-        <section className="flex flex-col gap-[13px]">
-          <SectionHeading className="mb-0">Who they are</SectionHeading>
+        <section className="flex flex-col gap-5">
           {/* Not an AdminField: the control is a button, and a <label> around
               a button misroutes its clicks. Same label markup as AdminField so
               it stays in step with the fields under it. */}
@@ -535,7 +538,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
               {...register("name")}
             />
           </AdminField>
-          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+          <div className="grid gap-5 @min-[440px]:grid-cols-2">
             <AdminField label="Phone" error={errors.phone?.message}>
               <Input
                 type="tel"
@@ -557,9 +560,8 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
           </div>
         </section>
 
-        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
-          <SectionHeading className="mb-0">Where they work</SectionHeading>
-          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+        <section className="flex flex-col gap-5">
+          <div className="grid gap-5 @min-[440px]:grid-cols-2">
             <AdminField
               label="Company"
               optional
@@ -588,14 +590,8 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
           </div>
         </section>
 
-        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
-          <SectionHeading
-            className="mb-0"
-            hint="The papers you checked, so the person driving your load can be identified."
-          >
-            Licence and ID
-          </SectionHeading>
-          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+        <section className="flex flex-col gap-5">
+          <div className="grid gap-5 @min-[440px]:grid-cols-2">
             <AdminField
               label="Licence no"
               optional
@@ -632,8 +628,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
           </div>
         </section>
 
-        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
-          <SectionHeading className="mb-0">How they are paid</SectionHeading>
+        <section className="flex flex-col gap-5">
           {/* What this driver is normally paid on. The middle of the
               resolution order: a trip can override it, and a driver without one
               falls through to the system default. */}
@@ -671,8 +666,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
           </AdminField>
         </section>
 
-        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
-          <SectionHeading className="mb-0">Anything else</SectionHeading>
+        <section className="flex flex-col gap-5">
           <AdminField label="Notes" optional error={errors.notes?.message}>
             <textarea
               rows={4}

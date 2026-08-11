@@ -176,9 +176,9 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        className="@container flex flex-col gap-4"
+        className="@container flex flex-col gap-5"
       >
-        <AdminCard className="grid grid-cols-1 gap-3 px-5 py-4 @min-[440px]:grid-cols-2">
+        <AdminCard className="grid grid-cols-1 gap-5 px-5 py-4 @min-[440px]:grid-cols-2">
           <AdminField label="Name" error={errors.name?.message}>
             <Input
               placeholder="e.g. NPK fertiliser"

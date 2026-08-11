@@ -13,7 +13,6 @@ import {
   adminInputClass,
   adminLinkClass,
   adminSelectClass,
-  SectionHeading,
 } from "@/components/admin/ui";
 import {
   ConsoleFilterBar,
@@ -34,6 +33,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { ListPagination } from "@/components/ui/ListPagination";
 import { useAuthRole } from "@/hooks/use-auth-role";
+import { usePermissions } from "@/hooks/use-permissions";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -110,6 +110,7 @@ function ReviewStats() {
 function ReviewModCard({
   review,
   canDelete,
+  canModerate,
   busy,
   onPublish,
   onReject,
@@ -117,6 +118,8 @@ function ReviewModCard({
 }: {
   review: IAdminReview;
   canDelete: boolean;
+  /** Publish / reject render only for WEBSITE_MODERATE holders. */
+  canModerate: boolean;
   /** True while any decision is in flight - keeps double-clicks out. */
   busy: boolean;
   onPublish: (review: IAdminReview) => void;
@@ -174,9 +177,9 @@ function ReviewModCard({
           </Mono>
         ) : null}
 
-        {isPending || canDelete ? (
+        {(isPending && canModerate) || canDelete ? (
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            {isPending ? (
+            {isPending && canModerate ? (
               <>
                 <AdminButton
                   type="button"
@@ -281,11 +284,10 @@ function AddReviewDialog({
           onSubmit={handleSubmit(onSubmit)}
           className="flex flex-col gap-5"
         >
-          <section className="flex flex-col gap-3">
-            <SectionHeading className="mb-0">Who reviewed us</SectionHeading>
+          <section className="flex flex-col gap-5">
             {/* Paired in the dialog's wide (lg) form, stacked below - two
                 short fields on one row is what buys back the inner scroll. */}
-            <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
               <AdminField
                 label="Reviewer's name"
                 error={errors.authorName?.message}
@@ -323,13 +325,7 @@ function AddReviewDialog({
             </div>
           </section>
 
-          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
-            <SectionHeading
-              className="mb-0"
-              hint="Published as recorded by the office, never as verified."
-            >
-              What they said
-            </SectionHeading>
+          <section className="flex flex-col gap-5">
             <AdminField label="Rating" error={errors.rating?.message}>
               <Controller
                 control={control}
@@ -406,6 +402,8 @@ function AddReviewDialog({
 
 /** /admin/reviews - the moderation queue for website reviews. */
 export function ReviewsScreen() {
+  const { has } = usePermissions();
+  const canModerate = has("WEBSITE_MODERATE");
   const { isSuperAdmin } = useAuthRole();
   const { confirm, confirmationDialog } = useConfirm();
   const [adding, setAdding] = useState(false);
@@ -445,7 +443,9 @@ export function ReviewsScreen() {
   const reviews = data?.data ?? [];
   const totalPages = data?.meta.totalPages ?? 1;
   const isPendingView = filters.status === "PENDING";
-  const activeFilterCount = filters.role !== "all" ? 1 : 0;
+  const activeFilterCount =
+    (filters.role !== "all" ? 1 : 0) +
+    (filters.status !== "PENDING" ? 1 : 0);
   // A register with nothing on file and nothing narrowing it shows ONLY the
   // empty state. The status tabs are navigation, not filters, so pristine
   // additionally requires the WHOLE register to be empty (stats total 0) -
@@ -513,13 +513,15 @@ export function ReviewsScreen() {
         hint="Customer reviews waiting to be published or already live."
         sub="Moderate what the website shows the world"
         actions={
-          <AdminButton
-            onClick={() => {
-              setAdding(true);
-            }}
-          >
-            + Add review
-          </AdminButton>
+          canModerate ? (
+            <AdminButton
+              onClick={() => {
+                setAdding(true);
+              }}
+            >
+              + Add review
+            </AdminButton>
+          ) : undefined
         }
       />
 
@@ -528,30 +530,12 @@ export function ReviewsScreen() {
           filtered={false}
           noun="reviews"
           description="Reviews submitted on the website land here for a decision - or record one the office took by phone or on paper."
-          actionLabel="+ Add review"
-          onAction={() => {
-            setAdding(true);
-          }}
+          actionLabel={canModerate ? "+ Add review" : undefined}
+          onAction={canModerate ? () => { setAdding(true); } : undefined}
         />
       ) : (
         <>
           <ReviewStats />
-
-          {/* Status tabs - the default is what needs deciding. */}
-          <div className="mb-4 flex gap-1.5">
-            {REVIEW_STATUSES.map((value) => (
-              <AdminButton
-                key={value}
-                variant={filters.status === value ? "primary" : "secondary"}
-                onClick={() => {
-                  setFilter("status", value);
-                }}
-                aria-pressed={filters.status === value}
-              >
-                {REVIEW_STATUS_META[value].label}
-              </AdminButton>
-            ))}
-          </div>
 
           <ConsoleFilterBar
             search={searchInput}
@@ -560,6 +544,22 @@ export function ReviewsScreen() {
             activeCount={activeFilterCount}
             onClear={resetFilters}
           >
+            {/* Status is a filter like any other - it lived as a row of tabs
+                above the toolbar, which was a second filtering vocabulary on
+                a screen that already had one. The default is still what
+                needs deciding (PENDING). */}
+            <ConsoleLabeledSelect
+              label="Status"
+              value={filters.status}
+              onChange={(v) => {
+                setFilter("status", v);
+              }}
+              options={REVIEW_STATUSES.map((value) => ({
+                value,
+                label: REVIEW_STATUS_META[value].label,
+              }))}
+              active={filters.status !== "PENDING"}
+            />
             <ConsoleLabeledSelect
               label="Role"
               value={filters.role}
@@ -568,7 +568,6 @@ export function ReviewsScreen() {
               }}
               options={ROLE_OPTIONS}
               active={filters.role !== "all"}
-              className="lg:w-[160px]"
             />
           </ConsoleFilterBar>
 
@@ -626,6 +625,7 @@ export function ReviewsScreen() {
                     key={review.id}
                     review={review}
                     canDelete={isSuperAdmin}
+                    canModerate={canModerate}
                     busy={busy}
                     onPublish={(r) => void onPublish(r)}
                     onReject={(r) => void onReject(r)}

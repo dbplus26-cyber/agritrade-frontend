@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import { useAuthRole } from "@/hooks/use-auth-role";
+import { usePermissions } from "@/hooks/use-permissions";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis, formatKg } from "@/lib/format-money";
@@ -132,7 +133,7 @@ function CancelDialog({
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-3"
+          className="flex flex-col gap-5"
         >
           <AdminField label="Reason" error={errors.reason?.message}>
             <Input
@@ -172,6 +173,7 @@ export function SaleDetail({
   id: string;
   initialPayOpen?: boolean;
 }) {
+  const { has } = usePermissions();
   const { data, isLoading, isError, error, refetch } = useGetSaleQuery(id);
   const [confirmSale, confirmState] = useConfirmSaleMutation();
   const { confirm, confirmationDialog } = useConfirm();
@@ -220,9 +222,13 @@ export function SaleDetail({
     );
 
   const sale = data.data.sale;
-  const isDraft = sale.status === "DRAFT";
-  const canPay = sale.status === "CONFIRMED" || sale.status === "FULFILLED";
-  const canCancel = sale.status === "DRAFT" || sale.status === "CONFIRMED";
+  const canManage = has("SALES_MANAGE");
+  const isDraft = canManage && sale.status === "DRAFT";
+  const canPay =
+    has("PAYMENTS_RECORD") &&
+    (sale.status === "CONFIRMED" || sale.status === "FULFILLED");
+  const canCancel =
+    canManage && (sale.status === "DRAFT" || sale.status === "CONFIRMED");
 
   const onConfirm = async () => {
     const ok = await confirm({
@@ -262,7 +268,7 @@ export function SaleDetail({
           Record payment
         </AdminButton>
       ) : null}
-      {sale.status === "CONFIRMED" ? (
+      {sale.status === "CONFIRMED" && has("SHIPMENTS_MANAGE") ? (
         <AdminButton variant="outline" asChild>
           <Link href={`/admin/shipments/new?saleId=${sale.id}`}>
             Ship goods

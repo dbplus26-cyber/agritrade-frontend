@@ -369,7 +369,7 @@ function TransferDialog({
         </ResponsiveDialogHeader>
 
         <form
-          className="space-y-4 px-4 pb-2 sm:px-0"
+          className="space-y-5 px-4 pb-2 sm:px-0"
           onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
         >
           <AdminField

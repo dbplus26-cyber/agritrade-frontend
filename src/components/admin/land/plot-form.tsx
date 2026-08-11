@@ -10,7 +10,6 @@ import {
   AdminField,
   AdminPageHeader,
   adminInputClass,
-  SectionHeading,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
@@ -149,17 +148,11 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        className="@container flex flex-col gap-4"
+        className="@container flex flex-col gap-5"
       >
         <AdminCard className="flex flex-col gap-5 px-5 py-4">
-          <section className="flex flex-col gap-3">
-            <SectionHeading
-              className="mb-0"
-              hint="What this plot is called on the register, where it is, and how big."
-            >
-              The plot itself
-            </SectionHeading>
-            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+          <section className="flex flex-col gap-5">
+            <div className="grid grid-cols-1 gap-5 @min-[440px]:grid-cols-2">
               {field("reference", "Reference", {
                 placeholder: "e.g. TML-014",
                 locked: plot !== undefined,
@@ -181,14 +174,8 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
             </div>
           </section>
 
-          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
-            <SectionHeading
-              className="mb-0"
-              hint="What the plot is listed at and what it cost you. The difference is what you make on a sale."
-            >
-              Pricing
-            </SectionHeading>
-            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+          <section className="flex flex-col gap-5">
+            <div className="grid grid-cols-1 gap-5 @min-[440px]:grid-cols-2">
               {field("askingPriceGhs", "Asking price (GHS)", {
                 mode: "decimal",
                 placeholder: "e.g. 60000",
@@ -207,8 +194,7 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
             </label>
           </section>
 
-          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
-            <SectionHeading className="mb-0">On the website</SectionHeading>
+          <section className="flex flex-col gap-5">
             {field("description", "Description", {
               optional: true,
               placeholder: "e.g. Corner plot, fenced on two sides, borehole on site",

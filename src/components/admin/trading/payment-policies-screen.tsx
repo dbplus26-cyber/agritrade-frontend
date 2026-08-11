@@ -157,7 +157,7 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="@container flex flex-col gap-3"
+          className="@container flex flex-col gap-5"
         >
           <AdminField label="Name" error={errors.name?.message}>
             <Input

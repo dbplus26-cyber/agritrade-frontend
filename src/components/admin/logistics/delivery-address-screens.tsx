@@ -18,7 +18,6 @@ import {
   AdminField,
   AdminPageHeader,
   EditableFormActions,
-  SectionHeading,
   adminInputClass,
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
@@ -36,6 +35,7 @@ import {
   useUpdateDeliveryAddressMutation,
 } from "@/redux/delivery-addresses/delivery-addresses-api";
 import { useTableQuery } from "@/hooks/use-table-query";
+import { usePermissions } from "@/hooks/use-permissions";
 import { extractApiError } from "@/lib/extract-api-error";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import { notify } from "@/lib/notify";
@@ -71,6 +71,8 @@ const FILTER_DEFAULTS = { status: "all", size: "10", from: "", to: "" };
 /** The saved delivery-address book shipments ship to. */
 export function DeliveryAddressTable() {
   const router = useRouter();
+  const { has } = usePermissions();
+  const canManage = has("DIRECTORY_MANAGE");
   const {
     page,
     search: searchInput,
@@ -200,9 +202,11 @@ export function DeliveryAddressTable() {
             Saved destinations shipments deliver to, with the receiving contact
           </p>
         </div>
-        {<AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ Add address</Link>
-            </AdminButton>}
+        {canManage ? (
+          <AdminButton asChild>
+            <Link href={`${LIST}/new`}>+ Add address</Link>
+          </AdminButton>
+        ) : null}
       </div>
 
       {pristine || (isError && !filtered) ? null : (
@@ -245,8 +249,8 @@ export function DeliveryAddressTable() {
           noun="addresses"
           title="No delivery addresses yet"
           description="Save the destinations trucks regularly deliver to."
-          actionLabel="Add your first address"
-          onAction={() => router.push(`${LIST}/new`)}
+          actionLabel={canManage ? "Add your first address" : undefined}
+          onAction={canManage ? () => router.push(`${LIST}/new`) : undefined}
           onClear={() => {
             setSearch("");
             resetFilters();
@@ -430,13 +434,7 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
         onSubmit={handleSubmit(onSubmit)}
         className="@container flex flex-col gap-5"
       >
-        <section className="flex flex-col gap-[13px]">
-          <SectionHeading
-            className="mb-0"
-            hint="Where the drop-off is, in the terms a driver would use to find it."
-          >
-            Where it is
-          </SectionHeading>
+        <section className="flex flex-col gap-5">
           <AdminField
             label="Label"
             hint="How this address appears in pickers, e.g. 'Makola - Adjei Bros'."
@@ -449,7 +447,7 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
               {...register("label")}
             />
           </AdminField>
-          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+          <div className="grid gap-5 @min-[440px]:grid-cols-2">
             <AdminField label="City" error={errors.city?.message}>
               <Input
                 placeholder="e.g. Accra"
@@ -467,7 +465,7 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
               />
             </AdminField>
           </div>
-          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+          <div className="grid gap-5 @min-[440px]:grid-cols-2">
             <AdminField
               label="Digital address"
               optional
@@ -501,8 +499,7 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
           </div>
         </section>
 
-        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
-          <SectionHeading className="mb-0">Who receives it</SectionHeading>
+        <section className="flex flex-col gap-5">
           <AdminField label="Shop name" optional error={errors.shopName?.message}>
             <Input
               placeholder="e.g. Adjei Brothers Enterprise"
@@ -515,7 +512,7 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
               {...register("shopName")}
             />
           </AdminField>
-          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+          <div className="grid gap-5 @min-[440px]:grid-cols-2">
             <AdminField
               label="Contact name"
               optional
@@ -552,8 +549,7 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
           </div>
         </section>
 
-        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
-          <SectionHeading className="mb-0">Finding it</SectionHeading>
+        <section className="flex flex-col gap-5">
           <AdminField
             label="Directions"
             optional

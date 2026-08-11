@@ -17,7 +17,6 @@ import {
   AdminField,
   AdminPageHeader,
   EditableFormActions,
-  SectionHeading,
   adminInputClass,
 } from "@/components/admin/ui";
 import {
@@ -442,9 +441,8 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
         onSubmit={handleSubmit(onSubmit)}
         className="@container flex flex-col gap-5"
       >
-        <section className="flex flex-col gap-[13px]">
-          <SectionHeading className="mb-0">What this account is</SectionHeading>
-          <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+        <section className="flex flex-col gap-5">
+          <div className="grid gap-5 @min-[440px]:grid-cols-2">
             <AdminField
               label="Label"
               hint="What staff call it internally, e.g. 'Ecobank - main operating'."
@@ -484,13 +482,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
 
         </section>
 
-        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
-          <SectionHeading
-            className="mb-0"
-            hint="The details a payer types in. Get these wrong and the money lands somewhere else."
-          >
-            Where the money goes
-          </SectionHeading>
+        <section className="flex flex-col gap-5">
           <AdminField
             label="Account name"
             hint="The name the money must be sent to. A payer is asked to confirm this."
@@ -524,7 +516,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
 
           {isBank ? (
             <>
-              <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+              <div className="grid gap-5 @min-[440px]:grid-cols-2">
                 <AdminField label="Bank" error={errors.bankName?.message}>
                   <Input
                     placeholder="e.g. Ecobank Ghana"
@@ -550,7 +542,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
                   />
                 </AdminField>
               </div>
-              <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+              <div className="grid gap-5 @min-[440px]:grid-cols-2">
                 <AdminField
                   label="Sort code"
                   optional
@@ -601,13 +593,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
 
         </section>
 
-        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
-          <SectionHeading
-            className="mb-0"
-            hint="How and whether this account is printed on invoices and statements."
-          >
-            On invoices
-          </SectionHeading>
+        <section className="flex flex-col gap-5">
           <AdminField
             label="Instructions"
             optional

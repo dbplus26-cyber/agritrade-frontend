@@ -10,7 +10,6 @@ import {
   AdminField,
   AdminPageHeader,
   adminInputClass,
-  SectionHeading,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
@@ -145,16 +144,10 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
-        className="@container flex flex-col gap-4"
+        className="@container flex flex-col gap-5"
       >
         <AdminCard className="flex flex-col gap-5 px-5 py-4">
-          <section className="flex flex-col gap-3">
-            <SectionHeading
-              className="mb-0"
-              hint="Who this outgrower is, and the ID you verified them against."
-            >
-              Identity
-            </SectionHeading>
+          <section className="flex flex-col gap-5">
             {/* Not an AdminField: the control here is a button, and wrapping a
                 button in a <label> misroutes its clicks. Same label markup as
                 AdminField so it stays in step with the fields under it. */}
@@ -192,7 +185,7 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+            <div className="grid grid-cols-1 gap-5 @min-[440px]:grid-cols-2">
               <AdminField label="Name" error={errors.name?.message}>
                 <Input
                   placeholder="e.g. Abukari Yakubu"
@@ -248,14 +241,8 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
             </div>
           </section>
 
-          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
-            <SectionHeading
-              className="mb-0"
-              hint="Where to find them, and how much land they work."
-            >
-              Where they farm
-            </SectionHeading>
-            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+          <section className="flex flex-col gap-5">
+            <div className="grid grid-cols-1 gap-5 @min-[440px]:grid-cols-2">
               <AdminField label="Community" optional error={errors.community?.message}>
                 <Input
                   placeholder="e.g. Kumbungu"
@@ -310,14 +297,8 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
             </AdminField>
           </section>
 
-          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
-            <SectionHeading
-              className="mb-0"
-              hint="Who to reach if the farmer cannot be, and the wallet repayments settle to."
-            >
-              Contacts and payout
-            </SectionHeading>
-            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+          <section className="flex flex-col gap-5">
+            <div className="grid grid-cols-1 gap-5 @min-[440px]:grid-cols-2">
               <AdminField
                 label="Next of kin name"
                 optional
@@ -365,13 +346,7 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
             </div>
           </section>
 
-          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
-            <SectionHeading
-              className="mb-0"
-              hint="Anything about this farmer the next person to open the record should know."
-            >
-              Anything else
-            </SectionHeading>
+          <section className="flex flex-col gap-5">
             <AdminField label="Notes" optional error={errors.notes?.message}>
               <Input
                 placeholder="e.g. Farms with his two brothers"

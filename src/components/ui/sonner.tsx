@@ -11,6 +11,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
     <Sonner
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
+      // Every toast is dismissible on sight: the X clears it immediately
+      // instead of making the reader wait out its timer.
+      closeButton
       icons={{
         success: (
           <CircleCheckIcon className="size-4" />

@@ -14,6 +14,7 @@ import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { ListPagination } from "@/components/ui/ListPagination";
 import { useTableQuery } from "@/hooks/use-table-query";
+import { usePermissions } from "@/hooks/use-permissions";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatKg } from "@/lib/format-money";
 import { useGetShipmentsQuery } from "@/redux/shipments/shipments-api";
@@ -33,6 +34,8 @@ const FILTER_DEFAULTS = { status: "all", from: "", to: "", size: "12" };
 
 export function ShipmentsRegister() {
   const router = useRouter();
+  const { has } = usePermissions();
+  const canManage = has("SHIPMENTS_MANAGE");
   const {
     page,
     setPage,
@@ -83,9 +86,11 @@ export function ShipmentsRegister() {
             Trucks loaded against confirmed sales, from warehouse to buyer
           </p>
         </div>
-        {<AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ Plan shipment</Link>
-            </AdminButton>}
+        {canManage ? (
+          <AdminButton asChild>
+            <Link href={`${LIST}/new`}>+ Plan shipment</Link>
+          </AdminButton>
+        ) : null}
       </div>
 
       {pristine || (isError && !filtered) ? null : (
@@ -133,8 +138,8 @@ export function ShipmentsRegister() {
           filtered={filtered}
           noun="shipments"
           description="Plan the first truck against a confirmed sale."
-          actionLabel="Plan a shipment"
-          onAction={() => router.push(`${LIST}/new`)}
+          actionLabel={canManage ? "Plan a shipment" : undefined}
+          onAction={canManage ? () => router.push(`${LIST}/new`) : undefined}
           onClear={() => {
             setSearch("");
             resetFilters();

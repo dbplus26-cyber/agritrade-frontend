@@ -40,6 +40,7 @@ import {
 } from "@/redux/purchases/purchases-api";
 import { useGetWarehousesQuery } from "@/redux/warehouses/warehouses-api";
 import { useAuthRole } from "@/hooks/use-auth-role";
+import { usePermissions } from "@/hooks/use-permissions";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis, formatKg } from "@/lib/format-money";
@@ -169,7 +170,7 @@ function ReceiveDialog({
           <form
             noValidate
             onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-3"
+            className="flex flex-col gap-5"
           >
             <AdminField
               label="Received weight (kg)"
@@ -299,7 +300,7 @@ function VoidDialog({
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-3"
+          className="flex flex-col gap-5"
         >
           <AdminField label="Reason" error={errors.reason?.message}>
             <textarea
@@ -342,6 +343,7 @@ export function PurchaseDetail({ id }: { id: string }) {
   const [markInTransit, transitState] = useMarkPurchaseInTransitMutation();
   const { confirm, confirmationDialog } = useConfirm();
   const { isSuperAdmin } = useAuthRole();
+  const { has } = usePermissions();
   const [receiveOpen, setReceiveOpen] = useState(false);
   const [voidOpen, setVoidOpen] = useState(false);
 
@@ -355,10 +357,12 @@ export function PurchaseDetail({ id }: { id: string }) {
     );
 
   const p = data.data.purchase;
-  const canTransit = p.status === PurchaseStatus.RECORDED;
+  const mayReceive = has("PURCHASES_RECEIVE");
+  const canTransit = mayReceive && p.status === PurchaseStatus.RECORDED;
   const canReceive =
-    p.status === PurchaseStatus.RECORDED ||
-    p.status === PurchaseStatus.IN_TRANSIT;
+    mayReceive &&
+    (p.status === PurchaseStatus.RECORDED ||
+      p.status === PurchaseStatus.IN_TRANSIT);
   // Voiding reverses the float and stock ledgers with compensating entries -
   // the owner's correction path (design doc 5.1), enforced by the API too.
   const canVoid = p.status !== PurchaseStatus.VOIDED && isSuperAdmin;

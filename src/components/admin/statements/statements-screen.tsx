@@ -182,7 +182,7 @@ function OpeningBalanceCard() {
         <form
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="@container flex flex-col gap-[13px] pt-2"
+          className="@container flex flex-col gap-5 pt-2"
         >
           <AdminField
             label="Balances as at (31 December)"
@@ -194,7 +194,7 @@ function OpeningBalanceCard() {
               {...register("asOfDate")}
             />
           </AdminField>
-          <div className="grid gap-[13px] @min-[420px]:grid-cols-2">
+          <div className="grid gap-5 @min-[420px]:grid-cols-2">
             <AdminField label="Inventory (GHS)" error={errors.inventoryGhs?.message}>
               <Input
                 inputMode="decimal"
