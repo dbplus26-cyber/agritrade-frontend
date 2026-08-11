@@ -31,7 +31,6 @@ import {
   lastActiveLabel,
   ROLE_LABEL,
   StatusBadge,
-  visibilityLabel,
 } from "./user-bits";
 
 const ROLE_FILTER_OPTIONS = [
@@ -193,11 +192,11 @@ export function UsersTable() {
                     {initialsOf(u)}
                   </span>
                 )}
-                <span className="block min-w-0 max-w-[90%]">
-                  <span className="block truncate font-medium text-adm-ink">
+                <span className="block min-w-0 @2xl/table:max-w-[90%]">
+                  <span className="block [overflow-wrap:anywhere] @2xl/table:truncate font-medium text-adm-ink">
                     {u.firstName} {u.lastName}
                   </span>
-                  <span className="block truncate text-[12.5px] text-adm-faint">
+                  <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-faint">
                     {u.email}
                   </span>
                 </span>
@@ -230,21 +229,6 @@ export function UsersTable() {
         cell: ({ row }) => (
           <span className="whitespace-nowrap text-adm-muted">
             {row.original.phone ?? "-"}
-          </span>
-        ),
-      },
-      {
-        id: "visibility",
-        accessorFn: visibilityLabel,
-        header: columnHelp(
-          "Visibility",
-          "How much of the money on screen this person is allowed to see.",
-        ),
-        enableSorting: false,
-        meta: columnMeta({ at: "xl" }),
-        cell: ({ row }) => (
-          <span className="whitespace-nowrap text-adm-muted">
-            {visibilityLabel(row.original)}
           </span>
         ),
       },

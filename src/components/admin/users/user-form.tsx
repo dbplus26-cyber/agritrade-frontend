@@ -5,14 +5,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
-import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import {
   AdminButton,
   AdminCard,
@@ -75,30 +68,19 @@ export function UserForm() {
       password: "",
       phone: "",
       role: UserRole.STAFF,
-      canApprove: false,
-      financialVisibility: false,
     },
   });
 
   const onSubmit = async (values: CreateUserValues) => {
-    // Read the account's reach back in plain words - the two switches are
-    // easy to leave on by accident and they decide who sees the money.
-    const extras = [
-      values.canApprove ? "can approve requests" : null,
-      values.financialVisibility ? "can see money" : null,
-    ].filter(Boolean);
-    // An owner account, approval rights or the money columns are a privilege
-    // grant, so the email is typed back. A plain staff account with neither
-    // switch on is one deliberate click - no friction where none is earned.
-    const privileged =
-      values.role === UserRole.SUPER_ADMIN ||
-      values.canApprove ||
-      values.financialVisibility;
+    // An owner account is a privilege grant, so the email is typed back. A
+    // plain staff or agent account is one deliberate click - permissions are
+    // granted afterwards on the Permissions screen, never at creation.
+    const privileged = values.role === UserRole.SUPER_ADMIN;
     const confirmed = await confirm({
       title: "Create this account?",
       description: `${values.firstName} ${values.lastName} (${values.email}) - ${
         ROLE_LABEL[values.role]
-      }${extras.length > 0 ? `, ${extras.join(" and ")}` : ""}. They can sign in as soon as you hand over the password.`,
+      }. They can sign in as soon as you hand over the password.`,
       confirmText: "Create user",
       ...(privileged ? { requireExactMatch: values.email } : {}),
     });
@@ -112,8 +94,6 @@ export function UserForm() {
         password: values.password,
         ...(values.phone?.trim() ? { phone: values.phone.trim() } : {}),
         role: values.role,
-        canApprove: values.canApprove,
-        financialVisibility: values.financialVisibility,
       }).unwrap();
       notify.success("User created", {
         description:
@@ -179,41 +159,41 @@ export function UserForm() {
                 />
               </AdminField>
             </div>
-            <AdminField label="Email" error={errors.email?.message}>
-              <Input
-                type="email"
-                placeholder="e.g. amina@dbplus.com"
-                className={cn(adminInputClass, errors.email && "border-console-red")}
-                {...register("email")}
-              />
-            </AdminField>
-            <AdminField
-              label="Phone"
-              optional
-              error={errors.phone?.message}
-            >
-              {/* A phone number has a known length; the 640px column it
-                  sits in does not have to be filled. */}
-              <Input
-                type="tel"
-                placeholder="e.g. 024 000 0000"
-                className={cn(
-                  adminInputClass,
-                  "max-w-[20ch]",
-                  errors.phone && "border-console-red",
-                )}
-                {...register("phone")}
-              />
-            </AdminField>
+            <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
+              <AdminField label="Email" error={errors.email?.message}>
+                <Input
+                  type="email"
+                  placeholder="e.g. amina@dbplus.com"
+                  className={cn(adminInputClass, errors.email && "border-console-red")}
+                  {...register("email")}
+                />
+              </AdminField>
+              <AdminField
+                label="Phone"
+                optional
+                error={errors.phone?.message}
+              >
+                <Input
+                  type="tel"
+                  placeholder="e.g. 024 000 0000"
+                  className={cn(
+                    adminInputClass,
+                    errors.phone && "border-console-red",
+                  )}
+                  {...register("phone")}
+                />
+              </AdminField>
+            </div>
           </section>
 
-          <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+          <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
             <SectionHeading
               className="mb-0"
               hint="What this account can reach, and the password you hand over to open it."
             >
               Access
             </SectionHeading>
+            <div className="grid gap-[13px] @min-[520px]:grid-cols-2">
             <AdminField
               label="Role"
               hint="Agents only ever see their own float and purchases."
@@ -222,18 +202,15 @@ export function UserForm() {
                 control={control}
                 name="role"
                 render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className={cn(adminSelectClass, "w-full")}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ROLE_OPTIONS.map((role) => (
-                        <SelectItem key={role} value={role}>
-                          {ROLE_LABEL[role]}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <SimpleSelect
+                    className={cn(adminSelectClass, "w-full")}
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={ROLE_OPTIONS.map((role) => ({
+                      value: role,
+                      label: ROLE_LABEL[role],
+                    }))}
+                  />
                 )}
               />
             </AdminField>
@@ -269,61 +246,10 @@ export function UserForm() {
                 </AdminButton>
               </div>
             </AdminField>
-          </section>
-
-          <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
-            <SectionHeading
-              className="mb-0"
-              hint="Two switches that widen the account beyond its role. Both are easy to leave on by accident."
-            >
-              Extra permissions
-            </SectionHeading>
-            <div className="grid gap-3 rounded-[6px] border border-adm-line bg-adm-sunken p-3.5">
-              <Controller
-                control={control}
-                name="canApprove"
-                render={({ field }) => (
-                  <label className="flex cursor-pointer items-center justify-between gap-3">
-                    <span>
-                      <span className="block text-[13px] font-semibold text-adm-ink">
-                        Can approve
-                      </span>
-                      <span className="block text-[12px] text-adm-muted">
-                        May decide pending approval requests (delegated authority).
-                      </span>
-                    </span>
-                    <Switch checked={field.value} onCheckedChange={field.onChange} />
-                  </label>
-                )}
-              />
-              <Controller
-                control={control}
-                name="financialVisibility"
-                render={({ field }) => (
-                  <label className="flex cursor-pointer items-center justify-between gap-3">
-                    <span>
-                      <span className="block text-[13px] font-semibold text-adm-ink">
-                        Financial visibility
-                      </span>
-                      <span className="block text-[12px] text-adm-muted">
-                        May see prices, totals and profit across the console.
-                      </span>
-                    </span>
-                    <Switch checked={field.value} onCheckedChange={field.onChange} />
-                  </label>
-                )}
-              />
             </div>
           </section>
 
-          <div className="flex gap-2 border-t border-adm-hairline pt-5">
-            <AdminButton
-              type="submit"
-              disabled={isLoading}
-              size="lg"
-            >
-              {isLoading ? "Creating…" : "Create user"}
-            </AdminButton>
+          <div className="flex justify-end gap-2 pt-3 sm:pt-6">
             <AdminButton
               type="button"
               variant="outline"
@@ -331,6 +257,13 @@ export function UserForm() {
               onClick={() => router.push("/admin/users")}
             >
               Cancel
+            </AdminButton>
+            <AdminButton
+              type="submit"
+              disabled={isLoading}
+              size="lg"
+            >
+              {isLoading ? "Creating…" : "Create user"}
             </AdminButton>
           </div>
         </form>

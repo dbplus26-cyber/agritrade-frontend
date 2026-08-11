@@ -30,6 +30,12 @@ export interface IUser {
   lastLoginAt: string | null;
   createdAt: string;
   updatedAt: string;
+  /**
+   * The caller's effective permission keys (role baseline plus personal
+   * grants). Present on `/auth/me` only - the admin user list does not carry
+   * it, so treat absence as "unknown", not "none".
+   */
+  permissions?: string[];
 }
 
 /**
@@ -66,8 +72,6 @@ export interface ICreateUserInput {
   password: string;
   phone?: string;
   role?: UserRole;
-  canApprove?: boolean;
-  financialVisibility?: boolean;
 }
 
 /** Mirrors the backend `updateUserSchema` (PATCH /admin/users/:id). */
@@ -76,8 +80,6 @@ export interface IUpdateUserInput {
   lastName?: string;
   email?: string;
   phone?: string | null;
-  canApprove?: boolean;
-  financialVisibility?: boolean;
   /** Clears the existing photo (the backend deletes the Cloudinary asset). */
   removeProfilePicture?: boolean;
 }

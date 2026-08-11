@@ -141,6 +141,7 @@ export const adminNavGroups: AdminNavGroup[] = [
     label: "Admin",
     items: [
       item("users", "Users", "Who can sign in, and what each of them is allowed to do.", { ownerOnly: true }),
+      item("permissions", "Permissions", "What staff and agents may do - set for the whole role, or granted to one person.", { ownerOnly: true }),
       item("audit", "Audit Log", "A record of who changed what, and when.", { ownerOnly: true }),
       item("notifications", "Notifications", "Every email and text the system has tried to send.", { ownerOnly: true }),
       // "My profile" and "Settings" deliberately absent: both live behind

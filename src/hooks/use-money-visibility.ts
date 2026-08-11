@@ -17,5 +17,10 @@ import { UserRole } from "@/types/user.types";
 export function useMoneyVisibility(): boolean {
   const user = useCurrentUser();
   if (!user) return false;
-  return user.role === UserRole.STAFF ? user.financialVisibility : true;
+  if (user.role !== UserRole.STAFF) return true;
+  // `/auth/me` now carries the effective permission set (role baseline plus
+  // personal grants), which is what the backend actually redacts on - a
+  // MONEY_VIEW grant made on the Permissions screen never touches the legacy
+  // column, so the column alone would hide money the API is sending.
+  return user.permissions?.includes("MONEY_VIEW") ?? user.financialVisibility;
 }

@@ -2,18 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Pencil } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import {
   AdminButton,
   AdminCard,
   AdminField,
   AdminPageHeader,
-  DetailGrid,
-  DetailItem,
   DetailShell,
   SectionHeading,
   ToneBadge,
@@ -34,10 +31,11 @@ import {
   useUnblockUserMutation,
   useUpdateUserMutation,
 } from "@/redux/users/users-api";
+import { useGetUserPermissionsQuery } from "@/redux/permissions/permissions-api";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
-import type { IUser } from "@/types/user.types";
+import { UserRole, type IUser } from "@/types/user.types";
 import { editUserSchema, type EditUserValues } from "@/validations/user-schema";
 import { StatusBadge } from "./user-bits";
 import { IdentityFacts, ROLE_TITLE } from "./user-identity";
@@ -154,43 +152,11 @@ function IdentityCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
           ) : null}
         </div>
 
-        <div className="mt-6 border-t border-adm-hairline pt-5">
+        <div className="mt-6 pt-3 sm:pt-6">
           {editing ? (
-            <EditDetailsForm
-              user={user}
-              isSelf={isSelf}
-              onClose={() => setEditing(false)}
-            />
+            <EditDetailsForm user={user} onClose={() => setEditing(false)} />
           ) : (
-            <>
-              <IdentityFacts user={user} />
-
-              {/* These two permissions used to be a hand-rolled dt/dd pair,
-                  so they read a size and a weight apart from every other fact
-                  in the console. DetailItem is the same pair, shared. */}
-              <div className="mt-5 border-t border-adm-hairline pt-4">
-                <DetailGrid columns={2}>
-                  <DetailItem label="Can approve">
-                    {user.canApprove ? (
-                      <span className="text-console">
-                        Yes - may decide approvals
-                      </span>
-                    ) : (
-                      "No"
-                    )}
-                  </DetailItem>
-                  <DetailItem label="Financial visibility">
-                    {user.financialVisibility ? (
-                      <span className="text-console">
-                        Full - sees money columns
-                      </span>
-                    ) : (
-                      "Hidden"
-                    )}
-                  </DetailItem>
-                </DetailGrid>
-              </div>
-            </>
+            <IdentityFacts user={user} />
           )}
         </div>
       </div>
@@ -200,17 +166,14 @@ function IdentityCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
 
 function EditDetailsForm({
   user,
-  isSelf,
   onClose,
 }: {
   user: IUser;
-  isSelf: boolean;
   onClose: () => void;
 }) {
   const [updateUser, { isLoading }] = useUpdateUserMutation();
   const {
     register,
-    control,
     handleSubmit,
     setError,
     formState: { errors },
@@ -221,8 +184,6 @@ function EditDetailsForm({
       lastName: user.lastName,
       email: user.email,
       phone: user.phone ?? "",
-      canApprove: user.canApprove,
-      financialVisibility: user.financialVisibility,
     },
   });
 
@@ -235,13 +196,6 @@ function EditDetailsForm({
           lastName: values.lastName,
           ...(values.email !== user.email ? { email: values.email } : {}),
           phone: values.phone?.trim() ? values.phone.trim() : null,
-          // Own flags are admin-locked backend-side; don't send them for self.
-          ...(isSelf
-            ? {}
-            : {
-                canApprove: values.canApprove,
-                financialVisibility: values.financialVisibility,
-              }),
         },
       }).unwrap();
       notify.success("User updated");
@@ -306,59 +260,7 @@ function EditDetailsForm({
         />
       </AdminField>
 
-      {isSelf ? null : (
-      <div className="grid gap-3 rounded-[6px] border border-adm-line bg-adm-sunken p-3.5">
-        <Controller
-          control={control}
-          name="canApprove"
-          render={({ field }) => (
-            <label className="flex cursor-pointer items-center justify-between gap-3">
-              <span>
-                <span className="block text-[13px] font-semibold text-adm-ink">
-                  Can approve
-                </span>
-                <span className="block text-[12px] text-adm-muted">
-                  May decide pending approval requests.
-                </span>
-              </span>
-              <Switch
-                checked={field.value}
-                onCheckedChange={field.onChange}
-              />
-            </label>
-          )}
-        />
-        <Controller
-          control={control}
-          name="financialVisibility"
-          render={({ field }) => (
-            <label className="flex cursor-pointer items-center justify-between gap-3">
-              <span>
-                <span className="block text-[13px] font-semibold text-adm-ink">
-                  Financial visibility
-                </span>
-                <span className="block text-[12px] text-adm-muted">
-                  May see prices, totals and profit.
-                </span>
-              </span>
-              <Switch
-                checked={field.value}
-                onCheckedChange={field.onChange}
-              />
-            </label>
-          )}
-        />
-      </div>
-      )}
-
-      <div className="flex gap-2">
-        <AdminButton
-          type="submit"
-          disabled={isLoading}
-          size="lg"
-        >
-          {isLoading ? "Saving…" : "Save changes"}
-        </AdminButton>
+      <div className="flex justify-end gap-2">
         <AdminButton
           type="button"
           variant="outline"
@@ -368,8 +270,64 @@ function EditDetailsForm({
         >
           Cancel
         </AdminButton>
+        <AdminButton
+          type="submit"
+          disabled={isLoading}
+          size="lg"
+        >
+          {isLoading ? "Saving…" : "Save changes"}
+        </AdminButton>
       </div>
     </form>
+  );
+}
+
+/* ── Permissions (managed on the Permissions screen; summarised here) ────── */
+
+function PermissionsCard({ user }: { user: IUser }) {
+  const router = useRouter();
+  const isOwner = user.role === UserRole.SUPER_ADMIN;
+  const { data } = useGetUserPermissionsQuery(user.id, { skip: isOwner });
+  const state = data?.data;
+
+  return (
+    <AdminCard className="px-4 py-[18px] sm:px-6">
+      <SectionHeading className="mb-3.5">Permissions</SectionHeading>
+      {isOwner ? (
+        <p className="text-[12.5px] leading-[1.55] text-adm-muted">
+          Full access - the owner role holds every permission and cannot be
+          narrowed.
+        </p>
+      ) : (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-[13.5px] font-semibold text-adm-ink">
+              {state
+                ? `${String(state.effective.length)} permission${
+                    state.effective.length === 1 ? "" : "s"
+                  } in effect`
+                : "Loading their access…"}
+            </div>
+            <div className="mt-0.5 text-[12.5px] text-adm-muted">
+              {state
+                ? `${String(state.fromRole.length)} from the role, ${String(
+                    state.granted.length,
+                  )} granted personally.`
+                : "What they may do, and where it comes from."}
+            </div>
+          </div>
+          <AdminButton
+            variant="secondary"
+            className="flex-none whitespace-nowrap"
+            onClick={() =>
+              router.push(`/admin/permissions?tab=people&user=${user.id}`)
+            }
+          >
+            Manage
+          </AdminButton>
+        </div>
+      )}
+    </AdminCard>
   );
 }
 
@@ -616,33 +574,33 @@ function ActionsCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
 function UserDetailSkeleton() {
   return (
     <div aria-hidden="true" className="w-full max-w-[1120px]">
-      <Skeleton className="mb-2 h-6 w-24 rounded-[6px]" />
+      <Skeleton className="mb-2 h-6 w-24 rounded-none" />
       <div className="mb-5">
-        <Skeleton className="h-5 w-44 rounded-[4px]" />
-        <Skeleton className="mt-2 h-3 w-60 rounded-[4px]" />
+        <Skeleton className="h-5 w-44 rounded-none" />
+        <Skeleton className="mt-2 h-3 w-60 rounded-none" />
       </div>
 
       <DetailShell
         asideFirstOnStack={false}
         main={
         <AdminCard className="overflow-hidden p-0">
-          <Skeleton className="h-[88px] w-full rounded-[6px]" />
+          <Skeleton className="h-[88px] w-full rounded-none" />
           <div className="px-4 pb-6 sm:px-6">
             <div className="-mt-[52px] flex flex-col items-center gap-3 sm:flex-row sm:items-end sm:gap-5">
               <Skeleton className="h-[104px] w-[104px] flex-none rounded-full ring-4 ring-white" />
               <div className="min-w-0 flex-1 space-y-2 text-center sm:pb-2 sm:text-left">
-                <Skeleton className="mx-auto h-4 w-40 rounded-[4px] sm:mx-0" />
-                <Skeleton className="mx-auto h-3 w-56 rounded-[4px] sm:mx-0" />
+                <Skeleton className="mx-auto h-4 w-40 rounded-none sm:mx-0" />
+                <Skeleton className="mx-auto h-3 w-56 rounded-none sm:mx-0" />
               </div>
-              <Skeleton className="h-8 w-28 flex-none rounded-[6px] sm:mb-2" />
+              <Skeleton className="h-8 w-28 flex-none rounded-none sm:mb-2" />
             </div>
             <div className="mt-6 grid grid-cols-1 gap-x-8 gap-y-4 border-t border-adm-hairline pt-5 sm:grid-cols-2">
               {Array.from({ length: 6 }, (_, i) => (
                 <div key={i} className="flex items-start gap-2.5">
-                  <Skeleton className="h-7 w-7 flex-none rounded-[6px]" />
+                  <Skeleton className="h-7 w-7 flex-none rounded-none" />
                   <div className="flex-1 space-y-1.5">
-                    <Skeleton className="h-2.5 w-16 rounded-[4px]" />
-                    <Skeleton className="h-3.5 w-[70%] rounded-[4px]" />
+                    <Skeleton className="h-2.5 w-16 rounded-none" />
+                    <Skeleton className="h-3.5 w-[70%] rounded-none" />
                   </div>
                 </div>
               ))}
@@ -654,13 +612,13 @@ function UserDetailSkeleton() {
           <div className="flex flex-col gap-4">
             {Array.from({ length: 2 }, (_, i) => (
               <AdminCard key={i} className="px-4 py-[18px] sm:px-6">
-                <Skeleton className="h-2.5 w-20 rounded-[4px]" />
+                <Skeleton className="h-2.5 w-20 rounded-none" />
                 <div className="mt-3.5 flex items-center justify-between gap-3">
                   <div className="flex-1 space-y-1.5">
-                    <Skeleton className="h-3.5 w-36 rounded-[4px]" />
-                    <Skeleton className="h-3 w-64 max-w-full rounded-[4px]" />
+                    <Skeleton className="h-3.5 w-36 rounded-none" />
+                    <Skeleton className="h-3 w-64 max-w-full rounded-none" />
                   </div>
-                  <Skeleton className="h-8 w-24 flex-none rounded-[6px]" />
+                  <Skeleton className="h-8 w-24 flex-none rounded-none" />
                 </div>
               </AdminCard>
             ))}
@@ -704,6 +662,7 @@ export function UserDetail({ id }: { id: string }) {
         aside={
           <div className="flex flex-col gap-4">
             <RoleCard user={user} isSelf={isSelf} />
+            <PermissionsCard user={user} />
             <ActionsCard user={user} isSelf={isSelf} />
           </div>
         }

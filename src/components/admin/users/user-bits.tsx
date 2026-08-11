@@ -37,12 +37,6 @@ export function StatusBadge({ user }: { user: IUser }) {
   return help ? <HelpWrap text={help}>{badge}</HelpWrap> : badge;
 }
 
-/** The money-columns story in one word (list column "Visibility"). */
-export function visibilityLabel(user: IUser): string {
-  if (user.role === UserRole.AGENT) return "Own only";
-  return user.financialVisibility ? "Full" : "Hidden";
-}
-
 export function lastActiveLabel(user: IUser): string {
   if (!user.lastLoginAt) return "Never";
   const d = new Date(user.lastLoginAt);

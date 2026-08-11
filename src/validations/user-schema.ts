@@ -20,8 +20,6 @@ export const createUserSchema = z.object({
     .or(z.literal(""))
     .optional(),
   role: z.enum(UserRole),
-  canApprove: z.boolean(),
-  financialVisibility: z.boolean(),
 });
 export type CreateUserValues = z.infer<typeof createUserSchema>;
 
@@ -36,7 +34,5 @@ export const editUserSchema = z.object({
     .max(20)
     .or(z.literal(""))
     .optional(),
-  canApprove: z.boolean(),
-  financialVisibility: z.boolean(),
 });
 export type EditUserValues = z.infer<typeof editUserSchema>;
