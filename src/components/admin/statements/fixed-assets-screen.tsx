@@ -26,6 +26,7 @@ import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
@@ -180,8 +181,7 @@ function AddAssetDialog({ onClose }: { onClose: () => void }) {
                 />
               </AdminField>
               <AdminField label="Acquired on" error={errors.acquiredAt?.message}>
-                <Input
-                  type="date"
+                <DateInput
                   className={cn(adminInputClass, errors.acquiredAt && "border-console-red")}
                   {...assetForm.register("acquiredAt")}
                 />
@@ -325,8 +325,7 @@ function DisposeDialog({
         >
           <div className="grid gap-5 sm:grid-cols-2">
             <AdminField label="Disposed on" error={errors.disposedAt?.message}>
-              <Input
-                type="date"
+              <DateInput
                 className={cn(adminInputClass, errors.disposedAt && "border-console-red")}
                 {...register("disposedAt")}
               />

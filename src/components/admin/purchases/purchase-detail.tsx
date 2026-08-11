@@ -32,6 +32,7 @@ import {
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import {
   useGetPurchaseQuery,
   useMarkPurchaseInTransitMutation,
@@ -216,8 +217,7 @@ function ReceiveDialog({
               />
             </AdminField>
             <AdminField label="Received date" optional>
-              <Input
-                type="date"
+              <DateInput
                 className={adminInputClass}
                 {...register("receivedAt")}
               />

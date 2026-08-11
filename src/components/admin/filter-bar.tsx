@@ -227,7 +227,7 @@ export function ConsoleDateRange({
         // with the toolbar's own grid); on the statement screens, which drop
         // this straight into a document header, it falls back to the shell's
         // main container and still pairs up wherever there is room.
-        "col-span-1 grid grid-cols-1 gap-2 @min-[320px]:col-span-2 @min-[320px]:grid-cols-2",
+        "col-span-2 grid grid-cols-2 gap-2",
         // Same reason as the toolbar grid: the pair owns its own widths so the
         // two bounds always match each other and the filters beside them.
         "[&>*]:w-full!",
@@ -435,7 +435,11 @@ export function ConsoleFilterBar({
         <div
           id="console-filters"
           className={cn(
-            "mt-2 grid grid-cols-1 gap-2 @min-[320px]/toolbar:grid-cols-2 @min-[520px]/toolbar:grid-cols-3",
+            // TWO columns from the smallest phone up - a single column made
+            // every filter a full-width bar and the panel a tower. Three
+            // from tablet widths; past 680px the auto-fill tracks below give
+            // the iPad-Pro-and-up sizes as many compact columns as fit.
+            "mt-2 grid grid-cols-2 gap-2 @min-[520px]/toolbar:grid-cols-3",
             // Wide: fixed 190px tracks instead of equal fractions. Equal
             // fractions stretch three filters across a 1300px console into
             // 430px boxes, which is not the compact register control this is

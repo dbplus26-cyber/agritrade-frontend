@@ -13,6 +13,7 @@ import {
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
 import { optimizeImage } from "@/lib/optimize-image";
@@ -206,8 +207,7 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
                 optional
                 error={errors.dateOfBirth?.message}
               >
-                <Input
-                  type="date"
+                <DateInput
                   className={cn(
                     adminInputClass,
                     errors.dateOfBirth && "border-console-red",

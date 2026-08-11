@@ -32,6 +32,7 @@ import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import { SimpleSelect } from "@/components/ui/simple-select";
 import { useAuthRole } from "@/hooks/use-auth-role";
 import { usePermissions } from "@/hooks/use-permissions";
@@ -543,8 +544,7 @@ function TransferDialog({
                 hint="The day the stock physically left, if that was not today."
                 error={errors.occurredAt?.message}
               >
-                <Input
-                  type="date"
+                <DateInput
                   className={adminInputClass}
                   {...register("occurredAt")}
                 />

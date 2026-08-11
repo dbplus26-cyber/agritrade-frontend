@@ -80,7 +80,7 @@ function SelectContent({
       <SelectPrimitive.Content
         data-slot="select-content"
         data-align-trigger={position === "item-aligned"}
-        className={cn("relative z-[80] max-h-(--radix-select-content-available-height) w-(--radix-select-trigger-width) max-w-[92vw] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-none border-0 border-t-[1.5px] border-b-[3px] border-t-soil/50 border-b-forest bg-surface text-popover-foreground duration-100 data-[align-trigger=true]:animate-none data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95", position ==="popper"&&"data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1", className )}
+        className={cn("relative z-[80] max-h-(--radix-select-content-available-height) w-max min-w-(--radix-select-trigger-width) max-w-[min(92vw,20rem)] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-none border-0 border-t-[1.5px] border-b-[3px] border-t-soil/50 border-b-forest bg-surface text-popover-foreground duration-100 data-[align-trigger=true]:animate-none data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95", position ==="popper"&&"data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1", className )}
         position={position}
         align={align}
         {...props}
@@ -89,11 +89,12 @@ function SelectContent({
         <SelectPrimitive.Viewport
           data-position={position}
           className={cn(
-            // NOT min-w-(--radix-select-trigger-width). A min-width is a floor the
-            // panel grows past whenever an option is longer than the control, which
-            // is how a 150px filter came to open a list twice its width. The Content
-            // above is pinned to the trigger's exact width instead, and this only
-            // fills it.
+            // The Content above opens AT LEAST trigger-wide and grows only as
+            // far as its longest option, capped at 20rem. It was pinned to the
+            // trigger's exact width for a while, but a trigger narrower than a
+            // two-word option then wrapped that option mid-row ("Last 30 /
+            // days") - and short labels must hold their line. The cap is what
+            // keeps a 150px filter from opening a list twice the screen.
             "data-[position=popper]:h-(--radix-select-trigger-height) data-[position=popper]:w-full data-[position=popper]:min-w-0",
             position === "popper" && ""
           )}
@@ -145,7 +146,7 @@ function SelectItem({
           give way instead: two lines, then ellipsis, wrapping mid-token so an
           unbroken value cannot push a horizontal scrollbar into the list. */}
       <SelectPrimitive.ItemText>
-        <span className="min-w-0 flex-1 line-clamp-2 whitespace-normal [overflow-wrap:anywhere]">
+        <span className="min-w-0 flex-1 line-clamp-2 whitespace-normal [overflow-wrap:break-word]">
           {children}
         </span>
       </SelectPrimitive.ItemText>

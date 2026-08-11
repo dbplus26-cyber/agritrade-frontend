@@ -117,7 +117,7 @@ export function SearchableSelect({
         >
           <span
             className={cn(
-              "min-w-0 flex-1 line-clamp-1 whitespace-normal [overflow-wrap:anywhere]",
+              "min-w-0 flex-1 line-clamp-1 whitespace-normal [overflow-wrap:break-word]",
               !triggerLabel && "text-adm-faint",
             )}
           >
@@ -182,7 +182,7 @@ export function SearchableSelect({
                 }}
                 className="rounded-none text-[13.5px]"
               >
-                <span className="min-w-0 flex-1 text-adm-ink [overflow-wrap:anywhere]">
+                <span className="min-w-0 flex-1 text-adm-ink [overflow-wrap:break-word]">
                   {o.label}
                 </span>
                 {/* The hint has to be able to GIVE WAY.

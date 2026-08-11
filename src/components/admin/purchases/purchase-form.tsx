@@ -17,6 +17,7 @@ import {
 import { HelpTip } from "@/components/admin/help-tip";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import { SimpleSelect } from "@/components/ui/simple-select";
 import { SearchableSelect } from "@/components/admin/searchable-select";
 import { useGetAgentsQuery } from "@/redux/agents/agents-api";
@@ -345,8 +346,7 @@ export function PurchaseCreate() {
                 label="Purchase date"
                 error={errors.purchasedAt?.message}
               >
-                <Input
-                  type="date"
+                <DateInput
                   className={cn(
                     adminInputClass,
                     errors.purchasedAt && "border-console-red",

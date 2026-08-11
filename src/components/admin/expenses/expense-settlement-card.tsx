@@ -19,6 +19,7 @@ import {
 import { ReverseReasonDialog } from "@/components/admin/drivers/driver-settlement-dialogs";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
@@ -181,9 +182,8 @@ function PayDialog({
                 />
               </AdminField>
               <AdminField error={errors.paidAt?.message} label="Paid on">
-                <Input
+                <DateInput
                   className={adminInputClass}
-                  type="date"
                   {...register("paidAt")}
                 />
               </AdminField>

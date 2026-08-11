@@ -15,6 +15,7 @@ import { SearchableSelect } from "@/components/admin/searchable-select";
 import { BackButton } from "@/components/ui/BackButton";
 import { FilePicker } from "@/components/ui/FilePicker";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
@@ -248,8 +249,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
                 label="Due date"
                 optional
               >
-                <Input
-                  type="date"
+                <DateInput
                   className={cn(adminInputClass, errors.dueDate && "border-console-red")}
                   {...register("dueDate")}
                 />

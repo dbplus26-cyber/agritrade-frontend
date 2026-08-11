@@ -18,6 +18,7 @@ import {
 import { SearchableSelect } from "@/components/admin/searchable-select";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import { SimpleSelect } from "@/components/ui/simple-select";
 import {
   useCreateShipmentMutation,
@@ -875,8 +876,7 @@ export function ShipmentForm({
                 />
               </AdminField>
               <AdminField label="Expected arrival" optional>
-                <Input
-                  type="date"
+                <DateInput
                   className={adminInputClass}
                   {...register("expectedArrivalAt")}
                 />

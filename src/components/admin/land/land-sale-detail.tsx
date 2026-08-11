@@ -32,6 +32,7 @@ import {
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import { SimpleSelect } from "@/components/ui/simple-select";
 import { useAuthRole } from "@/hooks/use-auth-role";
 import { useConfirm } from "@/hooks/use-confirm";
@@ -172,7 +173,7 @@ function PaymentDialog({
             <Input className={adminInputClass} {...register("reference")} />
           </AdminField>
           <AdminField label="Payment date" optional>
-            <Input type="date" className={adminInputClass} {...register("paidAt")} />
+            <DateInput className={adminInputClass} {...register("paidAt")} />
           </AdminField>
           <ResponsiveDialogFooter className="gap-2">
             <AdminButton type="button" variant="outline" size="lg" onClick={onClose}>

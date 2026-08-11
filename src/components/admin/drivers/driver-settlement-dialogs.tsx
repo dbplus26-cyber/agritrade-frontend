@@ -13,6 +13,7 @@ import {
   adminSelectClass,
 } from "@/components/admin/ui";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import { SimpleSelect } from "@/components/ui/simple-select";
 import {
   ResponsiveDialog,
@@ -315,9 +316,8 @@ export function DriverPaymentDialog({
                 />
               </AdminField>
               <AdminField error={errors.paidAt?.message} label="Paid on">
-                <Input
+                <DateInput
                   className={adminInputClass}
-                  type="date"
                   {...register("paidAt")}
                 />
               </AdminField>

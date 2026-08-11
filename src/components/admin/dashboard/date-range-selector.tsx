@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { ConsoleDateField } from "@/components/admin/filter-bar";
 import { AdminButton } from "@/components/admin/ui";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -113,24 +113,26 @@ export function DateRangeSelector({
       </Select>
 
       {preset === "custom" ? (
-        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
-          <Input
-            type="date"
-            value={customFrom}
-            max={customTo || undefined}
-            onChange={(e) => setCustomFrom(e.target.value)}
-            aria-label="From date"
-            className="h-9 w-full text-[13px] sm:w-[148px]"
-          />
-          <span className="text-[12px] text-adm-muted">to</span>
-          <Input
-            type="date"
-            value={customTo}
-            min={customFrom || undefined}
-            onChange={(e) => setCustomTo(e.target.value)}
-            aria-label="To date"
-            className="h-9 w-full text-[13px] sm:w-[148px]"
-          />
+        // Titled bounds that share ONE row at every width (a phone included),
+        // in the same labelled boxed shape as the register filters, with
+        // Apply sitting level with the boxes.
+        <div className="flex w-full flex-wrap items-end gap-2 sm:w-auto">
+          <div className="grid min-w-0 flex-1 grid-cols-2 gap-2 sm:w-[320px] sm:flex-none">
+            <ConsoleDateField
+              label="Start date"
+              value={customFrom}
+              max={customTo || undefined}
+              onChange={setCustomFrom}
+              placeholder="Pick a date"
+            />
+            <ConsoleDateField
+              label="End date"
+              value={customTo}
+              min={customFrom || undefined}
+              onChange={setCustomTo}
+              placeholder="Pick a date"
+            />
+          </div>
           <AdminButton
             onClick={applyCustom}
             disabled={!customFrom || !customTo}

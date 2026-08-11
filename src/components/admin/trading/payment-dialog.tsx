@@ -20,6 +20,7 @@ import {
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import { SimpleSelect } from "@/components/ui/simple-select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useConfirm } from "@/hooks/use-confirm";
@@ -378,8 +379,7 @@ export function PaymentDialog({
                 // label over its control once this cell is a column.
                 className="flex flex-col items-stretch justify-end gap-0"
               >
-                <Input
-                  type="date"
+                <DateInput
                   className={adminInputClass}
                   {...register("paidAt")}
                 />

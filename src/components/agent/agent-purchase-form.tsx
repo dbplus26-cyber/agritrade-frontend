@@ -1,5 +1,6 @@
 "use client";
 
+import { DateInput } from "@/components/ui/date-input";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
@@ -175,9 +176,8 @@ export function AgentPurchaseForm() {
 
       <div>
         <AgentLabel htmlFor="purchasedAt">Purchase date</AgentLabel>
-        <input
+        <DateInput
           id="purchasedAt"
-          type="date"
           className={cn(agentInputClass, errors.purchasedAt && "border-error")}
           {...register("purchasedAt")}
         />

@@ -22,6 +22,7 @@ import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
@@ -98,8 +99,7 @@ function AddDrawingDialog({ onClose }: { onClose: () => void }) {
               />
             </AdminField>
             <AdminField label="Date" error={errors.occurredAt?.message}>
-              <Input
-                type="date"
+              <DateInput
                 className={cn(adminInputClass, errors.occurredAt && "border-console-red")}
                 {...register("occurredAt")}
               />

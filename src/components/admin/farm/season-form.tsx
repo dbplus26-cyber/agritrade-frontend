@@ -12,6 +12,7 @@ import {
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
@@ -139,8 +140,7 @@ export function SeasonForm({ season }: { season?: ISeason }) {
           <section className="flex flex-col gap-5">
             <div className="grid grid-cols-1 gap-5 @min-[440px]:grid-cols-2">
               <AdminField label="Starts on" error={errors.startsOn?.message}>
-                <Input
-                  type="date"
+                <DateInput
                   className={cn(
                     adminInputClass,
                     errors.startsOn && "border-console-red",
@@ -149,8 +149,7 @@ export function SeasonForm({ season }: { season?: ISeason }) {
                 />
               </AdminField>
               <AdminField label="Ends on" optional error={errors.endsOn?.message}>
-                <Input
-                  type="date"
+                <DateInput
                   className={cn(
                     adminInputClass,
                     errors.endsOn && "border-console-red",

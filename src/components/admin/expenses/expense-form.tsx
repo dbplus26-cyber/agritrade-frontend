@@ -1,5 +1,6 @@
 "use client";
 
+import { DateInput } from "@/components/ui/date-input";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -175,9 +176,8 @@ export function ExpenseFormDialog({
                 hint="The day the cost was actually run up, not the day it is being typed in."
                 error={errors.incurredAt?.message}
               >
-                <input
+                <DateInput
                   id="expense-date"
-                  type="date"
                   max={today()}
                   className={adminInputClass}
                   {...register("incurredAt")}

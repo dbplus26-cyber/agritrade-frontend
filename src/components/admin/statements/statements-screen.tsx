@@ -23,6 +23,7 @@ import {
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import { SimpleSelect } from "@/components/ui/simple-select";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -188,8 +189,7 @@ function OpeningBalanceCard() {
             label="Balances as at (31 December)"
             error={errors.asOfDate?.message}
           >
-            <Input
-              type="date"
+            <DateInput
               className={cn(adminInputClass, errors.asOfDate && "border-console-red")}
               {...register("asOfDate")}
             />
