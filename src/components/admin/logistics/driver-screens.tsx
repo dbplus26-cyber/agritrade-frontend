@@ -136,7 +136,7 @@ export function DriverTable() {
               onClick={(e) => e.stopPropagation()}
             >
               <RegistryAvatar name={d.name} photoUrl={d.photoUrl} />
-              <span className="block min-w-0 max-w-[85%]">
+              <span className="block min-w-0 @2xl/table:max-w-[85%]">
                 <span className="block [overflow-wrap:anywhere] @2xl/table:truncate font-medium text-adm-ink">
                   {d.name}
                 </span>

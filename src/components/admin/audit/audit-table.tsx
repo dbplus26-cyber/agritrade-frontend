@@ -126,13 +126,13 @@ export function AuditTable() {
             // the reader with no way to the rest of a name or email.
             <div className="min-w-0 w-full">
               <div
-                className="max-w-[90%] font-medium text-adm-ink [overflow-wrap:anywhere] @2xl/table:truncate"
+                className="@2xl/table:max-w-[90%] font-medium text-adm-ink [overflow-wrap:anywhere] @2xl/table:truncate"
                 title={actor.name}
               >
                 {actor.name}
               </div>
               <div
-                className="max-w-[90%] text-[12.5px] text-adm-faint [overflow-wrap:anywhere] @2xl/table:truncate"
+                className="@2xl/table:max-w-[90%] text-[12.5px] text-adm-faint [overflow-wrap:anywhere] @2xl/table:truncate"
                 title={actor.email}
               >
                 {actor.email}

@@ -169,7 +169,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         header: "Counterparty",
         enableSorting: false,
         cell: ({ row }) => (
-          <span className="block max-w-[90%] truncate text-adm-ink">
+          <span className="block min-w-0 @2xl/table:max-w-[90%] [overflow-wrap:anywhere] @2xl/table:truncate text-adm-ink">
             {row.original.counterparty}
           </span>
         ),
@@ -211,7 +211,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         enableSorting: false,
         cell: ({ row }) =>
           row.original.reference ? (
-            <Mono className="block max-w-[19rem] truncate text-adm-muted">
+            <Mono className="block min-w-0 @2xl/table:max-w-[19rem] [overflow-wrap:anywhere] @2xl/table:truncate text-adm-muted">
               {row.original.reference}
             </Mono>
           ) : (

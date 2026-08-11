@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   type ColumnDef,
@@ -104,6 +104,96 @@ declare module "@tanstack/react-table" {
   // The standard TanStack meta-augmentation shape - params/emptiness required.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-object-type
   interface ColumnMeta<TData, TValue> extends ConsoleColumnMeta {}
+}
+
+/**
+ * One label/value line of the phone card.
+ *
+ * The pair is a WRAPPING flex row, which gives the value its two intended
+ * shapes from a single rule. While the value fits beside the label it sits on
+ * the same line, pushed to the right edge, and is free to spend ALL of the
+ * space between the two - shrink-to-fit against the whole remainder of the
+ * row, not some smaller strip. The moment it would collide with the label,
+ * flex wrapping drops the whole value onto its own line UNDER the label,
+ * where it starts at the left edge and wraps across the card's full width to
+ * as many lines as it needs. A long value is never squeezed into a sliver
+ * with dead space sitting beside the label.
+ *
+ * (For that to hold, nothing the cell renders may cap its own width in the
+ * card view - see table-cells.tsx, whose clamps are all scoped to
+ * `@2xl/table:` for exactly this reason. A percentage max-width inside a
+ * shrink-to-fit flex item resolves against the item's own content-derived
+ * width, which shaved values narrow and wrapped two-word cells while half
+ * the row stood empty - the bug this layout replaces.)
+ *
+ * The one decision CSS cannot make is the text alignment: right-aligned is
+ * correct while the value sits beside the label, but a stacked multi-line
+ * value must read left to right like prose. Which shape the row took is only
+ * knowable after layout - the value's box starts below the label's exactly
+ * when it wrapped - so the component observes it and flips `text-align` to
+ * match. The observation changes alignment ONLY, never a width, so it cannot
+ * feed back into the wrap it is watching.
+ *
+ * The value span is BLOCK, not the default inline: cell content is routinely
+ * a block element, and inside an inline parent its containing block resolves
+ * further up the tree, letting wide content run off the side of the card.
+ */
+function CardField({
+  label,
+  children,
+}: {
+  label: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  const labelRef = useRef<HTMLSpanElement | null>(null);
+  const valueRef = useRef<HTMLSpanElement | null>(null);
+  const [stacked, setStacked] = useState(false);
+
+  useLayoutEffect(() => {
+    const labelEl = labelRef.current;
+    const valueEl = valueRef.current;
+    if (!labelEl || !valueEl) return;
+    // `items-start` puts both boxes at the top of their flex line, so the
+    // value sits lower than the label exactly when it wrapped to its own
+    // line (1px of tolerance for rounding).
+    const measure = () =>
+      setStacked(valueEl.offsetTop > labelEl.offsetTop + 1);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(valueEl);
+    if (valueEl.parentElement) observer.observe(valueEl.parentElement);
+    return () => observer.disconnect();
+  }, []);
+
+  if (!label) {
+    return (
+      <div className="border-b border-adm-hairline py-1.5 text-[14px] last:border-b-0">
+        <span className="block min-w-0 [overflow-wrap:anywhere] text-adm-body">
+          {children}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-0.5 border-b border-adm-hairline py-1.5 text-[14px] last:border-b-0">
+      <span
+        ref={labelRef}
+        className="flex-none pt-px text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase"
+      >
+        {label}
+      </span>
+      <span
+        ref={valueRef}
+        className={cn(
+          "block min-w-0 [overflow-wrap:anywhere] text-adm-body",
+          stacked ? "text-left" : "text-right",
+        )}
+      >
+        {children}
+      </span>
+    </div>
+  );
 }
 
 /**
@@ -375,32 +465,12 @@ export function ConsoleDataTable<TData>({
                       return null;
                     }
                     return (
-                      <div
-                        key={cell.id}
-                        className="flex items-start justify-between gap-3 border-b border-adm-hairline py-1.5 text-[14px] last:border-b-0"
-                      >
-                        {label ? (
-                          <span className="flex-none pt-px text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                            {label}
-                          </span>
-                        ) : null}
-                        {/* BLOCK, not the default inline. Cell content is
-                            routinely a block element with a max-width; inside
-                            an inline parent its containing block is resolved
-                            somewhere further up, so the clamp missed and wide
-                            content ran straight off the side of the card. */}
-                        <span
-                          className={cn(
-                            "block min-w-0 [overflow-wrap:anywhere] text-adm-body",
-                            label ? "text-right" : "w-full",
-                          )}
-                        >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </span>
-                      </div>
+                      <CardField key={cell.id} label={label}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </CardField>
                     );
                   })}
                   {actionCells.length > 0 ? (

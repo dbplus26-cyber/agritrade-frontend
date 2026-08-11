@@ -105,12 +105,12 @@ export function NotificationsScreen() {
         enableSorting: false,
         meta: columnMeta({ stretch: true }),
         cell: ({ row }) => (
-          <div className="min-w-0 max-w-[90%]">
+          <div className="min-w-0 @2xl/table:max-w-[90%]">
             <div className="font-medium text-adm-ink">
               {EVENT_LABEL[row.original.event] ?? row.original.event}
             </div>
             {row.original.preview ? (
-              <div className="text-[12.5px] text-adm-muted [overflow-wrap:anywhere] md:truncate">
+              <div className="text-[12.5px] text-adm-muted [overflow-wrap:anywhere] @2xl/table:truncate">
                 {row.original.preview}
               </div>
             ) : null}

@@ -30,22 +30,28 @@ import { cn } from "@/lib/utils";
  * column's declaration says what it holds and the widths stay consistent
  * across registers.
  */
-// The MINIMUMS are md-and-up only. They exist to stop a table column being
-// starved by a greedy neighbour, which is a table problem - below md the same
-// cells render inside a stacked phone card where there are no neighbours to
-// compete with, and a rigid floor there just pushes the card off the screen.
-// The MAXIMUMS apply at every width: clamping long text is wanted everywhere.
+// BOTH bounds are table-view only (`@2xl/table:` - ConsoleDataTable's own
+// container query, the same one that swaps the phone cards for the real
+// table). The minimums stop a table column being starved by a greedy
+// neighbour, which is a table problem - in the stacked phone card there are
+// no neighbours to compete with, and a rigid floor there just pushes the
+// card off the screen. The maximums hold a column's width, and a card row
+// has no column to hold: the card itself bounds the line, and the value must
+// be free to spend the whole row - first the space between it and its label,
+// then, once it wraps under the label, the card's full width. Any cap left
+// active in the card view re-creates the squeezed-value bug: the value wraps
+// inside a narrow strip while empty space sits beside the label.
 const CELL_WIDTHS = {
   /** Reference numbers, short codes, dates - never wraps, never truncates. */
-  code: "md:min-w-[6.5rem]",
+  code: "@2xl/table:min-w-[6.5rem]",
   /** A short label: status, role, method, a warehouse name. */
-  label: "max-w-[20rem] md:min-w-[6rem]",
+  label: "@2xl/table:max-w-[20rem] @2xl/table:min-w-[6rem]",
   /** A name with an optional description beneath - the identity column. */
-  identity: "max-w-[30rem] md:min-w-[10rem]",
+  identity: "@2xl/table:max-w-[30rem] @2xl/table:min-w-[10rem]",
   /** Free text that could be any length: notes, reasons, descriptions. */
-  prose: "max-w-[28rem] md:min-w-[8rem]",
+  prose: "@2xl/table:max-w-[28rem] @2xl/table:min-w-[8rem]",
   /** Roomier identity for tables with few columns. */
-  wide: "max-w-[38rem] md:min-w-[12rem]",
+  wide: "@2xl/table:max-w-[38rem] @2xl/table:min-w-[12rem]",
 } as const;
 
 /**
@@ -56,8 +62,14 @@ const CELL_WIDTHS = {
  * equals, and the eye has nothing to grab. Letting the title give up a little
  * width first restores the hierarchy: the name is the shorter, heavier line
  * and its description runs on beneath it.
+ *
+ * Table view only, like every clamp in this file. In the phone card the cell
+ * sits inside a shrink-to-fit flex item, and a percentage max-width there
+ * resolves against the item's own content-derived width - it shaved even a
+ * two-word value by 8% and wrapped its last word while half the row stood
+ * empty beside the label.
  */
-const TITLE_CLAMP = "max-w-[92%]";
+const TITLE_CLAMP = "@2xl/table:max-w-[92%]";
 
 /**
  * The clamps used INSIDE the table's one stretch column (the 40% share).
@@ -75,8 +87,8 @@ const TITLE_CLAMP = "max-w-[92%]";
  * 90% normally; 85% when an avatar sits beside the text and has already taken
  * a fixed bite out of the line.
  */
-const STRETCH_CLAMP = "max-w-[90%]";
-const STRETCH_CLAMP_WITH_AVATAR = "max-w-[85%]";
+const STRETCH_CLAMP = "@2xl/table:max-w-[90%]";
+const STRETCH_CLAMP_WITH_AVATAR = "@2xl/table:max-w-[85%]";
 
 /** The title clamp for a cell, given where it sits. */
 const titleClamp = (stretch?: boolean, avatar?: boolean): string =>
@@ -185,7 +197,7 @@ export function TitleCell({
           className={cn(
             "block text-[12.5px] text-adm-faint [overflow-wrap:anywhere] @2xl/table:truncate",
             // A little more than the title, preserving the hierarchy above.
-            stretch && "max-w-[96%]",
+            stretch && "@2xl/table:max-w-[96%]",
           )}
           title={href ? CLICK_THROUGH : meta}
         >

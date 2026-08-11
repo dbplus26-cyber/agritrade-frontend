@@ -174,7 +174,7 @@ export function DrawingsScreen() {
         meta: columnMeta({ stretch: true }),
         cell: ({ row }) =>
           row.original.notes ? (
-            <span className="block max-w-[90%] [overflow-wrap:anywhere] @2xl/table:truncate" title={row.original.notes}>
+            <span className="block @2xl/table:max-w-[90%] [overflow-wrap:anywhere] @2xl/table:truncate" title={row.original.notes}>
               {row.original.notes}
             </span>
           ) : (
