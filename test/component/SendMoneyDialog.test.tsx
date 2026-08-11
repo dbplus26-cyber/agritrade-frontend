@@ -42,6 +42,13 @@ vi.mock("@/redux/disbursements/disbursements-api", () => ({
     { isLoading: companyLoading },
   ],
   useCreateMyDisbursementMutation: () => [createMine, { isLoading: false }],
+  // The verified-name hint stays silent in these tests: an unconfigured
+  // environment renders nothing, which keeps every assertion about the form
+  // itself untouched by the lookup.
+  useGetRecipientNameQuery: () => ({
+    data: { data: { configured: false, lookup: null }, message: "" },
+    isFetching: false,
+  }),
   useGetSupportedBanksQuery: () => ({
     data: { data: { banks: [{ code: "300302", name: "GCB Bank" }] } },
     isLoading: false,

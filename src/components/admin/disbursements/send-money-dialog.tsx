@@ -28,8 +28,10 @@ import { cn } from "@/lib/utils";
 import {
   useCreateDisbursementMutation,
   useCreateMyDisbursementMutation,
+  useGetRecipientNameQuery,
   useGetSupportedBanksQuery,
 } from "@/redux/disbursements/disbursements-api";
+import { skipToken } from "@reduxjs/toolkit/query";
 import type { ICreateDisbursementInput } from "@/types/disbursement.types";
 import {
   disbursementSchema,
@@ -86,6 +88,76 @@ const GUIDANCE: Record<string, string> = {
   SPENDING_ACCOUNT_SUSPENDED:
     "Your float has been suspended, so sending is disabled. Speak to the owner.",
 };
+
+/**
+ * The verified-name hint under the mobile money number: once the number is
+ * complete and a network chosen, ask Hubtel whose name is on it and offer it.
+ * Assistive only - the typed name always wins, an unconfigured environment
+ * or a Hubtel outage just means no hint, and nothing here can block a send.
+ *
+ * No debounce needed: the query only fires once the number matches the full
+ * 233XXXXXXXXX shape, so typing never sprays requests - completion is the
+ * trigger, and the cache absorbs re-checks of the same number.
+ */
+function RecipientNameHint({
+  channel,
+  currentName,
+  msisdn,
+  onUse,
+  surface,
+}: {
+  channel: string;
+  currentName: string;
+  msisdn: string;
+  onUse: (name: string) => void;
+  surface: SendSurface;
+}) {
+  const complete = /^233\d{9}$/.test(msisdn) && channel !== "";
+  const { data, isFetching } = useGetRecipientNameQuery(
+    complete
+      ? {
+          channel,
+          msisdn,
+          surface: surface === "agent" ? "agent" : "admin",
+        }
+      : skipToken,
+  );
+
+  if (!complete) return null;
+  if (data && !data.data.configured) return null;
+
+  const lookup = data?.data.lookup;
+  return (
+    <div className="border border-adm-line bg-adm-sunken px-3 py-2 text-[12.5px] leading-[1.55] text-adm-body">
+      {isFetching || !data ? (
+        "Checking the name on this number…"
+      ) : lookup?.name ? (
+        <span className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+          <span className="min-w-0">
+            {lookup.source === "momo"
+              ? "This number's wallet is registered to "
+              : "No wallet found - the SIM is registered to "}
+            <strong className="font-semibold text-adm-ink">
+              {lookup.name}
+            </strong>
+          </span>
+          {currentName.trim().toLowerCase() !==
+          lookup.name.trim().toLowerCase() ? (
+            <button
+              type="button"
+              onClick={() => onUse(lookup.name ?? "")}
+              className="flex-none cursor-pointer border border-adm-line bg-adm-card px-2 py-0.5 text-[12px] font-semibold text-console hover:bg-adm-hover"
+            >
+              Use this name
+            </button>
+          ) : null}
+        </span>
+      ) : (
+        "No name found for this number on that network - double-check it before sending."
+      )}
+    </div>
+  );
+}
 
 export function SendMoneyDialog({
   onClose,
@@ -296,6 +368,17 @@ export function SendMoneyDialog({
                     {...form.register("recipientMsisdn")}
                   />
                 </AdminField>
+                <RecipientNameHint
+                  channel={form.watch("channel") ?? ""}
+                  currentName={form.watch("recipientName")}
+                  msisdn={form.watch("recipientMsisdn") ?? ""}
+                  onUse={(name) =>
+                    form.setValue("recipientName", name, {
+                      shouldValidate: true,
+                    })
+                  }
+                  surface={surface}
+                />
               </>
             ) : (
               <>

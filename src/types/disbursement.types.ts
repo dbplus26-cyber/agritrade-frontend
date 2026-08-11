@@ -123,6 +123,24 @@ export interface ISupportedBanksResponse {
   data: { banks: ISupportedBank[] };
 }
 
+/** Hubtel's answer for who a mobile-money number belongs to. */
+export interface IRecipientNameLookup {
+  /** Name as Hubtel has it (usually ALL CAPS); null when nothing matched. */
+  name: string | null;
+  /** True when the number holds a wallet on the queried network. */
+  registered: boolean;
+  /** Which register answered: the wallet, or the SIM registration. */
+  source: "momo" | "sim" | null;
+}
+
+export interface IRecipientNameResponse {
+  success: boolean;
+  message: string;
+  /** `configured: false` means the environment cannot look names up at all -
+   * the hint simply stays silent. */
+  data: { configured: boolean; lookup: IRecipientNameLookup | null };
+}
+
 // ── Treasury: the company's own Hubtel position ──────────────────────
 
 export type BalanceTransferStatus =

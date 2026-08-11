@@ -7,6 +7,7 @@ import type {
   IDisbursementListResponse,
   IDisbursementResponse,
   IResolveDisbursementInput,
+  IRecipientNameResponse,
   ISupportedBanksResponse,
 } from "@/types/disbursement.types";
 
@@ -54,6 +55,19 @@ export const disbursementsApi = apiSlice.injectEndpoints({
       // Static for the lifetime of a deployment; there is nothing to
       // invalidate it, so it is fetched once and kept.
       keepUnusedDataFor: 3600,
+    }),
+
+    /** The verified-name hint under the MoMo number field: whose name Hubtel
+     * has for this number on this network. Cached per number+network pair, so
+     * flicking between fields never re-asks. */
+    getRecipientName: builder.query<
+      IRecipientNameResponse,
+      { channel: string; msisdn: string; surface: "admin" | "agent" }
+    >({
+      query: ({ channel, msisdn, surface }) =>
+        `${surface === "agent" ? "agent" : "admin/disbursements"}/recipient-name` +
+        `?msisdn=${encodeURIComponent(msisdn)}&channel=${encodeURIComponent(channel)}`,
+      keepUnusedDataFor: 600,
     }),
 
     createDisbursement: builder.mutation<
@@ -165,6 +179,7 @@ export const {
   useGetDisbursementsQuery,
   useGetMyDisbursementsQuery,
   useGetSupportedBanksQuery,
+  useGetRecipientNameQuery,
   useResolveDisbursementMutation,
 } = disbursementsApi;
 
