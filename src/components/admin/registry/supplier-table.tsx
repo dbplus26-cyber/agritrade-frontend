@@ -12,7 +12,7 @@ import {
 } from "@/components/admin/filter-bar";
 import { AdminButton, AdminCard } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useGetSuppliersQuery } from "@/redux/suppliers/suppliers-api";
 import { useTableQuery } from "@/hooks/use-table-query";
@@ -158,6 +158,11 @@ export function SupplierTable() {
     (sourceFilter !== "all" ? 1 : 0) +
     (from ? 1 : 0) +
     (to ? 1 : 0);
+  const filtered = Boolean(search) || activeFilterCount > 0;
+  // A register with nothing on file and no filters narrowing it shows ONLY
+  // the empty state (with its create action) - a filter bar filters nothing.
+  const pristine =
+    !isLoading && !isError && suppliers.length === 0 && !filtered;
 
   const columns = useMemo<ColumnDef<ISupplier, unknown>[]>(
     () => [
@@ -239,27 +244,27 @@ export function SupplierTable() {
 
   return (
     <div>
-      <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Suppliers
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          Who the business buys from at the farm gate and beyond
-        </p>
+      <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
+            Suppliers
+          </h1>
+          <p className="mt-0.5 text-[13px] text-adm-muted">
+            Who the business buys from at the farm gate and beyond
+          </p>
+        </div>
+        {<AdminButton asChild>
+              <Link href={`${LIST}/new`}>+ Add supplier</Link>
+            </AdminButton>}
       </div>
 
-      {isError && !search && activeFilterCount === 0 ? null : (
+      {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
           search={searchInput}
           onSearch={setSearch}
           searchPlaceholder="Search supplier…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
-          action={
-            <AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ Add supplier</Link>
-            </AdminButton>
-          }
         >
           <ConsoleLabeledSelect
             hint="What kind of seller to show: individual farmers, companies, or your own agents."
@@ -297,28 +302,17 @@ export function SupplierTable() {
           onRetry={() => void refetch()}
         />
       ) : suppliers.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          {search || activeFilterCount > 0 ? (
-            <EmptyState
-              variant="plain"
-              title="No matching suppliers"
-              description="Nothing matches this search and filter combination."
-              actionLabel="Clear search & filters"
-              onAction={() => {
-                setSearch("");
-                resetFilters();
-              }}
-            />
-          ) : (
-            <EmptyState
-              variant="plain"
-              title="No suppliers yet"
-              description="Add the first person or company the business buys from."
-              actionLabel="Add your first supplier"
-              onAction={() => router.push(`${LIST}/new`)}
-            />
-          )}
-        </AdminCard>
+        <RegisterEmpty
+          filtered={filtered}
+          noun="suppliers"
+          description="Add the first person or company the business buys from."
+          actionLabel="Add your first supplier"
+          onAction={() => router.push(`${LIST}/new`)}
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
+        />
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<ISupplier>

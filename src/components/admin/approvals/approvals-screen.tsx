@@ -16,6 +16,7 @@ import {
 } from "@/components/admin/filter-bar";
 import { HelpTip } from "@/components/admin/help-tip";
 import { AdminPageHeader } from "@/components/admin/ui";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ListPagination } from "@/components/ui/ListPagination";
 import {
   useApproveApprovalMutation,
@@ -433,6 +434,13 @@ export function ApprovalsScreen() {
     (filters.action !== "all" ? 1 : 0) +
     (filters.from ? 1 : 0) +
     (filters.to ? 1 : 0);
+  const filtered = Boolean(search) || activeFilterCount > 0;
+  // An empty queue with nothing narrowing it shows the empty state alone -
+  // search and filters only earn their place once there is something to
+  // search or filter. The status tabs stay: they are navigation between
+  // queues, and their counts say where the work actually is.
+  const pristine =
+    !isLoading && !isError && approvals.length === 0 && !filtered;
 
   return (
     // Geometry comes from the console shell, not from here.
@@ -487,29 +495,31 @@ export function ApprovalsScreen() {
 
       </div>
 
-      <ConsoleFilterBar
-        search={searchInput}
-        onSearch={setSearch}
-        searchPlaceholder="Search commodity, amount, note…"
-        activeCount={activeFilterCount}
-        onClear={resetFilters}
-      >
-        <ConsoleLabeledSelect
-          label="Action"
-          value={filters.action}
-          onChange={(v) => setFilter("action", v)}
-          options={ACTION_FILTER_OPTIONS}
-          active={filters.action !== "all"}
-          className="lg:w-[210px]"
-        />
-        <ConsoleDateRange
-          from={filters.from}
-          to={filters.to}
-          onFromChange={(v) => setFilter("from", v)}
-          onToChange={(v) => setFilter("to", v)}
-          fieldClassName="lg:w-[150px]"
-        />
-      </ConsoleFilterBar>
+      {pristine ? null : (
+        <ConsoleFilterBar
+          search={searchInput}
+          onSearch={setSearch}
+          searchPlaceholder="Search commodity, amount, note…"
+          activeCount={activeFilterCount}
+          onClear={resetFilters}
+        >
+          <ConsoleLabeledSelect
+            label="Action"
+            value={filters.action}
+            onChange={(v) => setFilter("action", v)}
+            options={ACTION_FILTER_OPTIONS}
+            active={filters.action !== "all"}
+            className="lg:w-[210px]"
+          />
+          <ConsoleDateRange
+            from={filters.from}
+            to={filters.to}
+            onFromChange={(v) => setFilter("from", v)}
+            onToChange={(v) => setFilter("to", v)}
+            fieldClassName="lg:w-[150px]"
+          />
+        </ConsoleFilterBar>
+      )}
 
       {selected.length > 0 ? (
         <div className="mb-3 flex flex-wrap items-center gap-3.5 rounded-[6px] bg-[var(--ap-forest)] px-3.5 py-2.5 text-[13px] text-white">
@@ -554,7 +564,17 @@ export function ApprovalsScreen() {
           </div>
         </div>
       ) : approvals.length === 0 ? (
-        <EmptyQueue status={status} />
+        <RegisterEmpty
+          filtered={filtered}
+          noun="approvals"
+          title={EMPTY_COPY[status].title}
+          description={EMPTY_COPY[status].body}
+          filteredDescription="Nothing in this queue matches the search and filter combination."
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
+        />
       ) : (
         <ApprovalsQueue table={table} />
       )}
@@ -743,16 +763,6 @@ const EMPTY_COPY: Record<ApprovalStatus, { body: string; title: string }> = {
     title: "No rejections yet",
   },
 };
-
-function EmptyQueue({ status }: { status: ApprovalStatus }) {
-  const copy = EMPTY_COPY[status];
-  return (
-    <div className="rounded-[6px] border border-[var(--ap-hair)] bg-[var(--ap-surface)] px-6 py-12 text-center">
-      <p className="text-[15px] font-[550] text-[var(--ap-ink)]">{copy.title}</p>
-      <p className="mt-1 text-[13px] text-[var(--ap-muted)]">{copy.body}</p>
-    </div>
-  );
-}
 
 /** Six rows at the real row height - a spinner would say nothing about shape. */
 function QueueSkeleton() {

@@ -14,7 +14,7 @@ import { TitleCell } from "@/components/admin/table-cells";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import { AdminButton, AdminCard } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -57,6 +57,10 @@ export function InputItemsRegister() {
   const items = data?.data ?? [];
   const totalCount = data?.meta.total ?? 0;
   const activeFilterCount = active !== "all" ? 1 : 0;
+  const filtered = Boolean(search) || activeFilterCount > 0;
+  // A register with nothing on file and no filters narrowing it shows ONLY
+  // the empty state (with its create action) - a filter bar filters nothing.
+  const pristine = !isLoading && !isError && items.length === 0 && !filtered;
 
   const columns = useMemo<ColumnDef<IInputItem, unknown>[]>(
     () => [
@@ -111,27 +115,27 @@ export function InputItemsRegister() {
 
   return (
     <div>
-      <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Input items
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          The catalogue of inputs granted to farmers (seed, fertiliser, cash)
-        </p>
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
+            Input items
+          </h1>
+          <p className="mt-0.5 text-[13px] text-adm-muted">
+            The catalogue of inputs granted to farmers (seed, fertiliser, cash)
+          </p>
+        </div>
+        {<AdminButton asChild>
+              <Link href={`${LIST}/new`}>+ New item</Link>
+            </AdminButton>}
       </div>
 
-      {isError && !search && activeFilterCount === 0 ? null : (
+      {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
           search={searchInput}
           onSearch={setSearch}
           searchPlaceholder="Search item…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
-          action={
-            <AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ New item</Link>
-            </AdminButton>
-          }
         >
           <ConsoleLabeledSelect
             label="Status"
@@ -152,27 +156,18 @@ export function InputItemsRegister() {
           onRetry={() => void refetch()}
         />
       ) : items.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          <EmptyState
-            variant="plain"
-            title={
-              search || activeFilterCount > 0
-                ? "No matching items"
-                : "No input items yet"
-            }
-            description={
-              search || activeFilterCount > 0
-                ? "Nothing matches this search and filter combination."
-                : "Add the inputs you grant to farmers."
-            }
-            actionLabel={search || activeFilterCount > 0 ? undefined : "New item"}
-            onAction={
-              search || activeFilterCount > 0
-                ? undefined
-                : () => router.push(`${LIST}/new`)
-            }
-          />
-        </AdminCard>
+        <RegisterEmpty
+          filtered={filtered}
+          noun="items"
+          title="No input items yet"
+          description="Add the inputs you grant to farmers."
+          actionLabel="New item"
+          onAction={() => router.push(`${LIST}/new`)}
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
+        />
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IInputItem>

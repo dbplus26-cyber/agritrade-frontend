@@ -22,7 +22,7 @@ import {
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
 import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
 import { useTableQuery } from "@/hooks/use-table-query";
@@ -95,6 +95,10 @@ export function LandSellerTable() {
   const sellers = data?.data ?? [];
   const totalCount = data?.meta.total ?? 0;
   const activeFilterCount = statusFilter !== "all" ? 1 : 0;
+  const filtered = Boolean(search) || activeFilterCount > 0;
+  // A register with nothing on file and no filters narrowing it shows ONLY
+  // the empty state (with its create action) - a filter bar filters nothing.
+  const pristine = !isLoading && !isError && sellers.length === 0 && !filtered;
 
   const columns = useMemo<ColumnDef<ILandSeller, unknown>[]>(
     () => [
@@ -160,27 +164,27 @@ export function LandSellerTable() {
 
   return (
     <div>
-      <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Land sellers
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          People and companies the business buys land from
-        </p>
+      <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
+            Land sellers
+          </h1>
+          <p className="mt-0.5 text-[13px] text-adm-muted">
+            People and companies the business buys land from
+          </p>
+        </div>
+        {<AdminButton asChild>
+              <Link href={`${LIST}/new`}>+ Add seller</Link>
+            </AdminButton>}
       </div>
 
-      {isError && !search && activeFilterCount === 0 ? null : (
+      {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
           search={searchInput}
           onSearch={setSearch}
           searchPlaceholder="Search seller..."
           activeCount={activeFilterCount}
           onClear={resetFilters}
-          action={
-            <AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ Add seller</Link>
-            </AdminButton>
-          }
         >
           <ConsoleLabeledSelect
             label="Status"
@@ -201,28 +205,17 @@ export function LandSellerTable() {
           onRetry={() => void refetch()}
         />
       ) : sellers.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          {search || activeFilterCount > 0 ? (
-            <EmptyState
-              variant="plain"
-              title="No matching sellers"
-              description="Nothing matches this search and filter combination."
-              actionLabel="Clear search & filters"
-              onAction={() => {
-                setSearch("");
-                resetFilters();
-              }}
-            />
-          ) : (
-            <EmptyState
-              variant="plain"
-              title="No sellers yet"
-              description="Add the first person or company the business buys land from."
-              actionLabel="Add your first seller"
-              onAction={() => router.push(`${LIST}/new`)}
-            />
-          )}
-        </AdminCard>
+        <RegisterEmpty
+          filtered={filtered}
+          noun="sellers"
+          description="Add the first person or company the business buys land from."
+          actionLabel="Add your first seller"
+          onAction={() => router.push(`${LIST}/new`)}
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
+        />
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<ILandSeller>

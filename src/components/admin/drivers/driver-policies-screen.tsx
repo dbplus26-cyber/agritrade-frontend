@@ -25,7 +25,7 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
 import { useAuthRole } from "@/hooks/use-auth-role";
@@ -440,12 +440,13 @@ export function DriverPoliciesScreen() {
           onRetry={() => void refetch()}
         />
       ) : policies.length === 0 ? (
-        <EmptyState
-          actionLabel="New policy"
-          description="Create the first policy trips will resolve their driver terms against."
-          onAction={() => setCreateOpen(true)}
+        <RegisterEmpty
+          filtered={false}
+          noun="driver payment policies"
           title="No driver payment policies"
-          variant="plain"
+          description="Create the first policy trips will resolve their driver terms against."
+          actionLabel="New policy"
+          onAction={() => setCreateOpen(true)}
         />
       ) : (
         // Container queries, not viewport ones: the console shell's sidebar

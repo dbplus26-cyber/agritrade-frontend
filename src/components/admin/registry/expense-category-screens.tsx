@@ -31,7 +31,7 @@ import {
   FormSkeleton,
   LedgerSkeleton,
 } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ListPagination } from "@/components/ui/ListPagination";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
@@ -221,6 +221,11 @@ export function ExpenseCategoryTable() {
   const categories = data?.data ?? [];
   const totalCount = data?.meta.total ?? 0;
   const activeFilterCount = statusFilter !== "all" ? 1 : 0;
+  const registerFiltered = Boolean(search) || activeFilterCount > 0;
+  // A register with nothing on file and no filters narrowing it shows ONLY
+  // the empty state (with its create action) - a filter bar filters nothing.
+  const pristine =
+    !isLoading && !isError && categories.length === 0 && !registerFiltered;
 
   const columns = useMemo<ColumnDef<IExpenseCategory, unknown>[]>(
     () => [
@@ -277,29 +282,29 @@ export function ExpenseCategoryTable() {
 
   return (
     <div>
-      <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Expense Categories
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          The vocabulary every recorded expense is filed under
-        </p>
+      <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
+            Expense Categories
+          </h1>
+          <p className="mt-0.5 text-[13px] text-adm-muted">
+            The vocabulary every recorded expense is filed under
+          </p>
+        </div>
+        {isSuperAdmin ? (
+              <AdminButton onClick={() => setCreateOpen(true)}>
+                + Add category
+              </AdminButton>
+            ) : null}
       </div>
 
-      {isError && !search && activeFilterCount === 0 ? null : (
+      {pristine || (isError && !registerFiltered) ? null : (
         <ConsoleFilterBar
           search={searchInput}
           onSearch={setSearch}
           searchPlaceholder="Search category…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
-          action={
-            isSuperAdmin ? (
-              <AdminButton onClick={() => setCreateOpen(true)}>
-                + Add category
-              </AdminButton>
-            ) : null
-          }
         >
           <ConsoleLabeledSelect
             label="Status"
@@ -320,28 +325,18 @@ export function ExpenseCategoryTable() {
           onRetry={() => void refetch()}
         />
       ) : categories.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          {search || activeFilterCount > 0 ? (
-            <EmptyState
-              variant="plain"
-              title="No matching categories"
-              description="Nothing matches this search and filter combination."
-              actionLabel="Clear search & filters"
-              onAction={() => {
-                setSearch("");
-                resetFilters();
-              }}
-            />
-          ) : (
-            <EmptyState
-              variant="plain"
-              title="No expense categories yet"
-              description="Add the first category expenses will be filed under - transport, loading, commission."
-              actionLabel="Add your first category"
-              onAction={() => setCreateOpen(true)}
-            />
-          )}
-        </AdminCard>
+        <RegisterEmpty
+          filtered={registerFiltered}
+          noun="categories"
+          title="No expense categories yet"
+          description="Add the first category expenses will be filed under - transport, loading, commission."
+          actionLabel={isSuperAdmin ? "Add your first category" : undefined}
+          onAction={isSuperAdmin ? () => setCreateOpen(true) : undefined}
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
+        />
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IExpenseCategory>
@@ -635,6 +630,9 @@ function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
   const matched = data?.meta.total ?? 0;
   const activeFilterCount = (filters.from ? 1 : 0) + (filters.to ? 1 : 0);
   const filtered = activeFilterCount > 0 || search.trim().length > 0;
+  // Nothing filed under the category and nothing narrowing it: the empty
+  // state alone - a search box over an empty ledger searches nothing.
+  const pristine = !isLoading && !isError && rows.length === 0 && !filtered;
 
   return (
     // Fills the column so the statement ends where the record rail beside it
@@ -673,23 +671,25 @@ function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
           page, so the search owns the column's whole width and the date
           window files underneath it, instead of a stubby 30% box with the
           filters wrapping into the leftover. */}
-      <ConsoleFilterBar
-        fullWidthSearch
-        search={search}
-        onSearch={setSearch}
-        searchPlaceholder="Search voucher no. or description…"
-        activeCount={activeFilterCount}
-        onClear={resetFilters}
-      >
-        <ConsoleDateRange
-          from={filters.from}
-          to={filters.to}
-          onFromChange={(v) => setFilter("from", v)}
-          onToChange={(v) => setFilter("to", v)}
-          fromLabel="Incurred from"
-          toLabel="Incurred to"
-        />
-      </ConsoleFilterBar>
+      {pristine ? null : (
+        <ConsoleFilterBar
+          fullWidthSearch
+          search={search}
+          onSearch={setSearch}
+          searchPlaceholder="Search voucher no. or description…"
+          activeCount={activeFilterCount}
+          onClear={resetFilters}
+        >
+          <ConsoleDateRange
+            from={filters.from}
+            to={filters.to}
+            onFromChange={(v) => setFilter("from", v)}
+            onToChange={(v) => setFilter("to", v)}
+            fromLabel="Incurred from"
+            toLabel="Incurred to"
+          />
+        </ConsoleFilterBar>
+      )}
 
       {isLoading ? (
         // A ledger skeleton, matching what actually arrives. A card-grid
@@ -704,17 +704,17 @@ function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
           onRetry={() => void refetch()}
         />
       ) : rows.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          <EmptyState
-            variant="plain"
-            title={filtered ? "No expenses match" : "No expenses yet"}
-            description={
-              filtered
-                ? "Nothing under this category matches that search or date window."
-                : "Nothing has been filed under this category so far."
-            }
-          />
-        </AdminCard>
+        <RegisterEmpty
+          filtered={filtered}
+          noun="expenses"
+          description="Nothing has been filed under this category so far."
+          filteredTitle="No expenses match"
+          filteredDescription="Nothing under this category matches that search or date window."
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
+        />
       ) : (
         <>
           <AdminCard className="flex-1 overflow-hidden">

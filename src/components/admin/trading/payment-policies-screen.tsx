@@ -15,7 +15,7 @@ import {
 } from "@/components/admin/ui";
 import { HelpTip } from "@/components/admin/help-tip";
 import { CardGridSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import {
   ResponsiveDialog,
@@ -477,8 +477,9 @@ export function PaymentPoliciesScreen() {
           onRetry={() => void refetch()}
         />
       ) : policies.length === 0 ? (
-        <EmptyState
-          variant="plain"
+        <RegisterEmpty
+          filtered={false}
+          noun="payment policies"
           title="No payment policies"
           description="Create the first policy sales will resolve their terms against."
           actionLabel="New policy"

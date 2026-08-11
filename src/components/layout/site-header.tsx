@@ -267,7 +267,7 @@ export function SiteHeader() {
             // declared after Tailwind's utilities and wins), and tailwind-merge
             // reads the v3-era `bg-gradient-to-b` as a background COLOUR, which
             // silently dropped `bg-surface` and left the panel see-through.
-            className="texture-grain flex flex-col gap-0 border-l-0 bg-surface p-0 shadow-[-10px_0_34px_-16px_rgb(31_33_28/0.6)] duration-[280ms] ease-[cubic-bezier(.22,.9,.3,1)] data-[side=right]:w-[min(330px,86vw)] data-open:slide-in-from-right-full data-closed:slide-out-to-right-full"
+            className="texture-grain flex flex-col gap-0 border-l-0 bg-surface p-0 shadow-[-10px_0_34px_-16px_rgb(31_33_28/0.6)] duration-[280ms] ease-[cubic-bezier(.22,.9,.3,1)] data-[side=right]:w-[min(330px,86vw)] data-[state=open]:slide-in-from-right-full data-[state=closed]:slide-out-to-right-full"
           >
             {/* A gold thread runs under the brand: one warm line is what stops
                 the sheet reading as an empty page, and it ties the drawer to

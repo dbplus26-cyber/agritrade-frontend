@@ -11,7 +11,7 @@ import {
 } from "@/components/admin/filter-bar";
 import { AdminButton, AdminCard, Mono } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useGetCommoditiesQuery } from "@/redux/commodities/commodities-api";
 import { useTableQuery } from "@/hooks/use-table-query";
@@ -79,6 +79,11 @@ export function CommodityTable() {
 
   const activeFilterCount =
     (statusFilter !== "all" ? 1 : 0) + (visibilityFilter !== "all" ? 1 : 0);
+  const filtered = Boolean(search) || activeFilterCount > 0;
+  // A register with nothing on file and no filters narrowing it shows ONLY
+  // the empty state (with its create action) - a filter bar filters nothing.
+  const pristine =
+    !isLoading && !isError && commodities.length === 0 && !filtered;
 
   const columns = useMemo<ColumnDef<ICommodity, unknown>[]>(
     () => [
@@ -190,30 +195,30 @@ export function CommodityTable() {
 
   return (
     <div>
-      <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Commodities
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          Everything the business trades - varieties, grades and website
-          visibility
-        </p>
+      <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
+            Commodities
+          </h1>
+          <p className="mt-0.5 text-[13px] text-adm-muted">
+            Everything the business trades - varieties, grades and website
+            visibility
+          </p>
+        </div>
+        {isSuperAdmin ? (
+              <AdminButton asChild>
+                <Link href="/admin/commodities/new">+ Add commodity</Link>
+              </AdminButton>
+            ) : null}
       </div>
 
-      {isError && !search && activeFilterCount === 0 ? null : (
+      {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
           search={searchInput}
           onSearch={setSearch}
           searchPlaceholder="Search commodity…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
-          action={
-            isSuperAdmin ? (
-              <AdminButton asChild>
-                <Link href="/admin/commodities/new">+ Add commodity</Link>
-              </AdminButton>
-            ) : null
-          }
         >
           <ConsoleLabeledSelect
             label="Status"
@@ -242,28 +247,21 @@ export function CommodityTable() {
           onRetry={() => void refetch()}
         />
       ) : commodities.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          {search || activeFilterCount > 0 ? (
-            <EmptyState
-              variant="plain"
-              title="No matching commodities"
-              description="Nothing matches this search and filter combination. Adjust the criteria or clear them."
-              actionLabel="Clear search & filters"
-              onAction={() => {
-                setSearch("");
-                resetFilters();
-              }}
-            />
-          ) : (
-            <EmptyState
-              variant="plain"
-              title="No commodities yet"
-              description="Add the first commodity the business trades - name, variety and grade."
-              actionLabel="Add your first commodity"
-              onAction={() => router.push("/admin/commodities/new")}
-            />
-          )}
-        </AdminCard>
+        <RegisterEmpty
+          filtered={filtered}
+          noun="commodities"
+          description="Add the first commodity the business trades - name, variety and grade."
+          actionLabel={isSuperAdmin ? "Add your first commodity" : undefined}
+          onAction={
+            isSuperAdmin
+              ? () => router.push("/admin/commodities/new")
+              : undefined
+          }
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
+        />
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<ICommodity>

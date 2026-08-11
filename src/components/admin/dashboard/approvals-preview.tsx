@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useGetApprovalsQuery } from "@/redux/approvals/approvals-api";
 import { ApprovalStatus } from "@/types/approval.types";
 
-import { WidgetCard, WidgetError } from "./chart-kit";
+import { WidgetCard, WidgetEmpty, WidgetError } from "./chart-kit";
 
 /**
  * The four oldest pending approvals, previewed on the dashboard (design doc
@@ -51,7 +51,10 @@ export function ApprovalsPreview() {
           ))}
         </div>
       ) : rows.length === 0 ? (
-        <p className="text-[13px] text-adm-muted">Nothing awaiting approval.</p>
+        <WidgetEmpty
+          title="Nothing awaiting approval"
+          hint="Items above an approval limit queue here until somebody decides."
+        />
       ) : (
         <ul className="flex flex-col">
           {rows.map((a) => {

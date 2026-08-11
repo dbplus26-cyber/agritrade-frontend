@@ -4,7 +4,7 @@ import { TONES, type Tone } from "@/components/admin/ui";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetActivityQuery } from "@/redux/reports/reports-api";
 
-import { WidgetCard, WidgetError } from "./chart-kit";
+import { WidgetCard, WidgetEmpty, WidgetError } from "./chart-kit";
 
 /** Humanise a dotted audit action, e.g. "float.topped_up" → "Float topped up". */
 const humanizeAction = (action: string): string => {
@@ -55,7 +55,10 @@ export function ActivityFeed() {
           ))}
         </div>
       ) : rows.length === 0 ? (
-        <p className="text-[13px] text-adm-muted">No activity yet.</p>
+        <WidgetEmpty
+          title="No activity yet"
+          hint="Everything recorded in the console lands here as it happens."
+        />
       ) : (
         <ul className="flex flex-col">
           {rows.map((row) => (

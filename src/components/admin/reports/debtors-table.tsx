@@ -3,7 +3,7 @@
 import { X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { CardHeader } from "@/components/admin/dashboard/chart-kit";
+import { CardHeader, WidgetEmpty } from "@/components/admin/dashboard/chart-kit";
 import { HelpWrap } from "@/components/admin/help-tip";
 import { Money } from "@/components/admin/trading/sale-bits";
 import {
@@ -59,6 +59,9 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
         }
       />
 
+      {/* No search box over an empty book: it appears once there is a debtor
+          to look for, or while a term is still narrowing the list. */}
+      {!isError && !isFetching && rows.length === 0 && !debounced ? null : (
       <div className="relative mb-3 max-w-[280px]">
         <Input
           value={search}
@@ -78,6 +81,7 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
           </button>
         ) : null}
       </div>
+      )}
 
       {/* A failed request must NEVER read as "everyone is paid up". This
           used to fall through to the empty state, so a dropped connection
@@ -92,13 +96,22 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
           onRetry={() => void refetch()}
         />
       ) : rows.length === 0 ? (
-        <p className="py-4 text-[13px] text-adm-muted">
-          {isFetching
-            ? "Loading…"
-            : debounced
-              ? "No debtors match that name."
-              : "No outstanding balances. Everyone is paid up."}
-        </p>
+        isFetching ? (
+          <p className="py-4 text-[13px] text-adm-muted">Loading…</p>
+        ) : (
+          <WidgetEmpty
+            title={
+              debounced
+                ? "No debtors match that name"
+                : "No outstanding balances"
+            }
+            hint={
+              debounced
+                ? "Try a different buyer name, or clear the search."
+                : "Everyone is paid up."
+            }
+          />
+        )
       ) : (
         <>
         {/* Phones get a row list, messaging-app style: buyer and the balance

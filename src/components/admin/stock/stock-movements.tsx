@@ -11,7 +11,7 @@ import {
 } from "@/components/admin/filter-bar";
 import { adminLinkClass, AdminCard } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useGetStockMovementsQuery } from "@/redux/stock/stock-api";
 import { useTableQuery } from "@/hooks/use-table-query";
@@ -73,6 +73,11 @@ export function StockMovements({
     (filters.commodity !== "all" ? 1 : 0) +
     (filters.from ? 1 : 0) +
     (filters.to ? 1 : 0);
+  const filtered = activeFilterCount > 0;
+  // A ledger with nothing on file and no filters narrowing it shows ONLY the
+  // empty state - a filter bar filters nothing.
+  const pristine =
+    !isLoading && !isError && movements.length === 0 && !filtered;
 
   const columns = useMemo<ColumnDef<IStockMovement, unknown>[]>(
     () => [
@@ -158,6 +163,7 @@ export function StockMovements({
 
   return (
     <div>
+      {pristine ? null : (
       <ConsoleFilterBar
         search=""
         onSearch={() => undefined}
@@ -194,6 +200,7 @@ export function StockMovements({
           fieldClassName="lg:w-[150px]"
         />
       </ConsoleFilterBar>
+      )}
 
       {isLoading ? (
         <ConsoleTableSkeleton columns={6} />
@@ -203,12 +210,13 @@ export function StockMovements({
           onRetry={() => void refetch()}
         />
       ) : movements.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          <EmptyState
-            title="No movements on file"
-            description="Every receipt, load and approved adjustment lands here as a ledger line."
-          />
-        </AdminCard>
+        <RegisterEmpty
+          filtered={filtered}
+          noun="movements"
+          title="No movements on file"
+          description="Every receipt, load and approved adjustment lands here as a ledger line."
+          onClear={resetFilters}
+        />
       ) : (
         // On a card, like every other register - and like this screen's own
         // empty state, which was already carded while the table beside it was

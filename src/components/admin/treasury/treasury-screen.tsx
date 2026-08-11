@@ -22,6 +22,7 @@ import {
   Mono,
   adminInputClass,
 } from "@/components/admin/ui";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
@@ -167,7 +168,9 @@ export function TreasuryScreen() {
       <div className="space-y-5">
         <AdminPageHeader title="Company account"
         hint="The business's own balance, and moving money between its accounts." />
-        <EmptyState
+        <RegisterEmpty
+          filtered={false}
+          noun="accounts"
           title="Hubtel is not connected"
           description="This server has no Hubtel credentials, so balances cannot be read and no money can be sent. Whoever administers the server needs to set them."
         />
@@ -226,12 +229,11 @@ export function TreasuryScreen() {
             />
           </div>
         ) : total === 0 && !transfers.isFetching ? (
-          <div className="py-6">
-            <EmptyState
-              title="Nothing moved yet"
-              description="Transfers from the collection account into the payout account appear here."
-            />
-          </div>
+          <EmptyState
+            variant="plain"
+            title="Nothing moved yet"
+            description="Transfers from the collection account into the payout account appear here."
+          />
         ) : (
           <ConsoleDataTable<IBalanceTransfer>
             columns={columns}

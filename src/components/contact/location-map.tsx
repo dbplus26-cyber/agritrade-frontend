@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { Loader2, Navigation } from "lucide-react";
 
-// Office location - Industrial Area, off Bolgatanga Road, Tamale. Coordinates
-// approximate the area; nudge when the real pin is confirmed.
-const OFFICE_LAT = 9.4449;
-const OFFICE_LNG = -0.8394;
+// Office location - Aboabo Super Market, Tamale. Coordinates approximate the
+// Aboabo area; nudge when the precise pin is confirmed.
+const OFFICE_LAT = 9.40132;
+const OFFICE_LNG = -0.84911;
 const OFFICE_LABEL = "DB Plus Trading Ltd";
 
 /**

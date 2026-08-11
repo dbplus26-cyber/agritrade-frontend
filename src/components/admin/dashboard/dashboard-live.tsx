@@ -22,7 +22,7 @@ import type { IReportWindow } from "@/types/report.types";
 import { ActivityFeed } from "./activity-feed";
 import { ApprovalsPreview } from "./approvals-preview";
 import { CashflowChart } from "./cashflow-chart";
-import { WidgetCard, WidgetError } from "./chart-kit";
+import { WidgetCard, WidgetEmpty, WidgetError } from "./chart-kit";
 import { DateRangeSelector, DEFAULT_RANGE } from "./date-range-selector";
 import { PeriodSummary } from "./period-summary";
 import { StockDonut } from "./stock-donut";
@@ -84,7 +84,10 @@ function Kpi({
 }
 
 function AgentFloatsCard() {
-  const { data } = useGetAgentsQuery({ isActive: true, limit: 8 });
+  const { data, isError, isLoading, refetch } = useGetAgentsQuery({
+    isActive: true,
+    limit: 8,
+  });
   const agents = data?.data ?? [];
   return (
     <WidgetCard
@@ -96,8 +99,18 @@ function AgentFloatsCard() {
         </Link>
       }
     >
-      {agents.length === 0 ? (
-        <p className="text-[13px] text-adm-muted">No active agents.</p>
+      {isError ? (
+        <WidgetError
+          what="the agent floats"
+          onRetry={() => void refetch()}
+        />
+      ) : isLoading ? (
+        <Skeleton className="h-[120px] w-full rounded-[6px]" />
+      ) : agents.length === 0 ? (
+        <WidgetEmpty
+          title="No active agents"
+          hint="Agents appear here with their float once they are created and funded."
+        />
       ) : (
         agents.map((a) => (
           // The FIGURE is what this list is for, so it is the part that
@@ -150,8 +163,21 @@ function TrucksCard() {
         </Link>
       }
     >
-      {trucks.length === 0 ? (
-        <p className="text-[13px] text-adm-muted">No trucks currently moving.</p>
+      {dispatched.isError || loading.isError ? (
+        <WidgetError
+          what="the trucks on the road"
+          onRetry={() => {
+            void dispatched.refetch();
+            void loading.refetch();
+          }}
+        />
+      ) : dispatched.isLoading || loading.isLoading ? (
+        <Skeleton className="h-[120px] w-full rounded-[6px]" />
+      ) : trucks.length === 0 ? (
+        <WidgetEmpty
+          title="No trucks currently moving"
+          hint="Loads appear here from planning until they are signed off."
+        />
       ) : (
         trucks.map((t) => (
           <Link

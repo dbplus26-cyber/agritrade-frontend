@@ -24,7 +24,7 @@ import {
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
 import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
 import {
@@ -111,6 +111,10 @@ export function DriverTable() {
   const totalCount = data?.meta.total ?? 0;
   const activeFilterCount =
     (statusFilter !== "all" ? 1 : 0) + (from ? 1 : 0) + (to ? 1 : 0);
+  const filtered = Boolean(search) || activeFilterCount > 0;
+  // A register with nothing on file and no filters narrowing it shows ONLY
+  // the empty state (with its create action) - a filter bar filters nothing.
+  const pristine = !isLoading && !isError && drivers.length === 0 && !filtered;
 
   const columns = useMemo<ColumnDef<IDriver, unknown>[]>(
     () => [
@@ -187,27 +191,27 @@ export function DriverTable() {
 
   return (
     <div>
-      <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Drivers
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          The trucking directory shipments pull their driver details from
-        </p>
+      <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
+            Drivers
+          </h1>
+          <p className="mt-0.5 text-[13px] text-adm-muted">
+            The trucking directory shipments pull their driver details from
+          </p>
+        </div>
+        {<AdminButton asChild>
+              <Link href={`${LIST}/new`}>+ Add driver</Link>
+            </AdminButton>}
       </div>
 
-      {isError && !search && activeFilterCount === 0 ? null : (
+      {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
           search={searchInput}
           onSearch={setSearch}
           searchPlaceholder="Search driver…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
-          action={
-            <AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ Add driver</Link>
-            </AdminButton>
-          }
         >
           <ConsoleLabeledSelect
             label="Status"
@@ -236,28 +240,17 @@ export function DriverTable() {
           onRetry={() => void refetch()}
         />
       ) : drivers.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          {search || activeFilterCount > 0 ? (
-            <EmptyState
-              variant="plain"
-              title="No matching drivers"
-              description="Nothing matches this search and filter combination."
-              actionLabel="Clear search & filters"
-              onAction={() => {
-                setSearch("");
-                resetFilters();
-              }}
-            />
-          ) : (
-            <EmptyState
-              variant="plain"
-              title="No drivers yet"
-              description="Add the drivers who haul the business's shipments."
-              actionLabel="Add your first driver"
-              onAction={() => router.push(`${LIST}/new`)}
-            />
-          )}
-        </AdminCard>
+        <RegisterEmpty
+          filtered={filtered}
+          noun="drivers"
+          description="Add the drivers who haul the business's shipments."
+          actionLabel="Add your first driver"
+          onAction={() => router.push(`${LIST}/new`)}
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
+        />
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IDriver>

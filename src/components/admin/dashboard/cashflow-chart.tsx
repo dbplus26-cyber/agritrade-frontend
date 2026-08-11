@@ -17,6 +17,7 @@ import type { IReportWindow } from "@/types/report.types";
 import {
   AXIS_TICK,
   ChartNote,
+  WidgetEmpty,
   GRID_STROKE,
   LegendItem,
   WidgetCard,
@@ -103,7 +104,11 @@ export function CashflowChart({ window }: { window: IReportWindow }) {
       ) : redacted ? (
         <ChartNote>Cashflow figures are hidden for your role.</ChartNote>
       ) : rows.length === 0 ? (
-        <ChartNote>No money moved in this period.</ChartNote>
+        <WidgetEmpty
+          className="h-[220px]"
+          title="No money moved in this period"
+          hint="Payments in and purchases out will draw here as they are recorded."
+        />
       ) : (
         <div className="h-[220px] min-w-0">
           <ResponsiveContainer width="100%" height="100%">

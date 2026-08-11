@@ -16,6 +16,7 @@ import {
 } from "@/components/admin/ui";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
@@ -212,9 +213,13 @@ export function DisbursementsScreen() {
       />
 
       {pristine ? (
-        <EmptyState
+        <RegisterEmpty
+          filtered={false}
+          noun="payouts"
           title="No money has been sent yet"
           description="Payouts made through Hubtel appear here, with what Hubtel said about each one."
+          actionLabel="Send money"
+          onAction={() => setSending(true)}
         />
       ) : (
         <>
@@ -259,6 +264,7 @@ export function DisbursementsScreen() {
               data={rows}
               emptyState={
                 <EmptyState
+                  variant="plain"
                   title="Nothing matches"
                   description="Try a different status, rail or search term."
                 />

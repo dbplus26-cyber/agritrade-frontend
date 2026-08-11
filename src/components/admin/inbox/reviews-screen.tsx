@@ -28,6 +28,7 @@ import {
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
 import { CardGridSkeleton } from "@/components/admin/skeletons";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { ListPagination } from "@/components/ui/ListPagination";
@@ -502,20 +503,27 @@ export function ReviewsScreen() {
         title="Reviews"
         hint="Customer reviews waiting to be published or already live."
         sub="Moderate what the website shows the world"
+        actions={
+          <AdminButton
+            onClick={() => {
+              setAdding(true);
+            }}
+          >
+            + Add review
+          </AdminButton>
+        }
       />
 
       {pristine ? (
-        <AdminCard className="overflow-hidden">
-          <EmptyState
-            variant="plain"
-            title="No reviews yet"
-            description="Reviews submitted on the website land here for a decision - or record one the office took by phone or on paper."
-            actionLabel="+ Add review"
-            onAction={() => {
-              setAdding(true);
-            }}
-          />
-        </AdminCard>
+        <RegisterEmpty
+          filtered={false}
+          noun="reviews"
+          description="Reviews submitted on the website land here for a decision - or record one the office took by phone or on paper."
+          actionLabel="+ Add review"
+          onAction={() => {
+            setAdding(true);
+          }}
+        />
       ) : (
         <>
           <ReviewStats />
@@ -542,15 +550,6 @@ export function ReviewsScreen() {
             searchPlaceholder="Search name or words…"
             activeCount={activeFilterCount}
             onClear={resetFilters}
-            action={
-              <AdminButton
-                onClick={() => {
-                  setAdding(true);
-                }}
-              >
-                + Add review
-              </AdminButton>
-            }
           >
             <ConsoleLabeledSelect
               label="Role"

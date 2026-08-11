@@ -27,7 +27,7 @@ import {
 } from "@/components/admin/record-shell";
 import { BackButton } from "@/components/ui/BackButton";
 import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
 import {
@@ -126,6 +126,11 @@ export function PaymentAccountTable() {
   const totalCount = data?.meta.total ?? 0;
   const activeFilterCount =
     (statusFilter !== "all" ? 1 : 0) + (kindFilter !== "all" ? 1 : 0);
+  const filtered = Boolean(search) || activeFilterCount > 0;
+  // A register with nothing on file and no filters narrowing it shows ONLY
+  // the empty state (with its create action) - a filter bar filters nothing.
+  const pristine =
+    !isLoading && !isError && accounts.length === 0 && !filtered;
 
   const columns = useMemo<ColumnDef<IPaymentAccount, unknown>[]>(
     () => [
@@ -216,27 +221,27 @@ export function PaymentAccountTable() {
 
   return (
     <div>
-      <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Payment accounts
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          Where customers send money. These print on invoices and statements
-        </p>
+      <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
+            Payment accounts
+          </h1>
+          <p className="mt-0.5 text-[13px] text-adm-muted">
+            Where customers send money. These print on invoices and statements
+          </p>
+        </div>
+        {<AdminButton asChild>
+              <Link href={`${LIST}/new`}>+ Add account</Link>
+            </AdminButton>}
       </div>
 
-      {isError && !search && activeFilterCount === 0 ? null : (
+      {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
           search={searchInput}
           onSearch={setSearch}
           searchPlaceholder="Search account…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
-          action={
-            <AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ Add account</Link>
-            </AdminButton>
-          }
         >
           <ConsoleLabeledSelect
             label="Kind"
@@ -265,28 +270,18 @@ export function PaymentAccountTable() {
           onRetry={() => void refetch()}
         />
       ) : accounts.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          {search || activeFilterCount > 0 ? (
-            <EmptyState
-              variant="plain"
-              title="No matching accounts"
-              description="Nothing matches this search and filter combination."
-              actionLabel="Clear search & filters"
-              onAction={() => {
-                setSearch("");
-                resetFilters();
-              }}
-            />
-          ) : (
-            <EmptyState
-              variant="plain"
-              title="No payment accounts yet"
-              description="Add the bank accounts and mobile-money numbers customers should pay into. Until one exists, invoices cannot tell a buyer where to send money."
-              actionLabel="Add your first account"
-              onAction={() => router.push(`${LIST}/new`)}
-            />
-          )}
-        </AdminCard>
+        <RegisterEmpty
+          filtered={filtered}
+          noun="accounts"
+          title="No payment accounts yet"
+          description="Add the bank accounts and mobile-money numbers customers should pay into. Until one exists, invoices cannot tell a buyer where to send money."
+          actionLabel="Add your first account"
+          onAction={() => router.push(`${LIST}/new`)}
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
+        />
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IPaymentAccount>

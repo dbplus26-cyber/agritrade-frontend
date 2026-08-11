@@ -16,7 +16,7 @@ import { TextCell, TitleCell } from "@/components/admin/table-cells";
 import { AdminButton, AdminCard, Mono, ToneBadge } from "@/components/admin/ui";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -163,24 +163,24 @@ export function RepaymentsRegister() {
 
   return (
     <div>
-      <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Produce repayments
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          Produce received against farmer grants, optionally taken into stock
-        </p>
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
+            Produce repayments
+          </h1>
+          <p className="mt-0.5 text-[13px] text-adm-muted">
+            Produce received against farmer grants, optionally taken into stock
+          </p>
+        </div>
+        {<AdminButton asChild>
+              <Link href={`${LIST}/new`}>+ Record repayment</Link>
+            </AdminButton>}
       </div>
 
       {pristine || (isError && activeFilterCount === 0) ? null : (
         <ConsoleFilterBar
           activeCount={activeFilterCount}
           onClear={resetFilters}
-          action={
-            <AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ Record repayment</Link>
-            </AdminButton>
-          }
         >
           <ConsoleLabeledSelect
             label="Season"
@@ -208,23 +208,15 @@ export function RepaymentsRegister() {
           onRetry={() => void refetch()}
         />
       ) : repayments.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          <EmptyState
-            variant="plain"
-            title={
-              activeFilterCount > 0 ? "No matching repayments" : "No repayments yet"
-            }
-            description={
-              activeFilterCount > 0
-                ? "Nothing matches this filter."
-                : "Record produce received against a grant."
-            }
-            actionLabel={activeFilterCount > 0 ? undefined : "Record repayment"}
-            onAction={
-              activeFilterCount > 0 ? undefined : () => router.push(`${LIST}/new`)
-            }
-          />
-        </AdminCard>
+        <RegisterEmpty
+          filtered={activeFilterCount > 0}
+          noun="repayments"
+          description="Record produce received against a grant."
+          filteredDescription="Nothing matches this filter."
+          actionLabel="Record repayment"
+          onAction={() => router.push(`${LIST}/new`)}
+          onClear={resetFilters}
+        />
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IRepayment>

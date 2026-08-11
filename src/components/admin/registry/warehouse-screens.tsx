@@ -22,6 +22,7 @@ import { RecordFacts } from "@/components/admin/record-facts";
 import { TitleCell } from "@/components/admin/table-cells";
 import { BackButton } from "@/components/ui/BackButton";
 import { ConsoleTableSkeleton, DetailSkeleton } from "@/components/admin/skeletons";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
@@ -102,6 +103,11 @@ export function WarehouseTable() {
   const warehouses = data?.data ?? [];
   const totalCount = data?.meta.total ?? 0;
   const activeFilterCount = statusFilter !== "all" ? 1 : 0;
+  const filtered = Boolean(search) || activeFilterCount > 0;
+  // A register with nothing on file and no filters narrowing it shows ONLY
+  // the empty state (with its create action) - a filter bar filters nothing.
+  const pristine =
+    !isLoading && !isError && warehouses.length === 0 && !filtered;
 
   const columns = useMemo<ColumnDef<IWarehouse, unknown>[]>(
     () => [
@@ -153,29 +159,29 @@ export function WarehouseTable() {
 
   return (
     <div>
-      <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Warehouses
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          Where goods are received into and loaded out of
-        </p>
+      <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
+            Warehouses
+          </h1>
+          <p className="mt-0.5 text-[13px] text-adm-muted">
+            Where goods are received into and loaded out of
+          </p>
+        </div>
+        {isSuperAdmin ? (
+              <AdminButton asChild>
+                <Link href={`${LIST}/new`}>+ Add warehouse</Link>
+              </AdminButton>
+            ) : null}
       </div>
 
-      {isError && !search && activeFilterCount === 0 ? null : (
+      {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
           search={searchInput}
           onSearch={setSearch}
           searchPlaceholder="Search warehouse…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
-          action={
-            isSuperAdmin ? (
-              <AdminButton asChild>
-                <Link href={`${LIST}/new`}>+ Add warehouse</Link>
-              </AdminButton>
-            ) : null
-          }
         >
           <ConsoleLabeledSelect
             label="Status"
@@ -196,28 +202,19 @@ export function WarehouseTable() {
           onRetry={() => void refetch()}
         />
       ) : warehouses.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          {search || activeFilterCount > 0 ? (
-            <EmptyState
-              variant="plain"
-              title="No matching warehouses"
-              description="Nothing matches this search and filter combination."
-              actionLabel="Clear search & filters"
-              onAction={() => {
-                setSearch("");
-                resetFilters();
-              }}
-            />
-          ) : (
-            <EmptyState
-              variant="plain"
-              title="No warehouses yet"
-              description="Add the first storage location goods are received into."
-              actionLabel="Add your first warehouse"
-              onAction={() => router.push(`${LIST}/new`)}
-            />
-          )}
-        </AdminCard>
+        <RegisterEmpty
+          filtered={filtered}
+          noun="warehouses"
+          description="Add the first storage location goods are received into."
+          actionLabel={isSuperAdmin ? "Add your first warehouse" : undefined}
+          onAction={
+            isSuperAdmin ? () => router.push(`${LIST}/new`) : undefined
+          }
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
+        />
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IWarehouse>

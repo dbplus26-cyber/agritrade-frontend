@@ -13,7 +13,7 @@ import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import { AdminButton, adminLinkClass, AdminCard, Mono } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -160,14 +160,19 @@ export function StocktakesScreen() {
 
   return (
     <div>
-      <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Stocktakes
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          Physical counts checked against the book - approved differences post
-          as adjustments
-        </p>
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
+            Stocktakes
+          </h1>
+          <p className="mt-0.5 text-[13px] text-adm-muted">
+            Physical counts checked against the book - approved differences post
+            as adjustments
+          </p>
+        </div>
+        {<AdminButton asChild>
+              <Link href={`${LIST}/new`}>+ New stocktake</Link>
+            </AdminButton>}
       </div>
 
       {pristine ? null : (
@@ -177,11 +182,6 @@ export function StocktakesScreen() {
           hideSearch
           activeCount={activeFilterCount}
           onClear={resetFilters}
-          action={
-            <AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ New stocktake</Link>
-            </AdminButton>
-          }
         >
           <ConsoleLabeledSelect
             label="Status"
@@ -210,27 +210,15 @@ export function StocktakesScreen() {
           onRetry={() => void refetch()}
         />
       ) : stocktakes.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          <EmptyState
-            variant="plain"
-            title={
-              activeFilterCount > 0
-                ? "No matching stocktakes"
-                : "No stocktakes yet"
-            }
-            description={
-              activeFilterCount > 0
-                ? "Nothing matches this filter."
-                : "Start a count sheet to check a warehouse against the book."
-            }
-            actionLabel={activeFilterCount > 0 ? undefined : "New stocktake"}
-            onAction={
-              activeFilterCount > 0
-                ? undefined
-                : () => router.push(`${LIST}/new`)
-            }
-          />
-        </AdminCard>
+        <RegisterEmpty
+          filtered={activeFilterCount > 0}
+          noun="stocktakes"
+          description="Start a count sheet to check a warehouse against the book."
+          filteredDescription="Nothing matches this filter."
+          actionLabel="New stocktake"
+          onAction={() => router.push(`${LIST}/new`)}
+          onClear={resetFilters}
+        />
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IStocktake>

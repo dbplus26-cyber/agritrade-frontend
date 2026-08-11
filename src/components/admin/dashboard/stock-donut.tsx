@@ -2,7 +2,7 @@
 
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 
-import { ChartNote, colorFor, formatWeight, LegendItem, WidgetCard } from "./chart-kit";
+import { colorFor, formatWeight, LegendItem, WidgetCard, WidgetEmpty } from "./chart-kit";
 
 interface StockRow {
   commodityId: string;
@@ -30,7 +30,11 @@ export function StockDonut({ rows }: { rows: StockRow[] }) {
       hint="How the stock you are holding right now splits across the commodities you trade."
     >
       {total <= 0 ? (
-        <ChartNote>No stock on hand.</ChartNote>
+        <WidgetEmpty
+          className="h-[180px]"
+          title="No stock on hand"
+          hint="The mix appears once a purchase is received into a warehouse."
+        />
       ) : (
         <div className="flex flex-col items-center gap-4 sm:flex-row">
           <div className="relative h-[168px] w-[168px] flex-none">

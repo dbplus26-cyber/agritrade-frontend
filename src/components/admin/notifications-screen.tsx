@@ -11,7 +11,7 @@ import {
 import { HelpWrap } from "@/components/admin/help-tip";
 import { AdminCard, Mono, ToneBadge, type Tone } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { useTableQuery } from "@/hooks/use-table-query";
@@ -92,6 +92,10 @@ export function NotificationsScreen() {
   const total = data?.meta.total ?? 0;
   const activeFilterCount =
     (status !== "all" ? 1 : 0) + (channel !== "all" ? 1 : 0);
+  const filtered = Boolean(search) || activeFilterCount > 0;
+  // A register with nothing on file and no filters narrowing it shows ONLY
+  // the empty state - a filter bar filters nothing.
+  const pristine = !isLoading && !isError && rows.length === 0 && !filtered;
 
   const columns = useMemo<ColumnDef<INotification, unknown>[]>(
     () => [
@@ -175,7 +179,7 @@ export function NotificationsScreen() {
         </p>
       </div>
 
-      {isError && !search && activeFilterCount === 0 ? null : (
+      {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
           search={searchInput}
           onSearch={setSearch}
@@ -210,21 +214,15 @@ export function NotificationsScreen() {
           onRetry={() => void refetch()}
         />
       ) : rows.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          <EmptyState
-            variant="plain"
-            title={
-              search || activeFilterCount > 0
-                ? "No matching notifications"
-                : "No notifications yet"
-            }
-            description={
-              search || activeFilterCount > 0
-                ? "Nothing matches this search and filter combination."
-                : "Sent SMS and emails will appear here as the system notifies buyers and the owner."
-            }
-          />
-        </AdminCard>
+        <RegisterEmpty
+          filtered={filtered}
+          noun="notifications"
+          description="Sent SMS and emails will appear here as the system notifies buyers and the owner."
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
+        />
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<INotification>

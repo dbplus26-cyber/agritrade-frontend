@@ -19,7 +19,7 @@ import {
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
 import { useGetCommoditiesQuery } from "@/redux/commodities/commodities-api";
@@ -109,6 +109,9 @@ export function StockView() {
   );
   const totals = useMemo(() => data?.summary.totals ?? [], [data]);
 
+  const balancesFiltered =
+    warehouseId !== "all" || commodityId !== "all" || includeZero;
+
   /**
    * The rows pivoted into a warehouse-by-commodity matrix, both axes in the
    * order the API returned them. Subtotals are summed client-side for
@@ -155,6 +158,14 @@ export function StockView() {
     { value: "all", label: "All commodities" },
     ...commodities.map((c) => ({ value: c.id, label: c.name })),
   ];
+
+  // Nothing on hand and nothing narrowing the view: the empty state alone -
+  // a filter bar over an empty register filters nothing.
+  const balancesPristine =
+    !isLoading &&
+    !isError &&
+    matrix.warehouses.length === 0 &&
+    !balancesFiltered;
 
   return (
     <div>
@@ -251,6 +262,7 @@ export function StockView() {
             </div>
           ) : null}
 
+          {balancesPristine ? null : (
           <ConsoleFilterBar
             search=""
             onSearch={() => undefined}
@@ -312,6 +324,7 @@ export function StockView() {
               ) : null}
             </label>
           </ConsoleFilterBar>
+          )}
 
           {isLoading ? (
             <ConsoleTableSkeleton columns={5} />
@@ -321,12 +334,18 @@ export function StockView() {
               onRetry={() => void refetch()}
             />
           ) : matrix.warehouses.length === 0 ? (
-            <AdminCard className="overflow-hidden">
-              <EmptyState
-                title="Nothing on hand"
-                description="Stock appears here the moment a purchase is received into a warehouse."
-              />
-            </AdminCard>
+            <RegisterEmpty
+              filtered={balancesFiltered}
+              noun="stock lines"
+              title="Nothing on hand"
+              description="Stock appears here the moment a purchase is received into a warehouse."
+              filteredDescription="No stock lines match this warehouse and commodity combination."
+              onClear={() => {
+                setWarehouseId("all");
+                setCommodityId("all");
+                setIncludeZero(false);
+              }}
+            />
           ) : (
             <AdminCard className="overflow-hidden">
               {/* Warehouses STACK, they do not become columns.

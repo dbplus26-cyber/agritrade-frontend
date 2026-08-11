@@ -30,7 +30,7 @@ import {
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
 import { useAuthRole } from "@/hooks/use-auth-role";
@@ -279,14 +279,21 @@ export function TransfersScreen() {
     // Without this the widest table stretched the PAGE instead of scrolling
     // inside its own box, so a phone got a sideways-scrolling page.
     <div className="min-w-0">
-      <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Transfers
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          Stock moved between warehouses - each posts an out and an in on the
-          ledger
-        </p>
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
+            Transfers
+          </h1>
+          <p className="mt-0.5 text-[13px] text-adm-muted">
+            Stock moved between warehouses - each posts an out and an in on the
+            ledger
+          </p>
+        </div>
+        {isSuperAdmin ? (
+              <AdminButton onClick={() => setDialogOpen(true)}>
+                + New transfer
+              </AdminButton>
+            ) : undefined}
       </div>
 
       {pristine ? null : (
@@ -296,13 +303,6 @@ export function TransfersScreen() {
           hideSearch
           activeCount={activeFilterCount}
           onClear={resetFilters}
-          action={
-            isSuperAdmin ? (
-              <AdminButton onClick={() => setDialogOpen(true)}>
-                + New transfer
-              </AdminButton>
-            ) : undefined
-          }
         >
           <ConsoleLabeledSelect
             label="From warehouse"
@@ -346,31 +346,15 @@ export function TransfersScreen() {
           onRetry={() => void refetch()}
         />
       ) : transfers.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          <EmptyState
-            variant="plain"
-            title={
-              activeFilterCount > 0
-                ? "No matching transfers"
-                : "No transfers yet"
-            }
-            description={
-              activeFilterCount > 0
-                ? "Nothing matches this filter."
-                : "Stock moved between warehouses is recorded here."
-            }
-            actionLabel={
-              activeFilterCount === 0 && isSuperAdmin
-                ? "+ New transfer"
-                : undefined
-            }
-            onAction={
-              activeFilterCount === 0 && isSuperAdmin
-                ? () => setDialogOpen(true)
-                : undefined
-            }
-          />
-        </AdminCard>
+        <RegisterEmpty
+          filtered={activeFilterCount > 0}
+          noun="transfers"
+          description="Stock moved between warehouses is recorded here."
+          filteredDescription="Nothing matches this filter."
+          actionLabel={isSuperAdmin ? "+ New transfer" : undefined}
+          onAction={isSuperAdmin ? () => setDialogOpen(true) : undefined}
+          onClear={resetFilters}
+        />
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<ITransfer>

@@ -18,6 +18,7 @@ import {
   GRID_STROKE,
   LegendItem,
   WidgetCard,
+  WidgetEmpty,
   WidgetError,
 } from "@/components/admin/dashboard/chart-kit";
 import { Money } from "@/components/admin/trading/sale-bits";
@@ -107,7 +108,11 @@ export function PlTrendChart() {
       ) : redacted ? (
         <ChartNote>Financial figures are hidden for your role.</ChartNote>
       ) : rows.length === 0 ? (
-        <ChartNote>No activity in this period.</ChartNote>
+        <WidgetEmpty
+          className="h-[240px]"
+          title="No activity in this period"
+          hint="Sales in and purchases out will draw here month by month."
+        />
       ) : (
         <div className="h-[240px] min-w-0">
           <ResponsiveContainer width="100%" height="100%">

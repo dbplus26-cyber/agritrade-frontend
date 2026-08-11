@@ -7,7 +7,12 @@ import {
   DEFAULT_RANGE,
 } from "@/components/admin/dashboard/date-range-selector";
 import { HelpTip, HelpWrap } from "@/components/admin/help-tip";
+import {
+  WidgetEmpty,
+  WidgetError,
+} from "@/components/admin/dashboard/chart-kit";
 import { Money } from "@/components/admin/trading/sale-bits";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   adminLinkClass,
   AdminButton,
@@ -16,7 +21,6 @@ import {
   ToneBadge,
 } from "@/components/admin/ui";
 import { env } from "@/lib/env";
-import { extractApiError } from "@/lib/extract-api-error";
 import { formatDateTime } from "@/lib/format-date";
 import {
   formatCedis,
@@ -164,7 +168,8 @@ function AgentPerformance({
   exportHref: string;
   window: IReportWindow;
 }) {
-  const { data } = useGetAgentPerformanceQuery(window);
+  const { data, isError, isLoading, refetch } =
+    useGetAgentPerformanceQuery(window);
   const rows = data?.data ?? [];
   return (
     <AdminCard className="px-5 py-4">
@@ -180,8 +185,18 @@ function AgentPerformance({
           Export CSV
         </a>
       </div>
-      {rows.length === 0 ? (
-        <p className="text-[13px] text-adm-muted">No agent purchases in this period.</p>
+      {isError ? (
+        <WidgetError
+          what="the agent performance"
+          onRetry={() => void refetch()}
+        />
+      ) : isLoading ? (
+        <Skeleton className="h-[120px] w-full rounded-[6px]" />
+      ) : rows.length === 0 ? (
+        <WidgetEmpty
+          title="No agent purchases in this period"
+          hint="Each agent's buying and average price lands here as purchases are recorded."
+        />
       ) : (
         <div className="overflow-x-auto">
           {/* Declared widths so the figures are never the columns that give
@@ -255,7 +270,7 @@ const LIST_CAP = 6;
  */
 function CashComingIn() {
   const [days, setDays] = useState<ForecastDays>(30);
-  const { data, isLoading, isError, error } = useGetCashflowForecastQuery({
+  const { data, isLoading, isError, refetch } = useGetCashflowForecastQuery({
     days,
   });
   const f = data?.data.forecast;
@@ -312,11 +327,9 @@ function CashComingIn() {
       </div>
 
       {isLoading ? (
-        <p className="py-2 text-[13px] text-adm-muted">Loading the forecast…</p>
+        <Skeleton className="h-[140px] w-full rounded-[6px]" />
       ) : isError ? (
-        <p className="py-2 text-[13px] text-console-red">
-          {extractApiError(error).message}
-        </p>
+        <WidgetError what="the forecast" onRetry={() => void refetch()} />
       ) : (
         <>
           <div className="mb-4 flex flex-col gap-2 min-[420px]:flex-row">
@@ -338,9 +351,10 @@ function CashComingIn() {
                 Sale balances
               </div>
               {saleRows.length === 0 ? (
-                <p className="py-1.5 text-[13px] text-adm-muted">
-                  No open sale balances in this window.
-                </p>
+                <WidgetEmpty
+                  className="min-h-[86px]"
+                  title="No open sale balances in this window"
+                />
               ) : (
                 <>
                   {saleRows.slice(0, LIST_CAP).map((r) => (
@@ -384,9 +398,10 @@ function CashComingIn() {
                 Farm dues
               </div>
               {farmRows.length === 0 ? (
-                <p className="py-1.5 text-[13px] text-adm-muted">
-                  No farm dues in this window.
-                </p>
+                <WidgetEmpty
+                  className="min-h-[86px]"
+                  title="No farm dues in this window"
+                />
               ) : (
                 <>
                   {farmRows.slice(0, LIST_CAP).map((r, i) => (

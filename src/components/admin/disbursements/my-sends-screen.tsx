@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AdminButton, AdminPageHeader, Mono } from "@/components/admin/ui";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { ListPagination } from "@/components/ui/ListPagination";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -71,7 +71,9 @@ export function MySendsScreen({
           onRetry={() => void refetch()}
         />
       ) : total === 0 ? (
-        <EmptyState
+        <RegisterEmpty
+          filtered={false}
+          noun="sends"
           title="You have not sent anything yet"
           description="Money you send from your float appears here, with its status."
         />

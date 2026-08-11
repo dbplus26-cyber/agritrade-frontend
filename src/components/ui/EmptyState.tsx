@@ -1,8 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-/** The empty folder illustration the registers share, in warm palette inks. */
-function EmptyFolder({ className }: { className?: string }) {
+/**
+ * The empty folder illustration the registers share, in warm palette inks.
+ * Exported so the console's widget-level empty note (chart-kit's WidgetEmpty)
+ * draws the same mark - one illustration for "nothing here", everywhere.
+ */
+export function EmptyFolder({ className }: { className?: string }) {
   return (
     <svg
       width="60"

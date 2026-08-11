@@ -6,6 +6,7 @@ import {
   colorFor,
   LegendItem,
   WidgetCard,
+  WidgetEmpty,
 } from "@/components/admin/dashboard/chart-kit";
 import { Money } from "@/components/admin/trading/sale-bits";
 import type { IExpenseSummary } from "@/types/report.types";
@@ -35,7 +36,11 @@ export function ExpenseDonut({ summary }: { summary?: IExpenseSummary }) {
       hint="Where your running costs went in the period you picked, grouped under the headings you file them by."
     >
       {cats.length === 0 ? (
-        <ChartNote>No expenses recorded in this period.</ChartNote>
+        <WidgetEmpty
+          className="h-[180px]"
+          title="No expenses in this period"
+          hint="Recorded expenses group here under their categories."
+        />
       ) : redacted ? (
         <ChartNote>Financial figures are hidden for your role.</ChartNote>
       ) : (

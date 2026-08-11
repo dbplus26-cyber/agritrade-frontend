@@ -15,7 +15,7 @@ import {
 import { adminLinkClass, AdminButton, AdminCard, Mono } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useGetCommoditiesQuery } from "@/redux/commodities/commodities-api";
 import { useGetPurchasesQuery } from "@/redux/purchases/purchases-api";
@@ -228,14 +228,19 @@ export function PurchasesTable() {
 
   return (
     <div>
-      <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Purchases
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          Goods bought at the farm gate and beyond - money is real from the
-          moment a purchase is recorded
-        </p>
+      <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
+            Purchases
+          </h1>
+          <p className="mt-0.5 text-[13px] text-adm-muted">
+            Goods bought at the farm gate and beyond - money is real from the
+            moment a purchase is recorded
+          </p>
+        </div>
+        {<AdminButton asChild>
+              <Link href={`${LIST}/new`}>+ Record purchase</Link>
+            </AdminButton>}
       </div>
 
       {pristine || (isError && !search && activeFilterCount === 0) ? null : (
@@ -245,11 +250,6 @@ export function PurchasesTable() {
           searchPlaceholder="Search supplier, notes…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
-          action={
-            <AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ Record purchase</Link>
-            </AdminButton>
-          }
         >
           <ConsoleLabeledSelect
             label="Status"
@@ -314,28 +314,17 @@ export function PurchasesTable() {
           onRetry={() => void refetch()}
         />
       ) : purchases.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          {search || activeFilterCount > 0 ? (
-            <EmptyState
-              variant="plain"
-              title="No matching purchases"
-              description="Nothing matches this search and filter combination."
-              actionLabel="Clear search & filters"
-              onAction={() => {
-                setSearch("");
-                resetFilters();
-              }}
-            />
-          ) : (
-            <EmptyState
-              variant="plain"
-              title="No purchases yet"
-              description="Record the first goods bought from a village or supplier."
-              actionLabel="Record your first purchase"
-              onAction={() => router.push(`${LIST}/new`)}
-            />
-          )}
-        </AdminCard>
+        <RegisterEmpty
+          filtered={Boolean(search) || activeFilterCount > 0}
+          noun="purchases"
+          description="Record the first goods bought from a village or supplier."
+          actionLabel="Record your first purchase"
+          onAction={() => router.push(`${LIST}/new`)}
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
+        />
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IPurchase>

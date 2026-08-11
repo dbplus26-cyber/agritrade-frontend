@@ -2,13 +2,14 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
-import { AdminButton, AdminCard, Mono, ToneBadge } from "@/components/admin/ui";
+import { AdminButton, Mono, ToneBadge } from "@/components/admin/ui";
 import { RecordCardGridSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { ListPagination } from "@/components/ui/ListPagination";
 import { useTableQuery } from "@/hooks/use-table-query";
@@ -25,6 +26,7 @@ const LIST = "/admin/plots";
 const FILTER_DEFAULTS = { status: "all", size: "12" };
 
 export function PlotsRegister() {
+  const router = useRouter();
   const {
     page,
     setPage,
@@ -55,31 +57,35 @@ export function PlotsRegister() {
   const plots = data?.data ?? [];
   const meta = data?.meta;
   const activeFilterCount = status !== "all" ? 1 : 0;
+  const filtered = Boolean(search) || activeFilterCount > 0;
+  // A register with nothing on file and no filters narrowing it shows ONLY
+  // the empty state (with its create action) - a filter bar filters nothing.
+  const pristine = !isLoading && !isError && plots.length === 0 && !filtered;
 
   return (
     <div>
-      <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Land plots
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          Every plot the business holds - photos, title documents and what is
-          published to the website
-        </p>
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
+            Land plots
+          </h1>
+          <p className="mt-0.5 text-[13px] text-adm-muted">
+            Every plot the business holds - photos, title documents and what is
+            published to the website
+          </p>
+        </div>
+        {<AdminButton asChild>
+              <Link href={`${LIST}/new`}>+ Add plot</Link>
+            </AdminButton>}
       </div>
 
-      {isError && !search && activeFilterCount === 0 ? null : (
+      {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
           search={searchInput}
           onSearch={setSearch}
           searchPlaceholder="Search reference, location…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
-          action={
-            <AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ Add plot</Link>
-            </AdminButton>
-          }
         >
           <ConsoleLabeledSelect
             label="Status"
@@ -100,21 +106,17 @@ export function PlotsRegister() {
           onRetry={() => void refetch()}
         />
       ) : plots.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          <EmptyState
-            variant="plain"
-            title={
-              search || activeFilterCount > 0
-                ? "No matching plots"
-                : "No plots yet"
-            }
-            description={
-              search || activeFilterCount > 0
-                ? "Nothing matches this search and filter combination."
-                : "Add the first plot to the register."
-            }
-          />
-        </AdminCard>
+        <RegisterEmpty
+          filtered={filtered}
+          noun="plots"
+          description="Add the first plot to the register."
+          actionLabel="Add your first plot"
+          onAction={() => router.push(`${LIST}/new`)}
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
+        />
       ) : (
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {plots.map((p) => (

@@ -14,7 +14,7 @@ import {
 } from "@/components/admin/filter-bar";
 import { AdminButton, AdminCard, Mono } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -240,11 +240,6 @@ export function SalesRegister() {
       searchPlaceholder="Search buyer…"
       activeCount={activeFilterCount}
       onClear={resetFilters}
-      action={
-        <AdminButton asChild>
-          <Link href={`${LIST}/new`}>+ New sale</Link>
-        </AdminButton>
-      }
     >
       <ConsoleLabeledSelect
         label="Status"
@@ -282,25 +277,28 @@ export function SalesRegister() {
 
   return (
     <div>
-      <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Sales
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          Agreements with buyers, payments and balances
-        </p>
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
+            Sales
+          </h1>
+          <p className="mt-0.5 text-[13px] text-adm-muted">
+            Agreements with buyers, payments and balances
+          </p>
+        </div>
+        {<AdminButton asChild>
+          <Link href={`${LIST}/new`}>+ New sale</Link>
+        </AdminButton>}
       </div>
 
       {pristine ? (
-        <AdminCard className="overflow-hidden">
-          <EmptyState
-            variant="plain"
-            title="No sales yet"
-            description="Draft your first sale to start tracking agreements and balances."
-            actionLabel="Draft your first sale"
-            onAction={() => router.push(`${LIST}/new`)}
-          />
-        </AdminCard>
+        <RegisterEmpty
+          filtered={false}
+          noun="sales"
+          description="Draft your first sale to start tracking agreements and balances."
+          actionLabel="Draft your first sale"
+          onAction={() => router.push(`${LIST}/new`)}
+        />
       ) : (
         <>
           <SalesStats />
@@ -316,18 +314,15 @@ export function SalesRegister() {
             />
           ) : sales.length === 0 ? (
             // Not pristine, so a search or filter is narrowing the register.
-            <AdminCard className="overflow-hidden">
-              <EmptyState
-                variant="plain"
-                title="No matching sales"
-                description="Nothing matches this search and filter combination."
-                actionLabel="Clear search & filters"
-                onAction={() => {
-                  setSearch("");
-                  resetFilters();
-                }}
-              />
-            </AdminCard>
+            <RegisterEmpty
+              filtered
+              noun="sales"
+              description=""
+              onClear={() => {
+                setSearch("");
+                resetFilters();
+              }}
+            />
           ) : (
             <>
               <AdminCard className="hidden overflow-hidden md:block">

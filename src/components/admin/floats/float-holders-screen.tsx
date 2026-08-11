@@ -25,7 +25,7 @@ import {
   adminInputClass,
   adminSelectClass,
 } from "@/components/admin/ui";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
 import {
@@ -97,6 +97,11 @@ export function FloatHoldersScreen() {
   const activeFilterCount = (["funded", "role"] as const).filter(
     (k) => filters[k] !== "all",
   ).length;
+  const filtered = activeFilterCount > 0 || Boolean(queryParams.search);
+  // Loading and error return early below, so at render time an empty rows
+  // list with no filters means a genuinely pristine register: show the empty
+  // state alone - a filter bar filters nothing.
+  const pristine = rows.length === 0 && !filtered;
 
   // Columns follow the register convention: an explicit `id` plus an
   // `accessorFn`, not the `accessorKey` shorthand. The mobile card renderer
@@ -206,6 +211,7 @@ export function FloatHoldersScreen() {
         sub="Who is holding company money to spend, and how much is left"
       />
 
+      {pristine ? null : (
       <ConsoleFilterBar
         activeCount={activeFilterCount}
         onClear={resetFilters}
@@ -229,33 +235,40 @@ export function FloatHoldersScreen() {
           value={filters.funded}
         />
       </ConsoleFilterBar>
+      )}
 
-      {/* Every other register files its rows on an AdminCard. This screen and
-          the payout register rendered the table bare, so the two money
-          surfaces were the only ones with no sheet under the rows. */}
-      <AdminCard className="overflow-hidden">
-        <ConsoleDataTable<IFloatHolder>
-          columns={columns}
-          data={rows}
-          emptyState={
-            <EmptyState
-              title="Nobody matches"
-              description="Try a different role or search term."
-            />
-          }
-          isFetching={isFetching}
-          isFiltered={activeFilterCount > 0 || Boolean(queryParams.search)}
-          itemNoun="people"
-          rowClassName={() => "h-14 hover:bg-adm-sunken"}
-          serverPagination={{
-            onPageChange: setPage,
-            onPageSizeChange: (size) => setFilter("size", String(size)),
-            page,
-            pageSize: limit,
-            totalCount: total,
+      {rows.length === 0 ? (
+        <RegisterEmpty
+          filtered={filtered}
+          noun="float holders"
+          description="Create AGENT or STAFF users - they appear here ready to hold company money."
+          filteredDescription="Nobody matches this role, funding or search combination."
+          onClear={() => {
+            setSearch("");
+            resetFilters();
           }}
         />
-      </AdminCard>
+      ) : (
+        // Every other register files its rows on an AdminCard. This screen and
+        // the payout register rendered the table bare, so the two money
+        // surfaces were the only ones with no sheet under the rows.
+        <AdminCard className="overflow-hidden">
+          <ConsoleDataTable<IFloatHolder>
+            columns={columns}
+            data={rows}
+            isFetching={isFetching}
+            itemNoun="people"
+            rowClassName={() => "h-14 hover:bg-adm-sunken"}
+            serverPagination={{
+              onPageChange: setPage,
+              onPageSizeChange: (size) => setFilter("size", String(size)),
+              page,
+              pageSize: limit,
+              totalCount: total,
+            }}
+          />
+        </AdminCard>
+      )}
 
       <TopUpDialog holder={toppingUp} onClose={() => setToppingUp(null)} />
     </div>

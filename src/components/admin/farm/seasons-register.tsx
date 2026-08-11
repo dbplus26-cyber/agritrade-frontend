@@ -12,7 +12,7 @@ import {
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { AdminButton, AdminCard } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -56,6 +56,10 @@ export function SeasonsRegister() {
   const seasons = data?.data ?? [];
   const totalCount = data?.meta.total ?? 0;
   const activeFilterCount = active !== "all" ? 1 : 0;
+  const filtered = Boolean(search) || activeFilterCount > 0;
+  // A register with nothing on file and no filters narrowing it shows ONLY
+  // the empty state (with its create action) - a filter bar filters nothing.
+  const pristine = !isLoading && !isError && seasons.length === 0 && !filtered;
 
   const columns = useMemo<ColumnDef<ISeason, unknown>[]>(
     () => [
@@ -111,27 +115,27 @@ export function SeasonsRegister() {
 
   return (
     <div>
-      <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Seasons
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          Farming seasons that grants and repayments are booked against
-        </p>
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
+            Seasons
+          </h1>
+          <p className="mt-0.5 text-[13px] text-adm-muted">
+            Farming seasons that grants and repayments are booked against
+          </p>
+        </div>
+        {<AdminButton asChild>
+              <Link href={`${LIST}/new`}>+ New season</Link>
+            </AdminButton>}
       </div>
 
-      {isError && !search && activeFilterCount === 0 ? null : (
+      {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
           search={searchInput}
           onSearch={setSearch}
           searchPlaceholder="Search season…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
-          action={
-            <AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ New season</Link>
-            </AdminButton>
-          }
         >
           <ConsoleLabeledSelect
             label="Status"
@@ -152,29 +156,17 @@ export function SeasonsRegister() {
           onRetry={() => void refetch()}
         />
       ) : seasons.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          <EmptyState
-            variant="plain"
-            title={
-              search || activeFilterCount > 0
-                ? "No matching seasons"
-                : "No seasons yet"
-            }
-            description={
-              search || activeFilterCount > 0
-                ? "Nothing matches this search and filter combination."
-                : "Create the first season to start booking grants."
-            }
-            actionLabel={
-              search || activeFilterCount > 0 ? undefined : "New season"
-            }
-            onAction={
-              search || activeFilterCount > 0
-                ? undefined
-                : () => router.push(`${LIST}/new`)
-            }
-          />
-        </AdminCard>
+        <RegisterEmpty
+          filtered={filtered}
+          noun="seasons"
+          description="Create the first season to start booking grants."
+          actionLabel="New season"
+          onAction={() => router.push(`${LIST}/new`)}
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
+        />
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<ISeason>

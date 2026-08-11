@@ -37,14 +37,10 @@ export const siteConfig = {
    * Contact details are OWNER DATA, not code: the live values come from the
    * backend settings block and are merged over these in `public-contact.ts`.
    * These stand in only while the settings block is blank or unreachable.
-   *
-   * PLACEHOLDERS, pending the business's confirmed details - swap them for
-   * the real fallback values, or better, have the owner fill Admin →
-   * Settings, which overrides them everywhere with no deploy.
    */
-  phone: "024 000 0000",
-  whatsapp: "024 000 0000",
-  email: "info@dbplus.com",
+  phone: "0244961887",
+  whatsapp: "0244961887",
+  email: "firstfastcom@gmail.com",
   /**
    * Where the call/WhatsApp links point while no number is configured: the
    * contact page, never a `tel:`/`wa.me` that dials nobody.
@@ -70,7 +66,7 @@ export const siteConfig = {
     instagram: "",
     tiktok: "",
   },
-  address: "Industrial Area, off Bolgatanga Road, Tamale, Northern Region",
+  address: "Aboabu Super Market",
   hours: "Mon – Sat 7:00 – 17:00 · Sunday closed",
   city: "Tamale",
   country: "Ghana",

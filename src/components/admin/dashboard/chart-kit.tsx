@@ -2,6 +2,7 @@
 
 import { HelpTip } from "@/components/admin/help-tip";
 import { AdminCard } from "@/components/admin/ui";
+import { EmptyFolder } from "@/components/ui/EmptyState";
 import { cn } from "@/lib/utils";
 
 /**
@@ -143,6 +144,48 @@ export function ChartNote({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-[180px] items-center justify-center text-center text-[13px] text-adm-muted">
       {children}
+    </div>
+  );
+}
+
+/**
+ * The no-data state for a dashboard or report widget - one shape everywhere.
+ *
+ * Widgets used to say "nothing here" three different ways (ChartNote, a bare
+ * muted paragraph, or nothing at all), so an empty board read as several
+ * different products. This is the registers' folder mark scaled to widget
+ * size, with the same title/hint hierarchy as EmptyState. Keep ChartNote for
+ * REDACTION notes ("hidden for your role") - that is a different message from
+ * "there is no data", and the two must not look alike.
+ *
+ * `className` sets the slot height so a chart card keeps its chart height
+ * (e.g. "h-[180px]") and a list card its list height (default min-h-[120px]).
+ */
+export function WidgetEmpty({
+  title,
+  hint,
+  className,
+}: {
+  /** What is absent, plainly, e.g. "No activity yet". */
+  title: string;
+  /** One line on when data will appear here. */
+  hint?: string;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "flex min-h-[120px] flex-col items-center justify-center gap-1 rounded-[6px] border border-dashed border-adm-hairline bg-adm-page/60 px-4 py-5 text-center",
+        className,
+      )}
+    >
+      <EmptyFolder className="mb-1 h-9 w-auto" />
+      <p className="text-[13px] font-semibold text-adm-ink">{title}</p>
+      {hint ? (
+        <p className="max-w-[36ch] text-[12.5px] leading-[1.55] text-adm-muted">
+          {hint}
+        </p>
+      ) : null}
     </div>
   );
 }

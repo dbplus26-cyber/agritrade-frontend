@@ -16,6 +16,7 @@ import {
   GRID_STROKE,
   LegendItem,
   WidgetCard,
+  WidgetEmpty,
 } from "@/components/admin/dashboard/chart-kit";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { ToneBadge } from "@/components/admin/ui";
@@ -91,7 +92,11 @@ export function ProfitBarChart({
       right={rows.length > 0 && !redacted ? legend : undefined}
     >
       {rows.length === 0 ? (
-        <ChartNote>No shipped sales in this period yet.</ChartNote>
+        <WidgetEmpty
+          className="h-[240px]"
+          title="No shipped sales in this period yet"
+          hint="Profit per commodity appears once sales ship."
+        />
       ) : redacted ? (
         <ChartNote>Financial figures are hidden for your role.</ChartNote>
       ) : (

@@ -12,7 +12,7 @@ import {
 } from "@/components/admin/filter-bar";
 import { AdminButton, AdminCard } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useGetBuyersQuery } from "@/redux/buyers/buyers-api";
 import { useTableQuery } from "@/hooks/use-table-query";
@@ -70,6 +70,10 @@ export function BuyerTable() {
   const totalCount = data?.meta.total ?? 0;
   const activeFilterCount =
     (statusFilter !== "all" ? 1 : 0) + (from ? 1 : 0) + (to ? 1 : 0);
+  const filtered = Boolean(search) || activeFilterCount > 0;
+  // A register with nothing on file and no filters narrowing it shows ONLY
+  // the empty state (with its create action) - a filter bar filters nothing.
+  const pristine = !isLoading && !isError && buyers.length === 0 && !filtered;
 
   const columns = useMemo<ColumnDef<IBuyer, unknown>[]>(
     () => [
@@ -149,27 +153,27 @@ export function BuyerTable() {
 
   return (
     <div>
-      <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Buyers
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          Traders and companies the business sells to
-        </p>
+      <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
+            Buyers
+          </h1>
+          <p className="mt-0.5 text-[13px] text-adm-muted">
+            Traders and companies the business sells to
+          </p>
+        </div>
+        {<AdminButton asChild>
+              <Link href={`${LIST}/new`}>+ Add buyer</Link>
+            </AdminButton>}
       </div>
 
-      {isError && !search && activeFilterCount === 0 ? null : (
+      {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
           search={searchInput}
           onSearch={setSearch}
           searchPlaceholder="Search buyer…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
-          action={
-            <AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ Add buyer</Link>
-            </AdminButton>
-          }
         >
           <ConsoleLabeledSelect
             label="Status"
@@ -198,28 +202,17 @@ export function BuyerTable() {
           onRetry={() => void refetch()}
         />
       ) : buyers.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          {search || activeFilterCount > 0 ? (
-            <EmptyState
-              variant="plain"
-              title="No matching buyers"
-              description="Nothing matches this search and filter combination."
-              actionLabel="Clear search & filters"
-              onAction={() => {
-                setSearch("");
-                resetFilters();
-              }}
-            />
-          ) : (
-            <EmptyState
-              variant="plain"
-              title="No buyers yet"
-              description="Add the first trader or company the business sells to."
-              actionLabel="Add your first buyer"
-              onAction={() => router.push(`${LIST}/new`)}
-            />
-          )}
-        </AdminCard>
+        <RegisterEmpty
+          filtered={filtered}
+          noun="buyers"
+          description="Add the first trader or company the business sells to."
+          actionLabel="Add your first buyer"
+          onAction={() => router.push(`${LIST}/new`)}
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
+        />
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IBuyer>

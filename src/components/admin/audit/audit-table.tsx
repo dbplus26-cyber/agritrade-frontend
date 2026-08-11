@@ -94,8 +94,13 @@ export function AuditTable() {
 
   const columns = useMemo<ColumnDef<IAuditLog, unknown>[]>(
     () => [
+      // Every column declares an accessorFn: the mobile card renderer tells a
+      // labelled DATA row from a trailing ACTION by its presence, and without
+      // it every column tipped into the unlabelled actions bucket - which is
+      // what made an audit row on a phone read as a scattered pile of values.
       {
         id: "time",
+        accessorFn: (log) => log.createdAt,
         header: "Time",
         enableSorting: false,
         meta: columnMeta(),
@@ -103,6 +108,7 @@ export function AuditTable() {
       },
       {
         id: "actor",
+        accessorFn: (log) => log.actor?.name ?? "System",
         header: columnHelp(
           "Actor",
           "Who did it: the person signed in at the time, or the system itself.",
@@ -137,6 +143,7 @@ export function AuditTable() {
       },
       {
         id: "action",
+        accessorFn: (log) => log.action,
         header: columnHelp("Action", "What they did, in plain words."),
         enableSorting: false,
         meta: columnMeta(),
@@ -148,6 +155,7 @@ export function AuditTable() {
       },
       {
         id: "record",
+        accessorFn: (log) => log.entity,
         header: columnHelp(
           "Record",
           "Which thing in the system was touched, and its reference.",
@@ -172,6 +180,7 @@ export function AuditTable() {
       },
       {
         id: "ip",
+        accessorFn: (log) => log.ip ?? "",
         header: columnHelp(
           "IP",
           "The internet address they were connecting from, useful for spotting a sign-in from somewhere odd.",

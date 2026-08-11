@@ -15,7 +15,7 @@ import { TextCell, TitleCell } from "@/components/admin/table-cells";
 import { AdminButton, AdminCard, Mono } from "@/components/admin/ui";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -162,29 +162,29 @@ export function GrantsRegister() {
 
   return (
     <div>
-      <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Input grants
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          Inputs given to farmers, carrying the cash value owed
-        </p>
-      </div>
-
-      {pristine || (isError && activeFilterCount === 0) ? null : (
-        <ConsoleFilterBar
-          activeCount={activeFilterCount}
-          onClear={resetFilters}
-          action={
-            <span className="flex items-center gap-2">
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
+            Input grants
+          </h1>
+          <p className="mt-0.5 text-[13px] text-adm-muted">
+            Inputs given to farmers, carrying the cash value owed
+          </p>
+        </div>
+        {<span className="flex items-center gap-2">
               <AdminButton asChild variant="ghost">
                 <Link href={`${LIST}/aging`}>Aging</Link>
               </AdminButton>
               <AdminButton asChild>
                 <Link href={`${LIST}/new`}>+ New grant</Link>
               </AdminButton>
-            </span>
-          }
+            </span>}
+      </div>
+
+      {pristine || (isError && activeFilterCount === 0) ? null : (
+        <ConsoleFilterBar
+          activeCount={activeFilterCount}
+          onClear={resetFilters}
         >
           <ConsoleLabeledSelect
             label="Season"
@@ -212,21 +212,15 @@ export function GrantsRegister() {
           onRetry={() => void refetch()}
         />
       ) : grants.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          <EmptyState
-            variant="plain"
-            title={activeFilterCount > 0 ? "No matching grants" : "No grants yet"}
-            description={
-              activeFilterCount > 0
-                ? "Nothing matches this filter."
-                : "Record the first input grant."
-            }
-            actionLabel={activeFilterCount > 0 ? undefined : "New grant"}
-            onAction={
-              activeFilterCount > 0 ? undefined : () => router.push(`${LIST}/new`)
-            }
-          />
-        </AdminCard>
+        <RegisterEmpty
+          filtered={activeFilterCount > 0}
+          noun="grants"
+          description="Record the first input grant."
+          filteredDescription="Nothing matches this filter."
+          actionLabel="New grant"
+          onAction={() => router.push(`${LIST}/new`)}
+          onClear={resetFilters}
+        />
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IGrant>

@@ -12,7 +12,7 @@ import {
 } from "@/components/admin/filter-bar";
 import { adminLinkClass, AdminButton, AdminCard, Mono } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -62,6 +62,10 @@ export function LandSalesRegister() {
   const total = data?.meta.total ?? 0;
   const activeFilterCount =
     (status !== "all" ? 1 : 0) + (from ? 1 : 0) + (to ? 1 : 0);
+  const filtered = activeFilterCount > 0;
+  // A register with nothing on file and no filters narrowing it shows ONLY
+  // the empty state (with its create action) - a filter bar filters nothing.
+  const pristine = !isLoading && !isError && sales.length === 0 && !filtered;
 
   const columns = useMemo<ColumnDef<ILandSale, unknown>[]>(
     () => [
@@ -159,27 +163,27 @@ export function LandSalesRegister() {
 
   return (
     <div>
-      <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Land sales
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          Plots sold to buyers, their part-payments and what is still owed
-        </p>
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
+            Land sales
+          </h1>
+          <p className="mt-0.5 text-[13px] text-adm-muted">
+            Plots sold to buyers, their part-payments and what is still owed
+          </p>
+        </div>
+        {<AdminButton asChild>
+              <Link href={`${LIST}/new`}>+ New land sale</Link>
+            </AdminButton>}
       </div>
 
-      {isError && activeFilterCount === 0 ? null : (
+      {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
           search={searchInput}
           onSearch={setSearch}
           hideSearch
           activeCount={activeFilterCount}
           onClear={resetFilters}
-          action={
-            <AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ New land sale</Link>
-            </AdminButton>
-          }
         >
           <ConsoleLabeledSelect
             label="Status"
@@ -214,15 +218,14 @@ export function LandSalesRegister() {
           onRetry={() => void refetch()}
         />
       ) : sales.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          <EmptyState
-            variant="plain"
-            title="No land sales yet"
-            description="Draft a land sale from an available plot to start tracking it."
-            actionLabel="New land sale"
-            onAction={() => router.push(`${LIST}/new`)}
-          />
-        </AdminCard>
+        <RegisterEmpty
+          filtered={filtered}
+          noun="land sales"
+          description="Draft a land sale from an available plot to start tracking it."
+          actionLabel="New land sale"
+          onAction={() => router.push(`${LIST}/new`)}
+          onClear={resetFilters}
+        />
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<ILandSale>

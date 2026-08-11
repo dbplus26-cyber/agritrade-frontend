@@ -527,10 +527,13 @@ function Crumbs() {
   return (
     <nav
       aria-label="Breadcrumb"
-      className="flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-[13px] text-adm-muted"
+      // Desktop only: on a phone the page already says its own name in its
+      // h1, and repeating it an inch above wasted the bar - the topbar
+      // carries the brand there instead (see the header).
+      className="flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-[13px] text-adm-muted max-md:hidden"
     >
-      <span className="text-adm-faint max-sm:hidden">DB Plus</span>
-      <span className="text-adm-strong max-sm:hidden">/</span>
+      <span className="text-adm-faint">DB Plus</span>
+      <span className="text-adm-strong">/</span>
       {sub && section ? (
         <>
           <Link
@@ -630,6 +633,21 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           {/* Collapse/expand the rail (sheet on mobile) - dms behaviour in the
               console skin, living on the topbar's left edge. */}
           <SidebarTrigger className="h-[30px] w-[30px] flex-none cursor-pointer rounded-[6px] border border-adm-line bg-adm-card text-adm-muted hover:bg-adm-sunken hover:text-adm-ink max-md:hidden" />
+          {/* On a phone the bar's left edge carries the company mark instead
+              of the page heading - every page already states its own name in
+              its h1, and the account menu keeps the right edge to itself. */}
+          <span className="flex items-center gap-2 md:hidden">
+            <Image
+              src="/logo-mark.png"
+              alt=""
+              width={44}
+              height={44}
+              className="h-[22px] w-[22px] shrink-0"
+            />
+            <span className="text-[13px] font-bold tracking-[0.14em] text-adm-ink">
+              DB PLUS
+            </span>
+          </span>
           <Crumbs />
           <div className="flex-1" />
           {/* The notifications bell returns here when the notifications feed

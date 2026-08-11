@@ -2,14 +2,15 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ConsoleDateField,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
-import { AdminButton, AdminCard, Mono } from "@/components/admin/ui";
+import { AdminButton, Mono } from "@/components/admin/ui";
 import { RecordCardGridSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { ListPagination } from "@/components/ui/ListPagination";
 import { useTableQuery } from "@/hooks/use-table-query";
@@ -31,6 +32,7 @@ const LIST = "/admin/shipments";
 const FILTER_DEFAULTS = { status: "all", from: "", to: "", size: "12" };
 
 export function ShipmentsRegister() {
+  const router = useRouter();
   const {
     page,
     setPage,
@@ -64,30 +66,35 @@ export function ShipmentsRegister() {
   const meta = data?.meta;
   const activeFilterCount =
     (status !== "all" ? 1 : 0) + (from ? 1 : 0) + (to ? 1 : 0);
+  const filtered = Boolean(search) || activeFilterCount > 0;
+  // A register with nothing on file and no filters narrowing it shows ONLY
+  // the empty state (with its create action) - a filter bar filters nothing.
+  const pristine =
+    !isLoading && !isError && shipments.length === 0 && !filtered;
 
   return (
     <div>
-      <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Shipments
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          Trucks loaded against confirmed sales, from warehouse to buyer
-        </p>
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
+            Shipments
+          </h1>
+          <p className="mt-0.5 text-[13px] text-adm-muted">
+            Trucks loaded against confirmed sales, from warehouse to buyer
+          </p>
+        </div>
+        {<AdminButton asChild>
+              <Link href={`${LIST}/new`}>+ Plan shipment</Link>
+            </AdminButton>}
       </div>
 
-      {isError && !search && activeFilterCount === 0 ? null : (
+      {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
           search={searchInput}
           onSearch={setSearch}
           searchPlaceholder="Search truck, driver, buyer…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
-          action={
-            <AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ Plan shipment</Link>
-            </AdminButton>
-          }
         >
           <ConsoleDateField
             label="From"
@@ -122,24 +129,17 @@ export function ShipmentsRegister() {
           onRetry={() => void refetch()}
         />
       ) : shipments.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          <EmptyState
-            variant="plain"
-            title={
-              search || activeFilterCount > 0
-                ? "No matching shipments"
-                : "No shipments yet"
-            }
-            description={
-              search || activeFilterCount > 0
-                ? "Nothing matches this search and filter combination."
-                : "Plan the first truck against a confirmed sale."
-            }
-            actionLabel={
-              search || activeFilterCount > 0 ? undefined : "Plan a shipment"
-            }
-          />
-        </AdminCard>
+        <RegisterEmpty
+          filtered={filtered}
+          noun="shipments"
+          description="Plan the first truck against a confirmed sale."
+          actionLabel="Plan a shipment"
+          onAction={() => router.push(`${LIST}/new`)}
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
+        />
       ) : (
         // Container columns, not viewport ones: this grid sits inside the
         // console shell, where a viewport `md:` fires while the content area

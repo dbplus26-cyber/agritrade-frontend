@@ -12,7 +12,7 @@ import {
 } from "@/components/admin/filter-bar";
 import { AdminCard, Mono } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useGetAgentsQuery } from "@/redux/agents/agents-api";
 import { useTableQuery } from "@/hooks/use-table-query";
@@ -82,6 +82,10 @@ export function AgentsTable() {
   const agents = data?.data ?? [];
   const totalCount = data?.meta.total ?? 0;
   const activeFilterCount = statusFilter !== "all" ? 1 : 0;
+  const filtered = Boolean(search) || activeFilterCount > 0;
+  // A register with nothing on file and no filters narrowing it shows ONLY
+  // the empty state - a filter bar filters nothing.
+  const pristine = !isLoading && !isError && agents.length === 0 && !filtered;
 
   const showMoney = useMoneyVisibility();
   const columns = useMemo<ColumnDef<IAgentSummary, unknown>[]>(() => {
@@ -176,7 +180,7 @@ export function AgentsTable() {
         </p>
       </div>
 
-      {isError && !search && activeFilterCount === 0 ? null : (
+      {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
           search={searchInput}
           onSearch={setSearch}
@@ -203,17 +207,15 @@ export function AgentsTable() {
           onRetry={() => void refetch()}
         />
       ) : agents.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          <EmptyState
-            variant="plain"
-            title={search || activeFilterCount ? "No matching agents" : "No agents yet"}
-            description={
-              search || activeFilterCount
-                ? "Nothing matches this search and filter combination."
-                : "Create a user with the AGENT role in Users - they appear here with their float."
-            }
-          />
-        </AdminCard>
+        <RegisterEmpty
+          filtered={filtered}
+          noun="agents"
+          description="Create a user with the AGENT role in Users - they appear here with their float."
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
+        />
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IAgentSummary>

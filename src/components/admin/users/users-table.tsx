@@ -12,7 +12,7 @@ import {
 } from "@/components/admin/filter-bar";
 import { AdminButton, AdminCard } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import {
   useDeleteUserMutation,
@@ -124,6 +124,10 @@ export function UsersTable() {
 
   const activeFilterCount =
     (roleFilter !== "all" ? 1 : 0) + (statusFilter !== "all" ? 1 : 0);
+  const filtered = Boolean(search) || activeFilterCount > 0;
+  // A register with nothing on file and no filters narrowing it shows ONLY
+  // the empty state (with its create action) - a filter bar filters nothing.
+  const pristine = !isLoading && !isError && users.length === 0 && !filtered;
 
   const deleteSelected = async (selected: IUser[], clear: () => void) => {
     const deletable = selected.filter((u) => u.id !== me?.id);
@@ -293,30 +297,30 @@ export function UsersTable() {
 
   return (
     <div>
-      <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Users
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          Staff accounts and permissions
-        </p>
+      <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
+            Users
+          </h1>
+          <p className="mt-0.5 text-[13px] text-adm-muted">
+            Staff accounts and permissions
+          </p>
+        </div>
+        <AdminButton asChild>
+          <Link href="/admin/users/new">+ Add user</Link>
+        </AdminButton>
       </div>
 
-      {/* dms rule: a failed PLAIN load hides the toolbar (dead UI beside an
-          error card) - but when the user's own search/filters might be the
-          cause, the toolbar stays so they can clear or adjust them. */}
-      {isError && !search && activeFilterCount === 0 ? null : (
+      {/* dms rule: a pristine register or a failed plain load hides the
+          toolbar - but when the user's own search/filters might be the cause,
+          it stays so they can clear or adjust them. */}
+      {pristine || (isError && !filtered) ? null : (
       <ConsoleFilterBar
         search={searchInput}
         onSearch={setSearch}
         searchPlaceholder="Search user…"
         activeCount={activeFilterCount}
         onClear={resetFilters}
-        action={
-          <AdminButton asChild>
-            <Link href="/admin/users/new">+ Add user</Link>
-          </AdminButton>
-        }
       >
         <ConsoleLabeledSelect
           label="Role"
@@ -345,30 +349,17 @@ export function UsersTable() {
           onRetry={() => void refetch()}
         />
       ) : users.length === 0 ? (
-        // Outside the table on purpose (dms pattern): inside it, the nowrap
-        // headers force a wide scroll area and the card overflows on phones.
-        <AdminCard className="overflow-hidden">
-          {search || activeFilterCount > 0 ? (
-            <EmptyState
-              variant="plain"
-              title="No matching users"
-              description="Nothing matches this search and filter combination. Adjust the criteria or clear them to see everyone."
-              actionLabel="Clear search & filters"
-              onAction={() => {
-                setSearch("");
-                resetFilters();
-              }}
-            />
-          ) : (
-            <EmptyState
-              variant="plain"
-              title="No users yet"
-              description="Add your first staff account - assign a role, set the permission flags and hand over the first password."
-              actionLabel="Add your first user"
-              onAction={() => router.push("/admin/users/new")}
-            />
-          )}
-        </AdminCard>
+        <RegisterEmpty
+          filtered={filtered}
+          noun="users"
+          description="Add your first staff account - assign a role, set the permission flags and hand over the first password."
+          actionLabel="Add your first user"
+          onAction={() => router.push("/admin/users/new")}
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
+        />
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IUser>

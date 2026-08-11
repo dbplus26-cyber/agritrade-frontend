@@ -15,7 +15,7 @@ import type { IReportWindow } from "@/types/report.types";
 
 import {
   AXIS_TICK,
-  ChartNote,
+  WidgetEmpty,
   colorFor,
   formatWeight,
   GRID_STROKE,
@@ -96,7 +96,11 @@ export function VolumeChart({ window }: { window: IReportWindow }) {
       ) : isLoading ? (
         <Skeleton className="h-[220px] w-full rounded-[6px]" />
       ) : !hasVolume ? (
-        <ChartNote>No purchases recorded in this period.</ChartNote>
+        <WidgetEmpty
+          className="h-[220px]"
+          title="No purchases in this period"
+          hint="Received purchases will stack here by commodity."
+        />
       ) : (
         <div className="h-[220px] min-w-0">
           <ResponsiveContainer width="100%" height="100%">

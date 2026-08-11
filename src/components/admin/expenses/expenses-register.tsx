@@ -16,6 +16,7 @@ import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
 } from "@/components/admin/filter-bar";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
@@ -213,18 +214,21 @@ export function ExpensesRegister() {
           title="Expenses"
           hint="Costs the business has incurred, and whether they have been paid."
           sub="Operating costs and per-trip spend"
+          actions={
+            <AdminButton onClick={() => { setCreating(true); }}>
+              + Record expense
+            </AdminButton>
+          }
         />
-        <AdminCard className="overflow-hidden">
-          <EmptyState
-            variant="plain"
-            title="No expenses yet"
-            description="Record rent, salaries, fumigation and other running costs so the profit figure is honest."
-            actionLabel="+ Record expense"
-            onAction={() => {
-              setCreating(true);
-            }}
-          />
-        </AdminCard>
+        <RegisterEmpty
+          filtered={false}
+          noun="expenses"
+          description="Record rent, salaries, fumigation and other running costs so the profit figure is honest."
+          actionLabel="+ Record expense"
+          onAction={() => {
+            setCreating(true);
+          }}
+        />
         <ExpenseFormDialog
           open={creating}
           onOpenChange={setCreating}
@@ -236,8 +240,16 @@ export function ExpensesRegister() {
 
   return (
     <div>
-      <AdminPageHeader title="Expenses"
-      hint="Costs the business has incurred, and whether they have been paid." sub="Operating costs and per-trip spend" />
+      <AdminPageHeader
+        title="Expenses"
+        hint="Costs the business has incurred, and whether they have been paid."
+        sub="Operating costs and per-trip spend"
+        actions={
+          <AdminButton onClick={() => { setCreating(true); }}>
+            + Record expense
+          </AdminButton>
+        }
+      />
 
       {isError && !search && activeFilterCount === 0 ? null : (
         <ConsoleFilterBar
@@ -246,13 +258,6 @@ export function ExpensesRegister() {
           searchPlaceholder="Search description or voucher…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
-          action={
-            <AdminButton
-              onClick={() => { setCreating(true); }}
-            >
-              + Record expense
-            </AdminButton>
-          }
         >
           <ConsoleLabeledSelect
             label="Category"
