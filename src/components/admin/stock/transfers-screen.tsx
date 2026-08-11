@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {
@@ -33,6 +33,7 @@ import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { useAuthRole } from "@/hooks/use-auth-role";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -406,6 +407,7 @@ function TransferDialog({
   const [serverError, setServerError] = useState<string | null>(null);
   const {
     register,
+    control,
     handleSubmit,
     reset,
     formState: { errors },
@@ -466,50 +468,65 @@ function TransferDialog({
               label="From warehouse"
               error={errors.fromWarehouseId?.message}
             >
-              <select
-                className={cn(adminInputClass, "cursor-pointer")}
-                {...register("fromWarehouseId")}
-              >
-                <option value="">Choose the source…</option>
-                {warehouses.map((w) => (
-                  <option key={w.id} value={w.id}>
-                    {w.name}
-                  </option>
-                ))}
-              </select>
+              <Controller
+                control={control}
+                name="fromWarehouseId"
+                render={({ field }) => (
+                  <SimpleSelect
+                    className={cn(adminInputClass, "cursor-pointer")}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Choose the source…"
+                    options={warehouses.map((w) => ({
+                      value: w.id,
+                      label: w.name,
+                    }))}
+                  />
+                )}
+              />
             </AdminField>
             <AdminField
               label="To warehouse"
               error={errors.toWarehouseId?.message}
             >
-              <select
-                className={cn(adminInputClass, "cursor-pointer")}
-                {...register("toWarehouseId")}
-              >
-                <option value="">Choose the destination…</option>
-                {warehouses.map((w) => (
-                  <option key={w.id} value={w.id}>
-                    {w.name}
-                  </option>
-                ))}
-              </select>
+              <Controller
+                control={control}
+                name="toWarehouseId"
+                render={({ field }) => (
+                  <SimpleSelect
+                    className={cn(adminInputClass, "cursor-pointer")}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Choose the destination…"
+                    options={warehouses.map((w) => ({
+                      value: w.id,
+                      label: w.name,
+                    }))}
+                  />
+                )}
+              />
             </AdminField>
           </section>
 
           <section className="grid gap-3.5 border-t border-adm-hairline pt-5">
             <SectionHeading className="mb-0">What, and how much</SectionHeading>
             <AdminField label="Commodity" error={errors.commodityId?.message}>
-              <select
-                className={cn(adminInputClass, "cursor-pointer")}
-                {...register("commodityId")}
-              >
-                <option value="">Choose a commodity…</option>
-                {commodities.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+              <Controller
+                control={control}
+                name="commodityId"
+                render={({ field }) => (
+                  <SimpleSelect
+                    className={cn(adminInputClass, "cursor-pointer")}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Choose a commodity…"
+                    options={commodities.map((c) => ({
+                      value: c.id,
+                      label: c.name,
+                    }))}
+                  />
+                )}
+              />
             </AdminField>
             <div className="grid grid-cols-1 gap-3.5 @[300px]:grid-cols-2">
               <AdminField label="Weight (kg)" error={errors.weightKg?.message}>

@@ -27,6 +27,7 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthRole } from "@/hooks/use-auth-role";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -189,13 +190,18 @@ function PayDialog({
           </div>
 
           <AdminField label="How it was paid">
-            <select className={adminSelectClass} {...register("method")}>
-              {PAYMENT_METHOD_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="method"
+              render={({ field }) => (
+                <SimpleSelect
+                  className={adminSelectClass}
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={PAYMENT_METHOD_OPTIONS}
+                />
+              )}
+            />
           </AdminField>
 
           {/* Cash leaves the till, not an account. */}

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AdminButton, AdminCard, AdminField, adminInputClass } from "@/components/admin/ui";
 import {
@@ -22,6 +22,7 @@ import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { useGetCommoditiesQuery } from "@/redux/commodities/commodities-api";
 import { useGetWarehousesQuery } from "@/redux/warehouses/warehouses-api";
 import {
@@ -491,6 +492,7 @@ function AdjustmentDialog({
     useRequestStockAdjustmentMutation();
   const {
     register,
+    control,
     handleSubmit,
     setValue,
     watch,
@@ -541,30 +543,40 @@ function AdjustmentDialog({
         </ResponsiveDialogHeader>
         <form onSubmit={(e) => void onSubmit(e)} className="grid gap-3.5">
           <AdminField label="Warehouse" error={errors.warehouseId?.message}>
-            <select
-              className={cn(adminInputClass, "cursor-pointer")}
-              {...register("warehouseId")}
-            >
-              <option value="">Choose a warehouse…</option>
-              {warehouses.map((w) => (
-                <option key={w.id} value={w.id}>
-                  {w.name}
-                </option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="warehouseId"
+              render={({ field }) => (
+                <SimpleSelect
+                  className={cn(adminInputClass, "cursor-pointer")}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="Choose a warehouse…"
+                  options={warehouses.map((w) => ({
+                    value: w.id,
+                    label: w.name,
+                  }))}
+                />
+              )}
+            />
           </AdminField>
           <AdminField label="Commodity" error={errors.commodityId?.message}>
-            <select
-              className={cn(adminInputClass, "cursor-pointer")}
-              {...register("commodityId")}
-            >
-              <option value="">Choose a commodity…</option>
-              {commodities.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="commodityId"
+              render={({ field }) => (
+                <SimpleSelect
+                  className={cn(adminInputClass, "cursor-pointer")}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="Choose a commodity…"
+                  options={commodities.map((c) => ({
+                    value: c.id,
+                    label: c.name,
+                  }))}
+                />
+              )}
+            />
           </AdminField>
 
           <div className="grid grid-cols-[auto_1fr] items-end gap-2.5">

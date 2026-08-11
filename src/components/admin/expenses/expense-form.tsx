@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ResponsiveDialog,
@@ -11,6 +11,7 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import {
   AdminButton,
   AdminField,
@@ -51,6 +52,7 @@ export function ExpenseFormDialog({
   const isEdit = Boolean(expense);
 
   const {
+    control,
     formState: { errors },
     handleSubmit,
     register,
@@ -129,18 +131,23 @@ export function ExpenseFormDialog({
               hint="The heading this cost is filed under, so spending can be grouped in reports."
               error={errors.categoryId?.message}
             >
-              <select
-                id="expense-category"
-                className={adminSelectClass}
-                {...register("categoryId")}
-              >
-                <option value="">Choose a category…</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+              <Controller
+                control={control}
+                name="categoryId"
+                render={({ field }) => (
+                  <SimpleSelect
+                    id="expense-category"
+                    className={adminSelectClass}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Choose a category…"
+                    options={categories.map((c) => ({
+                      value: c.id,
+                      label: c.name,
+                    }))}
+                  />
+                )}
+              />
             </AdminField>
 
             <AdminField label="Description" error={errors.description?.message} optional>

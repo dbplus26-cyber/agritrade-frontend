@@ -16,6 +16,7 @@ import { AllocateSkeleton, LotRowsSkeleton } from "@/components/admin/skeletons"
 import { HelpTip } from "@/components/admin/help-tip";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatKg } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
@@ -694,15 +695,16 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
               </AdminButton>
               <label className="flex items-center gap-1.5 text-[12.5px] text-adm-muted">
                 <span className="sr-only sm:not-sr-only">Apply to</span>
-                <select
-                  aria-label="Which sales to auto-allocate"
+                <SimpleSelect
+                  ariaLabel="Which sales to auto-allocate"
                   className={cn(adminSelectClass, "h-9 w-auto")}
                   value={scope}
-                  onChange={(e) => setScope(e.target.value as FillScope)}
-                >
-                  <option value="ACTIVE">This sale</option>
-                  <option value="ALL">Every sale on the truck</option>
-                </select>
+                  onChange={(v) => setScope(v as FillScope)}
+                  options={[
+                    { value: "ACTIVE", label: "This sale" },
+                    { value: "ALL", label: "Every sale on the truck" },
+                  ]}
+                />
               </label>
               {sumWeights(activeRows) > 0 ? (
                 <AdminButton

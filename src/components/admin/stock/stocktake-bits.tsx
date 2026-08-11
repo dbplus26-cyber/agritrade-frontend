@@ -13,6 +13,7 @@ import {
 import { HelpWrap } from "@/components/admin/help-tip";
 import { Input } from "@/components/ui/input";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { extractApiError } from "@/lib/extract-api-error";
 import { cn } from "@/lib/utils";
@@ -259,22 +260,16 @@ export function StocktakeCountSheet({
               optional
               hint="For produce found on the floor with no book balance."
             >
-              <select
+              <SimpleSelect
                 className={cn(adminInputClass, "cursor-pointer")}
                 value=""
-                onChange={(e) => {
-                  if (e.target.value) {
-                    setAdded((prev) => [...prev, e.target.value]);
-                  }
-                }}
-              >
-                <option value="">Choose a commodity…</option>
-                {addableOptions.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+                onChange={(v) => setAdded((prev) => [...prev, v])}
+                placeholder="Choose a commodity…"
+                options={addableOptions.map((c) => ({
+                  value: c.id,
+                  label: c.name,
+                }))}
+              />
             </AdminField>
           </div>
         ) : null}

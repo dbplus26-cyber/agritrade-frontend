@@ -20,6 +20,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEventBase from "@testing-library/user-event";
 
+import { pickOption } from "../helpers/pick-option";
+
 import { AgentPurchaseForm } from "@/components/agent/agent-purchase-form";
 import { loadDraft } from "@/components/agent/draft-storage";
 
@@ -58,7 +60,7 @@ type PurchaseCall = [
 ];
 
 const fillForm = async () => {
-  await userEvent.selectOptions(screen.getByLabelText("Commodity"), "c-maize");
+  await pickOption(screen.getByLabelText("Commodity"), "Maize");
   await userEvent.type(screen.getByLabelText(/Weight \(kg\)/i), "120");
   await userEvent.type(screen.getByLabelText(/Price \/ kg/i), "5.00");
 };

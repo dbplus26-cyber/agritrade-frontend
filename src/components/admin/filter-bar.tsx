@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { ChevronDown, X } from "lucide-react";
+import { X } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { HelpTip } from "@/components/admin/help-tip";
 import { cn } from "@/lib/utils";
@@ -82,65 +89,45 @@ export function ConsoleLabeledSelect({
     );
   }
   return (
-    // A NATIVE select, not a rendered one.
+    // A RENDERED select (ui/select), not a native one.
     //
-    // The rendered version drew its own panel in a portal, and a portal has
-    // no obligation to the control that opened it: it sized to the longest
-    // option, so a 150px filter opened a list twice its width and a toolbar
-    // of them came out ragged. Pinning the panel to the trigger fixed the
-    // width and cost the thing a native control gives free - the platform's
-    // own list, which is a wheel on a phone, is keyboard-navigable by typing,
-    // and never escapes its own control.
+    // This was native for a while because the rendered panel used to size
+    // itself to the longest option; ui/select now pins its panel to the
+    // trigger's exact width, so that reason is gone - and a native select's
+    // popup is drawn by the OS, which was the one dropdown in the console
+    // that could never match the account menu's panel. The rendered one
+    // opens the same squared sheet as every other dropdown.
     //
-    // The label rides INSIDE the box as a prefix beside the select, because a
-    // native select renders one line of text and cannot hold a second element.
-    //
-    // It is a FLEX SIBLING of the select, not an absolutely positioned overlay
-    // with the select's `padding-left` guessed from `label.length` in `ch`.
-    // That guess was wrong in both directions: `ch` measures the digit zero in
-    // the SELECT's 13px font while the prefix renders in a 10px uppercase
-    // semibold face with 0.06em tracking, so wide labels ("WAREHOUSE",
-    // "MOVEMENT TYPE") under-reserved and ran under the option text, and short
-    // ones over-reserved and squeezed the option text into nothing. Laying the
-    // two out in a flex row makes the reservation exact and free.
-    <label
-      className={cn(
-        boxField(active),
-        // `relative` for the chevron, and `pr-6` is its reserved track: the
-        // select's own box now ends before the glyph instead of running under
-        // it. The chevron is pinned to THIS element, which is why the select
-        // must fill it (`grow`) and must never carry a width of its own: a
-        // 150px select inside a 200px label put the chevron 50px past the
-        // control's visible right edge, floating on the page ground.
-        "relative cursor-pointer gap-1.5 pr-6 pl-2.5",
-        className,
-      )}
-    >
-      <span className="sr-only">{`Filter by ${label.toLowerCase()}`}</span>
-      <span aria-hidden="true" className={fieldPrefix}>
-        {label}
-      </span>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        // `grow shrink-0 basis-20`, not `flex-1`: the select claims a 5rem
-        // floor and never gives it back, so a tight box takes its room out of
-        // the prefix (which truncates) instead of squeezing the option text to
-        // nothing. Written as three longhands because the `flex` shorthand
-        // would race the individual properties in the stylesheet.
-        className="h-full min-w-0 shrink-0 grow basis-20 cursor-pointer appearance-none border-0 bg-transparent text-[13px] font-normal text-adm-body outline-none focus:ring-0 focus-visible:ring-0"
+    // The label rides INSIDE the box as a flex-sibling prefix (see
+    // fieldPrefix): it shrinks and truncates first, so the value always
+    // keeps a readable floor.
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger
+        unstyled
+        aria-label={`Filter by ${label.toLowerCase()}`}
+        className={cn(
+          boxField(active),
+          "cursor-pointer gap-1.5 pr-2 pl-2.5 text-[13px] font-normal text-adm-body [&_svg]:size-3.5 [&_svg]:text-adm-faint",
+          className,
+        )}
       >
+        <span aria-hidden="true" className={fieldPrefix}>
+          {label}
+        </span>
+        {/* `grow shrink-0 basis-20`: the value claims a 5rem floor so a
+            tight box takes its room out of the prefix instead. */}
+        <span className="min-w-0 shrink-0 grow basis-20 truncate text-left">
+          <SelectValue />
+        </span>
+      </SelectTrigger>
+      <SelectContent>
         {options.map((o) => (
-          <option key={o.value} value={o.value}>
+          <SelectItem key={o.value} value={o.value}>
             {o.label}
-          </option>
+          </SelectItem>
         ))}
-      </select>
-      <ChevronDown
-        aria-hidden="true"
-        className="pointer-events-none absolute top-1/2 right-2 size-3.5 -translate-y-1/2 text-adm-faint"
-      />
-    </label>
+      </SelectContent>
+    </Select>
   );
 }
 

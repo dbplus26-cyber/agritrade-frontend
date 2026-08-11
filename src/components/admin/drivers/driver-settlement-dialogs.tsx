@@ -13,6 +13,7 @@ import {
   adminSelectClass,
 } from "@/components/admin/ui";
 import { Input } from "@/components/ui/input";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
@@ -74,6 +75,7 @@ export function DriverFeeDialog({
   });
 
   const {
+    control,
     formState: { errors },
     handleSubmit,
     register,
@@ -137,14 +139,30 @@ export function DriverFeeDialog({
             hint="Leave as the default to use this driver's own terms, or the system default if they have none."
             label="Terms"
           >
-            <select className={adminSelectClass} {...register("policyId")}>
-              <option value="">Use the usual terms</option>
-              {(policies.data?.data ?? []).map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="policyId"
+              render={({ field }) => (
+                <SimpleSelect
+                  className={adminSelectClass}
+                  value={field.value}
+                  // "Usual terms" is a real choice - the sentinel maps back
+                  // to "" so a picked policy can be cleared again (Radix
+                  // reserves the empty string).
+                  onChange={(v) =>
+                    field.onChange(v === "__default__" ? "" : v)
+                  }
+                  placeholder="Use the usual terms"
+                  options={[
+                    { value: "__default__", label: "Use the usual terms" },
+                    ...(policies.data?.data ?? []).map((p) => ({
+                      value: p.id,
+                      label: p.name,
+                    })),
+                  ]}
+                />
+              )}
+            />
           </AdminField>
 
           <ResponsiveDialogFooter className="gap-2">
@@ -336,13 +354,18 @@ export function DriverPaymentDialog({
           </div>
 
           <AdminField label="How it was paid">
-            <select className={adminSelectClass} {...register("method")}>
-              {PAYMENT_METHOD_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="method"
+              render={({ field }) => (
+                <SimpleSelect
+                  className={adminSelectClass}
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={PAYMENT_METHOD_OPTIONS}
+                />
+              )}
+            />
           </AdminField>
 
           {/* Cash leaves the till, not an account, so the picker is only
@@ -561,10 +584,21 @@ export function DriverFeeAdjustDialog({
           onSubmit={handleSubmit(onSubmit)}
         >
           <AdminField label="Which way">
-            <select className={adminSelectClass} {...register("direction")}>
-              <option value="down">Reduce what the driver is owed</option>
-              <option value="up">Increase what the driver is owed</option>
-            </select>
+            <Controller
+              control={control}
+              name="direction"
+              render={({ field }) => (
+                <SimpleSelect
+                  className={adminSelectClass}
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={[
+                    { value: "down", label: "Reduce what the driver is owed" },
+                    { value: "up", label: "Increase what the driver is owed" },
+                  ]}
+                />
+              )}
+            />
           </AdminField>
 
           <AdminField

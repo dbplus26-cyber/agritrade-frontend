@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   AdminButton,
@@ -19,6 +19,7 @@ import {
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatKg } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
@@ -76,6 +77,7 @@ export function ExpenseDialog({
   const [add, { isLoading }] = useAddShipmentExpenseMutation();
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<ShipmentExpenseValues>({
@@ -120,17 +122,22 @@ export function ExpenseDialog({
           className="flex flex-col gap-3"
         >
           <AdminField label="Category" error={errors.categoryId?.message}>
-            <select
-              className={cn(adminSelectClass, "w-full")}
-              {...register("categoryId")}
-            >
-              <option value="">Choose a category</option>
-              {(categories.data?.data ?? []).map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="categoryId"
+              render={({ field }) => (
+                <SimpleSelect
+                  className={cn(adminSelectClass, "w-full")}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="Choose a category"
+                  options={(categories.data?.data ?? []).map((c) => ({
+                    value: c.id,
+                    label: c.name,
+                  }))}
+                />
+              )}
+            />
           </AdminField>
           <AdminField label="Amount (GHS)" error={errors.amountGhs?.message}>
             <Input

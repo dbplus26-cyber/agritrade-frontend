@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PaymentAccountField } from "@/components/admin/payment-account-field";
 import {
@@ -21,6 +21,7 @@ import {
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -65,6 +66,7 @@ export function PaymentDialog({
     handleSubmit,
     setValue,
     watch,
+    control,
     formState: { errors },
   } = useForm<RecordPaymentValues>({
     resolver: zodResolver(recordPaymentSchema),
@@ -363,16 +365,18 @@ export function PaymentDialog({
                 // label over its control once this cell is a column.
                 className="flex flex-col items-stretch justify-end gap-0"
               >
-                <select
-                  className={cn(adminSelectClass, "w-full")}
-                  {...register("method")}
-                >
-                  {PAYMENT_METHOD_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
+                <Controller
+                  control={control}
+                  name="method"
+                  render={({ field }) => (
+                    <SimpleSelect
+                      className={cn(adminSelectClass, "w-full")}
+                      value={field.value}
+                      onChange={field.onChange}
+                      options={PAYMENT_METHOD_OPTIONS}
+                    />
+                  )}
+                />
               </AdminField>
               <AdminField
                 label="Payment date"

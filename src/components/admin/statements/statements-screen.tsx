@@ -23,6 +23,7 @@ import {
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis } from "@/lib/format-money";
@@ -306,19 +307,17 @@ export function StatementsScreen() {
           hasOpening ? (
             <label className="flex items-center gap-2 text-[12.5px] text-adm-muted">
               Year
-              <select
-                value={year}
-                onChange={(e) => {
-                  setYear(Number(e.target.value));
+              <SimpleSelect
+                value={String(year)}
+                onChange={(v) => {
+                  setYear(Number(v));
                 }}
                 className="h-[34px] cursor-pointer rounded-[6px] border border-adm-line bg-adm-card px-2.5 text-[13.5px] font-semibold text-adm-ink outline-none focus:border-console"
-              >
-                {years.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-              </select>
+                options={years.map((y) => ({
+                  value: String(y),
+                  label: String(y),
+                }))}
+              />
             </label>
           ) : undefined
         }

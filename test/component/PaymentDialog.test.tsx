@@ -19,6 +19,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEventBase from "@testing-library/user-event";
 
+import { pickOption } from "../helpers/pick-option";
+
 import { PaymentDialog } from "@/components/admin/trading/payment-dialog";
 
 const { errorToast, recordTrigger, saleQuery } = vi.hoisted(() => ({
@@ -107,7 +109,7 @@ describe("PaymentDialog", () => {
   it("will not file a transfer without its reference and company account", async () => {
     render(<PaymentDialog onClose={vi.fn()} open sale={{ id: "sale-1" }} />);
 
-    await userEvent.selectOptions(screen.getByLabelText(/METHOD/i), "BANK");
+    await pickOption(screen.getByLabelText(/METHOD/i), "Bank transfer");
     await userEvent.type(screen.getByLabelText(/AMOUNT/i), "1500.50");
     await userEvent.click(screen.getByRole("button", { name: /Record/i }));
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
@@ -26,6 +26,7 @@ import {
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { useAuthRole } from "@/hooks/use-auth-role";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -197,17 +198,19 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
                     placeholder="%"
                     {...register(`milestones.${i}.percent`)}
                   />
-                  <select
-                    aria-label={`Milestone ${String(i + 1)} trigger`}
-                    className={cn(adminSelectClass, "w-full min-w-0")}
-                    {...register(`milestones.${i}.trigger`)}
-                  >
-                    {TRIGGER_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>
-                        {o.label}
-                      </option>
-                    ))}
-                  </select>
+                  <Controller
+                    control={control}
+                    name={`milestones.${i}.trigger` as const}
+                    render={({ field: triggerField }) => (
+                      <SimpleSelect
+                        ariaLabel={`Milestone ${String(i + 1)} trigger`}
+                        className={cn(adminSelectClass, "w-full min-w-0")}
+                        value={triggerField.value}
+                        onChange={triggerField.onChange}
+                        options={TRIGGER_OPTIONS}
+                      />
+                    )}
+                  />
                   {fields.length > 1 ? (
                     <button
                       type="button"

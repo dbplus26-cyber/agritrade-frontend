@@ -1,11 +1,12 @@
 "use client";
 
 import { useId, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { DocCard } from "@/components/ui/DocCard";
 import { FieldError } from "@/components/ui/FieldError";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { Stamp } from "@/components/ui/Stamp";
 import {
   TURNSTILE_ENABLED,
@@ -62,6 +63,7 @@ export function EnquiryForm({
     handleSubmit,
     reset,
     setError,
+    control,
     formState: { errors },
   } = useForm<EnquiryValues>({
     resolver: zodResolver(enquirySchema),
@@ -229,17 +231,22 @@ export function EnquiryForm({
             <label htmlFor={`${fieldId}-subject`} className={labelClass}>
               SUBJECT
             </label>
-            <select
-              id={`${fieldId}-subject`}
-              {...register("subject")}
-              className={cn(inputClass, "cursor-pointer")}
-            >
-              {ENQUIRY_SUBJECTS.map((subject) => (
-                <option key={subject} value={subject}>
-                  {subject}
-                </option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="subject"
+              render={({ field }) => (
+                <SimpleSelect
+                  id={`${fieldId}-subject`}
+                  className={cn(inputClass, "cursor-pointer")}
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={ENQUIRY_SUBJECTS.map((subject) => ({
+                    value: subject,
+                    label: subject,
+                  }))}
+                />
+              )}
+            />
           </div>
         </div>
 

@@ -27,6 +27,7 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { CardGridSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -303,13 +304,21 @@ function AddReviewDialog({
                 label="They dealt with us as"
                 error={errors.role?.message}
               >
-                <select className={adminSelectClass} {...register("role")}>
-                  {REVIEW_ROLES.map((r) => (
-                    <option key={r} value={r}>
-                      {REVIEW_ROLE_LABELS[r]}
-                    </option>
-                  ))}
-                </select>
+                <Controller
+                  control={control}
+                  name="role"
+                  render={({ field }) => (
+                    <SimpleSelect
+                      className={adminSelectClass}
+                      value={field.value}
+                      onChange={field.onChange}
+                      options={REVIEW_ROLES.map((r) => ({
+                        value: r,
+                        label: REVIEW_ROLE_LABELS[r],
+                      }))}
+                    />
+                  )}
+                />
               </AdminField>
             </div>
           </section>

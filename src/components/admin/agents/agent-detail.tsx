@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   AdminButton,
@@ -32,6 +32,7 @@ import {
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import {
   useCreateReconciliationMutation,
   useGetAgentFloatQuery,
@@ -297,6 +298,7 @@ function TopUpDialog({
   const { confirm, confirmationDialog } = useConfirm();
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<TopUpValues>({
@@ -362,13 +364,18 @@ function TopUpDialog({
             />
           </AdminField>
           <AdminField label="Method">
-            <select className={cn(adminSelectClass, "w-full")} {...register("method")}>
-              {METHOD_OPTIONS.map((m) => (
-                <option key={m.value} value={m.value}>
-                  {m.label}
-                </option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="method"
+              render={({ field }) => (
+                <SimpleSelect
+                  className={cn(adminSelectClass, "w-full")}
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={METHOD_OPTIONS}
+                />
+              )}
+            />
           </AdminField>
           <AdminField label="Note" optional error={errors.reason?.message}>
             <Input

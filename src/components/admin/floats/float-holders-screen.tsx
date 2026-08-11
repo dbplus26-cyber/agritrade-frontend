@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
@@ -36,6 +36,7 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useMoneyVisibility } from "@/hooks/use-money-visibility";
 import { useTableQuery } from "@/hooks/use-table-query";
@@ -409,11 +410,22 @@ function TopUpDialog({
             />
           </AdminField>
           <AdminField label="How did it reach them?">
-            <select className={adminSelectClass} {...form.register("method")}>
-              <option value="CASH">Cash</option>
-              <option value="MOMO">Mobile money</option>
-              <option value="BANK">Bank transfer</option>
-            </select>
+            <Controller
+              control={form.control}
+              name="method"
+              render={({ field }) => (
+                <SimpleSelect
+                  className={adminSelectClass}
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={[
+                    { value: "CASH", label: "Cash" },
+                    { value: "MOMO", label: "Mobile money" },
+                    { value: "BANK", label: "Bank transfer" },
+                  ]}
+                />
+              )}
+            />
           </AdminField>
           <AdminField label="Note" optional>
             <Input

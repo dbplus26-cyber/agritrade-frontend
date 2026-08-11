@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
@@ -28,6 +28,7 @@ import {
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { useAuthRole } from "@/hooks/use-auth-role";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -195,17 +196,19 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
                     placeholder="%"
                     {...register(`milestones.${i}.percent` as const)}
                   />
-                  <select
-                    aria-label={`Milestone ${String(i + 1)} trigger`}
-                    className={adminSelectClass}
-                    {...register(`milestones.${i}.trigger` as const)}
-                  >
-                    {DRIVER_TRIGGER_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>
-                        {o.label}
-                      </option>
-                    ))}
-                  </select>
+                  <Controller
+                    control={control}
+                    name={`milestones.${i}.trigger` as const}
+                    render={({ field }) => (
+                      <SimpleSelect
+                        ariaLabel={`Milestone ${String(i + 1)} trigger`}
+                        className={adminSelectClass}
+                        value={field.value}
+                        onChange={field.onChange}
+                        options={DRIVER_TRIGGER_OPTIONS}
+                      />
+                    )}
+                  />
                   {fields.length > 1 ? (
                     <button
                       aria-label={`Remove milestone ${String(i + 1)}`}

@@ -2,13 +2,14 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   useCreateMyPurchaseMutation,
   useGetAgentCommoditiesQuery,
 } from "@/redux/agent/agent-api";
 import { FilePicker } from "@/components/ui/FilePicker";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
@@ -51,6 +52,7 @@ export function AgentPurchaseForm() {
 
   const {
     register,
+    control,
     handleSubmit,
     watch,
     formState: { errors },
@@ -114,18 +116,23 @@ export function AgentPurchaseForm() {
     >
       <div>
         <AgentLabel htmlFor="commodityId">Commodity</AgentLabel>
-        <select
-          id="commodityId"
-          className={cn(agentInputClass, errors.commodityId && "border-error")}
-          {...register("commodityId")}
-        >
-          <option value="">Choose…</option>
-          {(commodities.data?.data.commodities ?? []).map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+        <Controller
+          control={control}
+          name="commodityId"
+          render={({ field }) => (
+            <SimpleSelect
+              id="commodityId"
+              className={cn(agentInputClass, errors.commodityId && "border-error")}
+              value={field.value}
+              onChange={field.onChange}
+              placeholder="Choose…"
+              options={(commodities.data?.data.commodities ?? []).map((c) => ({
+                value: c.id,
+                label: c.name,
+              }))}
+            />
+          )}
+        />
         <AgentFieldError message={errors.commodityId?.message} />
       </div>
 

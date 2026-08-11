@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useForm, useWatch } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
@@ -27,6 +27,7 @@ import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import {
   useActivateDriverMutation,
   useCreateDriverMutation,
@@ -642,18 +643,31 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
             label="Payment terms"
             optional
           >
-            <select
-              className={cn(adminSelectClass, roCls)}
-              disabled={readOnly}
-              {...register("paymentPolicyId")}
-            >
-              <option value="">Use the system default</option>
-              {(policies.data?.data ?? []).map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="paymentPolicyId"
+              render={({ field }) => (
+                <SimpleSelect
+                  className={cn(adminSelectClass, roCls)}
+                  disabled={readOnly}
+                  value={field.value}
+                  onChange={(v) =>
+                    field.onChange(v === "__default__" ? "" : v)
+                  }
+                  placeholder="Use the system default"
+                  // "Default" is a real choice, not just an unset state - the
+                  // sentinel maps back to "" so a picked policy can be
+                  // cleared again (Radix reserves the empty string).
+                  options={[
+                    { value: "__default__", label: "Use the system default" },
+                    ...(policies.data?.data ?? []).map((p) => ({
+                      value: p.id,
+                      label: p.name,
+                    })),
+                  ]}
+                />
+              )}
+            />
           </AdminField>
         </section>
 

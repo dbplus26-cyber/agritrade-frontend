@@ -15,6 +15,7 @@ import {
   adminSelectClass,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Absent } from "@/components/admin/registry/registry-bits";
@@ -286,19 +287,17 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
             <AdminCard className="px-5 py-[18px]">
               <div className="flex flex-col gap-[13px]">
                 <AdminField label="Status">
-                  <select
+                  <SimpleSelect
                     value={status}
-                    onChange={(e) => {
-                      setStatus(e.target.value as EnquiryStatus);
+                    onChange={(v) => {
+                      setStatus(v as EnquiryStatus);
                     }}
                     className={cn(adminSelectClass, "w-full")}
-                  >
-                    {ENQUIRY_STATUSES.map((s) => (
-                      <option key={s} value={s}>
-                        {ENQUIRY_STATUS_META[s].label}
-                      </option>
-                    ))}
-                  </select>
+                    options={ENQUIRY_STATUSES.map((s) => ({
+                      value: s,
+                      label: ENQUIRY_STATUS_META[s].label,
+                    }))}
+                  />
                 </AdminField>
                 <AdminField
                   label="Internal notes"

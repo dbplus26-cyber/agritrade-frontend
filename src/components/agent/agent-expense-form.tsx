@@ -2,12 +2,13 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   useCreateMyExpenseMutation,
   useGetAgentExpenseCategoriesQuery,
 } from "@/redux/agent/agent-api";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
@@ -43,6 +44,7 @@ export function AgentExpenseForm() {
 
   const {
     register,
+    control,
     handleSubmit,
     watch,
     formState: { errors },
@@ -98,18 +100,22 @@ export function AgentExpenseForm() {
     >
       <div>
         <AgentLabel htmlFor="categoryId">Category</AgentLabel>
-        <select
-          id="categoryId"
-          className={cn(agentInputClass, errors.categoryId && "border-error")}
-          {...register("categoryId")}
-        >
-          <option value="">Choose…</option>
-          {(categories.data?.data.expenseCategories ?? []).map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+        <Controller
+          control={control}
+          name="categoryId"
+          render={({ field }) => (
+            <SimpleSelect
+              id="categoryId"
+              className={cn(agentInputClass, errors.categoryId && "border-error")}
+              value={field.value}
+              onChange={field.onChange}
+              placeholder="Choose…"
+              options={(categories.data?.data.expenseCategories ?? []).map(
+                (c) => ({ value: c.id, label: c.name }),
+              )}
+            />
+          )}
+        />
         <AgentFieldError message={errors.categoryId?.message} />
       </div>
 

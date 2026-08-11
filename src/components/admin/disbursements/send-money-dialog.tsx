@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SearchableSelect } from "@/components/admin/searchable-select";
 import {
@@ -20,6 +20,7 @@ import {
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
@@ -204,23 +205,30 @@ export function SendMoneyDialog({
           <section className="space-y-4">
             <SectionHeading className="mb-0">How much, and how</SectionHeading>
             <AdminField label="How are they being paid?">
-              <select
-                className={adminSelectClass}
-                {...form.register("rail")}
-                // Switching rails clears the other rail's fields so a stale
-                // account number can never ride along with a MoMo send.
-                onChange={(e) => {
-                  form.setValue("rail", e.target.value as "BANK" | "MOMO");
-                  form.setValue("bankAccountNumber", "");
-                  form.setValue("bankCode", "");
-                  form.setValue("channel", "");
-                  form.setValue("recipientMsisdn", "");
-                  form.clearErrors();
-                }}
-              >
-                <option value="MOMO">Mobile money</option>
-                <option value="BANK">Bank transfer</option>
-              </select>
+              <Controller
+                control={form.control}
+                name="rail"
+                render={({ field }) => (
+                  <SimpleSelect
+                    className={adminSelectClass}
+                    value={field.value}
+                    // Switching rails clears the other rail's fields so a stale
+                    // account number can never ride along with a MoMo send.
+                    onChange={(v) => {
+                      form.setValue("rail", v as "BANK" | "MOMO");
+                      form.setValue("bankAccountNumber", "");
+                      form.setValue("bankCode", "");
+                      form.setValue("channel", "");
+                      form.setValue("recipientMsisdn", "");
+                      form.clearErrors();
+                    }}
+                    options={[
+                      { value: "MOMO", label: "Mobile money" },
+                      { value: "BANK", label: "Bank transfer" },
+                    ]}
+                  />
+                )}
+              />
             </AdminField>
 
             <AdminField
@@ -262,14 +270,19 @@ export function SendMoneyDialog({
                   label="Network"
                   error={form.formState.errors.channel?.message}
                 >
-                  <select className={adminSelectClass} {...form.register("channel")}>
-                    <option value="">Choose a network</option>
-                    {MOMO_CHANNEL_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>
-                        {o.label}
-                      </option>
-                    ))}
-                  </select>
+                  <Controller
+                    control={form.control}
+                    name="channel"
+                    render={({ field }) => (
+                      <SimpleSelect
+                        className={adminSelectClass}
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Choose a network"
+                        options={MOMO_CHANNEL_OPTIONS}
+                      />
+                    )}
+                  />
                 </AdminField>
                 <AdminField
                   label="Mobile money number"

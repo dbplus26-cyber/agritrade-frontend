@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { AdminField, adminSelectClass } from "@/components/admin/ui";
 
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { cn } from "@/lib/utils";
 import { useGetPaymentAccountsQuery } from "@/redux/payment-accounts/payment-accounts-api";
 import type { PaymentAccountKind } from "@/types/payment-account.types";
@@ -25,6 +26,9 @@ const COMPATIBLE_KINDS: Record<
 /** Last four digits only - enough to recognise the account at a glance. */
 const maskAccountNumber = (accountNumber: string): string =>
   `····${accountNumber.slice(-4)}`;
+
+/** Sentinel for "no account" - Radix select items cannot carry "". */
+const NO_ACCOUNT = "__no_account__";
 
 /**
  * The "which company account did this money move on" select for the three
@@ -78,34 +82,32 @@ export function PaymentAccountField({
       hint={hint}
       error={error}
     >
-      {/* Native. The rendered version drew its own panel, which sized to its
-          content and escaped the dialog around it; a native list is drawn by
-          the platform against the control and cannot.
-          
-          The option text is kept SHORT for the same reason - the label alone,
-          not "label · ····1234". A native popup does follow its longest
-          option, so the way to keep it narrow is to not write a long one; the
-          masked number sits under the field instead, where it is readable
-          without opening anything. */}
-      <select
+      {/* The option text is kept SHORT - the label alone, not
+          "label · ····1234" - so the panel stays narrow; the masked number
+          sits under the field instead, where it is readable without opening
+          anything. */}
+      <SimpleSelect
         disabled={isLoading}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        // Radix reserves the empty string, so "no account" travels as a
+        // sentinel option and maps back to "" here - without it, a picked
+        // account could never be cleared back to the cash till.
+        onChange={(v) => onChange(v === NO_ACCOUNT ? "" : v)}
         className={cn(adminSelectClass, "w-full", error && "border-console-red")}
-      >
-        <option value="">
-          {isLoading
+        placeholder={
+          isLoading
             ? "Loading accounts…"
             : optional
               ? "Cash till (no account)"
-              : "Select the account…"}
-        </option>
-        {accounts.map((a) => (
-          <option key={a.id} value={a.id}>
-            {a.label}
-          </option>
-        ))}
-      </select>
+              : "Select the account…"
+        }
+        options={[
+          ...(optional && !isLoading
+            ? [{ value: NO_ACCOUNT, label: "Cash till (no account)" }]
+            : []),
+          ...accounts.map((a) => ({ value: a.id, label: a.label })),
+        ]}
+      />
       {chosen ? (
         <p className="mt-1 text-[12px] text-adm-muted">
           {chosen.accountName} · {maskAccountNumber(chosen.accountNumber)}

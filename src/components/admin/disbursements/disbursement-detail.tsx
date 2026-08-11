@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import { DetailSkeleton } from "@/components/admin/skeletons";
@@ -18,6 +18,7 @@ import {
 import { BackButton } from "@/components/ui/BackButton";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
@@ -298,12 +299,21 @@ function ResolveDialog({
           onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
         >
           <AdminField label="What actually happened?">
-            <select className={adminSelectClass} {...form.register("outcome")}>
-              <option value="SUCCESS">The money reached the recipient</option>
-              <option value="FAILED">
-                It never went out (refund the float)
-              </option>
-            </select>
+            <Controller
+              control={form.control}
+              name="outcome"
+              render={({ field }) => (
+                <SimpleSelect
+                  className={adminSelectClass}
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={[
+                    { value: "SUCCESS", label: "The money reached the recipient" },
+                    { value: "FAILED", label: "It never went out (refund the float)" },
+                  ]}
+                />
+              )}
+            />
           </AdminField>
           <AdminField
             label="How did you confirm it?"

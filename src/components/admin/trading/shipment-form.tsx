@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useForm, useWatch } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check } from "lucide-react";
 import {
@@ -18,6 +18,7 @@ import {
 import { SearchableSelect } from "@/components/admin/searchable-select";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import {
   useCreateShipmentMutation,
   useGetEligibleSalesQuery,
@@ -618,21 +619,26 @@ export function ShipmentForm({
               label="Origin warehouse"
               error={errors.originWarehouseId?.message}
             >
-              <select
-                className={cn(
-                  adminSelectClass,
-                  "w-full",
-                  errors.originWarehouseId && "border-console-red",
+              <Controller
+                control={control}
+                name="originWarehouseId"
+                render={({ field }) => (
+                  <SimpleSelect
+                    className={cn(
+                      adminSelectClass,
+                      "w-full",
+                      errors.originWarehouseId && "border-console-red",
+                    )}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Choose the warehouse"
+                    options={(warehouses.data?.data ?? []).map((w) => ({
+                      value: w.id,
+                      label: w.name,
+                    }))}
+                  />
                 )}
-                {...register("originWarehouseId")}
-              >
-                <option value="">Choose the warehouse</option>
-                {(warehouses.data?.data ?? []).map((w) => (
-                  <option key={w.id} value={w.id}>
-                    {w.name}
-                  </option>
-                ))}
-              </select>
+              />
             </AdminField>
           )}
           {/* The other sheds the truck also calls at. Each row carries how

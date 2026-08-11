@@ -18,6 +18,7 @@ import {
 import { HelpTip } from "@/components/admin/help-tip";
 import { BackButton } from "@/components/ui/BackButton";
 import { Input } from "@/components/ui/input";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { SearchableSelect } from "@/components/admin/searchable-select";
 import { useGetAgentsQuery } from "@/redux/agents/agents-api";
 import { useGetCommoditiesQuery } from "@/redux/commodities/commodities-api";
@@ -178,23 +179,25 @@ export function PurchaseCreate() {
                 hint="Who you bought from: an individual farmer, a company, or one of your own field agents."
                 error={errors.source?.message}
               >
-                {/* Native, like every other fixed-option select in the
-                    console - the styled dropdown sat alone here and read as
-                    a different control. */}
-                <select
-                  className={cn(
-                    adminSelectClass,
-                    "w-full",
-                    errors.source && "border-console-red",
+                <Controller
+                  control={control}
+                  name="source"
+                  render={({ field }) => (
+                    <SimpleSelect
+                      className={cn(
+                        adminSelectClass,
+                        "w-full",
+                        errors.source && "border-console-red",
+                      )}
+                      value={field.value}
+                      onChange={field.onChange}
+                      options={SOURCE_OPTIONS.map((s) => ({
+                        value: s,
+                        label: SOURCE_LABEL[s],
+                      }))}
+                    />
                   )}
-                  {...register("source")}
-                >
-                  {SOURCE_OPTIONS.map((s) => (
-                    <option key={s} value={s}>
-                      {SOURCE_LABEL[s]}
-                    </option>
-                  ))}
-                </select>
+                />
               </AdminField>
               <AdminField label="Commodity" error={errors.commodityId?.message}>
                 <Controller

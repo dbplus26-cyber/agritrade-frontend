@@ -8,20 +8,16 @@ import { routes } from "@/lib/routes";
  * stripped so `${siteUrl}/path` is always safe.
  */
 
-// NEXT_PUBLIC_BASE_URL is the real source of truth and MUST be set in
+// NEXT_PUBLIC_BASE_URL is the source of truth and should be set in
 // production: it lands in every canonical, OG url and sitemap entry.
 //
-// The fallbacks are deliberately not a guessed business domain. The previous
-// `https://dbplus.com` fallback is a domain the business may not own, so any
-// deploy that forgot the env var handed our whole SEO surface - canonicals,
-// OG tags, sitemap - to a stranger's server. Vercel exposes the deployment
-// host so previews still get a real absolute origin; everything else lands on
-// the dev server, which is obviously wrong rather than quietly wrong.
-const vercelHost = process.env.NEXT_PUBLIC_VERCEL_URL || process.env.VERCEL_URL;
-
+// The fallback is the business's REAL domain - dbplus.org is registered and
+// live, so a deploy that forgets the env var still stamps its own SEO
+// surface rather than a deployment-specific *.vercel.app host that crawlers
+// cannot reach through deployment protection. (An earlier guessed-domain
+// fallback was removed while no domain was confirmed; this one is confirmed.)
 export const siteUrl = (
-  process.env.NEXT_PUBLIC_BASE_URL ||
-  (vercelHost ? `https://${vercelHost}` : "http://localhost:3000")
+  process.env.NEXT_PUBLIC_BASE_URL || "https://dbplus.org"
 ).replace(/\/$/, "");
 
 export const siteConfig = {

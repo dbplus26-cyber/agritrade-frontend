@@ -4,7 +4,7 @@
 // classes (depreciation + capital-allowance vocabulary). An asset is entered
 // once and flows into every later book until disposed of.
 import { useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
@@ -34,6 +34,7 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis } from "@/lib/format-money";
@@ -145,19 +146,21 @@ function AddAssetDialog({ onClose }: { onClose: () => void }) {
               hint="Sets the depreciation rate and the capital-allowance pool."
               error={errors.classId?.message}
             >
-              <select
-                className={cn(adminSelectClass, errors.classId && "border-console-red")}
-                {...assetForm.register("classId")}
-              >
-                <option value="">Choose a class</option>
-                {(classes.data?.data.assetClasses ?? [])
-                  .filter((c) => c.isActive)
-                  .map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-              </select>
+              <Controller
+                control={assetForm.control}
+                name="classId"
+                render={({ field }) => (
+                  <SimpleSelect
+                    className={cn(adminSelectClass, errors.classId && "border-console-red")}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Choose a class"
+                    options={(classes.data?.data.assetClasses ?? [])
+                      .filter((c) => c.isActive)
+                      .map((c) => ({ value: c.id, label: c.name }))}
+                  />
+                )}
+              />
               <button
                 type="button"
                 onClick={() => {

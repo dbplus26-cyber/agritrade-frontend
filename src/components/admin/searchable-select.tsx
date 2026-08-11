@@ -140,13 +140,13 @@ export function SearchableSelect({
         // panel wider than itself, overhanging the control it belonged to. The
         // 92vw cap stays only as a last guard against a trigger that is itself
         // near the screen width.
-        className="z-[80] w-[var(--radix-popover-trigger-width)] max-w-[92vw] min-w-0 rounded-[6px] border border-adm-line bg-adm-card p-0 shadow-[0_1px_2px_rgba(16,24,40,0.05)] ring-0"
+        className="z-[80] w-[var(--radix-popover-trigger-width)] max-w-[92vw] min-w-0 rounded-none border-0 border-t-[1.5px] border-b-[3px] border-t-soil/50 border-b-forest bg-surface p-0 shadow-none ring-0"
       >
         {/* shouldFilter={false} in remote mode: the server has already
             decided what matches, and letting cmdk filter on top of it would
             hide rows the server deliberately returned. */}
         <Command
-          className="rounded-[6px]! bg-transparent p-0"
+          className="rounded-none! bg-transparent p-0"
           shouldFilter={!remote}
         >
           <CommandInput

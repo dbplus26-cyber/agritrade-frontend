@@ -21,6 +21,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEventBase from "@testing-library/user-event";
 
+import { pickOption } from "../helpers/pick-option";
+
 import { SendMoneyDialog } from "@/components/admin/disbursements/send-money-dialog";
 
 const { createCompany, createMine, errorToast, successToast } = vi.hoisted(
@@ -97,7 +99,7 @@ const fillCommon = async () => {
 
 const fillMomo = async () => {
   await fillCommon();
-  await userEvent.selectOptions(screen.getByLabelText(/Network/i), "mtn-gh");
+  await pickOption(screen.getByLabelText(/Network/i), "MTN");
   await userEvent.type(
     screen.getByLabelText(/Mobile money number/i),
     "233249111411",
@@ -146,9 +148,9 @@ describe("SendMoneyDialog - rail rules", () => {
   it("sends a bank payload with the amount as a NUMBER and a UUID key", async () => {
     render(<SendMoneyDialog onClose={vi.fn()} open surface="company" />);
 
-    await userEvent.selectOptions(
+    await pickOption(
       screen.getByLabelText(/How are they being paid/i),
-      "BANK",
+      "Bank transfer",
     );
     await fillCommon();
     await userEvent.selectOptions(screen.getByLabelText("Bank"), "300302");
@@ -180,9 +182,9 @@ describe("SendMoneyDialog - rail rules", () => {
       screen.getByLabelText(/Mobile money number/i),
       "233249111411",
     );
-    await userEvent.selectOptions(
+    await pickOption(
       screen.getByLabelText(/How are they being paid/i),
-      "BANK",
+      "Bank transfer",
     );
     await fillCommon();
     await userEvent.selectOptions(screen.getByLabelText("Bank"), "300302");

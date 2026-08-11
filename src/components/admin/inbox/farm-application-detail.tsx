@@ -18,6 +18,7 @@ import {
   adminSelectClass,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Absent } from "@/components/admin/registry/registry-bits";
@@ -271,11 +272,11 @@ function FarmApplicationDetailBody({
                       : undefined
                   }
                 >
-                  <select
+                  <SimpleSelect
                     value={status}
                     disabled={isConverted}
-                    onChange={(e) => {
-                      setStatus(e.target.value as FarmApplicationStatus);
+                    onChange={(v) => {
+                      setStatus(v as FarmApplicationStatus);
                     }}
                     className={cn(
                       adminSelectClass,
@@ -283,13 +284,11 @@ function FarmApplicationDetailBody({
                       isConverted &&
                         "disabled:cursor-default disabled:opacity-100",
                     )}
-                  >
-                    {FARM_APPLICATION_STATUSES.map((s) => (
-                      <option key={s} value={s}>
-                        {FARM_APPLICATION_STATUS_META[s].label}
-                      </option>
-                    ))}
-                  </select>
+                    options={FARM_APPLICATION_STATUSES.map((s) => ({
+                      value: s,
+                      label: FARM_APPLICATION_STATUS_META[s].label,
+                    }))}
+                  />
                 </AdminField>
                 <AdminField
                   label="Internal notes"

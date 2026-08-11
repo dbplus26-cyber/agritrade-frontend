@@ -10,6 +10,7 @@ import {
   SectionHeading,
 } from "@/components/admin/ui";
 import { BackButton } from "@/components/ui/BackButton";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
 import { useCreateStocktakeMutation } from "@/redux/stocktakes/stocktakes-api";
@@ -65,18 +66,16 @@ export function StocktakeNew() {
               : "Choose the warehouse to bring up its count sheet."
           }
         >
-          <select
+          <SimpleSelect
             className={adminSelectClass}
             value={warehouseId}
-            onChange={(e) => setWarehouseId(e.target.value)}
-          >
-            <option value="">Choose a warehouse…</option>
-            {(warehouses.data?.data ?? []).map((w) => (
-              <option key={w.id} value={w.id}>
-                {w.name}
-              </option>
-            ))}
-          </select>
+            onChange={setWarehouseId}
+            placeholder="Choose a warehouse…"
+            options={(warehouses.data?.data ?? []).map((w) => ({
+              value: w.id,
+              label: w.name,
+            }))}
+          />
         </AdminField>
       </AdminCard>
 

@@ -1,11 +1,12 @@
 "use client";
 
 import { useId, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { DocCard } from "@/components/ui/DocCard";
 import { FieldError } from "@/components/ui/FieldError";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import { Stamp } from "@/components/ui/Stamp";
 import {
   TURNSTILE_ENABLED,
@@ -280,17 +281,22 @@ export function ReviewForm() {
             <label htmlFor={`${fieldId}-role`} className={labelClass}>
               YOU DEALT WITH US AS
             </label>
-            <select
-              id={`${fieldId}-role`}
-              {...register("role")}
-              className={cn(inputClass, "cursor-pointer")}
-            >
-              {REVIEW_ROLES.map((role) => (
-                <option key={role} value={role}>
-                  {REVIEW_ROLE_LABELS[role]}
-                </option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="role"
+              render={({ field }) => (
+                <SimpleSelect
+                  id={`${fieldId}-role`}
+                  className={cn(inputClass, "cursor-pointer")}
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={REVIEW_ROLES.map((role) => ({
+                    value: role,
+                    label: REVIEW_ROLE_LABELS[role],
+                  }))}
+                />
+              )}
+            />
           </div>
         </div>
 

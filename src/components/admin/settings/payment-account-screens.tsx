@@ -3,7 +3,7 @@
 import { useMemo, } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
@@ -30,6 +30,7 @@ import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
+import { SimpleSelect } from "@/components/ui/simple-select";
 import {
   useActivatePaymentAccountMutation,
   useCreatePaymentAccountMutation,
@@ -321,6 +322,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
     handleSubmit,
     setError,
     watch,
+    control,
     formState: { errors },
   } = useForm<PaymentAccountFormValues>({
     resolver: zodResolver(paymentAccountSchema),
@@ -462,19 +464,21 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
               hint="What sort of account this is: a bank account, or a mobile money wallet."
               error={errors.kind?.message}
             >
-              <select
-                className={cn(
-                  adminInputClass,
-                  errors.kind && "border-console-red",
+              <Controller
+                control={control}
+                name="kind"
+                render={({ field }) => (
+                  <SimpleSelect
+                    className={cn(
+                      adminInputClass,
+                      errors.kind && "border-console-red",
+                    )}
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={KIND_OPTIONS}
+                  />
                 )}
-                {...register("kind")}
-              >
-                {KIND_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+              />
             </AdminField>
           </div>
 
