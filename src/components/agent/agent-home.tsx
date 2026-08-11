@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePermissions } from "@/hooks/use-permissions";
 import { useGetMyFloatQuery } from "@/redux/agent/agent-api";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis } from "@/lib/format-money";
@@ -49,6 +50,10 @@ export function AgentHome() {
     limit: 5,
   });
   const balance = data?.summary.balanceGhs ?? 0;
+  const { has } = usePermissions();
+  const canBuy = has("PURCHASES_RECORD");
+  const canSend = has("PAYOUTS_SEND");
+  const canExpense = has("EXPENSES_RECORD");
 
   return (
     <div className="flex flex-col gap-4">
@@ -90,33 +95,52 @@ export function AgentHome() {
         )}
       </section>
 
+      {/* Only the actions this agent actually HOLDS - the owner switches
+          them per role or per person on the console's Permissions screen,
+          and a button that would only 403 is worse than no button. */}
       <div className="grid grid-cols-1 gap-2.5">
-        <Link
-          href="/agent/purchases/new"
-          className="rounded-none bg-forest px-4 py-3.5 text-center text-[15px] font-semibold text-paper transition-colors hover:bg-board"
-        >
-          Record a purchase
-        </Link>
-        <Link
-          href="/agent/sends"
-          className="rounded-none border-[1.5px] border-forest bg-paper px-4 py-3.5 text-center text-[15px] font-semibold text-forest transition-colors hover:bg-surface-alt"
-        >
-          Send money
-        </Link>
-        <div className="grid grid-cols-2 gap-2.5">
+        {canBuy ? (
           <Link
-            href="/agent/expenses/new"
-            className="rounded-none border border-soil/35 bg-paper px-4 py-3 text-center text-[13.5px] font-medium text-ink transition-colors hover:bg-surface-alt"
+            href="/agent/purchases/new"
+            className="rounded-none bg-forest px-4 py-3.5 text-center text-[15px] font-semibold text-paper transition-colors hover:bg-board"
           >
-            Record expense
+            Record a purchase
           </Link>
+        ) : null}
+        {canSend ? (
+          <Link
+            href="/agent/sends"
+            className="rounded-none border-[1.5px] border-forest bg-paper px-4 py-3.5 text-center text-[15px] font-semibold text-forest transition-colors hover:bg-surface-alt"
+          >
+            Send money
+          </Link>
+        ) : null}
+        <div className="grid grid-cols-2 gap-2.5">
+          {canExpense ? (
+            <Link
+              href="/agent/expenses/new"
+              className="rounded-none border border-soil/35 bg-paper px-4 py-3 text-center text-[13.5px] font-medium text-ink transition-colors hover:bg-surface-alt"
+            >
+              Record expense
+            </Link>
+          ) : null}
           <Link
             href="/agent/purchases"
-            className="rounded-none border border-soil/35 bg-paper px-4 py-3 text-center text-[13.5px] font-medium text-ink transition-colors hover:bg-surface-alt"
+            className={cn(
+              "rounded-none border border-soil/35 bg-paper px-4 py-3 text-center text-[13.5px] font-medium text-ink transition-colors hover:bg-surface-alt",
+              !canExpense && "col-span-2",
+            )}
           >
             My purchases
           </Link>
         </div>
+        {!canBuy && !canSend && !canExpense ? (
+          <div className="rounded-none border border-soil/25 bg-paper px-4 py-3 text-[12.5px] leading-[1.55] text-soil">
+            The office has not opened any actions for your account yet. Your
+            float and history stay visible; call the office if this seems
+            wrong.
+          </div>
+        ) : null}
       </div>
 
       <section className="rounded-none border border-soil/25 bg-paper px-4 py-3">

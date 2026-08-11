@@ -33,10 +33,13 @@ const PAGE_SIZE = 10;
  */
 export function MySendsScreen({
   availableGhs,
+  canSend = true,
   surface,
 }: {
   /** The sender's remaining float, for the dialog's guidance line. */
   availableGhs?: null | number;
+  /** False hides the send action (permission withdrawn); history stays. */
+  canSend?: boolean;
   surface: Extract<SendSurface, "agent" | "staff">;
 }) {
   const [page, setPage] = useState(1);
@@ -57,9 +60,11 @@ export function MySendsScreen({
         hint="Money you personally have sent out, and whether it arrived."
         sub="Money you have sent, and what Hubtel said about each one"
         actions={
-          <AdminButton onClick={() => setSending(true)} type="button">
-            Send money
-          </AdminButton>
+          canSend ? (
+            <AdminButton onClick={() => setSending(true)} type="button">
+              Send money
+            </AdminButton>
+          ) : undefined
         }
       />
 

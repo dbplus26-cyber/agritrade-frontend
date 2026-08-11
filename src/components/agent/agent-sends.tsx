@@ -1,6 +1,7 @@
 "use client";
 
 import { MySendsScreen } from "@/components/admin/disbursements/my-sends-screen";
+import { usePermissions } from "@/hooks/use-permissions";
 import { useGetMyFloatQuery } from "@/redux/agent/agent-api";
 
 /**
@@ -11,9 +12,13 @@ import { useGetMyFloatQuery } from "@/redux/agent/agent-api";
  */
 export function AgentSends() {
   const { data } = useGetMyFloatQuery({ limit: 1, page: 1 });
+  const { has } = usePermissions();
   return (
     <MySendsScreen
       availableGhs={data?.summary.balanceGhs ?? null}
+      // History stays readable when sending is withdrawn - past sends are
+      // the agent's own record of work; only the action goes.
+      canSend={has("PAYOUTS_SEND")}
       surface="agent"
     />
   );
