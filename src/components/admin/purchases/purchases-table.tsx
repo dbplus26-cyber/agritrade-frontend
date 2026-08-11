@@ -132,14 +132,14 @@ export function PurchasesTable() {
               className="outline-none focus-visible:underline"
               onClick={(e) => e.stopPropagation()}
             >
-              <span className="block min-w-0 max-w-[90%]">
-                <span className="block truncate font-medium text-adm-ink">
+              <span className="block min-w-0 @2xl/table:max-w-[90%]">
+                <span className="block [overflow-wrap:anywhere] @2xl/table:truncate font-medium text-adm-ink">
                   {p.commodity.name}
                   <Mono className="ml-1.5 text-[12.5px] text-adm-muted">
                     {formatKg(p.weightKg)}
                   </Mono>
                 </span>
-                <span className="block truncate text-[12.5px] text-adm-faint">
+                <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-faint">
                   {purchaseCounterparty(p)}
                 </span>
               </span>
@@ -196,7 +196,7 @@ export function PurchasesTable() {
             // The row itself navigates to the purchase, so the warehouse has
             // to stop the click reaching it or the two destinations race.
             <Link
-              className={cn(adminLinkClass, "block max-w-[22rem] truncate")}
+              className={cn(adminLinkClass, "block @2xl/table:max-w-[22rem] [overflow-wrap:anywhere] @2xl/table:truncate")}
               href={`/admin/warehouses/${row.original.warehouse.id}`}
               onClick={(e) => e.stopPropagation()}
             >

@@ -223,7 +223,7 @@ export function AgentPurchaseForm() {
       <button
         type="submit"
         disabled={isLoading}
-        className="rounded-lg bg-forest px-4 py-3.5 text-[15px] font-semibold text-paper transition-colors hover:bg-board disabled:opacity-60"
+        className="rounded-none bg-forest px-4 py-3.5 text-[15px] font-semibold text-paper transition-colors hover:bg-board disabled:opacity-60"
       >
         {isLoading ? "Recording…" : "Record purchase"}
       </button>

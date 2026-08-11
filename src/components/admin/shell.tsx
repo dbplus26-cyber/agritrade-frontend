@@ -144,7 +144,7 @@ function NavbarUser() {
       <DropdownMenu>
         <DropdownMenuTrigger
           aria-label="Account menu"
-          className="flex cursor-pointer items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-console/40 sm:rounded-[8px] sm:pl-2"
+          className="flex cursor-pointer items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-console/40 sm:rounded-none sm:pl-2"
         >
           {user ? (
             <span className="hidden text-right sm:block">
@@ -375,7 +375,7 @@ function ConsoleSidebar({ activeKey }: { activeKey: string }) {
                     }
                   }}
                   className={cn(
-                    "h-auto cursor-pointer justify-between gap-2 rounded-[6px] px-2.5 py-[7px] text-[13.5px] font-medium text-adm-body hover:bg-adm-sunken hover:text-adm-ink",
+                    "h-auto cursor-pointer justify-between gap-2 rounded-none px-2.5 py-[7px] text-[13.5px] font-medium text-adm-body hover:bg-adm-sunken hover:text-adm-ink",
                     hasActive && (!isOpen || collapsed) && "text-console",
                   )}
                 >
@@ -410,7 +410,7 @@ function ConsoleSidebar({ activeKey }: { activeKey: string }) {
                         key={item.key}
                         asChild
                         isActive={activeKey === item.key}
-                        className="h-auto justify-between gap-2 rounded-[6px] px-2.5 py-[6px] text-[13px] font-normal text-adm-body hover:bg-adm-sunken hover:text-adm-ink data-[active=true]:bg-console data-[active=true]:font-semibold data-[active=true]:text-white"
+                        className="h-auto justify-between gap-2 rounded-none px-2.5 py-[6px] text-[13px] font-normal text-adm-body hover:bg-adm-sunken hover:text-adm-ink data-[active=true]:bg-console data-[active=true]:font-semibold data-[active=true]:text-white"
                       >
                         <Link
                           href={item.href}
@@ -632,7 +632,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <header className="sticky top-0 z-40 flex h-[54px] flex-none items-center gap-3 border-b border-adm-line bg-adm-card px-4 lg:px-[26px] print:hidden">
           {/* Collapse/expand the rail (sheet on mobile) - dms behaviour in the
               console skin, living on the topbar's left edge. */}
-          <SidebarTrigger className="h-[30px] w-[30px] flex-none cursor-pointer rounded-[6px] border border-adm-line bg-adm-card text-adm-muted hover:bg-adm-sunken hover:text-adm-ink max-md:hidden" />
+          <SidebarTrigger className="h-[30px] w-[30px] flex-none cursor-pointer rounded-none border border-adm-line bg-adm-card text-adm-muted hover:bg-adm-sunken hover:text-adm-ink max-md:hidden" />
           {/* On a phone the bar's left edge carries the company mark instead
               of the page heading - every page already states its own name in
               its h1, and the account menu keeps the right edge to itself. */}

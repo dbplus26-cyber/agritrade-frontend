@@ -116,11 +116,11 @@ export function LandSellerTable() {
               className="outline-none focus-visible:underline"
               onClick={(e) => e.stopPropagation()}
             >
-              <span className="block min-w-0 max-w-[90%]">
-                <span className="block truncate font-medium text-adm-ink">
+              <span className="block min-w-0 @2xl/table:max-w-[90%]">
+                <span className="block [overflow-wrap:anywhere] @2xl/table:truncate font-medium text-adm-ink">
                   {s.name}
                 </span>
-                <span className="block truncate text-[12.5px] text-adm-faint">
+                <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-faint">
                   {s.community ?? "No community"}
                 </span>
               </span>
@@ -423,7 +423,7 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
           </div>
         </section>
 
-        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
           <SectionHeading className="mb-0">Anything else</SectionHeading>
           <AdminField label="Notes" optional error={errors.notes?.message}>
             <textarea
@@ -441,7 +441,7 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
           </AdminField>
         </section>
 
-        <div className="border-t border-adm-hairline pt-5">
+        <div className="pt-3 sm:pt-6">
           <EditableFormActions
             mode={!isEdit ? "create" : isEditing ? "editing" : "locked"}
             saving={saving}

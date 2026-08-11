@@ -181,7 +181,7 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
             </div>
           </section>
 
-          <section className="flex flex-col gap-3 border-t border-adm-hairline pt-5">
+          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
             <SectionHeading
               className="mb-0"
               hint="What the plot is listed at and what it cost you. The difference is what you make on a sale."
@@ -207,7 +207,7 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
             </label>
           </section>
 
-          <section className="flex flex-col gap-3 border-t border-adm-hairline pt-5">
+          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
             <SectionHeading className="mb-0">On the website</SectionHeading>
             {field("description", "Description", {
               optional: true,

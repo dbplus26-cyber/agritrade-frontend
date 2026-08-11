@@ -125,7 +125,7 @@ export function PlotsRegister() {
               href={`${LIST}/${p.id}`}
               // Squared off and 1.5px-bordered to match AdminCard, which every other
               // surface in the console uses. These were the only rounded cards.
-              className="shadow-[0_1px_2px_rgba(16,24,40,0.05)] overflow-hidden rounded-[6px] border border-adm-line bg-adm-card transition-colors hover:border-adm-line"
+              className="shadow-[0_1px_2px_rgba(16,24,40,0.05)] overflow-hidden rounded-none border border-adm-line bg-adm-card transition-colors hover:border-adm-line"
             >
               {p.photos[0] ? (
                 // eslint-disable-next-line @next/next/no-img-element -- Cloudinary
@@ -151,7 +151,7 @@ export function PlotsRegister() {
                     <PlotStatusBadge status={p.status} />
                   </span>
                 </div>
-                <div className="max-w-[22rem] truncate text-[14px] font-semibold text-adm-ink">
+                <div className="@2xl/table:max-w-[22rem] [overflow-wrap:anywhere] @2xl/table:truncate text-[14px] font-semibold text-adm-ink">
                   {p.locationText}
                 </div>
                 <div className="mt-0.5 flex items-center justify-between text-[12.5px] text-adm-muted">

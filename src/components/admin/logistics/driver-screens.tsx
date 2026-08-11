@@ -135,10 +135,10 @@ export function DriverTable() {
             >
               <RegistryAvatar name={d.name} photoUrl={d.photoUrl} />
               <span className="block min-w-0 max-w-[85%]">
-                <span className="block truncate font-medium text-adm-ink">
+                <span className="block [overflow-wrap:anywhere] @2xl/table:truncate font-medium text-adm-ink">
                   {d.name}
                 </span>
-                <span className="block truncate text-[12.5px] text-adm-faint">
+                <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-faint">
                   {d.company ?? "Independent"}
                 </span>
               </span>
@@ -557,7 +557,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
           </div>
         </section>
 
-        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
           <SectionHeading className="mb-0">Where they work</SectionHeading>
           <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
             <AdminField
@@ -588,7 +588,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
           </div>
         </section>
 
-        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
           <SectionHeading
             className="mb-0"
             hint="The papers you checked, so the person driving your load can be identified."
@@ -632,7 +632,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
           </div>
         </section>
 
-        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
           <SectionHeading className="mb-0">How they are paid</SectionHeading>
           {/* What this driver is normally paid on. The middle of the
               resolution order: a trip can override it, and a driver without one
@@ -671,7 +671,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
           </AdminField>
         </section>
 
-        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
           <SectionHeading className="mb-0">Anything else</SectionHeading>
           <AdminField label="Notes" optional error={errors.notes?.message}>
             <textarea
@@ -689,7 +689,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
           </AdminField>
         </section>
 
-        <div className="border-t border-adm-hairline pt-5">
+        <div className="pt-3 sm:pt-6">
           <EditableFormActions
             mode={mode}
             saving={saving}

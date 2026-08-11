@@ -78,13 +78,13 @@ export function LandSalesRegister() {
         cell: ({ row }) => (
           <Link
             href={`/admin/land-sales/${row.original.id}`}
-            className="block min-w-0 max-w-[90%] outline-none focus-visible:underline"
+            className="block min-w-0 @2xl/table:max-w-[90%] outline-none focus-visible:underline"
             onClick={(e) => { e.stopPropagation(); }}
           >
             <Mono className="font-semibold text-console">
               {row.original.plot.reference}
             </Mono>
-            <div className="truncate text-[12.5px] text-adm-muted">
+            <div className="[overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-muted">
               {row.original.plot.locationText}
             </div>
           </Link>
@@ -98,7 +98,7 @@ export function LandSalesRegister() {
         // The row navigates to the sale, so the buyer stops the click first.
         cell: ({ row }) => (
           <Link
-            className={cn(adminLinkClass, "block min-w-0 truncate")}
+            className={cn(adminLinkClass, "block min-w-0 [overflow-wrap:anywhere] @2xl/table:truncate")}
             href={`/admin/buyers/${row.original.buyer.id}`}
             onClick={(e) => e.stopPropagation()}
             title={row.original.buyer.name}

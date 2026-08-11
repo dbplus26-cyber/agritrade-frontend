@@ -133,7 +133,7 @@ export function WarehouseTable() {
         meta: columnMeta(),
         cell: ({ row }) =>
           row.original.location ? (
-            <span className="block max-w-[17rem] truncate text-adm-muted">{row.original.location}</span>
+            <span className="block @2xl/table:max-w-[17rem] [overflow-wrap:anywhere] @2xl/table:truncate text-adm-muted">{row.original.location}</span>
           ) : (
             <Absent />
           ),
@@ -377,7 +377,7 @@ function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
         {/* What the shed is actually for - which commodities it holds, its
             capacity, whether it is fumigated. Operational detail that
             otherwise lives in one person's head. */}
-        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
           <SectionHeading className="mb-0">What it holds</SectionHeading>
           <AdminField
             label="Description"
@@ -494,7 +494,7 @@ function WarehouseStockSection({ warehouseId }: { warehouseId: string }) {
                   <Link
                     className={cn(
                       adminLinkClass,
-                      "min-w-0 truncate text-[13.5px] font-medium",
+                      "min-w-0 [overflow-wrap:anywhere] text-[13.5px] font-medium",
                     )}
                     href={`/admin/commodities/${row.commodityId}`}
                   >

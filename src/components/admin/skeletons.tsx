@@ -53,7 +53,7 @@ export function ConsoleTableSkeleton({
           {Array.from({ length: Math.min(rows, 5) }, (_, row) => (
             <div
               key={row}
-              className="rounded-[6px] border border-adm-line bg-adm-card px-3 py-2"
+              className="rounded-none border border-adm-line bg-adm-card px-3 py-2"
             >
               {Array.from({ length: Math.min(columns, 4) }, (_, line) => (
                 <div
@@ -254,7 +254,7 @@ export function RecordCardGridSkeleton({
     >
       {Array.from({ length: cards }, (_, i) => (
         <AdminCard key={i} className="overflow-hidden">
-          {media ? <Skeleton className="h-[130px] w-full rounded-[6px]" /> : null}
+          {media ? <Skeleton className="h-[130px] w-full rounded-none" /> : null}
           <div className="px-4 py-3">
             <div className="mb-2 flex items-center justify-between gap-2.5">
               <Skeleton className="h-3 w-24" />

@@ -105,7 +105,7 @@ function AgentFloatsCard() {
           onRetry={() => void refetch()}
         />
       ) : isLoading ? (
-        <Skeleton className="h-[120px] w-full rounded-[6px]" />
+        <Skeleton className="h-[120px] w-full rounded-none" />
       ) : agents.length === 0 ? (
         <WidgetEmpty
           title="No active agents"
@@ -172,7 +172,7 @@ function TrucksCard() {
           }}
         />
       ) : dispatched.isLoading || loading.isLoading ? (
-        <Skeleton className="h-[120px] w-full rounded-[6px]" />
+        <Skeleton className="h-[120px] w-full rounded-none" />
       ) : trucks.length === 0 ? (
         <WidgetEmpty
           title="No trucks currently moving"
@@ -241,7 +241,7 @@ export function DashboardLive() {
       ) : isLoading || !d ? (
         <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-5">
           {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-[86px] w-full rounded-[6px]" />
+            <Skeleton key={i} className="h-[86px] w-full rounded-none" />
           ))}
         </div>
       ) : (

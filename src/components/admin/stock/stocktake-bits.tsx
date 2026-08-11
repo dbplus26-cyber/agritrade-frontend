@@ -289,7 +289,7 @@ export function StocktakeCountSheet({
       {formError ? (
         <p
           role="alert"
-          className="rounded-[6px] border border-console-red/40 bg-console-red/5 px-3 py-2 text-[12.5px] font-medium text-console-red"
+          className="rounded-none border border-console-red/40 bg-console-red/5 px-3 py-2 text-[12.5px] font-medium text-console-red"
         >
           {formError}
         </p>

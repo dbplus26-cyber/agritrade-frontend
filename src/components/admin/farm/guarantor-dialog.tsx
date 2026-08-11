@@ -174,7 +174,7 @@ export function GuarantorDialog({
             </div>
           </section>
 
-          <section className="flex flex-col gap-3 border-t border-adm-hairline pt-5">
+          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
             <SectionHeading
               className="mb-0"
               hint="The ID you checked, so the person vouching can be identified later."
@@ -205,7 +205,7 @@ export function GuarantorDialog({
             </div>
           </section>
 
-          <section className="flex flex-col gap-3 border-t border-adm-hairline pt-5">
+          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
             <SectionHeading
               className="mb-0"
               hint="How you would actually reach this person if repayment stalls."

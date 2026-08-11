@@ -138,7 +138,7 @@
   --chart-3: #3e7d62;
   --chart-4: #59523b;
   --chart-5: #7a611c;
-  --radius: 0.25rem; /* the design squares almost everything off */
+  --radius: 0rem; /* the design squares almost everything off */
   --sidebar: #e6eae0;
   --sidebar-foreground: #1f211c;
   --sidebar-primary: #155744;

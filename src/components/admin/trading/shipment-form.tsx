@@ -458,574 +458,576 @@ export function ShipmentForm({
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col gap-5"
       >
-        <AdminCard className="flex flex-col gap-4 p-5">
-          <StepHead
-            step={1}
-            title="Sales on this trip"
-            hint={
-              editing
-                ? "The orders this truck carries. Add or remove them on the shipment page."
-                : "One truck can serve several orders. Each shows the weight still to ship."
-            }
-          />
-          {/* Not an AdminField: its Label wrapper would nest the row labels
-              (invalid HTML) and steal clicks for the first control. */}
-          {editing && shipment ? (
-            <div>
-              <div className="rounded-[6px] border border-adm-line bg-[#FBFCF7]">
-                {shipment.sales.map((s) => (
-                  <div
-                    key={s.id}
-                    className="border-b border-adm-hairline px-3 py-2 last:border-b-0"
-                  >
-                    <div className="flex items-baseline justify-between gap-2">
-                      <Mono className="text-[12.5px] text-console">
-                        {s.transactionNo}
-                      </Mono>
-                      <Mono className="flex-none text-[12.5px] font-bold text-adm-ink">
-                        {formatKg(
-                          s.lines.reduce((kg, l) => kg + l.outstandingKg, 0),
-                        )}
-                      </Mono>
-                    </div>
-                    <p className="min-w-0 text-[13px] text-adm-ink [overflow-wrap:anywhere]">
-                      {s.buyer.name}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-          <div>
-            <div
-              className={cn(
-                "rounded-[6px] border border-adm-line bg-[#FBFCF7]",
-                errors.saleIds && "border-console-red",
-              )}
-            >
-              <div className="border-b border-adm-hairline p-2">
-                <Input
-                  value={saleSearch}
-                  onChange={(e) => setSaleSearch(e.target.value)}
-                  placeholder="Search sale no. or buyer…"
-                  className={cn(adminInputClass, "h-9")}
-                />
-              </div>
-              {eligible.isLoading ? (
-                <p className="px-3 py-3 text-[13px] text-adm-muted">
-                  Loading shippable sales…
-                </p>
-              ) : eligible.isError ? (
-                <p className="px-3 py-3 text-[13px] text-console-red">
-                  Couldn&apos;t load the shippable sales. Reload and try again.
-                </p>
-              ) : visibleSales.length === 0 ? (
-                <p className="px-3 py-3 text-[13px] text-adm-muted">
-                  {allSales.length === 0
-                    ? "No sales are ready to ship - a sale appears here once it is confirmed, its payment terms are met and it isn't already on a truck."
-                    : "No sales match this search."}
-                </p>
-              ) : (
-                <div className="max-h-[280px] overflow-y-auto">
-                  {visibleSales.map((s) => (
-                    <label
+        <AdminCard className="flex flex-col gap-5 p-5">
+          <section className="flex flex-col gap-4">
+            <StepHead
+              step={1}
+              title="Sales on this trip"
+              hint={
+                editing
+                  ? "The orders this truck carries. Add or remove them on the shipment page."
+                  : "One truck can serve several orders. Each shows the weight still to ship."
+              }
+            />
+            {/* Not an AdminField: its Label wrapper would nest the row labels
+                (invalid HTML) and steal clicks for the first control. */}
+            {editing && shipment ? (
+              <div>
+                <div className="rounded-none border border-adm-line bg-[#FBFCF7]">
+                  {shipment.sales.map((s) => (
+                    <div
                       key={s.id}
-                      className={cn(
-                        "flex cursor-pointer items-start gap-2.5 border-b border-adm-hairline border-l-2 border-l-transparent px-3 py-2 last:border-b-0 hover:bg-adm-sunken",
-                        // A ticked sale reads as picked from across the room:
-                        // green rail, tinted row, not just a 16px checkbox.
-                        selected.includes(s.id) &&
-                          "border-l-[#155744] bg-[#F1F6EE] hover:bg-[#EBF2E7]",
-                      )}
+                      className="border-b border-adm-hairline px-3 py-2 last:border-b-0"
                     >
-                      <input
-                        type="checkbox"
-                        checked={selected.includes(s.id)}
-                        onChange={() => toggleSale(s.id)}
-                        className="mt-1 h-4 w-4 flex-none accent-[#155744]"
-                      />
-                      <span className="min-w-0 flex-1">
-                        <span className="flex items-baseline justify-between gap-2">
-                          <Mono
-                            className={cn(
-                              "block text-[12.5px] text-console",
-                              selected.includes(s.id) && "font-bold",
-                            )}
-                          >
-                            {s.transactionNo}
-                          </Mono>
-                          <Mono className="flex-none text-[12.5px] font-bold text-adm-ink">
-                            {formatKg(s.totalRemainingKg)}
-                          </Mono>
-                        </span>
-                        <span className="block min-w-0 text-[13px] text-adm-ink [overflow-wrap:anywhere]">
-                          {s.buyer.name}
-                        </span>
-                        <span className="mt-0.5 block text-[12px] text-adm-muted">
-                          {s.lines.map((l) => (
-                            <span
-                              key={l.commodityId}
-                              className="mr-2 inline-block whitespace-nowrap"
-                            >
-                              {l.commodityName}{" "}
-                              <Mono>{formatKg(l.remainingKg)}</Mono>
-                            </span>
-                          ))}
-                        </span>
-                      </span>
-                    </label>
+                      <div className="flex items-baseline justify-between gap-2">
+                        <Mono className="text-[12.5px] text-console">
+                          {s.transactionNo}
+                        </Mono>
+                        <Mono className="flex-none text-[12.5px] font-bold text-adm-ink">
+                          {formatKg(
+                            s.lines.reduce((kg, l) => kg + l.outstandingKg, 0),
+                          )}
+                        </Mono>
+                      </div>
+                      <p className="min-w-0 text-[13px] text-adm-ink [overflow-wrap:anywhere]">
+                        {s.buyer.name}
+                      </p>
+                    </div>
                   ))}
                 </div>
-              )}
-              <div className="border-t border-adm-hairline px-3 py-1.5 text-[12px] text-adm-muted">
-                {selected.length} sale{selected.length === 1 ? "" : "s"} selected
-                {selectedKg > 0 ? (
-                  <>
-                    {" "}
-                    · <Mono>{formatKg(selectedKg)}</Mono> to load
-                  </>
-                ) : null}
               </div>
-            </div>
-            {errors.saleIds ? (
-              <span
-                role="alert"
-                className="mt-1 block text-[12px] font-medium text-console-red"
-              >
-                {errors.saleIds.message}
-              </span>
-            ) : null}
-          </div>
-          )}
-        </AdminCard>
-
-        <AdminCard className="flex flex-col gap-4 p-5">
-          <StepHead
-            step={2}
-            title="Loading warehouses"
-            hint="Where the truck takes its loads. Start at the origin, then tick every other shed it will call at."
-          />
-          {editing && shipment ? (
-            <AdminField
-              label="Origin warehouse"
-              hint="Fixed once planned - tick more sheds below instead."
-            >
-              <p className="rounded-[6px] border border-adm-line bg-adm-sunken px-3 py-2 text-[13.5px] font-medium text-adm-ink">
-                {shipment.originWarehouse.name}
-              </p>
-            </AdminField>
-          ) : (
-            <AdminField
-              label="Origin warehouse"
-              error={errors.originWarehouseId?.message}
-            >
-              <Controller
-                control={control}
-                name="originWarehouseId"
-                render={({ field }) => (
-                  <SimpleSelect
-                    className={cn(
-                      adminSelectClass,
-                      "w-full",
-                      errors.originWarehouseId && "border-console-red",
-                    )}
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="Choose the warehouse"
-                    options={(warehouses.data?.data ?? []).map((w) => ({
-                      value: w.id,
-                      label: w.name,
-                    }))}
-                  />
-                )}
-              />
-            </AdminField>
-          )}
-          {/* The other sheds the truck also calls at. Each row carries how
-              much of THIS load's commodities the shed holds, so picking the
-              next stop is a glance, not a stock-report expedition. */}
-          <div>
-            <span className="mb-[7px] block text-[11px] uppercase tracking-[0.14em] text-adm-muted">
-              Also loads at{" "}
-              <span className="normal-case tracking-normal">(optional)</span>
-            </span>
-            {otherWarehouses.length === 0 ? (
-              <p className="text-[12.5px] text-adm-muted">
-                {originWarehouseId
-                  ? "There are no other active warehouses to take loads from."
-                  : "Choose the origin warehouse first."}
-              </p>
             ) : (
+            <div>
               <div
                 className={cn(
-                  "rounded-[6px] border border-adm-line bg-[#FBFCF7]",
-                  errors.loadingWarehouseIds && "border-console-red",
+                  "rounded-none border border-adm-line bg-[#FBFCF7]",
+                  errors.saleIds && "border-console-red",
                 )}
               >
-                {otherWarehouses.map((w) => {
-                  const ticked = extraShedIds.includes(w.id);
-                  const heldKg = relevantStockIn(w.id);
-                  return (
-                    <label
-                      key={w.id}
-                      className={cn(
-                        "flex cursor-pointer items-center gap-2.5 border-b border-adm-hairline border-l-2 border-l-transparent px-3 py-2 last:border-b-0 hover:bg-adm-sunken",
-                        ticked &&
-                          "border-l-[#155744] bg-[#F1F6EE] hover:bg-[#EBF2E7]",
-                      )}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={ticked}
-                        onChange={() => toggleShed(w.id)}
-                        className="h-4 w-4 flex-none accent-[#155744]"
-                      />
-                      <span
+                <div className="border-b border-adm-hairline p-2">
+                  <Input
+                    value={saleSearch}
+                    onChange={(e) => setSaleSearch(e.target.value)}
+                    placeholder="Search sale no. or buyer…"
+                    className={cn(adminInputClass, "h-9")}
+                  />
+                </div>
+                {eligible.isLoading ? (
+                  <p className="px-3 py-3 text-[13px] text-adm-muted">
+                    Loading shippable sales…
+                  </p>
+                ) : eligible.isError ? (
+                  <p className="px-3 py-3 text-[13px] text-console-red">
+                    Couldn&apos;t load the shippable sales. Reload and try again.
+                  </p>
+                ) : visibleSales.length === 0 ? (
+                  <p className="px-3 py-3 text-[13px] text-adm-muted">
+                    {allSales.length === 0
+                      ? "No sales are ready to ship - a sale appears here once it is confirmed, its payment terms are met and it isn't already on a truck."
+                      : "No sales match this search."}
+                  </p>
+                ) : (
+                  <div className="max-h-[280px] overflow-y-auto">
+                    {visibleSales.map((s) => (
+                      <label
+                        key={s.id}
                         className={cn(
-                          "min-w-0 flex-1 text-[13px] text-adm-ink [overflow-wrap:anywhere]",
-                          ticked && "font-medium",
+                          "flex cursor-pointer items-start gap-2.5 border-b border-adm-hairline border-l-2 border-l-transparent px-3 py-2 last:border-b-0 hover:bg-adm-sunken",
+                          // A ticked sale reads as picked from across the room:
+                          // green rail, tinted row, not just a 16px checkbox.
+                          selected.includes(s.id) &&
+                            "border-l-[#155744] bg-[#F1F6EE] hover:bg-[#EBF2E7]",
                         )}
                       >
-                        {w.name}
-                      </span>
-                      {needed.size > 0 && stock.data ? (
-                        <Mono className="flex-none text-[12px] text-adm-muted">
-                          {formatKg(heldKg)} of this load&apos;s goods
-                        </Mono>
-                      ) : null}
-                    </label>
-                  );
-                })}
+                        <input
+                          type="checkbox"
+                          checked={selected.includes(s.id)}
+                          onChange={() => toggleSale(s.id)}
+                          className="mt-1 h-4 w-4 flex-none accent-[#155744]"
+                        />
+                        <span className="min-w-0 flex-1">
+                          <span className="flex items-baseline justify-between gap-2">
+                            <Mono
+                              className={cn(
+                                "block text-[12.5px] text-console",
+                                selected.includes(s.id) && "font-bold",
+                              )}
+                            >
+                              {s.transactionNo}
+                            </Mono>
+                            <Mono className="flex-none text-[12.5px] font-bold text-adm-ink">
+                              {formatKg(s.totalRemainingKg)}
+                            </Mono>
+                          </span>
+                          <span className="block min-w-0 text-[13px] text-adm-ink [overflow-wrap:anywhere]">
+                            {s.buyer.name}
+                          </span>
+                          <span className="mt-0.5 block text-[12px] text-adm-muted">
+                            {s.lines.map((l) => (
+                              <span
+                                key={l.commodityId}
+                                className="mr-2 inline-block whitespace-nowrap"
+                              >
+                                {l.commodityName}{" "}
+                                <Mono>{formatKg(l.remainingKg)}</Mono>
+                              </span>
+                            ))}
+                          </span>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+                <div className="border-t border-adm-hairline px-3 py-1.5 text-[12px] text-adm-muted">
+                  {selected.length} sale{selected.length === 1 ? "" : "s"} selected
+                  {selectedKg > 0 ? (
+                    <>
+                      {" "}
+                      · <Mono>{formatKg(selectedKg)}</Mono> to load
+                    </>
+                  ) : null}
+                </div>
               </div>
-            )}
-            {errors.loadingWarehouseIds ? (
-              <span
-                role="alert"
-                className="mt-1 block text-[12px] font-medium text-console-red"
-              >
-                {errors.loadingWarehouseIds.message}
-              </span>
-            ) : null}
-          </div>
-          {/* Live sufficiency check: needed vs on hand across every selected
-              shed. The backend re-checks against actual lot remainders. */}
-          {needed.size > 0 && shedIds.length > 0 && stock.data ? (
-            shortfalls.length > 0 ? (
-              <div
-                role="alert"
-                className="rounded-[6px] border border-[#B45309]/40 bg-[#FFFBEB] px-3 py-2.5 text-[12.5px] text-[#92400E]"
-              >
-                <p className="font-semibold">
-                  There isn&apos;t enough goods in the selected warehouses to
-                  load these sales.
-                </p>
-                <ul className="mt-1 flex flex-col gap-0.5">
-                  {shortfalls.map((s) => (
-                    <li key={s.name}>
-                      {s.name}: needs <Mono>{formatKg(s.neededKg)}</Mono>, on
-                      hand <Mono>{formatKg(s.availableKg)}</Mono>
-                    </li>
-                  ))}
-                </ul>
-                <p className="mt-1">
-                  Select more warehouses to take loads from, or plan a smaller
-                  load.
-                </p>
-              </div>
-            ) : (
-              <p className="flex items-center gap-1.5 text-[12.5px] font-medium text-console">
-                <Check className="h-3.5 w-3.5 flex-none" />
-                The selected warehouse{shedIds.length === 1 ? " holds" : "s hold"}{" "}
-                enough of every commodity for this load.
-              </p>
-            )
-          ) : null}
-        </AdminCard>
-
-        <AdminCard className="flex flex-col gap-4 p-5">
-          <StepHead
-            step={3}
-            title="Truck & destination"
-            hint="What carries the goods and where they are going."
-          />
-          {/* Always rendered, even with an empty book. Hiding the picker when
-              nothing is saved yet makes the directory look like it does not
-              exist, so staff retype the same depot onto every waybill. */}
-          <AdminField
-            label="Deliver to"
-            hint={
-              addressBookEmpty
-                ? undefined
-                : "Type to search the address book, or enter this one by hand."
-            }
-            error={errors.deliveryAddressId?.message}
-          >
-            {!addressBookEmpty ? (
-              <SearchableSelect
-                value={deliveryAddressId}
-                onChange={pickAddress}
-                options={[
-                  { value: "", label: "Enter destination manually" },
-                  ...addressList.map((a) => ({
-                    value: a.id,
-                    label: a.label,
-                    hint: a.city,
-                  })),
-                ]}
-                placeholder="Enter destination manually"
-                onSearchChange={addressSearch.onSearchChange}
-                loading={addresses.isFetching}
-                // The picked address is usually off the page a search left
-                // loaded; without this the trigger would read as empty on a
-                // field that is set.
-                selectedLabel={
-                  pickedAddress
-                    ? `${pickedAddress.label} · ${pickedAddress.city}`
-                    : undefined
-                }
-                emptyText="No saved destination matches that."
-              />
-            ) : (
-              <p className="text-[12.5px] text-adm-muted">
-                No saved destinations yet - enter this one below, or{" "}
-                <Link
-                  href="/admin/delivery-addresses/new"
-                  className="font-medium text-console underline underline-offset-2"
+              {errors.saleIds ? (
+                <span
+                  role="alert"
+                  className="mt-1 block text-[12px] font-medium text-console-red"
                 >
-                  add it to the address book
-                </Link>{" "}
-                to reuse it.
-              </p>
-            )}
-          </AdminField>
-          {pickedAddress ? (
-            <div className="rounded-[6px] border border-[#155744]/45 bg-[#F1F6EE] px-3 py-2 text-[12.5px] text-adm-muted">
-              <p className="mb-0.5 flex items-center gap-1 text-[10.5px] font-bold uppercase tracking-[0.09em] text-console">
-                <Check className="h-3 w-3 flex-none" /> Delivering to
-              </p>
-              <p className="min-w-0 font-medium text-adm-ink [overflow-wrap:anywhere]">
-                {pickedAddress.label} · {pickedAddress.city}
-                {pickedAddress.area ? `, ${pickedAddress.area}` : ""}
-              </p>
-              {pickedAddress.shopName ? (
-                <p className="min-w-0 [overflow-wrap:anywhere]">
-                  {pickedAddress.shopName}
-                </p>
-              ) : null}
-              {pickedAddress.digitalAddress || pickedAddress.landmark ? (
-                <p className="min-w-0 [overflow-wrap:anywhere]">
-                  {pickedAddress.digitalAddress ? (
-                    <Mono>{pickedAddress.digitalAddress}</Mono>
-                  ) : null}
-                  {pickedAddress.digitalAddress && pickedAddress.landmark
-                    ? " · "
-                    : ""}
-                  {pickedAddress.landmark ?? ""}
-                </p>
-              ) : null}
-              {pickedAddress.contactName || pickedAddress.contactPhone ? (
-                <p className="min-w-0 [overflow-wrap:anywhere]">
-                  Receives: {pickedAddress.contactName ?? ""}
-                  {pickedAddress.contactName && pickedAddress.contactPhone
-                    ? " · "
-                    : ""}
-                  {pickedAddress.contactPhone ? (
-                    <Mono>{pickedAddress.contactPhone}</Mono>
-                  ) : null}
-                </p>
+                  {errors.saleIds.message}
+                </span>
               ) : null}
             </div>
-          ) : (
-            <AdminField label="Destination" error={errors.destination?.message}>
-              <Input
-                className={cn(
-                  adminInputClass,
-                  errors.destination && "border-console-red",
-                )}
-                placeholder="Accra / Kumasi / address"
-                {...register("destination")}
-              />
-            </AdminField>
-          )}
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <AdminField
-              label="Truck registration"
-              error={errors.truckReg?.message}
-            >
-              <Input
-                className={cn(adminInputClass, errors.truckReg && "border-console-red")}
-                placeholder="GT-1234-24"
-                {...register("truckReg")}
-              />
-            </AdminField>
-            <AdminField
-              label="Truck capacity (kg)"
-              optional
-              hint="The load meter warns you past this."
-              error={errors.truckCapacityKg?.message}
-            >
-              <Input
-                inputMode="decimal"
-                className={cn(
-                  adminInputClass,
-                  errors.truckCapacityKg && "border-console-red",
-                )}
-                {...register("truckCapacityKg")}
-              />
-            </AdminField>
-            <AdminField label="Expected arrival" optional>
-              <Input
-                type="date"
-                className={adminInputClass}
-                {...register("expectedArrivalAt")}
-              />
-            </AdminField>
-            <AdminField label="Notes" optional>
-              <Input className={adminInputClass} {...register("notes")} />
-            </AdminField>
-          </div>
-          {selected.length > 0 && (hasCapacity || selectedKg > 0) ? (
-            <LoadMeter loadedKg={selectedKg} capacityKg={hasCapacity ? capacityKg : null} />
-          ) : null}
-        </AdminCard>
-
-        <AdminCard className="flex flex-col gap-4 p-5">
-          <StepHead
-            step={4}
-            title="Driver"
-            hint="Who has the truck. Pick from the directory or enter the trip's driver by hand."
-          />
-          {/* Same rule as the destination: the directory stays visible even
-              when it is empty, so its existence is discoverable. */}
-          <AdminField
-            label="Driver"
-            hint={driverBookEmpty ? undefined : "Type to search the directory."}
-            error={errors.driverId?.message}
-          >
-            {!driverBookEmpty ? (
-              <SearchableSelect
-                value={driverId}
-                onChange={pickDriver}
-                options={[
-                  { value: "", label: "Enter details manually" },
-                  ...driverList.map((d) => ({
-                    value: d.id,
-                    label: d.name,
-                    hint: d.phone,
-                  })),
-                ]}
-                placeholder="Enter details manually"
-                onSearchChange={driverSearch.onSearchChange}
-                loading={drivers.isFetching}
-                // Same reason as the address picker: the chosen driver is
-                // often not among the rows a later search loaded.
-                selectedLabel={
-                  pickedDriver
-                    ? `${pickedDriver.name} · ${pickedDriver.phone}`
-                    : undefined
-                }
-                emptyText="No driver matches that."
-              />
-            ) : (
-              <p className="text-[12.5px] text-adm-muted">
-                No drivers saved yet - enter this trip&apos;s driver below, or{" "}
-                <Link
-                  href="/admin/drivers/new"
-                  className="font-medium text-console underline underline-offset-2"
-                >
-                  add them to the register
-                </Link>{" "}
-                to reuse them.
-              </p>
             )}
-          </AdminField>
-          {pickedDriver && !showDriverOverrides ? (
-            <div className="flex flex-wrap items-center justify-between gap-2 rounded-[6px] border border-[#155744]/45 bg-[#F1F6EE] px-3 py-2">
-              <div className="min-w-0 text-[12.5px] text-adm-muted">
+          </section>
+
+          <section className="flex flex-col gap-4 pt-3 sm:pt-6">
+            <StepHead
+              step={2}
+              title="Loading warehouses"
+              hint="Where the truck takes its loads. Start at the origin, then tick every other shed it will call at."
+            />
+            {editing && shipment ? (
+              <AdminField
+                label="Origin warehouse"
+                hint="Fixed once planned - tick more sheds below instead."
+              >
+                <p className="rounded-none border border-adm-line bg-adm-sunken px-3 py-2 text-[13.5px] font-medium text-adm-ink">
+                  {shipment.originWarehouse.name}
+                </p>
+              </AdminField>
+            ) : (
+              <AdminField
+                label="Origin warehouse"
+                error={errors.originWarehouseId?.message}
+              >
+                <Controller
+                  control={control}
+                  name="originWarehouseId"
+                  render={({ field }) => (
+                    <SimpleSelect
+                      className={cn(
+                        adminSelectClass,
+                        "w-full",
+                        errors.originWarehouseId && "border-console-red",
+                      )}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Choose the warehouse"
+                      options={(warehouses.data?.data ?? []).map((w) => ({
+                        value: w.id,
+                        label: w.name,
+                      }))}
+                    />
+                  )}
+                />
+              </AdminField>
+            )}
+            {/* The other sheds the truck also calls at. Each row carries how
+                much of THIS load's commodities the shed holds, so picking the
+                next stop is a glance, not a stock-report expedition. */}
+            <div>
+              <span className="mb-[7px] block text-[11px] uppercase tracking-[0.14em] text-adm-muted">
+                Also loads at{" "}
+                <span className="normal-case tracking-normal">(optional)</span>
+              </span>
+              {otherWarehouses.length === 0 ? (
+                <p className="text-[12.5px] text-adm-muted">
+                  {originWarehouseId
+                    ? "There are no other active warehouses to take loads from."
+                    : "Choose the origin warehouse first."}
+                </p>
+              ) : (
+                <div
+                  className={cn(
+                    "rounded-none border border-adm-line bg-[#FBFCF7]",
+                    errors.loadingWarehouseIds && "border-console-red",
+                  )}
+                >
+                  {otherWarehouses.map((w) => {
+                    const ticked = extraShedIds.includes(w.id);
+                    const heldKg = relevantStockIn(w.id);
+                    return (
+                      <label
+                        key={w.id}
+                        className={cn(
+                          "flex cursor-pointer items-center gap-2.5 border-b border-adm-hairline border-l-2 border-l-transparent px-3 py-2 last:border-b-0 hover:bg-adm-sunken",
+                          ticked &&
+                            "border-l-[#155744] bg-[#F1F6EE] hover:bg-[#EBF2E7]",
+                        )}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={ticked}
+                          onChange={() => toggleShed(w.id)}
+                          className="h-4 w-4 flex-none accent-[#155744]"
+                        />
+                        <span
+                          className={cn(
+                            "min-w-0 flex-1 text-[13px] text-adm-ink [overflow-wrap:anywhere]",
+                            ticked && "font-medium",
+                          )}
+                        >
+                          {w.name}
+                        </span>
+                        {needed.size > 0 && stock.data ? (
+                          <Mono className="flex-none text-[12px] text-adm-muted">
+                            {formatKg(heldKg)} of this load&apos;s goods
+                          </Mono>
+                        ) : null}
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+              {errors.loadingWarehouseIds ? (
+                <span
+                  role="alert"
+                  className="mt-1 block text-[12px] font-medium text-console-red"
+                >
+                  {errors.loadingWarehouseIds.message}
+                </span>
+              ) : null}
+            </div>
+            {/* Live sufficiency check: needed vs on hand across every selected
+                shed. The backend re-checks against actual lot remainders. */}
+            {needed.size > 0 && shedIds.length > 0 && stock.data ? (
+              shortfalls.length > 0 ? (
+                <div
+                  role="alert"
+                  className="rounded-none border border-[#B45309]/40 bg-[#FFFBEB] px-3 py-2.5 text-[12.5px] text-[#92400E]"
+                >
+                  <p className="font-semibold">
+                    There isn&apos;t enough goods in the selected warehouses to
+                    load these sales.
+                  </p>
+                  <ul className="mt-1 flex flex-col gap-0.5">
+                    {shortfalls.map((s) => (
+                      <li key={s.name}>
+                        {s.name}: needs <Mono>{formatKg(s.neededKg)}</Mono>, on
+                        hand <Mono>{formatKg(s.availableKg)}</Mono>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-1">
+                    Select more warehouses to take loads from, or plan a smaller
+                    load.
+                  </p>
+                </div>
+              ) : (
+                <p className="flex items-center gap-1.5 text-[12.5px] font-medium text-console">
+                  <Check className="h-3.5 w-3.5 flex-none" />
+                  The selected warehouse{shedIds.length === 1 ? " holds" : "s hold"}{" "}
+                  enough of every commodity for this load.
+                </p>
+              )
+            ) : null}
+          </section>
+
+          <section className="flex flex-col gap-4 pt-3 sm:pt-6">
+            <StepHead
+              step={3}
+              title="Truck & destination"
+              hint="What carries the goods and where they are going."
+            />
+            {/* Always rendered, even with an empty book. Hiding the picker when
+                nothing is saved yet makes the directory look like it does not
+                exist, so staff retype the same depot onto every waybill. */}
+            <AdminField
+              label="Deliver to"
+              hint={
+                addressBookEmpty
+                  ? undefined
+                  : "Type to search the address book, or enter this one by hand."
+              }
+              error={errors.deliveryAddressId?.message}
+            >
+              {!addressBookEmpty ? (
+                <SearchableSelect
+                  value={deliveryAddressId}
+                  onChange={pickAddress}
+                  options={[
+                    { value: "", label: "Enter destination manually" },
+                    ...addressList.map((a) => ({
+                      value: a.id,
+                      label: a.label,
+                      hint: a.city,
+                    })),
+                  ]}
+                  placeholder="Enter destination manually"
+                  onSearchChange={addressSearch.onSearchChange}
+                  loading={addresses.isFetching}
+                  // The picked address is usually off the page a search left
+                  // loaded; without this the trigger would read as empty on a
+                  // field that is set.
+                  selectedLabel={
+                    pickedAddress
+                      ? `${pickedAddress.label} · ${pickedAddress.city}`
+                      : undefined
+                  }
+                  emptyText="No saved destination matches that."
+                />
+              ) : (
+                <p className="text-[12.5px] text-adm-muted">
+                  No saved destinations yet - enter this one below, or{" "}
+                  <Link
+                    href="/admin/delivery-addresses/new"
+                    className="font-medium text-console underline underline-offset-2"
+                  >
+                    add it to the address book
+                  </Link>{" "}
+                  to reuse it.
+                </p>
+              )}
+            </AdminField>
+            {pickedAddress ? (
+              <div className="rounded-none border border-[#155744]/45 bg-[#F1F6EE] px-3 py-2 text-[12.5px] text-adm-muted">
                 <p className="mb-0.5 flex items-center gap-1 text-[10.5px] font-bold uppercase tracking-[0.09em] text-console">
-                  <Check className="h-3 w-3 flex-none" /> Driving this trip
+                  <Check className="h-3 w-3 flex-none" /> Delivering to
                 </p>
                 <p className="min-w-0 font-medium text-adm-ink [overflow-wrap:anywhere]">
-                  {ovName || pickedDriver.name}
+                  {pickedAddress.label} · {pickedAddress.city}
+                  {pickedAddress.area ? `, ${pickedAddress.area}` : ""}
                 </p>
-                <p className="min-w-0 [overflow-wrap:anywhere]">
-                  <Mono>{ovPhone || pickedDriver.phone}</Mono>
-                  {ovCompany ? ` · ${ovCompany}` : ""}
-                  {ovCity ? ` · ${ovCity}` : ""}
-                </p>
+                {pickedAddress.shopName ? (
+                  <p className="min-w-0 [overflow-wrap:anywhere]">
+                    {pickedAddress.shopName}
+                  </p>
+                ) : null}
+                {pickedAddress.digitalAddress || pickedAddress.landmark ? (
+                  <p className="min-w-0 [overflow-wrap:anywhere]">
+                    {pickedAddress.digitalAddress ? (
+                      <Mono>{pickedAddress.digitalAddress}</Mono>
+                    ) : null}
+                    {pickedAddress.digitalAddress && pickedAddress.landmark
+                      ? " · "
+                      : ""}
+                    {pickedAddress.landmark ?? ""}
+                  </p>
+                ) : null}
+                {pickedAddress.contactName || pickedAddress.contactPhone ? (
+                  <p className="min-w-0 [overflow-wrap:anywhere]">
+                    Receives: {pickedAddress.contactName ?? ""}
+                    {pickedAddress.contactName && pickedAddress.contactPhone
+                      ? " · "
+                      : ""}
+                    {pickedAddress.contactPhone ? (
+                      <Mono>{pickedAddress.contactPhone}</Mono>
+                    ) : null}
+                  </p>
+                ) : null}
               </div>
-              <AdminButton
-                type="button"
-                variant="outline"
-                size="sm"
-                className="flex-none"
-                onClick={() => setShowDriverOverrides(true)}
-              >
-                Edit details
-              </AdminButton>
-            </div>
-          ) : (
+            ) : (
+              <AdminField label="Destination" error={errors.destination?.message}>
+                <Input
+                  className={cn(
+                    adminInputClass,
+                    errors.destination && "border-console-red",
+                  )}
+                  placeholder="Accra / Kumasi / address"
+                  {...register("destination")}
+                />
+              </AdminField>
+            )}
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <AdminField label="Name" error={errors.driverName?.message}>
+              <AdminField
+                label="Truck registration"
+                error={errors.truckReg?.message}
+              >
                 <Input
-                  className={cn(
-                    adminInputClass,
-                    errors.driverName && "border-console-red",
-                  )}
-                  {...register("driverName")}
-                />
-              </AdminField>
-              <AdminField label="Phone" error={errors.driverPhone?.message}>
-                <Input
-                  type="tel"
-                  className={cn(
-                    adminInputClass,
-                    errors.driverPhone && "border-console-red",
-                  )}
-                  {...register("driverPhone")}
+                  className={cn(adminInputClass, errors.truckReg && "border-console-red")}
+                  placeholder="GT-1234-24"
+                  {...register("truckReg")}
                 />
               </AdminField>
               <AdminField
-                label="Email"
+                label="Truck capacity (kg)"
                 optional
-                error={errors.driverEmail?.message}
+                hint="The load meter warns you past this."
+                error={errors.truckCapacityKg?.message}
               >
                 <Input
-                  type="email"
+                  inputMode="decimal"
                   className={cn(
                     adminInputClass,
-                    errors.driverEmail && "border-console-red",
+                    errors.truckCapacityKg && "border-console-red",
                   )}
-                  {...register("driverEmail")}
+                  {...register("truckCapacityKg")}
                 />
               </AdminField>
-              <AdminField
-                label="Company"
-                optional
-                hint="Haulage company or leave blank for solo"
-              >
+              <AdminField label="Expected arrival" optional>
                 <Input
+                  type="date"
                   className={adminInputClass}
-                  {...register("driverCompany")}
+                  {...register("expectedArrivalAt")}
                 />
               </AdminField>
-              <AdminField label="City" optional>
-                <Input className={adminInputClass} {...register("driverCity")} />
-              </AdminField>
-              <AdminField label="Licence no" optional>
-                <Input
-                  className={adminInputClass}
-                  {...register("driverLicenseNo")}
-                />
-              </AdminField>
-              <AdminField label="ID number" optional>
-                <Input
-                  className={adminInputClass}
-                  {...register("driverIdNumber")}
-                />
+              <AdminField label="Notes" optional>
+                <Input className={adminInputClass} {...register("notes")} />
               </AdminField>
             </div>
-          )}
+            {selected.length > 0 && (hasCapacity || selectedKg > 0) ? (
+              <LoadMeter loadedKg={selectedKg} capacityKg={hasCapacity ? capacityKg : null} />
+            ) : null}
+          </section>
+
+          <section className="flex flex-col gap-4 pt-3 sm:pt-6">
+            <StepHead
+              step={4}
+              title="Driver"
+              hint="Who has the truck. Pick from the directory or enter the trip's driver by hand."
+            />
+            {/* Same rule as the destination: the directory stays visible even
+                when it is empty, so its existence is discoverable. */}
+            <AdminField
+              label="Driver"
+              hint={driverBookEmpty ? undefined : "Type to search the directory."}
+              error={errors.driverId?.message}
+            >
+              {!driverBookEmpty ? (
+                <SearchableSelect
+                  value={driverId}
+                  onChange={pickDriver}
+                  options={[
+                    { value: "", label: "Enter details manually" },
+                    ...driverList.map((d) => ({
+                      value: d.id,
+                      label: d.name,
+                      hint: d.phone,
+                    })),
+                  ]}
+                  placeholder="Enter details manually"
+                  onSearchChange={driverSearch.onSearchChange}
+                  loading={drivers.isFetching}
+                  // Same reason as the address picker: the chosen driver is
+                  // often not among the rows a later search loaded.
+                  selectedLabel={
+                    pickedDriver
+                      ? `${pickedDriver.name} · ${pickedDriver.phone}`
+                      : undefined
+                  }
+                  emptyText="No driver matches that."
+                />
+              ) : (
+                <p className="text-[12.5px] text-adm-muted">
+                  No drivers saved yet - enter this trip&apos;s driver below, or{" "}
+                  <Link
+                    href="/admin/drivers/new"
+                    className="font-medium text-console underline underline-offset-2"
+                  >
+                    add them to the register
+                  </Link>{" "}
+                  to reuse them.
+                </p>
+              )}
+            </AdminField>
+            {pickedDriver && !showDriverOverrides ? (
+              <div className="flex flex-wrap items-center justify-between gap-2 rounded-none border border-[#155744]/45 bg-[#F1F6EE] px-3 py-2">
+                <div className="min-w-0 text-[12.5px] text-adm-muted">
+                  <p className="mb-0.5 flex items-center gap-1 text-[10.5px] font-bold uppercase tracking-[0.09em] text-console">
+                    <Check className="h-3 w-3 flex-none" /> Driving this trip
+                  </p>
+                  <p className="min-w-0 font-medium text-adm-ink [overflow-wrap:anywhere]">
+                    {ovName || pickedDriver.name}
+                  </p>
+                  <p className="min-w-0 [overflow-wrap:anywhere]">
+                    <Mono>{ovPhone || pickedDriver.phone}</Mono>
+                    {ovCompany ? ` · ${ovCompany}` : ""}
+                    {ovCity ? ` · ${ovCity}` : ""}
+                  </p>
+                </div>
+                <AdminButton
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="flex-none"
+                  onClick={() => setShowDriverOverrides(true)}
+                >
+                  Edit details
+                </AdminButton>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <AdminField label="Name" error={errors.driverName?.message}>
+                  <Input
+                    className={cn(
+                      adminInputClass,
+                      errors.driverName && "border-console-red",
+                    )}
+                    {...register("driverName")}
+                  />
+                </AdminField>
+                <AdminField label="Phone" error={errors.driverPhone?.message}>
+                  <Input
+                    type="tel"
+                    className={cn(
+                      adminInputClass,
+                      errors.driverPhone && "border-console-red",
+                    )}
+                    {...register("driverPhone")}
+                  />
+                </AdminField>
+                <AdminField
+                  label="Email"
+                  optional
+                  error={errors.driverEmail?.message}
+                >
+                  <Input
+                    type="email"
+                    className={cn(
+                      adminInputClass,
+                      errors.driverEmail && "border-console-red",
+                    )}
+                    {...register("driverEmail")}
+                  />
+                </AdminField>
+                <AdminField
+                  label="Company"
+                  optional
+                  hint="Haulage company or leave blank for solo"
+                >
+                  <Input
+                    className={adminInputClass}
+                    {...register("driverCompany")}
+                  />
+                </AdminField>
+                <AdminField label="City" optional>
+                  <Input className={adminInputClass} {...register("driverCity")} />
+                </AdminField>
+                <AdminField label="Licence no" optional>
+                  <Input
+                    className={adminInputClass}
+                    {...register("driverLicenseNo")}
+                  />
+                </AdminField>
+                <AdminField label="ID number" optional>
+                  <Input
+                    className={adminInputClass}
+                    {...register("driverIdNumber")}
+                  />
+                </AdminField>
+              </div>
+            )}
+          </section>
         </AdminCard>
 
         <div className="flex flex-wrap justify-end gap-2">

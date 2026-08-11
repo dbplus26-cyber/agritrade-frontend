@@ -42,7 +42,7 @@ function ProfitTooltip({
 }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-[6px] border border-adm-line bg-adm-card px-3 py-2 text-[12px] shadow-[0_1px_2px_rgba(16,24,40,0.05)]">
+    <div className="rounded-none border border-adm-line bg-adm-card px-3 py-2 text-[12px] shadow-[0_1px_2px_rgba(16,24,40,0.05)]">
       <div className="mb-1 font-semibold text-adm-ink">{label}</div>
       {payload.map((p) => (
         <div key={p.name} className="flex items-center justify-between gap-4">
@@ -129,7 +129,7 @@ export function ProfitBarChart({
                   name={s.label}
                   fill={s.color}
                   maxBarSize={26}
-                  radius={[2, 2, 0, 0]}
+                  radius={[0, 0, 0, 0]}
                 />
               ))}
             </BarChart>

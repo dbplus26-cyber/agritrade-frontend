@@ -576,7 +576,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                   aria-selected={active}
                   onClick={() => setActiveSaleId(s.id)}
                   className={cn(
-                    "flex-none rounded-[6px] border px-3 py-2 text-left outline-none focus-visible:ring-2 focus-visible:ring-console/40",
+                    "flex-none rounded-none border px-3 py-2 text-left outline-none focus-visible:ring-2 focus-visible:ring-console/40",
                     active
                       ? "border-console bg-console text-white"
                       : "border-adm-line bg-[#FBFCF7] text-adm-ink hover:bg-adm-sunken",
@@ -744,7 +744,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
             {fillNote ? (
               <p
                 role="status"
-                className="mt-2 rounded-[6px] border border-adm-line bg-adm-sunken px-3 py-2 text-[12.5px] text-adm-ink"
+                className="mt-2 rounded-none border border-adm-line bg-adm-sunken px-3 py-2 text-[12.5px] text-adm-ink"
               >
                 {fillNote}
               </p>
@@ -864,7 +864,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
           {serverError ? (
             <p
               role="alert"
-              className="rounded-[6px] border border-console-red/50 bg-console-red/[0.06] px-3 py-2 text-[12.5px] font-medium text-console-red"
+              className="rounded-none border border-console-red/50 bg-console-red/[0.06] px-3 py-2 text-[12.5px] font-medium text-console-red"
             >
               {serverError}
             </p>

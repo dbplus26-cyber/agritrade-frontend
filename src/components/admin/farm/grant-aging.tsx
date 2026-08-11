@@ -100,13 +100,13 @@ export function GrantAging() {
             <Link
               href={`/admin/farmers/${row.original.farmer.id}`}
               onClick={(e) => e.stopPropagation()}
-              className="block max-w-[90%] truncate font-semibold text-adm-ink underline-offset-2 hover:underline"
+              className="block @2xl/table:max-w-[90%] [overflow-wrap:anywhere] @2xl/table:truncate font-semibold text-adm-ink underline-offset-2 hover:underline"
               title={row.original.farmer.name}
             >
               {row.original.farmer.name}
             </Link>
             {row.original.farmer.phone ? (
-              <div className="truncate text-[12.5px] text-adm-muted">
+              <div className="[overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-muted">
                 {row.original.farmer.phone}
               </div>
             ) : null}

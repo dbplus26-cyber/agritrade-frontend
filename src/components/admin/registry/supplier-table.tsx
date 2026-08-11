@@ -181,11 +181,11 @@ export function SupplierTable() {
               onClick={(e) => e.stopPropagation()}
             >
               <RegistryAvatar name={s.name} photoUrl={s.photoUrl} />
-              <span className="block min-w-0 max-w-[85%]">
-                <span className="block truncate font-medium text-adm-ink">
+              <span className="block min-w-0 @2xl/table:max-w-[85%]">
+                <span className="block [overflow-wrap:anywhere] @2xl/table:truncate font-medium text-adm-ink">
                   {s.name}
                 </span>
-                <span className="block truncate text-[12.5px] text-adm-faint">
+                <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-faint">
                   {s.community ?? "No community"}
                 </span>
               </span>
@@ -218,7 +218,7 @@ export function SupplierTable() {
         enableSorting: false,
         meta: columnMeta({ wide: true }),
         cell: ({ row }) => (
-          <span className="block max-w-[22rem] truncate text-adm-muted">
+          <span className="block @2xl/table:max-w-[22rem] [overflow-wrap:anywhere] @2xl/table:truncate text-adm-muted">
             {SOURCE_LABEL[row.original.sourceType]}
           </span>
         ),

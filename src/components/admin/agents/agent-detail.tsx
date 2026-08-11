@@ -98,7 +98,7 @@ function TxMarker({ type }: { type: FloatTxType }) {
   return (
     <span
       title={TX_LABEL[type]}
-      className="font-adminmono mt-0.5 flex h-6 w-6 flex-none items-center justify-center rounded-[6px] text-[10px] font-bold"
+      className="font-adminmono mt-0.5 flex h-6 w-6 flex-none items-center justify-center rounded-none text-[10px] font-bold"
       style={{ background: t.bg, color: t.fg }}
     >
       {TX_CODE[type]}
@@ -492,7 +492,7 @@ function ReconcileDialog({
                 were 2px apart with the label and its figure at almost the
                 same weight, so the whole computation read as one texture and
                 the total - the only line anyone needs - sat inside it. */}
-            <div className="rounded-[6px] border border-adm-line bg-adm-sunken px-4 py-1">
+            <div className="rounded-none border border-adm-line bg-adm-sunken px-4 py-1">
               {line(
                 p.since
                   ? `Opening (last count ${formatConsoleDate(p.since)})`

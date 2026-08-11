@@ -329,7 +329,7 @@ export function PaymentDialog({
                     key={f.key}
                     type="button"
                     onClick={() => fillAmount(f.amount)}
-                    className="flex w-full cursor-pointer flex-col items-start gap-0.5 rounded-[6px] border border-adm-line bg-adm-card px-3 py-2 text-left transition-colors outline-none hover:border-console hover:bg-console/[0.04] focus-visible:border-console focus-visible:ring-3 focus-visible:ring-leaf/30"
+                    className="flex w-full cursor-pointer flex-col items-start gap-0.5 rounded-none border border-adm-line bg-adm-card px-3 py-2 text-left transition-colors outline-none hover:border-console hover:bg-console/[0.04] focus-visible:border-console focus-visible:ring-3 focus-visible:ring-leaf/30"
                   >
                     <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                       {f.label}
@@ -344,7 +344,7 @@ export function PaymentDialog({
 
           </section>
 
-          <section className="flex flex-col gap-3 border-t border-adm-hairline pt-5">
+          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
             <SectionHeading
               className="mb-0"
               hint="How the money reached you, and the trail that proves it did."

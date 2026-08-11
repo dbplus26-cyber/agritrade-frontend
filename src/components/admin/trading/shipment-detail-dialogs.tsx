@@ -241,7 +241,7 @@ export function AddSalesDialog({
             No other sale is ready to ship right now.
           </p>
         ) : (
-          <div className="max-h-[46dvh] overflow-y-auto rounded-[6px] border border-adm-line">
+          <div className="max-h-[46dvh] overflow-y-auto rounded-none border border-adm-line">
             {sales.map((s) => (
               <label
                 key={s.id}
@@ -284,7 +284,7 @@ export function AddSalesDialog({
         {serverError ? (
           <p
             role="alert"
-            className="rounded-[6px] border border-console-red/50 bg-console-red/[0.06] px-3 py-2 text-[12.5px] font-medium text-console-red"
+            className="rounded-none border border-console-red/50 bg-console-red/[0.06] px-3 py-2 text-[12.5px] font-medium text-console-red"
           >
             {serverError}
           </p>

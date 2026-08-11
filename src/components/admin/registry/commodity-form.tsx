@@ -266,7 +266,7 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
           </div>
         </section>
 
-        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
           <SectionHeading
             className="mb-0"
             hint="Conventions the console uses when it shows this commodity: nothing here changes how stock is counted."
@@ -315,7 +315,7 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
           </div>
         </section>
 
-        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
           <SectionHeading
             className="mb-0"
             hint="What the public site shows for this commodity once it is published."
@@ -361,7 +361,7 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
                   becomes a picker preview once Edit is pressed. */}
               {readOnly ? (
                 <ViewablePhoto
-                  className="rounded-[6px]"
+                  className="rounded-none"
                   name={commodity?.name ?? "Commodity"}
                   size={96}
                   src={previewUrl}
@@ -371,10 +371,10 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
                 <img
                   src={previewUrl}
                   alt="Commodity photo"
-                  className="h-14 w-14 flex-none rounded-[4px] border border-adm-line object-cover"
+                  className="h-14 w-14 flex-none rounded-none border border-adm-line object-cover"
                 />
               ) : (
-                <span className="flex h-14 w-14 flex-none items-center justify-center rounded-[4px] border border-dashed border-adm-line text-[10px] text-adm-faint">
+                <span className="flex h-14 w-14 flex-none items-center justify-center rounded-none border border-dashed border-adm-line text-[10px] text-adm-faint">
                   No photo
                 </span>
               )}
@@ -412,7 +412,7 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
           </div>
         </section>
 
-        <div className="border-t border-adm-hairline pt-5">
+        <div className="pt-3 sm:pt-6">
           <EditableFormActions
             mode={mode}
             saving={saving}

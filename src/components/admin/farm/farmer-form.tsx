@@ -147,237 +147,239 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
         onSubmit={handleSubmit(onSubmit)}
         className="@container flex flex-col gap-4"
       >
-        <AdminCard className="flex flex-col gap-3 px-5 py-4">
-          <SectionHeading
-            className="mb-0"
-            hint="Who this outgrower is, and the ID you verified them against."
-          >
-            Identity
-          </SectionHeading>
-          {/* Not an AdminField: the control here is a button, and wrapping a
-              button in a <label> misroutes its clicks. Same label markup as
-              AdminField so it stays in step with the fields under it. */}
-          <div>
-            <span className="mb-1 block text-[13px] font-semibold text-adm-ink">
-              Photo <span className="font-normal text-adm-faint">(optional)</span>
-            </span>
-            <div className="flex flex-wrap items-center gap-4">
-              {preview ? (
-                // eslint-disable-next-line @next/next/no-img-element -- Cloudinary/blob
-                <img
-                  src={preview}
-                  alt=""
-                  className="h-16 w-16 rounded-full object-cover"
+        <AdminCard className="flex flex-col gap-5 px-5 py-4">
+          <section className="flex flex-col gap-3">
+            <SectionHeading
+              className="mb-0"
+              hint="Who this outgrower is, and the ID you verified them against."
+            >
+              Identity
+            </SectionHeading>
+            {/* Not an AdminField: the control here is a button, and wrapping a
+                button in a <label> misroutes its clicks. Same label markup as
+                AdminField so it stays in step with the fields under it. */}
+            <div>
+              <span className="mb-1 block text-[13px] font-semibold text-adm-ink">
+                Photo <span className="font-normal text-adm-faint">(optional)</span>
+              </span>
+              <div className="flex flex-wrap items-center gap-4">
+                {preview ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- Cloudinary/blob
+                  <img
+                    src={preview}
+                    alt=""
+                    className="h-16 w-16 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-adm-sunken text-[11px] text-adm-faint">
+                    No photo
+                  </div>
+                )}
+                <AdminButton
+                  type="button"
+                  variant="outline"
+                  onClick={() => photoInput.current?.click()}
+                >
+                  {preview ? "Change photo" : "Add photo"}
+                </AdminButton>
+                <input
+                  ref={photoInput}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => onPick(e.target.files?.[0])}
                 />
-              ) : (
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-adm-sunken text-[11px] text-adm-faint">
-                  No photo
-                </div>
-              )}
-              <AdminButton
-                type="button"
-                variant="outline"
-                onClick={() => photoInput.current?.click()}
-              >
-                {preview ? "Change photo" : "Add photo"}
-              </AdminButton>
-              <input
-                ref={photoInput}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => onPick(e.target.files?.[0])}
-              />
+              </div>
             </div>
-          </div>
 
-          <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
-            <AdminField label="Name" error={errors.name?.message}>
-              <Input
-                placeholder="e.g. Abukari Yakubu"
-                className={cn(adminInputClass, errors.name && "border-console-red")}
-                {...register("name")}
-              />
-            </AdminField>
-            <AdminField label="Phone" optional error={errors.phone?.message}>
-              <Input
-                inputMode="tel"
-                placeholder="e.g. 024 000 0000"
-                className={cn(adminInputClass, errors.phone && "border-console-red")}
-                {...register("phone")}
-              />
-            </AdminField>
-            <AdminField
-              label="Date of birth"
-              optional
-              error={errors.dateOfBirth?.message}
-            >
-              <Input
-                type="date"
-                className={cn(
-                  adminInputClass,
-                  errors.dateOfBirth && "border-console-red",
-                )}
-                {...register("dateOfBirth")}
-              />
-            </AdminField>
-            <AdminField label="ID type" optional error={errors.idType?.message}>
-              <Input
-                list="farmer-id-types"
-                placeholder="e.g. Ghana Card"
-                className={cn(adminInputClass, errors.idType && "border-console-red")}
-                {...register("idType")}
-              />
-              <datalist id="farmer-id-types">
-                {ID_TYPE_SUGGESTIONS.map((t) => (
-                  <option key={t} value={t} />
-                ))}
-              </datalist>
-            </AdminField>
-            <AdminField label="ID number" optional error={errors.idNumber?.message}>
-              <Input
-                placeholder="e.g. GHA-000000000-0"
-                className={cn(
-                  adminInputClass,
-                  errors.idNumber && "border-console-red",
-                )}
-                {...register("idNumber")}
-              />
-            </AdminField>
-          </div>
-        </AdminCard>
+            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+              <AdminField label="Name" error={errors.name?.message}>
+                <Input
+                  placeholder="e.g. Abukari Yakubu"
+                  className={cn(adminInputClass, errors.name && "border-console-red")}
+                  {...register("name")}
+                />
+              </AdminField>
+              <AdminField label="Phone" optional error={errors.phone?.message}>
+                <Input
+                  inputMode="tel"
+                  placeholder="e.g. 024 000 0000"
+                  className={cn(adminInputClass, errors.phone && "border-console-red")}
+                  {...register("phone")}
+                />
+              </AdminField>
+              <AdminField
+                label="Date of birth"
+                optional
+                error={errors.dateOfBirth?.message}
+              >
+                <Input
+                  type="date"
+                  className={cn(
+                    adminInputClass,
+                    errors.dateOfBirth && "border-console-red",
+                  )}
+                  {...register("dateOfBirth")}
+                />
+              </AdminField>
+              <AdminField label="ID type" optional error={errors.idType?.message}>
+                <Input
+                  list="farmer-id-types"
+                  placeholder="e.g. Ghana Card"
+                  className={cn(adminInputClass, errors.idType && "border-console-red")}
+                  {...register("idType")}
+                />
+                <datalist id="farmer-id-types">
+                  {ID_TYPE_SUGGESTIONS.map((t) => (
+                    <option key={t} value={t} />
+                  ))}
+                </datalist>
+              </AdminField>
+              <AdminField label="ID number" optional error={errors.idNumber?.message}>
+                <Input
+                  placeholder="e.g. GHA-000000000-0"
+                  className={cn(
+                    adminInputClass,
+                    errors.idNumber && "border-console-red",
+                  )}
+                  {...register("idNumber")}
+                />
+              </AdminField>
+            </div>
+          </section>
 
-        <AdminCard className="flex flex-col gap-3 px-5 py-4">
-          <SectionHeading
-            className="mb-0"
-            hint="Where to find them, and how much land they work."
-          >
-            Where they farm
-          </SectionHeading>
-          <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
-            <AdminField label="Community" optional error={errors.community?.message}>
-              <Input
-                placeholder="e.g. Kumbungu"
-                className={cn(
-                  adminInputClass,
-                  errors.community && "border-console-red",
-                )}
-                {...register("community")}
-              />
-            </AdminField>
-            <AdminField
-              label="Farm location"
-              optional
-              error={errors.farmLocation?.message}
+          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
+            <SectionHeading
+              className="mb-0"
+              hint="Where to find them, and how much land they work."
             >
-              <Input
-                placeholder="e.g. near the Bontanga dam"
+              Where they farm
+            </SectionHeading>
+            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+              <AdminField label="Community" optional error={errors.community?.message}>
+                <Input
+                  placeholder="e.g. Kumbungu"
+                  className={cn(
+                    adminInputClass,
+                    errors.community && "border-console-red",
+                  )}
+                  {...register("community")}
+                />
+              </AdminField>
+              <AdminField
+                label="Farm location"
+                optional
+                error={errors.farmLocation?.message}
+              >
+                <Input
+                  placeholder="e.g. near the Bontanga dam"
+                  className={cn(
+                    adminInputClass,
+                    errors.farmLocation && "border-console-red",
+                  )}
+                  {...register("farmLocation")}
+                />
+              </AdminField>
+              <AdminField
+                label="Farm size (acres)"
+                optional
+                error={errors.farmSizeAcres?.message}
+              >
+                <Input
+                  inputMode="decimal"
+                  placeholder="e.g. 2.5"
+                  className={cn(
+                    adminInputClass,
+                    errors.farmSizeAcres && "border-console-red",
+                  )}
+                  {...register("farmSizeAcres")}
+                />
+              </AdminField>
+            </div>
+            <AdminField label="Address" optional error={errors.address?.message}>
+              <textarea
+                rows={4}
+                placeholder="e.g. House 12, Sagnarigu, Tamale"
                 className={cn(
                   adminInputClass,
-                  errors.farmLocation && "border-console-red",
+                  "h-auto min-h-[60px] w-full resize-y py-2",
+                  errors.address && "border-console-red",
                 )}
-                {...register("farmLocation")}
+                {...register("address")}
               />
             </AdminField>
-            <AdminField
-              label="Farm size (acres)"
-              optional
-              error={errors.farmSizeAcres?.message}
-            >
-              <Input
-                inputMode="decimal"
-                placeholder="e.g. 2.5"
-                className={cn(
-                  adminInputClass,
-                  errors.farmSizeAcres && "border-console-red",
-                )}
-                {...register("farmSizeAcres")}
-              />
-            </AdminField>
-          </div>
-          <AdminField label="Address" optional error={errors.address?.message}>
-            <textarea
-              rows={4}
-              placeholder="e.g. House 12, Sagnarigu, Tamale"
-              className={cn(
-                adminInputClass,
-                "h-auto min-h-[60px] w-full resize-y py-2",
-                errors.address && "border-console-red",
-              )}
-              {...register("address")}
-            />
-          </AdminField>
-        </AdminCard>
+          </section>
 
-        <AdminCard className="flex flex-col gap-3 px-5 py-4">
-          <SectionHeading
-            className="mb-0"
-            hint="Who to reach if the farmer cannot be, and the wallet repayments settle to."
-          >
-            Contacts and payout
-          </SectionHeading>
-          <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
-            <AdminField
-              label="Next of kin name"
-              optional
-              error={errors.nextOfKinName?.message}
+          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
+            <SectionHeading
+              className="mb-0"
+              hint="Who to reach if the farmer cannot be, and the wallet repayments settle to."
             >
-              <Input
-                placeholder="e.g. Fatima Abukari"
-                className={cn(
-                  adminInputClass,
-                  errors.nextOfKinName && "border-console-red",
-                )}
-                {...register("nextOfKinName")}
-              />
-            </AdminField>
-            <AdminField
-              label="Next of kin phone"
-              optional
-              error={errors.nextOfKinPhone?.message}
-            >
-              <Input
-                inputMode="tel"
-                placeholder="e.g. 024 000 0000"
-                className={cn(
-                  adminInputClass,
-                  errors.nextOfKinPhone && "border-console-red",
-                )}
-                {...register("nextOfKinPhone")}
-              />
-            </AdminField>
-            <AdminField
-              label="Mobile money number"
-              optional
-              error={errors.momoNumber?.message}
-            >
-              <Input
-                inputMode="tel"
-                placeholder="e.g. 024 000 0000"
-                className={cn(
-                  adminInputClass,
-                  errors.momoNumber && "border-console-red",
-                )}
-                {...register("momoNumber")}
-              />
-            </AdminField>
-          </div>
-        </AdminCard>
+              Contacts and payout
+            </SectionHeading>
+            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+              <AdminField
+                label="Next of kin name"
+                optional
+                error={errors.nextOfKinName?.message}
+              >
+                <Input
+                  placeholder="e.g. Fatima Abukari"
+                  className={cn(
+                    adminInputClass,
+                    errors.nextOfKinName && "border-console-red",
+                  )}
+                  {...register("nextOfKinName")}
+                />
+              </AdminField>
+              <AdminField
+                label="Next of kin phone"
+                optional
+                error={errors.nextOfKinPhone?.message}
+              >
+                <Input
+                  inputMode="tel"
+                  placeholder="e.g. 024 000 0000"
+                  className={cn(
+                    adminInputClass,
+                    errors.nextOfKinPhone && "border-console-red",
+                  )}
+                  {...register("nextOfKinPhone")}
+                />
+              </AdminField>
+              <AdminField
+                label="Mobile money number"
+                optional
+                error={errors.momoNumber?.message}
+              >
+                <Input
+                  inputMode="tel"
+                  placeholder="e.g. 024 000 0000"
+                  className={cn(
+                    adminInputClass,
+                    errors.momoNumber && "border-console-red",
+                  )}
+                  {...register("momoNumber")}
+                />
+              </AdminField>
+            </div>
+          </section>
 
-        <AdminCard className="flex flex-col gap-3 px-5 py-4">
-          <SectionHeading
-            className="mb-0"
-            hint="Anything about this farmer the next person to open the record should know."
-          >
-            Anything else
-          </SectionHeading>
-          <AdminField label="Notes" optional error={errors.notes?.message}>
-            <Input
-              placeholder="e.g. Farms with his two brothers"
-              className={adminInputClass}
-              {...register("notes")}
-            />
-          </AdminField>
+          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
+            <SectionHeading
+              className="mb-0"
+              hint="Anything about this farmer the next person to open the record should know."
+            >
+              Anything else
+            </SectionHeading>
+            <AdminField label="Notes" optional error={errors.notes?.message}>
+              <Input
+                placeholder="e.g. Farms with his two brothers"
+                className={adminInputClass}
+                {...register("notes")}
+              />
+            </AdminField>
+          </section>
         </AdminCard>
 
         {/* Cancel returns to where the record is read rather than locking

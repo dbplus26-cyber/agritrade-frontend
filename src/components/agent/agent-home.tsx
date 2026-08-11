@@ -52,7 +52,7 @@ export function AgentHome() {
 
   return (
     <div className="flex flex-col gap-4">
-      <section className="rounded-lg border border-soil/25 bg-paper px-4 py-4">
+      <section className="rounded-none border border-soil/25 bg-paper px-4 py-4">
         <p className="text-[11px] font-bold tracking-[0.08em] text-soil uppercase">
           My float
         </p>
@@ -93,33 +93,33 @@ export function AgentHome() {
       <div className="grid grid-cols-1 gap-2.5">
         <Link
           href="/agent/purchases/new"
-          className="rounded-lg bg-forest px-4 py-3.5 text-center text-[15px] font-semibold text-paper transition-colors hover:bg-board"
+          className="rounded-none bg-forest px-4 py-3.5 text-center text-[15px] font-semibold text-paper transition-colors hover:bg-board"
         >
           Record a purchase
         </Link>
         <Link
           href="/agent/sends"
-          className="rounded-lg border-[1.5px] border-forest bg-paper px-4 py-3.5 text-center text-[15px] font-semibold text-forest transition-colors hover:bg-surface-alt"
+          className="rounded-none border-[1.5px] border-forest bg-paper px-4 py-3.5 text-center text-[15px] font-semibold text-forest transition-colors hover:bg-surface-alt"
         >
           Send money
         </Link>
         <div className="grid grid-cols-2 gap-2.5">
           <Link
             href="/agent/expenses/new"
-            className="rounded-lg border border-soil/35 bg-paper px-4 py-3 text-center text-[13.5px] font-medium text-ink transition-colors hover:bg-surface-alt"
+            className="rounded-none border border-soil/35 bg-paper px-4 py-3 text-center text-[13.5px] font-medium text-ink transition-colors hover:bg-surface-alt"
           >
             Record expense
           </Link>
           <Link
             href="/agent/purchases"
-            className="rounded-lg border border-soil/35 bg-paper px-4 py-3 text-center text-[13.5px] font-medium text-ink transition-colors hover:bg-surface-alt"
+            className="rounded-none border border-soil/35 bg-paper px-4 py-3 text-center text-[13.5px] font-medium text-ink transition-colors hover:bg-surface-alt"
           >
             My purchases
           </Link>
         </div>
       </div>
 
-      <section className="rounded-lg border border-soil/25 bg-paper px-4 py-3">
+      <section className="rounded-none border border-soil/25 bg-paper px-4 py-3">
         <p className="mb-1 text-[11px] font-bold tracking-[0.08em] text-soil uppercase">
           Recent movements
         </p>

@@ -41,7 +41,7 @@ export function PhotoViewDialog({
             {name}
           </DialogTitle>
         </DialogHeader>
-        <div className="aspect-square w-full overflow-hidden rounded-[8px] bg-adm-sunken">
+        <div className="aspect-square w-full overflow-hidden rounded-none bg-adm-sunken">
           {/* eslint-disable-next-line @next/next/no-img-element -- Cloudinary, full-view photo */}
           <img src={src} alt={name} className="h-full w-full object-cover" />
         </div>

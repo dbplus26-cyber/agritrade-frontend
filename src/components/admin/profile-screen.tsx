@@ -145,7 +145,7 @@ function IdentityCard() {
           ) : null}
         </div>
 
-        <div className="mt-6 border-t border-adm-hairline pt-5">
+        <div className="mt-6 pt-3 sm:pt-6">
           {editing ? (
             <ProfileEditForm user={user} onClose={() => setEditing(false)} />
           ) : (
@@ -264,14 +264,7 @@ function ProfileEditForm({
           {...register("phone")}
         />
       </AdminField>
-      <div className="flex gap-2">
-        <AdminButton
-          type="submit"
-          disabled={isLoading}
-          size="lg"
-        >
-          {isLoading ? "Saving…" : "Save changes"}
-        </AdminButton>
+      <div className="flex justify-end gap-2">
         <AdminButton
           type="button"
           variant="outline"
@@ -280,6 +273,13 @@ function ProfileEditForm({
           onClick={onClose}
         >
           Cancel
+        </AdminButton>
+        <AdminButton
+          type="submit"
+          disabled={isLoading}
+          size="lg"
+        >
+          {isLoading ? "Saving…" : "Save changes"}
         </AdminButton>
       </div>
     </form>
@@ -389,14 +389,7 @@ function PasswordCard() {
               />
             </AdminField>
           </div>
-          <div className="flex gap-2">
-            <AdminButton
-              type="submit"
-              disabled={isLoading}
-              size="lg"
-            >
-              {isLoading ? "Updating…" : "Update password"}
-            </AdminButton>
+          <div className="flex justify-end gap-2">
             <AdminButton
               type="button"
               variant="outline"
@@ -404,6 +397,13 @@ function PasswordCard() {
               onClick={close}
             >
               Cancel
+            </AdminButton>
+            <AdminButton
+              type="submit"
+              disabled={isLoading}
+              size="lg"
+            >
+              {isLoading ? "Updating…" : "Update password"}
             </AdminButton>
           </div>
         </form>
@@ -449,7 +449,7 @@ function RecoveryCodesPanel({
     }
   };
   return (
-    <div className="mt-3 rounded-[6px] border border-console-gold/40 bg-[#FBF6EA] p-3.5">
+    <div className="mt-3 rounded-none border border-console-gold/40 bg-[#FBF6EA] p-3.5">
       <div className="text-[12.5px] font-semibold text-adm-ink">
         Save these recovery codes now - they are shown only once.
       </div>
@@ -628,13 +628,7 @@ function TwoFactorCard() {
               className={adminInputClass}
             />
           </AdminField>
-          <div className="flex gap-2">
-            <AdminButton
-              disabled={isConfirming || !/^\d{6}$/.test(code.trim())}
-              onClick={confirmCode}
-            >
-              {isConfirming ? "Confirming…" : "Confirm & enable"}
-            </AdminButton>
+          <div className="flex justify-end gap-2">
             <AdminButton
               variant="ghost"
               onClick={() => {
@@ -643,6 +637,12 @@ function TwoFactorCard() {
               }}
             >
               Cancel
+            </AdminButton>
+            <AdminButton
+              disabled={isConfirming || !/^\d{6}$/.test(code.trim())}
+              onClick={confirmCode}
+            >
+              {isConfirming ? "Confirming…" : "Confirm & enable"}
             </AdminButton>
           </div>
         </div>
@@ -665,7 +665,16 @@ function TwoFactorCard() {
               className={adminInputClass}
             />
           </AdminField>
-          <div className="flex gap-2">
+          <div className="flex justify-end gap-2">
+            <AdminButton
+              variant="outline"
+              onClick={() => {
+                setStep("idle");
+                setPassword("");
+              }}
+            >
+              Cancel
+            </AdminButton>
             <AdminButton
               variant={step === "disable" ? "danger" : "primary"}
               disabled={
@@ -682,21 +691,12 @@ function TwoFactorCard() {
                   ? "Generating…"
                   : "Generate new codes"}
             </AdminButton>
-            <AdminButton
-              variant="outline"
-              onClick={() => {
-                setStep("idle");
-                setPassword("");
-              }}
-            >
-              Cancel
-            </AdminButton>
           </div>
         </div>
       ) : null}
 
       {enabled && freshCodes === null && step === "idle" ? (
-        <div className="mt-3 flex items-center gap-2 rounded-[6px] bg-[#E6F0E9] px-3 py-[9px] text-[12.5px] text-[#2F5E3D]">
+        <div className="mt-3 flex items-center gap-2 rounded-none bg-[#E6F0E9] px-3 py-[9px] text-[12.5px] text-[#2F5E3D]">
           <span className="font-bold">✓</span>
           <span>
             Two-factor authentication is on. Lost your recovery codes? Generate

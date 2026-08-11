@@ -112,7 +112,7 @@ export function TreasuryScreen() {
           // AGAINST, the column simply grew to the longest description and
           // took the table with it.
           <span
-            className="block max-w-[90%] truncate text-left"
+            className="block @2xl/table:max-w-[90%] [overflow-wrap:anywhere] @2xl/table:truncate text-left"
             title={row.original.description}
           >
             {row.original.description}

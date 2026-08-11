@@ -373,7 +373,7 @@ export function PlotDetail({ id }: { id: string }) {
                   value={docName}
                   onChange={(e) => setDocName(e.target.value)}
                   placeholder="Document name (e.g. Indenture)"
-                  className="h-8 min-w-0 flex-1 rounded-[6px] border border-adm-line bg-adm-card px-2.5 text-[13px] outline-none transition-colors placeholder:text-adm-faint focus:border-console"
+                  className="h-8 min-w-0 flex-1 rounded-none border border-adm-line bg-adm-card px-2.5 text-[13px] outline-none transition-colors placeholder:text-adm-faint focus:border-console"
                 />
                 <FilePicker
                   accept="image/*,application/pdf,.doc,.docx"

@@ -166,7 +166,7 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
                   <ul className="flex flex-col gap-3">
                     {enquiry.replies.map((r) => (
                       <li
-                        className="rounded-[6px] bg-adm-sunken px-3.5 py-3"
+                        className="rounded-none bg-adm-sunken px-3.5 py-3"
                         key={r.id}
                       >
                         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">

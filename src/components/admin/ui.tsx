@@ -241,7 +241,7 @@ export function ToneBadge({
   return (
     <Badge
       className={cn(
-        "gap-1.5 rounded-full border-transparent px-2.5 py-0.5 text-[10px] font-bold tracking-[0.08em] uppercase whitespace-nowrap",
+        "gap-1.5 rounded-[2px] border-transparent px-2.5 py-0.5 text-[10px] font-bold tracking-[0.08em] uppercase whitespace-nowrap",
         className,
       )}
       style={{ color: t.fg, background: t.bg }}
@@ -274,7 +274,7 @@ export function AdminCard({
   return (
     <Card
       className={cn(
-        "block gap-0 rounded-[8px] border border-adm-line bg-adm-card py-0 shadow-[0_1px_2px_rgba(16,24,40,0.05)]",
+        "block gap-0 rounded-none border border-adm-line bg-adm-card py-0 shadow-[0_1px_2px_rgba(16,24,40,0.05)]",
         className,
       )}
     >
@@ -436,7 +436,7 @@ export function AdminButton({
         // Meridian controls: 34px, 6px radius, no offset shadow anywhere. The
         // console's buttons used to shift on hover like a stamped plate, which
         // is charming once and tiring on the fortieth click of a working day.
-        "gap-1.5 rounded-[6px] font-semibold shadow-none transition-colors hover:translate-x-0 hover:translate-y-0 hover:shadow-none",
+        "gap-1.5 rounded-none font-semibold shadow-none transition-colors hover:translate-x-0 hover:translate-y-0 hover:shadow-none",
         size === "md" && "h-[34px] px-3.5 text-[13.5px]",
         size === "lg" && "h-[38px] px-[18px] text-[13.5px]",
         // 28px is a deliberate visual density for row and card actions, but a
@@ -517,13 +517,35 @@ export function AdminField({
       : children;
 
   return (
-    <Label className={cn("block font-normal leading-normal", className)}>
+    // A flex COLUMN filling its grid cell, with the whole field content
+    // anchored to the bottom (justify-end). When two fields share a grid row
+    // and only one carries a hint, the extra text used to push that field's
+    // control below its neighbour's, so every mixed row came out stepped.
+    // Grid rows stretch both cells to the same height; bottom-anchoring the
+    // shorter field's CONTENT - label and control together - lands both
+    // inputs on one line with each label sitting directly on its own input,
+    // instead of a lone label hanging at the top of the cell.
+    <Label
+      // No h-full: as a direct grid child the Label is stretched to the row
+      // height by the grid itself, and a percentage height inside nested
+      // wrapper divs would only invite circular-sizing surprises.
+      //
+      // items-stretch and gap-0 are load-bearing, not decoration: the base
+      // Label ships `flex items-center gap-2`, which the old `block` display
+      // kept dormant. Switching to flex-col woke both up - items-center
+      // shrank every control to content width and centred it, gap-2 padded
+      // the label/hint/control rhythm the mb-* utilities already set.
+      className={cn(
+        "flex flex-col items-stretch justify-end gap-0 font-normal leading-normal",
+        className,
+      )}
+    >
       {/* Four kinds of text live in a field - the LABEL, the value you type,
           the HINT and the ERROR - and they used to sit within half a step of
           each other in size and colour, all in the same muted grey. So a form
           read as one flat wall and nothing said which line was the question
           and which was the answer.
-          
+
           The label is now ink rather than muted and sentence case rather than
           a wide-tracked micro-cap: it is the question being asked, so it reads
           first and it reads as words. "Optional" stays faint, because it
@@ -566,7 +588,7 @@ export function AdminField({
  * was a public-site form control standing in a working tool.
  */
 export const adminInputClass =
-  "h-[38px] w-full rounded-[6px] border border-adm-line bg-adm-card px-3 text-[14.5px] font-medium text-adm-ink shadow-none outline-none transition-[border-color,box-shadow] placeholder:text-adm-faint focus:border-console focus:shadow-[0_0_0_3px_rgba(30,61,43,0.12)] focus-visible:border-console focus-visible:ring-0 aria-invalid:border-console-red";
+  "h-[38px] w-full rounded-none border border-adm-line bg-adm-card px-3 text-[14.5px] font-medium text-adm-ink shadow-none outline-none transition-[border-color,box-shadow] placeholder:text-adm-faint focus:border-console focus:shadow-[0_0_0_3px_rgba(30,61,43,0.12)] focus-visible:border-console focus-visible:ring-0 aria-invalid:border-console-red";
 
 export const adminSelectClass = cn(adminInputClass, "cursor-pointer");
 
@@ -622,12 +644,12 @@ export function EditableFormActions({
   onCancel: () => void;
   onEdit: () => void;
 }) {
+  // Actions sit at the RIGHT edge, cancel before the primary, so every form
+  // in the console ends the same way a dialog does: the eye finds the commit
+  // action in the same place everywhere.
   if (mode === "create") {
     return (
-      <div key="create" className="mt-1 flex gap-2">
-        <AdminButton type="submit" disabled={saving} size="lg">
-          {saving ? "Saving…" : createLabel}
-        </AdminButton>
+      <div key="create" className="mt-1 flex justify-end gap-2">
         <AdminButton
           type="button"
           variant="outline"
@@ -636,6 +658,9 @@ export function EditableFormActions({
           onClick={onCancel}
         >
           Cancel
+        </AdminButton>
+        <AdminButton type="submit" disabled={saving} size="lg">
+          {saving ? "Saving…" : createLabel}
         </AdminButton>
       </div>
     );
@@ -643,10 +668,7 @@ export function EditableFormActions({
 
   if (mode === "editing") {
     return (
-      <div key="editing" className="mt-1 flex gap-2">
-        <AdminButton type="submit" disabled={saving} size="lg">
-          {saving ? "Saving…" : "Save changes"}
-        </AdminButton>
+      <div key="editing" className="mt-1 flex justify-end gap-2">
         <AdminButton
           type="button"
           variant="outline"
@@ -656,12 +678,15 @@ export function EditableFormActions({
         >
           Cancel
         </AdminButton>
+        <AdminButton type="submit" disabled={saving} size="lg">
+          {saving ? "Saving…" : "Save changes"}
+        </AdminButton>
       </div>
     );
   }
 
   return (
-    <div key="locked" className="mt-1 flex gap-2">
+    <div key="locked" className="mt-1 flex justify-end gap-2">
       <AdminButton type="button" variant="gold" size="lg" onClick={onEdit}>
         {editLabel}
       </AdminButton>

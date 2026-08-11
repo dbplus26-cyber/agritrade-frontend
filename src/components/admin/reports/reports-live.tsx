@@ -191,7 +191,7 @@ function AgentPerformance({
           onRetry={() => void refetch()}
         />
       ) : isLoading ? (
-        <Skeleton className="h-[120px] w-full rounded-[6px]" />
+        <Skeleton className="h-[120px] w-full rounded-none" />
       ) : rows.length === 0 ? (
         <WidgetEmpty
           title="No agent purchases in this period"
@@ -278,7 +278,7 @@ function CashComingIn() {
   const farmRows = f?.farmRows ?? [];
 
   const kpi = (label: string, hint: string, value: number | null) => (
-    <div className="min-w-0 flex-1 rounded-[6px] border border-adm-hairline bg-adm-sunken px-3.5 py-2.5">
+    <div className="min-w-0 flex-1 rounded-none border border-adm-hairline bg-adm-sunken px-3.5 py-2.5">
       <div className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         <span className="min-w-0">{label}</span>
         <HelpTip label={`What does ${label} count?`} text={hint} />
@@ -314,7 +314,7 @@ function CashComingIn() {
               onClick={() => setDays(d)}
               aria-pressed={days === d}
               className={cn(
-                "cursor-pointer rounded-[6px] border px-2.5 py-1 text-[12px] font-semibold transition-colors",
+                "cursor-pointer rounded-none border px-2.5 py-1 text-[12px] font-semibold transition-colors",
                 days === d
                   ? "border-console bg-console text-white"
                   : "border-adm-line bg-adm-card text-adm-muted hover:border-console/60",
@@ -327,7 +327,7 @@ function CashComingIn() {
       </div>
 
       {isLoading ? (
-        <Skeleton className="h-[140px] w-full rounded-[6px]" />
+        <Skeleton className="h-[140px] w-full rounded-none" />
       ) : isError ? (
         <WidgetError what="the forecast" onRetry={() => void refetch()} />
       ) : (

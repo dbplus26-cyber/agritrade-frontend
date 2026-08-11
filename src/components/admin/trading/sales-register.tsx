@@ -169,7 +169,7 @@ export function SalesRegister() {
             className="block w-full min-w-0 outline-none focus-visible:underline"
             onClick={(e) => { e.stopPropagation(); }}
           >
-            <div className="max-w-[90%] truncate font-semibold text-adm-ink">
+            <div className="@2xl/table:max-w-[90%] [overflow-wrap:anywhere] @2xl/table:truncate font-semibold text-adm-ink">
               {row.original.buyer.name}
             </div>
           </Link>
@@ -351,10 +351,10 @@ export function SalesRegister() {
                     onClick={() => router.push(`${LIST}/${s.id}`)}
                     // Squared and 1.5px-bordered to match AdminCard, the
                     // surface every other console screen is filed on.
-                    className="shadow-[0_1px_2px_rgba(16,24,40,0.05)] rounded-[6px] border border-adm-line bg-adm-card px-3.5 py-[13px] text-left"
+                    className="shadow-[0_1px_2px_rgba(16,24,40,0.05)] rounded-none border border-adm-line bg-adm-card px-3.5 py-[13px] text-left"
                   >
                     <div className="mb-1.5 flex items-center justify-between gap-2">
-                      <span className="block max-w-[22rem] truncate text-[14px] font-semibold text-adm-ink">
+                      <span className="block @2xl/table:max-w-[22rem] [overflow-wrap:anywhere] @2xl/table:truncate text-[14px] font-semibold text-adm-ink">
                         {s.buyer.name}
                       </span>
                       <SaleStatusBadge status={s.status} />

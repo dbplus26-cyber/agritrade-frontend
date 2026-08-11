@@ -140,11 +140,11 @@ export function FarmApplicationsScreen() {
         // on why a whole identity column does not go green.
         cell: ({ row }) => (
           <Link
-            className="block min-w-0 max-w-[90%] outline-none focus-visible:underline"
+            className="block min-w-0 @2xl/table:max-w-[90%] outline-none focus-visible:underline"
             href={`${LIST}/${row.original.id}`}
             onClick={(e) => e.stopPropagation()}
           >
-            <span className="block truncate font-medium text-adm-ink">
+            <span className="block [overflow-wrap:anywhere] @2xl/table:truncate font-medium text-adm-ink">
               {row.original.name}
             </span>
             <Mono className="block text-[12.5px] text-adm-faint">
@@ -173,7 +173,7 @@ export function FarmApplicationsScreen() {
         meta: columnMeta({ wide: true }),
         cell: ({ row }) =>
           row.original.community ? (
-            <span className="block max-w-[160px] truncate text-adm-muted">
+            <span className="block @2xl/table:max-w-[160px] [overflow-wrap:anywhere] @2xl/table:truncate text-adm-muted">
               {row.original.community}
             </span>
           ) : (

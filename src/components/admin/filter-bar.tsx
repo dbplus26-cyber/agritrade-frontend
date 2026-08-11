@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils";
  */
 const boxField = (active: boolean) =>
   cn(
-    "flex h-[34px] w-full min-w-0 items-center rounded-[6px] border bg-adm-card transition-colors focus-within:border-console",
+    "flex h-[34px] w-full min-w-0 items-center rounded-none border bg-adm-card transition-colors focus-within:border-console",
     active ? "border-console/60" : "border-adm-line",
   );
 
@@ -423,7 +423,7 @@ export function ConsoleFilterBar({
               // always on screen, so a control claiming to expand them would
               // be describing something that never happens.
               className={cn(
-                "inline-flex h-8 cursor-pointer items-center gap-2 rounded-[6px] border bg-adm-card px-2.5 text-[10.5px] tracking-[0.14em] whitespace-nowrap uppercase transition-colors @min-[680px]/toolbar:hidden",
+                "inline-flex h-8 cursor-pointer items-center gap-2 rounded-none border bg-adm-card px-2.5 text-[10.5px] tracking-[0.14em] whitespace-nowrap uppercase transition-colors @min-[680px]/toolbar:hidden",
                 open
                   ? "border-console text-console"
                   : "border-adm-line text-adm-muted hover:text-console",

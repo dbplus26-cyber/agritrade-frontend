@@ -162,7 +162,7 @@ export function ShipmentsRegister() {
               <Link
                 key={sh.id}
                 href={`${LIST}/${sh.id}`}
-                className="flex h-full flex-col rounded-[6px] border border-adm-line bg-adm-card p-4 shadow-[0_1px_2px_rgba(16,24,40,0.05)] transition-colors hover:border-adm-strong"
+                className="flex h-full flex-col rounded-none border border-adm-line bg-adm-card p-4 shadow-[0_1px_2px_rgba(16,24,40,0.05)] transition-colors hover:border-adm-strong"
               >
                 <div className="flex items-start justify-between gap-2.5">
                   <Mono className="text-[12.5px] text-adm-muted">

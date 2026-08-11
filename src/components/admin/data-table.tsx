@@ -352,7 +352,7 @@ export function ConsoleDataTable<TData>({
                   className={cn(
                     // Squared with a 1.5px border to match AdminCard, the
                     // surface every other console screen is filed on.
-                    "rounded-[8px] border border-adm-line bg-adm-card px-3.5 py-2.5 shadow-[0_1px_2px_rgba(16,24,40,0.05)] data-[state=selected]:border-console/40 data-[state=selected]:bg-console/5",
+                    "rounded-none border border-adm-line bg-adm-card px-3.5 py-2.5 shadow-[0_1px_2px_rgba(16,24,40,0.05)] data-[state=selected]:border-console/40 data-[state=selected]:bg-console/5",
                     href && "cursor-pointer hover:border-adm-strong",
                   )}
                 >

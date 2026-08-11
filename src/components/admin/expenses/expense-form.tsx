@@ -160,7 +160,7 @@ export function ExpenseFormDialog({
             </AdminField>
           </section>
 
-          <section className="grid gap-3 border-t border-adm-hairline pt-5">
+          <section className="grid gap-3 pt-3 sm:pt-6">
             <SectionHeading className="mb-0">How much, and when</SectionHeading>
             <div className="grid gap-3 @min-[380px]:grid-cols-2">
               <AdminField label="Amount (GH₵)" error={errors.amountGhs?.message}>

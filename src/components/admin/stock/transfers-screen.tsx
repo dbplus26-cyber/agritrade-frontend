@@ -82,7 +82,7 @@ function Route({ from, to }: { from: string; to: string }) {
     // widen the page.
     <span
       aria-label={`${from} to ${to}`}
-      className="block max-w-[90%] min-w-0 truncate text-adm-ink"
+      className="block @2xl/table:max-w-[90%] min-w-0 [overflow-wrap:anywhere] @2xl/table:truncate text-adm-ink"
       title={`${from} -> ${to}`}
     >
       <span aria-hidden="true">
@@ -508,7 +508,7 @@ function TransferDialog({
             </AdminField>
           </section>
 
-          <section className="grid gap-3.5 border-t border-adm-hairline pt-5">
+          <section className="grid gap-3.5 pt-3 sm:pt-6">
             <SectionHeading className="mb-0">What, and how much</SectionHeading>
             <AdminField label="Commodity" error={errors.commodityId?.message}>
               <Controller
@@ -552,7 +552,7 @@ function TransferDialog({
             </div>
           </section>
 
-          <section className="grid gap-3.5 border-t border-adm-hairline pt-5">
+          <section className="grid gap-3.5 pt-3 sm:pt-6">
             <SectionHeading className="mb-0">Anything else</SectionHeading>
             <AdminField label="Notes" optional error={errors.notes?.message}>
               <Input
@@ -566,7 +566,7 @@ function TransferDialog({
           {serverError ? (
             <p
               role="alert"
-              className="min-w-0 rounded-[6px] border border-console-red/40 bg-console-red/5 px-3 py-2 text-[12.5px] font-medium text-console-red [overflow-wrap:anywhere]"
+              className="min-w-0 rounded-none border border-console-red/40 bg-console-red/5 px-3 py-2 text-[12.5px] font-medium text-console-red [overflow-wrap:anywhere]"
             >
               {serverError}
             </p>

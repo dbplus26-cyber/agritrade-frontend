@@ -180,7 +180,7 @@ export function SearchableSelect({
                   onChange(o.value);
                   setOpen(false);
                 }}
-                className="rounded-[6px] text-[13.5px]"
+                className="rounded-none text-[13.5px]"
               >
                 <span className="min-w-0 flex-1 text-adm-ink [overflow-wrap:anywhere]">
                   {o.label}

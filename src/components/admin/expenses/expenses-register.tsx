@@ -132,7 +132,7 @@ export function ExpensesRegister() {
             <Link
               className={cn(
                 adminLinkClass,
-                "font-adminmono block max-w-[12rem] truncate text-[12.5px]",
+                "font-adminmono block @2xl/table:max-w-[12rem] [overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px]",
               )}
               href={`/admin/shipments/${row.original.shipment.id}`}
               onClick={(e) => e.stopPropagation()}

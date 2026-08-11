@@ -110,7 +110,7 @@ function SendCard({ send }: { send: IDisbursement }) {
           <p className="[overflow-wrap:anywhere] md:truncate text-[14px] font-medium text-adm-ink">
             {send.recipientName}
           </p>
-          <p className="font-adminmono truncate text-[11.5px] text-adm-faint">
+          <p className="font-adminmono [overflow-wrap:anywhere] md:truncate text-[11.5px] text-adm-faint">
             {recipientLine(send)}
           </p>
         </div>

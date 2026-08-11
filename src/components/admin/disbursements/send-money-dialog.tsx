@@ -245,7 +245,7 @@ export function SendMoneyDialog({
 
           </section>
 
-          <section className="space-y-4 border-t border-adm-hairline pt-5">
+          <section className="space-y-4 pt-3 sm:pt-6">
             <SectionHeading
               className="mb-0"
               hint="The account the money actually lands in. Check the number, not the name."
@@ -331,7 +331,7 @@ export function SendMoneyDialog({
 
           </section>
 
-          <section className="space-y-4 border-t border-adm-hairline pt-5">
+          <section className="space-y-4 pt-3 sm:pt-6">
             <SectionHeading className="mb-0">What it is for</SectionHeading>
             <AdminField
               label="What is it for?"

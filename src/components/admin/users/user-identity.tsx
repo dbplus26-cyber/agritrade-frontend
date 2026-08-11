@@ -82,7 +82,7 @@ function Fact({
 }) {
   return (
     <div className="flex min-w-0 items-start gap-2.5">
-      <span className="mt-0.5 flex h-7 w-7 flex-none items-center justify-center rounded-[6px] bg-console/8 text-console">
+      <span className="mt-0.5 flex h-7 w-7 flex-none items-center justify-center rounded-none bg-console/8 text-console">
         <Icon className="h-3.5 w-3.5" aria-hidden />
       </span>
       <div className="min-w-0">

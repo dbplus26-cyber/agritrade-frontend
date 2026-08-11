@@ -128,7 +128,7 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
                 <Link
                   className={cn(
                     adminLinkClass,
-                    "min-w-0 text-[13.5px] font-semibold line-clamp-1 whitespace-normal [overflow-wrap:anywhere]",
+                    "min-w-0 text-[13.5px] font-semibold whitespace-normal [overflow-wrap:anywhere]",
                   )}
                   href={`/admin/buyers/${r.buyer.id}`}
                 >
@@ -139,7 +139,7 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
                 </Mono>
               </div>
               <div className="mt-0.5 flex items-baseline justify-between gap-3 text-[12px] text-adm-muted">
-                <span className="min-w-0 truncate">
+                <span className="min-w-0 [overflow-wrap:anywhere]">
                   {r.kind === "LAND" ? "Land" : "Commodity"} ·{" "}
                   <Mono>{r.subject}</Mono>
                 </span>

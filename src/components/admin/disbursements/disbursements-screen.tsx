@@ -117,12 +117,12 @@ export function DisbursementsScreen() {
         cell: ({ row }) => (
           <span className="block w-full min-w-0 text-left">
             <span
-              className="block max-w-[90%] truncate font-medium text-adm-ink"
+              className="block @2xl/table:max-w-[90%] [overflow-wrap:anywhere] @2xl/table:truncate font-medium text-adm-ink"
               title={row.original.recipientName}
             >
               {row.original.recipientName}
             </span>
-            <span className="font-adminmono block truncate text-[12.5px] text-adm-faint">
+            <span className="font-adminmono block [overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-faint">
               {recipientLine(row.original)}
             </span>
           </span>

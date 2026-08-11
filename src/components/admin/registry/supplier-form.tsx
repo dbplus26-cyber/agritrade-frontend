@@ -406,7 +406,7 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
           </div>
         </section>
 
-        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
           <SectionHeading
             className="mb-0"
             hint="Every way of reaching this supplier, and where they are."
@@ -483,7 +483,7 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
           </AdminField>
         </section>
 
-        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
           <SectionHeading
             className="mb-0"
             hint="Where money owed to this supplier is sent."
@@ -541,7 +541,7 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
           </AdminField>
         </section>
 
-        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
           <SectionHeading className="mb-0">Anything else</SectionHeading>
           <AdminField label="Notes" optional error={errors.notes?.message}>
             <textarea
@@ -559,7 +559,7 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
           </AdminField>
         </section>
 
-        <div className="border-t border-adm-hairline pt-5">
+        <div className="pt-3 sm:pt-6">
           <EditableFormActions
             mode={mode}
             saving={saving}

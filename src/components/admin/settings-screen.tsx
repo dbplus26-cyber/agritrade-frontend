@@ -43,7 +43,7 @@ function GhsInput({
   return (
     <div
       className={cn(
-        "flex h-[42px] items-center overflow-hidden rounded-[6px] border bg-[#FBFCF7] transition-[border-color,box-shadow] focus-within:border-console focus-within:shadow-[0_0_0_3px_rgb(62_125_98/0.16)]",
+        "flex h-[42px] items-center overflow-hidden rounded-none border bg-[#FBFCF7] transition-[border-color,box-shadow] focus-within:border-console focus-within:shadow-[0_0_0_3px_rgb(62_125_98/0.16)]",
         error ? "border-console-red" : "border-adm-line",
       )}
     >
@@ -352,10 +352,10 @@ function SignatureCard({ settings }: { settings: ISystemSettings }) {
             <img
               src={shownUrl}
               alt="Saved signature"
-              className="h-16 w-40 flex-none rounded-[6px] border border-adm-line bg-white object-contain px-2"
+              className="h-16 w-40 flex-none rounded-none border border-adm-line bg-white object-contain px-2"
             />
           ) : (
-            <div className="flex h-16 w-40 flex-none items-center justify-center rounded-[6px] border border-dashed border-adm-strong/60 text-[9px] font-bold tracking-[0.08em] text-adm-faint uppercase">
+            <div className="flex h-16 w-40 flex-none items-center justify-center rounded-none border border-dashed border-adm-strong/60 text-[9px] font-bold tracking-[0.08em] text-adm-faint uppercase">
               No signature
             </div>
           )}

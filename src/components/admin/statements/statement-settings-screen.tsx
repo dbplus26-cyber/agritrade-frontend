@@ -113,10 +113,10 @@ function LogoCard({ settings }: { settings: ISystemSettings }) {
             <img
               src={settings.statementLogoUrl}
               alt="Current statement logo"
-              className="h-16 w-16 flex-none rounded-[6px] border border-adm-line object-contain"
+              className="h-16 w-16 flex-none rounded-none border border-adm-line object-contain"
             />
           ) : (
-            <div className="flex h-16 w-16 flex-none items-center justify-center rounded-[6px] border border-dashed border-adm-strong/60 text-[9px] font-bold tracking-[0.08em] text-adm-faint uppercase">
+            <div className="flex h-16 w-16 flex-none items-center justify-center rounded-none border border-dashed border-adm-strong/60 text-[9px] font-bold tracking-[0.08em] text-adm-faint uppercase">
               No logo
             </div>
           )}
@@ -362,12 +362,9 @@ function StatementSettingsForm({
 
       {/* Same keyed-branch discipline as the system settings form: an unkeyed
           swap would let the Edit button's DOM node become the submit. */}
-      <div className="flex gap-2">
+      <div className="flex justify-end gap-2">
         {isEditing ? (
           <Fragment key="editing">
-            <AdminButton type="submit" disabled={saving || !isDirty} size="lg">
-              {saving ? "Saving…" : "Save statement settings"}
-            </AdminButton>
             <AdminButton
               type="button"
               variant="outline"
@@ -378,6 +375,9 @@ function StatementSettingsForm({
               }}
             >
               Cancel
+            </AdminButton>
+            <AdminButton type="submit" disabled={saving || !isDirty} size="lg">
+              {saving ? "Saving…" : "Save statement settings"}
             </AdminButton>
           </Fragment>
         ) : (

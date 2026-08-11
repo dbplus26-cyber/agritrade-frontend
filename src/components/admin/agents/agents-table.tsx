@@ -108,11 +108,11 @@ export function AgentsTable() {
                 name={`${a.firstName} ${a.lastName}`}
                 photoUrl={a.profilePicture}
               />
-              <span className="block min-w-0 max-w-[85%]">
-                <span className="block truncate font-medium text-adm-ink">
+              <span className="block min-w-0 @2xl/table:max-w-[85%]">
+                <span className="block [overflow-wrap:anywhere] @2xl/table:truncate font-medium text-adm-ink">
                   {a.firstName} {a.lastName}
                 </span>
-                <span className="block truncate text-[12.5px] text-adm-faint">
+                <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-faint">
                   {a.region ?? a.email}
                 </span>
               </span>

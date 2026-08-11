@@ -501,7 +501,7 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
           </div>
         </section>
 
-        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
           <SectionHeading className="mb-0">Who receives it</SectionHeading>
           <AdminField label="Shop name" optional error={errors.shopName?.message}>
             <Input
@@ -552,7 +552,7 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
           </div>
         </section>
 
-        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
           <SectionHeading className="mb-0">Finding it</SectionHeading>
           <AdminField
             label="Directions"
@@ -575,7 +575,7 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
           </AdminField>
         </section>
 
-        <div className="border-t border-adm-hairline pt-5">
+        <div className="pt-3 sm:pt-6">
           <EditableFormActions
             mode={!isEdit ? "create" : isEditing ? "editing" : "locked"}
             saving={saving}

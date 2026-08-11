@@ -138,7 +138,7 @@ export function SeasonForm({ season }: { season?: ISeason }) {
             </AdminField>
           </section>
 
-          <section className="flex flex-col gap-3 border-t border-adm-hairline pt-5">
+          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
             <SectionHeading
               className="mb-0"
               hint="The window grants and repayments are booked against."

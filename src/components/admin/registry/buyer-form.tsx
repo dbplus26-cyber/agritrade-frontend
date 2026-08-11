@@ -337,7 +337,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
           </AdminField>
         </section>
 
-        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
           <SectionHeading
             className="mb-0"
             hint="Every way of reaching this buyer, and where they take delivery."
@@ -406,7 +406,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
           </AdminField>
         </section>
 
-        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
           <SectionHeading
             className="mb-0"
             hint="The registered company behind the buyer, and the person who answers for it."
@@ -483,7 +483,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
           </div>
         </section>
 
-        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
           <SectionHeading className="mb-0">Anything else</SectionHeading>
           <AdminField label="Notes" optional error={errors.notes?.message}>
             <textarea
@@ -501,7 +501,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
           </AdminField>
         </section>
 
-        <div className="border-t border-adm-hairline pt-5">
+        <div className="pt-3 sm:pt-6">
           <EditableFormActions
             mode={mode}
             saving={saving}

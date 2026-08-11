@@ -92,11 +92,11 @@ export function BuyerTable() {
               onClick={(e) => e.stopPropagation()}
             >
               <RegistryAvatar name={b.name} photoUrl={b.photoUrl} />
-              <span className="block min-w-0 max-w-[85%]">
-                <span className="block truncate font-medium text-adm-ink">
+              <span className="block min-w-0 @2xl/table:max-w-[85%]">
+                <span className="block [overflow-wrap:anywhere] @2xl/table:truncate font-medium text-adm-ink">
                   {b.name}
                 </span>
-                <span className="block truncate text-[12.5px] text-adm-faint">
+                <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-faint">
                   {b.city ?? "No city"}
                 </span>
               </span>
@@ -127,7 +127,7 @@ export function BuyerTable() {
         meta: columnMeta({ wide: true }),
         cell: ({ row }) =>
           row.original.email ? (
-            <span className="block max-w-[17rem] truncate text-adm-muted">{row.original.email}</span>
+            <span className="block @2xl/table:max-w-[17rem] [overflow-wrap:anywhere] @2xl/table:truncate text-adm-muted">{row.original.email}</span>
           ) : (
             <Absent />
           ),

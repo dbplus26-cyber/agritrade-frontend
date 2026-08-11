@@ -175,7 +175,7 @@ export function WidgetEmpty({
   return (
     <div
       className={cn(
-        "flex min-h-[120px] flex-col items-center justify-center gap-1 rounded-[6px] border border-dashed border-adm-hairline bg-adm-page/60 px-4 py-5 text-center",
+        "flex min-h-[120px] flex-col items-center justify-center gap-1 rounded-none border border-dashed border-adm-hairline bg-adm-page/60 px-4 py-5 text-center",
         className,
       )}
     >
@@ -211,7 +211,7 @@ export function WidgetError({
   return (
     <div
       role="alert"
-      className="flex min-h-[86px] flex-col items-center justify-center gap-1.5 rounded-[6px] border border-dashed border-console-red/35 bg-console-red/[0.03] px-4 py-4 text-center"
+      className="flex min-h-[86px] flex-col items-center justify-center gap-1.5 rounded-none border border-dashed border-console-red/35 bg-console-red/[0.03] px-4 py-4 text-center"
     >
       <p className="text-[12.5px] text-adm-muted">Couldn&apos;t load {what}.</p>
       <button

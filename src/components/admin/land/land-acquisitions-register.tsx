@@ -89,11 +89,11 @@ export function LandAcquisitionsRegister() {
         enableSorting: false,
         meta: columnMeta({ stretch: true }),
         cell: ({ row }) => (
-          <div className="min-w-0 max-w-[90%]">
+          <div className="min-w-0 @2xl/table:max-w-[90%]">
             <Mono className="font-semibold text-console">
               {row.original.reference}
             </Mono>
-            <div className="truncate text-[12.5px] text-adm-muted">
+            <div className="[overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-muted">
               {/* The row navigates to the acquisition, so the seller has to
                   stop the click reaching it. */}
               <Link

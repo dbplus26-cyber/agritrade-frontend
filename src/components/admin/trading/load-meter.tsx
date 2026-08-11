@@ -34,7 +34,7 @@ export function LoadMeter({
   return (
     <div
       className={cn(
-        "rounded-[6px] border px-3 py-2",
+        "rounded-none border px-3 py-2",
         over
           ? "border-console-red/60 bg-console-red/[0.05]"
           : "border-adm-line bg-adm-sunken",

@@ -111,7 +111,7 @@ export function StocktakesScreen() {
           <Link
             className={cn(
               adminLinkClass,
-              "block min-w-0 max-w-[90%] font-medium line-clamp-1 whitespace-normal [overflow-wrap:anywhere]",
+              "block min-w-0 @2xl/table:max-w-[90%] font-medium @2xl/table:line-clamp-1 whitespace-normal [overflow-wrap:anywhere]",
             )}
             href={`/admin/warehouses/${row.original.warehouse.id}`}
             onClick={(e) => e.stopPropagation()}

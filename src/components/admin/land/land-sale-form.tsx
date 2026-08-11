@@ -131,7 +131,7 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
             </AdminField>
           </section>
 
-          <section className="flex flex-col gap-3 border-t border-adm-hairline pt-5">
+          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
             <SectionHeading
               className="mb-0"
               hint="What the buyer is taking the plot at. Deposits and instalments are recorded against the sale afterwards."

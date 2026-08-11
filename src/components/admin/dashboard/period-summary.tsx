@@ -88,7 +88,7 @@ export function PeriodSummary({ window }: { window: IReportWindow }) {
       ) : isLoading || !s ? (
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-[74px] w-full rounded-[6px]" />
+            <Skeleton key={i} className="h-[74px] w-full rounded-none" />
           ))}
         </div>
       ) : (

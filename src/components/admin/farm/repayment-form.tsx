@@ -213,7 +213,7 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
             </div>
           </section>
 
-          <section className="flex flex-col gap-3 border-t border-adm-hairline pt-5">
+          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
             <SectionHeading
               className="mb-0"
               hint="How much came back and what you are crediting it at. Those two set the value cleared off the grant."
@@ -244,7 +244,7 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
             </div>
             {/* The running total sits with the two figures it is worked out
                 from, not at the foot of the form where it read as a stray. */}
-            <div className="flex items-center justify-between rounded-[6px] border border-adm-hairline bg-adm-sunken px-4 py-3 text-[13px]">
+            <div className="flex items-center justify-between rounded-none border border-adm-hairline bg-adm-sunken px-4 py-3 text-[13px]">
               <span className="font-semibold text-adm-muted">Value credited</span>
               <span className="text-[16px] font-bold text-console">
                 {value === null ? "-" : formatCedis(value)}
@@ -252,7 +252,7 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
             </div>
           </section>
 
-          <section className="flex flex-col gap-3 border-t border-adm-hairline pt-5">
+          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
             <SectionHeading
               className="mb-0"
               hint="Whether this produce also becomes stock you can sell on."
@@ -292,64 +292,64 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
               />
             </AdminField>
           </section>
-        </AdminCard>
 
-        <AdminCard className="flex flex-col gap-3 px-5 py-4">
-          <SectionHeading
-            className="mb-0"
-            hint="The signed receipt or weigh slip is what settles &quot;I already paid&quot; disputes - it stays on this record as the evidence."
-          >
-            Paperwork
-          </SectionHeading>
-          <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
-            <AdminField
-              label="Received by"
-              optional
-              hint="Who physically took delivery of the produce."
-              error={errors.receivedByName?.message}
+          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
+            <SectionHeading
+              className="mb-0"
+              hint="The signed receipt or weigh slip is what settles &quot;I already paid&quot; disputes - it stays on this record as the evidence."
             >
-              <Input
-                placeholder="e.g. Musah Alhassan"
-                className={cn(adminInputClass, errors.receivedByName && "border-console-red")}
-                {...register("receivedByName")}
-              />
-            </AdminField>
-            <AdminField label="Document name" optional>
-              <Input
-                placeholder="e.g. Weigh slip, 12 Nov"
-                className={adminInputClass}
-                value={documentName}
-                onChange={(e) => setDocumentName(e.target.value)}
-              />
-            </AdminField>
-          </div>
-          {/* Not an AdminField: wrapping the picker's buttons in a <label>
-              would misroute label clicks. Same label/error markup as
-              AdminField so it reads as one of the fields above it. */}
-          <div>
-            <span className="mb-1 block text-[13px] font-semibold text-adm-ink">
-              Receipt file
-            </span>
-            <FilePicker
-              accept="image/*,application/pdf,.doc,.docx"
-              hint="PDF or a photo of the signed receipt / weigh slip"
-              onConfirm={(file) => {
-                setReceipt(file);
-                if (file) setReceiptError(null);
-              }}
-              optimize={false}
-              stage
-              triggerLabel="Choose receipt"
-            />
-            {receiptError ? (
-              <span
-                role="alert"
-                className="mt-1.5 block text-[12.5px] font-medium text-console-red"
+              Paperwork
+            </SectionHeading>
+            <div className="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
+              <AdminField
+                label="Received by"
+                optional
+                hint="Who physically took delivery of the produce."
+                error={errors.receivedByName?.message}
               >
-                {receiptError}
+                <Input
+                  placeholder="e.g. Musah Alhassan"
+                  className={cn(adminInputClass, errors.receivedByName && "border-console-red")}
+                  {...register("receivedByName")}
+                />
+              </AdminField>
+              <AdminField label="Document name" optional>
+                <Input
+                  placeholder="e.g. Weigh slip, 12 Nov"
+                  className={adminInputClass}
+                  value={documentName}
+                  onChange={(e) => setDocumentName(e.target.value)}
+                />
+              </AdminField>
+            </div>
+            {/* Not an AdminField: wrapping the picker's buttons in a <label>
+                would misroute label clicks. Same label/error markup as
+                AdminField so it reads as one of the fields above it. */}
+            <div>
+              <span className="mb-1 block text-[13px] font-semibold text-adm-ink">
+                Receipt file
               </span>
-            ) : null}
-          </div>
+              <FilePicker
+                accept="image/*,application/pdf,.doc,.docx"
+                hint="PDF or a photo of the signed receipt / weigh slip"
+                onConfirm={(file) => {
+                  setReceipt(file);
+                  if (file) setReceiptError(null);
+                }}
+                optimize={false}
+                stage
+                triggerLabel="Choose receipt"
+              />
+              {receiptError ? (
+                <span
+                  role="alert"
+                  className="mt-1.5 block text-[12.5px] font-medium text-console-red"
+                >
+                  {receiptError}
+                </span>
+              ) : null}
+            </div>
+          </section>
         </AdminCard>
 
         <div className="flex flex-wrap justify-end gap-2">

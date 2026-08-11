@@ -146,13 +146,13 @@ export function PaymentAccountTable() {
           return (
             <Link
               href={`${LIST}/${a.id}`}
-              className="block min-w-0 max-w-[90%] outline-none focus-visible:underline"
+              className="block min-w-0 @2xl/table:max-w-[90%] outline-none focus-visible:underline"
               onClick={(e) => e.stopPropagation()}
             >
-              <span className="block truncate font-medium text-adm-ink">
+              <span className="block [overflow-wrap:anywhere] @2xl/table:truncate font-medium text-adm-ink">
                 {a.label}
               </span>
-              <span className="block truncate text-[12.5px] text-adm-faint">
+              <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-faint">
                 {a.accountName}
               </span>
             </Link>
@@ -166,7 +166,7 @@ export function PaymentAccountTable() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => (
-          <span className="font-adminmono block truncate text-adm-ink">
+          <span className="font-adminmono block [overflow-wrap:anywhere] @2xl/table:truncate text-adm-ink">
             {row.original.accountNumber}
           </span>
         ),
@@ -182,11 +182,11 @@ export function PaymentAccountTable() {
           const where = a.bankName ?? a.provider;
           if (!where) return <Absent />;
           return (
-            <span className="block min-w-[8rem] max-w-[20rem]">
-              <span className="block truncate text-adm-ink">
+            <span className="block @2xl/table:min-w-[8rem] @2xl/table:max-w-[20rem]">
+              <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-adm-ink">
                 {where}
               </span>
-              <span className="block truncate text-[12.5px] text-adm-faint">
+              <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-faint">
                 {KIND_LABEL[a.kind]}
                 {a.branch ? ` · ${a.branch}` : ""}
               </span>
@@ -484,7 +484,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
 
         </section>
 
-        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
           <SectionHeading
             className="mb-0"
             hint="The details a payer types in. Get these wrong and the money lands somewhere else."
@@ -601,7 +601,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
 
         </section>
 
-        <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+        <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
           <SectionHeading
             className="mb-0"
             hint="How and whether this account is printed on invoices and statements."
@@ -654,7 +654,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
           </label>
         </section>
 
-        <div className="border-t border-adm-hairline pt-5">
+        <div className="pt-3 sm:pt-6">
           {/* Never "locked" - there is no locked state on this route any more.
               Cancel returns to the record, which is where it is read. */}
           <EditableFormActions

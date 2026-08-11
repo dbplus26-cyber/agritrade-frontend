@@ -199,7 +199,7 @@ export function StockView() {
             onClick={() => setSection(key)}
             aria-pressed={section === key}
             className={cn(
-              "cursor-pointer rounded-[6px] border px-3.5 py-[7px] text-[13px] font-semibold transition-colors",
+              "cursor-pointer rounded-none border px-3.5 py-[7px] text-[13px] font-semibold transition-colors",
               section === key
                 ? "border-console bg-console text-white"
                 : "border-adm-line bg-adm-card text-adm-muted hover:border-console/60",
@@ -303,7 +303,7 @@ export function StockView() {
             <label
               title="Show warehouse/commodity lines that have been emptied to a zero balance"
               className={cn(
-                "flex h-8 cursor-pointer items-center gap-2 rounded-[6px] border bg-adm-card px-2.5 text-[13px] whitespace-nowrap transition-colors select-none",
+                "flex h-8 cursor-pointer items-center gap-2 rounded-none border bg-adm-card px-2.5 text-[13px] whitespace-nowrap transition-colors select-none",
                 includeZero
                   ? "border-console/60 text-adm-ink"
                   : "border-adm-line text-adm-muted",
@@ -599,7 +599,7 @@ function AdjustmentDialog({
                       setValue("direction", value, { shouldValidate: true })
                     }
                     className={cn(
-                      "cursor-pointer rounded-[6px] border px-3.5 py-[7px] text-[13px] font-semibold transition-colors",
+                      "cursor-pointer rounded-none border px-3.5 py-[7px] text-[13px] font-semibold transition-colors",
                       direction === value
                         ? value === "REMOVE"
                           ? "border-console-red bg-console-red text-white"

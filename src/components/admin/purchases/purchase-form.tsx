@@ -277,7 +277,7 @@ export function PurchaseCreate() {
               </AdminField>
           </section>
 
-          <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+          <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
             <SectionHeading
               className="mb-0"
               hint="What the load weighs and what you agreed to pay for it. The total below is worked out from these two."
@@ -323,7 +323,7 @@ export function PurchaseCreate() {
             </div>
           </section>
 
-          <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+          <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
             <SectionHeading className="mb-0">Where it goes</SectionHeading>
             <div className="grid gap-[13px] @min-[440px]:grid-cols-2">
               <AdminField
@@ -366,7 +366,7 @@ export function PurchaseCreate() {
             </div>
           </section>
 
-          <section className="flex flex-col gap-[13px] border-t border-adm-hairline pt-5">
+          <section className="flex flex-col gap-[13px] pt-3 sm:pt-6">
             <SectionHeading
               className="mb-0"
               hint="What backs this record up if anyone questions it later."
@@ -442,14 +442,7 @@ export function PurchaseCreate() {
             </AdminField>
           </section>
 
-          <div className="mt-1 flex gap-2 border-t border-adm-hairline pt-5">
-            <AdminButton
-              type="submit"
-              disabled={saving}
-              size="lg"
-            >
-              {saving ? "Recording…" : "Record purchase"}
-            </AdminButton>
+          <div className="mt-1 flex justify-end gap-2 pt-3 sm:pt-6">
             <AdminButton
               type="button"
               variant="outline"
@@ -457,6 +450,13 @@ export function PurchaseCreate() {
               onClick={() => router.push(LIST)}
             >
               Cancel
+            </AdminButton>
+            <AdminButton
+              type="submit"
+              disabled={saving}
+              size="lg"
+            >
+              {saving ? "Recording…" : "Record purchase"}
             </AdminButton>
           </div>
         </form>

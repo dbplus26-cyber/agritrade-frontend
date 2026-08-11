@@ -42,7 +42,7 @@ function FarmerCell({ farmer }: { farmer: IFarmer }) {
         {a.init}
       </span>
       <div className="w-full min-w-0">
-        <div className="max-w-[85%] truncate font-semibold text-adm-ink" title={farmer.name}>
+        <div className="@2xl/table:max-w-[85%] [overflow-wrap:anywhere] @2xl/table:truncate font-semibold text-adm-ink" title={farmer.name}>
           {farmer.name}
         </div>
         {farmer.phone ? (

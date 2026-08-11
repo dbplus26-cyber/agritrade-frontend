@@ -136,11 +136,11 @@ export function EnquiriesScreen() {
         // on why a whole identity column does not go green.
         cell: ({ row }) => (
           <Link
-            className="block min-w-[8rem] max-w-[20rem] outline-none focus-visible:underline"
+            className="block @2xl/table:min-w-[8rem] @2xl/table:max-w-[20rem] outline-none focus-visible:underline"
             href={`${LIST}/${row.original.id}`}
             onClick={(e) => e.stopPropagation()}
           >
-            <span className="block truncate font-medium text-adm-ink">
+            <span className="block [overflow-wrap:anywhere] @2xl/table:truncate font-medium text-adm-ink">
               {row.original.fullName}
             </span>
             <Mono className="block text-[12.5px] text-adm-faint">
@@ -168,7 +168,7 @@ export function EnquiriesScreen() {
         enableSorting: false,
         meta: columnMeta({ stretch: true }),
         cell: ({ row }) => (
-          <span className="block max-w-[90%] truncate text-adm-muted">
+          <span className="block @2xl/table:max-w-[90%] [overflow-wrap:anywhere] @2xl/table:truncate text-adm-muted">
             {row.original.subject}
           </span>
         ),

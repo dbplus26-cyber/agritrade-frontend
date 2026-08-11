@@ -191,7 +191,7 @@ export function AgentStatement({ id }: { id: string }) {
 
       {/* Left-aligned like every other console page - the sheet keeps its own
           720px measure so it still reads as a piece of paper. */}
-      <div className="max-w-[720px] rounded-[8px] border border-adm-line bg-white p-8 text-adm-ink">
+      <div className="max-w-[720px] rounded-none border border-adm-line bg-white p-8 text-adm-ink">
         <div className="flex items-start justify-between gap-4 border-b-2 border-adm-strong pb-3">
           <div className="flex items-center gap-3">
             <DocumentLogo />

@@ -93,12 +93,12 @@ export function AttachmentTile({
   const metaLine = meta ?? [kind.label, stamp].filter(Boolean).join(" · ");
 
   return (
-    <li className="relative flex min-w-0 items-center gap-3 rounded-[6px] border border-adm-line bg-adm-card p-2.5 transition-colors hover:border-adm-strong hover:bg-adm-sunken">
+    <li className="relative flex min-w-0 items-center gap-3 rounded-none border border-adm-line bg-adm-card p-2.5 transition-colors hover:border-adm-strong hover:bg-adm-sunken">
       {/* The type plate: the one loud element, so a run of tiles scans by
           kind the way an inbox's attachments do. */}
       <span
         aria-hidden="true"
-        className="flex size-9 flex-none items-center justify-center rounded-[6px]"
+        className="flex size-9 flex-none items-center justify-center rounded-none"
         style={{ background: t.bg, color: t.fg }}
       >
         <Icon className="size-4.5" />
@@ -111,7 +111,7 @@ export function AttachmentTile({
         target="_blank"
         rel="noopener noreferrer"
         title={`Open ${name}`}
-        className="min-w-0 flex-1 outline-none after:absolute after:inset-0 after:rounded-[6px] focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-console"
+        className="min-w-0 flex-1 outline-none after:absolute after:inset-0 after:rounded-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-console"
       >
         <span className="block min-w-0 text-[13.5px] leading-[1.35] font-semibold text-adm-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere]">
           {name}
@@ -139,7 +139,7 @@ export function AttachmentTile({
  * reads as an empty drawer rather than a missing feature. */
 export function AttachmentEmpty({ text }: { text: string }) {
   return (
-    <div className="flex items-center justify-center gap-2 rounded-[6px] border border-dashed border-adm-strong/60 px-4 py-5">
+    <div className="flex items-center justify-center gap-2 rounded-none border border-dashed border-adm-strong/60 px-4 py-5">
       <Paperclip aria-hidden="true" className="size-3.5 flex-none text-adm-faint" />
       <p className="text-[12.5px] text-adm-muted">{text}</p>
     </div>

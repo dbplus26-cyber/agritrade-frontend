@@ -136,7 +136,7 @@ export function FilePicker({
   return (
     <div className={cn("flex flex-col gap-2", className)}>
       {staged ? (
-        <div className="flex flex-wrap items-center gap-3 rounded-[6px] border border-console-gold/50 bg-console-gold/5 p-2.5">
+        <div className="flex flex-wrap items-center gap-3 rounded-none border border-console-gold/50 bg-console-gold/5 p-2.5">
           {staged.url ? (
             // eslint-disable-next-line @next/next/no-img-element -- local blob preview
             <img

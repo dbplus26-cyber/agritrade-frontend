@@ -455,7 +455,7 @@ export function ShipmentDetail({ id }: { id: string }) {
             return (
               <div
                 key={sale.id}
-                className="flex h-full flex-col rounded-[6px] border border-adm-line bg-adm-card p-3.5"
+                className="flex h-full flex-col rounded-none border border-adm-line bg-adm-card p-3.5"
               >
                 <div className="flex items-start justify-between gap-2.5">
                   <Link
@@ -793,7 +793,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                 onChange={(e) => setDocName(e.target.value)}
                 placeholder="Document name"
                 aria-label="Document name"
-                className="h-8 min-w-[160px] flex-1 rounded-[6px] border border-adm-line bg-adm-card px-2.5 text-[13px] outline-none transition-colors placeholder:text-adm-faint focus:border-console"
+                className="h-8 min-w-[160px] flex-1 rounded-none border border-adm-line bg-adm-card px-2.5 text-[13px] outline-none transition-colors placeholder:text-adm-faint focus:border-console"
               />
               <FilePicker
                 accept="image/*,application/pdf"

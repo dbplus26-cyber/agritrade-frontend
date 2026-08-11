@@ -110,7 +110,7 @@ export function DisbursementDetail({ id }: { id: string }) {
       />
 
       {d.needsAttention ? (
-        <div className="rounded-[6px] border border-console-red/40 bg-console-red/5 px-4 py-3 text-[13px] text-console-red">
+        <div className="rounded-none border border-console-red/40 bg-console-red/5 px-4 py-3 text-[13px] text-console-red">
           Hubtel has not given a final answer for this payout after several
           checks. It has NOT been marked failed, because the money may well
           have gone out - confirm on the Hubtel dashboard, then record the real

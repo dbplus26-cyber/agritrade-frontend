@@ -24,7 +24,7 @@ const STATUS_CLASS: Record<PurchaseStatus, string> = {
 
 function PurchaseCard({ p }: { p: IPurchase }) {
   return (
-    <div className="rounded-lg border border-soil/25 bg-paper px-3.5 py-3">
+    <div className="rounded-none border border-soil/25 bg-paper px-3.5 py-3">
       <div className="flex items-baseline justify-between gap-3">
         <p className="min-w-0 truncate text-[14px] font-semibold text-ink">
           {p.commodity.name}

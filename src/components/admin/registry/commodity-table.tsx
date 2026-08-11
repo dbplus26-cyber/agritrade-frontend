@@ -109,18 +109,18 @@ export function CommodityTable() {
                     alt=""
                     width={28}
                     height={28}
-                    className="h-7 w-7 flex-none rounded-[4px] object-cover"
+                    className="h-7 w-7 flex-none rounded-none object-cover"
                   />
                 ) : (
-                  <span className="font-adminmono inline-flex h-7 w-7 flex-none items-center justify-center rounded-[4px] bg-console/10 text-[11px] font-bold text-console">
+                  <span className="font-adminmono inline-flex h-7 w-7 flex-none items-center justify-center rounded-none bg-console/10 text-[11px] font-bold text-console">
                     {c.name.charAt(0).toUpperCase()}
                   </span>
                 )}
-                <span className="block min-w-0 max-w-[90%]">
-                  <span className="block truncate font-medium text-adm-ink">
+                <span className="block min-w-0 @2xl/table:max-w-[90%]">
+                  <span className="block [overflow-wrap:anywhere] @2xl/table:truncate font-medium text-adm-ink">
                     {c.name}
                   </span>
-                  <span className="block truncate text-[12.5px] text-adm-faint">
+                  <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-faint">
                     {c.variety ?? "No variety"}
                   </span>
                 </span>
@@ -140,7 +140,7 @@ export function CommodityTable() {
         meta: columnMeta({ at: "xl" }),
         cell: ({ row }) =>
           row.original.qualityGrade ? (
-            <span className="block max-w-[22rem] truncate text-adm-muted">
+            <span className="block @2xl/table:max-w-[22rem] [overflow-wrap:anywhere] @2xl/table:truncate text-adm-muted">
               {row.original.qualityGrade}
             </span>
           ) : (

@@ -404,7 +404,7 @@ export function DriverSettlementCard({
           says so, rather than silently showing an empty schedule - which
           would look like a policy with no milestones. */}
       {settlement.hasFee && !settlement.snapshotValid ? (
-        <p className="mt-4 rounded-[6px] bg-[#F8E9E7] px-3 py-2 text-[12.5px] text-[#8E2E24]">
+        <p className="mt-4 rounded-none bg-[#F8E9E7] px-3 py-2 text-[12.5px] text-[#8E2E24]">
           This trip&apos;s frozen terms could not be read. The fee and payments
           are still correct; re-agree the fee to restore the schedule.
         </p>
@@ -414,7 +414,7 @@ export function DriverSettlementCard({
           only the current one is exactly how a haulier ends up saying "we
           settled on X" against a record that no longer contains X. */}
       {adjustments.length > 0 ? (
-        <div className="mt-4 rounded-[6px] border border-adm-line bg-adm-sunken px-3.5 py-3">
+        <div className="mt-4 rounded-none border border-adm-line bg-adm-sunken px-3.5 py-3">
           <p className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
             Changed after dispatch
           </p>

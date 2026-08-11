@@ -49,7 +49,7 @@ function ResponsiveDialogContent({
         // clear the sheet.
         overlayClassName={cn("z-[70]", overlayClassName)}
         className={cn(
-          "shadow-doc gap-4 rounded-t-[6px] border-t-[1.5px] border-soil/40 bg-paper p-4 pt-2.5 text-sm text-ink",
+          "shadow-doc gap-4 rounded-t-none border-t-[1.5px] border-soil/40 bg-paper p-4 pt-2.5 text-sm text-ink",
           "max-h-[88dvh] overflow-y-auto pb-[max(1rem,env(safe-area-inset-bottom))]",
           className,
           // Declared after the caller's classes so tailwind-merge keeps

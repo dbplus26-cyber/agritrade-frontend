@@ -323,7 +323,7 @@ function AddReviewDialog({
             </div>
           </section>
 
-          <section className="flex flex-col gap-3 border-t border-adm-hairline pt-5">
+          <section className="flex flex-col gap-3 pt-3 sm:pt-6">
             <SectionHeading
               className="mb-0"
               hint="Published as recorded by the office, never as verified."
@@ -357,7 +357,7 @@ function AddReviewDialog({
                         <span
                           aria-hidden="true"
                           className={cn(
-                            "block px-0.5 text-[26px] leading-none transition-colors peer-focus-visible:rounded-[6px] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-leaf",
+                            "block px-0.5 text-[26px] leading-none transition-colors peer-focus-visible:rounded-none peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-leaf",
                             star <= field.value ? "text-console-gold" : "text-adm-faint",
                           )}
                         >

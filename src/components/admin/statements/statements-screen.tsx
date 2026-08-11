@@ -230,10 +230,7 @@ function OpeningBalanceCard() {
           <AdminField label="Notes" optional error={errors.notes?.message}>
             <Input className={adminInputClass} {...register("notes")} />
           </AdminField>
-          <div className="flex gap-2">
-            <AdminButton type="submit" disabled={saveState.isLoading} size="lg">
-              {saveState.isLoading ? "Saving…" : "Save opening position"}
-            </AdminButton>
+          <div className="flex justify-end gap-2">
             <AdminButton
               type="button"
               variant="outline"
@@ -245,6 +242,9 @@ function OpeningBalanceCard() {
               }}
             >
               Cancel
+            </AdminButton>
+            <AdminButton type="submit" disabled={saveState.isLoading} size="lg">
+              {saveState.isLoading ? "Saving…" : "Save opening position"}
             </AdminButton>
           </div>
         </form>
@@ -312,7 +312,7 @@ export function StatementsScreen() {
                 onChange={(v) => {
                   setYear(Number(v));
                 }}
-                className="h-[34px] cursor-pointer rounded-[6px] border border-adm-line bg-adm-card px-2.5 text-[13.5px] font-semibold text-adm-ink outline-none focus:border-console"
+                className="h-[34px] cursor-pointer rounded-none border border-adm-line bg-adm-card px-2.5 text-[13.5px] font-semibold text-adm-ink outline-none focus:border-console"
                 options={years.map((y) => ({
                   value: String(y),
                   label: String(y),
@@ -365,7 +365,7 @@ export function StatementsScreen() {
                         <li
                           key={check.code}
                           className={cn(
-                            "rounded-[6px] border px-3 py-2 text-[12.5px] leading-[1.55]",
+                            "rounded-none border px-3 py-2 text-[12.5px] leading-[1.55]",
                             check.level === "error"
                               ? "border-console-red/40 bg-console-red/5 text-console-red-deep"
                               : "border-console-gold/40 bg-console-gold/5 text-adm-body",

@@ -469,7 +469,7 @@ export function ApprovalsScreen() {
         <div
           role="tablist"
           aria-label="Approval status"
-          className="flex gap-[3px] rounded-[6px] bg-[var(--ap-tabs)] p-[3px]"
+          className="flex gap-[3px] rounded-none bg-[var(--ap-tabs)] p-[3px]"
         >
           {TABS.map(([value, label]) => (
             <StatusTab
@@ -522,7 +522,7 @@ export function ApprovalsScreen() {
       )}
 
       {selected.length > 0 ? (
-        <div className="mb-3 flex flex-wrap items-center gap-3.5 rounded-[6px] bg-[var(--ap-forest)] px-3.5 py-2.5 text-[13px] text-white">
+        <div className="mb-3 flex flex-wrap items-center gap-3.5 rounded-none bg-[var(--ap-forest)] px-3.5 py-2.5 text-[13px] text-white">
           <span className="font-adminmono font-semibold tabular-nums">
             {selected.length} selected
           </span>
@@ -549,7 +549,7 @@ export function ApprovalsScreen() {
       {isLoading ? (
         <QueueSkeleton />
       ) : isError ? (
-        <div className="overflow-hidden rounded-[6px] border border-[var(--ap-hair)] bg-[var(--ap-surface)]">
+        <div className="overflow-hidden rounded-none border border-[var(--ap-hair)] bg-[var(--ap-surface)]">
           <div className="flex flex-wrap items-center gap-3 bg-[var(--ap-clay-soft)] px-4 py-3.5 text-[13px] text-[var(--ap-ink)]">
             <span className="min-w-0 flex-1">
               The approvals list did not load. {extractApiError(error).message}
@@ -599,7 +599,7 @@ export function ApprovalsScreen() {
 }
 
 const ghostBarButton =
-  "cursor-pointer rounded-[6px] border border-white/35 bg-transparent px-3 py-[5px] text-[12.5px] leading-[1.4] font-[550] text-white " +
+  "cursor-pointer rounded-none border border-white/35 bg-transparent px-3 py-[5px] text-[12.5px] leading-[1.4] font-[550] text-white " +
   "hover:bg-white/12 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white " +
   "disabled:cursor-not-allowed disabled:opacity-50";
 
@@ -653,7 +653,7 @@ function StatusTab({
       aria-selected={active}
       onClick={onSelect}
       className={cn(
-        "flex cursor-pointer items-center gap-[7px] rounded-[6px] px-3.5 py-[7px] text-[13px] leading-[1.4] font-[550]",
+        "flex cursor-pointer items-center gap-[7px] rounded-none px-3.5 py-[7px] text-[13px] leading-[1.4] font-[550]",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ap-forest)]",
         active
           ? "bg-[var(--ap-surface)] text-[var(--ap-ink)] shadow-[0_1px_2px_rgba(0,0,0,.08)]"
@@ -663,7 +663,7 @@ function StatusTab({
       {label}
       <span
         className={cn(
-          "rounded-[6px] px-1.5 py-px font-adminmono text-[11px] leading-[1.4] tabular-nums",
+          "rounded-none px-1.5 py-px font-adminmono text-[11px] leading-[1.4] tabular-nums",
           active
             ? "bg-[var(--ap-forest)] text-white"
             : "bg-[var(--ap-pill)] text-[var(--ap-ink-2)]",
@@ -767,15 +767,15 @@ const EMPTY_COPY: Record<ApprovalStatus, { body: string; title: string }> = {
 /** Six rows at the real row height - a spinner would say nothing about shape. */
 function QueueSkeleton() {
   return (
-    <div className="overflow-hidden rounded-[6px] border border-[var(--ap-hair)] bg-[var(--ap-surface)]">
+    <div className="overflow-hidden rounded-none border border-[var(--ap-hair)] bg-[var(--ap-surface)]">
       {Array.from({ length: 6 }, (_, i) => (
         <div
           key={i}
           className="grid h-[62px] grid-cols-[110px_1fr] items-center gap-3.5 border-b border-[var(--ap-hair-soft)] px-4 last:border-b-0 @min-[900px]/main:grid-cols-[34px_190px_1fr]"
         >
           <span className="hidden @min-[900px]/main:block" />
-          <span className="block h-3.5 w-[120px] rounded-[6px] bg-[var(--ap-track)]" />
-          <span className="block h-3.5 w-[60%] rounded-[6px] bg-[var(--ap-track)]" />
+          <span className="block h-3.5 w-[120px] rounded-none bg-[var(--ap-track)]" />
+          <span className="block h-3.5 w-[60%] rounded-none bg-[var(--ap-track)]" />
         </div>
       ))}
     </div>
