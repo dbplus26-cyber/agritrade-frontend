@@ -6,7 +6,10 @@ import { AdminField, adminSelectClass } from "@/components/admin/ui";
 import { SimpleSelect } from "@/components/ui/simple-select";
 import { cn } from "@/lib/utils";
 import { useGetPaymentAccountsQuery } from "@/redux/payment-accounts/payment-accounts-api";
-import type { PaymentAccountKind } from "@/types/payment-account.types";
+import type {
+  IPaymentAccount,
+  PaymentAccountKind,
+} from "@/types/payment-account.types";
 
 /**
  * Mirrors the backend `COMPATIBLE_KINDS`
@@ -24,8 +27,14 @@ const COMPATIBLE_KINDS: Record<
 };
 
 /** Last four digits only - enough to recognise the account at a glance. */
-const maskAccountNumber = (accountNumber: string): string =>
-  `····${accountNumber.slice(-4)}`;
+const maskAccountNumber = (accountNumber: null | string): string =>
+  accountNumber ? `····${accountNumber.slice(-4)}` : "";
+
+/** "DB Plus Ltd · ····4417", with whichever halves the account actually has. */
+const accountHint = (account: IPaymentAccount): string =>
+  [account.accountName, maskAccountNumber(account.accountNumber)]
+    .filter(Boolean)
+    .join(" · ");
 
 /** Sentinel for "no account" - Radix select items cannot carry "". */
 const NO_ACCOUNT = "__no_account__";
@@ -108,10 +117,10 @@ export function PaymentAccountField({
           ...accounts.map((a) => ({ value: a.id, label: a.label })),
         ]}
       />
-      {chosen ? (
-        <p className="mt-1 text-[12px] text-adm-muted">
-          {chosen.accountName} · {maskAccountNumber(chosen.accountNumber)}
-        </p>
+      {/* Joined rather than interpolated so an account carrying neither name
+          nor number renders nothing, not a stranded separator. */}
+      {chosen && accountHint(chosen) ? (
+        <p className="mt-1 text-[12px] text-adm-muted">{accountHint(chosen)}</p>
       ) : null}
     </AdminField>
   );

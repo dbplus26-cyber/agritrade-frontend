@@ -8,13 +8,22 @@ import type { IRegistryListQuery } from "./registry.types";
 
 export type PaymentAccountKind = "BANK" | "CASH" | "MOMO" | "OTHER";
 
-/** Mirrors the backend payment-account DTO (envelope key `account`). */
+/**
+ * Mirrors the backend payment-account DTO (envelope key `account`).
+ *
+ * `accountName` and `accountNumber` are nullable because not every account is
+ * somewhere money is SENT to. The cash book treats every place money can sit as
+ * an account - the office till, an agent's cash in hand - and a cash box has no
+ * number to quote. This register endpoint only ever returns the accounts a
+ * human added as a payment destination, so in practice both are set here; the
+ * type is honest about the model rather than about one endpoint's filter.
+ */
 export interface IPaymentAccount {
   id: string;
   label: string;
   kind: PaymentAccountKind;
-  accountName: string;
-  accountNumber: string;
+  accountName: string | null;
+  accountNumber: string | null;
   bankName: string | null;
   branch: string | null;
   sortCode: string | null;
@@ -35,8 +44,8 @@ export interface IPaymentAccount {
  */
 export interface IPayableAccount {
   kind: PaymentAccountKind;
-  accountName: string;
-  accountNumber: string;
+  accountName: string | null;
+  accountNumber: string | null;
   bankName: string | null;
   branch: string | null;
   sortCode: string | null;
