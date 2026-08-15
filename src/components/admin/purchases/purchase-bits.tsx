@@ -2,7 +2,7 @@ import { HelpWrap } from "@/components/admin/help-tip";
 import { ToneBadge, type Tone } from "@/components/admin/ui";
 import { formatDateTime } from "@/lib/format-date";
 import { formatCedis, MONEY_HIDDEN } from "@/lib/format-money";
-import { PurchaseStatus } from "@/types/purchase.types";
+import { type IPurchase, PurchaseStatus } from "@/types/purchase.types";
 
 /**
  * Shared bits for the live purchase screens - status tones, labels and the
@@ -118,4 +118,29 @@ export function purchaseCounterparty(p: {
 /** Today as the YYYY-MM-DD a date input wants. */
 export function todayInputValue(): string {
   return new Date().toISOString().slice(0, 10);
+}
+
+/**
+ * Whether the supplier has been paid.
+ *
+ * Kept beside the status badge rather than folded into it: a purchase's
+ * LOGISTICS state (recorded, in transit, received) and whether the money has
+ * gone out are two different facts, and the system used to hold only the
+ * first. The status survives money redaction, so a staff member without
+ * financial visibility can still see that somebody is owed.
+ */
+export function SettlementBadge({
+  settlement,
+}: {
+  settlement: IPurchase["settlement"];
+}) {
+  if (!settlement) return null;
+  if (settlement.status === "PAID") {
+    return <ToneBadge tone="forest">Paid</ToneBadge>;
+  }
+  return settlement.status === "PART_PAID" ? (
+    <ToneBadge tone="harvest">Part paid</ToneBadge>
+  ) : (
+    <ToneBadge tone="alert">Not paid</ToneBadge>
+  );
 }

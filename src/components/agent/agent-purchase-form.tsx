@@ -64,6 +64,11 @@ export function AgentPurchaseForm() {
       weightKg: "",
       unitPriceGhs: "",
       purchasedAt: today(),
+      // Cash at the scale is the ordinary field case, so it is the default -
+      // but it is now a CHOICE, because a farmer paid at the weekend is real
+      // and used to have nowhere to be recorded.
+      paidNow: true,
+      paymentMethod: "CASH",
       notes: "",
     },
   });
@@ -84,6 +89,7 @@ export function AgentPurchaseForm() {
   const weightKg = Number(values.weightKg) || 0;
   const unitPriceGhs = Number(values.unitPriceGhs) || 0;
   const total = weightKg * unitPriceGhs;
+  const paidNow = values.paidNow;
 
   const onSubmit = async (v: AgentPurchaseValues) => {
     setSubmitError(null);
@@ -94,6 +100,18 @@ export function AgentPurchaseForm() {
           weightKg: Number(v.weightKg),
           unitPriceGhs: Number(v.unitPriceGhs),
           purchasedAt: v.purchasedAt,
+          // The purchase and the payment travel together in ONE request: cash
+          // changes hands as the grain is weighed, and making somebody submit
+          // twice on a 2G connection is two chances to lose half of it. The
+          // server still records them as two things, because they are.
+          ...(v.paidNow
+            ? {
+                payment: {
+                  amountGhs: Number(v.weightKg) * Number(v.unitPriceGhs),
+                  method: v.paymentMethod,
+                },
+              }
+            : {}),
           ...(v.notes?.trim() ? { notes: v.notes.trim() } : {}),
         },
         idempotencyKey,
@@ -101,7 +119,11 @@ export function AgentPurchaseForm() {
       }).unwrap();
       submitted.current = true;
       clearDraft(DRAFT_KEY);
-      notify.success("Purchase recorded - your float has been charged");
+      notify.success(
+        v.paidNow
+          ? "Purchase recorded - your float has been charged"
+          : "Purchase recorded - this farmer is still owed",
+      );
       router.replace("/agent/purchases");
     } catch (err) {
       // Keep the draft AND the key: the retry must reuse both.
@@ -167,12 +189,76 @@ export function AgentPurchaseForm() {
 
       <div className="flex items-baseline justify-between rounded border border-soil/25 bg-surface-alt/60 px-3 py-2">
         <span className="text-[11px] font-bold tracking-[0.08em] text-soil uppercase">
-          I paid
+          {paidNow ? "I paid" : "I owe"}
         </span>
         <span className="font-mono text-[16px] font-bold tabular-nums text-ink">
           {formatCedis(total)}
         </span>
       </div>
+
+      {/* Recording a purchase used to charge the float by itself, so a farmer
+          paid at the weekend had nowhere to be recorded. Two big taps, because
+          this is answered with a thumb at a village scale. */}
+      <div>
+        <AgentLabel>Did you pay for this?</AgentLabel>
+        <Controller
+          control={control}
+          name="paidNow"
+          render={({ field }) => (
+            <div className="grid grid-cols-2 gap-2.5">
+              {[
+                { label: "Paid now", value: true },
+                { label: "Paying later", value: false },
+              ].map((option) => (
+                <button
+                  aria-pressed={field.value === option.value}
+                  className={cn(
+                    "min-h-[44px] rounded border px-3 py-2 text-[14px] font-semibold transition-colors active:opacity-80",
+                    field.value === option.value
+                      ? "border-soil bg-soil text-white"
+                      : "border-soil/30 bg-surface text-ink",
+                  )}
+                  key={option.label}
+                  onClick={() => field.onChange(option.value)}
+                  type="button"
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          )}
+        />
+      </div>
+
+      {paidNow ? (
+        <div>
+          <AgentLabel htmlFor="paymentMethod">How did you pay?</AgentLabel>
+          <Controller
+            control={control}
+            name="paymentMethod"
+            render={({ field }) => (
+              <SimpleSelect
+                className={agentInputClass}
+                id="paymentMethod"
+                onChange={field.onChange}
+                options={[
+                  { label: "Cash", value: "CASH" },
+                  { label: "Mobile money", value: "MOMO" },
+                ]}
+                value={field.value}
+              />
+            )}
+          />
+          <p className="mt-1 text-[12px] text-soil">
+            This comes out of your float either way.
+          </p>
+        </div>
+      ) : (
+        <p className="text-[12px] text-soil">
+          Your float is not charged. Record the payment from your purchases
+          list once you have paid.
+        </p>
+      )}
 
       <div>
         <AgentLabel htmlFor="purchasedAt">Purchase date</AgentLabel>

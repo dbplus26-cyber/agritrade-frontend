@@ -1,4 +1,5 @@
 import type { IPaginationMeta } from "./api";
+import type { SalePaymentMethod } from "./admin-sale.types";
 import type { ApprovalStatus } from "./approval.types";
 import type { PurchaseSource } from "./registry.types";
 
@@ -49,6 +50,20 @@ export interface IPurchase {
   unitPriceGhs: number | null;
   /** Null when the API redacted it (financial visibility). */
   totalGhs: number | null;
+  /**
+   * What has been paid for these goods, and what is still owed the supplier.
+   * Null when the read did not resolve it. A purchase is a DOCUMENT - recording
+   * one moves no money - so this is the only thing that says whether anybody
+   * has actually been paid.
+   *
+   * The STATUS survives money redaction on purpose: whether a supplier has
+   * been paid is an operational fact, and it discloses no figure.
+   */
+  settlement: {
+    outstandingGhs: number | null;
+    paidGhs: number | null;
+    status: PurchaseSettlementStatus;
+  } | null;
   photo: string | null;
   notes: string | null;
   idempotencyKey: string | null;
@@ -98,7 +113,85 @@ export interface ICreatePurchaseInput {
   unitPriceGhs: number;
   purchasedAt: string;
   notes?: string;
+  /** Omit to record the purchase unpaid - the supplier is simply owed. */
+  payment?: IPurchasePaymentOnCreate;
   idempotencyKey?: string;
+}
+
+export type PurchaseSettlementStatus = "PAID" | "PART_PAID" | "UNPAID";
+
+/** Paying in the same submission that records the purchase. */
+export interface IPurchasePaymentOnCreate {
+  amountGhs: number;
+  /** Field case: the paying agent's own float covered it. */
+  fromFloat?: boolean;
+  method: SalePaymentMethod;
+  paidAt?: string;
+  paymentAccountId?: string;
+  reference?: string;
+}
+
+/** Mirrors backend `recordPurchasePaymentSchema`. */
+export interface IRecordPurchasePaymentInput {
+  amountGhs: number;
+  method: SalePaymentMethod;
+  paidAt?: string;
+  paymentAccountId?: string;
+  reference?: string;
+}
+
+export interface IPurchasePayment {
+  amountGhs: number | null;
+  /** True when a field agent's float paid this, not a company account. */
+  fromFloat: boolean;
+  id: string;
+  isReversal: boolean;
+  method: SalePaymentMethod;
+  paidAt: string;
+  paymentAccount: { id: string; label: string } | null;
+  reference: string | null;
+  reversalReason: string | null;
+  reversedByPaymentId: string | null;
+  transactionNo: string;
+}
+
+export interface IPurchaseSettlement {
+  outstandingGhs: number | null;
+  paidGhs: number | null;
+  status: PurchaseSettlementStatus;
+}
+
+export interface IPurchasePaymentsResponse {
+  message: string;
+  data: { payments: IPurchasePayment[]; settlement: IPurchaseSettlement };
+}
+
+export interface IPurchasePaymentResponse {
+  message: string;
+  data: { payment: IPurchasePayment; settlement: IPurchaseSettlement };
+}
+
+export interface IPurchasePaymentReversalResponse {
+  message: string;
+  data: { reversal: IPurchasePayment; settlement: IPurchaseSettlement };
+}
+
+export interface IUnpaidPurchasesResponse {
+  message: string;
+  data: IUnpaidPurchase[];
+  meta: IPaginationMeta;
+}
+
+export interface IUnpaidPurchase {
+  amountGhs: number | null;
+  commodity: { id: string; name: string };
+  id: string;
+  outstandingGhs: number | null;
+  paidGhs: number | null;
+  purchasedAt: string;
+  status: PurchaseSettlementStatus;
+  supplier: { id: string; name: string } | null;
+  transactionNo: string;
 }
 
 /** Mirrors backend `agentCreatePurchaseSchema` (own float, source forced). */
@@ -109,6 +202,13 @@ export interface IAgentCreatePurchaseInput {
   weightKg: number;
   unitPriceGhs: number;
   purchasedAt: string;
+  /**
+   * How it was paid for, if it was. Omit and the purchase records unpaid - the
+   * farmer is owed. The paying account is always the agent's own float, which
+   * the server resolves from their profile, so `paymentAccountId` is not part
+   * of this shape.
+   */
+  payment?: Omit<IPurchasePaymentOnCreate, "paymentAccountId">;
   notes?: string;
 }
 
