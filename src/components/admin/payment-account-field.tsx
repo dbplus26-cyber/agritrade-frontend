@@ -48,19 +48,31 @@ const NO_ACCOUNT = "__no_account__";
  * optional for cash, which sits in the till.
  */
 export function PaymentAccountField({
-  method,
   direction,
   error,
+  label,
+  method,
   onChange,
+  required = false,
   value,
 }: {
-  method: "BANK" | "CASH" | "MOMO";
   /** "in": money received into the account; "out": paid out of it. */
   direction: "in" | "out";
   error?: string;
+  /** Overrides the default field label. */
+  label?: string;
+  /**
+   * Narrows the list to the kinds this method can touch. OMIT to offer every
+   * live account: handing an agent cash you withdrew from the bank leaves a
+   * BANK account, so the source is not decided by what the agent ends up
+   * holding.
+   */
+  method?: "BANK" | "CASH" | "MOMO";
+  onChange: (value: string) => void;
+  /** Forces a choice even where cash would normally allow "no account". */
+  required?: boolean;
   /** Controlled: pair with react-hook-form's `Controller`. */
   value: string;
-  onChange: (value: string) => void;
 }) {
   const { data, isLoading, isError } = useGetPaymentAccountsQuery({
     isActive: true,
@@ -70,23 +82,27 @@ export function PaymentAccountField({
   });
   const accounts = useMemo(
     () =>
-      (data?.data ?? []).filter((a) =>
-        COMPATIBLE_KINDS[method].includes(a.kind),
-      ),
+      method
+        ? (data?.data ?? []).filter((a) =>
+            COMPATIBLE_KINDS[method].includes(a.kind),
+          )
+        : (data?.data ?? []),
     [data, method],
   );
 
   const chosen = accounts.find((a) => a.id === value);
-  const optional = method === "CASH";
+  const optional = method === "CASH" && !required;
   const hint = isError
     ? "Couldn't load the accounts register - close and try again."
     : !isLoading && accounts.length === 0
-      ? "No live account can carry this method. Add one under Payment accounts first."
+      ? "No live account can carry this. Add one under Payment accounts first."
       : undefined;
 
   return (
     <AdminField
-      label={direction === "in" ? "Received into account" : "Paid from account"}
+      label={
+        label ?? (direction === "in" ? "Received into account" : "Paid from account")
+      }
       optional={optional}
       hint={hint}
       error={error}

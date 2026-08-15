@@ -24,21 +24,26 @@ export enum PaymentMethod {
 }
 
 /** One float ledger line (`toFloatTransactionDTO`); amountGhs is signed. */
+/**
+ * One line of what somebody is holding for the business.
+ *
+ * Mirrors the backend `toHeldMovementDTO`. It carries WHICH of their accounts
+ * moved, which the float row it replaces could not: a single balance covering
+ * cash in a pocket and money in a wallet is exactly what made an agent's
+ * position unreadable, and a statement that does not say which pot moved
+ * reproduces the problem one row at a time.
+ */
 export interface IFloatTransaction {
-  id: string;
-  /** Human-readable document number, e.g. "SAL-2026-00042". */
-  transactionNo: string;
-  type: FloatTxType;
+  account: { id: string; kind: string; label: string };
   /** Null when the API redacted it (financial visibility). */
   amountGhs: number | null;
-  method: PaymentMethod | null;
-  reason: string | null;
-  purchaseId: string | null;
-  expenseId: string | null;
-  /** Set on DISBURSEMENT rows - links the line to the send it belongs to. */
-  disbursementId: string | null;
-  idempotencyKey: string | null;
+  id: string;
   occurredAt: string;
+  reason: string | null;
+  /** Human-readable document number, e.g. "PUR-2026-00042". */
+  transactionNo: string;
+  /** The cash-book movement type: RECEIPT, PAYMENT, TRANSFER_IN, … */
+  type: string;
 }
 
 /** An agent row in the admin register (`AgentSummaryDTO`). */
@@ -203,11 +208,25 @@ export interface IFloatLedgerQuery {
   to?: string;
 }
 
-/** Mirrors backend `topUpSchema`. */
+/**
+ * Mirrors backend `topUpSchema`.
+ *
+ * `fromAccountId` is REQUIRED, and that is the whole point of the shape. A
+ * top-up used to say only how much and by what method, so money appeared in an
+ * agent's hands and left no company account - the business's own position never
+ * fell by what it had just given away. Naming the source makes it a transfer,
+ * which is what it always was.
+ */
 export interface ITopUpInput {
   amountGhs: number;
-  method: PaymentMethod.CASH | PaymentMethod.MOMO | PaymentMethod.BANK;
+  /** The company account the money actually left. */
+  fromAccountId: string;
+  occurredAt?: string;
   reason?: string;
+  /** One of the holder's own accounts; omit and `toKind` opens the right one. */
+  toAccountId?: string;
+  /** Where it landed: cash in hand, their wallet, their bank. */
+  toKind?: "BANK" | "CASH" | "MOMO";
 }
 
 export interface ICreateReconciliationInput {

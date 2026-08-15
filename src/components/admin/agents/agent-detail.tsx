@@ -32,6 +32,7 @@ import {
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
+import { PaymentAccountField } from "@/components/admin/payment-account-field";
 import { SimpleSelect } from "@/components/ui/simple-select";
 import {
   useCreateReconciliationMutation,
@@ -50,8 +51,6 @@ import { notify } from "@/lib/notify";
 import { ViewablePhoto } from "@/components/admin/photo-view";
 import { cn } from "@/lib/utils";
 import {
-  FloatTxType,
-  PaymentMethod,
   type IFloatTransaction,
 } from "@/types/agent.types";
 import {
@@ -64,53 +63,76 @@ import { formatConsoleDate } from "@/components/admin/purchases/purchase-bits";
 
 const LIST = "/admin/agents";
 
-// These three maps are exhaustive over FloatTxType on purpose: adding a
-// ledger type without a marker used to render `undefined` and then throw on
-// TONES[undefined].bg, so the compiler is made to catch it instead.
-const TX_LABEL: Record<FloatTxType, string> = {
-  [FloatTxType.TOP_UP]: "Top-up",
-  [FloatTxType.PURCHASE]: "Purchase",
-  [FloatTxType.FIELD_EXPENSE]: "Field expense",
-  [FloatTxType.ADJUSTMENT]: "Adjustment",
-  [FloatTxType.DISBURSEMENT]: "Money sent",
+// The ledger is the CASH BOOK now, so its lines are movement types rather than
+// float types. An unknown type falls back rather than throwing: the cash book
+// gains types over time and a ledger that crashes on one it has not met is
+// worse than one that renders it plainly.
+const TX_LABEL: Record<string, string> = {
+  CAPITAL: "Own money in",
+  CHARGE: "Charge",
+  CORRECTION: "Correction",
+  DEPOSIT: "Money in",
+  PAYMENT: "Spent",
+  RECEIPT: "Received",
+  TRANSFER_IN: "Handed over",
+  TRANSFER_OUT: "Sent back",
+  WITHDRAWAL: "Money out",
 };
 
-const TX_TONE: Record<FloatTxType, Tone> = {
-  [FloatTxType.TOP_UP]: "leaf",
-  [FloatTxType.PURCHASE]: "sky",
-  [FloatTxType.FIELD_EXPENSE]: "harvest",
-  [FloatTxType.ADJUSTMENT]: "slate",
-  [FloatTxType.DISBURSEMENT]: "forest",
+const TX_TONE: Record<string, Tone> = {
+  CAPITAL: "leaf",
+  CHARGE: "harvest",
+  CORRECTION: "slate",
+  DEPOSIT: "leaf",
+  PAYMENT: "sky",
+  RECEIPT: "forest",
+  TRANSFER_IN: "leaf",
+  TRANSFER_OUT: "forest",
+  WITHDRAWAL: "harvest",
 };
 
 /** Two-letter ledger markers, stamped in the type's tone. */
-const TX_CODE: Record<FloatTxType, string> = {
-  [FloatTxType.TOP_UP]: "TU",
-  [FloatTxType.PURCHASE]: "PU",
-  [FloatTxType.FIELD_EXPENSE]: "FE",
-  [FloatTxType.ADJUSTMENT]: "AD",
-  [FloatTxType.DISBURSEMENT]: "SN",
+const TX_CODE: Record<string, string> = {
+  CAPITAL: "CP",
+  CHARGE: "CH",
+  CORRECTION: "AD",
+  DEPOSIT: "IN",
+  PAYMENT: "SP",
+  RECEIPT: "RC",
+  TRANSFER_IN: "TU",
+  TRANSFER_OUT: "SB",
+  WITHDRAWAL: "OU",
 };
 
+const txLabel = (type: string): string => TX_LABEL[type] ?? type;
+const txTone = (type: string): Tone => TX_TONE[type] ?? "slate";
+const txCode = (type: string): string => TX_CODE[type] ?? "··";
+
 /** Square type marker at the head of a ledger line (label in the tooltip). */
-function TxMarker({ type }: { type: FloatTxType }) {
-  const t = TONES[TX_TONE[type]];
+function TxMarker({ type }: { type: string }) {
+  const t = TONES[txTone(type)];
   return (
     <span
-      title={TX_LABEL[type]}
+      title={txLabel(type)}
       className="font-adminmono mt-0.5 flex h-6 w-6 flex-none items-center justify-center rounded-none text-[10px] font-bold"
       style={{ background: t.bg, color: t.fg }}
     >
-      {TX_CODE[type]}
-      <span className="sr-only">{TX_LABEL[type]}</span>
+      {txCode(type)}
+      <span className="sr-only">{txLabel(type)}</span>
     </span>
   );
 }
 
-const METHOD_OPTIONS = [
-  { value: PaymentMethod.CASH, label: "Cash" },
-  { value: PaymentMethod.MOMO, label: "Mobile money" },
-  { value: PaymentMethod.BANK, label: "Bank" },
+/**
+ * Where handed-over money LANDS. Not "how it was sent" - what the agent is now
+ * holding, and where. Notes in a pocket, their own wallet and their bank are
+ * three different pots, and the single float balance that covered all three is
+ * exactly what made an agent's position impossible to read.
+ */
+const TENDER_OPTIONS = [
+  { label: "Cash in hand", value: "CASH" },
+  { label: "Their mobile money", value: "MOMO" },
+  { label: "Their bank account", value: "BANK" },
 ] as const;
 
 /**
@@ -238,25 +260,15 @@ function LedgerRow({
       <TxMarker type={tx.type} />
       <div className="min-w-0">
         <p className="min-w-0 text-[13px] leading-snug text-adm-ink [overflow-wrap:anywhere]">
-          {tx.reason ??
-            (tx.purchaseId
-              ? "Paid from float for a purchase"
-              : TX_LABEL[tx.type])}
+          {tx.reason ?? txLabel(tx.type)}
         </p>
         <div className="mt-0.5 flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
           <Mono className="text-[11px] text-adm-faint">{tx.transactionNo}</Mono>
           <DateTimeCell value={tx.occurredAt} muted />
-          {tx.method ? (
-            <span className="text-[11px] text-adm-faint">{tx.method}</span>
-          ) : null}
-          {tx.purchaseId ? (
-            <Link
-              href={`/admin/purchases/${tx.purchaseId}`}
-              className="text-[11.5px] text-adm-ink underline-offset-2 hover:underline"
-            >
-              View purchase
-            </Link>
-          ) : null}
+          {/* WHICH pot moved. Cash in a pocket and money in a wallet are
+              different money, and a line that does not say which is the same
+              conflation the single float balance made. */}
+          <span className="text-[11px] text-adm-faint">{tx.account.label}</span>
         </div>
         {/* Narrow cards have no room for a fourth track, so the balance rides
             under the entry rather than being dropped from the page. */}
@@ -303,7 +315,12 @@ function TopUpDialog({
     formState: { errors },
   } = useForm<TopUpValues>({
     resolver: zodResolver(topUpSchema),
-    defaultValues: { amountGhs: "", method: PaymentMethod.CASH, reason: "" },
+    defaultValues: {
+      amountGhs: "",
+      fromAccountId: "",
+      reason: "",
+      toKind: "CASH",
+    },
   });
 
   const onSubmit = async (values: TopUpValues) => {
@@ -312,10 +329,10 @@ function TopUpDialog({
     // mistake here (right amount, wrong agent) is silent until reconciliation.
     const confirmed = await confirm({
       title: "Hand over this float?",
-      description: `${formatCedis(Number(values.amountGhs))} by ${
-        METHOD_OPTIONS.find((m) => m.value === values.method)?.label ??
-        values.method
-      } to ${agentName}. It is spendable at once; only a reconciliation can correct it.`,
+      description: `${formatCedis(Number(values.amountGhs))} to ${agentName}, as ${
+        TENDER_OPTIONS.find((t) => t.value === values.toKind)?.label ??
+        values.toKind
+      }. It leaves the account you chose and is spendable at once; only a reconciliation can correct it.`,
       confirmText: "Top up float",
       requireExactMatch: agentFirstName,
     });
@@ -326,7 +343,8 @@ function TopUpDialog({
         agentUserId,
         body: {
           amountGhs: Number(values.amountGhs),
-          method: values.method,
+          fromAccountId: values.fromAccountId,
+          toKind: values.toKind,
           ...(values.reason?.trim() ? { reason: values.reason.trim() } : {}),
         },
       }).unwrap();
@@ -347,7 +365,8 @@ function TopUpDialog({
             Top up {agentName}&apos;s float
           </ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
-            Cash or mobile money handed to the agent for village purchases.
+            Money handed to the agent for village purchases. It moves out of a
+            company account and into theirs.
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
         <form
@@ -363,16 +382,35 @@ function TopUpDialog({
               {...register("amountGhs")}
             />
           </AdminField>
-          <AdminField label="Method">
+          {/* Where the money LEAVES. Required: an agent holding company cash
+              means a company account is lighter, and the books only add up if
+              somebody says which one. */}
+          <Controller
+            control={control}
+            name="fromAccountId"
+            render={({ field }) => (
+              <PaymentAccountField
+                direction="out"
+                error={errors.fromAccountId?.message}
+                label="Out of which account?"
+                onChange={field.onChange}
+                value={field.value}
+              />
+            )}
+          />
+          {/* Where it LANDS. Notes in a pocket, their own wallet and their bank
+              are different money - one number for all three is what made an
+              agent's position unreadable. */}
+          <AdminField label="Handed over as">
             <Controller
               control={control}
-              name="method"
+              name="toKind"
               render={({ field }) => (
                 <SimpleSelect
                   className={cn(adminSelectClass, "w-full")}
                   value={field.value}
                   onChange={field.onChange}
-                  options={METHOD_OPTIONS}
+                  options={TENDER_OPTIONS}
                 />
               )}
             />
