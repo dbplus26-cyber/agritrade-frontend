@@ -67,6 +67,7 @@ export const adminNavGroups: AdminNavGroup[] = [
     items: [
       item("dashboard", "Dashboard", "Today at a glance: what came in, what went out, and what needs you."),
       item("approvals", "Approvals", "Requests waiting on your decision. Approving applies the change straight away.", { badge: "approvals", permission: "APPROVALS_DECIDE" }),
+      item("cash-book", "Cash book", "Where the business's money is right now, account by account, and every movement in and out of each.", { permission: "MONEY_VIEW" }),
       item("reports", "Reports", "Profit, cash and volume over a period you choose.", { permission: "MONEY_VIEW" }),
     ],
   },
