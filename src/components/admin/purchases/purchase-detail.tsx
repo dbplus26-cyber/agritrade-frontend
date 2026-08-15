@@ -59,6 +59,7 @@ import {
   type ReceivePurchaseValues,
   type VoidPurchaseValues,
 } from "@/validations/purchase-schema";
+import { PurchaseSettlementCard } from "@/components/admin/purchases/purchase-settlement-card";
 import { SOURCE_LABEL } from "@/components/admin/registry/registry-bits";
 import {
   formatConsoleDate,
@@ -517,6 +518,15 @@ export function PurchaseDetail({ id }: { id: string }) {
                 </DetailItem>
               </DetailGrid>
             </AdminCard>
+
+            {/* What was AGREED is above; what has actually been handed over is
+                its own ledger, because they are different facts and the
+                system used to hold only the first. */}
+            <PurchaseSettlementCard
+              isVoided={p.voidedAt !== null}
+              purchaseId={p.id}
+              totalGhs={p.totalGhs}
+            />
 
             <AdminCard className="px-5 py-3">
               <SectionHeading className="mb-1">Parties & logistics</SectionHeading>

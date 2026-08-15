@@ -49,6 +49,16 @@ export const agentPurchaseSchema = z.object({
   weightKg: requiredNumber("weight in kg", 1_000_000),
   unitPriceGhs: requiredNumber("price per kg", 1_000_000),
   purchasedAt: z.string().min(1, "Enter the purchase date"),
+  /**
+   * Whether the money changed hands at the scale.
+   *
+   * Recording a purchase used to charge the agent's float by itself, so the
+   * two were the same act and a farmer paid at the weekend had nowhere to be
+   * recorded. Defaults to yes because cash at the scale IS the ordinary field
+   * case - the convenience belongs in the form, not silently in the model.
+   */
+  paidNow: z.boolean(),
+  paymentMethod: z.enum(["CASH", "MOMO"]),
   notes: optionalText(1000),
 });
 export type AgentPurchaseValues = z.infer<typeof agentPurchaseSchema>;

@@ -4,8 +4,13 @@ import type {
   ICreatePurchaseInput,
   IPurchaseListQuery,
   IPurchaseListResponse,
+  IPurchasePaymentResponse,
+  IPurchasePaymentReversalResponse,
+  IPurchasePaymentsResponse,
   IPurchaseResponse,
   IReceivePurchaseInput,
+  IRecordPurchasePaymentInput,
+  IUnpaidPurchasesResponse,
   IVoidPurchaseInput,
 } from "@/types/purchase.types";
 
@@ -114,10 +119,69 @@ export const purchasesApi = apiSlice.injectEndpoints({
         { type: "StockMovements", id: "LIST" },
       ],
     }),
+
+    /**
+     * What has been paid for these goods. A purchase is a document; settling
+     * it is a separate act, so it has its own ledger.
+     */
+    getPurchasePayments: builder.query<IPurchasePaymentsResponse, string>({
+      query: (purchaseId) => `admin/purchases/${purchaseId}/payments`,
+      providesTags: (_r, _e, id) => [{ type: "Purchases", id: `PAY-${id}` }],
+    }),
+
+    /** The settle picker's feed: purchases that still owe a supplier money. */
+    getUnpaidPurchases: builder.query<
+      IUnpaidPurchasesResponse,
+      { limit?: number; page?: number; search?: string } | void
+    >({
+      query: (params) => `admin/purchases/unpaid${toQueryString(params ?? {})}`,
+      providesTags: [{ type: "Purchases", id: "UNPAID" }],
+    }),
+
+    recordPurchasePayment: builder.mutation<
+      IPurchasePaymentResponse,
+      { body: IRecordPurchasePaymentInput; purchaseId: string }
+    >({
+      query: ({ body, purchaseId }) => ({
+        url: `admin/purchases/${purchaseId}/payments`,
+        method: "POST",
+        body,
+      }),
+      // The money leaves a real account, so the cash book moves with it.
+      invalidatesTags: (_r, _e, { purchaseId }) => [
+        { type: "Purchases", id: purchaseId },
+        { type: "Purchases", id: `PAY-${purchaseId}` },
+        { type: "Purchases", id: "LIST" },
+        { type: "Purchases", id: "UNPAID" },
+        { type: "CashBook", id: "OVERVIEW" },
+      ],
+    }),
+
+    reversePurchasePayment: builder.mutation<
+      IPurchasePaymentReversalResponse,
+      { paymentId: string; purchaseId: string; reason: string }
+    >({
+      query: ({ paymentId, purchaseId, ...body }) => ({
+        url: `admin/purchases/${purchaseId}/payments/${paymentId}/reverse`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: (_r, _e, { purchaseId }) => [
+        { type: "Purchases", id: purchaseId },
+        { type: "Purchases", id: `PAY-${purchaseId}` },
+        { type: "Purchases", id: "LIST" },
+        { type: "Purchases", id: "UNPAID" },
+        { type: "CashBook", id: "OVERVIEW" },
+      ],
+    }),
   }),
 });
 
 export const {
+  useGetPurchasePaymentsQuery,
+  useGetUnpaidPurchasesQuery,
+  useRecordPurchasePaymentMutation,
+  useReversePurchasePaymentMutation,
   useGetPurchasesQuery,
   useGetPurchaseQuery,
   useCreatePurchaseMutation,

@@ -38,6 +38,7 @@ import {
   PURCHASE_STATUS_FILTER_OPTIONS,
   purchaseCounterparty,
   PurchaseStatusBadge,
+  SettlementBadge,
 } from "./purchase-bits";
 
 const LIST = "/admin/purchases";
@@ -163,6 +164,19 @@ export function PurchasesTable() {
           <Mono className="whitespace-nowrap text-adm-ink">
             <CompactCedis amount={row.original.totalGhs} />
           </Mono>
+        ),
+      },
+      {
+        id: "paid",
+        accessorFn: (p) => p.settlement?.status ?? "",
+        header: columnHelp(
+          "Paid?",
+          "Whether the supplier has actually been paid. Recording a purchase does not move money - paying for it does.",
+        ),
+        enableSorting: false,
+        meta: columnMeta(),
+        cell: ({ row }) => (
+          <SettlementBadge settlement={row.original.settlement} />
         ),
       },
       {

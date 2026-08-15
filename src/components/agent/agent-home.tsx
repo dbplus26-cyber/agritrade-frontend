@@ -6,26 +6,35 @@ import { useGetMyFloatQuery } from "@/redux/agent/agent-api";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis } from "@/lib/format-money";
 import { cn } from "@/lib/utils";
-import { FloatTxType, type IFloatTransaction } from "@/types/agent.types";
+import type { IFloatTransaction } from "@/types/agent.types";
 
-const TX_LABEL: Record<FloatTxType, string> = {
-  [FloatTxType.TOP_UP]: "Top-up",
-  [FloatTxType.PURCHASE]: "Purchase",
-  [FloatTxType.FIELD_EXPENSE]: "Expense",
-  [FloatTxType.ADJUSTMENT]: "Adjustment",
-  [FloatTxType.DISBURSEMENT]: "Money sent",
+// The ledger is the cash book now, so its lines are movement types. Unknown
+// types fall back to their own name rather than rendering `undefined`: the
+// cash book gains types over time and a field app that breaks on one it has
+// not met is worse than one that shows it plainly.
+const TX_LABEL: Record<string, string> = {
+  CAPITAL: "Own money in",
+  CHARGE: "Charge",
+  CORRECTION: "Adjustment",
+  DEPOSIT: "Money in",
+  PAYMENT: "Spent",
+  RECEIPT: "Received",
+  TRANSFER_IN: "Given to you",
+  TRANSFER_OUT: "Sent back",
+  WITHDRAWAL: "Money out",
 };
 
 function LedgerLine({ tx }: { tx: IFloatTransaction }) {
   return (
     <div className="flex items-baseline justify-between gap-3 border-b border-soil/15 py-2 last:border-b-0">
       <div className="min-w-0">
-        <p className="text-[13px] font-medium text-ink">{TX_LABEL[tx.type]}</p>
+        <p className="text-[13px] font-medium text-ink">{TX_LABEL[tx.type] ?? tx.type}</p>
         <p className="truncate text-[11.5px] text-soil/75">
           {new Date(tx.occurredAt).toLocaleDateString("en-GB", {
             day: "2-digit",
             month: "short",
           })}
+          {` · ${tx.account.label}`}
           {tx.reason ? ` · ${tx.reason}` : ""}
         </p>
       </div>

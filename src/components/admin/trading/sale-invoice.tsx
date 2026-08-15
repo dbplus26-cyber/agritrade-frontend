@@ -35,13 +35,17 @@ function PayToCard({
   account: IPayableAccount;
   reference: string;
 }) {
-  const rows: [string, string][] = [
-    ["Account name", account.accountName],
-    [
+  // Name and number are conditional like every other row: an account that
+  // carries neither is not a payment destination, and an empty "Account
+  // number:" on an invoice is worse than no line at all.
+  const rows: [string, string][] = [];
+  if (account.accountName) rows.push(["Account name", account.accountName]);
+  if (account.accountNumber) {
+    rows.push([
       account.kind === "MOMO" ? "MoMo number" : "Account number",
       account.accountNumber,
-    ],
-  ];
+    ]);
+  }
   if (account.bankName) rows.push(["Bank", account.bankName]);
   if (account.branch) rows.push(["Branch", account.branch]);
   if (account.provider) rows.push(["Network", account.provider]);

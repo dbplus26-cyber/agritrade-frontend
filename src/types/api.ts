@@ -8,6 +8,7 @@ export const apiSliceTags = [
   "ApprovalsCount",
   "AuditLogs",
   "Buyers",
+  "CashBook",
   "Commodities",
   "DeliveryAddresses",
   "Disbursements",
