@@ -4,6 +4,8 @@
  * has no financial visibility - the API redacts, the UI just renders what it
  * is given.
  */
+import type { SalePaymentMethod } from "./admin-sale.types";
+import type { IExpenseSettlement } from "./driver-settlement.types";
 
 export interface IExpense {
   amountGhs: null | number;
@@ -61,7 +63,38 @@ export interface ICreateExpenseInput {
   categoryId: string;
   description?: string;
   incurredAt: string;
+  /** Omit to record the cost unpaid - the payee is simply owed. */
+  payment?: IExpensePaymentOnCreate;
   shipmentId?: string;
+}
+
+/**
+ * Settling the cost in the same submission that records it.
+ *
+ * `amountGhs` is omitted by the console on purpose: the server defaults it to
+ * the whole cost, and asking for the same figure twice is how a part payment
+ * gets recorded by accident. BANK and MOMO must carry both a reference and the
+ * account the money moved on (REFERENCE_REQUIRED, ACCOUNT_REQUIRED); cash
+ * needs neither and falls to the office till.
+ */
+export interface IExpensePaymentOnCreate {
+  amountGhs?: number;
+  method: SalePaymentMethod;
+  paidAt?: string;
+  paymentAccountId?: string;
+  reference?: string;
+}
+
+/**
+ * What recording a cost answers with: the voucher, and how settled it now is.
+ *
+ * The settlement travels with the create because the caller has just asked for
+ * both halves - making the console fetch the cost again to learn whether its
+ * own payment landed is the round trip the combined endpoint exists to remove.
+ */
+export interface ICreateExpenseResponse {
+  data: { expense: IExpense; settlement: IExpenseSettlement };
+  message: string;
 }
 
 export interface IUpdateExpenseInput {

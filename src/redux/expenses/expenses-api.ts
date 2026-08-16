@@ -2,6 +2,7 @@ import { apiSlice } from "../api-slice";
 import { toQueryString } from "@/lib/to-query-string";
 import type {
   ICreateExpenseInput,
+  ICreateExpenseResponse,
   IExpenseListQuery,
   IExpenseListResponse,
   IExpenseResponse,
@@ -34,10 +35,29 @@ export const expensesApi = apiSlice.injectEndpoints({
       providesTags: (_r, _e, id) => [{ type: "Expenses", id }],
     }),
 
-    createExpense: builder.mutation<IExpenseResponse, ICreateExpenseInput>({
-      query: (body) => ({ url: "admin/expenses", method: "POST", body }),
+    /**
+     * Records a cost, and settles it in the same act when the form says it was
+     * paid.
+     *
+     * The key is not optional here the way it is in the contract: this
+     * endpoint moves money now, so a double-tapped form or a retry after a
+     * timeout would pay a supplier twice. Same shape as a float top-up - the
+     * key rides in the BODY, which is where `createExpenseSchema` reads it.
+     */
+    createExpense: builder.mutation<
+      ICreateExpenseResponse,
+      { body: ICreateExpenseInput; idempotencyKey: string }
+    >({
+      query: ({ body, idempotencyKey }) => ({
+        url: "admin/expenses",
+        method: "POST",
+        body: { ...body, idempotencyKey },
+      }),
+      // A paid cost is one fewer row in the unpaid feed the send-money picker
+      // reads, so that feed goes stale the moment this lands.
       invalidatesTags: [
         { type: "Expenses", id: "LIST" },
+        { type: "ExpensePayments", id: "UNPAID" },
         { type: "Reports", id: "LIST" },
       ],
     }),

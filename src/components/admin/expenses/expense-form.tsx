@@ -19,8 +19,12 @@ import {
   adminInputClass,
   adminSelectClass,
 } from "@/components/admin/ui";
+import { useIdempotencyKey } from "@/components/admin/disbursements/disbursement-bits";
+import { PaymentAccountField } from "@/components/admin/payment-account-field";
+import { PAYMENT_METHOD_OPTIONS } from "@/components/admin/trading/sale-bits";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
+import { cn } from "@/lib/utils";
 import {
   useCreateExpenseMutation,
   useUpdateExpenseMutation,
@@ -31,9 +35,40 @@ import { expenseSchema, type ExpenseValues } from "@/validations/expense-schema"
 
 const today = () => new Date().toISOString().slice(0, 10);
 
+/** The two answers to "has this been paid", in the order they are given. */
+const PAID_CHOICES = [
+  { label: "Paid now", value: true },
+  { label: "Paying later", value: false },
+] as const;
+
+/**
+ * Which field a refused payment belongs to. The server checks these after the
+ * form has already let the submission through - a retired account, an account
+ * that cannot carry the method - and a toast about it leaves the reader
+ * hunting for which of six fields to change.
+ */
+const FIELD_FOR_CODE: Record<string, "paymentAccountId" | "reference"> = {
+  ACCOUNT_METHOD_MISMATCH: "paymentAccountId",
+  ACCOUNT_NOT_SETTLEABLE: "paymentAccountId",
+  ACCOUNT_REQUIRED: "paymentAccountId",
+  ACCOUNT_RETIRED: "paymentAccountId",
+  DUPLICATE_REFERENCE: "reference",
+  REFERENCE_REQUIRED: "reference",
+};
+
 /**
  * Record or correct an operating cost. One dialog for both: an `expense` prop
  * switches it to edit mode, so the two paths cannot drift in validation or copy.
+ *
+ * Recording also PAYS the cost, in the same submission, because that is what
+ * happens in the room: rent is handed over, the fitter is paid, and the
+ * voucher is written afterwards. Splitting the two meant every such cost was
+ * entered here and then had to be chased on its own page, and any that was not
+ * chased sat in the books as money still owed that had already gone out.
+ *
+ * Editing does not offer the payment half. A correction is a decision about a
+ * cost that already exists, and its settlement has its own screen with its own
+ * ledger and reversals - one that can undo a payment, which this cannot.
  */
 export function ExpenseFormDialog({
   categories,
@@ -50,6 +85,10 @@ export function ExpenseFormDialog({
   const [create, { isLoading: creating }] = useCreateExpenseMutation();
   const [update, { isLoading: updating }] = useUpdateExpenseMutation();
   const isEdit = Boolean(expense);
+  // One key per OPENING of the dialog, reused by every attempt at submitting
+  // it: this endpoint moves money, so a double tap or a resend after a
+  // timeout must resolve to the one payment that already happened.
+  const idempotencyKey = useIdempotencyKey(open);
 
   const {
     control,
@@ -57,6 +96,9 @@ export function ExpenseFormDialog({
     handleSubmit,
     register,
     reset,
+    setError,
+    setValue,
+    watch,
   } = useForm<ExpenseValues>({
     resolver: zodResolver(expenseSchema),
     defaultValues: {
@@ -64,8 +106,15 @@ export function ExpenseFormDialog({
       categoryId: "",
       description: "",
       incurredAt: today(),
+      method: "CASH",
+      paidNow: true,
+      paymentAccountId: "",
+      reference: "",
     },
   });
+
+  const paidNow = watch("paidNow");
+  const method = watch("method");
 
   // Seed from the record each time the dialog opens, so reopening after a
   // cancel never shows the previous edit's half-typed values.
@@ -76,8 +125,23 @@ export function ExpenseFormDialog({
       categoryId: expense?.category.id ?? "",
       description: expense?.description ?? "",
       incurredAt: expense?.incurredAt.slice(0, 10) ?? today(),
+      method: "CASH",
+      // A correction never pays anything, and an edit that quietly settled the
+      // cost it was correcting would be a second payment nobody asked for.
+      paidNow: !expense,
+      paymentAccountId: "",
+      reference: "",
     });
   }, [expense, open, reset]);
+
+  // An account offered under one method is not offered under another - the
+  // list narrows to the kinds that method can move on - so switching the
+  // method clears the pick rather than leaving a bank account attached to a
+  // cash payment, which the server refuses (ACCOUNT_METHOD_MISMATCH) after the
+  // trigger has already stopped showing it.
+  useEffect(() => {
+    setValue("paymentAccountId", "");
+  }, [method, setValue]);
 
   const onSubmit = async (values: ExpenseValues) => {
     const body = {
@@ -91,12 +155,43 @@ export function ExpenseFormDialog({
         await update({ body, id: expense.id }).unwrap();
         notify.success("Expense updated");
       } else {
-        await create(body).unwrap();
-        notify.success("Expense recorded");
+        const res = await create({
+          body: {
+            ...body,
+            ...(values.paidNow
+              ? {
+                  payment: {
+                    method: values.method,
+                    // The cost and its settlement are one act here, so the
+                    // payment carries the day the cost was run up rather than
+                    // silently landing on today - a voucher written up on
+                    // Monday for Friday's fuel was paid on Friday.
+                    paidAt: values.incurredAt,
+                    // No amount: the server settles the whole cost.
+                    ...(values.paymentAccountId
+                      ? { paymentAccountId: values.paymentAccountId }
+                      : {}),
+                    ...(values.reference
+                      ? { reference: values.reference }
+                      : {}),
+                  },
+                }
+              : {}),
+          },
+          idempotencyKey: idempotencyKey(),
+        }).unwrap();
+        notify.success(
+          res.data.settlement.status === "UNPAID"
+            ? "Expense recorded - this is still owed"
+            : "Expense recorded and paid",
+        );
       }
       onOpenChange(false);
     } catch (error) {
-      notify.error(extractApiError(error).message);
+      const { code, message } = extractApiError(error);
+      const field = code ? FIELD_FOR_CODE[code] : undefined;
+      if (field) setError(field, { message });
+      notify.error(message);
     }
   };
 
@@ -185,6 +280,106 @@ export function ExpenseFormDialog({
               </AdminField>
             </div>
           </section>
+
+          {isEdit ? null : (
+            <section className="grid gap-5 border-t border-adm-hairline pt-5">
+              {/* Two taps, both thumb-sized and side by side at every width:
+                  this is the question the whole screen turns on, and it is
+                  answered far more often than it is read. */}
+              <div>
+                <span className="mb-1 flex text-[13px] font-semibold text-adm-ink">
+                  Has this been paid?
+                </span>
+                <Controller
+                  control={control}
+                  name="paidNow"
+                  render={({ field }) => (
+                    <div
+                      aria-label="Has this been paid?"
+                      className="grid grid-cols-2 gap-2"
+                      role="group"
+                    >
+                      {PAID_CHOICES.map((choice) => (
+                        <button
+                          aria-pressed={field.value === choice.value}
+                          className={cn(
+                            "min-h-[44px] cursor-pointer rounded-none border px-3 text-[13.5px] font-semibold transition-colors",
+                            field.value === choice.value
+                              ? "border-console bg-console text-white"
+                              : "border-adm-line bg-adm-card text-adm-body hover:bg-adm-sunken",
+                          )}
+                          key={choice.label}
+                          onClick={() => {
+                            field.onChange(choice.value);
+                          }}
+                          type="button"
+                        >
+                          {choice.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                />
+              </div>
+
+              {paidNow ? (
+                <>
+                  <AdminField label="How it was paid">
+                    <Controller
+                      control={control}
+                      name="method"
+                      render={({ field }) => (
+                        <SimpleSelect
+                          className={adminSelectClass}
+                          id="expense-method"
+                          onChange={field.onChange}
+                          options={PAYMENT_METHOD_OPTIONS}
+                          value={field.value}
+                        />
+                      )}
+                    />
+                  </AdminField>
+
+                  {/* Offered for cash too, unlike the settle-later dialog: an
+                      agent who pays for a repair out of the money they are
+                      holding is where that money went, and booking it to the
+                      office till says the cash is in a box it left. */}
+                  <Controller
+                    control={control}
+                    name="paymentAccountId"
+                    render={({ field }) => (
+                      <PaymentAccountField
+                        direction="out"
+                        error={errors.paymentAccountId?.message}
+                        method={method}
+                        onChange={field.onChange}
+                        value={field.value}
+                      />
+                    )}
+                  />
+
+                  <AdminField
+                    error={errors.reference?.message}
+                    hint="The transfer or MoMo id. Recording the same one twice against this cost is refused."
+                    label="Reference"
+                    optional={method === "CASH"}
+                  >
+                    <input
+                      className={adminInputClass}
+                      id="expense-reference"
+                      placeholder="e.g. TRF884512"
+                      {...register("reference")}
+                    />
+                  </AdminField>
+                </>
+              ) : (
+                <p className="text-[12.5px] text-adm-muted">
+                  Nothing goes out yet. The cost is recorded as owed, and can be
+                  paid from the voucher once the money moves.
+                </p>
+              )}
+            </section>
+          )}
 
           <ResponsiveDialogFooter className="mt-2 gap-2">
             <AdminButton
