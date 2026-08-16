@@ -5,12 +5,12 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useIdempotencyKey } from "@/components/admin/disbursements/disbursement-bits";
-import { ChoiceCards } from "@/components/admin/farm/farm-cash-source";
 import {
   AdminButton,
   AdminField,
   adminInputClass,
   adminSelectClass,
+  ChoiceCards,
 } from "@/components/admin/ui";
 import { DateInput } from "@/components/ui/date-input";
 import {

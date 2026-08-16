@@ -589,6 +589,75 @@ export function AdminField({
   );
 }
 
+/**
+ * A stacked pair of radio cards: one question, two answers, the whole row a
+ * tap target.
+ *
+ * A fieldset rather than a label around the group: a label wrapping two radios
+ * gives BOTH of them the whole group's text as their accessible name, so a
+ * screen reader reads every option on every option. The legend names the group;
+ * each option's own label names itself.
+ */
+export function ChoiceCards<T extends string>({
+  legend,
+  name,
+  onChange,
+  options,
+  value,
+}: {
+  legend: string;
+  /** Radio group name - must be unique per form. */
+  name: string;
+  onChange: (value: T) => void;
+  options: { hint?: string; label: string; value: T }[];
+  value: T;
+}) {
+  return (
+    <fieldset className="min-w-0">
+      <legend className="mb-1 text-[13px] font-semibold text-adm-ink">
+        {legend}
+      </legend>
+      {/* Stacked at every width, never two-up: both answers are sentences, and
+          a phone splits a sentence across three lines to save a row it did not
+          need. */}
+      <div className="flex flex-col gap-1.5">
+        {options.map((option) => (
+          <label
+            key={option.value}
+            className={cn(
+              "flex cursor-pointer items-start gap-2.5 rounded-[3px] border px-3 py-2.5 transition-colors",
+              value === option.value
+                ? "border-console bg-adm-sunken"
+                : "border-adm-line hover:bg-adm-sunken",
+            )}
+          >
+            <input
+              type="radio"
+              name={name}
+              value={option.value}
+              checked={value === option.value}
+              onChange={() => {
+                onChange(option.value);
+              }}
+              className="mt-[3px] flex-none accent-console"
+            />
+            <span className="min-w-0">
+              <span className="block text-[13.5px] font-semibold text-adm-ink">
+                {option.label}
+              </span>
+              {option.hint ? (
+                <span className="mt-0.5 block text-[12px] leading-[1.45] text-adm-muted">
+                  {option.hint}
+                </span>
+              ) : null}
+            </span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
 /** The one form-control skin (the enquiry form's document field): paper
  * fill, 2px corners, 1.5px soil border, leaf focus glow, error border when
  * invalid. Layer onto shadcn Input/native selects so every field matches. */
