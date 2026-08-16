@@ -22,6 +22,12 @@ import {
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
 import { SimpleSelect } from "@/components/ui/simple-select";
+import {
+  capitaliseToTreatment,
+  COST_TREATMENT_LEGEND,
+  COST_TREATMENT_OPTIONS,
+  treatmentToCapitalise,
+} from "@/lib/cost-treatment";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
 import { useAddPurchaseCostMutation } from "@/redux/purchases/purchases-api";
@@ -33,32 +39,6 @@ import {
 } from "@/validations/purchase-schema";
 
 import { todayInputValue } from "./purchase-bits";
-
-/**
- * The one decision this form exists to ask, in the words the business uses.
- *
- * "Capitalise" is the accountant's word for the first answer and it is not on
- * this screen on purpose: the person recording a cost at a village scale knows
- * perfectly well whether the money was spent getting the grain in, and does
- * not know what capitalising is. Both answers are legitimate - haulage belongs
- * in the goods, a late-permit fine does not - which is exactly why it is asked
- * rather than assumed from the fact that the cost names a purchase.
- *
- * The order is not arbitrary: the goods answer is first and is the default,
- * because it is the overwhelming majority of what gets recorded here.
- */
-const TREATMENT_OPTIONS = [
-  {
-    hint: "Haulage, loading, porters, bagging - money spent getting this grain in. It counts against the profit when the grain is sold, not this month.",
-    label: "Part of what these goods cost",
-    value: "goods" as const,
-  },
-  {
-    hint: "A licence or a fine: tied to this purchase, but not part of what the grain cost to buy. It lands in this month's costs.",
-    label: "A cost of this month",
-    value: "month" as const,
-  },
-];
 
 /**
  * Which field a refused cost belongs to, so the reader is not left hunting.
@@ -270,13 +250,13 @@ export function PurchaseCostDialog({
               name="capitalise"
               render={({ field }) => (
                 <ChoiceCards
-                  legend="Where does this cost belong?"
+                  legend={COST_TREATMENT_LEGEND}
                   name="purchase-cost-treatment"
                   onChange={(v) => {
-                    field.onChange(v === "goods");
+                    field.onChange(treatmentToCapitalise(v));
                   }}
-                  options={TREATMENT_OPTIONS}
-                  value={field.value ? "goods" : "month"}
+                  options={COST_TREATMENT_OPTIONS}
+                  value={capitaliseToTreatment(field.value)}
                 />
               )}
             />
