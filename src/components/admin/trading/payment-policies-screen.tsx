@@ -285,24 +285,26 @@ function PolicyCard({ policy }: { policy: IPaymentPolicy }) {
     }
   };
 
+  /**
+   * Ungated, like the register row it sits beside in spirit.
+   *
+   * Retiring a policy is undone by tapping the same word again, and here the
+   * two words are bare text links a thumb's width apart from Delete. A dialog
+   * on the reversible one is what teaches somebody to tap through the dialog
+   * on the one that is not. What the change did is said afterwards instead,
+   * where it is useful and costs nothing.
+   */
   const toggleActive = async () => {
-    const ok = await confirm({
-      title: policy.isActive
-        ? `Deactivate ${policy.name}?`
-        : `Activate ${policy.name}?`,
-      description: policy.isActive
-        ? "New sales won't be able to choose this policy. Existing sales keep their snapshot."
-        : "This policy becomes selectable on new sales again.",
-      confirmText: policy.isActive ? "Deactivate" : "Activate",
-      isDestructive: policy.isActive,
-    });
-    if (!ok) return;
     try {
       await update({
         id: policy.id,
         body: { isActive: !policy.isActive },
       }).unwrap();
-      notify.success(policy.isActive ? "Deactivated" : "Activated");
+      notify.success(policy.isActive ? "Deactivated" : "Activated", {
+        description: policy.isActive
+          ? "New sales can no longer choose it. Sales already on it keep their terms, and Activate puts it back."
+          : "It can be chosen on new sales again.",
+      });
     } catch (err) {
       notify.error("Couldn't update the policy", {
         description: extractApiError(err).message,
