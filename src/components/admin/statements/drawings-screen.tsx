@@ -3,6 +3,10 @@
 // The proprietor's drawings ledger: personal withdrawals, numbered like every
 // other money record, feeding the capital account on the statements - never
 // the P&L, which is the whole reason this is not an expense category.
+//
+// Every drawing now names the account it came out of, or says why none did.
+// Until it did, the cash-flow statement subtracted every drawing while no
+// balance anywhere fell by a pesewa.
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -31,6 +35,11 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
+import {
+  CashSourceField,
+  CashSourceNote,
+  cashSourceBody,
+} from "@/components/admin/statements/cash-source";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis } from "@/lib/format-money";
@@ -50,19 +59,40 @@ import {
 function AddDrawingDialog({ onClose }: { onClose: () => void }) {
   const [create, createState] = useCreateDrawingMutation();
   const {
+    clearErrors,
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<DrawingValues>({
     resolver: zodResolver(drawingSchema),
-    defaultValues: { amountGhs: "", notes: "", occurredAt: "" },
+    defaultValues: {
+      amountGhs: "",
+      cashSource: "ACCOUNT",
+      noCashReason: "",
+      notes: "",
+      occurredAt: "",
+      paymentAccountId: "",
+    },
   });
+
+  /**
+   * Switching answer clears the one not given, so a mode change cannot leave
+   * a stale value - or a stale error - behind the field it belongs to.
+   */
+  const onModeChange = (mode: DrawingValues["cashSource"]) => {
+    setValue("cashSource", mode);
+    setValue(mode === "ACCOUNT" ? "noCashReason" : "paymentAccountId", "");
+    clearErrors(["noCashReason", "paymentAccountId"]);
+  };
 
   const onSubmit = async (values: DrawingValues) => {
     try {
       await create({
         amountGhs: Number(values.amountGhs),
         occurredAt: values.occurredAt,
+        ...cashSourceBody(values),
         ...(values.notes?.trim() ? { notes: values.notes.trim() } : {}),
       }).unwrap();
       notify.success("Drawing recorded");
@@ -105,6 +135,24 @@ function AddDrawingDialog({ onClose }: { onClose: () => void }) {
               />
             </AdminField>
           </div>
+          {/* The question the ledger never asked. The owner taking GHS 5,000
+              out of the business took it out of SOMETHING, and until this was
+              asked the cash book never heard about it. */}
+          <CashSourceField
+            accountError={errors.paymentAccountId?.message}
+            accountId={watch("paymentAccountId") ?? ""}
+            kind="drawing"
+            mode={watch("cashSource")}
+            onAccountChange={(value) => {
+              setValue("paymentAccountId", value, { shouldValidate: true });
+            }}
+            onModeChange={onModeChange}
+            onReasonChange={(value) => {
+              setValue("noCashReason", value);
+            }}
+            reason={watch("noCashReason") ?? ""}
+            reasonError={errors.noCashReason?.message}
+          />
           <AdminField label="Note" optional error={errors.notes?.message}>
             <Input
               placeholder="e.g. School fees"
@@ -139,7 +187,14 @@ export function DrawingsScreen() {
   const onRemove = async (drawing: IDrawing) => {
     const ok = await confirm({
       title: "Remove this drawing?",
-      description: `${drawing.transactionNo} (${formatCedis(drawing.amountGhs)}) comes off the ledger and the capital account.`,
+      // Says where the money goes back to, because it does: removing a posted
+      // drawing writes a compensating entry into the cash book, dated where
+      // the original was.
+      description: `${drawing.transactionNo} (${formatCedis(drawing.amountGhs)}) comes off the ledger and the capital account.${
+        drawing.paymentAccount
+          ? ` The money goes back into ${drawing.paymentAccount.label}.`
+          : ""
+      }`,
       confirmText: "Remove",
       isDestructive: true,
     });
@@ -202,6 +257,19 @@ export function DrawingsScreen() {
         ),
       },
       {
+        id: "source",
+        accessorFn: (d) => d.paymentAccount?.label ?? d.noCashReason ?? "",
+        header: "Taken from",
+        enableSorting: false,
+        meta: columnMeta(),
+        cell: ({ row }) => (
+          <CashSourceNote
+            account={row.original.paymentAccount}
+            reason={row.original.noCashReason}
+          />
+        ),
+      },
+      {
         id: "actions",
         header: "",
         enableSorting: false,
@@ -235,7 +303,7 @@ export function DrawingsScreen() {
       />
 
       {isLoading ? (
-        <ConsoleTableSkeleton columns={4} />
+        <ConsoleTableSkeleton columns={5} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}
