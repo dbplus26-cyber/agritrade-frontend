@@ -198,3 +198,18 @@ export function summarisePurchaseCosts(
     monthlyGhs: sumGhs(live.filter((c) => c.capitalisedAt === null)),
   };
 }
+
+/**
+ * The type size for the landed-cost headline, chosen from how long the figure
+ * actually renders.
+ *
+ * The rail it sits in is 340px however wide the screen is, which leaves about
+ * 300px of line - and "GH₵ 1,000,000,000.00" at 26px does not fit in it. A
+ * clipped figure is worse than a smaller one: it reads as a DIFFERENT, shorter
+ * amount rather than as something cut off.
+ */
+export function goodsCostValueCls(rendered: string): string {
+  if (rendered.length <= 16) return "text-[26px]";
+  if (rendered.length <= 20) return "text-[21px]";
+  return "text-[17px]";
+}

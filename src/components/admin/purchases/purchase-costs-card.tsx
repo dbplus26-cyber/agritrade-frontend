@@ -23,7 +23,7 @@ import { useGetPurchaseCostsQuery } from "@/redux/purchases/purchases-api";
 import type { IPurchaseCost } from "@/types/purchase.types";
 
 import { PurchaseCostDialog } from "./purchase-cost-form";
-import { summarisePurchaseCosts } from "./purchase-bits";
+import { goodsCostValueCls, summarisePurchaseCosts } from "./purchase-bits";
 
 /**
  * How each cost was treated, said in one chip.
@@ -151,7 +151,12 @@ export function PurchaseGoodsCostSummary({
             text="What this whole load cost you: the weight bought times the price per kg."
           />
         </p>
-        <p className="font-adminmono mt-1 text-[26px] leading-[1.15] font-bold text-adm-ink tabular-nums">
+        <p
+          className={cn(
+            "font-adminmono mt-1 leading-[1.15] font-bold text-adm-ink tabular-nums",
+            goodsCostValueCls(formatCedis(totalGhs)),
+          )}
+        >
           {formatCedis(totalGhs)}
         </p>
         {rate}
@@ -175,7 +180,12 @@ export function PurchaseGoodsCostSummary({
           text="The grain itself, plus the costs of getting it in. This is what a sale is measured against to say what was made on the load."
         />
       </p>
-      <p className="font-adminmono mt-1 text-[26px] leading-[1.15] font-bold text-adm-ink tabular-nums">
+      <p
+        className={cn(
+          "font-adminmono mt-1 leading-[1.15] font-bold text-adm-ink tabular-nums",
+          goodsCostValueCls(formatCedis(summary.goodsCostGhs)),
+        )}
+      >
         {formatCedis(summary.goodsCostGhs)}
       </p>
       <p className="mt-1 text-[12.5px] leading-[1.5] text-adm-muted">
@@ -298,7 +308,12 @@ export function PurchaseCostsCard({
       {/* The headline first, its parts underneath. A reader who wants only the
           one number stops at the first line; a reader reconciling against the
           supplier's invoice finds the purchase price still stated in full. */}
-      <p className="font-adminmono text-[26px] leading-[1.15] font-bold text-adm-ink tabular-nums">
+      <p
+        className={cn(
+          "font-adminmono leading-[1.15] font-bold text-adm-ink tabular-nums",
+          goodsCostValueCls(formatCedis(goodsCostGhs)),
+        )}
+      >
         {formatCedis(goodsCostGhs)}
       </p>
       <p className="mt-1 text-[12.5px] leading-[1.5] text-adm-muted">
