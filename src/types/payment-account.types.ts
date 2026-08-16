@@ -54,6 +54,37 @@ export interface IPayableAccount {
   instructions: string | null;
 }
 
+/**
+ * One row of the "where did this money actually end up" picker
+ * (`GET /admin/payment-accounts/settlement`), mirroring the backend
+ * `SettlementAccountDTO`.
+ *
+ * A different question from both lists above: the register says where
+ * customers send money, the payable list says what prints on an invoice, and
+ * neither can answer this one, because the honest answer is sometimes a
+ * PERSON. An agent who collected GHS 3,000 at a roadside is holding it, and
+ * booking that to the office till says the money is in a box it is not in - so
+ * held accounts are offered here, named after whoever is holding them.
+ *
+ * Carries no account number and no balance BY CONTRACT: the picker is offered
+ * to anyone who may record a payment, and balances are money-visibility gated,
+ * so a figure here would leak what the ledger endpoints deliberately null.
+ * Nothing in the UI may build a hint out of either.
+ */
+export interface ISettlementAccount {
+  /** Set when this account is money a named person is holding. */
+  holder: null | { id: string; name: string };
+  id: string;
+  kind: PaymentAccountKind;
+  /** Already reads as the person for a held account: "Kwame Mensah - cash". */
+  label: string;
+}
+
+export interface ISettlementAccountsResponse {
+  message: string;
+  data: { accounts: ISettlementAccount[] };
+}
+
 export interface ICreatePaymentAccountInput {
   label: string;
   kind: PaymentAccountKind;

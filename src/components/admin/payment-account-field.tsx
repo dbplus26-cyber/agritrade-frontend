@@ -1,13 +1,21 @@
 "use client";
 
-import { useMemo } from "react";
+import { useId, useMemo } from "react";
 import { AdminField, adminSelectClass } from "@/components/admin/ui";
 
-import { SimpleSelect } from "@/components/ui/simple-select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { useGetPaymentAccountsQuery } from "@/redux/payment-accounts/payment-accounts-api";
+import { useGetSettlementAccountsQuery } from "@/redux/payment-accounts/payment-accounts-api";
 import type {
-  IPaymentAccount,
+  ISettlementAccount,
   PaymentAccountKind,
 } from "@/types/payment-account.types";
 
@@ -26,26 +34,157 @@ const COMPATIBLE_KINDS: Record<
   MOMO: ["MOMO", "OTHER"],
 };
 
-/** Last four digits only - enough to recognise the account at a glance. */
-const maskAccountNumber = (accountNumber: null | string): string =>
-  accountNumber ? `····${accountNumber.slice(-4)}` : "";
-
-/** "DB Plus Ltd · ····4417", with whichever halves the account actually has. */
-const accountHint = (account: IPaymentAccount): string =>
-  [account.accountName, maskAccountNumber(account.accountNumber)]
-    .filter(Boolean)
-    .join(" · ");
-
 /** Sentinel for "no account" - Radix select items cannot carry "". */
 const NO_ACCOUNT = "__no_account__";
 
 /**
- * The "which company account did this money move on" select for the three
- * record-payment forms (sales, land sales, land acquisitions). Populated from
- * the live payment-accounts register, narrowed to the kinds the chosen method
- * can touch. Required for BANK/MOMO (the account is what the bank statement
- * is reconciled against - the backend refuses without it, ACCOUNT_REQUIRED);
- * optional for cash, which sits in the till.
+ * What naming a held account commits the person to, said in the direction the
+ * money actually travelled.
+ *
+ * This is the one thing the old register-backed picker could never say, and
+ * the reason it has to be said: a held account is not a filing choice, it is a
+ * statement that a named person is carrying company money and will be asked to
+ * produce it.
+ */
+const holderNote = (direction: "in" | "out", name: string): string =>
+  direction === "in"
+    ? `${name} is holding this money. It is counted against them until it reaches the office.`
+    : `This came out of what ${name} is holding, so it is counted off what they owe.`;
+
+/**
+ * The grouped select itself.
+ *
+ * Split out rather than reaching for SimpleSelect because SimpleSelect takes a
+ * flat option list and cannot group, and grouping is the whole point here: a
+ * company account and somebody's pocket are different kinds of answer and must
+ * not read as one list. It takes the `aria-describedby` / `aria-invalid`
+ * AdminField clones onto its child and puts them on the trigger, which is the
+ * control a screen reader actually lands on.
+ */
+function AccountSelect({
+  "aria-describedby": describedBy,
+  "aria-invalid": invalid,
+  company,
+  held,
+  invalidClass,
+  noAccountLabel,
+  note,
+  onChange,
+  placeholder,
+  value,
+}: {
+  "aria-describedby"?: string;
+  "aria-invalid"?: boolean;
+  company: ISettlementAccount[];
+  held: ISettlementAccount[];
+  invalidClass?: string;
+  /** Present only where "no account at all" is a legitimate answer. */
+  noAccountLabel?: string;
+  /** Consequence of the current choice, shown under the control. */
+  note?: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  value: string;
+}) {
+  const noteId = useId();
+
+  return (
+    <div className="min-w-0">
+      <Select
+        value={value || undefined}
+        // Radix reserves the empty string, so "no account" travels as a
+        // sentinel option and maps back to "" here - without it, a picked
+        // account could never be cleared back to the office till.
+        onValueChange={(v) => {
+          onChange(v === NO_ACCOUNT ? "" : v);
+        }}
+      >
+        <SelectTrigger
+          unstyled
+          aria-describedby={
+            [describedBy, note ? noteId : null].filter(Boolean).join(" ") ||
+            undefined
+          }
+          aria-invalid={invalid}
+          className={cn(
+            adminSelectClass,
+            "w-full justify-between gap-1.5 text-left [&>span]:min-w-0 [&>span]:truncate",
+            invalidClass,
+          )}
+        >
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          {noAccountLabel ? (
+            <SelectItem value={NO_ACCOUNT}>{noAccountLabel}</SelectItem>
+          ) : null}
+          {company.length > 0 ? (
+            <SelectGroup>
+              <SelectLabel>Company accounts</SelectLabel>
+              {company.map((a) => (
+                <SelectItem key={a.id} value={a.id}>
+                  {a.label}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          ) : null}
+          {/* Held accounts sit second, under their own heading: they are the
+              exception, and a list where an agent's pocket sits between two
+              bank accounts is how money gets booked to a person by mistake.
+              Their label already reads as the person ("Kwame Mensah - cash"),
+              which is what somebody picking from a list needs; an id is not. */}
+          {held.length > 0 ? (
+            <SelectGroup>
+              <SelectLabel>In someone&apos;s hands</SelectLabel>
+              {held.map((a) => (
+                <SelectItem key={a.id} value={a.id}>
+                  {a.label}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          ) : null}
+        </SelectContent>
+      </Select>
+      {/* Beside the choice, not behind a tooltip icon: it is the consequence
+          of what was just picked, and a name is long enough to wrap on a phone
+          rather than push the field sideways. */}
+      {note ? (
+        <p
+          className="mt-1 text-[12px] text-adm-muted [overflow-wrap:anywhere]"
+          id={noteId}
+        >
+          {note}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+/**
+ * The "where did this money actually end up" select, for every form that
+ * records a payment by hand (sales, land sales, land acquisitions, purchases,
+ * expenses, driver fees).
+ *
+ * It reads the settlement list, NOT the payment-accounts register. The
+ * register answers where customers should send money: a question about the
+ * future, whose answer is only ever a company account. This one is about money
+ * that has already moved, and the honest answer is sometimes a person - an
+ * agent who collected GHS 3,000 at a roadside is holding it, and booking that
+ * to the office till says the money is in a box it is not in. So the list is
+ * the company's accounts, the office till and the accounts people are holding
+ * money in, minus the three the machinery keeps for itself.
+ *
+ * The list is narrowed to the kinds the chosen method can touch, because the
+ * backend refuses the mismatch (ACCOUNT_METHOD_MISMATCH) and offering a
+ * refusal is not offering a choice. Naming an account is required for
+ * BANK/MOMO - it is what a bank statement is reconciled against
+ * (ACCOUNT_REQUIRED); cash may name nothing and falls to the office till.
+ *
+ * The settlement rows carry NO account number and NO balance, by contract:
+ * this picker is offered to anyone who may record a payment, and a figure here
+ * would leak what money visibility deliberately nulls. There is therefore no
+ * masked-number hint under the field any more - the only thing worth saying
+ * about a chosen account is who is holding it.
  */
 export function PaymentAccountField({
   direction,
@@ -74,26 +213,21 @@ export function PaymentAccountField({
   /** Controlled: pair with react-hook-form's `Controller`. */
   value: string;
 }) {
-  const { data, isLoading, isError } = useGetPaymentAccountsQuery({
-    isActive: true,
-    // The register is a short owner-maintained list; 100 is the API's cap
-    // and far above any real count, so one page is the whole register.
-    limit: 100,
-  });
-  const accounts = useMemo(
-    () =>
-      method
-        ? (data?.data ?? []).filter((a) =>
-            COMPATIBLE_KINDS[method].includes(a.kind),
-          )
-        : (data?.data ?? []),
-    [data, method],
-  );
+  const { data, isError, isLoading } = useGetSettlementAccountsQuery();
+  const accounts = useMemo(() => {
+    const all = data?.data.accounts ?? [];
+    return method
+      ? all.filter((a) => COMPATIBLE_KINDS[method].includes(a.kind))
+      : all;
+  }, [data, method]);
+
+  const company = useMemo(() => accounts.filter((a) => !a.holder), [accounts]);
+  const held = useMemo(() => accounts.filter((a) => a.holder), [accounts]);
 
   const chosen = accounts.find((a) => a.id === value);
   const optional = method === "CASH" && !required;
   const hint = isError
-    ? "Couldn't load the accounts register - close and try again."
+    ? "Couldn't load the accounts - close and try again."
     : !isLoading && accounts.length === 0
       ? "No live account can carry this. Add one under Payment accounts first."
       : undefined;
@@ -101,43 +235,36 @@ export function PaymentAccountField({
   return (
     <AdminField
       label={
-        label ?? (direction === "in" ? "Received into account" : "Paid from account")
+        label ??
+        (direction === "in"
+          ? "Where the money landed"
+          : "Where the money came from")
       }
       optional={optional}
       hint={hint}
       error={error}
     >
-      {/* The option text is kept SHORT - the label alone, not
-          "label · ····1234" - so the panel stays narrow; the masked number
-          sits under the field instead, where it is readable without opening
-          anything. */}
-      <SimpleSelect
-        disabled={isLoading}
-        value={value}
-        // Radix reserves the empty string, so "no account" travels as a
-        // sentinel option and maps back to "" here - without it, a picked
-        // account could never be cleared back to the cash till.
-        onChange={(v) => onChange(v === NO_ACCOUNT ? "" : v)}
-        className={cn(adminSelectClass, "w-full", error && "border-console-red")}
+      <AccountSelect
+        company={company}
+        held={held}
+        invalidClass={error ? "border-console-red" : undefined}
+        // Offered only where naming nothing is a true answer: a cash payment
+        // with no account sits in the office till, which is exactly what the
+        // backend records for it.
+        noAccountLabel={
+          optional && !isLoading ? "No account named (office till)" : undefined
+        }
+        note={chosen?.holder ? holderNote(direction, chosen.holder.name) : undefined}
+        onChange={onChange}
         placeholder={
           isLoading
             ? "Loading accounts…"
             : optional
-              ? "Cash till (no account)"
+              ? "Office till"
               : "Select the account…"
         }
-        options={[
-          ...(optional && !isLoading
-            ? [{ value: NO_ACCOUNT, label: "Cash till (no account)" }]
-            : []),
-          ...accounts.map((a) => ({ value: a.id, label: a.label })),
-        ]}
+        value={value}
       />
-      {/* Joined rather than interpolated so an account carrying neither name
-          nor number renders nothing, not a stranded separator. */}
-      {chosen && accountHint(chosen) ? (
-        <p className="mt-1 text-[12px] text-adm-muted">{accountHint(chosen)}</p>
-      ) : null}
     </AdminField>
   );
 }

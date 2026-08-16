@@ -9,6 +9,7 @@ import type {
   IPaymentAccountHistoryResponse,
   IPaymentAccountListQuery,
   IPaymentAccountResponse,
+  ISettlementAccountsResponse,
   IUpdatePaymentAccountInput,
 } from "@/types/payment-account.types";
 import type { IRegistryListResponse } from "@/types/registry.types";
@@ -42,6 +43,23 @@ export const paymentAccountsApi = apiSlice.injectEndpoints({
     getPayableAccounts: builder.query<IPayableAccountsResponse, void>({
       query: () => "admin/payment-accounts/payable",
       providesTags: [{ type: "PaymentAccounts", id: "PAYABLE" }],
+    }),
+
+    /**
+     * Where money can actually be booked to: the company's accounts, the
+     * office till, and the accounts people are holding money in - which the
+     * register cannot answer, because it only knows about places a customer is
+     * told to pay. Excludes the accounts the machinery keeps for itself.
+     *
+     * Also provides FloatHolders: a held account is created for a person on
+     * first use, so somebody's first top-up adds a row to this list.
+     */
+    getSettlementAccounts: builder.query<ISettlementAccountsResponse, void>({
+      query: () => "admin/payment-accounts/settlement",
+      providesTags: [
+        { type: "PaymentAccounts", id: "SETTLEMENT" },
+        { type: "FloatHolders", id: "LIST" },
+      ],
     }),
 
     getPaymentAccount: builder.query<IPaymentAccountResponse, string>({
@@ -79,6 +97,7 @@ export const paymentAccountsApi = apiSlice.injectEndpoints({
       invalidatesTags: [
         { type: "PaymentAccounts", id: "LIST" },
         { type: "PaymentAccounts", id: "PAYABLE" },
+        { type: "PaymentAccounts", id: "SETTLEMENT" },
       ],
     }),
 
@@ -95,6 +114,7 @@ export const paymentAccountsApi = apiSlice.injectEndpoints({
         { type: "PaymentAccounts", id },
         { type: "PaymentAccounts", id: "LIST" },
         { type: "PaymentAccounts", id: "PAYABLE" },
+        { type: "PaymentAccounts", id: "SETTLEMENT" },
       ],
     }),
 
@@ -107,6 +127,7 @@ export const paymentAccountsApi = apiSlice.injectEndpoints({
         { type: "PaymentAccounts", id },
         { type: "PaymentAccounts", id: "LIST" },
         { type: "PaymentAccounts", id: "PAYABLE" },
+        { type: "PaymentAccounts", id: "SETTLEMENT" },
       ],
     }),
 
@@ -119,6 +140,7 @@ export const paymentAccountsApi = apiSlice.injectEndpoints({
         { type: "PaymentAccounts", id },
         { type: "PaymentAccounts", id: "LIST" },
         { type: "PaymentAccounts", id: "PAYABLE" },
+        { type: "PaymentAccounts", id: "SETTLEMENT" },
       ],
     }),
 
@@ -130,6 +152,7 @@ export const paymentAccountsApi = apiSlice.injectEndpoints({
       invalidatesTags: [
         { type: "PaymentAccounts", id: "LIST" },
         { type: "PaymentAccounts", id: "PAYABLE" },
+        { type: "PaymentAccounts", id: "SETTLEMENT" },
       ],
     }),
   }),
@@ -137,6 +160,7 @@ export const paymentAccountsApi = apiSlice.injectEndpoints({
 
 export const {
   useGetPaymentAccountsQuery,
+  useGetSettlementAccountsQuery,
   useGetPayableAccountsQuery,
   useGetPaymentAccountQuery,
   useGetPaymentAccountHistoryQuery,
