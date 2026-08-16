@@ -362,6 +362,7 @@ export function PurchaseCostsCard({
       {recording ? (
         <PurchaseCostDialog
           categories={categories.data?.data ?? []}
+          categoriesLoading={categories.isLoading}
           onOpenChange={setRecording}
           open={recording}
           purchaseId={purchaseId}

@@ -86,11 +86,20 @@ const FIELD_FOR_CODE: Record<string, "categoryId"> = {
  */
 export function PurchaseCostDialog({
   categories,
+  categoriesLoading = false,
   onOpenChange,
   open,
   purchaseId,
 }: {
   categories: IExpenseCategory[];
+  /**
+   * The vocabulary is fetched only when this dialog is wanted, so on a village
+   * 2G line it can still be in flight when the sheet opens. Said out loud in
+   * the picker, because an empty dropdown with a "Choose a category" prompt
+   * reads as a registry with nothing in it, and the way out of that is to back
+   * out of the form.
+   */
+  categoriesLoading?: boolean;
   onOpenChange: (open: boolean) => void;
   open: boolean;
   purchaseId: string;
@@ -204,7 +213,13 @@ export function PurchaseCostDialog({
                     label: c.name,
                     value: c.id,
                   }))}
-                  placeholder="Choose a category…"
+                  placeholder={
+                    categoriesLoading
+                      ? "Loading categories…"
+                      : categories.length === 0
+                        ? "No expense categories are set up"
+                        : "Choose a category…"
+                  }
                   value={field.value}
                 />
               )}
