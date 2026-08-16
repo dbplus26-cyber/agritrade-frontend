@@ -75,6 +75,43 @@ export interface IShipmentDocument {
   createdAt: string;
 }
 
+/** Which waybill slot a mark sits in. */
+export type ShipmentSignatureRole = "DRIVER" | "OWNER";
+
+/**
+ * Where the mark came from. DRAWN was made on a device at signing time,
+ * UPLOADED is a photo or scan of a wet signature, SAVED is the owner's stored
+ * mark applied deliberately to this trip. SAVED is the weakest of the three -
+ * it proves a decision to sign, not a hand moving - and the console says so
+ * rather than presenting all three as the same thing.
+ */
+export type ShipmentSignatureSource = "DRAWN" | "SAVED" | "UPLOADED";
+
+/**
+ * One party's captured signature on a trip's waybill.
+ *
+ * `capturedByName` is not decoration. A driver has no login, so a staff member
+ * always holds the device - and naming them is the whole difference between
+ * "the driver signed" and "somebody drew a squiggle". It is shown beside the
+ * mark for exactly that reason.
+ */
+export interface IShipmentSignature {
+  /** Who held the device. Not the signer. */
+  capturedByName: string;
+  id: string;
+  imageUrl: string;
+  /**
+   * True when the truck's load or details moved after this was signed. The
+   * mark still stands for what it was given for; this says it is no longer
+   * the load on the sheet.
+   */
+  manifestChanged: boolean;
+  role: ShipmentSignatureRole;
+  signedAt: string;
+  signedName: string;
+  source: ShipmentSignatureSource;
+}
+
 /** The saved delivery address snapshot carried on a shipment (null when the
  * destination was entered as free text). */
 export interface IShipmentDeliveryAddress {
@@ -119,6 +156,11 @@ export interface IShipment {
   driverLicenseNo: string | null;
   driverIdNumber: string | null;
   documents: IShipmentDocument[];
+  /** The two waybill slots. Null means nobody has signed that one yet. */
+  signatures: {
+    driver: IShipmentSignature | null;
+    owner: IShipmentSignature | null;
+  };
   costBasis: string;
   /** Weight allocated from lots so far - what has been keyed in. */
   totalWeightKg: number;
@@ -328,4 +370,23 @@ export interface IShipmentExpenseInput {
   amountGhs: number;
   description?: string;
   incurredAt?: string;
+}
+
+/**
+ * Capturing one party's mark. `file` is required for the driver and optional
+ * for the owner, where leaving it off applies the signature saved in Settings -
+ * which is the whole reason for saving one.
+ */
+export interface ISignShipmentInput {
+  file?: File;
+  id: string;
+  /** Defaults server-side: the trip's driver, or the signed-in owner. */
+  signedName?: string;
+}
+
+/** Striking a mark off a trip. Owner only, and the reason stays on the row. */
+export interface IRevokeSignatureInput {
+  id: string;
+  reason: string;
+  role: "driver" | "owner";
 }

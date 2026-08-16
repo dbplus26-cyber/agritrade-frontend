@@ -54,6 +54,7 @@ import { Money, SaleStatusBadge } from "./sale-bits";
 import { hasSettledTotal, saleSettlementDeltaGhs } from "./sale-payable";
 import { ArrivalDialog } from "./shipment-arrival-dialog";
 import { CostBasisBadge, ShipmentStatusBadge } from "./shipment-bits";
+import { ShipmentSignatures } from "./shipment-signatures";
 import {
   AddSalesDialog,
   CancelDialog,
@@ -814,6 +815,12 @@ export function ShipmentDetail({ id }: { id: string }) {
           ))
         )}
       </AdminCard>
+
+      {/* Signatures come BEFORE the documents drawer, because they are now the
+          normal way a waybill gets signed and the drawer is the fallback for a
+          sheet somebody photographed. Putting the fallback first taught the
+          depot to print. */}
+      <ShipmentSignatures shipment={s} />
 
       {/* Documents */}
       <AdminCard className="p-5">

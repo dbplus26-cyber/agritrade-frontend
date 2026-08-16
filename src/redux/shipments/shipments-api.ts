@@ -10,10 +10,12 @@ import type {
   IDispatchShipmentInput,
   IEligibleSalesResponse,
   IShipmentExpenseInput,
+  IRevokeSignatureInput,
   IShipmentListQuery,
   IShipmentListResponse,
   IShipmentResponse,
   IRemoveShipmentSaleInput,
+  ISignShipmentInput,
   IUpdateShipmentInput,
 } from "@/types/admin-shipment.types";
 
@@ -289,6 +291,71 @@ export const shipmentsApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (_r, _e, { id }) => [{ type: "Shipments", id }],
     }),
+
+    /**
+     * The driver's mark, taken at the depot. Multipart per the backend
+     * contract, and the file is compulsory: a name with no signature attached
+     * is refused with SIGNATURE_REQUIRED, which is the right answer.
+     */
+    signShipmentDriver: builder.mutation<IShipmentResponse, ISignShipmentInput>({
+      query: ({ id, file, signedName }) => {
+        const form = new FormData();
+        form.append("payload", JSON.stringify(signedName ? { signedName } : {}));
+        if (file) form.append("signature", file);
+        return {
+          url: `admin/shipments/${id}/signatures/driver`,
+          method: "POST",
+          body: form,
+        };
+      },
+      // Signing satisfies the dispatch gate, so the list's status column and
+      // the trip both change meaning.
+      invalidatesTags: (_r, _e, { id }) => [
+        { type: "Shipments", id },
+        { type: "Shipments", id: "LIST" },
+      ],
+    }),
+
+    /**
+     * The owner's countersignature. Owner-only at the router, so the console
+     * only ever offers it to a super admin. Sending NO file applies the
+     * signature saved in Settings - the owner does not redraw it per trip.
+     */
+    signShipmentOwner: builder.mutation<IShipmentResponse, ISignShipmentInput>({
+      query: ({ id, file, signedName }) => {
+        const form = new FormData();
+        form.append("payload", JSON.stringify(signedName ? { signedName } : {}));
+        if (file) form.append("signature", file);
+        return {
+          url: `admin/shipments/${id}/signatures/owner`,
+          method: "POST",
+          body: form,
+        };
+      },
+      invalidatesTags: (_r, _e, { id }) => [
+        { type: "Shipments", id },
+        { type: "Shipments", id: "LIST" },
+      ],
+    }),
+
+    /**
+     * Owner-only. A mark is never signed over: correcting one withdraws it
+     * with a reason, and the struck-out row stays on the record.
+     */
+    revokeShipmentSignature: builder.mutation<
+      IShipmentResponse,
+      IRevokeSignatureInput
+    >({
+      query: ({ id, reason, role }) => ({
+        url: `admin/shipments/${id}/signatures/${role}/revoke`,
+        method: "POST",
+        body: { reason },
+      }),
+      invalidatesTags: (_r, _e, { id }) => [
+        { type: "Shipments", id },
+        { type: "Shipments", id: "LIST" },
+      ],
+    }),
   }),
 });
 
@@ -310,4 +377,7 @@ export const {
   useVoidShipmentExpenseMutation,
   useAddShipmentDocumentMutation,
   useRemoveShipmentDocumentMutation,
+  useSignShipmentDriverMutation,
+  useSignShipmentOwnerMutation,
+  useRevokeShipmentSignatureMutation,
 } = shipmentsApi;

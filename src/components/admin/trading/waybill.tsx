@@ -8,7 +8,6 @@ import {
 } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
 import {
-  AuthorisedSignature,
   DocumentLogo,
   InkSignatureLine,
 } from "@/components/admin/document-marks";
@@ -20,7 +19,53 @@ import {
   shipmentWaybillPdfUrl,
   useGetShipmentQuery,
 } from "@/redux/shipments/shipments-api";
+import type { IShipmentSignature } from "@/types/admin-shipment.types";
 import { formatShipmentDate } from "./shipment-bits";
+
+/**
+ * One block of the sheet's signature row: a rule, its caption, the captured
+ * mark drawn over it, and the small print that makes the mark mean something.
+ *
+ * The small print is load-bearing. A signature on its own is a squiggle; what
+ * makes it evidence is the name it belongs to, the day it was made and - for
+ * the driver, who has no account of his own - the staff member whose device
+ * took it. Where the two names agree the second line is left off rather than
+ * printed twice, exactly as the PDF does it.
+ */
+function WaybillSignature({
+  label,
+  signature,
+}: {
+  label: string;
+  signature: IShipmentSignature | null;
+}) {
+  if (!signature) {
+    return <InkSignatureLine label={label} className="flex-1 basis-[160px]" />;
+  }
+  return (
+    <div className="flex-1 basis-[160px]">
+      <div className="flex h-[44px] items-end justify-center">
+        {/* eslint-disable-next-line @next/next/no-img-element -- Cloudinary asset */}
+        <img
+          src={signature.imageUrl}
+          alt={label}
+          className="max-h-[40px] max-w-[150px] object-contain"
+        />
+      </div>
+      <div className="border-t border-adm-strong pt-1 text-center text-[12px]">
+        {label}
+      </div>
+      <div className="mt-0.5 text-center text-[10px] leading-[1.35] text-adm-muted [overflow-wrap:anywhere]">
+        <div>
+          {signature.signedName} · {formatShipmentDate(signature.signedAt)}
+        </div>
+        {signature.capturedByName !== signature.signedName ? (
+          <div>Taken by {signature.capturedByName}</div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
 
 /**
  * A print-friendly loading sheet / waybill (design doc ADR-004): live data,
@@ -166,20 +211,33 @@ export function Waybill({ id }: { id: string }) {
           </tbody>
         </table>
 
-        {/* Ink lines left, the authorised block right - the same order the
-            PDF prints, so the two views of one waybill never disagree about
-            who signs where. The company signs before the truck leaves; the
-            driver and the receiver sign at handover. */}
+        {/* The same three blocks the PDF draws, in the same order, so the two
+            views of one waybill never disagree about who signed where.
+
+            The authorised block is driven by THIS trip's owner signature, not
+            by the business's saved one. Every other document stamps the saved
+            mark, which says "this business has a signature on file"; a waybill
+            has to say something stronger - that this trip was signed for, by
+            these people, on this day - or it would claim an authority nobody
+            exercised. An unsigned slot prints an empty rule, which is also
+            what still works when the depot's phone is flat.
+
+            The receiver keeps an ink line either way: nobody at the far end
+            has a login, and a mark taken on our device at our shed would not
+            be their acknowledgement of anything. */}
         <div className="mt-12 flex flex-wrap items-end gap-x-8 gap-y-6 text-[12px]">
-          <InkSignatureLine
+          <WaybillSignature
             label="Driver's signature"
-            className="flex-1 basis-[160px]"
+            signature={s.signatures.driver}
           />
           <InkSignatureLine
             label="Receiver's signature"
             className="flex-1 basis-[160px]"
           />
-          <AuthorisedSignature className="flex-1 basis-[160px]" />
+          <WaybillSignature
+            label="Authorised signature"
+            signature={s.signatures.owner}
+          />
         </div>
       </div>
     </div>
