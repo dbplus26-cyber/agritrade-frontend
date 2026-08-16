@@ -22,6 +22,7 @@ import {
   useUpdateSettingsMutation,
   useUploadDocumentSignatureMutation,
 } from "@/redux/settings/settings-api";
+import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
@@ -288,6 +289,7 @@ function SettingsForm({
 function SignatureCard({ settings }: { settings: ISystemSettings }) {
   const [uploadSignature, uploadState] = useUploadDocumentSignatureMutation();
   const [removeSignature, removeState] = useRemoveDocumentSignatureMutation();
+  const { confirm, confirmationDialog } = useConfirm();
   const [padOpen, setPadOpen] = useState(false);
   // What was just drawn or picked, shown IMMEDIATELY: the Cloudinary
   // round-trip plus the settings refetch takes seconds, and a preview that
@@ -319,6 +321,20 @@ function SignatureCard({ settings }: { settings: ISystemSettings }) {
   };
 
   const onRemove = async () => {
+    // One tap here changes every document the business issues, and it does it
+    // somewhere nobody looks again: the next receipt, waybill and certificate
+    // print an empty line, and the first anyone knows is a customer holding an
+    // unsigned document. The image itself is gone with it - re-signing means
+    // drawing or scanning a new one, not undoing this.
+    const ok = await confirm({
+      title: "Take the signature off every document?",
+      description:
+        "Receipts, waybills and the statement book's certificate go back to printing an empty line to sign by hand. The saved image is not kept: putting it back means drawing or scanning the signature again.",
+      confirmText: "Remove signature",
+      isDestructive: true,
+    });
+    if (!ok) return;
+
     try {
       await removeSignature().unwrap();
       setPendingUrl(null);
@@ -391,6 +407,7 @@ function SignatureCard({ settings }: { settings: ISystemSettings }) {
           ) : null}
         </div>
       </div>
+      {confirmationDialog}
       {padOpen ? (
         // The same inline pad the shipment page uses for the driver's
         // signature - drawn in normal document flow, where canvas sizing
