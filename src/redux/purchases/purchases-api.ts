@@ -1,7 +1,10 @@
 import { apiSlice } from "../api-slice";
 import { toQueryString } from "@/lib/to-query-string";
 import type {
+  IAddPurchaseCostInput,
+  IAddPurchaseCostResponse,
   ICreatePurchaseInput,
+  IPurchaseCostsResponse,
   IPurchaseListQuery,
   IPurchaseListResponse,
   IPurchasePaymentResponse,
@@ -174,10 +177,54 @@ export const purchasesApi = apiSlice.injectEndpoints({
         { type: "CashBook", id: "OVERVIEW" },
       ],
     }),
+
+    /**
+     * The costs incurred to acquire these goods - haulage from the farm gate,
+     * loading, porterage - and which of them were taken into the goods.
+     *
+     * Its own read rather than a slice of the purchase, exactly as the payment
+     * ledger is: what a load COST to acquire and what the document says it was
+     * bought for are two facts, and folding the first into the second is what
+     * left "how much did we make on that purchase" unanswerable.
+     */
+    getPurchaseCosts: builder.query<IPurchaseCostsResponse, string>({
+      query: (purchaseId) => `admin/purchases/${purchaseId}/expenses`,
+      providesTags: (_r, _e, id) => [{ type: "Purchases", id: `COST-${id}` }],
+    }),
+
+    addPurchaseCost: builder.mutation<
+      IAddPurchaseCostResponse,
+      {
+        body: IAddPurchaseCostInput;
+        idempotencyKey: string;
+        purchaseId: string;
+      }
+    >({
+      query: ({ body, idempotencyKey, purchaseId }) => ({
+        url: `admin/purchases/${purchaseId}/expenses`,
+        method: "POST",
+        body: { ...body, idempotencyKey },
+      }),
+      // A capitalised cost changes what the goods cost, so anything that
+      // reports on them moves: the purchase itself, its cost list, and the
+      // profit report, whose cost of sales this feeds once the grain sells.
+      // The Expenses register moves too - a purchase cost is an ordinary
+      // voucher there, and it lands unpaid, so the money-out picker that
+      // reads unpaid vouchers has to see it.
+      invalidatesTags: (_r, _e, { purchaseId }) => [
+        { type: "Purchases", id: purchaseId },
+        { type: "Purchases", id: `COST-${purchaseId}` },
+        { type: "Expenses", id: "LIST" },
+        { type: "ExpensePayments", id: "UNPAID" },
+        { type: "Reports", id: "LIST" },
+      ],
+    }),
   }),
 });
 
 export const {
+  useAddPurchaseCostMutation,
+  useGetPurchaseCostsQuery,
   useGetPurchasePaymentsQuery,
   useGetUnpaidPurchasesQuery,
   useRecordPurchasePaymentMutation,

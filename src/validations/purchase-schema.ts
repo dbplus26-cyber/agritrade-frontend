@@ -70,6 +70,42 @@ export const receivePurchaseSchema = z.object({
 });
 export type ReceivePurchaseValues = z.infer<typeof receivePurchaseSchema>;
 
+/**
+ * A cost incurred to acquire one purchase's goods. Mirrors the backend
+ * `purchaseExpenseSchema`.
+ *
+ * `capitalise` carries no default even though the server has one. It decides
+ * whether the cost rides on the goods to cost of sales or lands in this
+ * month's costs, it cannot be changed afterwards, and a form that submits
+ * without an answer has made that call for whoever filled it in.
+ */
+export const purchaseCostSchema = z.object({
+  amountGhs: z
+    .string()
+    .trim()
+    .min(1, "Enter the amount")
+    .refine((v) => Number(v) > 0, "The amount must be more than zero")
+    .refine(
+      (v) => Number(v) <= 10_000_000,
+      "That is larger than any single cost the system takes - check the figure",
+    )
+    .refine(
+      (v) => /^\d+(\.\d{1,2})?$/.test(v),
+      "Amounts are recorded to 2 decimal places (pesewas)",
+    ),
+  capitalise: z.boolean(),
+  categoryId: z.string().min(1, "Choose a category"),
+  description: optionalText(500),
+  incurredAt: z
+    .string()
+    .min(1, "Enter the date")
+    .refine(
+      (v) => new Date(v) <= new Date(),
+      "That date is in the future - check the year",
+    ),
+});
+export type PurchaseCostValues = z.infer<typeof purchaseCostSchema>;
+
 export const voidPurchaseSchema = z.object({
   reason: z
     .string()

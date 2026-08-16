@@ -1,6 +1,7 @@
 import type { IPaginationMeta } from "./api";
 import type { SalePaymentMethod } from "./admin-sale.types";
 import type { ApprovalStatus } from "./approval.types";
+import type { IExpense, ICreateExpenseResponse } from "./expense.types";
 import type { PurchaseSource } from "./registry.types";
 
 /**
@@ -16,6 +17,15 @@ import type { PurchaseSource } from "./registry.types";
  * gap as variance.
  */
 export const RECEIPT_VARIANCE_CODE = "RECEIPT_VARIANCE";
+
+/**
+ * The error code returned when a cost is charged against a struck-out
+ * purchase. A void reverses the money and the stock, so there are no goods
+ * left to carry an acquisition cost and no month that should be charged for
+ * one; the console hides the action once a purchase is voided, and this
+ * catches the case where somebody had the page open before it was.
+ */
+export const PURCHASE_VOIDED_CODE = "PURCHASE_VOIDED";
 
 /** Mirrors the backend `PurchaseStatus` enum. */
 export enum PurchaseStatus {
@@ -175,6 +185,67 @@ export interface IPurchasePaymentReversalResponse {
   message: string;
   data: { reversal: IPurchasePayment; settlement: IPurchaseSettlement };
 }
+
+/**
+ * A cost incurred to acquire these goods: haulage from the farm gate,
+ * loading, porterage, bagging - or a licence that is tied to the purchase but
+ * is not part of what the grain cost.
+ *
+ * An expense voucher like any other (same table, same numbering, same
+ * settlement screen), plus the one fact that only exists on this link.
+ */
+export interface IPurchaseCost extends IExpense {
+  /**
+   * The instant this cost was taken INTO the goods, and `null` when it was
+   * left as a cost of its own month.
+   *
+   * A date rather than a flag because that is the fact the books need: the
+   * goods gain the cost on the day it was incurred, not the day the row was
+   * typed, so a cost entered in August for a July load still lands in July.
+   * Decided once when the cost is recorded and never revisited - changing it
+   * afterwards would mean the month it was first read in quietly stops
+   * reproducing.
+   */
+  capitalisedAt: string | null;
+}
+
+/**
+ * The costs standing against one purchase.
+ *
+ * NOTE: the backend does not serve this yet - `GET
+ * /api/v1/admin/purchases/:purchaseId/expenses` has to be added alongside the
+ * POST that already lives at that path. The shape below is what this console
+ * reads: the vouchers, unpaginated the way the payment ledger is, each
+ * carrying `capitalisedAt`. No totals travel with them on purpose - a figure
+ * redacted for one reader has to stay redacted in the sum, so the sum is
+ * taken here from the same nullable amounts the rows show.
+ */
+export interface IPurchaseCostsResponse {
+  message: string;
+  data: { expenses: IPurchaseCost[] };
+}
+
+/** Mirrors backend `purchaseExpenseSchema` (validations/purchase-validation.ts). */
+export interface IAddPurchaseCostInput {
+  amountGhs: number;
+  /**
+   * Take the cost into the goods rather than into the month.
+   *
+   * The server defaults it to true; the console sends it explicitly on every
+   * submission, because a default that decides an unchangeable treatment for
+   * somebody is exactly what this field exists to stop.
+   */
+  capitalise: boolean;
+  categoryId: string;
+  description?: string;
+  incurredAt?: string;
+}
+
+/**
+ * What recording a purchase cost answers with. The same envelope the
+ * standalone expense endpoint returns: the voucher and how settled it is.
+ */
+export type IAddPurchaseCostResponse = ICreateExpenseResponse;
 
 export interface IUnpaidPurchasesResponse {
   message: string;
