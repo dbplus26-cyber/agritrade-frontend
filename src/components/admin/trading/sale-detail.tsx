@@ -246,8 +246,7 @@ export function SaleDetail({
   const onConfirm = async () => {
     const ok = await confirm({
       title: "Confirm this sale?",
-      description:
-        "The payment terms are resolved and locked in, and the agreed lines can no longer be edited.",
+      description: `${sale.transactionNo} to ${sale.buyer.name} stops being a draft: the payment terms are resolved and locked in, the agreed lines can no longer be edited, and the sale becomes something a truck can be planned around. Cancelling afterwards is only possible while nothing has been paid.`,
       confirmText: "Confirm sale",
     });
     if (!ok) return;

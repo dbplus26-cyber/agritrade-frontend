@@ -118,6 +118,21 @@ function ReceiveDialog({
     }).unwrap();
 
   const onSubmit = async (values: ReceivePurchaseValues) => {
+    // Receiving writes the lot and the stock movement: from here the goods can
+    // be sold and put on a truck out of THIS shed. The shed is what gets read
+    // back, because a wrong weight shows up the next time anybody counts, and
+    // a wrong shed does not - it just means the stock is not where the console
+    // says it is, and only an adjustment puts that right.
+    const shed =
+      (warehouses.data?.data ?? []).find((w) => w.id === values.warehouseId)
+        ?.name ?? "the warehouse you chose";
+    const ok = await confirm({
+      title: "Book this stock in?",
+      description: `${formatKg(Number(values.receivedKg))} of ${purchase.commodity.name} goes into ${shed} and can be sold and shipped from there. Only a stock adjustment moves it afterwards.`,
+      confirmText: "Receive stock",
+    });
+    if (!ok) return;
+
     try {
       await submitReceipt(values, false);
     } catch (err) {

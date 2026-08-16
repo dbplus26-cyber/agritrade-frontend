@@ -184,11 +184,18 @@ export function ShipmentDetail({ id }: { id: string }) {
     s.plannedWeightKg !== null &&
     roomLeftKg > s.truckCapacityKg * UNDER_FILL_SHARE;
 
+  // Every shed this truck takes a load from, origin first. A trip that calls
+  // at two sheds moves stock out of both, and a dialog naming only the origin
+  // would be describing half the movement.
+  const loadingFrom =
+    s.loadingWarehouses.length > 0
+      ? s.loadingWarehouses.map((w) => w.name).join(" and ")
+      : s.originWarehouse.name;
+
   const onDispatch = async () => {
     const ok = await confirm({
       title: "Dispatch this shipment?",
-      description:
-        "Stock leaves the warehouse now. If loading is below a payment milestone, the owner must approve it first.",
+      description: `${formatKg(s.totalWeightKg)} comes off stock at ${loadingFrom} now, and what these goods cost is frozen for this trip - a later purchase at a different price will not move this trip's profit. It cannot be undone. The server refuses this if the load is under a payment milestone the owner has not approved.`,
       confirmText: "Dispatch",
     });
     if (!ok) return;
@@ -226,6 +233,17 @@ export function ShipmentDetail({ id }: { id: string }) {
   };
 
   const onClose = async () => {
+    // Closing is the end of the trip's paperwork: nothing more can be added to
+    // it and its profit stops moving. The server refuses it while a buyer on
+    // this truck still owes, so the dialog says what that check means rather
+    // than repeating it - a close that goes through is a trip fully collected.
+    const ok = await confirm({
+      title: "Close this trip?",
+      description: `${s.transactionNo} is finished with: no further costs can be put on it and its profit is settled. The server refuses this while a buyer on this truck still owes money, so if it goes through the trip has been collected in full.`,
+      confirmText: "Close the trip",
+    });
+    if (!ok) return;
+
     try {
       await close(s.id).unwrap();
       notify.success("Shipment closed");

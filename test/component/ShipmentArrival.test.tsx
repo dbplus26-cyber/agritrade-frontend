@@ -15,9 +15,12 @@
 //   * weights and amounts cross the wire as NUMBERS, from text inputs;
 //   * a trip can be marked arrived with no figures at all;
 //   * settling below what the buyer has already paid is refused HERE, naming
-//     the sale - the server's 409 does not name it, and a trip carries several.
+//     the sale - the server's 409 does not name it, and a trip carries several;
+//   * neither path writes until its confirmation is cleared, because both are
+//     one-way: the trip cannot be put back on the road, and the settled totals
+//     become what every buyer on it owes.
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEventBase from "@testing-library/user-event";
 
 import { ArrivalDialog } from "@/components/admin/trading/shipment-arrival-dialog";
@@ -41,6 +44,38 @@ vi.mock("@/lib/notify", () => ({
 }));
 
 const userEvent = userEventBase.setup({ delay: null });
+
+/**
+ * Clears the confirmation raised before either write.
+ *
+ * Found by the gate's own title and scoped to it: both commit buttons carry
+ * the SAME label as the button that opened them, and both are in the document
+ * at this point, so an unscoped query would be resolving a collision by luck.
+ */
+const clearGate = async (title: RegExp, commit: string) => {
+  const heading = await screen.findByText(title);
+  const gate = heading.closest('[role="dialog"]');
+  if (!gate) throw new Error("the gate's title is not inside a dialog");
+  await userEvent.click(
+    within(gate as HTMLElement).getByRole("button", { name: commit }),
+  );
+};
+
+/** Submit the figures and clear the gate: what actually reaches the API. */
+const recordArrival = async () => {
+  await userEvent.click(
+    screen.getAllByRole("button", { name: "Record arrival" })[0],
+  );
+  await clearGate(/Bill these figures/i, "Record arrival");
+};
+
+/** Take the "weigh it later" path all the way through. */
+const arriveWithoutFigures = async () => {
+  await userEvent.click(
+    screen.getByRole("button", { name: /mark arrived and record this later/i }),
+  );
+  await clearGate(/Mark this trip arrived/i, "Mark arrived");
+};
 
 /** Maize at 10/kg and soya at 4/kg: 1,000 + 500 loaded, GHS 12,000 agreed. */
 const SALE_DETAIL = {
@@ -155,7 +190,7 @@ describe("ArrivalDialog", () => {
 
     await userEvent.clear(maizeBox());
     await userEvent.type(maizeBox(), "976");
-    await userEvent.click(screen.getByRole("button", { name: "Record arrival" }));
+    await recordArrival();
 
     expect(arriveTrigger).toHaveBeenCalledTimes(1);
     expect(arriveTrigger).toHaveBeenCalledWith({
@@ -181,7 +216,7 @@ describe("ArrivalDialog", () => {
     await userEvent.type(maizeBox(), "0");
     await userEvent.clear(soyaBox());
     await userEvent.type(soyaBox(), "0");
-    await userEvent.click(screen.getByRole("button", { name: "Record arrival" }));
+    await recordArrival();
 
     const [[sent]] = arriveTrigger.mock.calls as [
       [{ sales: { lines: { receivedKg: number }[]; settledTotalGhs: number }[] }],
@@ -193,13 +228,57 @@ describe("ArrivalDialog", () => {
   it("marks the trip arrived with no figures at all", async () => {
     render(<ArrivalDialog onClose={vi.fn()} shipment={shipment()} />);
 
-    await userEvent.click(
-      screen.getByRole("button", { name: /mark arrived and record this later/i }),
-    );
+    await arriveWithoutFigures();
 
     // No `sales` key: the load is on the ground either way, and the figures
     // are recorded once somebody has weighed it.
     expect(arriveTrigger).toHaveBeenCalledWith({ id: "shp-1" });
+  });
+
+  it("writes nothing until the bill is confirmed, and says what it will bill", async () => {
+    render(<ArrivalDialog onClose={vi.fn()} shipment={shipment()} />);
+    await screen.findByDisplayValue("12000.00");
+
+    await userEvent.click(
+      screen.getAllByRole("button", { name: "Record arrival" })[0],
+    );
+
+    // A filled form is not a bill. What the gate says is the point of it: the
+    // figure every buyer on the trip owes from here on.
+    expect(arriveTrigger).not.toHaveBeenCalled();
+    expect(await screen.findByText(/Bill these figures/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/GH₵ 12,000.00 across 1 sale on SHP-2026-00042/),
+    ).toBeInTheDocument();
+  });
+
+  it("bills nothing when the confirmation is cancelled", async () => {
+    render(<ArrivalDialog onClose={vi.fn()} shipment={shipment()} />);
+    await screen.findByDisplayValue("12000.00");
+
+    await userEvent.click(
+      screen.getAllByRole("button", { name: "Record arrival" })[0],
+    );
+    const heading = await screen.findByText(/Bill these figures/i);
+    const gate = heading.closest('[role="dialog"]') as HTMLElement;
+    await userEvent.click(within(gate).getByRole("button", { name: "Cancel" }));
+
+    expect(arriveTrigger).not.toHaveBeenCalled();
+    // The figures survive the cancel - the operator went back to check one.
+    expect(paymentBox()).toHaveValue("12000.00");
+  });
+
+  it("does not mark the trip arrived when that confirmation is cancelled", async () => {
+    render(<ArrivalDialog onClose={vi.fn()} shipment={shipment()} />);
+
+    await userEvent.click(
+      screen.getByRole("button", { name: /mark arrived and record this later/i }),
+    );
+    const heading = await screen.findByText(/Mark this trip arrived/i);
+    const gate = heading.closest('[role="dialog"]') as HTMLElement;
+    await userEvent.click(within(gate).getByRole("button", { name: "Cancel" }));
+
+    expect(arriveTrigger).not.toHaveBeenCalled();
   });
 
   it("refuses to settle below what the buyer already paid, and names the sale", async () => {
@@ -231,7 +310,7 @@ describe("ArrivalDialog", () => {
 
     render(<ArrivalDialog onClose={vi.fn()} shipment={shipment()} />);
     await screen.findByDisplayValue("12000.00");
-    await userEvent.click(screen.getByRole("button", { name: "Record arrival" }));
+    await recordArrival();
 
     expect(
       await screen.findByText(/Reverse a payment first, then record the arrival/i),

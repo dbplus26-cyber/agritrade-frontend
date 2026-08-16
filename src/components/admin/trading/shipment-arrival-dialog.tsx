@@ -25,6 +25,7 @@ import {
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
+import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis, formatKg } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
@@ -307,6 +308,7 @@ export function ArrivalDialog({
   onClose: () => void;
 }) {
   const [arrive, { isLoading }] = useArriveShipmentMutation();
+  const { confirm, confirmationDialog } = useConfirm();
   const [serverError, setServerError] = useState<null | string>(null);
   /** Sales the admin is settling below what the buyer has already handed over. */
   const [belowPaid, setBelowPaid] = useState<string[]>([]);
@@ -348,6 +350,21 @@ export function ArrivalDialog({
 
   /** The "weigh it later" path the backend explicitly allows. */
   const onArriveWithoutFigures = async () => {
+    // The owner's own example of a one-click, one-way action. It is the whole
+    // transition on a single tap - and on a phone it is a text link sitting a
+    // scroll away from a form the operator may have half filled, so it is the
+    // easiest button on this screen to hit by accident.
+    const ok = await confirm({
+      title: "Mark this trip arrived?",
+      description: `${shipment.transactionNo} stops being on the road and the goods count as delivered${
+        loaded.length > 0
+          ? ". No weights are recorded, so every buyer stays billed at the agreed price until somebody weighs the load in"
+          : ""
+      }. A trip cannot be put back on the road once it has arrived.`,
+      confirmText: "Mark arrived",
+    });
+    if (!ok) return;
+
     setServerError(null);
     try {
       await arrive({ id: shipment.id }).unwrap();
@@ -371,6 +388,23 @@ export function ArrivalDialog({
       .map((s) => s.saleId);
     setBelowPaid(offending);
     if (offending.length > 0) return;
+
+    // These figures ARE the bill. Every settled total on this form replaces
+    // what the buyer was going to be charged, and the trip leaves the road at
+    // the same time, so the money is read back as one figure before it
+    // commits - it is the number an invoice is raised against.
+    const billed = (values.sales ?? []).reduce(
+      (sum, sale) => sum + Number(sale.settledTotalGhs),
+      0,
+    );
+    const ok = await confirm({
+      title: "Bill these figures?",
+      description: `${formatCedis(billed)} across ${values.sales?.length ?? 0} sale${
+        (values.sales?.length ?? 0) === 1 ? "" : "s"
+      } on ${shipment.transactionNo}. That is what each buyer owes from now on, in place of the agreed price, and the trip is marked arrived. Correcting it afterwards means reversing payments first.`,
+      confirmText: "Record arrival",
+    });
+    if (!ok) return;
 
     try {
       await arrive({
@@ -504,6 +538,7 @@ export function ArrivalDialog({
           )}
         </ResponsiveDialogFooter>
       </ResponsiveDialogContent>
+      {confirmationDialog}
     </ResponsiveDialog>
   );
 }
