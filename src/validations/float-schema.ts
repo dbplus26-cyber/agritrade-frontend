@@ -57,3 +57,23 @@ export const agentExpenseSchema = z.object({
   incurredAt: z.string().min(1, "Enter the expense date"),
 });
 export type AgentExpenseValues = z.infer<typeof agentExpenseSchema>;
+
+/**
+ * What somebody may SEND, which is not what they are holding.
+ *
+ * Blank clears the cap rather than meaning zero: "no limit" and "may not send
+ * a pesewa" are opposite statements, and a form that turned an emptied box
+ * into a zero would silently suspend somebody. The server refuses a zero
+ * outright for the same reason - that is what the suspend switch is for.
+ */
+export const sendLimitSchema = z.object({
+  capGhs: z
+    .string()
+    .trim()
+    .refine(
+      (v) => v === "" || (Number(v) > 0 && /^\d+(\.\d{1,2})?$/.test(v)),
+      "Enter an amount above zero, or leave it blank for no limit",
+    ),
+  drawsOnAccountId: z.string(),
+});
+export type SendLimitValues = z.infer<typeof sendLimitSchema>;

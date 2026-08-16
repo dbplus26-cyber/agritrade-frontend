@@ -2,11 +2,14 @@
 
 import Link from "next/link";
 import { usePermissions } from "@/hooks/use-permissions";
-import { useGetMyFloatQuery } from "@/redux/agent/agent-api";
+import {
+  useGetMyFloatQuery,
+  useGetMySpendingQuery,
+} from "@/redux/agent/agent-api";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis } from "@/lib/format-money";
 import { cn } from "@/lib/utils";
-import type { IFloatTransaction } from "@/types/agent.types";
+import type { IFloatTransaction, IHeldPot } from "@/types/agent.types";
 
 // The ledger is the cash book now, so its lines are movement types. Unknown
 // types fall back to their own name rather than rendering `undefined`: the
@@ -53,12 +56,107 @@ function LedgerLine({ tx }: { tx: IFloatTransaction }) {
   );
 }
 
-/** The agent's landing screen: my cash, my last movements, the big actions. */
+/** What each pot is, in the words an agent uses for it. */
+const POT_LABEL: Record<string, string> = {
+  BANK: "In your bank",
+  CASH: "Cash in hand",
+  MOMO: "In your wallet",
+  OTHER: "Held",
+};
+
+/**
+ * One pot, with its own balance.
+ *
+ * Separately, deliberately. Cash in a pocket, money in an agent's own wallet
+ * and money in their own bank are three different things to somebody standing
+ * at a village scale, and the single figure that used to cover all three is
+ * what made their position unreadable: cash still in hand read as spent
+ * because a mobile-money send had come off the same total.
+ */
+function Pot({ pot }: { pot: IHeldPot }) {
+  return (
+    <div className="flex items-baseline justify-between gap-3 border-b border-soil/15 py-2 last:border-b-0">
+      <div className="min-w-0">
+        <p className="text-[13px] font-medium text-ink">
+          {POT_LABEL[pot.kind] ?? POT_LABEL.OTHER}
+        </p>
+        {/* The account's own label, so a person can tell two wallets apart.
+            Wrapped rather than truncated: on a phone this is the line that
+            says WHICH pot, and half a name answers nothing. */}
+        <p className="text-[11.5px] break-words text-soil/75">{pot.label}</p>
+      </div>
+      <span
+        className={cn(
+          "font-mono text-[15px] font-semibold whitespace-nowrap tabular-nums",
+          pot.balanceGhs < 0 ? "text-error" : "text-ink",
+        )}
+      >
+        {formatCedis(pot.balanceGhs)}
+      </span>
+    </div>
+  );
+}
+
+/**
+ * What the agent may still SEND, which is not what they are holding.
+ *
+ * Its own card, its own words, never a figure beside the pots. Money somebody
+ * holds falls when they spend it; an allowance is permission to draw on an
+ * account belonging to the business, and what falls when it is used is the
+ * company's account. Showing them as one number is the bug this whole rework
+ * exists to end, and two cards that merely sit near each other is how it comes
+ * back.
+ */
+function SendingAllowance() {
+  const { data, isError, isLoading } = useGetMySpendingQuery();
+
+  return (
+    <section className="rounded-none border border-soil/25 bg-paper px-4 py-4">
+      <p className="text-[11px] font-bold tracking-[0.08em] text-soil uppercase">
+        You may still send
+      </p>
+      {isLoading ? (
+        <p className="mt-1 text-[15px] text-soil">Loading…</p>
+      ) : isError || !data ? (
+        // Not an error state. The ordinary reason this read fails is that
+        // nobody has given this person permission to send, and telling them
+        // that plainly beats a retry button that will fail again.
+        <p className="mt-1 text-[13px] text-soil">
+          You have not been allowed to send money yet. Ask the office.
+        </p>
+      ) : data.data.spending.capGhs === null ? (
+        <>
+          <p className="mt-1 font-mono text-[22px] font-bold text-ink tabular-nums">
+            No limit
+          </p>
+          <p className="text-[12px] text-soil/80">
+            The office has set no ceiling. A send still needs the money to be
+            there in the company account.
+          </p>
+        </>
+      ) : (
+        <>
+          <p className="mt-1 font-mono text-[22px] font-bold text-ink tabular-nums">
+            {formatCedis(data.data.spending.remainingGhs)}
+          </p>
+          <p className="text-[12px] text-soil/80">
+            {formatCedis(data.data.spending.usedGhs)} of{" "}
+            {formatCedis(data.data.spending.capGhs)} used. This is the
+            company&apos;s money, not what you are holding.
+          </p>
+        </>
+      )}
+    </section>
+  );
+}
+
+/** The agent's landing screen: my pots, what I may send, my last movements. */
 export function AgentHome() {
   const { data, isLoading, isError, error, refetch } = useGetMyFloatQuery({
     limit: 5,
   });
   const balance = data?.summary.balanceGhs ?? 0;
+  const pots = data?.summary.pots ?? [];
   const { has } = usePermissions();
   const canBuy = has("PURCHASES_RECORD");
   const canSend = has("PAYOUTS_SEND");
@@ -68,7 +166,7 @@ export function AgentHome() {
     <div className="flex flex-col gap-4">
       <section className="rounded-none border border-soil/25 bg-paper px-4 py-4">
         <p className="text-[11px] font-bold tracking-[0.08em] text-soil uppercase">
-          My float
+          You are holding
         </p>
         {isLoading ? (
           <p className="mt-1 text-[15px] text-soil">Loading…</p>
@@ -100,9 +198,22 @@ export function AgentHome() {
                 You are fronting your own cash - tell the office.
               </p>
             ) : null}
+            {pots.length === 0 ? (
+              <p className="mt-2 text-[13px] text-soil">
+                Nothing has been handed to you yet.
+              </p>
+            ) : (
+              <div className="mt-3 border-t border-soil/25 pt-1">
+                {pots.map((pot) => (
+                  <Pot key={pot.id} pot={pot} />
+                ))}
+              </div>
+            )}
           </>
         )}
       </section>
+
+      <SendingAllowance />
 
       {/* Only the actions this agent actually HOLDS - the owner switches
           them per role or per person on the console's Permissions screen,

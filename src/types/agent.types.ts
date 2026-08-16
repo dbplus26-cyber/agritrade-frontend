@@ -71,8 +71,31 @@ export interface IAgentSummary {
  * and that state is shown rather than hidden: a staff member with no float
  * yet is exactly who the owner is looking for when they come to fund one.
  */
+/**
+ * Permission to spend the COMPANY's money, as the console reads it.
+ *
+ * Never folded into the balance beside it. What somebody HOLDS is money in
+ * their own accounts and falls when they spend it; an allowance is a licence
+ * to draw on an account belonging to the business, and what falls when it is
+ * used is the company's. The float was one number for both, which is why an
+ * agent handed GHS 5,000 cash who then sent GHS 3,000 by mobile money had his
+ * own cash shown as 2,000 while the 5,000 was still in his hand.
+ */
+export interface IHolderAuthority {
+  /** Null means UNCAPPED. A cap of zero is refused: that is a suspension. */
+  capGhs: number | null;
+  /** Null where nobody has chosen one: sends fall back to the payout wallet. */
+  drawsOnAccount: null | { id: string; label: string };
+  isActive: boolean;
+  /** Null when uncapped. Otherwise the cap less the sends already made. */
+  remainingGhs: number | null;
+  usedGhs: number | null;
+}
+
 export interface IFloatHolder {
   userId: string;
+  /** Null where this person has no permission to send at all. */
+  authority: IHolderAuthority | null;
   accountId: string | null;
   accountActive: boolean;
   agentProfileId: string | null;
@@ -149,6 +172,42 @@ export interface IAgentDetailResponse {
   data: { agent: IAgentDetail };
 }
 
+/**
+ * One place a person actually keeps the business's money.
+ *
+ * There is a row per pot because cash in a pocket, money in their own wallet
+ * and money in their own bank are three different things, and the single
+ * figure that used to cover all three is what made an agent's position
+ * unreadable: cash he was still holding read as spent because a mobile-money
+ * send had come off the same total.
+ */
+export interface IHeldPot {
+  balanceGhs: number;
+  id: string;
+  kind: "BANK" | "CASH" | "MOMO" | "OTHER";
+  label: string;
+}
+
+/**
+ * Permission to spend the COMPANY's money, which holds nothing itself.
+ *
+ * Deliberately never added to a balance and never shown in the same breath.
+ * Money somebody holds falls when they spend it; an allowance is a licence to
+ * draw on an account belonging to the business, and what falls when it is used
+ * is the company's account, not theirs.
+ */
+export interface ISpendingStanding {
+  /** Null means UNCAPPED, which is not the same as a cap of zero. */
+  capGhs: number | null;
+  remainingGhs: number | null;
+  usedGhs: number;
+}
+
+export interface IMySpendingResponse {
+  message: string;
+  data: { spending: ISpendingStanding };
+}
+
 /** Paginated ledger with the live balance riding in `summary`. */
 export interface IFloatLedgerResponse {
   message: string;
@@ -169,6 +228,12 @@ export interface IFloatLedgerResponse {
      * surface sends it; the agent's own view has no use for it.
      */
     accountActive?: boolean;
+    /**
+     * One row per pot. `balanceGhs` above is their sum and stays, because "how
+     * much of the company's money am I holding" is a real question - it is
+     * just no longer the only answer available.
+     */
+    pots?: IHeldPot[];
   };
 }
 

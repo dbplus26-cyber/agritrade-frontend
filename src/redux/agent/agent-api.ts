@@ -5,6 +5,7 @@ import type {
   IFloatLedgerQuery,
   IFloatLedgerResponse,
   IFloatTransactionResponse,
+  IMySpendingResponse,
 } from "@/types/agent.types";
 import type {
   IAgentCreatePurchaseInput,
@@ -56,6 +57,18 @@ export const agentApi = apiSlice.injectEndpoints({
       providesTags: [{ type: "FloatLedger", id: "MINE" }],
     }),
 
+    /**
+     * What the caller may still SEND, which is not what they are holding.
+     * Tagged with the same ledger id so a top-up or a send refreshes both:
+     * an allowance that has been consumed and a balance that has fallen are
+     * two consequences of one act, and a screen showing one stale beside the
+     * other is how the two came to be confused in the first place.
+     */
+    getMySpending: builder.query<IMySpendingResponse, void>({
+      query: () => "agent/me/spending",
+      providesTags: [{ type: "FloatLedger", id: "MINE" }],
+    }),
+
     getMyPurchases: builder.query<
       IPurchaseListResponse,
       IPurchaseListQuery | void
@@ -100,6 +113,7 @@ export const {
   useGetAgentExpenseCategoriesQuery,
   useGetMyFloatQuery,
   useGetMyPurchasesQuery,
+  useGetMySpendingQuery,
   useCreateMyPurchaseMutation,
   useCreateMyExpenseMutation,
 } = agentApi;
