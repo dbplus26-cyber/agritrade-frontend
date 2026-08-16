@@ -16,6 +16,7 @@ import type {
   IDrawingBody,
   IFixedAsset,
   IFixedAssetBody,
+  IFixedAssetEditBody,
   IOpeningBalance,
   IOpeningBalanceBody,
   IStatementPeriod,
@@ -147,9 +148,14 @@ export const statementsApi = apiSlice.injectEndpoints({
         url: `/admin/statements/asset-classes/${classId}`,
       }),
     }),
+    // Only the descriptive fields, and only the ones that changed: an
+    // acquisition that has posted freezes its cost and its date (COST_LOCKED,
+    // ACQUISITION_DATE_LOCKED), and the API compares rather than merely
+    // checking presence, so a form that re-sent the whole record would be
+    // refused for fields nobody touched.
     updateFixedAsset: builder.mutation<
       { data: { asset: IFixedAsset } },
-      { assetId: string; body: Partial<IFixedAssetBody> }
+      { assetId: string; body: IFixedAssetEditBody }
     >({
       invalidatesTags: ["StatementInputs", "Statements"],
       query: ({ assetId, body }) => ({
