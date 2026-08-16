@@ -96,6 +96,80 @@ export const cancelShipmentSchema = z.object({
   reason: z.string().trim().min(3, "Give a reason").max(500),
 });
 
+/**
+ * What was actually received off the truck, per commodity.
+ *
+ * Zero is legitimate and blank is not, and the difference is the whole point:
+ * a blank means nobody has answered yet, and coercing it to zero would write
+ * the entire load off as never arrived. Below zero is refused because no scale
+ * reads a negative weight.
+ */
+const receivedKgField = z
+  .string()
+  .trim()
+  .min(1, "Enter the weight received")
+  .refine((v) => Number.isFinite(Number(v)), {
+    message: "Enter the weight in kilograms",
+  })
+  .refine((v) => Number(v) >= 0, {
+    message: "A received weight cannot be negative",
+  })
+  .refine((v) => Number(v) <= 100_000_000, {
+    message: "That weight is too large",
+  });
+
+/**
+ * What the buyer will actually pay. Entered rather than computed: received x
+ * agreed price is only the SUGGESTION, and the two sides often settle on a
+ * round figure after arguing about a wet load. Zero is legitimate - a delivery
+ * refused outright is settled at nothing.
+ */
+const settledTotalField = z
+  .string()
+  .trim()
+  .min(1, "Enter the payment to expect")
+  .refine((v) => Number.isFinite(Number(v)), {
+    message: "Enter the amount in cedis",
+  })
+  .refine((v) => Number(v) >= 0, {
+    message: "A payment to expect cannot be negative",
+  })
+  .refine((v) => Number(v) <= 100_000_000, {
+    message: "That amount is too large",
+  })
+  // The API's money columns are Decimal(2), so a third decimal is refused at
+  // the boundary with a message about `multipleOf`. Say it here instead.
+  .refine((v) => Number.isInteger(Math.round(Number(v) * 1000) / 10), {
+    message: "Amounts are recorded to 2 decimal places (pesewas)",
+  });
+
+/**
+ * Recording what came off the truck, mirroring the backend's
+ * `arriveShipmentSchema`. `sales` may be empty: a trip can be marked arrived
+ * before anybody has weighed it, because the load is on the ground either way
+ * and refusing to record that would leave the register saying the truck is
+ * still on the road.
+ */
+export const arriveShipmentSchema = z.object({
+  sales: z
+    .array(
+      z.object({
+        lines: z
+          .array(
+            z.object({
+              commodityId: z.string().min(1),
+              receivedKg: receivedKgField,
+            }),
+          )
+          .min(1, "Say what was received"),
+        saleId: z.string().min(1),
+        settledTotalGhs: settledTotalField,
+      }),
+    )
+    .optional(),
+});
+
+export type ArriveShipmentValues = z.infer<typeof arriveShipmentSchema>;
 export type CancelShipmentValues = z.infer<typeof cancelShipmentSchema>;
 export type ShipmentExpenseValues = z.infer<typeof shipmentExpenseSchema>;
 export type ShipmentValues = z.infer<typeof shipmentSchema>;

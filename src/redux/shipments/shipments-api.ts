@@ -4,6 +4,7 @@ import { toQueryString } from "@/lib/to-query-string";
 import type {
   IAddShipmentSalesInput,
   IAllocationInput,
+  IArriveShipmentInput,
   IAvailableLotsResponse,
   ICreateShipmentInput,
   IDispatchShipmentInput,
@@ -169,11 +170,35 @@ export const shipmentsApi = apiSlice.injectEndpoints({
       ],
     }),
 
-    arriveShipment: builder.mutation<IShipmentResponse, string>({
-      query: (id) => ({ url: `admin/shipments/${id}/arrive`, method: "PATCH" }),
-      invalidatesTags: (_r, _e, id) => [
+    /**
+     * Mark the trip arrived, and - when somebody has weighed it - record what
+     * actually came off it. The figures move each sale's settled total, which
+     * is what its balance, the debtors list and the sale stats are measured
+     * against, so the sales side invalidates with the shipment.
+     */
+    arriveShipment: builder.mutation<IShipmentResponse, IArriveShipmentInput>({
+      query: ({ id, arrivedAt, sales }) => ({
+        url: `admin/shipments/${id}/arrive`,
+        method: "PATCH",
+        body: {
+          ...(arrivedAt ? { arrivedAt } : {}),
+          // Absent, not empty: `sales: []` and "nobody has weighed it" are the
+          // same request, and an empty array only invites the server to walk it.
+          ...(sales?.length ? { sales } : {}),
+        },
+      }),
+      invalidatesTags: (_r, _e, { id, sales }) => [
         { type: "Shipments", id },
         { type: "Shipments", id: "LIST" },
+        ...(sales?.length
+          ? [
+              ...sales.map((s) => ({ type: "Sales" as const, id: s.saleId })),
+              { type: "Sales" as const, id: "LIST" },
+              { type: "Sales" as const, id: "DEBTORS" },
+              { type: "SaleStats" as const, id: "SUMMARY" },
+              { type: "Reports" as const, id: "LIST" },
+            ]
+          : []),
       ],
     }),
 

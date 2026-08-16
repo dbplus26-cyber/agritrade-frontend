@@ -39,21 +39,26 @@ import {
   shipmentDocumentUrl,
   shipmentWaybillPdfUrl,
   useAddShipmentDocumentMutation,
-  useArriveShipmentMutation,
   useCloseShipmentMutation,
   useDispatchShipmentMutation,
   useGetShipmentQuery,
   useRemoveShipmentDocumentMutation,
   useRemoveShipmentSaleMutation,
 } from "@/redux/shipments/shipments-api";
-import type { IShipmentExpense } from "@/types/admin-shipment.types";
+import type {
+  IShipmentExpense,
+  IShipmentSale,
+} from "@/types/admin-shipment.types";
 import { LoadMeter } from "./load-meter";
 import { Money, SaleStatusBadge } from "./sale-bits";
+import { hasSettledTotal, saleSettlementDeltaGhs } from "./sale-payable";
+import { ArrivalDialog } from "./shipment-arrival-dialog";
 import { CostBasisBadge, ShipmentStatusBadge } from "./shipment-bits";
 import {
   AddSalesDialog,
   CancelDialog,
   ExpenseDialog,
+  SalesUnpaidDialog,
   VoidExpenseDialog,
   plannedWeightOf,
 } from "./shipment-detail-dialogs";
@@ -66,11 +71,69 @@ const UNDER_FILL_SHARE = 0.05;
 
 const Absent = () => <span className="text-adm-faint">Not provided</span>;
 
+/**
+ * What this sale was agreed at, what it settled at when the load was weighed
+ * in, and the gap. Renders nothing until there is a settled figure: the agreed
+ * price on its own is not a comparison, and an empty "settled" cell would read
+ * as a load that arrived weighing nothing.
+ *
+ * The agreed figure is never replaced. The owner has to be able to see the
+ * original handshake beside what was finally collected - that is the whole
+ * argument for keeping two columns.
+ */
+function SaleSettlement({ sale }: { sale: IShipmentSale }) {
+  if (!hasSettledTotal(sale)) return null;
+  const delta = saleSettlementDeltaGhs(sale);
+  return (
+    <div className="mt-2 border-t border-dotted border-adm-line pt-2">
+      <div className="text-[10px] font-bold tracking-[0.08em] text-adm-muted uppercase">
+        <HelpWrap text="What was agreed when the sale was struck, and what the buyer will pay now the load has been weighed in.">
+          Weighed in
+        </HelpWrap>
+      </div>
+      <dl className="mt-1 flex flex-col gap-0.5 text-[12px]">
+        <div className="flex items-baseline justify-between gap-2">
+          <dt className="text-adm-muted">Agreed</dt>
+          <dd className="flex-none">
+            <Mono className="text-adm-ink">
+              <Money value={sale.agreedTotalGhs} />
+            </Mono>
+          </dd>
+        </div>
+        <div className="flex items-baseline justify-between gap-2">
+          <dt className="text-adm-muted">Settled</dt>
+          <dd className="flex-none">
+            <Mono className="font-semibold text-adm-ink">
+              <Money value={sale.settledTotalGhs} />
+            </Mono>
+          </dd>
+        </div>
+        {delta !== null && delta !== 0 ? (
+          <div className="flex items-baseline justify-between gap-2">
+            <dt className="text-adm-muted">
+              {delta < 0 ? "Short by" : "Over by"}
+            </dt>
+            <dd className="flex-none">
+              <Mono
+                className={cn(
+                  "font-semibold",
+                  delta < 0 ? "text-console-red" : "text-console",
+                )}
+              >
+                <Money value={Math.abs(delta)} />
+              </Mono>
+            </dd>
+          </div>
+        ) : null}
+      </dl>
+    </div>
+  );
+}
+
 export function ShipmentDetail({ id }: { id: string }) {
   const { has } = usePermissions();
   const { data, isLoading, isError, error, refetch } = useGetShipmentQuery(id);
   const [dispatchShipment, dispatchState] = useDispatchShipmentMutation();
-  const [arrive, arriveState] = useArriveShipmentMutation();
   const [close, closeState] = useCloseShipmentMutation();
   const [addDocument, addDocState] = useAddShipmentDocumentMutation();
   const [removeDocument] = useRemoveShipmentDocumentMutation();
@@ -78,8 +141,11 @@ export function ShipmentDetail({ id }: { id: string }) {
   const { confirm, confirmationDialog } = useConfirm();
   const { isSuperAdmin } = useAuthRole();
   const [addSalesOpen, setAddSalesOpen] = useState(false);
+  const [arriveOpen, setArriveOpen] = useState(false);
   const [expenseOpen, setExpenseOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
+  /** The server's SALES_UNPAID words, while the refusal is on screen. */
+  const [closeBlocked, setCloseBlocked] = useState<string | null>(null);
   /** The expense the void dialog is open for, if any. */
   const [voidingExpense, setVoidingExpense] = useState<IShipmentExpense | null>(
     null,
@@ -158,31 +224,20 @@ export function ShipmentDetail({ id }: { id: string }) {
     }
   };
 
-  const onArrive = async () => {
-    try {
-      await arrive(s.id).unwrap();
-      // Arrival is when the buyer signs for the goods - steer the admin
-      // straight into filing that evidence.
-      setDocName("Signed delivery note");
-      notify.success("Marked arrived", {
-        description:
-          "Upload the buyer-signed delivery note under Documents so the delivery is on the record.",
-      });
-    } catch (err) {
-      notify.error("Couldn't update", {
-        description: extractApiError(err).message,
-      });
-    }
-  };
-
   const onClose = async () => {
     try {
       await close(s.id).unwrap();
       notify.success("Shipment closed");
     } catch (err) {
-      notify.error("Couldn't close", {
-        description: extractApiError(err).message,
-      });
+      const apiError = extractApiError(err);
+      // A buyer on this trip still owes money. That refusal is not a transport
+      // failure to be flashed and forgotten - it is a list of sales somebody
+      // has to go and collect on, so it gets a screen rather than a toast.
+      if (apiError.code === "SALES_UNPAID") {
+        setCloseBlocked(apiError.message);
+        return;
+      }
+      notify.error("Couldn't close", { description: apiError.message });
     }
   };
 
@@ -313,14 +368,10 @@ export function ShipmentDetail({ id }: { id: string }) {
       {s.status === "DISPATCHED" && canManage ? (
         <HelpWrap
           className="inline-flex flex-none xl:w-full"
-          text="Records that the truck reached the buyer, so the signed delivery note can be filed against the trip."
+          text="Records what actually came off the truck and what each buyer will pay for it. You can mark it arrived and weigh it later."
         >
-          <AdminButton
-            className="xl:w-full"
-            disabled={arriveState.isLoading}
-            onClick={() => void onArrive()}
-          >
-            {arriveState.isLoading ? "Updating…" : "Mark arrived"}
+          <AdminButton className="xl:w-full" onClick={() => setArriveOpen(true)}>
+            Mark arrived
           </AdminButton>
         </HelpWrap>
       ) : null}
@@ -551,6 +602,13 @@ export function ShipmentDetail({ id }: { id: string }) {
                       as a checklist rather than a run-on sentence. Only on a
                       mixed order - on a single-commodity sale it would
                       restate the totals above it. */}
+                  {/* WHAT THE TRIP SETTLED AT, once the load has been weighed
+                      in. The one money block that belongs on this screen: it
+                      was decided HERE, on arrival, and the owner has to be able
+                      to read the original agreement next to what was finally
+                      collected. Absent until there is a second figure - the
+                      agreed price alone is not a comparison. */}
+                  <SaleSettlement sale={sale} />
                   {sale.lines.length > 1 ? (
                     <ul className="mt-2 flex flex-col gap-1 border-t border-dotted border-adm-line pt-2">
                       {sale.lines.map((l) => {
@@ -984,6 +1042,22 @@ export function ShipmentDetail({ id }: { id: string }) {
 
       {addSalesOpen ? (
         <AddSalesDialog shipment={s} onClose={() => setAddSalesOpen(false)} />
+      ) : null}
+      {arriveOpen ? (
+        <ArrivalDialog
+          shipment={s}
+          // Arrival is when the buyer signs for the goods - steer the admin
+          // straight into filing that evidence.
+          onArrived={() => setDocName("Signed delivery note")}
+          onClose={() => setArriveOpen(false)}
+        />
+      ) : null}
+      {closeBlocked !== null ? (
+        <SalesUnpaidDialog
+          message={closeBlocked}
+          shipment={s}
+          onClose={() => setCloseBlocked(null)}
+        />
       ) : null}
       {expenseOpen ? (
         <ExpenseDialog shipment={s} onClose={() => setExpenseOpen(false)} />

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -8,6 +9,7 @@ import {
   AdminField,
   Mono,
   adminInputClass,
+  adminLinkClass,
   adminSelectClass,
 } from "@/components/admin/ui";
 import {
@@ -48,6 +50,7 @@ import {
 } from "@/validations/shipment-schema";
 import { LoadMeter } from "./load-meter";
 import { Money } from "./sale-bits";
+import { saleBalanceGhs } from "./sale-payable";
 
 /**
  * What this truck is due to carry, straight from the server. `totalWeightKg`
@@ -310,6 +313,83 @@ export function AddSalesDialog({
               : picked.length > 1
                 ? `Add ${String(picked.length)} sales`
                 : "Add sale"}
+          </AdminButton>
+        </ResponsiveDialogFooter>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
+  );
+}
+
+/**
+ * Why a trip refused to close: a buyer on it still owes money.
+ *
+ * A closed trip drops off the list anybody chases, so closing early is
+ * precisely how a debt stops being followed up - which is why the API refuses
+ * it (SALES_UNPAID). A toast would state the refusal and then take the words
+ * away; what the admin needs is WHICH sale and HOW MUCH, with somewhere to go
+ * and record the payment.
+ *
+ * The balances are measured against what each sale is payable at - the settled
+ * figure once the load was re-weighed - so this list agrees with the guard that
+ * produced it rather than restating the agreed price.
+ */
+export function SalesUnpaidDialog({
+  message,
+  shipment,
+  onClose,
+}: {
+  /** The server's own words, kept above the list it explains. */
+  message: string;
+  shipment: IShipment;
+  onClose: () => void;
+}) {
+  const owing = shipment.sales.filter(
+    (s) => s.status !== "CANCELLED" && saleBalanceGhs(s) !== 0,
+  );
+  return (
+    <ResponsiveDialog open onOpenChange={(o) => !o && onClose()}>
+      <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[460px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>
+            Money is still owed on this trip
+          </ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>{message}</ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
+
+        {owing.length > 0 ? (
+          <ul className="flex flex-col">
+            {owing.map((s) => (
+              <li
+                key={s.id}
+                className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 border-b border-adm-hairline py-2 last:border-b-0"
+              >
+                <Link
+                  href={`/admin/sales/${s.id}`}
+                  className={cn(adminLinkClass, "min-w-0 text-[13px]")}
+                >
+                  <Mono className="text-[12.5px] font-semibold">
+                    {s.transactionNo}
+                  </Mono>
+                  <span className="ml-2 [overflow-wrap:anywhere]">
+                    {s.buyer.name}
+                  </span>
+                </Link>
+                <Mono className="flex-none text-[13.5px] font-bold text-console-red">
+                  <Money value={saleBalanceGhs(s)} />
+                </Mono>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+
+        <p className="text-[12.5px] text-adm-muted">
+          Open each sale and record what the buyer has paid, then close the
+          trip.
+        </p>
+
+        <ResponsiveDialogFooter className="gap-2">
+          <AdminButton type="button" variant="outline" size="lg" onClick={onClose}>
+            Leave it open
           </AdminButton>
         </ResponsiveDialogFooter>
       </ResponsiveDialogContent>

@@ -65,7 +65,22 @@ export interface ISale {
   buyer: { id: string; name: string; phone: string | null };
   paymentPolicy: { id: string; name: string } | null;
   agreedTotalGhs: number | null;
+  /**
+   * What the buyer will actually pay, agreed when the truck arrived and the
+   * load was re-weighed. Null means nobody has weighed it yet, so the agreed
+   * figure still stands - null is NOT zero.
+   *
+   * Never read directly for a balance: `salePayableTotal` in
+   * `components/admin/trading/sale-payable` is the one place the fallback
+   * lives, and it is what the backend's guards measure against.
+   */
+  settledTotalGhs: number | null;
   paidGhs: number | null;
+  /**
+   * The API's own balance, still measured against `agreedTotalGhs`. Prefer
+   * `saleBalanceGhs()`, which measures against the settled figure once there
+   * is one - what the buyer is actually asked for.
+   */
   balanceGhs: number | null;
   notes: string | null;
   lines: ISaleLine[];

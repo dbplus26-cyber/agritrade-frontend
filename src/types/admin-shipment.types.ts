@@ -60,7 +60,11 @@ export interface IShipmentSale {
   status: SaleStatus;
   buyer: { id: string; name: string; phone: string | null };
   agreedTotalGhs: number | null;
+  /** What the buyer will pay once this trip's load was re-weighed. Null until
+   * the arrival figures are recorded; null is NOT zero. */
+  settledTotalGhs: number | null;
   paidGhs: number | null;
+  /** The API's agreed-based balance. Prefer `saleBalanceGhs()`. */
   balanceGhs: number | null;
 }
 
@@ -287,6 +291,36 @@ export interface IDispatchShipmentInput {
   departedAt?: string;
   /** Dispatch even though no signed waybill has been uploaded. */
   overrideMissingWaybill?: boolean;
+}
+
+/** What one commodity on one sale actually weighed when it came off the truck. */
+export interface IArrivalLineInput {
+  commodityId: string;
+  /** Zero is accepted (a load that never turned up); negative is refused. */
+  receivedKg: number;
+}
+
+/** The arrival figures for one sale on the trip. */
+export interface IArrivalSaleInput {
+  saleId: string;
+  lines: IArrivalLineInput[];
+  /**
+   * What the buyer will actually pay. Entered, never derived: received x
+   * agreed price is the suggestion, and the two sides often settle on a round
+   * figure after arguing about a wet load.
+   */
+  settledTotalGhs: number;
+}
+
+/**
+ * Mark a dispatched trip arrived. `sales` is optional: the load is on the
+ * ground whether or not anybody has weighed it yet, and the figures can be
+ * recorded later.
+ */
+export interface IArriveShipmentInput {
+  id: string;
+  arrivedAt?: string;
+  sales?: IArrivalSaleInput[];
 }
 
 export interface IShipmentExpenseInput {
