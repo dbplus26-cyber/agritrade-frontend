@@ -101,6 +101,31 @@ export interface IDriverSettlementResponse {
   };
 }
 
+/**
+ * A payment as it reads on the DRIVER's own record rather than on a trip's.
+ *
+ * Same row, one addition: the trip it settled. On a shipment screen that is
+ * ambient - the whole page is that trip - but a driver's history spans every
+ * load they have run, and amounts with no idea which haul each was for is not
+ * something anybody can check their own pay against.
+ */
+export interface IDriverPaymentLedgerRow extends IDriverPayment {
+  shipment: { destination: string; id: string; transactionNo: string };
+}
+
+export interface IDriverPaymentsResponse {
+  message: string;
+  data: IDriverPaymentLedgerRow[];
+  meta: IPaginationMeta;
+  summary: {
+    /** Null when we have no address for them - so nothing was ever emailed. */
+    driverEmail: string | null;
+    driverName: string;
+    /** Signed total kept across every trip. Null when redacted. */
+    paidGhs: number | null;
+  };
+}
+
 /** A trip that still owes its driver something - the send-money picker feed. */
 export interface IUnsettledTrip {
   id: string;

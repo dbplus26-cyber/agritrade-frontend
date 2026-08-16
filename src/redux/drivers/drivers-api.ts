@@ -9,6 +9,7 @@ import type {
 } from "@/types/logistics.types";
 import type { IRegistryListResponse } from "@/types/registry.types";
 import type { IMessageResponse } from "@/types/auth.types";
+import type { IDriverPaymentsResponse } from "@/types/driver-settlement.types";
 
 /** JSON unless a photo rides along, then `payload` + `photo` multipart parts. */
 const withOptionalPhoto = (
@@ -46,6 +47,29 @@ export const driversApi = apiSlice.injectEndpoints({
     getDriver: builder.query<IDriverResponse, string>({
       query: (id) => `admin/drivers/${id}`,
       providesTags: (_r, _e, id) => [{ type: "Drivers", id }],
+    }),
+
+    /**
+     * What this driver has been paid, across every trip, each row carrying the
+     * voucher its PDF is fetched by. For a driver with no email on file this
+     * is the only copy of their receipts, since nothing was ever sent to them.
+     *
+     * It subscribes to UNSETTLED as well as to the driver. Every driver-payment
+     * write - record and reverse alike - invalidates that tag, so it is the
+     * console's "a driver ledger moved" broadcast; without it, paying somebody
+     * on the shipment screen would leave this list showing yesterday's history
+     * to whoever walked over to the driver's record next.
+     */
+    getDriverPayments: builder.query<
+      IDriverPaymentsResponse,
+      { driverId: string; page?: number; limit?: number }
+    >({
+      query: ({ driverId, ...params }) =>
+        `admin/drivers/${driverId}/payments${toQueryString(params)}`,
+      providesTags: (_r, _e, { driverId }) => [
+        { type: "Drivers" as const, id: driverId },
+        { type: "DriverSettlement" as const, id: "UNSETTLED" },
+      ],
     }),
 
     createDriver: builder.mutation<
@@ -109,6 +133,7 @@ export const driversApi = apiSlice.injectEndpoints({
 export const {
   useGetDriversQuery,
   useGetDriverQuery,
+  useGetDriverPaymentsQuery,
   useCreateDriverMutation,
   useUpdateDriverMutation,
   useDeactivateDriverMutation,
