@@ -38,12 +38,14 @@ vi.mock("@/redux/agent/agent-api", () => ({
         {
           id: "pur-42",
           transactionNo: "PUR-2026-00042",
+          status: "RECORDED",
           commodity: { id: "c-maize", name: "Maize" },
           weightKg: 1000,
         },
         {
           id: "pur-41",
           transactionNo: "PUR-2026-00041",
+          status: "RECEIVED",
           commodity: { id: "c-soya", name: "Soya" },
           weightKg: 250,
         },
