@@ -2,7 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useForm, useWatch, type Control, type UseFormRegister, type UseFormSetValue } from "react-hook-form";
+import {
+  useForm,
+  useWatch,
+  type Control,
+  type UseFormRegister,
+  type UseFormSetValue,
+} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   AdminButton,
@@ -447,18 +453,35 @@ export function ArrivalDialog({
           </p>
         ) : null}
 
-        {/* Stacked on a phone and never side by side: "Record arrival" writes
-            money onto every sale on the trip, and it must not sit a thumb's
-            width from the button that skips the figures entirely. */}
+        {/* The "record the weights later" path, deliberately NOT in the footer
+            beside the commit. The footer is a wrapping row, so on a 360px
+            screen the two would end up a thumb's width apart - and one of them
+            writes money onto every sale on the trip while the other skips the
+            figures entirely. Its own line, under a rule, at link weight. */}
+        {loaded.length > 0 ? (
+          <div className="border-t border-adm-hairline pt-3">
+            <button
+              type="button"
+              disabled={isLoading}
+              onClick={() => void onArriveWithoutFigures()}
+              className={cn(
+                adminLinkClass,
+                "cursor-pointer text-[12.5px] font-semibold disabled:opacity-60",
+              )}
+            >
+              Nobody has weighed it - mark arrived and record this later
+            </button>
+          </div>
+        ) : null}
+
         <ResponsiveDialogFooter className="gap-2">
           <AdminButton
             type="button"
             variant="outline"
             size="lg"
-            disabled={isLoading}
-            onClick={() => void onArriveWithoutFigures()}
+            onClick={onClose}
           >
-            Weigh it later
+            Cancel
           </AdminButton>
           {loaded.length > 0 ? (
             <AdminButton
@@ -469,7 +492,16 @@ export function ArrivalDialog({
             >
               {isLoading ? "Recording…" : "Record arrival"}
             </AdminButton>
-          ) : null}
+          ) : (
+            <AdminButton
+              type="button"
+              size="lg"
+              disabled={isLoading}
+              onClick={() => void onArriveWithoutFigures()}
+            >
+              {isLoading ? "Updating…" : "Mark arrived"}
+            </AdminButton>
+          )}
         </ResponsiveDialogFooter>
       </ResponsiveDialogContent>
     </ResponsiveDialog>

@@ -193,7 +193,9 @@ describe("ArrivalDialog", () => {
   it("marks the trip arrived with no figures at all", async () => {
     render(<ArrivalDialog onClose={vi.fn()} shipment={shipment()} />);
 
-    await userEvent.click(screen.getByRole("button", { name: "Weigh it later" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: /mark arrived and record this later/i }),
+    );
 
     // No `sales` key: the load is on the ground either way, and the figures
     // are recorded once somebody has weighed it.
