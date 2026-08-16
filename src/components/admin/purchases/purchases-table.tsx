@@ -154,9 +154,15 @@ export function PurchasesTable() {
       {
         id: "total",
         accessorFn: (p) => p.totalGhs,
+        // Left as the purchase price, and left saying so. Now that costs can
+        // be taken into the goods, "total" is a word with two meanings, and
+        // the one this column has always had is the one somebody reconciles a
+        // supplier's invoice against. Widening it in place would have changed
+        // a figure people check without changing anything they could see. The
+        // landed figure is on the purchase itself, where it can be broken out.
         header: columnHelp(
           "Total",
-          "What the whole lot cost you: the weight bought times the price per kg.",
+          "The price of the grain itself: the weight bought times the price per kg. Haulage, loading and the rest of what it cost to get it in are not in this figure - open the purchase to see those.",
         ),
         enableSorting: false,
         meta: columnMeta(),
