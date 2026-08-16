@@ -163,6 +163,7 @@ export function ExpenseDetail({ id }: { id: string }) {
         amountGhs={showMoney ? expense.amountGhs : null}
         expenseId={expense.id}
         isVoided={expense.voidedAt !== null}
+        subject={`${expense.transactionNo} (${expense.category.name})`}
       />
 
       {/* Only when the cost belongs to a trip. An "Operating cost" card

@@ -26,6 +26,7 @@ import {
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
 import { SimpleSelect } from "@/components/ui/simple-select";
+import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
@@ -64,6 +65,7 @@ export function EntryDialog({
   open: boolean;
 }) {
   const [postEntry, { isLoading }] = usePostAccountEntryMutation();
+  const { confirm, confirmationDialog } = useConfirm();
   const form = useForm<AccountEntryValues>({
     defaultValues: {
       amountGhs: "",
@@ -90,6 +92,18 @@ export function EntryDialog({
   const chosen = ENTRY_TYPE_OPTIONS.find((o) => o.value === type);
 
   const onSubmit = async (values: AccountEntryValues) => {
+    // The only money path in the console with no document behind it, so
+    // nothing else will later contradict a wrong figure - a mistyped entry
+    // just becomes what the account says it holds. It can be answered with an
+    // opposite entry, which is why this reads back rather than demanding the
+    // account name be typed.
+    const ok = await confirm({
+      title: "Post this entry?",
+      description: `${chosen?.label ?? values.type} of ${formatCedis(Number(values.amountGhs))} on ${accountLabel}. It moves what this account is shown as holding straight away, and it can only be answered with an opposite entry - never removed.`,
+      confirmText: "Record entry",
+    });
+    if (!ok) return;
+
     try {
       const res = await postEntry({
         accountId,
@@ -199,6 +213,7 @@ export function EntryDialog({
           </AdminButton>
         </ResponsiveDialogFooter>
       </ResponsiveDialogContent>
+      {confirmationDialog}
     </ResponsiveDialog>
   );
 }
@@ -399,6 +414,7 @@ export function ReconcileDialog({
   open: boolean;
 }) {
   const [reconcile, { isLoading }] = useReconcileAccountMutation();
+  const { confirm, confirmationDialog } = useConfirm();
   const form = useForm<ReconcileValues>({
     defaultValues: {
       asOf: today(),
@@ -427,6 +443,29 @@ export function ReconcileDialog({
       : null;
 
   const onSubmit = async (values: ReconcileValues) => {
+    // Recording a count changes nothing and is asked nothing. Ticking the box
+    // is the part that writes money into or out of the books to close a gap,
+    // and a checkbox is the easiest control on this form to leave set from a
+    // previous, genuinely-an-error reconciliation - so the confirm is on the
+    // correction, not on the check.
+    if (values.postCorrection) {
+      const gap =
+        bookBalanceGhs === null
+          ? null
+          : Number(values.countedBalanceGhs) - bookBalanceGhs;
+      const ok = await confirm({
+        title: "Correct the books to the count?",
+        description: `${accountLabel} is ${
+          gap === null
+            ? "being corrected to what you counted"
+            : `${gap > 0 ? "over" : "short"} by ${formatCedis(Math.abs(gap))}, and that gap is being written into the books as a correction`
+        }. Do this only when the money is genuinely gone or genuinely there - a payment that has not cleared yet closes itself, and correcting for it invents money that was never missing. Only another correction can answer this one.`,
+        confirmText: "Correct the books",
+        isDestructive: true,
+      });
+      if (!ok) return;
+    }
+
     try {
       const res = await reconcile({
         accountId,
@@ -542,6 +581,7 @@ export function ReconcileDialog({
           </AdminButton>
         </ResponsiveDialogFooter>
       </ResponsiveDialogContent>
+      {confirmationDialog}
     </ResponsiveDialog>
   );
 }

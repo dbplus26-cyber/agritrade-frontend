@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import { SimpleSelect } from "@/components/ui/simple-select";
+import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
@@ -173,6 +174,7 @@ export function SendMoneyDialog({
   const [createCompany, companyState] = useCreateDisbursementMutation();
   const [createMine, mineState] = useCreateMyDisbursementMutation();
   const submitting = companyState.isLoading || mineState.isLoading;
+  const { confirm, confirmationDialog } = useConfirm();
 
   const form = useForm<DisbursementValues>({
     defaultValues: DEFAULTS,
@@ -203,6 +205,37 @@ export function SendMoneyDialog({
   );
 
   const onSubmit = async (values: DisbursementValues) => {
+    const destination =
+      values.rail === "MOMO"
+        ? (values.recipientMsisdn ?? "")
+        : (values.bankAccountNumber ?? "");
+    const via =
+      values.rail === "MOMO"
+        ? (MOMO_CHANNEL_OPTIONS.find((o) => o.value === values.channel)?.label ??
+          "mobile money")
+        : (bankOptions.find((o) => o.value === values.bankCode)?.label ??
+          "their bank");
+
+    // The one action in this console that puts money beyond recall. Hubtel
+    // pays out to whatever destination was keyed and no one in the business
+    // can pull it back, so this is read back in full before it commits.
+    //
+    // The four digits are what must be typed, not the recipient's name: on a
+    // MoMo send the name is decorative, the number alone decides who is paid,
+    // and re-typing a name the sender keyed in seconds earlier proves nothing
+    // about where the money is going.
+    const confirmed = await confirm({
+      title: "Send this money now?",
+      description: `${formatCedis(Number(values.amountGhs))} to ${values.recipientName} on ${via}, ${destination}. ${
+        surface === "company"
+          ? "It leaves the company payout account"
+          : "It comes off your float"
+      } as soon as this goes through, and nobody here can recall it.`,
+      confirmText: "Send money",
+      requireExactMatch: destination.slice(-4),
+    });
+    if (!confirmed) return;
+
     const body: ICreateDisbursementInput = {
       amountGhs: Number(values.amountGhs),
       description: values.description,
@@ -434,6 +467,7 @@ export function SendMoneyDialog({
           </AdminButton>
         </ResponsiveDialogFooter>
       </ResponsiveDialogContent>
+      {confirmationDialog}
     </ResponsiveDialog>
   );
 }

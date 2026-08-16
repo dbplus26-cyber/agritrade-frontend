@@ -91,6 +91,7 @@ function PaymentDialog({
   onClose: () => void;
 }) {
   const [record, { isLoading }] = useRecordAcquisitionPaymentMutation();
+  const { confirm, confirmationDialog } = useConfirm();
   const {
     register,
     handleSubmit,
@@ -109,6 +110,17 @@ function PaymentDialog({
     setValue("paymentAccountId", "");
   }, [method, setValue]);
   const onSubmit = async (values: LandPaymentValues) => {
+    // Money out to a named seller, against a plot the business does not own
+    // yet. The seller is read back with the figure because these are keyed off
+    // a paper receipt hours after the handover, when the wrong acquisition is
+    // an easy row to land on - and the ledger only lets an owner reverse it.
+    const ok = await confirm({
+      title: "Record this payment to the seller?",
+      description: `${formatCedis(Number(values.amountGhs))} paid to ${acquisition.seller.name} against ${acquisition.transactionNo}, ${acquisition.locationText}. It goes on the books as money out; only a reversal takes it back off.`,
+      confirmText: "Record payment",
+    });
+    if (!ok) return;
+
     try {
       await record({
         id: acquisition.id,
@@ -200,6 +212,7 @@ function PaymentDialog({
           </ResponsiveDialogFooter>
         </form>
       </ResponsiveDialogContent>
+      {confirmationDialog}
     </ResponsiveDialog>
   );
 }

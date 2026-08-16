@@ -31,6 +31,7 @@ import {
 import { SimpleSelect } from "@/components/ui/simple-select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthRole } from "@/hooks/use-auth-role";
+import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
@@ -106,13 +107,17 @@ type PaymentValues = z.infer<typeof paymentSchema>;
 function PayDialog({
   onClose,
   outstandingGhs,
+  payeeName,
   purchaseId,
 }: {
   onClose: () => void;
   outstandingGhs: null | number;
+  /** Who the money is going to, read back before it commits. */
+  payeeName: string;
   purchaseId: string;
 }) {
   const [record, { isLoading }] = useRecordPurchasePaymentMutation();
+  const { confirm, confirmationDialog } = useConfirm();
   const {
     control,
     formState: { errors },
@@ -133,6 +138,20 @@ function PayDialog({
   const method = useWatch({ control, name: "method" });
 
   const onSubmit = async (values: PaymentValues) => {
+    // Money out to a named supplier, and a ledger write only a reversal can
+    // undo - the same gate a sale's payment already carries, for the same
+    // reason: a misplaced decimal here is the expensive mistake, and it is
+    // invisible once it is on the books.
+    const ok = await confirm({
+      title: "Record this payment?",
+      description: `${formatCedis(Number(values.amountGhs))} paid to ${payeeName} by ${
+        PAYMENT_METHOD_OPTIONS.find((o) => o.value === values.method)?.label ??
+        values.method
+      }. It goes on the books as money out for these goods; only a reversal takes it back off.`,
+      confirmText: "Record payment",
+    });
+    if (!ok) return;
+
     try {
       await record({
         body: {
@@ -246,17 +265,21 @@ function PayDialog({
           </ResponsiveDialogFooter>
         </form>
       </ResponsiveDialogContent>
+      {confirmationDialog}
     </ResponsiveDialog>
   );
 }
 
 export function PurchaseSettlementCard({
   isVoided,
+  payeeName,
   purchaseId,
   totalGhs,
 }: {
   /** A voided purchase is not a cost, so it cannot be paid against. */
   isVoided: boolean;
+  /** Who is being paid, read back in the confirm step before money goes out. */
+  payeeName: string;
   purchaseId: string;
   /** What the goods cost; null when redacted. */
   totalGhs: null | number;
@@ -451,6 +474,7 @@ export function PurchaseSettlementCard({
             setPayOpen(false);
           }}
           outstandingGhs={settlement.outstandingGhs}
+          payeeName={payeeName}
           purchaseId={purchaseId}
         />
       ) : null}

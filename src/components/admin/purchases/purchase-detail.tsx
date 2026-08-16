@@ -524,6 +524,7 @@ export function PurchaseDetail({ id }: { id: string }) {
                 system used to hold only the first. */}
             <PurchaseSettlementCard
               isVoided={p.voidedAt !== null}
+              payeeName={purchaseCounterparty(p)}
               purchaseId={p.id}
               totalGhs={p.totalGhs}
             />

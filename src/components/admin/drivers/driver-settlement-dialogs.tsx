@@ -23,6 +23,7 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog";
+import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
@@ -208,6 +209,7 @@ export function DriverPaymentDialog({
   shipmentId: string;
 }) {
   const [record, { isLoading }] = useRecordDriverPaymentMutation();
+  const { confirm, confirmationDialog } = useConfirm();
   const {
     control,
     formState: { errors },
@@ -246,6 +248,20 @@ export function DriverPaymentDialog({
         })();
 
   const onSubmit = async (values: PaymentValues) => {
+    // Money out to a named haulier, and only an owner reversal takes it back
+    // off. The driver is read back with the figure because the quick-amount
+    // buttons above make a full settlement one tap away, and the page a
+    // settlement is keyed from looks the same for every trip.
+    const ok = await confirm({
+      title: "Record this payment?",
+      description: `${formatCedis(Number(values.amountGhs))} paid to ${driverName} by ${
+        PAYMENT_METHOD_OPTIONS.find((o) => o.value === values.method)?.label ??
+        values.method
+      }. It goes on the books as settled against this trip; only a reversal takes it back off.`,
+      confirmText: "Record payment",
+    });
+    if (!ok) return;
+
     try {
       await record({
         body: {
@@ -409,6 +425,7 @@ export function DriverPaymentDialog({
           </ResponsiveDialogFooter>
         </form>
       </ResponsiveDialogContent>
+      {confirmationDialog}
     </ResponsiveDialog>
   );
 }

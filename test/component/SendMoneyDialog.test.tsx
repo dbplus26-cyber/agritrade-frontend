@@ -12,13 +12,16 @@
 //     request it is given, wrong recipient included;
 //   * refusal wording: the two balance limits (company payout account vs the
 //     sender's own float) produce different fixes, so their error codes are
-//     rewritten into instructions rather than echoed as "conflict".
+//     rewritten into instructions rather than echoed as "conflict";
+//   * the confirm gate: Hubtel pays out to whatever destination it is handed
+//     and nobody here can recall it, so the last four digits of that
+//     destination must be typed back before anything is sent at all.
 //
 // Mocked at the RTK hook boundary like PaymentDialog.test.tsx; the bank
 // picker is its own searchable screen and is stubbed to a plain select so
 // this file tests the dialog's rules, not the picker's.
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEventBase from "@testing-library/user-event";
 
 import { pickOption } from "../helpers/pick-option";
@@ -113,8 +116,36 @@ const fillMomo = async () => {
   );
 };
 
-const send = () =>
-  userEvent.click(screen.getByRole("button", { name: "Send money" }));
+/** The form's own submit. On its own this now only raises the confirm gate. */
+const submit = () =>
+  userEvent.click(screen.getAllByRole("button", { name: "Send money" })[0]);
+
+/**
+ * Clears the confirm gate by typing the last four digits of the destination.
+ *
+ * Scoped to the confirmation dialog: its commit button carries the SAME label
+ * as the form's submit ("Send money") and both are in the document at this
+ * point, so an unscoped query would be resolving a collision by luck.
+ */
+const clearGate = async (last4: string) => {
+  // Found by the type-back box rather than by taking the last dialog: the box
+  // exists only inside the gate, so awaiting it also waits for the gate to
+  // open. Taking the last dialog resolves before the gate is up when the
+  // submit was dispatched rather than clicked.
+  const box = await screen.findByLabelText(/to confirm/i);
+  const gate = box.closest('[role="dialog"]');
+  if (!gate) throw new Error("the type-back box is not inside a dialog");
+  await userEvent.type(box, last4);
+  await userEvent.click(
+    within(gate as HTMLElement).getByRole("button", { name: "Send money" }),
+  );
+};
+
+/** Submit and clear the gate: what actually reaches Hubtel. */
+const send = async (last4 = "1411") => {
+  await submit();
+  await clearGate(last4);
+};
 
 type SentCall = [{ body: Record<string, unknown>; idempotencyKey: string }];
 
@@ -141,7 +172,7 @@ describe("SendMoneyDialog - rail rules", () => {
       screen.getByLabelText(/Mobile money number/i),
       "0249111411", // the local format people actually type
     );
-    await send();
+    await submit();
 
     expect(
       await screen.findByText(/Choose the recipient's mobile money network/i),
@@ -165,7 +196,7 @@ describe("SendMoneyDialog - rail rules", () => {
       screen.getByLabelText(/Account number/i),
       "1441000123456",
     );
-    await send();
+    await send("3456");
 
     expect(createCompany).toHaveBeenCalledTimes(1);
     const [{ body, idempotencyKey }] = createCompany.mock
@@ -199,7 +230,7 @@ describe("SendMoneyDialog - rail rules", () => {
       screen.getByLabelText(/Account number/i),
       "1441000123456",
     );
-    await send();
+    await send("3456");
 
     const [{ body }] = createCompany.mock.calls[0] as unknown as SentCall;
     expect(body).not.toHaveProperty("recipientMsisdn");
@@ -217,6 +248,63 @@ describe("SendMoneyDialog - rail rules", () => {
     expect(createCompany).not.toHaveBeenCalled();
     expect(createMine).toHaveBeenCalledTimes(1);
     expect(createMine.mock.calls[0]?.[0]).toMatchObject({ surface: "agent" });
+  });
+});
+
+describe("SendMoneyDialog - the confirm gate", () => {
+  it("sends nothing on submit alone, and names the destination it would pay", async () => {
+    render(<SendMoneyDialog onClose={vi.fn()} open surface="company" />);
+
+    await fillMomo();
+    await submit();
+
+    // A valid form is no longer a send. What is on screen at this point is the
+    // whole point of the gate: who, how much, and down which number.
+    expect(createCompany).not.toHaveBeenCalled();
+    expect(
+      await screen.findByText(/GH₵ 850.00 to Ibrahim Fuseini/),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/233249111411/)).toBeInTheDocument();
+    expect(screen.getByText(/nobody here can recall it/i)).toBeInTheDocument();
+  });
+
+  it("holds the send until the destination's last four digits are typed", async () => {
+    render(<SendMoneyDialog onClose={vi.fn()} open surface="company" />);
+
+    await fillMomo();
+    await submit();
+
+    const box = await screen.findByLabelText(/to confirm/i);
+    const gate = box.closest('[role="dialog"]') as HTMLElement;
+    const commit = within(gate).getByRole("button", { name: "Send money" });
+    expect(commit).toBeDisabled();
+
+    // The digits of a DIFFERENT number are not the digits of this one.
+    await userEvent.type(box, "1234");
+    expect(commit).toBeDisabled();
+
+    await userEvent.clear(box);
+    await userEvent.type(box, "1411");
+    expect(commit).toBeEnabled();
+    expect(createCompany).not.toHaveBeenCalled();
+
+    await userEvent.click(commit);
+    expect(createCompany).toHaveBeenCalledTimes(1);
+  });
+
+  it("sends nothing at all when the gate is cancelled", async () => {
+    render(<SendMoneyDialog onClose={vi.fn()} open surface="company" />);
+
+    await fillMomo();
+    await submit();
+
+    const box = await screen.findByLabelText(/to confirm/i);
+    const gate = box.closest('[role="dialog"]') as HTMLElement;
+    await userEvent.click(within(gate).getByRole("button", { name: "Cancel" }));
+
+    expect(createCompany).not.toHaveBeenCalled();
+    expect(createMine).not.toHaveBeenCalled();
+    expect(successToast).not.toHaveBeenCalled();
   });
 });
 
@@ -242,11 +330,13 @@ describe("SendMoneyDialog - idempotency key lifecycle", () => {
     expect(second.idempotencyKey).toBe(first.idempotencyKey);
   });
 
-  it("carries one key across a rapid double-click too", async () => {
-    // The submit button only disables once the mutation reports in-flight,
-    // and zod validation runs async first - so a fast second click CAN reach
-    // the handler. The guard is the key: both requests carry the same one,
-    // and the backend's dedupe makes the second a no-op.
+  it("turns a rapid double-tap on Send into ONE payout", async () => {
+    // The submit button only disables once the mutation reports in-flight, and
+    // zod validation runs async first, so a fast second tap does reach the
+    // handler. It no longer reaches Hubtel: both taps queue behind the one
+    // gate, and the single confirmation releases a single send. The key check
+    // stays because the backend's dedupe is still the last line if anything
+    // ever slips past.
     let resolveSend: (v: unknown) => void = () => undefined;
     createCompany.mockReturnValue({
       unwrap: () =>
@@ -257,13 +347,20 @@ describe("SendMoneyDialog - idempotency key lifecycle", () => {
     render(<SendMoneyDialog onClose={vi.fn()} open surface="company" />);
 
     await fillMomo();
-    await Promise.all([send(), send()]);
+    // fireEvent, not userEvent: once the gate is up radix makes the form
+    // behind it inert, so a real second tap cannot even land. Dispatching it
+    // anyway is the stricter test - it proves the collapse is the gate's doing
+    // and not just the overlay's.
+    const sendButton = screen.getAllByRole("button", { name: "Send money" })[0];
+    fireEvent.click(sendButton);
+    fireEvent.click(sendButton);
+    await clearGate("1411");
     resolveSend({ message: "done" });
 
     const keys = (createCompany.mock.calls as unknown as SentCall[]).map(
       ([call]) => call.idempotencyKey,
     );
-    expect(keys.length).toBeGreaterThanOrEqual(1);
+    expect(createCompany).toHaveBeenCalledTimes(1);
     expect(new Set(keys).size).toBe(1);
   });
 

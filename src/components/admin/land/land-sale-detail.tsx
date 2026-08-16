@@ -91,6 +91,7 @@ function PaymentDialog({
   onClose: () => void;
 }) {
   const [record, { isLoading }] = useRecordLandPaymentMutation();
+  const { confirm, confirmationDialog } = useConfirm();
   const {
     register,
     handleSubmit,
@@ -109,6 +110,18 @@ function PaymentDialog({
     setValue("paymentAccountId", "");
   }, [method, setValue]);
   const onSubmit = async (values: LandPaymentValues) => {
+    // Same gate as a trading sale's payment, for the same reason: this is a
+    // ledger write only an owner reversal can undo, and paying enough of the
+    // balance also completes the sale and marks the plot sold. A misplaced
+    // decimal is the expensive mistake this form can make, so the figure and
+    // the sale are read back before it commits.
+    const ok = await confirm({
+      title: "Record this payment?",
+      description: `${formatCedis(Number(values.amountGhs))} from ${sale.buyer.name} against ${sale.transactionNo}, plot ${sale.plot.reference}. Once recorded only a reversal takes it back off, and paying the balance in full completes the sale and marks the plot sold.`,
+      confirmText: "Record payment",
+    });
+    if (!ok) return;
+
     try {
       await record({
         id: sale.id,
@@ -185,6 +198,7 @@ function PaymentDialog({
           </ResponsiveDialogFooter>
         </form>
       </ResponsiveDialogContent>
+      {confirmationDialog}
     </ResponsiveDialog>
   );
 }

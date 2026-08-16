@@ -31,6 +31,7 @@ import {
 import { SimpleSelect } from "@/components/ui/simple-select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthRole } from "@/hooks/use-auth-role";
+import { useConfirm } from "@/hooks/use-confirm";
 import { usePermissions } from "@/hooks/use-permissions";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatCedis } from "@/lib/format-money";
@@ -103,12 +104,16 @@ function PayDialog({
   expenseId,
   onClose,
   outstandingGhs,
+  subject,
 }: {
   expenseId: string;
   onClose: () => void;
   outstandingGhs: null | number;
+  /** Which cost this settles, read back before the money goes out. */
+  subject: string;
 }) {
   const [record, { isLoading }] = useRecordExpensePaymentMutation();
+  const { confirm, confirmationDialog } = useConfirm();
   const {
     control,
     formState: { errors },
@@ -129,6 +134,20 @@ function PayDialog({
   const method = useWatch({ control, name: "method" });
 
   const onSubmit = async (values: PaymentValues) => {
+    // Money out, and a ledger write only a reversal can undo. Gated the same
+    // way as a supplier payment because it is the same operation pointed at a
+    // different payable, and somebody who has settled one should not meet a
+    // different standard of care on the other.
+    const ok = await confirm({
+      title: "Record this payment?",
+      description: `${formatCedis(Number(values.amountGhs))} paid on ${subject} by ${
+        PAYMENT_METHOD_OPTIONS.find((o) => o.value === values.method)?.label ??
+        values.method
+      }. It goes on the books as money out against this cost; only a reversal takes it back off.`,
+      confirmText: "Record payment",
+    });
+    if (!ok) return;
+
     try {
       await record({
         body: {
@@ -245,6 +264,7 @@ function PayDialog({
           </ResponsiveDialogFooter>
         </form>
       </ResponsiveDialogContent>
+      {confirmationDialog}
     </ResponsiveDialog>
   );
 }
@@ -253,12 +273,18 @@ export function ExpenseSettlementCard({
   amountGhs,
   expenseId,
   isVoided,
+  subject,
 }: {
   /** The cost being settled; null when redacted. */
   amountGhs: null | number;
   expenseId: string;
   /** A voided voucher is not a cost, so it cannot be paid against. */
   isVoided: boolean;
+  /**
+   * Which cost this is, in the words on the voucher. Read back in the confirm
+   * step so a payment keyed on the wrong tab is caught before it commits.
+   */
+  subject: string;
 }) {
   const { isSuperAdmin } = useAuthRole();
   const { has } = usePermissions();
@@ -446,6 +472,7 @@ export function ExpenseSettlementCard({
             setPayOpen(false);
           }}
           outstandingGhs={settlement.outstandingGhs}
+          subject={subject}
         />
       ) : null}
       {reversing ? (

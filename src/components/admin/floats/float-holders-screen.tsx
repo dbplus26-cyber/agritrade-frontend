@@ -42,6 +42,7 @@ import { usePermissions } from "@/hooks/use-permissions";
 import { useMoneyVisibility } from "@/hooks/use-money-visibility";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
+import { formatCedis } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import {
@@ -547,6 +548,21 @@ function SendLimitDialog({
   );
 }
 
+/**
+ * Where a top-up LANDS, named once.
+ *
+ * The picker and the confirm step read from the same list so they cannot
+ * drift: a dialog that reads back "cash in hand" for a transfer that actually
+ * went to a bank account is worse than no read-back at all, because it is
+ * believed.
+ */
+const TOP_UP_TENDER_OPTIONS: { label: string; value: TopUpValues["toKind"] }[] =
+  [
+    { label: "Cash in hand", value: "CASH" },
+    { label: "Their mobile money", value: "MOMO" },
+    { label: "Their bank account", value: "BANK" },
+  ];
+
 function TopUpDialog({
   holder,
   onClose,
@@ -555,6 +571,7 @@ function TopUpDialog({
   onClose: () => void;
 }) {
   const [topUp, { isLoading }] = useTopUpHolderFloatMutation();
+  const { confirm, confirmationDialog } = useConfirm();
   const form = useForm<TopUpValues>({
     defaultValues: {
       amountGhs: "",
@@ -581,6 +598,24 @@ function TopUpDialog({
 
   const onSubmit = async (values: TopUpValues) => {
     if (!holder) return;
+
+    // The same act as the agent float top-up, and gated the same way: cash
+    // leaving the business for a named person to hold. The one mistake here -
+    // right amount, wrong holder, picked off a list of similar names on a
+    // phone - is silent until somebody reconciles, so the holder's own name
+    // has to be typed before it commits.
+    const confirmed = await confirm({
+      title: "Hand over this float?",
+      description: `${formatCedis(Number(values.amountGhs))} to ${holder.firstName} ${holder.lastName}, as ${
+        TOP_UP_TENDER_OPTIONS.find(
+          (o) => o.value === values.toKind,
+        )?.label.toLowerCase() ?? values.toKind
+      }. It leaves the account you named and is spendable at once; only a reconciliation can correct it.`,
+      confirmText: "Record top-up",
+      requireExactMatch: holder.firstName,
+    });
+    if (!confirmed) return;
+
     try {
       const res = await topUp({
         amountGhs: Number(values.amountGhs),
@@ -656,11 +691,7 @@ function TopUpDialog({
                   className={adminSelectClass}
                   value={field.value}
                   onChange={field.onChange}
-                  options={[
-                    { value: "CASH", label: "Cash in hand" },
-                    { value: "MOMO", label: "Their mobile money" },
-                    { value: "BANK", label: "Their bank account" },
-                  ]}
+                  options={TOP_UP_TENDER_OPTIONS}
                 />
               )}
             />
@@ -687,6 +718,7 @@ function TopUpDialog({
           </AdminButton>
         </ResponsiveDialogFooter>
       </ResponsiveDialogContent>
+      {confirmationDialog}
     </ResponsiveDialog>
   );
 }
