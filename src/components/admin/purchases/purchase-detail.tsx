@@ -15,11 +15,9 @@ import {
   DetailGrid,
   DetailItem,
   DetailShell,
-  Mono,
   SectionHeading,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
-import { HelpTip } from "@/components/admin/help-tip";
 import { BackButton } from "@/components/ui/BackButton";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -59,6 +57,10 @@ import {
   type ReceivePurchaseValues,
   type VoidPurchaseValues,
 } from "@/validations/purchase-schema";
+import {
+  PurchaseCostsCard,
+  PurchaseGoodsCostSummary,
+} from "@/components/admin/purchases/purchase-costs-card";
 import { PurchaseSettlementCard } from "@/components/admin/purchases/purchase-settlement-card";
 import { SOURCE_LABEL } from "@/components/admin/registry/registry-bits";
 import {
@@ -523,9 +525,18 @@ export function PurchaseDetail({ id }: { id: string }) {
             </AdminCard>
 
             <AdminCard className="px-5 py-3">
-              <SectionHeading className="mb-1">Money</SectionHeading>
+              <SectionHeading
+                className="mb-1"
+                hint="What was agreed for the grain itself. The costs of getting it in are the section below."
+              >
+                Money
+              </SectionHeading>
               <DetailGrid>
-                <DetailItem label="Total" mono strong>
+                {/* Left saying "Total" and left meaning exactly what it always
+                    meant. It is the figure a supplier's invoice is checked
+                    against, and quietly turning it into the landed cost would
+                    have broken every reconciliation that reads this line. */}
+                <DetailItem label="Purchase price" mono strong>
                   {formatCedis(p.totalGhs)}
                 </DetailItem>
                 <DetailItem label="Price per kg" mono>
@@ -533,6 +544,18 @@ export function PurchaseDetail({ id }: { id: string }) {
                 </DetailItem>
               </DetailGrid>
             </AdminCard>
+
+            {/* What the grain was bought for is above; what it has COST is a
+                different figure, and the business had no way of stating it.
+                Haulage from the farm gate, loading and porterage were spend of
+                whatever month they were paid in, so a load bought in the
+                harvest window printed a loss then and a flattering margin
+                whenever it sold. */}
+            <PurchaseCostsCard
+              isVoided={p.voidedAt !== null}
+              purchaseId={p.id}
+              totalGhs={p.totalGhs}
+            />
 
             {/* What was AGREED is above; what has actually been handed over is
                 its own ledger, because they are different facts and the
@@ -620,20 +643,12 @@ export function PurchaseDetail({ id }: { id: string }) {
         aside={
           <div className="flex flex-col gap-4">
             <AdminCard className="px-5 py-4">
-              <p className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                <span className="min-w-0">Purchase total</span>
-                <HelpTip
-                  label="What is the purchase total?"
-                  text="What this whole load cost you: the weight bought times the price per kg."
-                />
-              </p>
-              <p className="font-adminmono mt-1 text-[26px] font-bold text-adm-ink tabular-nums">
-                {formatCedis(p.totalGhs)}
-              </p>
-              <p className="mt-1 text-[12.5px] text-adm-muted">
-                <Mono>{formatKg(p.weightKg)}</Mono> at{" "}
-                <Mono>{formatCedis(p.unitPriceGhs)}</Mono> per kg
-              </p>
+              <PurchaseGoodsCostSummary
+                purchaseId={p.id}
+                totalGhs={p.totalGhs}
+                unitPriceGhs={p.unitPriceGhs}
+                weightKg={p.weightKg}
+              />
               {actions ? (
                 <div className="mt-4 border-t border-adm-hairline pt-3.5">
                   {actions}

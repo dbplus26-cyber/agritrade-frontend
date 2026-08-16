@@ -2,7 +2,11 @@ import { HelpWrap } from "@/components/admin/help-tip";
 import { ToneBadge, type Tone } from "@/components/admin/ui";
 import { formatDateTime } from "@/lib/format-date";
 import { formatCedis, MONEY_HIDDEN } from "@/lib/format-money";
-import { type IPurchase, PurchaseStatus } from "@/types/purchase.types";
+import {
+  type IPurchase,
+  type IPurchaseCost,
+  PurchaseStatus,
+} from "@/types/purchase.types";
 
 /**
  * Shared bits for the live purchase screens - status tones, labels and the
@@ -143,4 +147,54 @@ export function SettlementBadge({
   ) : (
     <ToneBadge tone="alert">Not paid</ToneBadge>
   );
+}
+
+/**
+ * What one purchase has actually cost, and how its costs were treated.
+ *
+ * Summed here rather than read off the API on purpose. Every money field on
+ * the wire is nullable - the API strips figures for staff without financial
+ * visibility - so a total has to inherit that redaction rather than quietly
+ * skip the amounts it could not see and present a smaller number under the
+ * same label. One hidden figure hides the sum.
+ */
+export interface IPurchaseCostSummary {
+  /** Costs taken into the goods. Null when any of them was redacted. */
+  capitalisedGhs: number | null;
+  /** The grain plus the costs taken into it - the figure the owner asked for. */
+  goodsCostGhs: number | null;
+  /** The vouchers that still count: a voided one is not a cost. */
+  live: IPurchaseCost[];
+  /** Costs attributable to this purchase but left in their own month. */
+  monthlyGhs: number | null;
+}
+
+/** Cedis to the pesewa: 0.1 + 0.2 in binary floating point is not 0.3. */
+const toPesewa = (ghs: number): number => Math.round(ghs * 100) / 100;
+
+const sumGhs = (costs: IPurchaseCost[]): number | null =>
+  costs.reduce<number | null>(
+    (total, c) =>
+      total === null || c.amountGhs === null
+        ? null
+        : toPesewa(total + c.amountGhs),
+    0,
+  );
+
+export function summarisePurchaseCosts(
+  costs: IPurchaseCost[],
+  /** Weight x unit price, as the purchase document states it. */
+  totalGhs: number | null,
+): IPurchaseCostSummary {
+  const live = costs.filter((c) => c.voidedAt === null);
+  const capitalisedGhs = sumGhs(live.filter((c) => c.capitalisedAt !== null));
+  return {
+    capitalisedGhs,
+    goodsCostGhs:
+      totalGhs === null || capitalisedGhs === null
+        ? null
+        : toPesewa(totalGhs + capitalisedGhs),
+    live,
+    monthlyGhs: sumGhs(live.filter((c) => c.capitalisedAt === null)),
+  };
 }
