@@ -6,6 +6,18 @@
 // namespace is owner-only so in practice always visible.
 import type { IPaginationMeta } from "./api";
 
+/**
+ * The account a grant or a repayment moved through, as the farm DTOs carry it.
+ *
+ * Narrower than the statements' `IAccountRef` on purpose: the farm mappers send
+ * the id and the label and no `kind`, and a type claiming a kind that never
+ * arrives would be a fact the server never stated.
+ */
+export interface IFarmAccountRef {
+  id: string;
+  label: string;
+}
+
 // ── Seasons ───────────────────────────────────────────────────────
 export interface ISeason {
   id: string;
@@ -189,6 +201,13 @@ export interface IGrant {
   grantedAt: string;
   createdAt: string;
   approval: IGrantApproval | null;
+  /**
+   * Exactly one of these is set. The account that funded these inputs, or the
+   * reason no company money moved - a grant whose inputs came out of stock the
+   * business already paid for is a real answer, not a gap in the record.
+   */
+  paymentAccount: IFarmAccountRef | null;
+  noCashReason: string | null;
 }
 /** `GET admin/farm/grants/:id` - the full "who took what" view. */
 export interface IGrantDetail extends Omit<IGrant, "farmer"> {
@@ -239,17 +258,36 @@ export interface ICreateGrantInput {
   agreedTerms?: string;
   dueDate?: string;
   documentName?: string;
+  /** The account the inputs were bought with. Exclusive with `noCashReason`. */
+  paymentAccountId?: string;
+  /** Why funding this grant moved no company money (max 300). */
+  noCashReason?: string;
 }
 
-// ── Produce repayments ────────────────────────────────────────────
+// ── Repayments ────────────────────────────────────────────────────
+/**
+ * What the farmer handed back. PRODUCE turns a receivable into stock and moves
+ * no money; CASH lands in an account and posts a receipt. A farmer who had a
+ * bad season and settled in money had nowhere to be recorded until CASH
+ * existed.
+ */
+export type RepaymentKind = "CASH" | "PRODUCE";
 export interface IRepayment {
   id: string;
   transactionNo: string;
+  kind: RepaymentKind;
   farmer: { id: string; name: string };
   season: { id: string; name: string };
-  commodity: { id: string; name: string };
-  weightKg: number;
+  /**
+   * Null on a cash repayment, along with the weight and the rate - never a
+   * zero. A zero weight would read on the register as a farmer who handed over
+   * nothing, which is the opposite of what happened.
+   */
+  commodity: { id: string; name: string } | null;
+  weightKg: number | null;
   ratePerKgGhs: number | null;
+  /** Set on CASH only: produce moves no money, so it lands in no account. */
+  paymentAccount: IFarmAccountRef | null;
   valueGhs: number | null;
   intoStock: boolean;
   notes: string | null;
@@ -296,10 +334,16 @@ export interface IRepaymentListQuery {
 export interface ICreateRepaymentInput {
   farmerId: string;
   seasonId: string;
-  commodityId: string;
-  weightKg: number;
-  ratePerKgGhs: number;
+  /** Defaults to PRODUCE server-side, the only repayment this book once had. */
+  kind?: RepaymentKind;
+  /** PRODUCE only - the server refuses a cash repayment carrying any of them. */
+  commodityId?: string;
+  weightKg?: number;
+  ratePerKgGhs?: number;
   intakeWarehouseId?: string;
+  /** CASH only - and a produce repayment naming an account is refused. */
+  amountGhs?: number;
+  paymentAccountId?: string;
   notes?: string;
   receivedAt?: string;
   receivedByName?: string;

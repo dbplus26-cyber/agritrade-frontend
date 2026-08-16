@@ -24,6 +24,7 @@ import { useGetGrantsQuery } from "@/redux/farm/grants-api";
 import { useGetSeasonsQuery } from "@/redux/farm/seasons-api";
 import type { IGrant, IGrantListQuery } from "@/types/farm.types";
 import { GrantApprovalBadge } from "./farm-bits";
+import { FarmCashSourceNote } from "./farm-cash-source";
 
 const LIST = "/admin/grants";
 const FILTER_DEFAULTS = { season: "all", from: "", to: "", size: "10" };
@@ -129,6 +130,25 @@ export function GrantsRegister() {
         ),
       },
       {
+        // A register that shows an amount and stays silent about where it came
+        // from reproduces the bug this column exists to close, one row at a
+        // time: the value was always counted as spent, and nothing on the page
+        // said out of what.
+        id: "fundedFrom",
+        header: columnHelp(
+          "Funded from",
+          "The account that paid for these inputs - or, when no company money moved, why not.",
+        ),
+        enableSorting: false,
+        meta: columnMeta({ at: "lg" }),
+        cell: ({ row }) => (
+          <FarmCashSourceNote
+            account={row.original.paymentAccount}
+            reason={row.original.noCashReason}
+          />
+        ),
+      },
+      {
         id: "granted",
         header: columnHelp(
           "Granted",
@@ -205,7 +225,7 @@ export function GrantsRegister() {
       )}
 
       {isLoading ? (
-        <ConsoleTableSkeleton columns={6} />
+        <ConsoleTableSkeleton columns={7} />
       ) : isError ? (
         <ErrorMessage
           description={extractApiError(error).message}

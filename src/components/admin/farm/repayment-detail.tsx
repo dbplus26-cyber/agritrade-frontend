@@ -49,16 +49,26 @@ export function RepaymentDetail({ id }: { id: string }) {
     );
 
   const r = data.data.repayment;
+  // A cash repayment carries no crop, no weight and no valuation rate. Every
+  // one of those is read through this flag rather than printed straight, so a
+  // null never lands on the page as a blank and a missing weight never lands
+  // as "0 kg" - which would read as a farmer who handed over nothing.
+  const isCash = r.kind === "CASH";
 
   return (
     <div className="max-w-[1120px]">
       <BackButton href={LIST} label="All repayments" className="mb-2" />
       <AdminPageHeader
         title="Repayment details"
-        hint="One delivery of produce from a farmer against their advance."
+        hint="One repayment from a farmer against their advance, in produce or in cash."
         sub={`Recorded ${formatDateTime(r.createdAt)}`}
         actions={
-          r.intoStock ? <ToneBadge tone="sky">Taken into stock</ToneBadge> : null
+          <span className="flex flex-wrap items-center gap-1.5">
+            {isCash ? <ToneBadge tone="leaf">Repaid in cash</ToneBadge> : null}
+            {r.intoStock ? (
+              <ToneBadge tone="sky">Taken into stock</ToneBadge>
+            ) : null}
+          </span>
         }
       />
 
@@ -104,20 +114,45 @@ export function RepaymentDetail({ id }: { id: string }) {
                 <DetailItem label="Receipt no" mono strong>
                   {r.transactionNo}
                 </DetailItem>
-                <DetailItem label="Commodity">
-                  <Link
-                    className={adminLinkClass}
-                    href={`/admin/commodities/${r.commodity.id}`}
+                {isCash ? (
+                  // Money in, and the account it landed in. This is the whole
+                  // shape a cash repayment has: no crop, no weight, no rate.
+                  <DetailItem
+                    hint="The account this money was paid into. A receipt is posted to the cash book for it."
+                    label="Paid into"
                   >
-                    {r.commodity.name}
-                  </Link>
-                </DetailItem>
-                <DetailItem label="Weight" mono>
-                  {formatKg(r.weightKg)}
-                </DetailItem>
-                <DetailItem label="Rate per kg" mono>
-                  <Money value={r.ratePerKgGhs} />
-                </DetailItem>
+                    {r.paymentAccount ? (
+                      r.paymentAccount.label
+                    ) : (
+                      <NotRecorded />
+                    )}
+                  </DetailItem>
+                ) : (
+                  <>
+                    <DetailItem label="Commodity">
+                      {r.commodity ? (
+                        <Link
+                          className={adminLinkClass}
+                          href={`/admin/commodities/${r.commodity.id}`}
+                        >
+                          {r.commodity.name}
+                        </Link>
+                      ) : (
+                        <NotRecorded />
+                      )}
+                    </DetailItem>
+                    <DetailItem label="Weight" mono>
+                      {r.weightKg === null ? (
+                        <NotRecorded />
+                      ) : (
+                        formatKg(r.weightKg)
+                      )}
+                    </DetailItem>
+                    <DetailItem label="Rate per kg" mono>
+                      <Money value={r.ratePerKgGhs} />
+                    </DetailItem>
+                  </>
+                )}
                 <DetailItem label="Value credited" mono strong>
                   <span className="text-console">
                     <Money value={r.valueGhs} />
@@ -152,6 +187,9 @@ export function RepaymentDetail({ id }: { id: string }) {
                     <NotRecorded />
                   )}
                 </DetailItem>
+                {/* Money cannot be taken into a warehouse, so a cash repayment
+                    is not asked the question and is not answered it either. */}
+                {isCash ? null : (
                 <DetailItem label="Intake warehouse">
                   {r.intakeWarehouse ? (
                     <span className="inline-flex flex-wrap items-center gap-1.5">
@@ -169,6 +207,7 @@ export function RepaymentDetail({ id }: { id: string }) {
                     <span className="text-adm-muted">Not taken into stock</span>
                   )}
                 </DetailItem>
+                )}
                 {r.notes ? (
                   <DetailItem
                     label="Notes"
@@ -206,18 +245,34 @@ export function RepaymentDetail({ id }: { id: string }) {
               <span className="min-w-0">Value credited</span>
               <HelpTip
                 label="What is Value credited?"
-                text="What this produce was worth when it came in, and so how much it takes off what the farmer owes."
+                text="What this repayment was worth when it came in, and so how much it takes off what the farmer owes. The same figure whichever way the farmer settled."
               />
             </p>
             <p className="font-adminmono mt-1 text-[26px] font-bold text-console tabular-nums">
               <Money value={r.valueGhs} />
             </p>
-            <p className="mt-1 text-[12.5px] text-adm-muted">
-              <Mono>{formatKg(r.weightKg)}</Mono> of {r.commodity.name} at{" "}
-              <Mono>
-                <Money value={r.ratePerKgGhs} />
-              </Mono>{" "}
-              per kg
+            {/* How the figure above was arrived at. On a cash repayment there
+                is no weight and no rate to work it from, so the line says
+                where the money went instead of printing two blanks. */}
+            <p className="mt-1 text-[12.5px] text-adm-muted [overflow-wrap:anywhere]">
+              {isCash ? (
+                r.paymentAccount ? (
+                  <>Paid into {r.paymentAccount.label}</>
+                ) : (
+                  "Paid in cash"
+                )
+              ) : (
+                <>
+                  <Mono>
+                    {r.weightKg === null ? "-" : formatKg(r.weightKg)}
+                  </Mono>{" "}
+                  {r.commodity ? `of ${r.commodity.name} ` : ""}at{" "}
+                  <Mono>
+                    <Money value={r.ratePerKgGhs} />
+                  </Mono>{" "}
+                  per kg
+                </>
+              )}
             </p>
           </AdminCard>
         }

@@ -25,6 +25,8 @@ import { useGetInputItemsQuery } from "@/redux/farm/input-items-api";
 import { useGetSeasonsQuery } from "@/redux/farm/seasons-api";
 import { useRemoteSearch } from "@/hooks/use-remote-search";
 import { grantSchema, type GrantValues } from "@/validations/farm-schema";
+import { cashSourceBody } from "@/components/admin/statements/cash-source";
+import { GrantCashSourceField } from "./farm-cash-source";
 
 const LIST = "/admin/grants";
 const AGREEMENT_MISSING = "Upload the signed grant agreement";
@@ -49,24 +51,40 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
   const [documentName, setDocumentName] = useState("");
 
   const {
+    clearErrors,
     register,
     control,
     handleSubmit,
     setError,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<GrantValues>({
     resolver: zodResolver(grantSchema),
     defaultValues: {
       agreedTerms: "",
+      cashSource: "ACCOUNT",
       dueDate: "",
       farmerId: farmerId ?? "",
       itemId: "",
+      noCashReason: "",
       notes: "",
+      paymentAccountId: "",
       quantity: "",
       seasonId: "",
       valueGhs: "",
     },
   });
+
+  /**
+   * Switching answer clears the one not given, so a mode change cannot leave
+   * a stale value - or a stale error - behind the field it belongs to.
+   */
+  const onModeChange = (mode: GrantValues["cashSource"]) => {
+    setValue("cashSource", mode);
+    setValue(mode === "ACCOUNT" ? "noCashReason" : "paymentAccountId", "");
+    clearErrors(["noCashReason", "paymentAccountId"]);
+  };
 
   const onSubmit = async (values: GrantValues) => {
     if (!agreement) {
@@ -81,6 +99,9 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
           quantity: Number(values.quantity),
           seasonId: values.seasonId,
           valueGhs: Number(values.valueGhs),
+          // The exclusive-or, built once for every register that has it: the
+          // field the reader did not answer is never sent, empty or otherwise.
+          ...cashSourceBody(values),
           ...(values.notes?.trim() ? { notes: values.notes.trim() } : {}),
           ...(values.agreedTerms?.trim()
             ? { agreedTerms: values.agreedTerms.trim() }
@@ -104,6 +125,8 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
           "notes",
           "agreedTerms",
           "dueDate",
+          "paymentAccountId",
+          "noCashReason",
         ] as const) {
           if (fieldErrors[field])
             setError(field, { message: fieldErrors[field] });
@@ -223,6 +246,26 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
                 {...register("notes")}
               />
             </AdminField>
+          </section>
+
+          {/* The question the grant book never asked. Funding a farmer costs
+              the business money, and until this was asked the statement spent
+              every cedi of it while the cash book heard nothing. */}
+          <section className="flex flex-col gap-5 border-t border-adm-hairline pt-5">
+            <GrantCashSourceField
+              accountError={errors.paymentAccountId?.message}
+              accountId={watch("paymentAccountId") ?? ""}
+              mode={watch("cashSource")}
+              onAccountChange={(value) => {
+                setValue("paymentAccountId", value, { shouldValidate: true });
+              }}
+              onModeChange={onModeChange}
+              onReasonChange={(value) => {
+                setValue("noCashReason", value);
+              }}
+              reason={watch("noCashReason") ?? ""}
+              reasonError={errors.noCashReason?.message}
+            />
           </section>
 
           <section className="flex flex-col gap-5">

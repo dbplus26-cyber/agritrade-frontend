@@ -12,7 +12,7 @@ import {
 } from "@/components/admin/filter-bar";
 import { HelpWrap } from "@/components/admin/help-tip";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
-import { TextCell, TitleCell } from "@/components/admin/table-cells";
+import { TitleCell } from "@/components/admin/table-cells";
 import { AdminButton, AdminCard, Mono, ToneBadge } from "@/components/admin/ui";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
@@ -24,6 +24,7 @@ import { DateTimeCell } from "@/components/admin/date-cell";
 import { useGetRepaymentsQuery } from "@/redux/farm/repayments-api";
 import { useGetSeasonsQuery } from "@/redux/farm/seasons-api";
 import type { IRepayment, IRepaymentListQuery } from "@/types/farm.types";
+import { RepaymentSettlement } from "./farm-cash-source";
 
 const LIST = "/admin/repayments";
 const FILTER_DEFAULTS = { season: "all", from: "", to: "", size: "10" };
@@ -101,14 +102,23 @@ export function RepaymentsRegister() {
         ),
       },
       {
-        id: "produce",
-        header: "Produce",
+        // Not "Produce" any more: a farmer who had a bad season settles in
+        // money, and a column that can only name a crop had nowhere to put
+        // them - it printed a null or a zero weight, which reads as a farmer
+        // who handed over nothing.
+        id: "repaidIn",
+        header: columnHelp(
+          "Repaid in",
+          "What the farmer handed back: grain, with its weight, or money and the account it landed in.",
+        ),
         enableSorting: false,
         meta: columnMeta({ at: "lg" }),
         cell: ({ row }) => (
-          <TextCell
-            value={`${row.original.commodity.name} · ${String(row.original.weightKg)} kg`}
-            width="label"
+          <RepaymentSettlement
+            commodity={row.original.commodity}
+            kind={row.original.kind}
+            paymentAccount={row.original.paymentAccount}
+            weightKg={row.original.weightKg}
           />
         ),
       },
@@ -116,7 +126,7 @@ export function RepaymentsRegister() {
         id: "value",
         header: columnHelp(
           "Value",
-          "What this produce was credited at, which is how much it takes off what the farmer owes.",
+          "What this repayment was credited at, which is how much it takes off what the farmer owes - the same figure whichever way they settled.",
         ),
         enableSorting: false,
         meta: columnMeta(),
@@ -130,7 +140,7 @@ export function RepaymentsRegister() {
         id: "received",
         header: columnHelp(
           "Received",
-          "The day the produce actually came in, not the day it was typed in here.",
+          "The day the produce or the money actually came in, not the day it was typed in here.",
         ),
         enableSorting: false,
         meta: columnMeta(),
@@ -166,10 +176,10 @@ export function RepaymentsRegister() {
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            Produce repayments
+            Repayments
           </h1>
           <p className="mt-0.5 text-[13px] text-adm-muted">
-            Produce received against farmer grants, optionally taken into stock
+            What farmers have paid back on their grants, in produce or in cash
           </p>
         </div>
         {<AdminButton asChild>
@@ -211,7 +221,7 @@ export function RepaymentsRegister() {
         <RegisterEmpty
           filtered={activeFilterCount > 0}
           noun="repayments"
-          description="Record produce received against a grant."
+          description="Record what a farmer has paid back against a grant."
           filteredDescription="Nothing matches this filter."
           actionLabel="Record repayment"
           onAction={() => router.push(`${LIST}/new`)}

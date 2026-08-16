@@ -30,6 +30,7 @@ import { ListPagination } from "@/components/ui/ListPagination";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatDateOnly } from "@/lib/format-date";
+import { formatKg } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
 import {
   farmerDocumentUrl,
@@ -538,22 +539,42 @@ export function FarmerDetail({ id }: { id: string }) {
                     {(repayments.data?.data ?? []).map((r) => (
                       <li key={r.id} className="px-5 py-2.5 text-[13px]">
                         <div className="flex items-center justify-between gap-2">
-                          <Link
-                            className={cn(adminLinkClass, "font-semibold")}
-                            href={`/admin/commodities/${r.commodity.id}`}
-                          >
-                            {r.commodity.name}
-                          </Link>
-                          <Mono className="text-console">
+                          {/* A cash repayment names no crop and carries no
+                              weight. Printing them anyway would put "0 kg" on
+                              a farmer who paid in full, and link a commodity
+                              that was never involved. */}
+                          {r.commodity ? (
+                            <Link
+                              className={cn(
+                                adminLinkClass,
+                                "min-w-0 truncate font-semibold",
+                              )}
+                              href={`/admin/commodities/${r.commodity.id}`}
+                            >
+                              {r.commodity.name}
+                            </Link>
+                          ) : (
+                            <span className="min-w-0 truncate font-semibold text-adm-ink">
+                              Cash
+                            </span>
+                          )}
+                          <Mono className="flex-none text-console">
                             <Money value={r.valueGhs} />
                           </Mono>
                         </div>
-                        <div className="mt-0.5 flex items-center justify-between text-[12px] text-adm-muted">
-                          <span>
-                            {r.weightKg} kg · {formatFarmDate(r.receivedAt)}
+                        <div className="mt-0.5 flex items-center justify-between gap-2 text-[12px] text-adm-muted">
+                          <span className="min-w-0 truncate">
+                            {r.kind === "CASH"
+                              ? (r.paymentAccount?.label ?? "Paid in cash")
+                              : r.weightKg === null
+                                ? "Produce"
+                                : formatKg(r.weightKg)}{" "}
+                            · {formatFarmDate(r.receivedAt)}
                           </span>
                           {r.intoStock ? (
-                            <span className="text-console">Into stock</span>
+                            <span className="flex-none text-console">
+                              Into stock
+                            </span>
                           ) : null}
                         </div>
                       </li>

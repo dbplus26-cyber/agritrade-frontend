@@ -28,6 +28,7 @@ import {
 } from "@/redux/farm/grants-api";
 import { ViewablePhoto } from "@/components/admin/photo-view";
 import { FarmDocumentsSection, GrantApprovalBadge } from "./farm-bits";
+import { FarmCashSourceNote } from "./farm-cash-source";
 
 const LIST = "/admin/grants";
 
@@ -132,6 +133,22 @@ export function GrantDetail({ id }: { id: string }) {
                 </DetailItem>
                 <DetailItem label="Value" mono strong>
                   <Money value={g.valueGhs} />
+                </DetailItem>
+                {/* Beside the figure it belongs to. A grant that shows what it
+                    cost and says nothing about where that came from is the
+                    record this page used to keep: the statement spent it, the
+                    cash book never heard of it. `full` only when a reason has
+                    to be read - an account label is a phrase, a reason is up to
+                    300 characters of prose and takes the row. */}
+                <DetailItem
+                  full={Boolean(g.noCashReason)}
+                  hint="The account that paid for these inputs - or, when no company money moved, why not."
+                  label="Funded from"
+                >
+                  <FarmCashSourceNote
+                    account={g.paymentAccount}
+                    reason={g.noCashReason}
+                  />
                 </DetailItem>
                 <DetailItem label="Recorded">
                   {formatDateTime(g.createdAt)}
