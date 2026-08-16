@@ -1,3 +1,5 @@
+import type { StatementSection } from "@/lib/statement-section";
+
 import type { IPaginationMeta } from "./api";
 
 /**
@@ -97,6 +99,13 @@ export interface IExpenseCategory {
   name: string;
   /** What belongs under this heading, so two staff file a cost the same way. */
   description: string | null;
+  /**
+   * The accountant-style heading it prints under on the statements
+   * ("Salaries and Wages"). Null prints under the category's own name.
+   */
+  statementHeading: string | null;
+  /** Which statement section it belongs to. Every cost is grouped by this. */
+  statementSection: StatementSection;
   /** How many expenses are filed under it (list responses only - mirrors
    * the backend ExpenseCategoryDTO's optional relation count). */
   expenseCount?: number;
@@ -247,9 +256,14 @@ export interface IUpdateBuyerInput {
 export interface ICreateExpenseCategoryInput {
   name: string;
   description?: string;
+  statementHeading?: string;
+  statementSection?: StatementSection;
 }
 export interface IUpdateExpenseCategoryInput {
   name?: string;
   /** null clears it; undefined leaves it untouched. */
   description?: string | null;
+  /** null clears it; undefined leaves it untouched. */
+  statementHeading?: string | null;
+  statementSection?: StatementSection;
 }

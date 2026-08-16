@@ -25,6 +25,8 @@ import {
   adminLinkClass,
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
+import { CategoryStatementFields } from "@/components/admin/registry/category-statement-fields";
+import { statementSectionLabel } from "@/lib/statement-section";
 import { BackButton } from "@/components/ui/BackButton";
 import {
   ConsoleTableSkeleton,
@@ -101,6 +103,7 @@ function CreateCategoryDialog({
 }) {
   const [createCategory, { isLoading }] = useCreateExpenseCategoryMutation();
   const {
+    control,
     register,
     handleSubmit,
     reset,
@@ -108,7 +111,12 @@ function CreateCategoryDialog({
     formState: { errors },
   } = useForm<ExpenseCategoryValues>({
     resolver: zodResolver(expenseCategorySchema),
-    defaultValues: { description: "", name: "" },
+    defaultValues: {
+      description: "",
+      name: "",
+      statementHeading: "",
+      statementSection: "ADMINISTRATIVE",
+    },
   });
 
   const close = () => {
@@ -118,10 +126,13 @@ function CreateCategoryDialog({
 
   const onSubmit = async (values: ExpenseCategoryValues) => {
     const description = values.description?.trim() ?? "";
+    const statementHeading = values.statementHeading?.trim() ?? "";
     try {
       await createCategory({
         name: values.name,
         ...(description ? { description } : {}),
+        ...(statementHeading ? { statementHeading } : {}),
+        statementSection: values.statementSection,
       }).unwrap();
       notify.success("Category created");
       close();
@@ -174,6 +185,11 @@ function CreateCategoryDialog({
               {...register("description")}
             />
           </AdminField>
+          <CategoryStatementFields
+            control={control}
+            errors={errors}
+            register={register}
+          />
           <ResponsiveDialogFooter className="gap-2">
             <AdminButton type="button" variant="outline" size="lg" onClick={close}>
               Cancel
@@ -386,6 +402,7 @@ function ExpenseCategoryFormFields({
   const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
 
   const {
+    control,
     register,
     handleSubmit,
     reset,
@@ -396,6 +413,8 @@ function ExpenseCategoryFormFields({
     defaultValues: {
       description: category?.description ?? "",
       name: category?.name ?? "",
+      statementHeading: category?.statementHeading ?? "",
+      statementSection: category?.statementSection ?? "ADMINISTRATIVE",
     },
   });
 
@@ -408,6 +427,8 @@ function ExpenseCategoryFormFields({
       reset({
         description: category?.description ?? "",
         name: category?.name ?? "",
+        statementHeading: category?.statementHeading ?? "",
+        statementSection: category?.statementSection ?? "ADMINISTRATIVE",
       });
   }, [category, isEditing, reset]);
 
@@ -415,10 +436,16 @@ function ExpenseCategoryFormFields({
     try {
       // Empty clears the column on an edit; on a create it is simply omitted.
       const description = values.description?.trim() ?? "";
+      const statementHeading = values.statementHeading?.trim() ?? "";
       if (isEdit) {
         await updateCategory({
           id: category.id,
-          body: { description: description || null, name: values.name },
+          body: {
+            description: description || null,
+            name: values.name,
+            statementHeading: statementHeading || null,
+            statementSection: values.statementSection,
+          },
         }).unwrap();
         notify.success("Category updated");
         setIsEditing(false);
@@ -426,6 +453,8 @@ function ExpenseCategoryFormFields({
         const res = await createCategory({
           name: values.name,
           ...(description ? { description } : {}),
+          ...(statementHeading ? { statementHeading } : {}),
+          statementSection: values.statementSection,
         }).unwrap();
         notify.success("Category created");
         router.replace(`${LIST}/${res.data.expenseCategory.id}`);
@@ -450,6 +479,14 @@ function ExpenseCategoryFormFields({
         <RecordFacts
           facts={[
             { label: "Name", value: category.name },
+            {
+              label: "Files under",
+              value: statementSectionLabel(category.statementSection),
+            },
+            {
+              label: "Heading on the statements",
+              value: category.statementHeading ?? category.name,
+            },
             { full: true, label: "Description", value: category.description },
           ]}
         />
@@ -496,6 +533,13 @@ function ExpenseCategoryFormFields({
             {...register("description")}
           />
         </AdminField>
+        <CategoryStatementFields
+          control={control}
+          disabled={readOnly}
+          errors={errors}
+          readOnlyClass={roCls}
+          register={register}
+        />
         <EditableFormActions
           mode={!isEdit ? "create" : isEditing ? "editing" : "locked"}
           saving={saving}

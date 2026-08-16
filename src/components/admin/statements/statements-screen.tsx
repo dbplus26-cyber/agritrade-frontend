@@ -396,7 +396,7 @@ export function StatementsScreen() {
                       pair={statement.income.profitBeforeTax}
                     />
                     <Headline
-                      label="Tax provision"
+                      label="Taxation"
                       pair={statement.income.taxProvision}
                     />
                     <Headline
