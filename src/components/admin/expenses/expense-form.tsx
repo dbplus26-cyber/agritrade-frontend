@@ -1,7 +1,7 @@
 "use client";
 
 import { DateInput } from "@/components/ui/date-input";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -23,6 +23,7 @@ import { useIdempotencyKey } from "@/components/admin/disbursements/disbursement
 import { PaymentAccountField } from "@/components/admin/payment-account-field";
 import { PAYMENT_METHOD_OPTIONS } from "@/components/admin/trading/sale-bits";
 import { extractApiError } from "@/lib/extract-api-error";
+import { useGetSettlementAccountsQuery } from "@/redux/payment-accounts/payment-accounts-api";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import {
@@ -31,7 +32,10 @@ import {
 } from "@/redux/expenses/expenses-api";
 import type { IExpense } from "@/types/expense.types";
 import type { IExpenseCategory } from "@/types/registry.types";
-import { expenseSchema, type ExpenseValues } from "@/validations/expense-schema";
+import {
+  type ExpenseValues,
+  makeExpenseSchema,
+} from "@/validations/expense-schema";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -90,6 +94,25 @@ export function ExpenseFormDialog({
   // timeout must resolve to the one payment that already happened.
   const idempotencyKey = useIdempotencyKey(open);
 
+  // The reference rule depends on WHICH account was picked: the office gets no
+  // statement for somebody's personal wallet, so the server does not demand a
+  // reference there and neither should this form. Built from the same list the
+  // picker offers, so the two can never disagree about which accounts those
+  // are. Memoised on the accounts themselves, because a resolver rebuilt on
+  // every render resets the form's validation state under the user.
+  const { data: accounts } = useGetSettlementAccountsQuery();
+  const schema = useMemo(
+    () =>
+      makeExpenseSchema({
+        heldAccountIds: new Set(
+          (accounts?.data.accounts ?? [])
+            .filter((a) => a.holder !== null)
+            .map((a) => a.id),
+        ),
+      }),
+    [accounts],
+  );
+
   const {
     control,
     formState: { errors },
@@ -100,7 +123,7 @@ export function ExpenseFormDialog({
     setValue,
     watch,
   } = useForm<ExpenseValues>({
-    resolver: zodResolver(expenseSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       amountGhs: "",
       categoryId: "",

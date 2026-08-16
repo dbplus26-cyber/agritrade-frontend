@@ -62,6 +62,27 @@ vi.mock("@/components/admin/payment-account-field", () => ({
   ),
 }));
 
+// The form builds its own schema from the settlement list, because the
+// reference rule turns on whether the chosen account belongs to a person. Only
+// company accounts here: the held-account exemption is covered at the schema,
+// in test/unit/expense-schema.test.ts.
+vi.mock("@/redux/payment-accounts/payment-accounts-api", () => ({
+  useGetSettlementAccountsQuery: () => ({
+    data: {
+      data: {
+        accounts: [
+          {
+            holder: null,
+            id: "3d0c9f0e-1a2b-4c5d-8e9f-0a1b2c3d4e5f",
+            kind: "BANK",
+            label: "Ecobank - main operating",
+          },
+        ],
+      },
+    },
+  }),
+}));
+
 vi.mock("@/lib/notify", () => ({
   notify: { error: errorToast, success: successToast },
 }));

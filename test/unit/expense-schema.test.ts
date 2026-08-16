@@ -12,7 +12,10 @@
 // the dialog only renders them.
 import { describe, expect, it } from "vitest";
 
-import { expenseSchema } from "@/validations/expense-schema";
+import {
+  expenseSchema,
+  makeExpenseSchema,
+} from "@/validations/expense-schema";
 
 const COST = {
   amountGhs: "850.00",
@@ -56,6 +59,47 @@ describe("expenseSchema", () => {
         reference: "TRF884512",
       }).success,
     ).toBe(true);
+  });
+
+  it("lets a transfer out of somebody's own pocket go without a reference", () => {
+    // The office receives no statement for an agent's personal wallet - it is
+    // proved by a sit-down count - so the server exempts a held account from
+    // the reference rule (isHeldAccount, payment-account-link.ts). A form that
+    // demands one anyway refuses an entry the server would have taken, and
+    // there is nothing the person can type to get past it.
+    const held = "9c1b2a3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d";
+    const schema = makeExpenseSchema({ heldAccountIds: new Set([held]) });
+
+    expect(
+      schema.safeParse({
+        ...COST,
+        method: "MOMO",
+        paymentAccountId: held,
+        reference: "",
+      }).success,
+    ).toBe(true);
+
+    // The account is still required: money out of a wallet still moved
+    // through a named pot, and which pot is the whole point.
+    const paths = schema.safeParse({ ...COST, method: "MOMO" });
+    expect(
+      paths.success ? [] : paths.error.issues.map((i) => String(i.path[0])),
+    ).toContain("paymentAccountId");
+  });
+
+  it("still demands a reference for a COMPANY account", () => {
+    const schema = makeExpenseSchema({
+      heldAccountIds: new Set(["9c1b2a3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d"]),
+    });
+    const result = schema.safeParse({
+      ...COST,
+      method: "BANK",
+      paymentAccountId: "3d0c9f0e-1a2b-4c5d-8e9f-0a1b2c3d4e5f",
+      reference: "",
+    });
+    expect(
+      result.success ? [] : result.error.issues.map((i) => String(i.path[0])),
+    ).toContain("reference");
   });
 
   it("still refuses a cost with no figure, no category or a future date", () => {
