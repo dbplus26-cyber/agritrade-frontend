@@ -22,6 +22,11 @@ import {
 import { useGetSettingsQuery } from "@/redux/settings/settings-api";
 import type { IPayableAccount } from "@/types/payment-account.types";
 import { Money, formatSaleDate } from "./sale-bits";
+import {
+  hasSettledTotal,
+  saleBalanceGhs,
+  saleIsPaidInFull,
+} from "./sale-payable";
 
 /**
  * One payment destination as the buyer reads it. Whatever the kind, it is a
@@ -102,7 +107,11 @@ export function SaleInvoice({ id }: { id: string }) {
     );
 
   const s = data.data.sale;
-  const isReceipt = s.balanceGhs === 0;
+  // Billed against what the sale is PAYABLE at, which after arrival is the
+  // settled figure. Billing the agreement would send a buyer a demand for
+  // grain that evaporated on the Tamale road.
+  const balance = saleBalanceGhs(s);
+  const isReceipt = saleIsPaidInFull(s);
   const company = settings?.data.settings;
   // A settled sale is not asking for money, so printing account numbers on it
   // only gives the buyer a second, staler place to read them from.
@@ -228,6 +237,18 @@ export function SaleInvoice({ id }: { id: string }) {
               <Money value={s.agreedTotalGhs} />
             </span>
           </div>
+          {/* The re-weigh, stated on the document rather than folded silently
+              into the total. The buyer signed for the agreed price and is being
+              billed for less: the paperwork has to say why, or the difference
+              reads as a mistake on somebody's side. */}
+          {hasSettledTotal(s) ? (
+            <div className="flex justify-between py-1">
+              <span className="text-adm-muted">Settled on arrival</span>
+              <span className="font-semibold">
+                <Money value={s.settledTotalGhs} />
+              </span>
+            </div>
+          ) : null}
           <div className="flex justify-between py-1">
             <span className="text-adm-muted">Paid</span>
             <span>
@@ -236,9 +257,7 @@ export function SaleInvoice({ id }: { id: string }) {
           </div>
           <div className="flex justify-between border-t border-adm-strong py-1.5 text-[15px] font-bold">
             <span>{isReceipt ? "Settled" : "Balance due"}</span>
-            <span>
-              {isReceipt ? "Paid in full" : <Money value={s.balanceGhs} />}
-            </span>
+            <span>{isReceipt ? "Paid in full" : <Money value={balance} />}</span>
           </div>
         </div>
 

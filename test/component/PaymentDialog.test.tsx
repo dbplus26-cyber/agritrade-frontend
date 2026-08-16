@@ -66,6 +66,8 @@ const userEvent = userEventBase.setup({ delay: null });
 
 /** Every field the dialog reads (see `detail.*` in payment-dialog.tsx). */
 const SALE = {
+  agreedTotalGhs: 5000,
+  // The API's own figure, still measured against the agreed price.
   balanceGhs: 4000,
   beforeLoadingMet: false,
   buyer: { name: "Kwame Owusu" },
@@ -74,6 +76,7 @@ const SALE = {
   milestones: [],
   paidGhs: 1000,
   requiredBeforeLoadingGhs: 2500,
+  settledTotalGhs: null,
   transactionNo: "SAL-2026-00042",
 };
 
@@ -150,6 +153,23 @@ describe("PaymentDialog", () => {
       within(confirmation).getByRole("button", { name: "Cancel" }),
     );
     expect(recordTrigger).not.toHaveBeenCalled();
+  });
+
+  it("fills the balance from the SETTLED figure once the load was weighed in", async () => {
+    // Agreed 5,000, settled 4,200 on arrival, 1,000 paid. The balance is 3,200,
+    // and the API's overpayment guard measures it the same way - a quick fill
+    // built on the agreed price would hand over a figure the server refuses.
+    saleQuery.mockReturnValue({
+      data: { data: { sale: { ...SALE, settledTotalGhs: 4200 } } },
+      isLoading: false,
+    });
+
+    render(<PaymentDialog onClose={vi.fn()} open sale={{ id: "sale-1" }} />);
+    await userEvent.click(screen.getByRole("button", { name: /Full balance/i }));
+
+    expect(screen.getByLabelText(/AMOUNT/i)).toHaveValue("3200.00");
+    // And the agreement is still on screen beside what it settled at.
+    expect(screen.getByText(/settled\s*on arrival/i)).toBeInTheDocument();
   });
 
   it("shows the server's reason when the write is refused", async () => {

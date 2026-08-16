@@ -31,6 +31,11 @@ import {
   SALE_STATUS_FILTER_OPTIONS,
   SaleStatusBadge,
 } from "./sale-bits";
+import {
+  hasSettledTotal,
+  saleBalanceGhs,
+  saleIsPaidInFull,
+} from "./sale-payable";
 
 const LIST = "/admin/sales";
 const FILTER_DEFAULTS = {
@@ -182,14 +187,24 @@ export function SalesRegister() {
         id: "agreed",
         header: columnHelp(
           "Agreed",
-          "The full price the buyer agreed to pay for this order.",
+          "The full price the buyer agreed to pay for this order. It stands whatever the load weighed on arrival.",
         ),
         enableSorting: false,
         meta: columnMeta({ wide: true }),
+        // The agreement, and under it what the load settled at once it was
+        // weighed in - never in place of it. Absent where nothing has been
+        // weighed, so the column stays one line on most rows.
         cell: ({ row }) => (
-          <Mono className="whitespace-nowrap text-adm-ink">
-            <Money value={row.original.agreedTotalGhs} />
-          </Mono>
+          <div className="min-w-0">
+            <Mono className="block whitespace-nowrap text-adm-ink">
+              <Money value={row.original.agreedTotalGhs} />
+            </Mono>
+            {hasSettledTotal(row.original) ? (
+              <Mono className="block whitespace-nowrap text-[11.5px] text-adm-muted">
+                settled <Money value={row.original.settledTotalGhs} />
+              </Mono>
+            ) : null}
+          </div>
         ),
       },
       {
@@ -201,7 +216,10 @@ export function SalesRegister() {
         enableSorting: false,
         meta: columnMeta(),
         cell: ({ row }) => {
-          const b = row.original.balanceGhs;
+          // Against what the sale is payable at, so this column agrees with
+          // the balance on the sale itself and with the API's overpayment
+          // guard - all three used to read one field, and now there are two.
+          const b = saleBalanceGhs(row.original);
           return (
             <Mono
               className={cn(
@@ -369,13 +387,13 @@ export function SalesRegister() {
                       <Mono
                         className={cn(
                           "text-[14px] font-bold",
-                          s.balanceGhs === 0 ? "text-console" : "text-console-red",
+                          saleIsPaidInFull(s) ? "text-console" : "text-console-red",
                         )}
                       >
-                        {s.balanceGhs === 0 ? (
+                        {saleIsPaidInFull(s) ? (
                           "Paid in full"
                         ) : (
-                          <Money value={s.balanceGhs} />
+                          <Money value={saleBalanceGhs(s)} />
                         )}
                       </Mono>
                     </div>

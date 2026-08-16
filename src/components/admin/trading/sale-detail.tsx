@@ -54,6 +54,12 @@ import {
   formatSaleDate,
   milestoneTriggerLabel,
 } from "./sale-bits";
+import {
+  hasSettledTotal,
+  saleBalanceGhs,
+  saleIsPaidInFull,
+  saleSettlementDeltaGhs,
+} from "./sale-payable";
 import { ShipmentStatusBadge } from "./shipment-bits";
 
 const LIST = "/admin/sales";
@@ -222,6 +228,13 @@ export function SaleDetail({
     );
 
   const sale = data.data.sale;
+  // What the buyer is actually asked for. The API's own `balanceGhs` still
+  // counts against the agreed price, so a load settled down and paid in full
+  // would read as a debtor here and as square on the trip screen.
+  const settled = hasSettledTotal(sale);
+  const delta = saleSettlementDeltaGhs(sale);
+  const balance = saleBalanceGhs(sale);
+  const paidInFull = saleIsPaidInFull(sale);
   const canManage = has("SALES_MANAGE");
   const isDraft = canManage && sale.status === "DRAFT";
   const canPay =
@@ -288,7 +301,7 @@ export function SaleDetail({
       {sale.status !== "CANCELLED" ? (
         <AdminButton variant="outline" asChild>
           <Link href={`${LIST}/${sale.id}/invoice`}>
-            {sale.balanceGhs === 0 ? "Receipt" : "Invoice"}
+            {paidInFull ? "Receipt" : "Invoice"}
           </Link>
         </AdminButton>
       ) : null}
@@ -304,11 +317,45 @@ export function SaleDetail({
         <SummaryRow label="Buyer">{sale.buyer.name}</SummaryRow>
         <SummaryRow
           label="Agreed total"
-          hint="The full price the buyer agreed to pay for everything on this order."
-          strong
+          hint="The full price the buyer agreed to pay for everything on this order. It never changes, whatever arrives."
+          strong={!settled}
         >
           <Money value={sale.agreedTotalGhs} />
         </SummaryRow>
+        {/* The second figure, and never in place of the first. The agreement
+            is what both sides shook hands on and has to stay readable beside
+            what was finally collected; where nothing has been weighed there is
+            no second figure, and the agreed total stands alone rather than
+            over an empty row or a zero. */}
+        {settled ? (
+          <>
+            <div className="border-t border-adm-hairline">
+              <SummaryRow
+                label="Settled total"
+                hint="What the buyer will actually pay, agreed when the truck arrived and the load was weighed again."
+                strong
+              >
+                <Money value={sale.settledTotalGhs} />
+              </SummaryRow>
+            </div>
+            {delta !== null && delta !== 0 ? (
+              <div className="border-t border-adm-hairline">
+                <SummaryRow
+                  label={delta < 0 ? "Short by" : "Over by"}
+                  hint="The gap between the price agreed and what the load actually weighed in at."
+                >
+                  <span
+                    className={cn(
+                      delta < 0 ? "text-console-red" : "text-console",
+                    )}
+                  >
+                    <Money value={Math.abs(delta)} />
+                  </span>
+                </SummaryRow>
+              </div>
+            ) : null}
+          </>
+        ) : null}
         <div className="border-t border-adm-hairline">
           <SummaryRow
             label="Paid"
@@ -320,19 +367,11 @@ export function SaleDetail({
         <div className="border-t border-adm-hairline">
           <SummaryRow
             label="Balance"
-            hint="What the buyer still owes you: the agreed total less everything paid."
+            hint="What the buyer still owes you: what this sale is payable at, less everything paid."
             strong
           >
-            <span
-              className={cn(
-                sale.balanceGhs === 0 ? "text-console" : "text-console-red",
-              )}
-            >
-              {sale.balanceGhs === 0 ? (
-                "Paid in full"
-              ) : (
-                <Money value={sale.balanceGhs} />
-              )}
+            <span className={cn(paidInFull ? "text-console" : "text-console-red")}>
+              {paidInFull ? "Paid in full" : <Money value={balance} />}
             </span>
           </SummaryRow>
         </div>

@@ -42,6 +42,11 @@ import {
   milestoneTriggerLabel,
   todayInputValue,
 } from "./sale-bits";
+import {
+  hasSettledTotal,
+  saleBalanceGhs,
+  saleIsPaidInFull,
+} from "./sale-payable";
 
 /**
  * Record a manual payment against a confirmed sale. Shared by the sale detail
@@ -91,7 +96,11 @@ export function PaymentDialog({
     detail.paidGhs !== null
       ? Math.max(detail.requiredBeforeLoadingGhs - detail.paidGhs, 0)
       : null;
-  const fullBalanceGhs = detail?.balanceGhs ?? null;
+  // Against what the sale is PAYABLE at. The API refuses an overpayment
+  // measured the same way, so a quick fill built on the agreed price would
+  // hand the admin a figure the server then rejects.
+  const fullBalanceGhs = detail ? saleBalanceGhs(detail) : null;
+  const paidInFull = detail ? saleIsPaidInFull(detail) : false;
 
   const fillAmount = (amount: number) =>
     setValue("amountGhs", amount.toFixed(2), {
@@ -205,15 +214,15 @@ export function PaymentDialog({
               </div>
               <div className="text-right">
                 <span className="block text-[9.5px] tracking-[0.14em] text-adm-muted uppercase">
-                  {detail.fullyPaid ? "Settled" : "Balance"}
+                  {paidInFull ? "Settled" : "Balance"}
                 </span>
                 <Mono
                   className={cn(
                     "block text-[20px] leading-tight font-bold",
-                    detail.balanceGhs === 0 ? "text-console" : "text-adm-ink",
+                    paidInFull ? "text-console" : "text-adm-ink",
                   )}
                 >
-                  <Money value={detail.balanceGhs} />
+                  <Money value={fullBalanceGhs} />
                 </Mono>
               </div>
             </div>
@@ -221,6 +230,20 @@ export function PaymentDialog({
             {/* The schedule and the dispatch gate: supporting detail, so it
                 sits under a rule rather than competing with the balance. */}
             <div className="flex flex-col gap-1 px-3.5 py-2.5 text-[12.5px]">
+              {/* Why the balance is not the agreed price. Without this the
+                  admin reads a figure that does not match the sale they are
+                  holding and assumes the console is wrong. */}
+              {hasSettledTotal(detail) ? (
+                <p className="flex items-baseline justify-between gap-3">
+                  <span className="text-adm-muted">
+                    Agreed <Money compact value={detail.agreedTotalGhs} />, settled
+                    on arrival
+                  </span>
+                  <Mono className="flex-none font-semibold text-adm-ink">
+                    <Money compact value={detail.settledTotalGhs} />
+                  </Mono>
+                </p>
+              ) : null}
               {detail.paidGhs !== null ? (
                 <p className="flex items-baseline justify-between gap-3">
                   <span className="text-adm-muted">Paid so far</span>

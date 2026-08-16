@@ -48,7 +48,10 @@ const round2 = (n: number): number => Math.round(n * 100) / 100;
  * the agreed figure and go on chasing a buyer for a load they sent back.
  */
 export const salePayableTotal = (sale: PayableSale): null | number =>
-  sale.settledTotalGhs ?? sale.agreedTotalGhs;
+  // The trailing `?? null` is not decoration: an absent agreed total would
+  // otherwise return undefined, which passes the `=== null` guards below and
+  // turns every balance downstream into NaN.
+  sale.settledTotalGhs ?? sale.agreedTotalGhs ?? null;
 
 /**
  * Whether the load has been re-weighed and a figure agreed.
