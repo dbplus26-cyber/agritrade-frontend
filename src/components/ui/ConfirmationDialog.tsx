@@ -50,8 +50,11 @@ export function ConfirmationDialog({
     if (!nextOpen) setInputValue("");
   };
 
+  // Trimmed because a phone keyboard appends a space after an autocomplete
+  // pick, and an untrimmed compare then leaves the confirm button dead with
+  // the right word visibly typed into the box and nothing saying why.
   const confirmDisabled = requireExactMatch
-    ? inputValue !== requireExactMatch
+    ? inputValue.trim() !== requireExactMatch.trim()
     : false;
 
   return (
@@ -86,13 +89,30 @@ export function ConfirmationDialog({
           </div>
         ) : null}
 
-        <ResponsiveDialogFooter className="justify-end gap-2">
-          <AdminButton variant="outline" size="lg" onClick={() => handleOpenChange(false)}>
+        {/*
+          Phones get the two buttons stacked with CANCEL on the bottom edge,
+          not the commit. This is the one dialog in the app whose confirm
+          button voids a purchase or hands over cash, and a bottom sheet puts
+          its footer exactly where a thumb already rests - so a row here means
+          the destructive button sits under the thumb, one pixel from Cancel,
+          on a 360px screen. Reversing the column keeps the safe button in the
+          resting position and moves the commit up out of the way. Desktop,
+          where the pointer has to travel to the button either way, keeps the
+          conventional Cancel-then-commit row.
+        */}
+        <ResponsiveDialogFooter className="flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <AdminButton
+            variant="outline"
+            size="lg"
+            className="w-full sm:w-auto"
+            onClick={() => handleOpenChange(false)}
+          >
             {cancelText}
           </AdminButton>
           <AdminButton
             variant={isDestructive ? "danger" : "primary"}
             size="lg"
+            className="w-full sm:w-auto"
             onClick={onConfirm}
             disabled={confirmDisabled}
           >

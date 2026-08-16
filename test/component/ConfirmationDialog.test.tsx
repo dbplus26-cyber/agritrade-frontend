@@ -39,4 +39,57 @@ describe("ConfirmationDialog", () => {
     await userEvent.click(confirm);
     expect(onConfirm).toHaveBeenCalledTimes(1);
   });
+
+  it("forgives the space a phone keyboard adds after an autocomplete", async () => {
+    const onConfirm = vi.fn();
+    render(
+      <ConfirmationDialog
+        {...baseProps}
+        onConfirm={onConfirm}
+        requireExactMatch="Yakubu"
+        confirmText="Hand it over"
+      />,
+    );
+    await userEvent.type(screen.getByLabelText(/to confirm/i), "Yakubu ");
+    expect(screen.getByRole("button", { name: "Hand it over" })).toBeEnabled();
+  });
+
+  it("still refuses a near miss, so the typing is a real check", async () => {
+    const onConfirm = vi.fn();
+    render(
+      <ConfirmationDialog
+        {...baseProps}
+        onConfirm={onConfirm}
+        requireExactMatch="Yakubu"
+        confirmText="Hand it over"
+      />,
+    );
+    await userEvent.type(screen.getByLabelText(/to confirm/i), "yakubu");
+    expect(screen.getByRole("button", { name: "Hand it over" })).toBeDisabled();
+  });
+
+  it("cancels without confirming, and cancelling is what the sheet's bottom edge does", () => {
+    const onOpenChange = vi.fn();
+    const onConfirm = vi.fn();
+    render(
+      <ConfirmationDialog
+        {...baseProps}
+        onOpenChange={onOpenChange}
+        onConfirm={onConfirm}
+      />,
+    );
+    const cancel = screen.getByRole("button", { name: "Cancel" });
+    const footer = cancel.parentElement;
+
+    // A bottom sheet puts its footer under the resting thumb, so on phones the
+    // column is reversed and CANCEL takes that edge. If this class is ever
+    // dropped the commit button silently moves under the thumb, which is the
+    // whole failure this dialog exists to prevent.
+    expect(footer).toHaveClass("flex-col-reverse");
+    expect(footer).toHaveClass("sm:flex-row");
+
+    cancel.click();
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+    expect(onConfirm).not.toHaveBeenCalled();
+  });
 });
