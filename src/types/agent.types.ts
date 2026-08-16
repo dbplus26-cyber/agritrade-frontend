@@ -305,4 +305,12 @@ export interface IAgentExpenseInput {
   amountGhs: number;
   description?: string;
   incurredAt: string;
+  /** A purchase in this agent's name that the cost was incurred for. */
+  purchaseId?: string;
+  /**
+   * Whether the cost rides on the goods (true) or lands in the current
+   * period (false). Only meaningful with a purchaseId; the server defaults
+   * it to true when one is given.
+   */
+  capitalise?: boolean;
 }

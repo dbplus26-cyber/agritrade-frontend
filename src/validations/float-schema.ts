@@ -49,9 +49,18 @@ export const reconcileSchema = z.object({
 });
 export type ReconcileValues = z.infer<typeof reconcileSchema>;
 
-/** Agent field expense (porters, offloading, airtime on the road). */
+/**
+ * Agent field expense (porters, offloading, airtime on the road).
+ *
+ * `purchaseId` and `treatment` are the optional attribution: an empty
+ * `purchaseId` means an ordinary field cost, and `treatment` only matters
+ * once a purchase is named. Both are optional at the schema level so a draft
+ * saved on the phone before either existed still loads.
+ */
 export const agentExpenseSchema = z.object({
   categoryId: z.string().min(1, "Choose the expense category"),
+  purchaseId: z.string().optional(),
+  treatment: z.enum(["goods", "month"]).optional(),
   amountGhs: amountField("amount"),
   description: optionalText(500),
   incurredAt: z.string().min(1, "Enter the expense date"),
