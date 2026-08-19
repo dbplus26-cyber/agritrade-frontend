@@ -135,13 +135,39 @@ export interface IPayableAccountsResponse {
 
 // ── Account movement history ──────────────────────────────────────
 
-/** Which money ledger a movement row comes from. */
+/**
+ * What caused a movement row: the document kind where one exists, and the
+ * movement's own type where it does not.
+ *
+ * The server builds this in `services/cashbook/movement-rows.ts`, and its final
+ * branch is `ELSE m."type"::text` - an account-native entry (a deposit, a bank
+ * charge, an opening position) belongs to no document, so it reports its
+ * AccountMovementType instead. That branch is why the string is left open:
+ * anything rendering this MUST tolerate a value not listed here, or a new
+ * ledger on the server takes the screen down. The known values are named so
+ * they still autocomplete.
+ */
 export type AccountMovementSource =
+  | "CAPITAL"
+  | "CHARGE"
+  | "CORRECTION"
+  | "DEPOSIT"
+  | "DISBURSEMENT"
   | "DRIVER_PAYMENT"
   | "EXPENSE_PAYMENT"
+  | "FIXED_ASSET"
+  | "INPUT_GRANT"
   | "LAND_ACQUISITION_PAYMENT"
   | "LAND_SALE_PAYMENT"
-  | "SALE_PAYMENT";
+  | "OPENING"
+  | "PRODUCE_REPAYMENT"
+  | "PROPRIETOR_DRAWING"
+  | "PURCHASE_PAYMENT"
+  | "SALE_PAYMENT"
+  | "TRANSFER_IN"
+  | "TRANSFER_OUT"
+  | "WITHDRAWAL"
+  | (string & {});
 
 /**
  * One payment row (from any of the five money ledgers) that named this

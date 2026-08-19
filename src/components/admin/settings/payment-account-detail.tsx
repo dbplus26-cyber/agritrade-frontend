@@ -37,10 +37,23 @@ import type {
 
 const LIST = "/admin/payment-accounts";
 
-/** Ledger + chip wording for each of the three sources a movement can have. */
+/**
+ * Ledger + chip wording per movement source.
+ *
+ * `href` is optional on purpose. Two kinds of row have no page to open: an
+ * account-native entry (a deposit, a bank charge, an opening position) belongs
+ * to no document at all, and drawings and fixed assets are maintained on a
+ * single list screen with no per-record route. Those render their reference as
+ * plain text.
+ *
+ * Keyed by string rather than by AccountMovementSource because the server's
+ * final branch is `ELSE m."type"::text`: a ledger added on the server arrives
+ * here as a value this file has never heard of. Reading it through
+ * `sourceOf` below keeps that a plain-looking row instead of a thrown render.
+ */
 const SOURCE: Record<
-  AccountMovementSource,
-  { href: (parentId: string) => string; label: string; tone: Tone }
+  string,
+  { href?: (parentId: string) => string; label: string; tone: Tone }
 > = {
   SALE_PAYMENT: {
     href: (id) => `/admin/sales/${id}`,
@@ -67,7 +80,50 @@ const SOURCE: Record<
     label: "Expense",
     tone: "alert",
   },
+  PURCHASE_PAYMENT: {
+    href: (id) => `/admin/purchases/${id}`,
+    label: "Purchase",
+    tone: "harvest",
+  },
+  DISBURSEMENT: {
+    href: (id) => `/admin/disbursements/${id}`,
+    label: "Disbursement",
+    tone: "slate",
+  },
+  INPUT_GRANT: {
+    href: (id) => `/admin/grants/${id}`,
+    label: "Input grant",
+    tone: "forest",
+  },
+  PRODUCE_REPAYMENT: {
+    href: (id) => `/admin/repayments/${id}`,
+    label: "Repayment",
+    tone: "leaf",
+  },
+  PROPRIETOR_DRAWING: { label: "Drawing", tone: "alert" },
+  FIXED_ASSET: { label: "Asset", tone: "slate" },
+
+  // Account-native entries: money moving without a document behind it.
+  CAPITAL: { label: "Own money in", tone: "leaf" },
+  CHARGE: { label: "Bank charge", tone: "alert" },
+  CORRECTION: { label: "Correction", tone: "harvest" },
+  DEPOSIT: { label: "Money in", tone: "leaf" },
+  OPENING: { label: "Opening balance", tone: "slate" },
+  TRANSFER_IN: { label: "Moved in", tone: "sky" },
+  TRANSFER_OUT: { label: "Moved out", tone: "sky" },
+  WITHDRAWAL: { label: "Money out", tone: "alert" },
 };
+
+/**
+ * The chip for a source, including one this build has never seen. An unmapped
+ * value reads as itself in ordinary words rather than taking the screen down,
+ * which is the same degradation the cash book already makes.
+ */
+const sourceOf = (source: AccountMovementSource) =>
+  SOURCE[source] ?? {
+    label: source.toLowerCase().replace(/_/g, " "),
+    tone: "slate" as Tone,
+  };
 
 /**
  * What this row did to the account's balance: money in is positive, money
@@ -158,7 +214,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         header: "Source",
         enableSorting: false,
         cell: ({ row }) => {
-          const s = SOURCE[row.original.source];
+          const s = sourceOf(row.original.source);
           return <ToneBadge tone={s.tone}>{s.label}</ToneBadge>;
         },
         meta: { className: "px-4" },
@@ -182,9 +238,18 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         enableSorting: false,
         cell: ({ row }) => {
           const m = row.original;
+          const href = sourceOf(m.source).href?.(m.parentId);
+          // No href means there is nothing to open: an account-native entry has
+          // no document, and drawings and assets have no per-record page. The
+          // reference still prints, because it is what staff quote.
+          if (!href) {
+            return (
+              <Mono className="text-adm-ink">{m.parentNo}</Mono>
+            );
+          }
           return (
             <Link
-              href={SOURCE[m.source].href(m.parentId)}
+              href={href}
               onClick={(e) => e.stopPropagation()}
               className={cn(adminLinkClass, "font-adminmono tabular-nums")}
             >
