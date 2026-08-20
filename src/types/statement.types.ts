@@ -175,7 +175,9 @@ export interface IDrawingBody extends ICashSourceBody {
 
 export interface IOpeningBalanceBody {
   asOfDate: string;
-  cashGhs: number;
+  // No cashGhs: the opening cash position is derived from the cash book, and
+  // the backend refuses the field (OPENING_CASH_DERIVED). Post each account's
+  // opening balance to the cash book instead.
   inventoryGhs: number;
   notes?: null | string;
   payablesGhs: number;

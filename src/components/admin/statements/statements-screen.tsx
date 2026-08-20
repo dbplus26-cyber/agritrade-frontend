@@ -102,7 +102,6 @@ function OpeningBalanceCard() {
     values: opening
       ? {
           asOfDate: opening.asOfDate.slice(0, 10),
-          cashGhs: String(opening.cashGhs),
           inventoryGhs: String(opening.inventoryGhs),
           notes: opening.notes ?? "",
           payablesGhs: String(opening.payablesGhs),
@@ -115,7 +114,6 @@ function OpeningBalanceCard() {
     try {
       await save({
         asOfDate: values.asOfDate,
-        cashGhs: Number(values.cashGhs),
         inventoryGhs: Number(values.inventoryGhs),
         notes: values.notes?.trim() ? values.notes.trim() : null,
         payablesGhs: Number(values.payablesGhs),
@@ -161,7 +159,6 @@ function OpeningBalanceCard() {
               ["Inventory", formatCedis(opening.inventoryGhs)],
               ["Receivables", formatCedis(opening.receivablesGhs)],
               ["Payables", formatCedis(opening.payablesGhs)],
-              ["Cash", formatCedis(opening.cashGhs)],
             ].map(([label, value]) => (
               <div key={label} className="min-w-0">
                 <dt className="text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
@@ -219,14 +216,12 @@ function OpeningBalanceCard() {
                 {...register("payablesGhs")}
               />
             </AdminField>
-            <AdminField label="Cash & bank (GHS)" error={errors.cashGhs?.message}>
-              <Input
-                inputMode="decimal"
-                className={cn(adminInputClass, errors.cashGhs && "border-console-red")}
-                {...register("cashGhs")}
-              />
-            </AdminField>
           </div>
+          <p className="text-[12px] text-adm-muted">
+            The opening cash and bank position is not entered here - it is worked
+            out from the cash book. Post each account&rsquo;s opening balance to
+            the cash book instead.
+          </p>
           <AdminField label="Notes" optional error={errors.notes?.message}>
             <Input className={adminInputClass} {...register("notes")} />
           </AdminField>

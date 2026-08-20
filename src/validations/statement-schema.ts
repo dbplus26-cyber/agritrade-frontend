@@ -22,7 +22,6 @@ export const openingBalanceSchema = z.object({
       (v) => v.endsWith("-12-31"),
       "Balances must be as at 31 December - statements cover whole years",
     ),
-  cashGhs: moneyString("Cash"),
   inventoryGhs: moneyString("Inventory"),
   notes: z.string().trim().max(500).optional(),
   payablesGhs: moneyString("Payables"),
