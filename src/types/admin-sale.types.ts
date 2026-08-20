@@ -44,6 +44,11 @@ export interface ISalePayment {
   method: SalePaymentMethod;
   reference: string | null;
   paidAt: string;
+  /** Which company account the money landed in; null for cash into the till. */
+  paymentAccountId: null | string;
+  /** Set on a reversal row: what it cancels, and why. */
+  reversesId: null | string;
+  reversalReason: null | string;
 }
 
 /** A shipment carrying (part of) a sale, newest-first on the sale DTO. */
@@ -97,6 +102,8 @@ export interface ISale {
 export interface ISaleDetail extends ISale {
   milestones: ISaleMilestone[];
   payments: ISalePayment[];
+  /** Derived settlement state the register filters on: UNPAID | PART_PAID | PAID. */
+  paymentStatus: "PAID" | "PART_PAID" | "UNPAID";
   requiredBeforeLoadingGhs: number | null;
   /** True once payments cover every BEFORE_LOADING milestone. */
   beforeLoadingMet: boolean;

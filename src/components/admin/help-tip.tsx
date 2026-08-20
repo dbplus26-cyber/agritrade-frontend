@@ -130,7 +130,12 @@ export function HelpWrap({
     <TooltipProvider delayDuration={150}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className={cn("cursor-help", className)}>{children}</span>
+          {/* tabIndex puts the explanation in the tab order - a span trigger
+              is otherwise pointer-only, and Radix opens the tooltip on focus,
+              so this one attribute is the whole keyboard path. */}
+          <span className={cn("cursor-help", className)} tabIndex={0}>
+            {children}
+          </span>
         </TooltipTrigger>
         <TooltipContent
           className="max-w-[16rem] text-[12px] leading-[1.45]"

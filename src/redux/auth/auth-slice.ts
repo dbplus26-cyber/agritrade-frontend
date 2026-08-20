@@ -1,3 +1,4 @@
+import { clearAllDrafts } from "@/components/agent/draft-storage";
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { IUser } from "@/types/user.types";
 
@@ -62,6 +63,9 @@ const authSlice = createSlice({
     userLoggedOut: (state) => {
       state.user = null;
       persistUser(null);
+      // Field-form drafts hold real business figures typed on what is often a
+      // shared phone; they must not survive into the next person's session.
+      clearAllDrafts();
     },
   },
 });

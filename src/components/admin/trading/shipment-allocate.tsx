@@ -559,9 +559,14 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
             dispatch.
           </p>
 
-          {/* Sale tabs - the sale being loaded comes FIRST. */}
+          {/* Sale switcher - the sale being loaded comes FIRST. A GROUP of
+              toggle buttons, not role="tablist": the tab roles promise the
+              ARIA tabs keyboard pattern (arrow-key roving, aria-controls)
+              this simple switcher does not implement, and a promised pattern
+              that is absent is worse for a screen-reader user than plain
+              buttons that behave exactly as announced. */}
           <div
-            role="tablist"
+            role="group"
             aria-label="Sales on this shipment"
             className="flex gap-1.5 overflow-x-auto pb-0.5"
           >
@@ -572,8 +577,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                 <button
                   key={s.id}
                   type="button"
-                  role="tab"
-                  aria-selected={active}
+                  aria-pressed={active}
                   onClick={() => setActiveSaleId(s.id)}
                   className={cn(
                     "flex-none rounded-none border px-3 py-2 text-left outline-none focus-visible:ring-2 focus-visible:ring-console/40",

@@ -105,20 +105,17 @@ export interface ISupportedBank {
 }
 
 export interface IDisbursementResponse {
-  success: boolean;
   message: string;
   data: { disbursement: IDisbursement };
 }
 
 export interface IDisbursementListResponse {
-  success: boolean;
   message: string;
   data: IDisbursement[];
   meta: IPaginationMeta;
 }
 
 export interface ISupportedBanksResponse {
-  success: boolean;
   message: string;
   data: { banks: ISupportedBank[] };
 }
@@ -134,7 +131,6 @@ export interface IRecipientNameLookup {
 }
 
 export interface IRecipientNameResponse {
-  success: boolean;
   message: string;
   /** `configured: false` means the environment cannot look names up at all -
    * the hint simply stays silent. */
@@ -198,19 +194,16 @@ export interface ITransferListQuery {
 }
 
 export interface ITreasuryResponse {
-  success: boolean;
   message: string;
   data: { treasury: ITreasuryOverview };
 }
 
 export interface IBalanceTransferResponse {
-  success: boolean;
   message: string;
   data: { transfer: IBalanceTransfer };
 }
 
 export interface IBalanceTransferListResponse {
-  success: boolean;
   message: string;
   data: IBalanceTransfer[];
   meta: IPaginationMeta;

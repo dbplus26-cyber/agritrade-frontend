@@ -27,6 +27,12 @@ export const makeExpenseSchema = (options?: {
         .string()
         .min(1, "Enter the amount")
         .refine((v) => Number(v) > 0, "The amount must be more than zero")
+        // The backend's moneyField ceiling - uncapped here, a fat-fingered
+        // amount met a raw 400 instead of a field message.
+        .refine(
+          (v) => Number(v) <= 10_000_000,
+          "Enter an amount up to 10,000,000",
+        )
         .refine(
           (v) => /^\d+(\.\d{1,2})?$/.test(v),
           "Amounts are recorded to 2 decimal places (pesewas)",

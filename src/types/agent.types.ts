@@ -121,7 +121,6 @@ export interface IFloatHolderListQuery {
 }
 
 export interface IFloatHolderListResponse {
-  success: boolean;
   message: string;
   data: IFloatHolder[];
   meta: IPaginationMeta;

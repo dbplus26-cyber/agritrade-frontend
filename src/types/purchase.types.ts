@@ -219,9 +219,9 @@ export interface IPurchaseCost extends IExpense {
 /**
  * The costs standing against one purchase.
  *
- * NOTE: the backend does not serve this yet - `GET
- * /api/v1/admin/purchases/:purchaseId/expenses` has to be added alongside the
- * POST that already lives at that path. The shape below is what this console
+ * Served by `GET /api/v1/admin/purchases/:purchaseId/expenses` (the note that
+ * used to sit here claimed the endpoint did not exist yet; it does, beside the
+ * POST at the same path). The shape below is what this console
  * reads: the vouchers, unpaginated the way the payment ledger is, each
  * carrying `capitalisedAt`. No totals travel with them on purpose - a figure
  * redacted for one reader has to stay redacted in the sum, so the sum is

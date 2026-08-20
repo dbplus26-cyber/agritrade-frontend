@@ -47,3 +47,21 @@ export function clearDraft(storageKey: string): void {
 export function draftKey<T>(storageKey: string): string {
   return loadDraft<T>(storageKey)?.key ?? newKey();
 }
+
+/**
+ * The known draft keys, so ending a session can sweep them. Drafts hold real
+ * business figures (a purchase's weight and price, a cost and its category)
+ * typed on what is often a SHARED phone at a buying station - surviving logout
+ * meant the next person to sign in on the device saw the last agent's numbers.
+ * Registered here rather than discovered by prefix, because localStorage
+ * enumeration is what a typo in the prefix silently breaks.
+ */
+const DRAFT_KEYS = [
+  "dbplus.agent.expense.draft",
+  "dbplus.agent.purchase.draft",
+];
+
+/** Sweeps every field-form draft. Called when the session ends. */
+export function clearAllDrafts(): void {
+  for (const key of DRAFT_KEYS) clearDraft(key);
+}
