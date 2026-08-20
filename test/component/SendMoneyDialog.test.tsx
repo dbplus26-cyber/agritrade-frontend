@@ -21,7 +21,7 @@
 // picker is its own searchable screen and is stubbed to a plain select so
 // this file tests the dialog's rules, not the picker's.
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEventBase from "@testing-library/user-event";
 
 import { pickOption } from "../helpers/pick-option";
@@ -135,6 +135,13 @@ const clearGate = async (last4: string) => {
   const box = await screen.findByLabelText(/to confirm/i);
   const gate = box.closest('[role="dialog"]');
   if (!gate) throw new Error("the type-back box is not inside a dialog");
+  // The box EXISTS before it is clickable: Radix's dismissable layer turns
+  // pointer events back on for the new dialog an effect-tick after it mounts,
+  // and on a slow CI runner a type landing inside that tick is refused with
+  // "pointer-events: none". Hover runs the same pointer check user-event makes
+  // before typing, with no side effect, so polling it waits for exactly the
+  // condition the type needs - and nothing is typed twice on a retry.
+  await waitFor(() => userEvent.hover(box));
   await userEvent.type(box, last4);
   await userEvent.click(
     within(gate as HTMLElement).getByRole("button", { name: "Send money" }),
