@@ -15,6 +15,12 @@ const requiredNumber = (label: string, max: number) =>
     .min(1, `Enter the ${label}`)
     .refine((v) => Number(v) > 0 && Number(v) <= max, {
       message: `Enter a ${label} between 0 and ${max.toLocaleString("en-GH")}`,
+    })
+    // The backend stores weights and prices at 2dp (multipleOf 0.01) and rejects
+    // a 3dp value rather than rounding it, so the form must refuse it here or the
+    // user meets a raw 400 - the same 2dp rule every money field on the wire has.
+    .refine((v) => /^\d+(\.\d{1,2})?$/.test(v), {
+      message: `A ${label} is recorded to at most 2 decimal places`,
     });
 
 const optionalText = (max: number) =>
@@ -29,7 +35,7 @@ export const purchaseSchema = z
     agentProfileId: z.string().optional(),
     warehouseId: z.string().optional(),
     weightKg: requiredNumber("weight in kg", 1_000_000),
-    unitPriceGhs: requiredNumber("price per kg", 1_000_000),
+    unitPriceGhs: requiredNumber("price per kg", 10_000),
     purchasedAt: z.string().min(1, "Enter the purchase date"),
     notes: optionalText(1000),
   })
@@ -47,7 +53,7 @@ export const agentPurchaseSchema = z.object({
   commodityId: z.string().min(1, "Choose the commodity"),
   supplierId: z.string().optional(),
   weightKg: requiredNumber("weight in kg", 1_000_000),
-  unitPriceGhs: requiredNumber("price per kg", 1_000_000),
+  unitPriceGhs: requiredNumber("price per kg", 10_000),
   purchasedAt: z.string().min(1, "Enter the purchase date"),
   /**
    * Whether the money changed hands at the scale.
