@@ -1,5 +1,6 @@
 import { apiSlice } from "../api-slice";
 import { toQueryString } from "@/lib/to-query-string";
+import type { IAccountTransferResponse } from "@/types/cashbook.types";
 import type {
   IAgentDetailResponse,
   IAgentListQuery,
@@ -8,7 +9,6 @@ import type {
   IFloatLedgerQuery,
   IAgentMoneySummaryResponse,
   IFloatLedgerResponse,
-  IFloatTransactionResponse,
   IReconciliationListResponse,
   IReconciliationPreviewResponse,
   IReconciliationResponse,
@@ -64,7 +64,7 @@ export const agentsApi = apiSlice.injectEndpoints({
     }),
 
     topUpAgent: builder.mutation<
-      IFloatTransactionResponse,
+      IAccountTransferResponse,
       { agentUserId: string; body: ITopUpInput }
     >({
       query: ({ agentUserId, body }) => ({

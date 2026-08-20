@@ -1,11 +1,11 @@
 import { apiSlice } from "../api-slice";
 import { toQueryString } from "@/lib/to-query-string";
+import type { IAccountTransferResponse } from "@/types/cashbook.types";
 import type {
   IFloatHolderListQuery,
   IFloatHolderListResponse,
   IFloatLedgerQuery,
   IFloatLedgerResponse,
-  IFloatTransactionResponse,
 } from "@/types/agent.types";
 import type { IMessageResponse } from "@/types/auth.types";
 
@@ -67,7 +67,7 @@ export const floatsApi = apiSlice.injectEndpoints({
      * landed in, because a pocket, a wallet and a bank are different money.
      */
     topUpHolderFloat: builder.mutation<
-      IFloatTransactionResponse,
+      IAccountTransferResponse,
       {
         amountGhs: number;
         fromAccountId: string;

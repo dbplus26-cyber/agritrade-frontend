@@ -1,10 +1,10 @@
 import { apiSlice } from "../api-slice";
 import { toQueryString } from "@/lib/to-query-string";
 import type {
+  IFieldExpenseResponse,
   IAgentExpenseInput,
   IFloatLedgerQuery,
   IFloatLedgerResponse,
-  IFloatTransactionResponse,
   IMySpendingResponse,
 } from "@/types/agent.types";
 import type {
@@ -94,7 +94,7 @@ export const agentApi = apiSlice.injectEndpoints({
     }),
 
     createMyExpense: builder.mutation<
-      IFloatTransactionResponse,
+      IFieldExpenseResponse,
       { body: IAgentExpenseInput; idempotencyKey: string }
     >({
       query: ({ body, idempotencyKey }) => ({

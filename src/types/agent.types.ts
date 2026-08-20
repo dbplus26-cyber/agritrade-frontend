@@ -237,9 +237,23 @@ export interface IFloatLedgerResponse {
   };
 }
 
-export interface IFloatTransactionResponse {
+/**
+ * What recording a field expense answers with. `data.expense`, mirroring the
+ * agent controller - NOT a float transaction, which is what the old
+ * IFloatTransactionResponse wrongly claimed for this and the top-ups (which
+ * return data.transfer, see IAccountTransferResponse).
+ */
+export interface IFieldExpenseResponse {
   message: string;
-  data: { transaction: IFloatTransaction };
+  data: {
+    expense: {
+      amountGhs: number;
+      description: null | string;
+      id: string;
+      incurredAt: string;
+      transactionNo: string;
+    };
+  };
 }
 
 export interface IReconciliationListResponse {
