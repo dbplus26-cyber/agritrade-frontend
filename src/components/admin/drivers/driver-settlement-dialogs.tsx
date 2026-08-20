@@ -4,6 +4,7 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
+import { PaidThroughSystemField } from "@/components/admin/paid-through-system-field";
 import { PaymentAccountField } from "@/components/admin/payment-account-field";
 import {
   AdminButton,
@@ -189,6 +190,12 @@ const paymentSchema = z.object({
     .refine((v) => Number(v) > 0, {
       message: "The amount must be more than zero",
     }),
+  /**
+   * Set when this books against a send the system already made. The account is
+   * then implied (the payout wallet) and no movement is posted, because the
+   * send already moved the money.
+   */
+  disbursementId: z.string(),
   method: z.enum(["BANK", "CASH", "MOMO"]),
   paidAt: z.string().min(1, "Pick a date"),
   paymentAccountId: z.string(),
@@ -219,6 +226,7 @@ export function DriverPaymentDialog({
   } = useForm<PaymentValues>({
     defaultValues: {
       amountGhs: "",
+      disbursementId: "",
       method: "MOMO",
       paidAt: todayInputValue(),
       paymentAccountId: "",
@@ -227,6 +235,10 @@ export function DriverPaymentDialog({
     resolver: zodResolver(paymentSchema),
   });
   const method = useWatch({ control, name: "method" });
+  // A matched send answers "which account" and "what reference" on its own, so
+  // both controls come off the form rather than asking for answers the server
+  // ignores.
+  const matchedSend = useWatch({ control, name: "disbursementId" });
 
   /**
    * The one-tap amounts: half of what is left, and all of it.
@@ -254,10 +266,12 @@ export function DriverPaymentDialog({
     // settlement is keyed from looks the same for every trip.
     const ok = await confirm({
       title: "Record this payment?",
-      description: `${formatCedis(Number(values.amountGhs))} paid to ${driverName} by ${
-        PAYMENT_METHOD_OPTIONS.find((o) => o.value === values.method)?.label ??
-        values.method
-      }. It goes on the books as settled against this trip; only a reversal takes it back off.`,
+      description: values.disbursementId
+        ? `${formatCedis(Number(values.amountGhs))} to ${driverName}, booked against a send the system already made. The money has already left the payout wallet, so nothing is deducted again; this records what it settled. Only a reversal takes it back off.`
+        : `${formatCedis(Number(values.amountGhs))} paid to ${driverName} by ${
+            PAYMENT_METHOD_OPTIONS.find((o) => o.value === values.method)
+              ?.label ?? values.method
+          }. It goes on the books as settled against this trip; only a reversal takes it back off.`,
       confirmText: "Record payment",
     });
     if (!ok) return;
@@ -268,7 +282,13 @@ export function DriverPaymentDialog({
           amountGhs: Number(values.amountGhs),
           method: values.method,
           paidAt: values.paidAt,
-          ...(values.paymentAccountId
+          ...(values.disbursementId
+            ? { disbursementId: values.disbursementId }
+            : {}),
+          // Not sent alongside a matched send: the server resolves the payout
+          // wallet itself, because that is the one account this can have come
+          // out of and it is deliberately absent from the picker.
+          ...(!values.disbursementId && values.paymentAccountId
             ? { paymentAccountId: values.paymentAccountId }
             : {}),
           ...(values.reference ? { reference: values.reference } : {}),
@@ -386,7 +406,19 @@ export function DriverPaymentDialog({
 
           {/* Cash leaves the till, not an account, so the picker is only
               meaningful for the two rails that move through one. */}
-          {method !== "CASH" ? (
+          <Controller
+            control={control}
+            name="disbursementId"
+            render={({ field }) => (
+              <PaidThroughSystemField
+                error={errors.disbursementId?.message}
+                onChange={field.onChange}
+                value={field.value}
+              />
+            )}
+          />
+
+          {method !== "CASH" && !matchedSend ? (
             <Controller
               control={control}
               name="paymentAccountId"
@@ -402,18 +434,20 @@ export function DriverPaymentDialog({
             />
           ) : null}
 
-          <AdminField
-            error={errors.reference?.message}
-            hint="The transfer or MoMo reference. Recording the same one twice against this trip is refused."
-            label="Reference"
-            optional
-          >
-            <Input
-              className={adminInputClass}
-              placeholder="e.g. TRF884512"
-              {...register("reference")}
-            />
-          </AdminField>
+          {!matchedSend ? (
+            <AdminField
+              error={errors.reference?.message}
+              hint="The transfer or MoMo reference. Recording the same one twice against this trip is refused."
+              label="Reference"
+              optional
+            >
+              <Input
+                className={adminInputClass}
+                placeholder="e.g. TRF884512"
+                {...register("reference")}
+              />
+            </AdminField>
+          ) : null}
 
           <ResponsiveDialogFooter className="gap-2">
             <AdminButton onClick={onClose} type="button" variant="ghost">

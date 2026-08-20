@@ -76,16 +76,14 @@ export interface ICreateExpenseInput {
  * gets recorded by accident. BANK and MOMO must carry both a reference and the
  * account the money moved on (REFERENCE_REQUIRED, ACCOUNT_REQUIRED); cash
  * needs neither and falls to the office till.
+ *
+ * No disbursementId, deliberately, and the server strips it: booking a Hubtel
+ * send is a decision about a cost that ALREADY EXISTS, and the send has to have
+ * landed before anything can be booked against it. Match it from the cost's
+ * own settlement card instead.
  */
 export interface IExpensePaymentOnCreate {
   amountGhs?: number;
-  /**
-   * A settled Hubtel send this books against instead of describing a movement
-   * of its own. The server resolves the paying account (the payout wallet) and
-   * posts NO movement, because the send already moved the money. Never sent
-   * together with paymentAccountId.
-   */
-  disbursementId?: string;
   method: SalePaymentMethod;
   paidAt?: string;
   paymentAccountId?: string;

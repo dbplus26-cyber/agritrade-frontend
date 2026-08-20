@@ -181,6 +181,13 @@ export interface IAdjustDriverFeeInput {
 
 export interface IRecordDriverPaymentInput {
   amountGhs: number;
+  /**
+   * A settled Hubtel send this books against instead of describing a movement
+   * of its own. The server resolves the paying account (the payout wallet) and
+   * posts NO movement, because the send already moved the money. Never sent
+   * together with paymentAccountId.
+   */
+  disbursementId?: string;
   method: SalePaymentMethod;
   paidAt?: string;
   paymentAccountId?: string;
