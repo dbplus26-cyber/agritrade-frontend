@@ -166,6 +166,7 @@ export const shipmentsApi = apiSlice.injectEndpoints({
         { type: "Shipments", id },
         { type: "Shipments", id: "LIST" },
         { type: "Stock", id: "LIST" },
+        { type: "StockMovements", id: "LIST" },
         { type: "Sales", id: "LIST" },
         { type: "EligibleSales", id: "LIST" },
         { type: "ApprovalsCount", id: "COUNT" },
@@ -196,7 +197,7 @@ export const shipmentsApi = apiSlice.injectEndpoints({
           ? [
               ...sales.map((s) => ({ type: "Sales" as const, id: s.saleId })),
               { type: "Sales" as const, id: "LIST" },
-              { type: "Sales" as const, id: "DEBTORS" },
+              { type: "Reports" as const, id: "DEBTORS" },
               { type: "SaleStats" as const, id: "SUMMARY" },
               { type: "Reports" as const, id: "LIST" },
             ]
@@ -238,7 +239,14 @@ export const shipmentsApi = apiSlice.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: (_r, _e, { id }) => [{ type: "Shipments", id }],
+      // A shipment expense IS an ordinary Expense voucher, so the general
+      // expenses register and the reports built on it must refresh too, exactly
+      // as voiding one below does.
+      invalidatesTags: (_r, _e, { id }) => [
+        { type: "Shipments", id },
+        { type: "Expenses", id: "LIST" },
+        { type: "Reports", id: "LIST" },
+      ],
     }),
 
     /**

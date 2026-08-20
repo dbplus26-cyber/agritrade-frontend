@@ -100,7 +100,7 @@ export const adminSalesApi = apiSlice.injectEndpoints({
       invalidatesTags: (_r, _e, { id }) => [
         { type: "Sales", id },
         { type: "Sales", id: "LIST" },
-        { type: "Sales", id: "DEBTORS" },
+        { type: "Reports", id: "DEBTORS" },
         { type: "SaleStats", id: "SUMMARY" },
         { type: "EligibleSales", id: "LIST" },
       ],
@@ -120,7 +120,7 @@ export const adminSalesApi = apiSlice.injectEndpoints({
       invalidatesTags: (_r, _e, { id }) => [
         { type: "Sales", id },
         { type: "Sales", id: "LIST" },
-        { type: "Sales", id: "DEBTORS" },
+        { type: "Reports", id: "DEBTORS" },
         { type: "SaleStats", id: "SUMMARY" },
         { type: "EligibleSales", id: "LIST" },
         { type: "PaymentAccounts", id: "HISTORY" },
@@ -145,7 +145,7 @@ export const adminSalesApi = apiSlice.injectEndpoints({
       invalidatesTags: (_r, _e, { id }) => [
         { type: "Sales", id },
         { type: "Sales", id: "LIST" },
-        { type: "Sales", id: "DEBTORS" },
+        { type: "Reports", id: "DEBTORS" },
         { type: "SaleStats", id: "SUMMARY" },
         { type: "EligibleSales", id: "LIST" },
         { type: "PaymentAccounts", id: "HISTORY" },

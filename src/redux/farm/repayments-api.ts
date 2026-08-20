@@ -63,6 +63,7 @@ export const repaymentsApi = apiSlice.injectEndpoints({
         { type: "Repayments", id: "LIST" },
         { type: "FarmStats", id: "LIST" },
         { type: "Stock", id: "LIST" },
+        { type: "StockMovements", id: "LIST" },
       ],
     }),
 
