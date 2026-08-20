@@ -286,6 +286,12 @@ export interface ITopUpInput {
   amountGhs: number;
   /** The company account the money actually left. */
   fromAccountId: string;
+  /**
+   * Retry-safety. The dialog re-sends when a request times out, and without a
+   * key that hands the agent real money twice - the backend fundHolder dedupes
+   * on it exactly as the floats-screen top-up already does.
+   */
+  idempotencyKey?: string;
   occurredAt?: string;
   reason?: string;
   /** One of the holder's own accounts; omit and `toKind` opens the right one. */

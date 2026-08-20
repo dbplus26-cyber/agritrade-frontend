@@ -1,5 +1,6 @@
 "use client";
 
+import { useIdempotencyKey } from "@/components/admin/disbursements/disbursement-bits";
 import { useState } from "react";
 import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
@@ -309,6 +310,9 @@ function TopUpDialog({
 }) {
   const [topUp, { isLoading }] = useTopUpAgentMutation();
   const { confirm, confirmationDialog } = useConfirm();
+  // Money handed over is real: a re-submit after a timeout must credit the
+  // agent once, not twice. Reset per open, like the floats-screen top-up.
+  const idempotencyKey = useIdempotencyKey(open);
   const {
     register,
     control,
@@ -345,6 +349,7 @@ function TopUpDialog({
         body: {
           amountGhs: Number(values.amountGhs),
           fromAccountId: values.fromAccountId,
+          idempotencyKey: idempotencyKey(),
           toKind: values.toKind,
           ...(values.reason?.trim() ? { reason: values.reason.trim() } : {}),
         },
