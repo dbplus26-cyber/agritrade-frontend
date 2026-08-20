@@ -65,7 +65,7 @@ export function formatCedisCompact(major: number | null, currency = "GH₵"): st
         ? [1_000_000, "M"]
         : [1_000, "k"];
   const scaled = major / divisor;
-  // One decimal below 100 of the unit (344.7k), none above (1,204k) - keeps
+  // One decimal below 100 of the unit (1.2M), none above (345k) - keeps
   // every compacted figure to at most 8 characters.
   const digits = Math.abs(scaled) < 100 ? 1 : 0;
   return `${currency} ${scaled.toLocaleString("en-GH", {
