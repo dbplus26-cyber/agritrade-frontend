@@ -36,4 +36,13 @@ jobs:
         run: npm test
 
       - name: Build
+        # Placeholder values, deliberately. The env module fails fast on a
+        # missing NEXT_PUBLIC_SERVER_URI (better a build error than a console
+        # quietly calling undefined/api/v1), and CI has no .env. This build
+        # verifies the code compiles and every page renders - it is never
+        # deployed, so the API origin baked into it does not matter. The real
+        # values live in the hosting platform's environment.
+        env:
+          NEXT_PUBLIC_SERVER_URI: http://ci-placeholder.local/api/v1
+          NEXT_PUBLIC_BASE_URL: http://ci-placeholder.local
         run: npm run build
