@@ -83,6 +83,53 @@ export const sendLimitSchema = z.object({
       (v) => v === "" || (Number(v) > 0 && /^\d+(\.\d{1,2})?$/.test(v)),
       "Enter an amount above zero, or leave it blank for no limit",
     ),
-  drawsOnAccountId: z.string(),
 });
 export type SendLimitValues = z.infer<typeof sendLimitSchema>;
+
+/**
+ * The one form behind "Give money", across all three things that phrase can
+ * mean. Which fields matter depends on `mode`, so the cross-field rules live
+ * here rather than in three near-identical schemas:
+ *
+ *   CASH    - notes out of the office till. No account to pick: the till is
+ *             resolved by name, and their cash account is opened on demand.
+ *   ECASH   - a transfer, so it must say which company account it left.
+ *   SPEND   - permission, not money. Only the cap applies, and blank means
+ *             uncapped rather than nothing.
+ */
+export const giveMoneySchema = z
+  .object({
+    amountGhs: z.string().trim(),
+    capGhs: z
+      .string()
+      .trim()
+      .refine(
+        (v) => v === "" || (Number(v) > 0 && /^\d+(\.\d{1,2})?$/.test(v)),
+        "Enter an amount above zero, or leave it blank for no limit",
+      ),
+    fromAccountId: z.string(),
+    mode: z.enum(["CASH", "ECASH", "SPEND"]),
+    reason: optionalText(500),
+    toKind: z.enum(["MOMO", "BANK"]),
+  })
+  .superRefine((v, ctx) => {
+    if (v.mode === "SPEND") return;
+    if (!/^\d+(\.\d{1,2})?$/.test(v.amountGhs) || Number(v.amountGhs) <= 0) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Enter an amount above zero",
+        path: ["amountGhs"],
+      });
+    }
+    // Only the transfer needs a source named. Cash always leaves the till, and
+    // making the owner pick it off a list is how the wrong cash-looking
+    // account eventually gets chosen.
+    if (v.mode === "ECASH" && !v.fromAccountId) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Say which account the money is going out of",
+        path: ["fromAccountId"],
+      });
+    }
+  });
+export type GiveMoneyValues = z.infer<typeof giveMoneySchema>;

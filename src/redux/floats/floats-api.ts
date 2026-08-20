@@ -98,16 +98,18 @@ export const floatsApi = apiSlice.injectEndpoints({
      * and the other is cash, and the float made them the same thing, so a
      * top-up silently widened what an agent could draw on the company wallet.
      *
-     * Both fields optional - raising a limit should not mean restating where
-     * it draws from - and `capGhs: null` CLEARS the cap rather than setting it
-     * to nothing. A cap of zero is refused by the server: zero is not a cap,
-     * it is a suspension, and there is a switch for that below.
+     * `capGhs: null` CLEARS the cap rather than setting it to nothing. A cap of
+     * zero is refused by the server: zero is not a cap, it is a suspension, and
+     * there is a switch for that below.
+     *
+     * There is no account to name. A send is a Hubtel API call against the
+     * Hubtel disbursement wallet, so an allowance pointed anywhere else booked
+     * the debit against an account the money had never left.
      */
     setHolderAuthority: builder.mutation<
       IMessageResponse,
       {
         capGhs?: null | number;
-        drawsOnAccountId?: null | string;
         userId: string;
       }
     >({

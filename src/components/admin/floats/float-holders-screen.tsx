@@ -52,13 +52,13 @@ import {
   useTopUpHolderFloatMutation,
 } from "@/redux/floats/floats-api";
 import type { IFloatHolder, IFloatHolderListQuery } from "@/types/agent.types";
+import type { ISettlementAccount } from "@/types/payment-account.types";
 import { UserRole } from "@/types/user.types";
 import { PaymentAccountField } from "@/components/admin/payment-account-field";
+import { useGetSettlementAccountsQuery } from "@/redux/payment-accounts/payment-accounts-api";
 import {
-  sendLimitSchema,
-  type SendLimitValues,
-  topUpSchema,
-  type TopUpValues,
+  giveMoneySchema,
+  type GiveMoneyValues,
 } from "@/validations/float-schema";
 
 const FILTER_DEFAULTS = { funded: "all", role: "all", size: "10" };
@@ -86,8 +86,7 @@ export function FloatHoldersScreen() {
   const showMoney = useMoneyVisibility();
   const { filters, page, queryParams, resetFilters, search, setFilter, setPage, setSearch } =
     useTableQuery({ defaults: FILTER_DEFAULTS });
-  const [toppingUp, setToppingUp] = useState<IFloatHolder | null>(null);
-  const [settingLimit, setSettingLimit] = useState<IFloatHolder | null>(null);
+  const [giving, setGiving] = useState<IFloatHolder | null>(null);
 
   const limit = Number(filters.size);
   const args: IFloatHolderListQuery = {
@@ -217,8 +216,7 @@ export function FloatHoldersScreen() {
         cell: ({ row }) => (
           <HolderActions
             holder={row.original}
-            onSetLimit={setSettingLimit}
-            onTopUp={setToppingUp}
+            onGive={setGiving}
           />
         ),
       });
@@ -303,11 +301,7 @@ export function FloatHoldersScreen() {
         </AdminCard>
       )}
 
-      <TopUpDialog holder={toppingUp} onClose={() => setToppingUp(null)} />
-      <SendLimitDialog
-        holder={settingLimit}
-        onClose={() => setSettingLimit(null)}
-      />
+      <GiveMoneyDialog holder={giving} onClose={() => setGiving(null)} />
     </div>
   );
 }
@@ -370,12 +364,10 @@ function HolderAllowance({ holder }: { holder: IFloatHolder }) {
 
 function HolderActions({
   holder,
-  onTopUp,
-  onSetLimit,
+  onGive,
 }: {
   holder: IFloatHolder;
-  onSetLimit: (holder: IFloatHolder) => void;
-  onTopUp: (holder: IFloatHolder) => void;
+  onGive: (holder: IFloatHolder) => void;
 }) {
   const [setStatus, { isLoading }] = useSetFloatHolderStatusMutation();
   const { confirm, confirmationDialog } = useConfirm();
@@ -404,18 +396,12 @@ function HolderActions({
 
   return (
     <div className="flex flex-wrap justify-end gap-2">
-      <AdminButton onClick={() => onTopUp(holder)} type="button" variant="ghost">
-        Top up
-      </AdminButton>
-      {/* Separate from Top up, deliberately. Handing somebody money and
-          widening what they may draw on the company's account are two
-          decisions, and the float made them one act. */}
-      <AdminButton
-        onClick={() => onSetLimit(holder)}
-        type="button"
-        variant="ghost"
-      >
-        Send limit
+      {/* One door. Handing over notes, transferring e-cash and widening what
+          somebody may spend of the company's money are three different acts
+          with three different entries in the books - but a reader should not
+          have to know which one they want before they can find it. */}
+      <AdminButton onClick={() => onGive(holder)} type="button" variant="ghost">
+        Give money
       </AdminButton>
       {holder.accountId ? (
         <AdminButton
@@ -433,185 +419,153 @@ function HolderActions({
 }
 
 /**
- * Setting what somebody may SEND, and out of which company account.
+ * One dialog for every way money reaches a holder.
  *
- * A separate dialog from Top up, deliberately. Handing an agent cash and
- * widening what they may draw on the company's wallet are two different
- * decisions, and the float made them one act - so every top-up silently raised
- * what the agent could spend of the business's money. The two are never going
- * back into one form.
+ * There used to be two, and the split was along the wrong seam. "Top up" and
+ * "Send limit" are not two features, they are three DIFFERENT ACTS that the
+ * console asked about in two places:
+ *
+ *   1. notes handed across a desk,
+ *   2. e-cash transferred to their MoMo or bank,
+ *   3. permission to spend the company's money without holding any of it.
+ *
+ * Anyone reading two buttons had to already know which of the three they
+ * wanted before they could find it. Worse, the old Send limit dialog asked
+ * which account the sending drew on, which invited the one answer that cannot
+ * work: a send is a Hubtel API call against the Hubtel disbursement wallet, so
+ * an allowance pointed at the company MoMo booked the debit somewhere the money
+ * had never left. There is no picker here, because there is no choice.
+ *
+ * So: ask what KIND of giving this is first, and let that decide the fields.
+ * The three branches map onto what the server already models - a transfer into
+ * a held account for the first two, a spending authority for the third.
  */
-function SendLimitDialog({
+const GIVE_MODES: {
+  blurb: string;
+  label: string;
+  value: GiveMoneyValues["mode"];
+}[] = [
+  {
+    blurb:
+      "Notes out of the office cash till, into their name. Counted against them until it comes back or is spent.",
+    label: "Physical cash",
+    value: "CASH",
+  },
+  {
+    blurb:
+      "A transfer from a company account to their mobile money or bank. Say which account it leaves.",
+    label: "Send them e-cash",
+    value: "ECASH",
+  },
+  {
+    blurb:
+      "No money changes hands. They may send up to this much of the company's money from their console.",
+    label: "Let them spend company money",
+    value: "SPEND",
+  },
+];
+
+const E_CASH_TENDERS: { label: string; value: "BANK" | "MOMO" }[] = [
+  { label: "Their mobile money", value: "MOMO" },
+  { label: "Their bank account", value: "BANK" },
+];
+
+function GiveMoneyDialog({
   holder,
   onClose,
 }: {
-  holder: IFloatHolder | null;
+  holder: null | IFloatHolder;
   onClose: () => void;
 }) {
-  const [setAuthority, { isLoading }] = useSetHolderAuthorityMutation();
-  const form = useForm<SendLimitValues>({
-    defaultValues: { capGhs: "", drawsOnAccountId: "" },
-    resolver: zodResolver(sendLimitSchema),
+  const [topUp, { isLoading: funding }] = useTopUpHolderFloatMutation();
+  const [setAuthority, { isLoading: authorising }] =
+    useSetHolderAuthorityMutation();
+  const { confirm, confirmationDialog } = useConfirm();
+  const { data: settlement } = useGetSettlementAccountsQuery();
+
+  const form = useForm<GiveMoneyValues>({
+    defaultValues: {
+      amountGhs: "",
+      capGhs: "",
+      fromAccountId: "",
+      mode: "CASH",
+      reason: "",
+      toKind: "MOMO",
+    },
+    resolver: zodResolver(giveMoneySchema),
   });
+  const mode = form.watch("mode");
+
+  // Money handed over is real; the key makes a re-submitted form credit the
+  // person once rather than twice. Permission is idempotent by nature.
+  const idempotencyKey = useIdempotencyKey(holder !== null);
 
   useEffect(() => {
     if (!holder) return;
     form.reset({
+      amountGhs: "",
       capGhs:
         holder.authority?.capGhs === null ||
         holder.authority?.capGhs === undefined
           ? ""
           : String(holder.authority.capGhs),
-      drawsOnAccountId: holder.authority?.drawsOnAccount?.id ?? "",
+      fromAccountId: "",
+      mode: "CASH",
+      reason: "",
+      toKind: "MOMO",
     });
   }, [form, holder]);
 
-  const onSubmit = async (values: SendLimitValues) => {
-    if (!holder) return;
-    try {
-      const res = await setAuthority({
-        // Blank CLEARS the cap. Sending zero would suspend them instead, which
-        // is a different decision with its own switch.
-        capGhs: values.capGhs === "" ? null : Number(values.capGhs),
-        drawsOnAccountId: values.drawsOnAccountId || null,
-        userId: holder.userId,
-      }).unwrap();
-      notify.success(res.message);
-      onClose();
-    } catch (err) {
-      notify.error(extractApiError(err).message);
-    }
-  };
-
-  return (
-    <ResponsiveDialog
-      open={holder !== null}
-      onOpenChange={(o) => !o && onClose()}
-    >
-      <ResponsiveDialogContent className="sm:max-w-[500px]">
-        <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle className="[overflow-wrap:anywhere]">
-            What {holder ? holder.firstName : "they"} may send
-          </ResponsiveDialogTitle>
-          <ResponsiveDialogDescription>
-            This is permission to spend the COMPANY&apos;s money, not money
-            handed to them. A send takes the amount out of the account below,
-            never out of what they are holding.
-          </ResponsiveDialogDescription>
-        </ResponsiveDialogHeader>
-
-        <form
-          className="space-y-5 px-4 pb-2 sm:px-0"
-          onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
-        >
-          <AdminField
-            label="Most they may send (GH₵)"
-            error={form.formState.errors.capGhs?.message}
-            hint="Leave blank for no limit. Measured against what they have already sent, not against a balance that falls."
-          >
-            <Input
-              className={cn(adminInputClass, "font-adminmono")}
-              inputMode="decimal"
-              placeholder="Blank for no limit"
-              {...form.register("capGhs")}
-            />
-          </AdminField>
-          <Controller
-            control={form.control}
-            name="drawsOnAccountId"
-            render={({ field }) => (
-              <PaymentAccountField
-                direction="out"
-                error={form.formState.errors.drawsOnAccountId?.message}
-                label="Sends come out of"
-                onChange={field.onChange}
-                value={field.value}
-              />
-            )}
-          />
-        </form>
-
-        <ResponsiveDialogFooter>
-          <AdminButton onClick={onClose} type="button" variant="ghost">
-            Cancel
-          </AdminButton>
-          <AdminButton
-            disabled={isLoading}
-            onClick={(e) => void form.handleSubmit(onSubmit)(e)}
-            type="button"
-          >
-            {isLoading ? "Saving…" : "Save limit"}
-          </AdminButton>
-        </ResponsiveDialogFooter>
-      </ResponsiveDialogContent>
-    </ResponsiveDialog>
+  /**
+   * The office cash box, resolved BY NAME rather than picked off a list. The
+   * server keeps it under a stable handle precisely so a screen never has to
+   * guess which of several cash-looking accounts is the real till.
+   */
+  const till = settlement?.data.accounts.find(
+    (a: ISettlementAccount) => a.systemKey === "COMPANY_TILL",
   );
-}
 
-/**
- * Where a top-up LANDS, named once.
- *
- * The picker and the confirm step read from the same list so they cannot
- * drift: a dialog that reads back "cash in hand" for a transfer that actually
- * went to a bank account is worse than no read-back at all, because it is
- * believed.
- */
-const TOP_UP_TENDER_OPTIONS: { label: string; value: TopUpValues["toKind"] }[] =
-  [
-    { label: "Cash in hand", value: "CASH" },
-    { label: "Their mobile money", value: "MOMO" },
-    { label: "Their bank account", value: "BANK" },
-  ];
-
-function TopUpDialog({
-  holder,
-  onClose,
-}: {
-  holder: IFloatHolder | null;
-  onClose: () => void;
-}) {
-  const [topUp, { isLoading }] = useTopUpHolderFloatMutation();
-  const { confirm, confirmationDialog } = useConfirm();
-  const form = useForm<TopUpValues>({
-    defaultValues: {
-      amountGhs: "",
-      fromAccountId: "",
-      reason: "",
-      toKind: "CASH",
-    },
-    resolver: zodResolver(topUpSchema),
-  });
-
-  // A top-up is real cash handed over; the key makes a re-submitted one
-  // credit the person once rather than twice.
-  const idempotencyKey = useIdempotencyKey(holder !== null);
-  useEffect(() => {
-    if (holder) {
-      form.reset({
-        amountGhs: "",
-        fromAccountId: "",
-        reason: "",
-        toKind: "CASH",
-      });
-    }
-  }, [form, holder]);
-
-  const onSubmit = async (values: TopUpValues) => {
+  const onSubmit = async (values: GiveMoneyValues) => {
     if (!holder) return;
+    const who = `${holder.firstName} ${holder.lastName}`;
 
-    // The same act as the agent float top-up, and gated the same way: cash
-    // leaving the business for a named person to hold. The one mistake here -
-    // right amount, wrong holder, picked off a list of similar names on a
-    // phone - is silent until somebody reconciles, so the holder's own name
-    // has to be typed before it commits.
+    if (values.mode === "SPEND") {
+      try {
+        const res = await setAuthority({
+          // Blank CLEARS the cap. Sending zero would suspend them instead,
+          // which is a different decision with its own switch.
+          capGhs: values.capGhs === "" ? null : Number(values.capGhs),
+          userId: holder.userId,
+        }).unwrap();
+        notify.success(res.message);
+        onClose();
+      } catch (err) {
+        notify.error(extractApiError(err).message);
+      }
+      return;
+    }
+
+    const cash = values.mode === "CASH";
+    if (cash && !till) {
+      notify.error("No company cash till is set up yet", {
+        description:
+          "Handing over notes has to come out of the till. Open it under Payment accounts first.",
+      });
+      return;
+    }
+
+    // The one mistake here - right amount, wrong holder, picked off a list of
+    // similar names on a phone - is silent until somebody reconciles, so the
+    // holder's own name has to be typed before it commits.
     const confirmed = await confirm({
-      title: "Hand over this float?",
-      description: `${formatCedis(Number(values.amountGhs))} to ${holder.firstName} ${holder.lastName}, as ${
-        TOP_UP_TENDER_OPTIONS.find(
-          (o) => o.value === values.toKind,
-        )?.label.toLowerCase() ?? values.toKind
-      }. It leaves the account you named and is spendable at once; only a reconciliation can correct it.`,
-      confirmText: "Record top-up",
+      title: cash ? "Hand over this cash?" : "Send this money?",
+      description: `${formatCedis(Number(values.amountGhs))} to ${who}, as ${
+        cash
+          ? "physical cash out of the company till"
+          : (E_CASH_TENDERS.find((t) => t.value === values.toKind)?.label.toLowerCase() ??
+            "a transfer")
+      }. It leaves a company account and is counted against them at once; only a reconciliation can correct it.`,
+      confirmText: cash ? "Record hand-over" : "Record transfer",
       requireExactMatch: holder.firstName,
     });
     if (!confirmed) return;
@@ -619,10 +573,10 @@ function TopUpDialog({
     try {
       const res = await topUp({
         amountGhs: Number(values.amountGhs),
-        fromAccountId: values.fromAccountId,
+        fromAccountId: cash ? (till?.id ?? "") : values.fromAccountId,
         idempotencyKey: idempotencyKey(),
         reason: values.reason?.trim() || undefined,
-        toKind: values.toKind,
+        toKind: cash ? "CASH" : values.toKind,
         userId: holder.userId,
       }).unwrap();
       notify.success(res.message);
@@ -632,18 +586,28 @@ function TopUpDialog({
     }
   };
 
+  const busy = funding || authorising;
+  const submitLabel = busy
+    ? "Saving…"
+    : mode === "SPEND"
+      ? "Save limit"
+      : mode === "CASH"
+        ? "Record hand-over"
+        : "Record transfer";
+
   return (
-    <ResponsiveDialog open={holder !== null} onOpenChange={(o) => !o && onClose()}>
-      <ResponsiveDialogContent className="sm:max-w-[500px]">
+    <ResponsiveDialog
+      open={holder !== null}
+      onOpenChange={(o) => !o && onClose()}
+    >
+      <ResponsiveDialogContent className="sm:max-w-[520px]">
         <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle>
-            Top up {holder ? `${holder.firstName} ${holder.lastName}` : ""}
+          <ResponsiveDialogTitle className="[overflow-wrap:anywhere]">
+            Give {holder ? holder.firstName : "them"} money
           </ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
-            Records money you have handed over. It leaves the company account
-            you name and lands in one of theirs. This is not their sending
-            limit: what they may draw on the company&apos;s account is set
-            separately, under Send limit.
+            Three different things, and the books record them differently. Say
+            which this is.
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
 
@@ -651,58 +615,125 @@ function TopUpDialog({
           className="space-y-5 px-4 pb-2 sm:px-0"
           onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
         >
-          <AdminField
-            label="Amount (GH₵)"
-            error={form.formState.errors.amountGhs?.message}
-          >
-            <Input
-              className={cn(adminInputClass, "font-adminmono")}
-              inputMode="decimal"
-              placeholder="e.g. 2000.00"
-              {...form.register("amountGhs")}
-            />
-          </AdminField>
-          {/* Where the money LEAVES. Required by the server, and it was not
-              being sent at all - so this dialog refused every top-up made
-              through it. Money in somebody's hands means a company account is
-              lighter, and the books only add up if somebody says which. */}
-          <Controller
-            control={form.control}
-            name="fromAccountId"
-            render={({ field }) => (
-              <PaymentAccountField
-                direction="out"
-                error={form.formState.errors.fromAccountId?.message}
-                label="Out of which account?"
-                onChange={field.onChange}
-                value={field.value}
-              />
-            )}
-          />
-          {/* Where it LANDS. Notes in a pocket, their own wallet and their
-              bank are different money, and one number for all three is what
-              made an agent's position unreadable. */}
-          <AdminField label="Handed over as">
+          <AdminField label="What are you giving them?">
             <Controller
               control={form.control}
-              name="toKind"
+              name="mode"
               render={({ field }) => (
-                <SimpleSelect
-                  className={adminSelectClass}
-                  value={field.value}
-                  onChange={field.onChange}
-                  options={TOP_UP_TENDER_OPTIONS}
-                />
+                <div className="space-y-2">
+                  {GIVE_MODES.map((option) => (
+                    <label
+                      key={option.value}
+                      className={cn(
+                        "flex cursor-pointer gap-2.5 border p-3 transition-colors",
+                        field.value === option.value
+                          ? "border-console bg-adm-sunken"
+                          : "border-adm-line hover:bg-adm-sunken",
+                      )}
+                    >
+                      <input
+                        checked={field.value === option.value}
+                        className="mt-1 accent-[var(--console)]"
+                        name="give-mode"
+                        onChange={() => field.onChange(option.value)}
+                        type="radio"
+                        value={option.value}
+                      />
+                      <span className="min-w-0">
+                        <span className="block text-[13px] text-adm-ink">
+                          {option.label}
+                        </span>
+                        <span className="block text-[12px] text-adm-muted">
+                          {option.blurb}
+                        </span>
+                      </span>
+                    </label>
+                  ))}
+                </div>
               )}
             />
           </AdminField>
-          <AdminField label="Note" optional>
-            <Input
-              className={adminInputClass}
-              placeholder="e.g. Ahead of the Tolon buying round"
-              {...form.register("reason")}
-            />
-          </AdminField>
+
+          {mode === "SPEND" ? (
+            <AdminField
+              error={form.formState.errors.capGhs?.message}
+              hint="Leave blank for no limit. Measured against what they have already sent, not against a balance that falls. Sends always come out of the Hubtel payout wallet - it is the only account the system can move money from."
+              label="Most they may send (GH₵)"
+            >
+              <Input
+                className={cn(adminInputClass, "font-adminmono")}
+                inputMode="decimal"
+                placeholder="Blank for no limit"
+                {...form.register("capGhs")}
+              />
+            </AdminField>
+          ) : (
+            <>
+              <AdminField
+                error={form.formState.errors.amountGhs?.message}
+                label="Amount (GH₵)"
+              >
+                <Input
+                  className={cn(adminInputClass, "font-adminmono")}
+                  inputMode="decimal"
+                  placeholder="e.g. 2000.00"
+                  {...form.register("amountGhs")}
+                />
+              </AdminField>
+
+              {mode === "CASH" ? (
+                // Named, not chosen. Notes handed over always leave the office
+                // box, and the account in their name is opened on demand - so
+                // there is nothing here for the owner to get wrong.
+                <p className="border border-adm-line bg-adm-sunken p-3 text-[12px] text-adm-muted">
+                  Out of{" "}
+                  <span className="text-adm-ink">
+                    {till ? till.label : "the company cash till"}
+                  </span>
+                  , into a cash account in {holder ? holder.firstName : "their"}
+                  &rsquo;s name. Opened automatically the first time.
+                </p>
+              ) : (
+                <>
+                  <Controller
+                    control={form.control}
+                    name="fromAccountId"
+                    render={({ field }) => (
+                      <PaymentAccountField
+                        direction="out"
+                        error={form.formState.errors.fromAccountId?.message}
+                        label="Out of which account?"
+                        onChange={field.onChange}
+                        value={field.value}
+                      />
+                    )}
+                  />
+                  <AdminField label="Sent to their">
+                    <Controller
+                      control={form.control}
+                      name="toKind"
+                      render={({ field }) => (
+                        <SimpleSelect
+                          className={adminSelectClass}
+                          onChange={field.onChange}
+                          options={E_CASH_TENDERS}
+                          value={field.value}
+                        />
+                      )}
+                    />
+                  </AdminField>
+                </>
+              )}
+
+              <AdminField label="Note" optional>
+                <Input
+                  className={adminInputClass}
+                  placeholder="e.g. Ahead of the Tolon buying round"
+                  {...form.register("reason")}
+                />
+              </AdminField>
+            </>
+          )}
         </form>
 
         <ResponsiveDialogFooter>
@@ -710,11 +741,11 @@ function TopUpDialog({
             Cancel
           </AdminButton>
           <AdminButton
-            disabled={isLoading}
+            disabled={busy}
             onClick={() => void form.handleSubmit(onSubmit)()}
             type="button"
           >
-            {isLoading ? "Recording…" : "Record top-up"}
+            {submitLabel}
           </AdminButton>
         </ResponsiveDialogFooter>
       </ResponsiveDialogContent>

@@ -78,6 +78,16 @@ export interface ISettlementAccount {
   kind: PaymentAccountKind;
   /** Already reads as the person for a held account: "Kwame Mensah - cash". */
   label: string;
+  /**
+   * The stable handle for an account the system keeps rather than a person
+   * created - only COMPANY_TILL reaches this list. Null for everything else.
+   *
+   * Lets a screen resolve the till BY NAME instead of hoping the reader picks
+   * the right row: handing an agent notes always leaves the office box, and a
+   * UI that guesses which of several cash-looking accounts that is will
+   * eventually guess wrong.
+   */
+  systemKey: null | string;
 }
 
 export interface ISettlementAccountsResponse {
