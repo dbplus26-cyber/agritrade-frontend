@@ -12,7 +12,7 @@ import {
 import { FilePicker } from "@/components/ui/FilePicker";
 import { SimpleSelect } from "@/components/ui/simple-select";
 import { extractApiError } from "@/lib/extract-api-error";
-import { formatCedis } from "@/lib/format-money";
+import { cedisProduct, formatCedis } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import {
@@ -88,7 +88,7 @@ export function AgentPurchaseForm() {
 
   const weightKg = Number(values.weightKg) || 0;
   const unitPriceGhs = Number(values.unitPriceGhs) || 0;
-  const total = weightKg * unitPriceGhs;
+  const total = cedisProduct(weightKg, unitPriceGhs);
   const paidNow = values.paidNow;
 
   const onSubmit = async (v: AgentPurchaseValues) => {
@@ -107,7 +107,10 @@ export function AgentPurchaseForm() {
           ...(v.paidNow
             ? {
                 payment: {
-                  amountGhs: Number(v.weightKg) * Number(v.unitPriceGhs),
+                  amountGhs: cedisProduct(
+                    Number(v.weightKg),
+                    Number(v.unitPriceGhs),
+                  ),
                   method: v.paymentMethod,
                 },
               }
