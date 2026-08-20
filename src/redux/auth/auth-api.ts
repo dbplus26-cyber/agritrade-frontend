@@ -217,6 +217,22 @@ export const authApi = apiSlice.injectEndpoints({
       query: (body) => ({ url: "auth/reset-password", method: "POST", body }),
     }),
 
+    /**
+     * Applies a parked email change against the emailed single-use token.
+     * Unauthenticated by design - the token is the proof, same trust model as
+     * reset-password, and the person clicking the link usually has no session
+     * here at all. No tags: getMe carries none (it syncs through the auth
+     * slice), and a signed-in session picks the new address up on its next
+     * profile read.
+     */
+    confirmEmailChange: builder.mutation<IMessageResponse, { token: string }>({
+      query: (body) => ({
+        url: "auth/confirm-email-change",
+        method: "POST",
+        body,
+      }),
+    }),
+
     logout: builder.mutation<IMessageResponse, void>({
       query: () => ({ url: "auth/logout", method: "POST" }),
       async onQueryStarted(_arg, { queryFulfilled, dispatch }) {
@@ -247,5 +263,6 @@ export const {
   useRegenerateRecoveryCodesMutation,
   useForgotPasswordMutation,
   useResetPasswordMutation,
+  useConfirmEmailChangeMutation,
   useLogoutMutation,
 } = authApi;
