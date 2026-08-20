@@ -17,6 +17,7 @@ import {
   TONES,
   type Tone,
 } from "@/components/admin/ui";
+import { AgentMoneySummaryCard } from "@/components/admin/agents/agent-money-summary-card";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import { HelpTip } from "@/components/admin/help-tip";
 import { BackButton } from "@/components/ui/BackButton";
@@ -718,6 +719,13 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
           </div>
         }
       />
+
+      {/* Above the ledger, because it is the question the ledger cannot answer
+          on its own: the rows below walk HELD accounts, and a send made on
+          spending authority debits the company's wallet without touching one.
+          A reader who saw only the ledger read an agent who had moved thousands
+          of the company's money as having spent nothing. */}
+      <AgentMoneySummaryCard agentUserId={agentUserId} />
 
       {/* The ledger card names its own container: the fourth (balance) track
           appears on the CARD's width, not the viewport's - the card is 340px

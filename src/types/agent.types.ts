@@ -1,3 +1,4 @@
+import type { PaymentAccountKind } from "@/types/payment-account.types";
 import type { IPaginationMeta } from "./api";
 import type { UserRole } from "./user.types";
 
@@ -85,7 +86,6 @@ export interface IHolderAuthority {
   /** Null means UNCAPPED. A cap of zero is refused: that is a suspension. */
   capGhs: number | null;
   /** Null where nobody has chosen one: sends fall back to the payout wallet. */
-  drawsOnAccount: null | { id: string; label: string };
   isActive: boolean;
   /** Null when uncapped. Otherwise the cap less the sends already made. */
   remainingGhs: number | null;
@@ -313,4 +313,56 @@ export interface IAgentExpenseInput {
    * it to true when one is given.
    */
   capitalise?: boolean;
+}
+
+/**
+ * One held account of theirs over the period: what reached it and what left.
+ *
+ * Reported per account rather than as one figure because notes in a pocket and
+ * money on somebody's own wallet are different money, and a single number for
+ * both is what made a person's position unreadable in the first place. Amounts
+ * are null for a reader without money visibility; the account itself stays,
+ * because WHICH accounts somebody holds is operational truth.
+ */
+export interface IHeldAccountSummary {
+  id: string;
+  kind: PaymentAccountKind;
+  label: string;
+  netGhs: null | number;
+  receivedGhs: null | number;
+  spentGhs: null | number;
+}
+
+/**
+ * A person's money, in the two pots that must never be added together.
+ *
+ * `held` is money they are carrying and will be asked to produce. `sent` is the
+ * company's money they were allowed to move on authority - none of it ever
+ * reached their hands, and what remains of a cap is permission, not cash.
+ * Summing them is the confusion the old single float number was.
+ */
+export interface IAgentMoneySummary {
+  held: {
+    accounts: IHeldAccountSummary[];
+    closingGhs: null | number;
+    openingGhs: null | number;
+    receivedGhs: null | number;
+    spentGhs: null | number;
+  };
+  holder: { id: string; name: string };
+  sent: {
+    capGhs: null | number;
+    hasAuthority: boolean;
+    isActive: boolean;
+    sentGhs: null | number;
+    sentOnExpensesGhs: null | number;
+    sentOnPurchasesGhs: null | number;
+    /** Sends naming no purchase or expense. An agent cannot make one. */
+    sentUnmatchedGhs: null | number;
+  };
+}
+
+export interface IAgentMoneySummaryResponse {
+  message: string;
+  data: { summary: IAgentMoneySummary };
 }

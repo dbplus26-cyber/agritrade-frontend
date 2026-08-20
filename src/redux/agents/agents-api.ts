@@ -6,6 +6,7 @@ import type {
   IAgentListResponse,
   ICreateReconciliationInput,
   IFloatLedgerQuery,
+  IAgentMoneySummaryResponse,
   IFloatLedgerResponse,
   IFloatTransactionResponse,
   IReconciliationListResponse,
@@ -34,6 +35,28 @@ export const agentsApi = apiSlice.injectEndpoints({
     >({
       query: ({ agentUserId, params }) =>
         `admin/agents/${agentUserId}/float${toQueryString(params ?? {})}`,
+      providesTags: (_r, _e, { agentUserId }) => [
+        { type: "FloatLedger", id: "LIST" },
+        { type: "FloatLedger", id: agentUserId },
+      ],
+    }),
+
+    /**
+     * Both pots at once: what this person is HOLDING and what they have SENT of
+     * the company's money. The float ledger beside it walks held accounts only,
+     * and a send on authority never touches one - so on its own it showed a
+     * person who had moved thousands as having spent nothing.
+     *
+     * Tagged with FloatLedger so a top-up or a reconciliation refreshes the
+     * summary in the same beat as the ledger under it; a card that disagrees
+     * with the rows below it is worse than no card.
+     */
+    getAgentMoneySummary: builder.query<
+      IAgentMoneySummaryResponse,
+      { agentUserId: string; params?: IFloatLedgerQuery }
+    >({
+      query: ({ agentUserId, params }) =>
+        `admin/agents/${agentUserId}/money${toQueryString(params ?? {})}`,
       providesTags: (_r, _e, { agentUserId }) => [
         { type: "FloatLedger", id: "LIST" },
         { type: "FloatLedger", id: agentUserId },
@@ -104,6 +127,7 @@ export const agentsApi = apiSlice.injectEndpoints({
 export const {
   useGetAgentsQuery,
   useGetAgentQuery,
+  useGetAgentMoneySummaryQuery,
   useGetAgentFloatQuery,
   useTopUpAgentMutation,
   useGetAgentReconciliationsQuery,
