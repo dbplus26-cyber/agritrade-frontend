@@ -20,8 +20,9 @@ import type { ColumnDef } from "@tanstack/react-table";
 
 import { ConsoleDataTable } from "@/components/admin/data-table";
 
+const { pushMock } = vi.hoisted(() => ({ pushMock: vi.fn() }));
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  useRouter: () => ({ push: pushMock, replace: vi.fn() }),
 }));
 
 const userEvent = userEventBase.setup({ delay: null });
@@ -206,5 +207,42 @@ describe("ConsoleDataTable - server pagination wiring", () => {
       screen.queryByRole("navigation", { name: "Pagination" }),
     ).not.toBeInTheDocument();
     expect(screen.getByText(/4 lots/)).toBeInTheDocument();
+  });
+});
+
+
+describe("ConsoleDataTable - keyboard row navigation", () => {
+  it("opens a row's detail with Enter, from the keyboard alone", async () => {
+    pushMock.mockClear();
+    render(
+      <ConsoleDataTable
+        columns={COLUMNS}
+        data={ROWS}
+        isFetching={false}
+        itemNoun="rows"
+        rowHref={(r) => `/admin/things/${r.name}`}
+      />,
+    );
+
+    // The row announces itself as a link and sits in the tab order - the
+    // register used to be mouse-only, with no keyboard path to any detail.
+    const links = screen.getAllByRole("link");
+    expect(links.length).toBeGreaterThanOrEqual(2);
+    links[0].focus();
+    await userEvent.keyboard("{Enter}");
+    expect(pushMock).toHaveBeenCalledWith("/admin/things/Maize, Tolon");
+  });
+
+  it("gives a row without an href no link role and no tab stop", () => {
+    pushMock.mockClear();
+    render(
+      <ConsoleDataTable
+        columns={COLUMNS}
+        data={ROWS}
+        isFetching={false}
+        itemNoun="rows"
+      />,
+    );
+    expect(screen.queryAllByRole("link")).toHaveLength(0);
   });
 });

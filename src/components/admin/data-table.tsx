@@ -208,6 +208,36 @@ function CardField({
  *   selector, and - dms rule - it only appears once there are more rows than
  *   the smallest page size. Two items never get a pager.
  */
+/**
+ * The props that make a click-navigable row or card reachable by keyboard.
+ *
+ * Row navigation was mouse-only: registers had no keyboard path to their
+ * detail pages at all. A retrofit link inside a TanStack row is invasive, so
+ * the surface itself becomes a link: focusable, announced as one, opened with
+ * Enter (role=link semantics - Space stays with buttons). The keydown only
+ * fires when the row ITSELF is focused, so Enter on a button inside a row
+ * still presses the button, not the row.
+ */
+const rowNavProps = (
+  href: string | undefined,
+  navigate: (href: string) => void,
+) =>
+  href
+    ? {
+        onClick: () => {
+          navigate(href);
+        },
+        onKeyDown: (e: React.KeyboardEvent) => {
+          if (e.key === "Enter" && e.target === e.currentTarget) {
+            e.preventDefault();
+            navigate(href);
+          }
+        },
+        role: "link" as const,
+        tabIndex: 0,
+      }
+    : {};
+
 export interface ServerPagination {
   totalCount: number;
   /** 1-based current page. */
@@ -448,12 +478,13 @@ export function ConsoleDataTable<TData>({
                 <div
                   key={row.id}
                   data-state={row.getIsSelected() ? "selected" : undefined}
-                  onClick={href ? () => router.push(href) : undefined}
+                  {...rowNavProps(href, (h) => router.push(h))}
                   className={cn(
                     // Squared with a 1.5px border to match AdminCard, the
                     // surface every other console screen is filed on.
                     "rounded-none border border-adm-line bg-adm-card px-3.5 py-2.5 shadow-[0_1px_2px_rgba(16,24,40,0.05)] data-[state=selected]:border-console/40 data-[state=selected]:bg-console/5",
-                    href && "cursor-pointer hover:border-adm-strong",
+                    href &&
+                      "cursor-pointer hover:border-adm-strong focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-console",
                   )}
                 >
                   {selectCell ? (
@@ -566,10 +597,11 @@ export function ConsoleDataTable<TData>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() ? "selected" : undefined}
-                  onClick={href ? () => router.push(href) : undefined}
+                  {...rowNavProps(href, (h) => router.push(h))}
                   className={cn(
                     "border-adm-hairline data-[state=selected]:bg-console/5",
-                    href && "cursor-pointer hover:bg-adm-hover",
+                    href &&
+                      "cursor-pointer hover:bg-adm-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-console",
                     rowClassName?.(row.original),
                   )}
                 >
