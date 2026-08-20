@@ -211,9 +211,9 @@ export function ShipmentDetail({ id }: { id: string }) {
       }
       // The signed-waybill gate: offer an explicit, logged override.
       const proceed = await confirm({
-        title: "No signed waybill on file",
+        title: "The driver has not signed",
         description:
-          "The driver and an admin should sign the waybill and the signed copy be uploaded to this shipment before it leaves. You can dispatch without it, but the trip will have no signed paper trail.",
+          "Take the driver's signature on this trip before it leaves, or upload a signed sheet if the depot has one on paper. You can dispatch without either, but the trip will go out with nothing showing the driver accepted the load.",
         confirmText: "Dispatch anyway",
         isDestructive: true,
       });
@@ -840,17 +840,24 @@ export function ShipmentDetail({ id }: { id: string }) {
           depot to print. */}
       <ShipmentSignatures shipment={s} />
 
-      {/* Documents */}
+      {/* Retargeted, not removed. The instruction here used to be "download the
+          waybill, sign it with the driver, upload the signed copy" - a loop the
+          signature slots above have replaced, and one that kept teaching the
+          depot to print something it no longer needs to. What the drawer is
+          actually for is the paperwork a trip picks up on the road, which has
+          nowhere else to live. */}
       <AdminCard className="p-5">
         <SectionHeading
           className="mb-1.5"
           hint="Paperwork filed against this trip alone, for staff only - a buyer never sees what is kept here."
         >
-          Documents (private)
+          Other paperwork (private)
         </SectionHeading>
         <p className="mb-2 text-[12px] text-adm-muted">
-          Download the waybill, sign it with the driver, then upload the signed
-          copy before dispatch. Downloads are logged.
+          Weighbridge tickets, checkpoint and toll receipts, a buyer&rsquo;s
+          signed delivery note - anything this trip collected that is not a
+          signature. The driver and owner sign above; nothing here needs
+          printing. Downloads are logged.
         </p>
         {s.documents.length === 0 ? (
           <AttachmentEmpty text="No documents on file." />
@@ -885,7 +892,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                 accept="image/*,application/pdf"
                 busy={addDocState.isLoading}
                 confirmLabel="Upload"
-                hint="PDF or a photo of the signed waybill"
+                hint="PDF or a photo of the ticket, receipt or note"
                 onConfirm={onUploadDocument}
                 optimize={false}
                 triggerLabel="Choose document"
