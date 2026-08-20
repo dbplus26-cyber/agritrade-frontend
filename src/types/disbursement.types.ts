@@ -215,3 +215,27 @@ export interface IBalanceTransferListResponse {
   data: IBalanceTransfer[];
   meta: IPaginationMeta;
 }
+
+/**
+ * A settled send still free to be booked against a payable.
+ *
+ * Carries what a person needs to recognise it: the document number they quote,
+ * who it went to, how much, and when it landed. Deliberately not the whole
+ * disbursement - the picker is for matching, not for reading a send's history.
+ */
+export interface ILinkableDisbursement {
+  amountGhs: number;
+  bankName: null | string;
+  description: string;
+  id: string;
+  rail: "BANK" | "MOMO";
+  recipientMsisdn: null | string;
+  recipientName: string;
+  settledAt: null | string;
+  transactionNo: string;
+}
+
+export interface ILinkableDisbursementsResponse {
+  message: string;
+  data: { disbursements: ILinkableDisbursement[] };
+}

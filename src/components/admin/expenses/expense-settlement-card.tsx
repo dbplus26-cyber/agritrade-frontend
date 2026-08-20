@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { HelpTip, HelpWrap } from "@/components/admin/help-tip";
+import { PaidThroughSystemField } from "@/components/admin/paid-through-system-field";
 import { PaymentAccountField } from "@/components/admin/payment-account-field";
 import {
   AdminButton,
@@ -93,6 +94,12 @@ const paymentSchema = z.object({
     .refine((v) => Number(v) > 0, {
       message: "The amount must be more than zero",
     }),
+  /**
+   * Set when this books against a send the system already made. The account is
+   * then implied (the payout wallet) and no movement is posted, because the
+   * send already moved the money.
+   */
+  disbursementId: z.string(),
   method: z.enum(["BANK", "CASH", "MOMO"]),
   paidAt: z.string().min(1, "Pick a date"),
   paymentAccountId: z.string(),
@@ -124,6 +131,7 @@ function PayDialog({
     // onChange makes it impossible to clear.
     defaultValues: {
       amountGhs: "",
+      disbursementId: "",
       method: "BANK",
       paidAt: todayInputValue(),
       paymentAccountId: "",
@@ -132,6 +140,10 @@ function PayDialog({
     resolver: zodResolver(paymentSchema),
   });
   const method = useWatch({ control, name: "method" });
+  // A matched send answers "which account" and "what reference" on its own, so
+  // both controls come off the form rather than asking for answers that would
+  // be ignored.
+  const matchedSend = useWatch({ control, name: "disbursementId" });
 
   const onSubmit = async (values: PaymentValues) => {
     // Money out, and a ledger write only a reversal can undo. Gated the same
@@ -140,10 +152,12 @@ function PayDialog({
     // different standard of care on the other.
     const ok = await confirm({
       title: "Record this payment?",
-      description: `${formatCedis(Number(values.amountGhs))} paid on ${subject} by ${
-        PAYMENT_METHOD_OPTIONS.find((o) => o.value === values.method)?.label ??
-        values.method
-      }. It goes on the books as money out against this cost; only a reversal takes it back off.`,
+      description: values.disbursementId
+        ? `${formatCedis(Number(values.amountGhs))} on ${subject}, booked against a send the system already made. The money has already left the payout wallet, so nothing is deducted again; this records what it paid for. Only a reversal takes it back off.`
+        : `${formatCedis(Number(values.amountGhs))} paid on ${subject} by ${
+            PAYMENT_METHOD_OPTIONS.find((o) => o.value === values.method)
+              ?.label ?? values.method
+          }. It goes on the books as money out against this cost; only a reversal takes it back off.`,
       confirmText: "Record payment",
     });
     if (!ok) return;
@@ -154,7 +168,13 @@ function PayDialog({
           amountGhs: Number(values.amountGhs),
           method: values.method,
           paidAt: values.paidAt,
-          ...(values.paymentAccountId
+          ...(values.disbursementId
+            ? { disbursementId: values.disbursementId }
+            : {}),
+          // Not sent alongside a matched send: the server resolves the payout
+          // wallet itself, because that is the one account this can have come
+          // out of and it is deliberately absent from the picker.
+          ...(!values.disbursementId && values.paymentAccountId
             ? { paymentAccountId: values.paymentAccountId }
             : {}),
           ...(values.reference ? { reference: values.reference } : {}),
@@ -225,7 +245,19 @@ function PayDialog({
           </AdminField>
 
           {/* Cash leaves the till, not an account. */}
-          {method !== "CASH" ? (
+          <Controller
+            control={control}
+            name="disbursementId"
+            render={({ field }) => (
+              <PaidThroughSystemField
+                error={errors.disbursementId?.message}
+                onChange={field.onChange}
+                value={field.value}
+              />
+            )}
+          />
+
+          {method !== "CASH" && !matchedSend ? (
             <Controller
               control={control}
               name="paymentAccountId"
@@ -241,18 +273,20 @@ function PayDialog({
             />
           ) : null}
 
-          <AdminField
-            error={errors.reference?.message}
-            hint="Recording the same reference twice against this cost is refused."
-            label="Reference"
-            optional
-          >
-            <Input
-              className={adminInputClass}
-              placeholder="e.g. TRF884512"
-              {...register("reference")}
-            />
-          </AdminField>
+          {!matchedSend ? (
+            <AdminField
+              error={errors.reference?.message}
+              hint="Recording the same reference twice against this cost is refused."
+              label="Reference"
+              optional
+            >
+              <Input
+                className={adminInputClass}
+                placeholder="e.g. TRF884512"
+                {...register("reference")}
+              />
+            </AdminField>
+          ) : null}
 
           <ResponsiveDialogFooter className="gap-2">
             <AdminButton onClick={onClose} type="button" variant="ghost">
