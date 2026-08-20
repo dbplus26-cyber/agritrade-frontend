@@ -427,8 +427,18 @@ export function ConsoleDataTable<TData>({
               const visible = row
                 .getVisibleCells()
                 .filter((c) => c.column.id !== "select");
-              const isData = (c: (typeof visible)[number]) =>
-                Boolean((c.column.columnDef as { accessorFn?: unknown }).accessorFn);
+              // A DATA column carries an accessor - either form TanStack accepts,
+              // accessorFn or accessorKey. Checking only accessorFn mistook an
+              // accessorKey column (the expenses register's Voucher) for a row
+              // action and dropped it to the card foot. An ACTION column is a
+              // display column with neither.
+              const isData = (c: (typeof visible)[number]) => {
+                const def = c.column.columnDef as {
+                  accessorFn?: unknown;
+                  accessorKey?: unknown;
+                };
+                return Boolean(def.accessorFn ?? def.accessorKey);
+              };
               // A table puts row actions wherever the column order says; a CARD
               // reads top to bottom, so they belong at the foot of it. Split
               // rather than relying on call sites to declare actions last.
