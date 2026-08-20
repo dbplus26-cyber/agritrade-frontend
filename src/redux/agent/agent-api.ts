@@ -90,6 +90,7 @@ export const agentApi = apiSlice.injectEndpoints({
       invalidatesTags: [
         { type: "Purchases", id: "MINE" },
         { type: "FloatLedger", id: "MINE" },
+        "CashBook",
       ],
     }),
 
@@ -103,7 +104,7 @@ export const agentApi = apiSlice.injectEndpoints({
         headers: { "Idempotency-Key": idempotencyKey },
         body,
       }),
-      invalidatesTags: [{ type: "FloatLedger", id: "MINE" }],
+      invalidatesTags: [{ type: "FloatLedger", id: "MINE" }, "CashBook"],
     }),
   }),
 });

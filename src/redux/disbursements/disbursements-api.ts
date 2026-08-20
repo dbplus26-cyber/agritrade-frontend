@@ -87,6 +87,8 @@ export const disbursementsApi = apiSlice.injectEndpoints({
         { type: "Treasury", id: "OVERVIEW" },
         { type: "FloatHolders", id: "LIST" },
         { type: "FloatLedger", id: "LIST" },
+        // The hold debits the payout wallet the moment the send is asked for.
+        "CashBook",
       ],
     }),
 
@@ -103,6 +105,8 @@ export const disbursementsApi = apiSlice.injectEndpoints({
         { type: "Disbursements", id },
         { type: "Disbursements", id: "LIST" },
         { type: "FloatLedger", id: "LIST" },
+        // A settlement can post the charge or the failed-send refund.
+        "CashBook",
       ],
     }),
 
@@ -125,6 +129,7 @@ export const disbursementsApi = apiSlice.injectEndpoints({
         { type: "Disbursements", id: "LIST" },
         { type: "FloatHolders", id: "LIST" },
         { type: "FloatLedger", id: "LIST" },
+        "CashBook",
       ],
     }),
 
@@ -165,7 +170,11 @@ export const disbursementsApi = apiSlice.injectEndpoints({
         { type: "Disbursements", id: "MINE" },
         { type: "Disbursements", id: "LIST" },
         { type: "FloatLedger", id: "LIST" },
-        { type: "Agents", id: "ME" },
+        // The agent surface's own money views provide MINE, not the dead
+        // {Agents, ME} this used to name - the "what you can still send"
+        // figure sat stale on the very screen the send happened from.
+        { type: "FloatLedger", id: "MINE" },
+        "CashBook",
       ],
     }),
   }),

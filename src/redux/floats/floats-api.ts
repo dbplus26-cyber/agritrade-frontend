@@ -88,6 +88,8 @@ export const floatsApi = apiSlice.injectEndpoints({
         { type: "FloatLedger", id: userId },
         { type: "FloatLedger", id: "LIST" },
         { type: "Agents", id: "LIST" },
+        // A top-up is an account transfer - the cash book moved with it.
+        "CashBook",
       ],
     }),
 

@@ -66,6 +66,9 @@ export const purchasesApi = apiSlice.injectEndpoints({
         { type: "Purchases", id: "LIST" },
         { type: "Agents", id: "LIST" },
         { type: "FloatLedger", id: "LIST" },
+        // The optional pay-on-record posts a movement onto a named account.
+        { type: "PaymentAccounts", id: "HISTORY" },
+        "CashBook",
       ],
     }),
 
@@ -120,6 +123,9 @@ export const purchasesApi = apiSlice.injectEndpoints({
         { type: "FloatLedger", id: "LIST" },
         { type: "Stock", id: "LIST" },
         { type: "StockMovements", id: "LIST" },
+        // Voiding reverses every standing payment - movements come back.
+        { type: "PaymentAccounts", id: "HISTORY" },
+        "CashBook",
       ],
     }),
 
@@ -156,7 +162,9 @@ export const purchasesApi = apiSlice.injectEndpoints({
         { type: "Purchases", id: `PAY-${purchaseId}` },
         { type: "Purchases", id: "LIST" },
         { type: "Purchases", id: "UNPAID" },
-        { type: "CashBook", id: "OVERVIEW" },
+        // Bare type: the movement also lands on one account's own ledger view.
+        "CashBook",
+        { type: "PaymentAccounts", id: "HISTORY" },
       ],
     }),
 
@@ -174,7 +182,9 @@ export const purchasesApi = apiSlice.injectEndpoints({
         { type: "Purchases", id: `PAY-${purchaseId}` },
         { type: "Purchases", id: "LIST" },
         { type: "Purchases", id: "UNPAID" },
-        { type: "CashBook", id: "OVERVIEW" },
+        // Bare type: the movement also lands on one account's own ledger view.
+        "CashBook",
+        { type: "PaymentAccounts", id: "HISTORY" },
       ],
     }),
 
@@ -217,6 +227,8 @@ export const purchasesApi = apiSlice.injectEndpoints({
         { type: "Expenses", id: "LIST" },
         { type: "ExpensePayments", id: "UNPAID" },
         { type: "Reports", id: "LIST" },
+        { type: "PaymentAccounts", id: "HISTORY" },
+        "CashBook",
       ],
     }),
   }),

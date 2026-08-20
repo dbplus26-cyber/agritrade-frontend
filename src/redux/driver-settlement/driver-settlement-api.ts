@@ -118,6 +118,8 @@ export const driverSettlementApi = apiSlice.injectEndpoints({
         method: "POST",
         url: `admin/shipments/${shipmentId}/driver-fee-adjustments`,
       }),
+      // No cash-book tags here: an adjustment changes what is OWED, not what
+      // was paid - it appends to the fee history and posts no movement.
       invalidatesTags: (_r, _e, { shipmentId }) => [
         { type: "DriverSettlement", id: shipmentId },
         { type: "Shipments", id: shipmentId },
@@ -138,6 +140,11 @@ export const driverSettlementApi = apiSlice.injectEndpoints({
         { type: "DriverSettlement", id: shipmentId },
         { type: "Shipments", id: shipmentId },
         { type: "DriverSettlement", id: "UNSETTLED" },
+        // Money left (or came back to) a company account: the account's
+        // history and every cash-book view moved with it. The sale and land
+        // books already invalidated both; this book silently did not.
+        { type: "PaymentAccounts", id: "HISTORY" },
+        "CashBook",
       ],
     }),
 
@@ -154,6 +161,11 @@ export const driverSettlementApi = apiSlice.injectEndpoints({
         { type: "DriverSettlement", id: shipmentId },
         { type: "Shipments", id: shipmentId },
         { type: "DriverSettlement", id: "UNSETTLED" },
+        // Money left (or came back to) a company account: the account's
+        // history and every cash-book view moved with it. The sale and land
+        // books already invalidated both; this book silently did not.
+        { type: "PaymentAccounts", id: "HISTORY" },
+        "CashBook",
       ],
     }),
 
@@ -186,6 +198,8 @@ export const driverSettlementApi = apiSlice.injectEndpoints({
         { type: "ExpensePayments", id: expenseId },
         { type: "Expenses", id: expenseId },
         { type: "ExpensePayments", id: "UNPAID" },
+        { type: "PaymentAccounts", id: "HISTORY" },
+        "CashBook",
       ],
     }),
 
@@ -202,6 +216,8 @@ export const driverSettlementApi = apiSlice.injectEndpoints({
         { type: "ExpensePayments", id: expenseId },
         { type: "Expenses", id: expenseId },
         { type: "ExpensePayments", id: "UNPAID" },
+        { type: "PaymentAccounts", id: "HISTORY" },
+        "CashBook",
       ],
     }),
 

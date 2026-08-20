@@ -77,6 +77,8 @@ export const agentsApi = apiSlice.injectEndpoints({
         { type: "Agents", id: agentUserId },
         { type: "FloatLedger", id: agentUserId },
         { type: "Reconciliations", id: agentUserId },
+        // A top-up is an account transfer - two movements land in the cash book.
+        "CashBook",
       ],
     }),
 
@@ -119,6 +121,8 @@ export const agentsApi = apiSlice.injectEndpoints({
         { type: "FloatLedger", id: agentUserId },
         { type: "Reconciliations", id: agentUserId },
         { type: "Reconciliations", id: `preview-${agentUserId}` },
+        // A variance posts an ADJUSTMENT movement onto the held account.
+        "CashBook",
       ],
     }),
   }),

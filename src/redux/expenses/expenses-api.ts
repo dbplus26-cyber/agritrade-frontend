@@ -59,6 +59,9 @@ export const expensesApi = apiSlice.injectEndpoints({
         { type: "Expenses", id: "LIST" },
         { type: "ExpensePayments", id: "UNPAID" },
         { type: "Reports", id: "LIST" },
+        // The optional pay-on-record posts a movement onto a named account.
+        { type: "PaymentAccounts", id: "HISTORY" },
+        "CashBook",
       ],
     }),
 

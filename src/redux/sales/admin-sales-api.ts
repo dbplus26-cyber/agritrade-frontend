@@ -124,6 +124,8 @@ export const adminSalesApi = apiSlice.injectEndpoints({
         { type: "SaleStats", id: "SUMMARY" },
         { type: "EligibleSales", id: "LIST" },
         { type: "PaymentAccounts", id: "HISTORY" },
+        // The payment posted an AccountMovement - every cash-book view is stale.
+        "CashBook",
       ],
     }),
 
@@ -149,6 +151,8 @@ export const adminSalesApi = apiSlice.injectEndpoints({
         { type: "SaleStats", id: "SUMMARY" },
         { type: "EligibleSales", id: "LIST" },
         { type: "PaymentAccounts", id: "HISTORY" },
+        // The payment posted an AccountMovement - every cash-book view is stale.
+        "CashBook",
       ],
     }),
   }),

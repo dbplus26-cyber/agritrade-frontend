@@ -85,6 +85,8 @@ export const landSalesApi = apiSlice.injectEndpoints({
         { type: "LandSales", id: "LIST" },
         { type: "LandPlots", id: "LIST" },
         { type: "PaymentAccounts", id: "HISTORY" },
+        // The payment posted an AccountMovement - every cash-book view is stale.
+        "CashBook",
       ],
     }),
 
@@ -108,6 +110,8 @@ export const landSalesApi = apiSlice.injectEndpoints({
         { type: "LandSales", id: "LIST" },
         { type: "LandPlots", id: "LIST" },
         { type: "PaymentAccounts", id: "HISTORY" },
+        // The payment posted an AccountMovement - every cash-book view is stale.
+        "CashBook",
       ],
     }),
   }),

@@ -69,6 +69,7 @@ export const treasuryApi = apiSlice.injectEndpoints({
       invalidatesTags: [
         { type: "Treasury", id: "TRANSFERS" },
         { type: "Treasury", id: "OVERVIEW" },
+        "CashBook",
       ],
     }),
 
@@ -81,6 +82,7 @@ export const treasuryApi = apiSlice.injectEndpoints({
         { type: "Treasury", id },
         { type: "Treasury", id: "TRANSFERS" },
         { type: "Treasury", id: "OVERVIEW" },
+        "CashBook",
       ],
     }),
 
@@ -97,6 +99,7 @@ export const treasuryApi = apiSlice.injectEndpoints({
         { type: "Treasury", id },
         { type: "Treasury", id: "TRANSFERS" },
         { type: "Treasury", id: "OVERVIEW" },
+        "CashBook",
       ],
     }),
   }),
