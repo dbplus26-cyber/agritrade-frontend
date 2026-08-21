@@ -40,11 +40,19 @@ const FILTER_DEFAULTS = { season: "all", from: "", to: "", size: "10" };
 
 export function RepaymentsRegister() {
   const router = useRouter();
-  const { page, filters, setFilter, setPage, resetFilters } = useTableQuery({
-    defaults: FILTER_DEFAULTS,
-  });
+  const {
+    page,
+    search: searchInput,
+    filters,
+    setSearch,
+    setFilter,
+    setPage,
+    resetFilters,
+    queryParams,
+  } = useTableQuery({ defaults: FILTER_DEFAULTS });
 
   const pageSize = Number(filters.size) || 10;
+  const search = (queryParams.search as string | undefined) ?? "";
   const { season, from, to } = filters;
   const seasons = useGetSeasonsQuery({ limit: 100 });
 
@@ -52,11 +60,12 @@ export function RepaymentsRegister() {
     () => ({
       page,
       limit: pageSize,
+      ...(search ? { search } : {}),
       ...(season !== "all" ? { seasonId: season } : {}),
       ...(from ? { from } : {}),
       ...(to ? { to } : {}),
     }),
-    [page, pageSize, season, from, to],
+    [page, pageSize, search, season, from, to],
   );
 
   const { data, isLoading, isError, error, refetch } =
@@ -65,12 +74,13 @@ export function RepaymentsRegister() {
   const totalCount = data?.meta.total ?? 0;
   const activeFilterCount =
     (season !== "all" ? 1 : 0) + (from ? 1 : 0) + (to ? 1 : 0);
-  // A register with nothing on file and no filters narrowing it shows ONLY
-  // the empty state (with its create action) - a filter bar filters nothing.
+  // A register with nothing on file and nothing narrowing it shows ONLY the
+  // empty state (with its create action) - a filter bar filters nothing.
   const pristine =
     !isLoading &&
     !isError &&
     repayments.length === 0 &&
+    !search &&
     activeFilterCount === 0;
 
   const seasonOptions = useMemo(
@@ -187,9 +197,11 @@ export function RepaymentsRegister() {
         sub="What farmers have paid back on their grants, in produce or in cash"
       />
 
-      {pristine || (isError && activeFilterCount === 0) ? null : (
+      {pristine || (isError && !search && activeFilterCount === 0) ? null : (
         <ConsoleFilterBar
-          hideSearch
+          search={searchInput}
+          onSearch={setSearch}
+          searchPlaceholder="Search farmer, commodity, receipt no., notes…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
           totalCount={totalCount}
@@ -247,13 +259,16 @@ export function RepaymentsRegister() {
         />
       ) : repayments.length === 0 ? (
         <RegisterEmpty
-          filtered={activeFilterCount > 0}
+          filtered={Boolean(search) || activeFilterCount > 0}
           noun="repayments"
           description="Record what a farmer has paid back against a grant."
           filteredDescription="Nothing matches this filter."
           actionLabel="Record repayment"
           onAction={() => router.push(`${LIST}/new`)}
-          onClear={resetFilters}
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
         />
       ) : (
         <AdminCard className="overflow-hidden">

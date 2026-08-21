@@ -240,6 +240,7 @@ export interface IGrantDetailResponse {
 export interface IGrantListQuery {
   page?: number;
   limit?: number;
+  search?: string;
   farmerId?: string;
   seasonId?: string;
   from?: string;
@@ -324,6 +325,7 @@ export interface IRepaymentDetailResponse {
 export interface IRepaymentListQuery {
   page?: number;
   limit?: number;
+  search?: string;
   farmerId?: string;
   seasonId?: string;
   from?: string;

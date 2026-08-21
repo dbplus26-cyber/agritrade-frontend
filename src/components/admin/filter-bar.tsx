@@ -295,6 +295,7 @@ export function ConsoleFilterBar({
   activeCount = 0,
   onClear,
   action,
+  leading,
   totalCount,
   noun = "records",
   inlineFilter,
@@ -312,6 +313,13 @@ export function ConsoleFilterBar({
   onClear?: () => void;
   /** The page's actions ("+ Add"), on the right of the count row. */
   action?: ReactNode;
+  /**
+   * Something that belongs at the left of the top row, before the count:
+   * the page's section tabs (Balances / Movements). With `leading` the bar
+   * packs onto ONE row on desktop - leading left, search, filters and the
+   * action right - and splits into two rows below lg.
+   */
+  leading?: ReactNode;
   /** Total matching records, printed as "{n} total {noun}" in the count row. */
   totalCount?: number;
   noun?: string;
@@ -344,8 +352,22 @@ export function ConsoleFilterBar({
   const drawerOpen =
     open && ((hasFields && isBelowLg) || (!hasFields && !!inlineFilter && isBelowSm));
 
+  // Two densities. The standard toolbar is the two-row shape: count and
+  // actions, then a full-width search with the controls beside it. When
+  // there is no search box, or when a `leading` element (section tabs)
+  // opens the row, everything packs onto one row at the console's 34px
+  // control height so the row reads as one bar rather than a stack of
+  // half-empty lines.
+  const dense = hideSearch || Boolean(leading);
+  const controlHeight = dense ? "h-[34px]" : "h-10 sm:h-11";
+
   const searchField = hideSearch ? null : (
-    <div className="relative flex-1">
+    <div
+      className={cn(
+        "relative min-w-0 flex-1",
+        leading && "lg:w-64 lg:flex-none xl:w-80",
+      )}
+    >
       <Search
         strokeWidth={1.5}
         aria-hidden="true"
@@ -357,7 +379,10 @@ export function ConsoleFilterBar({
         onChange={(e) => onSearch?.(e.target.value)}
         placeholder={searchPlaceholder}
         aria-label={searchPlaceholder}
-        className="h-10 w-full min-w-0 rounded-none border border-adm-line bg-adm-card pr-10 pl-10 text-sm text-adm-ink shadow-none outline-none transition-colors placeholder:text-adm-faint focus:border-console focus-visible:ring-0 sm:h-11 [&::-webkit-search-cancel-button]:hidden"
+        className={cn(
+          "w-full min-w-0 rounded-none border border-adm-line bg-adm-card pr-10 pl-10 text-sm text-adm-ink shadow-none outline-none transition-colors placeholder:text-adm-faint focus:border-console focus-visible:ring-0 [&::-webkit-search-cancel-button]:hidden",
+          controlHeight,
+        )}
       />
       {search ? (
         <button
@@ -372,123 +397,179 @@ export function ConsoleFilterBar({
     </div>
   );
 
+  const inlineSlot =
+    inlineFilter && !hasFields ? (
+      <div className="hidden w-44 shrink-0 sm:block lg:w-52">{inlineFilter}</div>
+    ) : null;
+
+  const filtersButton =
+    hasFields || inlineFilter ? (
+      <AdminButton
+        variant={hasApplied ? "primary" : "outline"}
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        aria-controls={panelId}
+        className={cn(
+          "relative shrink-0 gap-2 px-3",
+          controlHeight,
+          inlineFilter && !hasFields && "sm:hidden",
+        )}
+      >
+        <SlidersHorizontal
+          strokeWidth={1.5}
+          className="h-4 w-4"
+          aria-hidden="true"
+        />
+        <span
+          className={cn(
+            "text-sm",
+            inlineFilter && !hasFields ? "hidden" : "hidden sm:inline",
+          )}
+        >
+          Filters
+        </span>
+        {activeCount > 0 ? (
+          <span
+            className={cn(
+              "ml-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-semibold",
+              hasApplied ? "bg-white/20 text-white" : "bg-adm-sunken text-adm-ink",
+            )}
+          >
+            {activeCount}
+          </span>
+        ) : null}
+      </AdminButton>
+    ) : null;
+
   const clearAll =
     hasApplied && onClear ? (
       <AdminButton
         variant="outline"
         onClick={onClear}
-        className="hidden h-10 shrink-0 text-console-red hover:bg-console-red/10 hover:text-console-red sm:h-11 lg:flex"
+        className={cn(
+          "hidden shrink-0 text-console-red hover:bg-console-red/10 hover:text-console-red lg:flex",
+          controlHeight,
+        )}
       >
         Clear all
       </AdminButton>
     ) : null;
 
+  const countText =
+    totalCount !== undefined
+      ? `${totalCount.toLocaleString()} total ${noun}`
+      : null;
+  const actionSlot = action ? (
+    <div className="flex items-center gap-1.5 sm:gap-2">{action}</div>
+  ) : null;
+
+  let header: ReactNode;
+  if (hideSearch) {
+    // One row: leading and count on the left, controls and the action right.
+    header =
+      leading || countText || filtersButton || clearAll || actionSlot ? (
+        <div className="flex flex-wrap items-center gap-2">
+          {leading ? (
+            <div className="flex min-w-0 items-center gap-3">{leading}</div>
+          ) : null}
+          {countText ? (
+            <div className="text-xs font-medium text-adm-muted sm:text-sm">
+              {countText}
+            </div>
+          ) : null}
+          <div className="ml-auto flex items-center gap-2">
+            {inlineSlot}
+            {filtersButton}
+            {clearAll}
+            {actionSlot}
+          </div>
+        </div>
+      ) : null;
+  } else if (leading) {
+    // Desktop: one row, leading left, then search + controls + action at the
+    // right edge. Below lg the search group drops to its own line (it asks
+    // for 60% of the row, which the leading element never leaves free).
+    header = (
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="order-1 flex min-w-0 items-center gap-3">
+          {leading}
+          {countText ? (
+            <span className="hidden text-sm font-medium text-adm-muted xl:inline">
+              {countText}
+            </span>
+          ) : null}
+        </div>
+        {actionSlot ? (
+          <div className="order-2 ml-auto lg:order-4 lg:ml-0">{actionSlot}</div>
+        ) : null}
+        <div className="order-3 flex min-w-0 flex-1 basis-[60%] gap-2 lg:order-2 lg:ml-auto lg:flex-none lg:basis-auto">
+          {searchField}
+          {inlineSlot}
+          {filtersButton}
+          {clearAll}
+        </div>
+      </div>
+    );
+  } else {
+    header = (
+      <>
+        {countText || actionSlot ? (
+          <div className="flex items-center justify-between gap-2">
+            <div className="text-xs font-medium text-adm-muted sm:text-sm">
+              {countText}
+            </div>
+            {actionSlot}
+          </div>
+        ) : null}
+        <div className="flex gap-2">
+          {searchField}
+          {inlineSlot}
+          {filtersButton}
+          {clearAll}
+        </div>
+      </>
+    );
+  }
+
   return (
     <div className={cn("mb-6 space-y-3 sm:space-y-4", className)}>
-      {totalCount !== undefined || action ? (
-        <div className="flex items-center justify-between gap-2">
-          <div className="text-xs font-medium text-adm-muted sm:text-sm">
-            {totalCount !== undefined
-              ? `${totalCount.toLocaleString()} total ${noun}`
-              : null}
+      {header}
+
+      {hasFields && open && !isBelowLg ? (
+        <div id={panelId} className="border border-adm-line bg-adm-sunken p-3">
+          <div className={cn("grid grid-cols-1 gap-3", panelClassName)}>
+            {children}
           </div>
-          {action ? (
-            <div className="flex items-center gap-1.5 sm:gap-2">{action}</div>
-          ) : null}
         </div>
       ) : null}
 
-      <div className="space-y-3">
-        <div className="flex gap-2">
-          {searchField}
-
-          {inlineFilter && !hasFields ? (
-            <div className="hidden w-44 shrink-0 sm:block lg:w-52">
-              {inlineFilter}
-            </div>
-          ) : null}
-
-          {hasFields || inlineFilter ? (
-            <AdminButton
-              variant={hasApplied ? "primary" : "outline"}
-              onClick={() => setOpen((o) => !o)}
-              aria-expanded={open}
-              aria-controls={panelId}
-              className={cn(
-                "relative h-10 shrink-0 gap-2 px-3 sm:h-11",
-                inlineFilter && !hasFields && "sm:hidden",
+      {drawerContent ? (
+        <Drawer open={drawerOpen} onOpenChange={setOpen}>
+          <DrawerContent className="max-h-[85vh] before:bg-adm-card">
+            <DrawerHeader>
+              <DrawerTitle className="text-adm-ink">Filters</DrawerTitle>
+            </DrawerHeader>
+            <div className="space-y-3 overflow-y-auto px-4 pb-6">
+              {hasFields ? (
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {children}
+                </div>
+              ) : (
+                drawerContent
               )}
-            >
-              <SlidersHorizontal
-                strokeWidth={1.5}
-                className="h-4 w-4"
-                aria-hidden="true"
-              />
-              <span
-                className={cn(
-                  "text-sm",
-                  inlineFilter && !hasFields ? "hidden" : "hidden sm:inline",
-                )}
-              >
-                Filters
-              </span>
-              {activeCount > 0 ? (
-                <span
-                  className={cn(
-                    "ml-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-semibold",
-                    hasApplied
-                      ? "bg-white/20 text-white"
-                      : "bg-adm-sunken text-adm-ink",
-                  )}
+              {hasApplied && onClear ? (
+                <AdminButton
+                  variant="outline"
+                  onClick={onClear}
+                  className="h-10 w-full text-console-red hover:bg-console-red/10 hover:text-console-red"
                 >
-                  {activeCount}
-                </span>
+                  Clear all filters
+                </AdminButton>
               ) : null}
-            </AdminButton>
-          ) : null}
-
-          {clearAll}
-        </div>
-
-        {hasFields && open && !isBelowLg ? (
-          <div
-            id={panelId}
-            className="border border-adm-line bg-adm-sunken p-3"
-          >
-            <div className={cn("grid grid-cols-1 gap-3", panelClassName)}>
-              {children}
             </div>
-          </div>
-        ) : null}
-
-        {drawerContent ? (
-          <Drawer open={drawerOpen} onOpenChange={setOpen}>
-            <DrawerContent className="max-h-[85vh] before:bg-adm-card">
-              <DrawerHeader>
-                <DrawerTitle className="text-adm-ink">Filters</DrawerTitle>
-              </DrawerHeader>
-              <div className="space-y-3 overflow-y-auto px-4 pb-6">
-                {hasFields ? (
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    {children}
-                  </div>
-                ) : (
-                  drawerContent
-                )}
-                {hasApplied && onClear ? (
-                  <AdminButton
-                    variant="outline"
-                    onClick={onClear}
-                    className="h-10 w-full text-console-red hover:bg-console-red/10 hover:text-console-red"
-                  >
-                    Clear all filters
-                  </AdminButton>
-                ) : null}
-              </div>
-            </DrawerContent>
-          </Drawer>
-        ) : null}
-      </div>
+          </DrawerContent>
+        </Drawer>
+      ) : null}
 
       {hasChips ? (
         <div className="flex flex-wrap items-center gap-2">

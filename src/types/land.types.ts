@@ -130,6 +130,7 @@ export interface ILandSaleResponse {
 export interface ILandSaleListQuery {
   page?: number;
   limit?: number;
+  search?: string;
   status?: LandSaleStatus;
   buyerId?: string;
   plotId?: string;
@@ -260,6 +261,7 @@ export interface ILandAcquisitionResponse {
 export interface ILandAcquisitionListQuery {
   page?: number;
   limit?: number;
+  search?: string;
   status?: LandAcquisitionStatus;
   sellerId?: string;
   outstanding?: boolean;

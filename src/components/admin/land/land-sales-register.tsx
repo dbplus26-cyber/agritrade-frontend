@@ -43,24 +43,29 @@ export function LandSalesRegister() {
   const router = useRouter();
   const {
     page,
+    search: searchInput,
     filters,
+    setSearch,
     setFilter,
     setPage,
     resetFilters,
+    queryParams,
   } = useTableQuery({ defaults: FILTER_DEFAULTS });
 
   const { status, from, to } = filters;
   const pageSize = Number(filters.size) || 10;
+  const search = (queryParams.search as string | undefined) ?? "";
 
   const queryArgs = useMemo<ILandSaleListQuery>(
     () => ({
       page,
       limit: pageSize,
+      ...(search ? { search } : {}),
       ...(status !== "all" ? { status: status as LandSaleStatus } : {}),
       ...(from ? { from } : {}),
       ...(to ? { to } : {}),
     }),
-    [page, pageSize, status, from, to],
+    [page, pageSize, search, status, from, to],
   );
 
   const { data, isLoading, isError, error, refetch } =
@@ -69,9 +74,9 @@ export function LandSalesRegister() {
   const total = data?.meta.total ?? 0;
   const activeFilterCount =
     (status !== "all" ? 1 : 0) + (from ? 1 : 0) + (to ? 1 : 0);
-  const filtered = activeFilterCount > 0;
-  // A register with nothing on file and no filters narrowing it shows ONLY
-  // the empty state (with its create action) - a filter bar filters nothing.
+  const filtered = Boolean(search) || activeFilterCount > 0;
+  // A register with nothing on file and nothing narrowing it shows ONLY the
+  // empty state (with its create action) - a filter bar filters nothing.
   const pristine = !isLoading && !isError && sales.length === 0 && !filtered;
 
   const columns = useMemo<ColumnDef<ILandSale, unknown>[]>(
@@ -177,7 +182,9 @@ export function LandSalesRegister() {
 
       {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
-          hideSearch
+          search={searchInput}
+          onSearch={setSearch}
+          searchPlaceholder="Search transaction no., plot reference, buyer…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
           totalCount={total}
@@ -240,7 +247,10 @@ export function LandSalesRegister() {
           description="Draft a land sale from an available plot to start tracking it."
           actionLabel="New land sale"
           onAction={() => router.push(`${LIST}/new`)}
-          onClear={resetFilters}
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
         />
       ) : (
         <AdminCard className="overflow-hidden">

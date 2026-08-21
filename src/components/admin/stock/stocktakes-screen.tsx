@@ -45,10 +45,18 @@ export function StocktakesScreen() {
   const router = useRouter();
   const { has } = usePermissions();
   const canCount = has("STOCK_MANAGE");
-  const { page, filters, setFilter, setPage, resetFilters } = useTableQuery({
-    defaults: FILTER_DEFAULTS,
-  });
+  const {
+    page,
+    search: searchInput,
+    filters,
+    setSearch,
+    setFilter,
+    setPage,
+    resetFilters,
+    queryParams,
+  } = useTableQuery({ defaults: FILTER_DEFAULTS });
   const pageSize = Number(filters.size) || 10;
+  const search = (queryParams.search as string | undefined) ?? "";
 
   const { data: warehousesData } = useGetWarehousesQuery({
     isActive: true,
@@ -59,6 +67,7 @@ export function StocktakesScreen() {
     () => ({
       page,
       limit: pageSize,
+      ...(search ? { search } : {}),
       ...(filters.status !== "all"
         ? { status: filters.status as StocktakeStatus }
         : {}),
@@ -66,7 +75,7 @@ export function StocktakesScreen() {
         ? { warehouseId: filters.warehouse }
         : {}),
     }),
-    [page, pageSize, filters],
+    [page, pageSize, search, filters],
   );
 
   const { data, isLoading, isFetching, isError, error, refetch } =
@@ -81,6 +90,7 @@ export function StocktakesScreen() {
     !isLoading &&
     !isError &&
     stocktakes.length === 0 &&
+    !search &&
     activeFilterCount === 0;
 
   const warehouseOptions = useMemo(
@@ -179,9 +189,14 @@ export function StocktakesScreen() {
 
       {pristine ? null : (
         <ConsoleFilterBar
-          hideSearch
+          search={searchInput}
+          onSearch={setSearch}
+          searchPlaceholder="Search count no., warehouse, notes…"
           activeCount={activeFilterCount}
-          onClear={resetFilters}
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
           totalCount={totalCount}
           noun="stocktakes"
           action={
@@ -236,13 +251,16 @@ export function StocktakesScreen() {
         />
       ) : stocktakes.length === 0 ? (
         <RegisterEmpty
-          filtered={activeFilterCount > 0}
+          filtered={Boolean(search) || activeFilterCount > 0}
           noun="stocktakes"
           description="Start a count sheet to check a warehouse against the book."
-          filteredDescription="Nothing matches this filter."
+          filteredDescription="Nothing matches this search and filter combination."
           actionLabel={canCount ? "New stocktake" : undefined}
           onAction={canCount ? () => router.push(`${LIST}/new`) : undefined}
-          onClear={resetFilters}
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
         />
       ) : (
         <AdminCard className="overflow-hidden">

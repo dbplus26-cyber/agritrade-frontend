@@ -67,6 +67,7 @@ export interface IStockMovementsResponse {
 export interface IStockMovementsQuery {
   page?: number;
   limit?: number;
+  search?: string;
   warehouseId?: string;
   commodityId?: string;
   type?: StockMoveType;

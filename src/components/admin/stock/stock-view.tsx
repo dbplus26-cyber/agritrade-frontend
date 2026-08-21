@@ -87,6 +87,10 @@ export function StockView() {
   const [warehouseId, setWarehouseId] = useState("all");
   const [commodityId, setCommodityId] = useState("all");
   const [includeZero, setIncludeZero] = useState(false);
+  // The balances call returns the whole matrix (it is small: commodities by
+  // warehouses), so search narrows it here rather than on the server.
+  const [search, setSearch] = useState("");
+  const searchTerm = search.trim().toLowerCase();
 
   const { data: warehousesData } = useGetWarehousesQuery({
     isActive: true,
@@ -110,7 +114,18 @@ export function StockView() {
   const { data, isLoading, isError, error, refetch } =
     useGetStockBalancesQuery(balancesArgs);
 
-  const balances = useMemo(() => data?.data ?? [], [data]);
+  const allBalances = useMemo(() => data?.data ?? [], [data]);
+  const balances = useMemo(
+    () =>
+      searchTerm
+        ? allBalances.filter(
+            (row) =>
+              row.commodityName.toLowerCase().includes(searchTerm) ||
+              row.warehouseName.toLowerCase().includes(searchTerm),
+          )
+        : allBalances,
+    [allBalances, searchTerm],
+  );
   /**
    * How many of the rows on screen are cleared lines - a warehouse/commodity
    * pair emptied to zero. Only ever above zero while the toggle is on, since
@@ -128,7 +143,16 @@ export function StockView() {
   const totals = useMemo(() => data?.summary.totals ?? [], [data]);
 
   const balancesFiltered =
-    warehouseId !== "all" || commodityId !== "all" || includeZero;
+    Boolean(searchTerm) ||
+    warehouseId !== "all" ||
+    commodityId !== "all" ||
+    includeZero;
+  const clearBalancesFilters = () => {
+    setSearch("");
+    setWarehouseId("all");
+    setCommodityId("all");
+    setIncludeZero(false);
+  };
 
   /**
    * The rows pivoted into a warehouse-by-commodity matrix, both axes in the
@@ -186,8 +210,7 @@ export function StockView() {
     !balancesFiltered;
 
   // The page's one action. It lives in the toolbar of whichever section is
-  // showing; where there is no toolbar to hold it (the pristine empty state)
-  // it gets its own row so it stays reachable.
+  // showing, on the same row as the section tabs.
   const adjustButton = canAdjust ? (
     <AdminButton
       onClick={() => setAdjustOpen(true)}
@@ -197,11 +220,35 @@ export function StockView() {
       <span className="hidden sm:inline">Request adjustment</span>
     </AdminButton>
   ) : null;
-  const adjustRow = adjustButton ? (
-    <div className="mb-6 flex items-center justify-end gap-1.5 sm:gap-2">
-      {adjustButton}
+
+  // Section toggle - balances / movements - opens the toolbar row, so tabs,
+  // search, filters and the action share one line on a desktop.
+  const sectionTabs = (
+    <div className="flex gap-1.5" role="tablist" aria-label="Stock sections">
+      {(
+        [
+          ["balances", "Balances"],
+          ["movements", "Movements"],
+        ] as const
+      ).map(([key, label]) => (
+        <button
+          key={key}
+          type="button"
+          role="tab"
+          onClick={() => setSection(key)}
+          aria-selected={section === key}
+          className={cn(
+            "flex h-[34px] cursor-pointer items-center rounded-none border px-3.5 text-[13px] font-semibold transition-colors",
+            section === key
+              ? "border-console bg-console text-white"
+              : "border-adm-line bg-adm-card text-adm-muted hover:border-console/60",
+          )}
+        >
+          {label}
+        </button>
+      ))}
     </div>
-  ) : null;
+  );
 
   return (
     <div>
@@ -210,36 +257,12 @@ export function StockView() {
         sub="On hand by warehouse - always the sum of the ledger, never a stored number"
       />
 
-      {/* Section toggle - balances / movements. */}
-      <div className="mb-4 flex gap-1.5">
-        {(
-          [
-            ["balances", "Balances"],
-            ["movements", "Movements"],
-          ] as const
-        ).map(([key, label]) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => setSection(key)}
-            aria-pressed={section === key}
-            className={cn(
-              "cursor-pointer rounded-none border px-3.5 py-[7px] text-[13px] font-semibold transition-colors",
-              section === key
-                ? "border-console bg-console text-white"
-                : "border-adm-line bg-adm-card text-adm-muted hover:border-console/60",
-            )}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
       {section === "movements" ? (
         <StockMovements
           warehouseOptions={warehouseOptions}
           commodityOptions={commodityOptions}
           action={adjustButton}
+          leading={sectionTabs}
         />
       ) : (
         <>
@@ -290,23 +313,26 @@ export function StockView() {
           ) : null}
 
           {balancesPristine ? (
-            adjustRow
+            <ConsoleFilterBar
+              hideSearch
+              leading={sectionTabs}
+              action={adjustButton}
+            />
           ) : (
           <ConsoleFilterBar
-            hideSearch
+            search={search}
+            onSearch={setSearch}
+            searchPlaceholder="Search commodity or warehouse…"
             activeCount={
               (warehouseId !== "all" ? 1 : 0) +
               (commodityId !== "all" ? 1 : 0) +
               (includeZero ? 1 : 0)
             }
-            onClear={() => {
-              setWarehouseId("all");
-              setCommodityId("all");
-              setIncludeZero(false);
-            }}
+            onClear={clearBalancesFilters}
             totalCount={balances.length}
             noun="stock lines"
             action={adjustButton}
+            leading={sectionTabs}
             chips={
               <>
                 {warehouseId !== "all" ? (
@@ -372,12 +398,8 @@ export function StockView() {
               noun="stock lines"
               title="Nothing on hand"
               description="Stock appears here the moment a purchase is received into a warehouse."
-              filteredDescription="No stock lines match this warehouse and commodity combination."
-              onClear={() => {
-                setWarehouseId("all");
-                setCommodityId("all");
-                setIncludeZero(false);
-              }}
+              filteredDescription="No stock lines match this search and filter combination."
+              onClear={clearBalancesFilters}
             />
           ) : (
             <AdminCard className="overflow-hidden">

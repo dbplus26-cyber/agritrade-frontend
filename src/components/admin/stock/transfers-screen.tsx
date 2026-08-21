@@ -105,10 +105,18 @@ export function TransfersScreen() {
   const { has } = usePermissions();
   const canManage = isSuperAdmin || has("TRANSFERS_MANAGE");
   const [dialogOpen, setDialogOpen] = useState(false);
-  const { page, filters, setFilter, setPage, resetFilters } = useTableQuery({
-    defaults: FILTER_DEFAULTS,
-  });
+  const {
+    page,
+    search: searchInput,
+    filters,
+    setSearch,
+    setFilter,
+    setPage,
+    resetFilters,
+    queryParams,
+  } = useTableQuery({ defaults: FILTER_DEFAULTS });
   const pageSize = Number(filters.size) || 20;
+  const search = (queryParams.search as string | undefined) ?? "";
 
   const { data: warehousesData } = useGetWarehousesQuery({
     isActive: true,
@@ -131,6 +139,7 @@ export function TransfersScreen() {
     () => ({
       page,
       limit: pageSize,
+      ...(search ? { search } : {}),
       ...(filters.fromWh !== "all" ? { fromWarehouseId: filters.fromWh } : {}),
       ...(filters.toWh !== "all" ? { toWarehouseId: filters.toWh } : {}),
       ...(filters.commodity !== "all"
@@ -139,7 +148,7 @@ export function TransfersScreen() {
       ...(filters.from ? { from: filters.from } : {}),
       ...(filters.to ? { to: filters.to } : {}),
     }),
-    [page, pageSize, filters],
+    [page, pageSize, search, filters],
   );
 
   const { data, isLoading, isFetching, isError, error, refetch } =
@@ -155,7 +164,11 @@ export function TransfersScreen() {
   // A register with nothing on file and no filters narrowing it shows ONLY
   // the empty state (with its create action) - a filter bar filters nothing.
   const pristine =
-    !isLoading && !isError && transfers.length === 0 && activeFilterCount === 0;
+    !isLoading &&
+    !isError &&
+    transfers.length === 0 &&
+    !search &&
+    activeFilterCount === 0;
 
   const fromOptions = useMemo(
     () => [
@@ -294,9 +307,14 @@ export function TransfersScreen() {
 
       {pristine ? null : (
         <ConsoleFilterBar
-          hideSearch
+          search={searchInput}
+          onSearch={setSearch}
+          searchPlaceholder="Search transfer no., notes…"
           activeCount={activeFilterCount}
-          onClear={resetFilters}
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
           totalCount={totalCount}
           noun="transfers"
           action={
@@ -380,13 +398,16 @@ export function TransfersScreen() {
         />
       ) : transfers.length === 0 ? (
         <RegisterEmpty
-          filtered={activeFilterCount > 0}
+          filtered={Boolean(search) || activeFilterCount > 0}
           noun="transfers"
           description="Stock moved between warehouses is recorded here."
-          filteredDescription="Nothing matches this filter."
+          filteredDescription="Nothing matches this search and filter combination."
           actionLabel={canManage ? "New transfer" : undefined}
           onAction={canManage ? () => setDialogOpen(true) : undefined}
-          onClear={resetFilters}
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
         />
       ) : (
         <AdminCard className="overflow-hidden">

@@ -39,11 +39,19 @@ const FILTER_DEFAULTS = { season: "all", from: "", to: "", size: "10" };
 
 export function GrantsRegister() {
   const router = useRouter();
-  const { page, filters, setFilter, setPage, resetFilters } = useTableQuery({
-    defaults: FILTER_DEFAULTS,
-  });
+  const {
+    page,
+    search: searchInput,
+    filters,
+    setSearch,
+    setFilter,
+    setPage,
+    resetFilters,
+    queryParams,
+  } = useTableQuery({ defaults: FILTER_DEFAULTS });
 
   const pageSize = Number(filters.size) || 10;
+  const search = (queryParams.search as string | undefined) ?? "";
   const { season, from, to } = filters;
   const seasons = useGetSeasonsQuery({ limit: 100 });
 
@@ -51,11 +59,12 @@ export function GrantsRegister() {
     () => ({
       page,
       limit: pageSize,
+      ...(search ? { search } : {}),
       ...(season !== "all" ? { seasonId: season } : {}),
       ...(from ? { from } : {}),
       ...(to ? { to } : {}),
     }),
-    [page, pageSize, season, from, to],
+    [page, pageSize, search, season, from, to],
   );
 
   const { data, isLoading, isError, error, refetch } =
@@ -64,10 +73,14 @@ export function GrantsRegister() {
   const totalCount = data?.meta.total ?? 0;
   const activeFilterCount =
     (season !== "all" ? 1 : 0) + (from ? 1 : 0) + (to ? 1 : 0);
-  // A register with nothing on file and no filters narrowing it shows ONLY
-  // the empty state (with its create action) - a filter bar filters nothing.
+  // A register with nothing on file and nothing narrowing it shows ONLY the
+  // empty state (with its create action) - a filter bar filters nothing.
   const pristine =
-    !isLoading && !isError && grants.length === 0 && activeFilterCount === 0;
+    !isLoading &&
+    !isError &&
+    grants.length === 0 &&
+    !search &&
+    activeFilterCount === 0;
 
   const seasonOptions = useMemo(
     () => [
@@ -195,9 +208,11 @@ export function GrantsRegister() {
         sub="Inputs given to farmers, carrying the cash value owed"
       />
 
-      {pristine || (isError && activeFilterCount === 0) ? null : (
+      {pristine || (isError && !search && activeFilterCount === 0) ? null : (
         <ConsoleFilterBar
-          hideSearch
+          search={searchInput}
+          onSearch={setSearch}
+          searchPlaceholder="Search farmer, item, grant no., notes…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
           totalCount={totalCount}
@@ -263,13 +278,16 @@ export function GrantsRegister() {
         />
       ) : grants.length === 0 ? (
         <RegisterEmpty
-          filtered={activeFilterCount > 0}
+          filtered={Boolean(search) || activeFilterCount > 0}
           noun="grants"
           description="Record the first input grant."
           filteredDescription="Nothing matches this filter."
           actionLabel="New grant"
           onAction={() => router.push(`${LIST}/new`)}
-          onClear={resetFilters}
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
         />
       ) : (
         <AdminCard className="overflow-hidden">

@@ -42,21 +42,33 @@ export function StockMovements({
   warehouseOptions,
   commodityOptions,
   action,
+  leading,
 }: {
   warehouseOptions: readonly { value: string; label: string }[];
   commodityOptions: readonly { value: string; label: string }[];
   /** The page's action ("Request adjustment"), shown in the toolbar. */
   action?: ReactNode;
+  /** The page's section tabs, at the left of the toolbar row. */
+  leading?: ReactNode;
 }) {
-  const { page, filters, setFilter, setPage, resetFilters } = useTableQuery({
-    defaults: FILTER_DEFAULTS,
-  });
+  const {
+    page,
+    search: searchInput,
+    filters,
+    setSearch,
+    setFilter,
+    setPage,
+    resetFilters,
+    queryParams,
+  } = useTableQuery({ defaults: FILTER_DEFAULTS });
   const pageSize = Number(filters.size) || 20;
+  const search = (queryParams.search as string | undefined) ?? "";
 
   const queryArgs = useMemo<IStockMovementsQuery>(
     () => ({
       page,
       limit: pageSize,
+      ...(search ? { search } : {}),
       ...(filters.type !== "all"
         ? { type: filters.type as StockMoveType }
         : {}),
@@ -65,7 +77,7 @@ export function StockMovements({
       ...(filters.from ? { from: filters.from } : {}),
       ...(filters.to ? { to: filters.to } : {}),
     }),
-    [page, pageSize, filters],
+    [page, pageSize, search, filters],
   );
 
   const { data, isLoading, isFetching, isError, error, refetch } =
@@ -78,7 +90,7 @@ export function StockMovements({
     (filters.commodity !== "all" ? 1 : 0) +
     (filters.from ? 1 : 0) +
     (filters.to ? 1 : 0);
-  const filtered = activeFilterCount > 0;
+  const filtered = Boolean(search) || activeFilterCount > 0;
   // A ledger with nothing on file and no filters narrowing it shows ONLY the
   // empty state - a filter bar filters nothing.
   const pristine =
@@ -169,20 +181,25 @@ export function StockMovements({
   return (
     <div>
       {pristine ? (
-        // No toolbar over an empty ledger, so the action gets its own row.
-        action ? (
-          <div className="mb-6 flex items-center justify-end gap-1.5 sm:gap-2">
-            {action}
-          </div>
+        // An empty ledger filters nothing, but the section tabs and the
+        // action still need their row.
+        leading || action ? (
+          <ConsoleFilterBar hideSearch leading={leading} action={action} />
         ) : null
       ) : (
       <ConsoleFilterBar
-        hideSearch
+        search={searchInput}
+        onSearch={setSearch}
+        searchPlaceholder="Search commodity, warehouse, reason…"
         activeCount={activeFilterCount}
-        onClear={resetFilters}
+        onClear={() => {
+          setSearch("");
+          resetFilters();
+        }}
         totalCount={totalCount}
         noun="movements"
         action={action}
+        leading={leading}
         panelClassName="sm:grid-cols-2 lg:grid-cols-5"
         chips={
           <>
@@ -257,7 +274,10 @@ export function StockMovements({
           noun="movements"
           title="No movements on file"
           description="Every receipt, load and approved adjustment lands here as a ledger line."
-          onClear={resetFilters}
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
         />
       ) : (
         // On a card, like every other register - and like this screen's own

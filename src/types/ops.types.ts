@@ -36,6 +36,7 @@ export interface ITransferResponse {
 export interface ITransferListQuery {
   page?: number;
   limit?: number;
+  search?: string;
   from?: string;
   to?: string;
   fromWarehouseId?: string;
@@ -103,6 +104,7 @@ export interface IStocktakeResponse {
 export interface IStocktakeListQuery {
   page?: number;
   limit?: number;
+  search?: string;
   status?: StocktakeStatus;
   warehouseId?: string;
 }

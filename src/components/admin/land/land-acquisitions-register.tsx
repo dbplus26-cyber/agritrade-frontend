@@ -58,25 +58,30 @@ export function LandAcquisitionsRegister() {
   const router = useRouter();
   const {
     page,
+    search: searchInput,
     filters,
+    setSearch,
     setFilter,
     setPage,
     resetFilters,
+    queryParams,
   } = useTableQuery({ defaults: FILTER_DEFAULTS });
 
   const { status, outstanding, from, to } = filters;
   const pageSize = Number(filters.size) || 10;
+  const search = (queryParams.search as string | undefined) ?? "";
 
   const queryArgs = useMemo<ILandAcquisitionListQuery>(
     () => ({
       page,
       limit: pageSize,
+      ...(search ? { search } : {}),
       ...(status !== "all" ? { status: status as LandAcquisitionStatus } : {}),
       ...(outstanding === "yes" ? { outstanding: true } : {}),
       ...(from ? { from } : {}),
       ...(to ? { to } : {}),
     }),
-    [page, pageSize, status, outstanding, from, to],
+    [page, pageSize, search, status, outstanding, from, to],
   );
 
   const { data, isLoading, isError, error, refetch } =
@@ -88,9 +93,9 @@ export function LandAcquisitionsRegister() {
     (outstanding !== "all" ? 1 : 0) +
     (from ? 1 : 0) +
     (to ? 1 : 0);
-  const filtered = activeFilterCount > 0;
-  // A register with nothing on file and no filters narrowing it shows ONLY
-  // the empty state (with its create action) - a filter bar filters nothing.
+  const filtered = Boolean(search) || activeFilterCount > 0;
+  // A register with nothing on file and nothing narrowing it shows ONLY the
+  // empty state (with its create action) - a filter bar filters nothing.
   const pristine = !isLoading && !isError && rows.length === 0 && !filtered;
 
   const columns = useMemo<ColumnDef<ILandAcquisition, unknown>[]>(
@@ -185,7 +190,9 @@ export function LandAcquisitionsRegister() {
 
       {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
-          hideSearch
+          search={searchInput}
+          onSearch={setSearch}
+          searchPlaceholder="Search transaction no., reference, seller, location…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
           totalCount={total}
@@ -260,7 +267,10 @@ export function LandAcquisitionsRegister() {
           description="Record a plot you are buying from a seller to start tracking it."
           actionLabel="New acquisition"
           onAction={() => router.push(`${LIST}/new`)}
-          onClear={resetFilters}
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
         />
       ) : (
         <AdminCard className="overflow-hidden">
