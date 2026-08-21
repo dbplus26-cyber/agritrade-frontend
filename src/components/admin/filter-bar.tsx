@@ -599,7 +599,7 @@ export function ConsoleFilterBar({
 
       {drawerContent ? (
         <Drawer open={drawerOpen} onOpenChange={setOpen}>
-          <DrawerContent className="max-h-[85vh] before:bg-adm-card">
+          <DrawerContent className="max-h-[85vh] border-adm-line bg-adm-card">
             <DrawerHeader>
               <DrawerTitle className="text-adm-ink">Filters</DrawerTitle>
             </DrawerHeader>

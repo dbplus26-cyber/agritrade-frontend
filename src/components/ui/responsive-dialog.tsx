@@ -12,6 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { useKeyboardInset } from "@/hooks/use-keyboard-inset";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
@@ -19,8 +20,10 @@ import { cn } from "@/lib/utils";
  * Dialog on desktop, bottom sheet on phones - same API shape as dialog.tsx so
  * call sites swap imports 1:1. From `md` it renders the existing Dialog
  * pieces; below `md` a Sheet slides up from the bottom edge with a drag
- * handle, internal scroll (`max-h-[88dvh]`) and safe-area padding, so the
- * submit row is always reachable above the keyboard.
+ * handle, internal scroll (`max-h-[88dvh]`) and safe-area padding. While the
+ * on-screen keyboard is up the sheet is lifted to sit on top of it and capped
+ * to the space that remains, so a short type-to-confirm sheet is not hidden
+ * behind the keys and a tall form's field stays in view while typing.
  *
  * Sheet and Dialog wrap the same Radix Dialog primitive, so the shared
  * Header/Title/Description/Footer pieces (and Close/Trigger) work unchanged
@@ -36,14 +39,22 @@ function ResponsiveDialogContent({
   children,
   showCloseButton = true,
   overlayClassName,
+  style,
   ...props
 }: React.ComponentProps<typeof DialogContent>) {
   const isMobile = useIsMobile();
+  const keyboard = useKeyboardInset(isMobile);
   if (isMobile) {
+    // Inline so it beats any `max-h-*` a call site sets: with the keyboard up
+    // the visible area is the only height there is.
+    const lifted = keyboard.bottom
+      ? { bottom: keyboard.bottom, maxHeight: keyboard.height }
+      : undefined;
     return (
       <SheetContent
         side="bottom"
         showCloseButton={showCloseButton}
+        style={{ ...style, ...lifted }}
         // The sheet and its overlay sit above the shell's bottom tab bar
         // (z-[60]); floating layers inside (popover/select, z-[80]) still
         // clear the sheet.
@@ -81,6 +92,7 @@ function ResponsiveDialogContent({
       className={cn("max-h-[88dvh] overflow-y-auto", className)}
       showCloseButton={showCloseButton}
       overlayClassName={overlayClassName}
+      style={style}
       {...props}
     >
       {children}
