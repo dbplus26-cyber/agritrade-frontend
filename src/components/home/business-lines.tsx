@@ -4,8 +4,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { StencilLabel } from "@/components/ui/StencilLabel";
 import { routes } from "@/lib/routes";
 
-const TRADING_PHOTO =
-  "https://commons.wikimedia.org/wiki/Special:FilePath/A%20section%20of%20traders%20in%20Tamale%20Aboabo%20market%2001.jpg?width=1000";
+const TRADING_PHOTO = "/images/home-commodities.webp";
 
 /** One of the stacked file cards (Land / Farming investment). */
 function FileCard({
@@ -75,7 +74,7 @@ export function BusinessLines() {
           <div className="relative h-[200px] border-b-[1.5px] border-soil/50 sm:h-[290px] lg:h-auto lg:min-h-[290px] lg:flex-1">
             <Photo
               src={TRADING_PHOTO}
-              alt="Traders at Tamale Aboabo market"
+              alt="Open sacks of dried chillies, maize and grain laid out at the market"
               fill
               sizes="(min-width: 1024px) 760px, 100vw"
               className="object-cover"

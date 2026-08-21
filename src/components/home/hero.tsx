@@ -2,8 +2,9 @@ import { Photo } from "@/components/ui/Photo";
 import { StencilLabel } from "@/components/ui/StencilLabel";
 import { getSiteContact } from "@/lib/public-contact";
 
-const HERO_PHOTO =
-  "https://commons.wikimedia.org/wiki/Special:FilePath/Truck%20and%20trike%2C%20Tamale%20(P1100339).jpg?width=1200";
+// Our own photograph, served from /public. Sized for the optimizer (see
+// public/images): it generates each device's variant from this source.
+const HERO_PHOTO = "/images/home-hero.webp";
 
 /**
  * Home hero - asymmetric 7/5: dispatch eyebrow, the two-line drop-in
@@ -103,7 +104,7 @@ export async function Hero() {
           <div className="shadow-doc-dark absolute inset-x-0 top-5 z-[3] h-[280px] border border-soil/30 sm:h-[380px] lg:left-0 lg:right-16 lg:top-[110px] lg:h-[520px]">
             <Photo
               src={HERO_PHOTO}
-              alt="A loaded truck at the Tamale warehouse"
+              alt="A loaded haulage truck at the depot, sacks stacked under tarpaulin, being readied to head south"
               fill
               priority
               sizes="(min-width: 1024px) 440px, 100vw"

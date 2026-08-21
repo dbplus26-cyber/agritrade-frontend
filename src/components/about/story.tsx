@@ -1,8 +1,7 @@
 import { Photo } from "@/components/ui/Photo";
 import { StencilLabel } from "@/components/ui/StencilLabel";
 
-const STORY_PHOTO =
-  "https://commons.wikimedia.org/wiki/Special:FilePath/Market%20in%20Tamale%20Northern%20Ghana.jpg?width=1000";
+const STORY_PHOTO = "/images/about-story.webp";
 
 /** Editorial opener - the ghost "TAMALE" stencil, story copy, treated photo
  * with the rotated caption plate. */
@@ -52,7 +51,7 @@ export function Story() {
           <div className="shadow-doc-dark relative h-[220px] border border-soil/30 sm:h-[340px] lg:h-[500px]">
             <Photo
               src={STORY_PHOTO}
-              alt="Weighing and trading at a Tamale warehouse"
+              alt="Weighing a sack of grain on the platform scale inside the warehouse, stock stacked behind"
               fill
               priority
               sizes="(min-width: 1024px) 560px, 100vw"

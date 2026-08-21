@@ -3,8 +3,7 @@ import { Photo } from "@/components/ui/Photo";
 import { Reveal } from "@/components/ui/Reveal";
 import { Stamp } from "@/components/ui/Stamp";
 
-const SCHEME_PHOTO =
-  "https://commons.wikimedia.org/wiki/Special:FilePath/The%20maize%20farm%20in%20Walewale%20Ghana.jpg?width=1000";
+const SCHEME_PHOTO = "/images/farming-investment-cover.webp";
 
 /**
  * The scheme, on paper: a treated field photo beside a sample season ledger -
@@ -18,7 +17,7 @@ export function SchemeFile() {
         <div className="shadow-doc-dark relative h-[240px] border border-soil/30 sm:h-[320px] lg:h-[400px]">
           <Photo
             src={SCHEME_PHOTO}
-            alt="A maize farm in Walewale, northern Ghana"
+            alt="A farmer walking between tall maize rows on a farm in northern Ghana"
             fill
             sizes="(min-width: 1024px) 600px, 100vw"
             className="object-cover"

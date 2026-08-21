@@ -33,9 +33,9 @@ const contentSecurityPolicy = [
   // blob:: staged photo previews (usePhotoStaging object URLs). data:: the
   // paper-grain SVG noise textures in globals.css are data: URIs. The https
   // hosts mirror images.remotePatterns in this file: Cloudinary uploads and
-  // picsum demo photos are rendered via plain <img>/bypassOptimizer, and the
-  // Wikimedia pair covers any non-optimized use of the credited photography.
-  "img-src 'self' blob: data: https://res.cloudinary.com https://picsum.photos https://fastly.picsum.photos https://upload.wikimedia.org https://commons.wikimedia.org",
+  // picsum demo photos are rendered via plain <img>/bypassOptimizer. The
+  // site's own photography is served from /public ('self').
+  "img-src 'self' blob: data: https://res.cloudinary.com https://picsum.photos https://fastly.picsum.photos",
   // next/font self-hosts the Google fonts at build time - no external origin.
   "font-src 'self'",
   // The DB Plus API (cookies + JSON, RTK Query). ws: dev-only for HMR - some
@@ -75,11 +75,10 @@ const nextConfig: NextConfig = {
   // two fighting over .next (e.g. NEXT_DIST_DIR=.next-build next build).
   distDir: process.env.NEXT_DIST_DIR || ".next",
   images: {
-    // Photography is served from Wikimedia Commons (CC BY-SA, credited in the
-    // footer). Special:FilePath 302s to upload.wikimedia.org, so both hosts
-    // are allowed.
+    // The site's own photography lives in /public/images and needs no remote
+    // host. What remains here is the console's uploaded media and demo
+    // fixtures.
     remotePatterns: [
-      { protocol: "https", hostname: "commons.wikimedia.org" },
       // Demo-fixture photography (prisma/demo/kit.ts). Picsum serves a stable
       // image per seed string, which is what lets the seeded console be
       // screenshotted twice and look the same. Harmless in production: nothing
@@ -87,7 +86,6 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "picsum.photos" },
       // Picsum redirects to this CDN host to serve the actual bytes.
       { protocol: "https", hostname: "fastly.picsum.photos" },
-      { protocol: "https", hostname: "upload.wikimedia.org" },
       // Commodity photos uploaded from the console (Cloudinary).
       //
       // The cloud name lives with the backend (it owns the upload

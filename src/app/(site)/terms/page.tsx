@@ -61,7 +61,6 @@ function buildSections(contact: ResolvedContact): LegalSection[] {
     title: "This website",
     paragraphs: [
       "Website content - including the availability board - is provided for information and reflects our records at the time it was updated; it is not an offer capable of acceptance. We may change the site, and these terms, at any time; the date at the top of this page tells you when the terms last changed.",
-      "Some photography on this site comes from Wikimedia Commons contributors and is used under the CC BY-SA licence.",
     ],
   },
   {
