@@ -74,7 +74,7 @@ export function BusinessLines() {
           <div className="relative h-[200px] border-b-[1.5px] border-soil/50 sm:h-[290px] lg:h-auto lg:min-h-[290px] lg:flex-1">
             <Photo
               src={TRADING_PHOTO}
-              alt="Open sacks of dried chillies, maize and grain laid out at the market"
+              alt="Basins of beans, maize, millet and other grains heaped on a market stall"
               fill
               sizes="(min-width: 1024px) 760px, 100vw"
               className="object-cover"
