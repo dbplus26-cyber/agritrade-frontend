@@ -466,7 +466,7 @@ export function PaymentPoliciesScreen() {
 
       {/* Policies are immutable by design: sales freeze a snapshot of their
           terms, so there is deliberately no edit action here. */}
-      <p className="mb-4 max-w-[62ch] text-[12.5px] leading-[1.5] text-adm-muted">
+      <p className="mb-4 text-[12.5px] leading-[1.5] text-adm-muted">
         A policy can&apos;t be edited once created. Sales freeze their terms at
         confirmation, so create a new policy when the terms change.
       </p>
@@ -474,7 +474,7 @@ export function PaymentPoliciesScreen() {
       {/* No search or filters on this list, so the create action takes the
           toolbar's place; the empty state carries its own. */}
       {!isLoading && !isError && policies.length === 0 ? null : (
-        <div className="mb-6 flex items-center justify-end gap-1.5 sm:gap-2">
+        <div className="mb-6 flex items-center gap-1.5 sm:gap-2">
           <AdminButton
             aria-label="New policy"
             onClick={() => setCreateOpen(true)}

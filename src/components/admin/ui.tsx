@@ -354,7 +354,7 @@ export function AdminPageHeader({
         className,
       )}
     >
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <h1 className="text-2xl font-bold tracking-tight text-adm-ink">
           {title}
           {hint ? (

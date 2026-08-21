@@ -38,11 +38,9 @@ const fieldBox =
 const fieldLabel = "text-xs font-medium text-adm-ink sm:text-sm";
 
 /**
- * Set by ConsoleFilterBar around a filter that sits BESIDE the search box.
- * There the field has no room for a label on top (the search has none, and
- * a labelled box next to an unlabelled one pushes the row out of line), so
- * the label goes to screen readers only and the box takes the row's control
- * height. Inside the panel and the drawer the same field keeps its label.
+ * Set by ConsoleFilterBar around a filter that sits BESIDE the search box,
+ * so the field's box takes the row's control height (the search box gets a
+ * label of its own there, and both boxes sit level on the same baseline).
  */
 const InlineFieldContext = createContext<{ heightClass: string } | null>(null);
 
@@ -95,18 +93,10 @@ export function ConsoleLabeledSelect({
   const id = useId();
   const inline = useContext(InlineFieldContext);
   return (
-    <div
-      className={cn("min-w-0", !inline && "space-y-1.5 sm:space-y-2", className)}
-    >
-      <label
-        htmlFor={id}
-        className={cn(
-          fieldLabel,
-          inline ? "sr-only" : "flex items-center gap-1",
-        )}
-      >
+    <div className={cn("min-w-0 space-y-1.5 sm:space-y-2", className)}>
+      <label htmlFor={id} className={cn(fieldLabel, "flex items-center gap-1")}>
         <span className="min-w-0 truncate">{label}</span>
-        {hint && !inline ? (
+        {hint ? (
           <HelpTip label={`What does the ${label} filter do?`} text={hint} />
         ) : null}
       </label>
@@ -173,16 +163,8 @@ export function ConsoleDateField({
   const id = useId();
   const inline = useContext(InlineFieldContext);
   return (
-    <div
-      className={cn("min-w-0", !inline && "space-y-1.5 sm:space-y-2", className)}
-    >
-      <label
-        htmlFor={id}
-        className={cn(
-          fieldLabel,
-          inline ? "sr-only" : "flex items-center gap-1",
-        )}
-      >
+    <div className={cn("min-w-0 space-y-1.5 sm:space-y-2", className)}>
+      <label htmlFor={id} className={cn(fieldLabel, "flex items-center gap-1")}>
         <span className="min-w-0 truncate">{label}</span>
       </label>
       <div
@@ -377,6 +359,7 @@ export function ConsoleFilterBar({
   const isBelowLg = useIsBelowLg();
   const isBelowSm = useIsBelowSm();
   const panelId = useId();
+  const searchId = useId();
 
   const fields = Children.toArray(children);
   const hasFields = fields.length > 0;
@@ -397,39 +380,54 @@ export function ConsoleFilterBar({
   const dense = hideSearch || Boolean(leading);
   const controlHeight = dense ? "h-[34px]" : "h-10 sm:h-11";
 
+  // A filter beside the search carries its label on top, so the search box
+  // gets one too ("Search") and the two boxes sit level on one baseline.
+  const labelledSearch = Boolean(inlineFilter && !hasFields);
   const searchField = hideSearch ? null : (
     <div
       className={cn(
-        "relative min-w-0 flex-1",
+        "min-w-0 flex-1",
+        labelledSearch && "space-y-1.5 sm:space-y-2",
         leading && "lg:w-64 lg:flex-none xl:w-80",
       )}
     >
-      <Search
-        strokeWidth={1.5}
-        aria-hidden="true"
-        className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-adm-muted"
-      />
-      <input
-        type="search"
-        value={search}
-        onChange={(e) => onSearch?.(e.target.value)}
-        placeholder={searchPlaceholder}
-        aria-label={searchPlaceholder}
-        className={cn(
-          "w-full min-w-0 rounded-none border border-adm-line bg-adm-card pr-10 pl-10 text-sm text-adm-ink shadow-none outline-none transition-colors placeholder:text-adm-faint focus:border-console focus-visible:ring-0 [&::-webkit-search-cancel-button]:hidden",
-          controlHeight,
-        )}
-      />
-      {search ? (
-        <button
-          type="button"
-          onClick={() => onSearch?.("")}
-          aria-label="Clear search"
-          className="absolute top-1/2 right-1 flex h-7 w-7 -translate-y-1/2 cursor-pointer items-center justify-center text-adm-muted hover:text-adm-ink"
+      {labelledSearch ? (
+        <label
+          htmlFor={searchId}
+          className={cn(fieldLabel, "hidden sm:flex sm:items-center")}
         >
-          <X strokeWidth={1.5} className="h-4 w-4" aria-hidden="true" />
-        </button>
+          Search
+        </label>
       ) : null}
+      <div className="relative">
+        <Search
+          strokeWidth={1.5}
+          aria-hidden="true"
+          className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-adm-muted"
+        />
+        <input
+          id={searchId}
+          type="search"
+          value={search}
+          onChange={(e) => onSearch?.(e.target.value)}
+          placeholder={searchPlaceholder}
+          aria-label={labelledSearch ? undefined : searchPlaceholder}
+          className={cn(
+            "w-full min-w-0 rounded-none border border-adm-line bg-adm-card pr-10 pl-10 text-sm text-adm-ink shadow-none outline-none transition-colors placeholder:text-adm-faint focus:border-console focus-visible:ring-0 [&::-webkit-search-cancel-button]:hidden",
+            controlHeight,
+          )}
+        />
+        {search ? (
+          <button
+            type="button"
+            onClick={() => onSearch?.("")}
+            aria-label="Clear search"
+            className="absolute top-1/2 right-1 flex h-7 w-7 -translate-y-1/2 cursor-pointer items-center justify-center text-adm-muted hover:text-adm-ink"
+          >
+            <X strokeWidth={1.5} className="h-4 w-4" aria-hidden="true" />
+          </button>
+        ) : null}
+      </div>
     </div>
   );
 
@@ -517,7 +515,7 @@ export function ConsoleFilterBar({
               {countText}
             </div>
           ) : null}
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-end gap-2">
             {inlineSlot}
             {filtersButton}
             {clearAll}
@@ -542,7 +540,7 @@ export function ConsoleFilterBar({
         {actionSlot ? (
           <div className="order-2 ml-auto lg:order-4 lg:ml-0">{actionSlot}</div>
         ) : null}
-        <div className="order-3 flex min-w-0 flex-1 basis-[60%] items-center gap-2 lg:order-2 lg:ml-auto lg:flex-none lg:basis-auto">
+        <div className="order-3 flex min-w-0 flex-1 basis-[60%] items-end gap-2 lg:order-2 lg:ml-auto lg:flex-none lg:basis-auto">
           {searchField}
           {inlineSlot}
           {filtersButton}
@@ -561,7 +559,7 @@ export function ConsoleFilterBar({
             {actionSlot}
           </div>
         ) : null}
-        <div className="flex items-center gap-2">
+        <div className="flex items-end gap-2">
           {searchField}
           {inlineSlot}
           {filtersButton}

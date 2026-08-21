@@ -427,7 +427,7 @@ export function DriverPoliciesScreen() {
         title="Driver Payment Policies"
       />
 
-      <p className="mb-4 max-w-[62ch] text-[12.5px] leading-[1.5] text-adm-muted">
+      <p className="mb-4 text-[12.5px] leading-[1.5] text-adm-muted">
         A policy can&apos;t be edited once created. Trips freeze their terms
         when the fee is agreed, so create a new policy when the terms change.
       </p>
@@ -452,7 +452,7 @@ export function DriverPoliciesScreen() {
         <>
           {/* No search or filters on this register, so the create action
               takes the action row a toolbar would otherwise carry. */}
-          <div className="mb-6 flex items-center justify-end gap-1.5 sm:gap-2">
+          <div className="mb-6 flex items-center gap-1.5 sm:gap-2">
             <AdminButton
               onClick={() => setCreateOpen(true)}
               aria-label="New policy"

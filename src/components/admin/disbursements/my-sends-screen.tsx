@@ -84,7 +84,7 @@ export function MySendsScreen({
       ) : total === 0 ? (
         <>
           {sendButton ? (
-            <div className="mb-6 flex items-center justify-end gap-1.5 sm:gap-2">
+            <div className="mb-6 flex items-center gap-1.5 sm:gap-2">
               {sendButton}
             </div>
           ) : null}
