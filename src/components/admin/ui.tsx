@@ -274,7 +274,7 @@ export function AdminCard({
   return (
     <Card
       className={cn(
-        "block gap-0 rounded-none border border-adm-line bg-adm-card py-0 shadow-[0_1px_2px_rgba(16,24,40,0.05)]",
+        "animate-in fade-in block gap-0 rounded-none border border-adm-line bg-adm-card py-0 shadow-[0_1px_2px_rgba(16,24,40,0.05)] duration-200 ease-out",
         className,
       )}
     >
@@ -481,7 +481,7 @@ export function AdminButton({
         // Meridian controls: 34px, 6px radius, no offset shadow anywhere. The
         // console's buttons used to shift on hover like a stamped plate, which
         // is charming once and tiring on the fortieth click of a working day.
-        "gap-1.5 rounded-none font-semibold shadow-none transition-colors hover:translate-x-0 hover:translate-y-0 hover:shadow-none",
+        "gap-1.5 rounded-none font-semibold shadow-none transition-[color,background-color,border-color,opacity,transform] duration-150 ease-out hover:translate-x-0 hover:translate-y-0 hover:shadow-none active:scale-[0.98]",
         size === "md" && "h-[34px] px-3.5 text-[13.5px]",
         size === "lg" && "h-[38px] px-[18px] text-[13.5px]",
         // 28px is a deliberate visual density for row and card actions, but a

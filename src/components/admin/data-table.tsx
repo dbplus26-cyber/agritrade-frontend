@@ -438,7 +438,7 @@ export function ConsoleDataTable<TData>({
           with whichever lands later in the stylesheet silently winning). */}
       <div
         className={cn(
-          "flex flex-col gap-2 py-2 transition-opacity @2xl/table:hidden",
+          "flex flex-col gap-2 py-2 transition-opacity duration-200 @2xl/table:hidden",
           isFetching && "pointer-events-none opacity-60",
         )}
         aria-busy={isFetching || undefined}
@@ -535,7 +535,7 @@ export function ConsoleDataTable<TData>({
           last resort on genuinely wide content. */}
       <div
         className={cn(
-          "hidden overflow-x-auto transition-opacity @2xl/table:block",
+          "hidden overflow-x-auto transition-opacity duration-200 @2xl/table:block",
           isFetching && "pointer-events-none opacity-60",
         )}
         aria-busy={isFetching || undefined}
@@ -601,7 +601,7 @@ export function ConsoleDataTable<TData>({
                   className={cn(
                     "border-adm-hairline data-[state=selected]:bg-console/5",
                     href &&
-                      "cursor-pointer hover:bg-adm-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-console",
+                      "cursor-pointer transition-colors duration-150 hover:bg-adm-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-console",
                     rowClassName?.(row.original),
                   )}
                 >

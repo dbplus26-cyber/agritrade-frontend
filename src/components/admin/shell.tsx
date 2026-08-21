@@ -8,7 +8,6 @@ import {
   BookOpenCheck,
   BookUser,
   ChevronDown,
-  ChevronRight,
   Globe,
   HandCoins,
   LayoutDashboard,
@@ -49,6 +48,7 @@ import {
   adminNavGroups,
   screenTitle,
 } from "@/static-data/admin/nav";
+import { PageTransition } from "@/components/admin/page-transition";
 import { HelpWrap } from "@/components/admin/help-tip";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { usePermissions } from "@/hooks/use-permissions";
@@ -399,14 +399,12 @@ function ConsoleSidebar({ activeKey }: { activeKey: string }) {
                       <span className="whitespace-nowrap">{group.label}</span>
                     )}
                   </span>
-                  {collapsed ? null : isOpen ? (
+                  {collapsed ? null : (
                     <ChevronDown
-                      className="h-3.5 w-3.5 flex-none text-adm-faint"
-                      aria-hidden="true"
-                    />
-                  ) : (
-                    <ChevronRight
-                      className="h-3.5 w-3.5 flex-none text-adm-faint"
+                      className={cn(
+                        "h-3.5 w-3.5 flex-none text-adm-faint transition-transform duration-200 ease-out",
+                        !isOpen && "-rotate-90",
+                      )}
                       aria-hidden="true"
                     />
                   )}
@@ -628,7 +626,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             only ~512px wide, which is exactly how a table ends up rendered
             into half the room it was designed for. */}
         <main className="@container/main mx-auto w-full min-w-0 max-w-[1360px] flex-1 p-4 lg:p-[26px] print:max-w-none print:p-0">
-          {children}
+          <PageTransition>{children}</PageTransition>
         </main>
         <div className="print:hidden">
           <ConsoleFooter />

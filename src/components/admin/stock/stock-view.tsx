@@ -302,7 +302,7 @@ export function StockView() {
                       className="mt-1.5 h-[3px] w-full bg-adm-sunken"
                     >
                       <div
-                        className="h-full bg-console-gold"
+                        className="h-full bg-console-gold transition-[width] duration-500 ease-out"
                         style={{ width: `${share}%` }}
                       />
                     </div>
@@ -546,7 +546,7 @@ function WarehouseSections({
                             className="block h-1 w-20 overflow-hidden bg-adm-sunken lg:w-28"
                           >
                             <span
-                              className="block h-full bg-console-gold"
+                              className="block h-full bg-console-gold transition-[width] duration-500 ease-out"
                               style={{ width: `${String(share)}%` }}
                             />
                           </span>

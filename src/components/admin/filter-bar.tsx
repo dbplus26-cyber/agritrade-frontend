@@ -574,7 +574,10 @@ export function ConsoleFilterBar({
       {header}
 
       {hasFields && open && !isBelowLg ? (
-        <div id={panelId} className="border border-adm-line bg-adm-sunken p-3">
+        <div
+          id={panelId}
+          className="animate-in fade-in slide-in-from-top-1 border border-adm-line bg-adm-sunken p-3 duration-150 ease-out"
+        >
           <div className={cn("grid grid-cols-1 gap-3", panelClassName)}>
             {children}
           </div>
@@ -610,7 +613,7 @@ export function ConsoleFilterBar({
       ) : null}
 
       {hasChips ? (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="animate-in fade-in flex flex-wrap items-center gap-2 duration-150">
           <span className="text-xs font-medium text-adm-muted sm:text-sm">
             Active:
           </span>
