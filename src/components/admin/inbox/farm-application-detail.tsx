@@ -321,6 +321,7 @@ function FarmApplicationDetailBody({
                 <AdminButton
                   type="button"
                   disabled={!dirty || saving}
+                  loading={saving}
                   onClick={() => void onSave()}
                   size="lg"
                 >
@@ -394,6 +395,7 @@ function FarmApplicationDetailBody({
                 type="button"
                 variant="danger"
                 disabled={deleting}
+                loading={deleting}
                 onClick={() => void onDelete()}
                 className="mt-2.5"
               >

@@ -2,6 +2,12 @@
 
 import Link from "next/link";
 import { flexRender, type Table } from "@tanstack/react-table";
+import {
+  AnimatePresence,
+  motion,
+  type TargetAndTransition,
+  useReducedMotion,
+} from "motion/react";
 import { HelpTip } from "@/components/admin/help-tip";
 import { formatCedis } from "@/lib/format-money";
 import { cn } from "@/lib/utils";
@@ -50,11 +56,53 @@ const GRID =
   "@min-[900px]/main:grid-cols-[34px_190px_1fr_150px_118px_190px_26px] " +
   "@min-[900px]/main:items-center @min-[900px]/main:gap-y-[14px]";
 
+/**
+ * How a request arrives in and leaves the queue.
+ *
+ * A request that appears after the queue is on screen fades in with a small
+ * lift, each a beat after the last (capped at ten so a long page never makes
+ * the reader wait). A decided request fades and shrinks out of its tab while
+ * the ones beneath slide up into the gap. Under reduced motion every step is
+ * instant, matching the global stylesheet rule that switches CSS transitions
+ * off.
+ */
+const STAGGER_CAP = 10;
+const rowMotion = (
+  index: number,
+  reduced: boolean,
+): {
+  initial: TargetAndTransition;
+  animate: TargetAndTransition;
+  exit: TargetAndTransition;
+} => ({
+  initial: { opacity: 0, y: reduced ? 0 : 4 },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: reduced
+      ? { duration: 0 }
+      : {
+          duration: 0.18,
+          ease: "easeOut",
+          delay: Math.min(index, STAGGER_CAP) * 0.02,
+        },
+  },
+  exit: {
+    opacity: 0,
+    scale: reduced ? 1 : 0.98,
+    transition: reduced ? { duration: 0 } : { duration: 0.15, ease: "easeIn" },
+  },
+});
+
 export function ApprovalsQueue({ table }: { table: Table<IApproval> }) {
   const rows = table.getRowModel().rows;
+  const reducedMotion = useReducedMotion() ?? false;
 
   return (
-    <div className="overflow-hidden rounded-none border border-[var(--ap-hair)] bg-[var(--ap-surface)]">
+    // `relative` anchors a leaving row: AnimatePresence pops it out of the
+    // flow so the rows beneath can slide up at once, and it needs a positioned
+    // ancestor to hold its place while it fades.
+    <div className="relative overflow-hidden rounded-none border border-[var(--ap-hair)] bg-[var(--ap-surface)]">
       {table.getHeaderGroups().map((group) => (
         <div
           key={group.id}
@@ -76,68 +124,81 @@ export function ApprovalsQueue({ table }: { table: Table<IApproval> }) {
         </div>
       ))}
 
-      {rows.map((row, index) => {
-        const approval = row.original;
-        const open = row.getIsExpanded();
-        const detailId = `approval-detail-${approval.id}`;
+      {/* `initial={false}`: the first paint arrives whole; only requests that
+          appear AFTER mount play the entrance. */}
+      <AnimatePresence initial={false} mode="popLayout">
+        {rows.map((row, index) => {
+          const approval = row.original;
+          const open = row.getIsExpanded();
+          const detailId = `approval-detail-${approval.id}`;
 
-        return (
-          <div
-            key={row.id}
-            className={cn(
-              "relative",
-              index < rows.length - 1 && "border-b border-[var(--ap-hair-soft)]",
-            )}
-          >
-            {/* The rail owns the whole record, expanded panel included. */}
-            <span
-              aria-hidden="true"
-              className="absolute top-0 bottom-0 left-0 w-[3px]"
-              style={{ background: RAIL[approval.status] }}
-            />
+          return (
+            <motion.div
+              key={row.id}
+              // Position only: a row that expands or collapses snaps to its new
+              // height rather than stretching its text through a scale.
+              layout="position"
+              {...rowMotion(index, reducedMotion)}
+              transition={{
+                layout: reducedMotion
+                  ? { duration: 0 }
+                  : { type: "spring", stiffness: 500, damping: 40 },
+              }}
+              className={cn(
+                "relative",
+                index < rows.length - 1 && "border-b border-[var(--ap-hair-soft)]",
+              )}
+            >
+              {/* The rail owns the whole record, expanded panel included. */}
+              <span
+                aria-hidden="true"
+                className="absolute top-0 bottom-0 left-0 w-[3px]"
+                style={{ background: RAIL[approval.status] }}
+              />
 
-            <div className="relative hover:bg-[var(--ap-surface-alt)]">
-              <button
-                type="button"
-                aria-expanded={open}
-                aria-controls={detailId}
-                onClick={row.getToggleExpandedHandler()}
-                className="absolute inset-0 z-0 w-full cursor-pointer focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-[var(--ap-forest)]"
-              >
-                <span className="sr-only">
-                  {open ? "Hide details for" : "Show details for"}{" "}
-                  {approval.subject}
-                  {approval.sourceRef ? ` ${approval.sourceRef}` : ""}
-                </span>
-              </button>
+              <div className="relative hover:bg-[var(--ap-surface-alt)]">
+                <button
+                  type="button"
+                  aria-expanded={open}
+                  aria-controls={detailId}
+                  onClick={row.getToggleExpandedHandler()}
+                  className="absolute inset-0 z-0 w-full cursor-pointer focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-[var(--ap-forest)]"
+                >
+                  <span className="sr-only">
+                    {open ? "Hide details for" : "Show details for"}{" "}
+                    {approval.subject}
+                    {approval.sourceRef ? ` ${approval.sourceRef}` : ""}
+                  </span>
+                </button>
 
-              <div className={cn(GRID, "pointer-events-none relative z-10 px-4 py-[13px]")}>
-                {row.getVisibleCells().map((cell, cellIndex) => (
-                  <div
-                    key={cell.id}
-                    className={cn(
-                      "min-w-0",
-                      // Narrow: the checkbox column disappears - bulk select
-                      // is a wide-screen workflow, and its 26px column plus
-                      // the grid gap squeezed every stacked cell 40px off the
-                      // row edge on a phone. The cells own the full width;
-                      // the checkbox returns with the full grid.
-                      cellIndex === 0 && "hidden @min-[900px]/main:block",
-                      cell.column.columnDef.meta?.className,
-                    )}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </div>
-                ))}
+                <div className={cn(GRID, "pointer-events-none relative z-10 px-4 py-[13px]")}>
+                  {row.getVisibleCells().map((cell, cellIndex) => (
+                    <div
+                      key={cell.id}
+                      className={cn(
+                        "min-w-0",
+                        // Narrow: the checkbox column disappears - bulk select
+                        // is a wide-screen workflow, and its 26px column plus
+                        // the grid gap squeezed every stacked cell 40px off the
+                        // row edge on a phone. The cells own the full width;
+                        // the checkbox returns with the full grid.
+                        cellIndex === 0 && "hidden @min-[900px]/main:block",
+                        cell.column.columnDef.meta?.className,
+                      )}
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {open ? (
-              <ApprovalDetailPanel id={detailId} approval={approval} />
-            ) : null}
-          </div>
-        );
-      })}
+              {open ? (
+                <ApprovalDetailPanel id={detailId} approval={approval} />
+              ) : null}
+            </motion.div>
+          );
+        })}
+      </AnimatePresence>
     </div>
   );
 }

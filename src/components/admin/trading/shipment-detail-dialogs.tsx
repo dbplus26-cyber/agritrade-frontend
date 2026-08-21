@@ -166,7 +166,7 @@ export function ExpenseDialog({
             >
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={isLoading} size="lg">
+            <AdminButton type="submit" disabled={isLoading} loading={isLoading} size="lg">
               {isLoading ? "Adding…" : "Add expense"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -310,6 +310,7 @@ export function AddSalesDialog({
           <AdminButton
             type="button"
             disabled={isLoading || picked.length === 0}
+            loading={isLoading}
             size="lg"
             onClick={() => void onSubmit()}
           >
@@ -463,6 +464,7 @@ export function CancelDialog({
               type="submit"
               variant="danger"
               disabled={isLoading}
+              loading={isLoading}
               size="lg"
             >
               {isLoading ? "Cancelling…" : "Cancel shipment"}
@@ -554,6 +556,7 @@ export function VoidExpenseDialog({
               type="submit"
               variant="danger"
               disabled={isLoading}
+              loading={isLoading}
               size="lg"
             >
               {isLoading ? "Voiding…" : "Void expense"}

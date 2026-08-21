@@ -208,6 +208,7 @@ export function EntryDialog({
           </AdminButton>
           <AdminButton
             disabled={isLoading}
+            loading={isLoading}
             onClick={() => void form.handleSubmit(onSubmit)()}
             type="button"
           >
@@ -383,6 +384,7 @@ export function TransferDialog({
           </AdminButton>
           <AdminButton
             disabled={isLoading}
+            loading={isLoading}
             onClick={() => void form.handleSubmit(onSubmit)()}
             type="button"
           >
@@ -578,6 +580,7 @@ export function ReconcileDialog({
           </AdminButton>
           <AdminButton
             disabled={isLoading}
+            loading={isLoading}
             onClick={() => void form.handleSubmit(onSubmit)()}
             type="button"
           >

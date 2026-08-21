@@ -362,6 +362,7 @@ export function ShipmentDetail({ id }: { id: string }) {
             <AdminButton
               className="xl:w-full"
               disabled={dispatchState.isLoading}
+              loading={dispatchState.isLoading}
               onClick={() => void onDispatch()}
             >
               {dispatchState.isLoading ? "Dispatching…" : "Dispatch"}
@@ -402,6 +403,7 @@ export function ShipmentDetail({ id }: { id: string }) {
           <AdminButton
             className="xl:w-full"
             disabled={closeState.isLoading}
+            loading={closeState.isLoading}
             onClick={() => void onClose()}
           >
             {closeState.isLoading ? "Closing…" : "Close shipment"}

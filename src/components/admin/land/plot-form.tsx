@@ -223,7 +223,7 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
               >
                 Cancel
               </AdminButton>
-              <AdminButton type="submit" disabled={saving} size="lg">
+              <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
                 {saving ? "Saving…" : "Create plot"}
               </AdminButton>
             </Fragment>
@@ -237,7 +237,7 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
               >
                 Cancel
               </AdminButton>
-              <AdminButton type="submit" disabled={saving} size="lg">
+              <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
                 {saving ? "Saving…" : "Save changes"}
               </AdminButton>
             </Fragment>

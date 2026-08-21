@@ -456,6 +456,7 @@ export function PaymentDialog({
             <AdminButton
               type="submit"
               disabled={isLoading}
+              loading={isLoading}
               size="lg"
             >
               {isLoading ? "Recording…" : "Record payment"}

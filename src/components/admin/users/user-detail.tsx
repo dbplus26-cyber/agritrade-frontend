@@ -273,6 +273,7 @@ function EditDetailsForm({
         <AdminButton
           type="submit"
           disabled={isLoading}
+          loading={isLoading}
           size="lg"
         >
           {isLoading ? "Saving…" : "Save changes"}
@@ -550,6 +551,7 @@ function ActionsCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
           <AdminButton
             variant={row.destructive ? "danger" : "secondary"}
             disabled={row.busy}
+            loading={row.busy}
             className="flex-none whitespace-nowrap"
             onClick={() =>
               void row.run().catch(onApiError(`Couldn't ${row.button.toLowerCase()}`))

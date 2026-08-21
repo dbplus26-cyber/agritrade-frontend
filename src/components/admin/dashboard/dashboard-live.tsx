@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { CountUp } from "@/components/admin/count-up";
 import { HelpWrap } from "@/components/admin/help-tip";
 import { ShipmentStatusBadge } from "@/components/admin/trading/shipment-bits";
 import { Money } from "@/components/admin/trading/sale-bits";
@@ -19,6 +20,7 @@ import { usePermissions } from "@/hooks/use-permissions";
 import {
   formatCedisCompact,
   formatKg,
+  MONEY_HIDDEN,
   statValueCls,
 } from "@/lib/format-money";
 import { cn } from "@/lib/utils";
@@ -36,22 +38,27 @@ import { PeriodSummary } from "./period-summary";
 import { StockDonut } from "./stock-donut";
 import { VolumeChart } from "./volume-chart";
 
-/** A headline KPI tile (state now - not affected by the date filter). */
+/** A whole-number count: the figure passes through fractions while it runs. */
+const formatCount = (n: number) => String(Math.round(n));
+
+/**
+ * A headline KPI tile (state now - not affected by the date filter). The
+ * figure counts up to its value; money (the default) is compacted with the
+ * exact amount on hover, any other number prints through `format`.
+ */
 function Kpi({
   alert = false,
+  figure,
+  format,
   hint,
   href,
   label,
   sub,
-  value,
-  /**
-   * The rendered figure as plain text. The tile width is fixed by the grid but
-   * the number is not, so the type scale is chosen from the length rather than
-   * pinned - at 280px a 10-character amount at 20px clips mid-number.
-   */
-  valueText,
 }: {
   alert?: boolean;
+  figure: number | null;
+  /** Prints a non-money figure (kilos, counts); omit for money. */
+  format?: (n: number) => string;
   /**
    * One sentence on what the figure counts, on hover over the label.
    *
@@ -64,9 +71,12 @@ function Kpi({
   href: string;
   label: string;
   sub?: React.ReactNode;
-  value: React.ReactNode;
-  valueText?: string;
 }) {
+  // The rendered figure as plain text. The tile width is fixed by the grid but
+  // the number is not, so the type scale is chosen from the length rather than
+  // pinned - at 280px a 10-character amount at 20px clips mid-number.
+  const valueText =
+    figure === null ? MONEY_HIDDEN : (format ?? formatCedisCompact)(figure);
   const heading = (
     <div className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
       {label}
@@ -79,11 +89,15 @@ function Kpi({
         <div
           className={cn(
             "mt-1 min-w-0 font-bold",
-            valueText ? statValueCls(valueText) : "text-[20px]",
+            statValueCls(valueText),
             alert ? "text-console-red" : "text-adm-ink",
           )}
         >
-          {value}
+          {figure !== null && format ? (
+            <CountUp value={figure} format={format} />
+          ) : (
+            <Money compact animate value={figure} />
+          )}
         </div>
         {sub ? <div className="mt-0.5 text-[12px] text-adm-muted">{sub}</div> : null}
       </AdminCard>
@@ -259,8 +273,8 @@ export function DashboardLive() {
           <Kpi
             label="Stock on hand"
             hint="Everything sitting in your warehouses right now, across every commodity."
-            value={formatKg(d.stockOnHandKg)}
-            valueText={formatKg(d.stockOnHandKg)}
+            figure={d.stockOnHandKg}
+            format={formatKg}
             sub={`${String(d.stockByCommodity.length)} commodities`}
             href="/admin/stock"
           />
@@ -268,8 +282,7 @@ export function DashboardLive() {
             <Kpi
               label="Paid goods incoming"
               hint="Grain you have already bought that has not reached a warehouse yet."
-              value={<Money compact value={d.incomingGhs} />}
-              valueText={formatCedisCompact(d.incomingGhs)}
+              figure={d.incomingGhs}
               sub={formatKg(d.incomingKg)}
               href="/admin/purchases"
             />
@@ -277,8 +290,8 @@ export function DashboardLive() {
             <Kpi
               label="Goods incoming"
               hint="Grain already bought that has not reached a warehouse yet."
-              value={formatKg(d.incomingKg)}
-              valueText={formatKg(d.incomingKg)}
+              figure={d.incomingKg}
+              format={formatKg}
               href="/admin/purchases"
             />
           )}
@@ -286,8 +299,7 @@ export function DashboardLive() {
             <Kpi
               label="Cash with agents"
               hint="Your money currently in field agents' hands, waiting to be spent or accounted for."
-              value={<Money compact value={d.cashWithAgentsGhs} />}
-              valueText={formatCedisCompact(d.cashWithAgentsGhs)}
+              figure={d.cashWithAgentsGhs}
               sub={`${String(d.activeAgents)} active agents`}
               href="/admin/agents"
             />
@@ -295,7 +307,8 @@ export function DashboardLive() {
           <Kpi
             label="Sales in progress"
             hint="Orders agreed with buyers that are not yet delivered and paid off."
-            value={d.salesInProgress}
+            figure={d.salesInProgress}
+            format={formatCount}
             sub={canSeeMoney ? <Money compact value={d.salesInProgressAgreedGhs} /> : undefined}
             href="/admin/sales"
           />
@@ -303,8 +316,7 @@ export function DashboardLive() {
             <Kpi
               label="Balances due"
               hint="What buyers still owe you across every order, right now."
-              value={<Money compact value={d.debtorsOutstandingGhs} />}
-              valueText={formatCedisCompact(d.debtorsOutstandingGhs)}
+              figure={d.debtorsOutstandingGhs}
               sub={`${String(d.debtorCount)} buyers`}
               href="/admin/sales?outstanding=yes"
               alert={(d.debtorsOutstandingGhs ?? 0) > 0}

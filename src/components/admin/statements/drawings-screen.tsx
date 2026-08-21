@@ -168,7 +168,7 @@ function AddDrawingDialog({ onClose }: { onClose: () => void }) {
             <AdminButton type="button" variant="outline" size="lg" onClick={onClose}>
               Cancel
             </AdminButton>
-            <AdminButton type="submit" size="lg" disabled={createState.isLoading}>
+            <AdminButton type="submit" size="lg" disabled={createState.isLoading} loading={createState.isLoading}>
               {createState.isLoading ? "Saving…" : "Record drawing"}
             </AdminButton>
           </ResponsiveDialogFooter>

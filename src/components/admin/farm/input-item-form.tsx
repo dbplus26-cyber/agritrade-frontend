@@ -249,6 +249,7 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
                 size="lg"
                 className="mr-auto text-console-red"
                 disabled={deleteState.isLoading}
+                loading={deleteState.isLoading}
                 onClick={() => void onDelete()}
               >
                 Delete
@@ -288,7 +289,7 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
               >
                 Cancel
               </AdminButton>
-              <AdminButton type="submit" disabled={saving} size="lg">
+              <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
                 {saving ? "Saving…" : "Save changes"}
               </AdminButton>
             </Fragment>
@@ -297,6 +298,7 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
               key="create"
               type="submit"
               disabled={saving}
+              loading={saving}
               size="lg"
             >
               {saving ? "Saving…" : "Create item"}

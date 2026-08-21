@@ -425,7 +425,7 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
           >
             Cancel
           </AdminButton>
-          <AdminButton type="submit" disabled={saving} size="lg">
+          <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
             {saving ? "Saving…" : sale ? "Save changes" : "Draft sale"}
           </AdminButton>
         </div>

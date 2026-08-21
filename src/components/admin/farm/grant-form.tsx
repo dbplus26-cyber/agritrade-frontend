@@ -354,7 +354,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
           >
             Cancel
           </AdminButton>
-          <AdminButton type="submit" disabled={saving} size="lg">
+          <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
             {saving ? "Saving…" : "Record grant"}
           </AdminButton>
         </div>

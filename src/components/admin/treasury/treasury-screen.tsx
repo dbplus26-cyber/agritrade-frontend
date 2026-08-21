@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
+import { CountUp } from "@/components/admin/count-up";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import {
   Money,
@@ -278,11 +279,11 @@ function BalanceCard({
   title: string;
   warn?: boolean;
 }) {
-  const unknown = !account || account.amountGhs === null;
+  const amount = account?.amountGhs ?? null;
   return (
     <TitledCard title={title}>
       <div className="py-2">
-        {unknown ? (
+        {amount === null ? (
           <p className="text-[15px] font-medium text-console-red">
             Could not be checked just now
           </p>
@@ -290,10 +291,10 @@ function BalanceCard({
           <p
             className={cn(
               "font-adminmono text-[26px] font-bold tabular-nums",
-              warn && account.amountGhs === 0 ? "text-console-red" : "text-adm-ink",
+              warn && amount === 0 ? "text-console-red" : "text-adm-ink",
             )}
           >
-            {formatCedis(account.amountGhs)}
+            <CountUp value={amount} format={formatCedis} />
           </p>
         )}
         <p className="mt-1 text-[12.5px] text-adm-muted">{hint}</p>
@@ -407,6 +408,7 @@ function TransferDialog({
           </AdminButton>
           <AdminButton
             disabled={isLoading}
+            loading={isLoading}
             onClick={() => void form.handleSubmit(onSubmit)()}
             type="button"
           >

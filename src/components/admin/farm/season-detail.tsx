@@ -196,6 +196,7 @@ export function SeasonDetail({ id }: { id: string }) {
                   variant="outline"
                   className="text-console-red"
                   disabled={deleteState.isLoading}
+                  loading={deleteState.isLoading}
                   onClick={() => void onDelete()}
                 >
                   Delete

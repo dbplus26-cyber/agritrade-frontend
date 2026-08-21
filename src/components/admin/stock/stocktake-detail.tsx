@@ -333,7 +333,7 @@ export function StocktakeDetail({ id }: { id: string }) {
 
             {st.status === StocktakeStatus.DRAFT && canCount ? (
               <div className="mt-4 flex flex-wrap gap-2 border-t border-adm-hairline pt-4">
-                <AdminButton disabled={busy} onClick={() => void onSubmit()}>
+                <AdminButton disabled={busy} loading={submitState.isLoading} onClick={() => void onSubmit()}>
                   {submitState.isLoading ? "Submitting…" : "Submit"}
                 </AdminButton>
                 <AdminButton
@@ -347,6 +347,7 @@ export function StocktakeDetail({ id }: { id: string }) {
                   variant="outline"
                   className="text-console-red hover:text-console-red"
                   disabled={busy}
+                  loading={cancelState.isLoading}
                   onClick={() => void onCancel()}
                 >
                   {cancelState.isLoading ? "Cancelling…" : "Cancel stocktake"}
@@ -355,7 +356,7 @@ export function StocktakeDetail({ id }: { id: string }) {
             ) : st.status === StocktakeStatus.SUBMITTED ? (
               <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-adm-hairline pt-4">
                 {isSuperAdmin ? (
-                  <AdminButton disabled={busy} onClick={() => void onApprove()}>
+                  <AdminButton disabled={busy} loading={approveState.isLoading} onClick={() => void onApprove()}>
                     {approveState.isLoading ? "Approving…" : "Approve"}
                   </AdminButton>
                 ) : (
@@ -367,6 +368,7 @@ export function StocktakeDetail({ id }: { id: string }) {
                   variant="outline"
                   className="text-console-red hover:text-console-red"
                   disabled={busy}
+                  loading={cancelState.isLoading}
                   onClick={() => void onCancel()}
                 >
                   {cancelState.isLoading ? "Cancelling…" : "Cancel stocktake"}

@@ -1,3 +1,4 @@
+import { CountUp } from "@/components/admin/count-up";
 import { HelpWrap } from "@/components/admin/help-tip";
 import { ToneBadge, type Tone } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
@@ -60,14 +61,25 @@ export function formatKg(kg: number): string {
   return `${kg.toLocaleString("en-GH", { maximumFractionDigits: 2 })} kg`;
 }
 
-/** Compact kg in the console's mono numerals, exact figure in the tooltip. */
-export function Kg({ kg, className }: { kg: number; className?: string }) {
+/**
+ * Compact kg in the console's mono numerals, exact figure in the tooltip.
+ * `countUp` runs the figure to its value: for headline totals, never cells.
+ */
+export function Kg({
+  kg,
+  className,
+  countUp = false,
+}: {
+  kg: number;
+  className?: string;
+  countUp?: boolean;
+}) {
   return (
     <span
       className={cn("font-adminmono tabular-nums", className)}
       title={kgTitle(kg)}
     >
-      {formatKg(kg)}
+      {countUp ? <CountUp value={kg} format={formatKg} /> : formatKg(kg)}
     </span>
   );
 }

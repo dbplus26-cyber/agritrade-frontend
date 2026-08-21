@@ -424,6 +424,7 @@ function HolderActions({
       {holder.accountId ? (
         <AdminButton
           disabled={isLoading}
+          loading={isLoading}
           onClick={() => void toggle()}
           type="button"
           variant="ghost"
@@ -761,6 +762,7 @@ function GiveMoneyDialog({
           </AdminButton>
           <AdminButton
             disabled={busy}
+            loading={busy}
             onClick={() => void form.handleSubmit(onSubmit)()}
             type="button"
           >

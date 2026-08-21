@@ -142,7 +142,7 @@ export function PhotoManager({
             Preview - not saved yet
           </span>
           <div className="flex items-center gap-1.5">
-            <AdminButton size="sm" onClick={() => void save()} disabled={isSaving}>
+            <AdminButton size="sm" onClick={() => void save()} disabled={isSaving} loading={isSaving}>
               <Check className="h-3.5 w-3.5" aria-hidden="true" />
               {isSaving ? "Saving…" : "Save photo"}
             </AdminButton>

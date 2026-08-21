@@ -525,6 +525,7 @@ export function ArrivalDialog({
               form="arrival-form"
               size="lg"
               disabled={isLoading}
+              loading={isLoading}
             >
               {isLoading ? "Recording…" : "Record arrival"}
             </AdminButton>
@@ -533,6 +534,7 @@ export function ArrivalDialog({
               type="button"
               size="lg"
               disabled={isLoading}
+              loading={isLoading}
               onClick={() => void onArriveWithoutFigures()}
             >
               {isLoading ? "Updating…" : "Mark arrived"}

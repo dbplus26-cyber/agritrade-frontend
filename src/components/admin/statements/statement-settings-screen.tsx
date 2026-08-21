@@ -145,6 +145,7 @@ function LogoCard({ settings }: { settings: ISystemSettings }) {
               variant="ghost"
               size="sm"
               disabled={removeState.isLoading}
+              loading={removeState.isLoading}
               onClick={() => void onRemove()}
             >
               {removeState.isLoading ? "Removing…" : "Remove logo"}
@@ -367,7 +368,7 @@ function StatementSettingsForm({
             >
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={saving || !isDirty} size="lg">
+            <AdminButton type="submit" disabled={saving || !isDirty} loading={saving} size="lg">
               {saving ? "Saving…" : "Save statement settings"}
             </AdminButton>
           </Fragment>

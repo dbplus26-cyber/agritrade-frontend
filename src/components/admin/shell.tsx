@@ -48,6 +48,7 @@ import {
   adminNavGroups,
   screenTitle,
 } from "@/static-data/admin/nav";
+import { NavigationProgress } from "@/components/admin/navigation-progress";
 import { PageTransition } from "@/components/admin/page-transition";
 import { HelpWrap } from "@/components/admin/help-tip";
 import { useCurrentUser } from "@/hooks/use-current-user";
@@ -410,7 +411,19 @@ function ConsoleSidebar({ activeKey }: { activeKey: string }) {
                   )}
                 </SidebarMenuButton>
 
-                {!collapsed && isOpen ? (
+                {/* The group's items slide open and closed (grid rows
+                    0fr -> 1fr) rather than popping in; `inert` keeps the
+                    closed list out of the tab order. */}
+                {!collapsed ? (
+                  <div
+                    className="grid transition-[grid-template-rows] duration-200"
+                    style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
+                  >
+                  <div
+                    className="min-h-0 overflow-hidden"
+                    inert={isOpen ? undefined : true}
+                    aria-hidden={isOpen ? undefined : true}
+                  >
                   <div className="ml-[15px] mt-0.5 flex flex-col gap-px border-l border-adm-hairline pl-2">
                     {group.items.map((item) => (
                       <SidebarMenuButton
@@ -439,6 +452,8 @@ function ConsoleSidebar({ activeKey }: { activeKey: string }) {
                         </Link>
                       </SidebarMenuButton>
                     ))}
+                  </div>
+                  </div>
                   </div>
                 ) : null}
               </SidebarMenuItem>
@@ -591,6 +606,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       </div>
 
       <SidebarInset className="min-w-0 bg-transparent">
+        <NavigationProgress />
         <header className="sticky top-0 z-40 flex h-[54px] flex-none items-center gap-3 border-b border-adm-line bg-adm-card px-4 lg:px-[26px] print:hidden">
           {/* Collapse/expand the rail from md up; on a phone the hamburger
               opens it as a sheet. Both live on the topbar's left edge. */}

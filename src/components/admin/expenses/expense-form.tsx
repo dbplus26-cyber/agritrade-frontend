@@ -414,7 +414,7 @@ export function ExpenseFormDialog({
             >
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={busy}>
+            <AdminButton type="submit" disabled={busy} loading={busy}>
               {busy ? "Saving…" : isEdit ? "Save changes" : "Record expense"}
             </AdminButton>
           </ResponsiveDialogFooter>

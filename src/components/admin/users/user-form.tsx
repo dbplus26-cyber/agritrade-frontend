@@ -257,6 +257,7 @@ export function UserForm() {
             <AdminButton
               type="submit"
               disabled={isLoading}
+              loading={isLoading}
               size="lg"
             >
               {isLoading ? "Creating…" : "Create user"}

@@ -249,6 +249,7 @@ export function PlotDetail({ id }: { id: string }) {
           {canPublish ? (
             <AdminButton
               disabled={publishState.isLoading}
+              loading={publishState.isLoading}
               onClick={() => void onPublish()}
             >
               {publishState.isLoading ? "Requesting…" : "Publish to website"}

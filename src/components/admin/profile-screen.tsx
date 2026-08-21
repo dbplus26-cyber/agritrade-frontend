@@ -277,6 +277,7 @@ function ProfileEditForm({
         <AdminButton
           type="submit"
           disabled={isLoading}
+          loading={isLoading}
           size="lg"
         >
           {isLoading ? "Saving…" : "Save changes"}
@@ -401,6 +402,7 @@ function PasswordCard() {
             <AdminButton
               type="submit"
               disabled={isLoading}
+              loading={isLoading}
               size="lg"
             >
               {isLoading ? "Updating…" : "Update password"}

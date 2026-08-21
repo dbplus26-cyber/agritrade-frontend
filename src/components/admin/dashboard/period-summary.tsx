@@ -1,5 +1,6 @@
 "use client";
 
+import { CountUp } from "@/components/admin/count-up";
 import { HelpTip } from "@/components/admin/help-tip";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { AdminCard, Mono } from "@/components/admin/ui";
@@ -7,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   formatCedisCompact,
   formatKg,
+  MONEY_HIDDEN,
   statValueCls,
 } from "@/lib/format-money";
 import { cn } from "@/lib/utils";
@@ -16,26 +18,33 @@ import type { IReportWindow, ITrend } from "@/types/report.types";
 import { WidgetError } from "./chart-kit";
 import { TrendBadge } from "./trend-badge";
 
-/** One windowed stat tile: label, mono value, optional sub + trend. */
+/**
+ * One windowed stat tile: label, mono figure, optional sub + trend. The
+ * figure counts up to its value; money (the default) is compacted with the
+ * exact amount on hover, any other number prints through `format`.
+ */
 function Tile({
+  figure,
+  format,
   hint,
   inverse = false,
   label,
   sub,
   trend,
-  value,
-  valueText,
 }: {
+  figure: number | null;
+  /** Prints a non-money figure (kilos, counts); omit for money. */
+  format?: (n: number) => string;
   /** One sentence on what the figure counts, on hover beside the label. */
   hint?: string;
   inverse?: boolean;
   label: string;
   sub?: React.ReactNode;
   trend?: ITrend;
-  value: React.ReactNode;
-  /** The rendered figure as text, so the type scale can adapt to its length. */
-  valueText?: string;
 }) {
+  // The rendered figure as text, so the type scale can adapt to its length.
+  const valueText =
+    figure === null ? MONEY_HIDDEN : (format ?? formatCedisCompact)(figure);
   return (
     <AdminCard className="min-w-0 px-3 py-2.5">
       {/* The label owns its own line. Sharing a row with the trend badge made
@@ -46,13 +55,12 @@ function Tile({
         {hint ? <HelpTip label={`What does ${label} count?`} text={hint} /> : null}
       </div>
       <div className="mt-1 flex items-baseline justify-between gap-1.5">
-        <Mono
-          className={cn(
-            "min-w-0 font-bold text-adm-ink",
-            valueText ? statValueCls(valueText) : "text-[18px]",
+        <Mono className={cn("min-w-0 font-bold text-adm-ink", statValueCls(valueText))}>
+          {figure !== null && format ? (
+            <CountUp value={figure} format={format} />
+          ) : (
+            <Money compact animate value={figure} />
           )}
-        >
-          {value}
         </Mono>
         {trend ? (
           <span className="flex-none">
@@ -96,8 +104,7 @@ export function PeriodSummary({ window }: { window: IReportWindow }) {
           <Tile
             label="Purchases out"
             hint="What you spent buying grain in the period you picked, agents and suppliers together."
-            value={<Money compact value={s.purchasesGhs} />}
-            valueText={formatCedisCompact(s.purchasesGhs)}
+            figure={s.purchasesGhs}
             sub={`${formatKg(s.purchasesKg)} · ${String(s.purchaseCount)} buys`}
             trend={s.purchasesTrend}
             inverse
@@ -105,23 +112,20 @@ export function PeriodSummary({ window }: { window: IReportWindow }) {
           <Tile
             label="Payments in"
             hint="Money buyers actually paid you in the period you picked, not what they agreed to pay."
-            value={<Money compact value={s.paymentsInGhs} />}
-            valueText={formatCedisCompact(s.paymentsInGhs)}
+            figure={s.paymentsInGhs}
             trend={s.paymentsInTrend}
           />
           <Tile
             label="Sales confirmed"
             hint="What buyers agreed to pay on orders confirmed in the period you picked."
-            value={<Money compact value={s.salesConfirmedGhs} />}
-            valueText={formatCedisCompact(s.salesConfirmedGhs)}
+            figure={s.salesConfirmedGhs}
             sub={`${String(s.salesConfirmedCount)} sales`}
             trend={s.salesConfirmedTrend}
           />
           <Tile
             label="Expenses"
             hint="Running costs recorded in the period you picked: transport, loading, fees and the rest."
-            value={<Money compact value={s.expensesGhs} />}
-            valueText={formatCedisCompact(s.expensesGhs)}
+            figure={s.expensesGhs}
             inverse
           />
         </div>

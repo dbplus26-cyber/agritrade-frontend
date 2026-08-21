@@ -900,6 +900,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
               <AdminButton
                 type="button"
                 disabled={saving}
+                loading={saving}
                 size="lg"
                 onClick={() => void submit()}
               >

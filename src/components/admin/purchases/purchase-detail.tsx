@@ -254,6 +254,7 @@ function ReceiveDialog({
               <AdminButton
                 type="submit"
                 disabled={isLoading}
+                loading={isLoading}
                 size="lg"
               >
                 {isLoading ? "Receiving…" : "Receive stock"}
@@ -347,6 +348,7 @@ function VoidDialog({
               type="submit"
               variant="danger"
               disabled={isLoading}
+              loading={isLoading}
               size="lg"
             >
               {isLoading ? "Voiding…" : "Void purchase"}
@@ -412,6 +414,7 @@ export function PurchaseDetail({ id }: { id: string }) {
           <AdminButton
             variant="secondary"
             disabled={transitState.isLoading}
+            loading={transitState.isLoading}
             onClick={() => void onMarkInTransit()}
           >
             Mark in transit

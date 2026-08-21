@@ -103,6 +103,7 @@ export function DisbursementDetail({ id }: { id: string }) {
             <>
               <AdminButton
                 disabled={checkState.isLoading}
+                loading={checkState.isLoading}
                 onClick={() => void onCheck()}
                 type="button"
                 variant="ghost"
@@ -342,6 +343,7 @@ function ResolveDialog({
           </AdminButton>
           <AdminButton
             disabled={isLoading}
+            loading={isLoading}
             onClick={() => void form.handleSubmit(onSubmit)()}
             type="button"
           >

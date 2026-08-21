@@ -161,6 +161,7 @@ function CancelDialog({
               type="submit"
               variant="danger"
               disabled={isLoading}
+              loading={isLoading}
               size="lg"
             >
               {isLoading ? "Cancelling…" : "Cancel sale"}
@@ -266,6 +267,7 @@ export function SaleDetail({
         <>
           <AdminButton
             disabled={confirmState.isLoading}
+            loading={confirmState.isLoading}
             onClick={() => void onConfirm()}
           >
             {confirmState.isLoading ? "Confirming…" : "Confirm sale"}

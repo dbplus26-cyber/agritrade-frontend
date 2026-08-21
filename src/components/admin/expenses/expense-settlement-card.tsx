@@ -295,7 +295,7 @@ function PayDialog({
             <AdminButton onClick={onClose} type="button" variant="ghost">
               Cancel
             </AdminButton>
-            <AdminButton disabled={isLoading} type="submit">
+            <AdminButton disabled={isLoading} loading={isLoading} type="submit">
               {isLoading ? "Recording…" : "Record payment"}
             </AdminButton>
           </ResponsiveDialogFooter>

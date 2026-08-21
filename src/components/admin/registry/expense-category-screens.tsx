@@ -198,7 +198,7 @@ function CreateCategoryDialog({
             <AdminButton type="button" variant="outline" size="lg" onClick={close}>
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={isLoading} size="lg">
+            <AdminButton type="submit" disabled={isLoading} loading={isLoading} size="lg">
               {isLoading ? "Saving…" : "Create category"}
             </AdminButton>
           </ResponsiveDialogFooter>

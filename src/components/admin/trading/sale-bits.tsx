@@ -1,5 +1,6 @@
 "use client";
 
+import { CountUp } from "@/components/admin/count-up";
 import { HelpWrap } from "@/components/admin/help-tip";
 import { ToneBadge, type Tone } from "@/components/admin/ui";
 import { formatDateTime } from "@/lib/format-date";
@@ -77,15 +78,32 @@ export function formatSaleDate(iso: string): string {
  * different, smaller number.
  */
 export function Money({
+  animate = false,
   compact = false,
   value,
 }: {
+  /** Count the figure up to its value: for headline tiles, never cells. */
+  animate?: boolean;
   compact?: boolean;
   value: number | null;
 }) {
   if (value === null) return <span className="text-adm-faint">{MONEY_HIDDEN}</span>;
-  if (!compact) return <>{formatCedis(value)}</>;
-  return <span title={formatCedis(value)}>{formatCedisCompact(value)}</span>;
+  if (!compact) {
+    return animate ? (
+      <CountUp value={value} format={formatCedis} />
+    ) : (
+      <>{formatCedis(value)}</>
+    );
+  }
+  return (
+    <span title={formatCedis(value)}>
+      {animate ? (
+        <CountUp value={value} format={formatCedisCompact} />
+      ) : (
+        formatCedisCompact(value)
+      )}
+    </span>
+  );
 }
 
 /** Today as a YYYY-MM-DD value for date inputs. */

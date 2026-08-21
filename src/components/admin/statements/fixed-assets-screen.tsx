@@ -265,7 +265,7 @@ function AddAssetDialog({ onClose }: { onClose: () => void }) {
               <AdminButton type="button" variant="outline" size="lg" onClick={onClose}>
                 Cancel
               </AdminButton>
-              <AdminButton type="submit" size="lg" disabled={createState.isLoading}>
+              <AdminButton type="submit" size="lg" disabled={createState.isLoading} loading={createState.isLoading}>
                 {createState.isLoading ? "Saving…" : "Record asset"}
               </AdminButton>
             </ResponsiveDialogFooter>
@@ -334,7 +334,7 @@ function AddAssetDialog({ onClose }: { onClose: () => void }) {
               >
                 Back
               </AdminButton>
-              <AdminButton type="submit" size="lg" disabled={createClassState.isLoading}>
+              <AdminButton type="submit" size="lg" disabled={createClassState.isLoading} loading={createClassState.isLoading}>
                 {createClassState.isLoading ? "Saving…" : "Create class"}
               </AdminButton>
             </ResponsiveDialogFooter>
@@ -462,7 +462,7 @@ function DisposeDialog({
             <AdminButton type="button" variant="outline" size="lg" onClick={onClose}>
               Cancel
             </AdminButton>
-            <AdminButton type="submit" variant="gold" size="lg" disabled={disposeState.isLoading}>
+            <AdminButton type="submit" variant="gold" size="lg" disabled={disposeState.isLoading} loading={disposeState.isLoading}>
               {disposeState.isLoading ? "Saving…" : "Dispose of asset"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -662,7 +662,7 @@ function EditAssetDialog({
             <AdminButton type="button" variant="outline" size="lg" onClick={onClose}>
               Cancel
             </AdminButton>
-            <AdminButton type="submit" size="lg" disabled={updateState.isLoading}>
+            <AdminButton type="submit" size="lg" disabled={updateState.isLoading} loading={updateState.isLoading}>
               {updateState.isLoading ? "Saving…" : "Save changes"}
             </AdminButton>
           </ResponsiveDialogFooter>

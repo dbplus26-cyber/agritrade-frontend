@@ -237,7 +237,7 @@ export function GuarantorDialog({
             >
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={saving} size="lg">
+            <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
               {saving
                 ? "Saving…"
                 : guarantor

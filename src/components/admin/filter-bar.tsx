@@ -468,8 +468,9 @@ export function ConsoleFilterBar({
         </span>
         {activeCount > 0 ? (
           <span
+            key={activeCount}
             className={cn(
-              "ml-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-semibold",
+              "animate-console-pop ml-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-semibold",
               hasApplied ? "bg-white/20 text-white" : "bg-adm-sunken text-adm-ink",
             )}
           >
@@ -573,13 +574,25 @@ export function ConsoleFilterBar({
     <div className={cn("mb-6 space-y-3 sm:space-y-4", className)}>
       {header}
 
-      {hasFields && open && !isBelowLg ? (
+      {/* The desktop panel slides open and closed (grid rows 0fr -> 1fr)
+          and stays mounted so the fields keep their state; `inert` keeps a
+          closed panel out of the tab order. */}
+      {hasFields && !isBelowLg ? (
         <div
-          id={panelId}
-          className="animate-in fade-in slide-in-from-top-1 border border-adm-line bg-adm-sunken p-3 duration-150 ease-out"
+          className="-mt-3 grid transition-[grid-template-rows] duration-200"
+          style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
         >
-          <div className={cn("grid grid-cols-1 gap-3", panelClassName)}>
-            {children}
+          <div
+            id={panelId}
+            className="min-h-0 overflow-hidden"
+            inert={open ? undefined : true}
+            aria-hidden={open ? undefined : true}
+          >
+            <div className="mt-3 border border-adm-line bg-adm-sunken p-3">
+              <div className={cn("grid grid-cols-1 gap-3", panelClassName)}>
+                {children}
+              </div>
+            </div>
           </div>
         </div>
       ) : null}

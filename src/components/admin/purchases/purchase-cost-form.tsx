@@ -286,7 +286,7 @@ export function PurchaseCostDialog({
             >
               Cancel
             </AdminButton>
-            <AdminButton disabled={isLoading} type="submit">
+            <AdminButton disabled={isLoading} loading={isLoading} type="submit">
               {isLoading ? "Saving…" : "Record cost"}
             </AdminButton>
           </ResponsiveDialogFooter>

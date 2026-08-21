@@ -460,6 +460,7 @@ export function SendMoneyDialog({
           </AdminButton>
           <AdminButton
             disabled={submitting}
+            loading={submitting}
             onClick={() => void form.handleSubmit(onSubmit)()}
             type="button"
           >

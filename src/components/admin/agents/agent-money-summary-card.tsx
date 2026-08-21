@@ -1,6 +1,7 @@
 "use client";
 
 import { AdminCard, Mono, SectionHeading, ToneBadge } from "@/components/admin/ui";
+import { CountUp } from "@/components/admin/count-up";
 import { HelpTip } from "@/components/admin/help-tip";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCedis } from "@/lib/format-money";
@@ -23,17 +24,24 @@ import type { IAgentMoneySummary } from "@/types/agent.types";
  * and what everything since has been unpicking.
  */
 
-/** A money figure, or the redaction placeholder. Never prints "null". */
+/**
+ * A money figure, or the redaction placeholder. Never prints "null". The
+ * headline lines count up; the per-account breakdown just prints.
+ */
 function Figure({
+  animate = false,
   className,
   value,
 }: {
+  animate?: boolean;
   className?: string;
   value: null | number;
 }) {
   if (value === null) return <span className="text-adm-faint">Hidden</span>;
   return (
-    <Mono className={cn("tabular-nums", className)}>{formatCedis(value)}</Mono>
+    <Mono className={cn("tabular-nums", className)}>
+      {animate ? <CountUp value={value} format={formatCedis} /> : formatCedis(value)}
+    </Mono>
   );
 }
 
@@ -60,7 +68,11 @@ function Line({
         <span className="[overflow-wrap:anywhere]">{label}</span>
         {hint ? <HelpTip label={label} text={hint} /> : null}
       </span>
-      <Figure className={emphasis ? "text-[15px] text-adm-ink" : undefined} value={value} />
+      <Figure
+        animate
+        className={emphasis ? "text-[15px] text-adm-ink" : undefined}
+        value={value}
+      />
     </div>
   );
 }
@@ -138,7 +150,7 @@ export function AgentMoneySummaryCard({ agentUserId }: { agentUserId: string }) 
                   // invite somebody to subtract against it.
                   <ToneBadge tone="harvest">No limit</ToneBadge>
                 ) : (
-                  <Figure value={sent.capGhs} />
+                  <Figure animate value={sent.capGhs} />
                 )}
               </div>
               <Line

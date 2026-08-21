@@ -18,6 +18,7 @@ import {
   FilterChip,
   labelOf,
 } from "@/components/admin/filter-bar";
+import { ConsoleTabs, type ConsoleTab } from "@/components/admin/console-tabs";
 import { HelpTip } from "@/components/admin/help-tip";
 import {
   ResponsiveDialog,
@@ -50,6 +51,11 @@ import { Kg } from "./stock-bits";
 import { StockMovements } from "./stock-movements";
 
 type Section = "balances" | "movements";
+
+const SECTION_TABS: readonly ConsoleTab<Section>[] = [
+  { value: "balances", label: "Balances" },
+  { value: "movements", label: "Movements" },
+];
 
 const CLEARED_LINES_OPTIONS = [
   { value: "hidden", label: "Hidden" },
@@ -224,30 +230,13 @@ export function StockView() {
   // Section toggle - balances / movements - opens the toolbar row, so tabs,
   // search, filters and the action share one line on a desktop.
   const sectionTabs = (
-    <div className="flex gap-1.5" role="tablist" aria-label="Stock sections">
-      {(
-        [
-          ["balances", "Balances"],
-          ["movements", "Movements"],
-        ] as const
-      ).map(([key, label]) => (
-        <button
-          key={key}
-          type="button"
-          role="tab"
-          onClick={() => setSection(key)}
-          aria-selected={section === key}
-          className={cn(
-            "flex h-[34px] cursor-pointer items-center rounded-none border px-3.5 text-[13px] font-semibold transition-colors",
-            section === key
-              ? "border-console bg-console text-white"
-              : "border-adm-line bg-adm-card text-adm-muted hover:border-console/60",
-          )}
-        >
-          {label}
-        </button>
-      ))}
-    </div>
+    <ConsoleTabs
+      variant="solid"
+      label="Stock sections"
+      tabs={SECTION_TABS}
+      value={section}
+      onChange={setSection}
+    />
   );
 
   return (
@@ -294,6 +283,7 @@ export function StockView() {
                       </span>
                     </div>
                     <Kg
+                      countUp
                       kg={t.totalKg}
                       className="mt-0.5 block text-[16px] font-bold text-adm-ink"
                     />
@@ -476,6 +466,7 @@ function WarehouseSections({
               </div>
               <div className="flex-none text-right">
                 <Kg
+                  countUp
                   kg={w.subtotalKg}
                   className="block text-[15px] font-semibold text-adm-ink"
                 />
@@ -728,7 +719,7 @@ function AdjustmentDialog({
             <AdminButton variant="outline" size="lg" onClick={close}>
               Cancel
             </AdminButton>
-            <AdminButton type="submit" size="lg" disabled={isLoading}>
+            <AdminButton type="submit" size="lg" disabled={isLoading} loading={isLoading}>
               {isLoading ? "Filing…" : "File for approval"}
             </AdminButton>
           </ResponsiveDialogFooter>

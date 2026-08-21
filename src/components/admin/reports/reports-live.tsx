@@ -6,6 +6,7 @@ import {
   DateRangeSelector,
   DEFAULT_RANGE,
 } from "@/components/admin/dashboard/date-range-selector";
+import { CountUp } from "@/components/admin/count-up";
 import { HelpTip, HelpWrap } from "@/components/admin/help-tip";
 import {
   WidgetEmpty,
@@ -85,7 +86,12 @@ function ReportKpi({
         )}
         title={text === undefined && value !== null ? formatCedis(value) : undefined}
       >
-        {display ?? <Money value={null} />}
+        {text ??
+          (value === null ? (
+            <Money value={null} />
+          ) : (
+            <CountUp value={value} format={formatCedisCompact} />
+          ))}
       </div>
     </AdminCard>
   );
@@ -285,7 +291,7 @@ function CashComingIn() {
         <HelpTip label={`What does ${label} count?`} text={hint} />
       </div>
       <div className="font-adminmono mt-0.5 text-[18px] font-bold text-console tabular-nums">
-        <Money value={value} compact />
+        <Money animate compact value={value} />
       </div>
     </div>
   );

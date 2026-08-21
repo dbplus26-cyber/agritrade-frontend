@@ -329,6 +329,7 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
                   <AdminButton
                     type="button"
                     disabled={!dirty || saving}
+                    loading={saving}
                     onClick={() => void onSave()}
                     size="lg"
                   >
@@ -347,6 +348,7 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
                   type="button"
                   variant="danger"
                   disabled={deleting}
+                  loading={deleting}
                   onClick={() => void onDelete()}
                   className="mt-2.5"
                 >

@@ -308,6 +308,7 @@ export function StocktakeCountSheet({
           type="button"
           size="lg"
           disabled={saving}
+          loading={saving}
           onClick={save}
         >
           {saving ? "Saving…" : submitLabel}

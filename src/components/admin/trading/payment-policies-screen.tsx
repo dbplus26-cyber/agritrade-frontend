@@ -259,7 +259,7 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
             >
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={isLoading} size="lg">
+            <AdminButton type="submit" disabled={isLoading} loading={isLoading} size="lg">
               {isLoading ? "Creating…" : "Create policy"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -434,6 +434,7 @@ function PolicyCard({ policy }: { policy: IPaymentPolicy }) {
             variant="outline"
             className="text-console-red hover:bg-console-red/10 hover:text-console-red"
             disabled={deleteState.isLoading}
+            loading={deleteState.isLoading}
             onClick={() => void onDelete()}
           >
             Delete

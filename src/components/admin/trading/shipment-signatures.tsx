@@ -221,6 +221,7 @@ export function ShipmentSignatures({ shipment }: { shipment: IShipment }) {
                   <AdminButton
                     className="w-full"
                     disabled={busy}
+                    loading={ownerState.isLoading}
                     onClick={() => void submitOwner()}
                     variant="secondary"
                   >
@@ -286,6 +287,7 @@ export function ShipmentSignatures({ shipment }: { shipment: IShipment }) {
                 <div className="flex flex-wrap gap-2">
                   <AdminButton
                     disabled={reason.trim().length < 3 || revokeState.isLoading}
+                    loading={revokeState.isLoading}
                     onClick={() => void submitWithdrawal(which)}
                     size="sm"
                     variant="danger"

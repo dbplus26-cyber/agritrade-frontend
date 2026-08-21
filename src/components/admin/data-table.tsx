@@ -3,6 +3,12 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  AnimatePresence,
+  motion,
+  type TargetAndTransition,
+  useReducedMotion,
+} from "motion/react";
+import {
   type ColumnDef,
   flexRender,
   getCoreRowModel,
@@ -26,6 +32,7 @@ import {
   DataTablePagination,
   PAGE_SIZE_OPTIONS,
 } from "@/components/ui/DataTablePagination";
+import { navigationStarted } from "@/components/admin/navigation-progress";
 import { HelpTip } from "@/components/admin/help-tip";
 import { cn } from "@/lib/utils";
 
@@ -225,11 +232,13 @@ const rowNavProps = (
   href
     ? {
         onClick: () => {
+          navigationStarted();
           navigate(href);
         },
         onKeyDown: (e: React.KeyboardEvent) => {
           if (e.key === "Enter" && e.target === e.currentTarget) {
             e.preventDefault();
+            navigationStarted();
             navigate(href);
           }
         },
@@ -237,6 +246,46 @@ const rowNavProps = (
         tabIndex: 0,
       }
     : {};
+
+/**
+ * How a row or card arrives and leaves.
+ *
+ * A row that appears after the table is on screen fades in with a small lift,
+ * each one a beat after the last so a set reads as arriving in order rather
+ * than popping in; the stagger stops growing after ten so a long page never
+ * keeps the reader waiting. A row that leaves - a decision, a delete, a
+ * filter - fades out a touch faster than it came in. `lift` is off for a
+ * `<tr>`: a table row cannot be transformed or height-animated reliably, so
+ * it fades only. Under reduced motion every step is instant, matching the
+ * global stylesheet rule that switches CSS transitions off.
+ */
+const STAGGER_CAP = 10;
+const rowMotion = (
+  index: number,
+  reduced: boolean,
+  lift: boolean,
+): {
+  initial: TargetAndTransition;
+  animate: TargetAndTransition;
+  exit: TargetAndTransition;
+} => ({
+  initial: { opacity: 0, ...(lift && !reduced ? { y: 4 } : {}) },
+  animate: {
+    opacity: 1,
+    ...(lift ? { y: 0 } : {}),
+    transition: reduced
+      ? { duration: 0 }
+      : {
+          duration: 0.18,
+          ease: "easeOut",
+          delay: Math.min(index, STAGGER_CAP) * 0.02,
+        },
+  },
+  exit: {
+    opacity: 0,
+    transition: reduced ? { duration: 0 } : { duration: 0.15, ease: "easeIn" },
+  },
+});
 
 export interface ServerPagination {
   totalCount: number;
@@ -313,6 +362,7 @@ export function ConsoleDataTable<TData>({
   isFiltered?: boolean;
 }) {
   const router = useRouter();
+  const reducedMotion = useReducedMotion() ?? false;
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [pageSize, setPageSize] = useState(initialPageSize);
@@ -365,6 +415,17 @@ export function ConsoleDataTable<TData>({
     manualPagination: manual,
     manualFiltering: manual,
     globalFilterFn: "includesString",
+    // A row's identity is its record's id where it has one, so the enter and
+    // exit animations below follow the RECORD: the row that was deleted is
+    // the one that fades out, and the rows under it slide up. TanStack's
+    // default id is the array index, which would have had the LAST row fade
+    // out on every removal while the others swapped content in place.
+    getRowId: (row, index) => {
+      const id = (row as { id?: unknown }).id;
+      return typeof id === "string" || typeof id === "number"
+        ? String(id)
+        : String(index);
+    },
     initialState: { pagination: { pageSize: initialPageSize } },
   });
 
@@ -412,7 +473,9 @@ export function ConsoleDataTable<TData>({
   }
 
   return (
-    <div className={cn("@container/table min-w-0", className)}>
+    <div
+      className={cn("animate-console-in @container/table min-w-0", className)}
+    >
       {enableSelection && selectedRows.length > 0 && renderBulkActions ? (
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-adm-line bg-adm-sunken px-4 py-2">
           <span className="text-[13.5px] font-semibold text-adm-body">
@@ -438,18 +501,25 @@ export function ConsoleDataTable<TData>({
           with whichever lands later in the stylesheet silently winning). */}
       <div
         className={cn(
-          "flex flex-col gap-2 py-2 transition-opacity duration-200 @2xl/table:hidden",
+          // `relative` anchors a leaving card: AnimatePresence pops it out of
+          // the flow so its neighbours can slide up at once, and it needs a
+          // positioned ancestor to hold its place while it fades.
+          "relative flex flex-col gap-2 py-2 transition-opacity duration-200 @2xl/table:hidden",
           isFetching && "pointer-events-none opacity-60",
         )}
         aria-busy={isFetching || undefined}
       >
-        {rows.length === 0
-          ? (emptyState ?? (
-              <div className="px-4 py-12 text-center text-[14px] text-adm-muted">
-                Nothing here yet.
-              </div>
-            ))
-          : rows.map((row) => {
+        {rows.length === 0 ? (
+          (emptyState ?? (
+            <div className="px-4 py-12 text-center text-[14px] text-adm-muted">
+              Nothing here yet.
+            </div>
+          ))
+        ) : (
+          // `initial={false}`: the first paint arrives whole; only cards that
+          // appear AFTER mount play the entrance.
+          <AnimatePresence initial={false} mode="popLayout">
+            {rows.map((row, index) => {
               const href = rowHref?.(row.original);
               const selectCell = row
                 .getVisibleCells()
@@ -475,8 +545,17 @@ export function ConsoleDataTable<TData>({
               const cells = visible.filter(isData);
               const actionCells = visible.filter((c) => !isData(c));
               return (
-                <div
+                <motion.div
                   key={row.id}
+                  // Position only: a card whose content changes size snaps to
+                  // it rather than stretching its text through a scale.
+                  layout="position"
+                  {...rowMotion(index, reducedMotion, true)}
+                  transition={{
+                    layout: reducedMotion
+                      ? { duration: 0 }
+                      : { type: "spring", stiffness: 500, damping: 40 },
+                  }}
                   data-state={row.getIsSelected() ? "selected" : undefined}
                   {...rowNavProps(href, (h) => router.push(h))}
                   className={cn(
@@ -526,9 +605,11 @@ export function ConsoleDataTable<TData>({
                       ))}
                     </div>
                   ) : null}
-                </div>
+                </motion.div>
               );
             })}
+          </AnimatePresence>
+        )}
       </div>
 
       {/* Wide container: the real table, horizontally scrollable only as a
@@ -591,47 +672,57 @@ export function ConsoleDataTable<TData>({
               </TableCell>
             </TableRow>
           ) : (
-            rows.map((row) => {
-              const href = rowHref?.(row.original);
-              return (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() ? "selected" : undefined}
-                  {...rowNavProps(href, (h) => router.push(h))}
-                  className={cn(
-                    "border-adm-hairline data-[state=selected]:bg-console/5",
-                    href &&
-                      "cursor-pointer transition-colors duration-150 hover:bg-adm-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-console",
-                    rowClassName?.(row.original),
-                  )}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className={cn(
-                        // Two lines is the ceiling for ANY cell. A row is a
-                        // scan target, not a paragraph: let one cell run to
-                        // four lines and every row beside it inherits the
-                        // height, and the table stops being scannable. Cells
-                        // that want a single line clamp themselves; this is
-                        // the backstop for the ones that do not.
-                        "px-3 py-2.5 text-[14px] text-adm-body [&_p]:line-clamp-2",
-                        cell.column.columnDef.meta?.className,
-                        // max-w-0 is not cosmetic: without it the cell's
-                        // min-content width beats w-2/5 and the column grows
-                        // back to whatever the longest value wants.
-                        cell.column.columnDef.meta?.stretch && "w-2/5 max-w-0",
-                      )}
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              );
-            })
+            // A `<tr>` fades in and out where a card also lifts and slides:
+            // table rows do not animate transform or height reliably, so
+            // neighbours snap into place once a leaving row has faded.
+            // `motion.tr` stands in for the shadcn TableRow with the same
+            // data-slot and base classes, so its styling is unchanged.
+            <AnimatePresence initial={false}>
+              {rows.map((row, index) => {
+                const href = rowHref?.(row.original);
+                return (
+                  <motion.tr
+                    key={row.id}
+                    {...rowMotion(index, reducedMotion, false)}
+                    data-slot="table-row"
+                    data-state={row.getIsSelected() ? "selected" : undefined}
+                    {...rowNavProps(href, (h) => router.push(h))}
+                    className={cn(
+                      "border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted",
+                      "border-adm-hairline data-[state=selected]:bg-console/5",
+                      href &&
+                        "cursor-pointer transition-colors duration-150 hover:bg-adm-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-console",
+                      rowClassName?.(row.original),
+                    )}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className={cn(
+                          // Two lines is the ceiling for ANY cell. A row is a
+                          // scan target, not a paragraph: let one cell run to
+                          // four lines and every row beside it inherits the
+                          // height, and the table stops being scannable. Cells
+                          // that want a single line clamp themselves; this is
+                          // the backstop for the ones that do not.
+                          "px-3 py-2.5 text-[14px] text-adm-body [&_p]:line-clamp-2",
+                          cell.column.columnDef.meta?.className,
+                          // max-w-0 is not cosmetic: without it the cell's
+                          // min-content width beats w-2/5 and the column grows
+                          // back to whatever the longest value wants.
+                          cell.column.columnDef.meta?.stretch && "w-2/5 max-w-0",
+                        )}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    ))}
+                  </motion.tr>
+                );
+              })}
+            </AnimatePresence>
           )}
         </TableBody>
       </Table>

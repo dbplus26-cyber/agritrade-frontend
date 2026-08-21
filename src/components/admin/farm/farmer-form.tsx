@@ -372,7 +372,7 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
           >
             Cancel
           </AdminButton>
-          <AdminButton type="submit" disabled={saving} size="lg">
+          <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
             {saving ? "Saving…" : farmer ? "Save changes" : "Add farmer"}
           </AdminButton>
         </div>

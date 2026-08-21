@@ -248,6 +248,7 @@ function SettingsForm({
             <AdminButton
               type="submit"
               disabled={saving || !isDirty}
+              loading={saving}
               size="lg"
             >
               {saving ? "Saving…" : "Save settings"}
@@ -400,6 +401,7 @@ function SignatureCard({ settings }: { settings: ISystemSettings }) {
               variant="ghost"
               size="sm"
               disabled={removeState.isLoading}
+              loading={removeState.isLoading}
               onClick={() => void onRemove()}
             >
               {removeState.isLoading ? "Removing…" : "Remove"}

@@ -172,7 +172,7 @@ export function DriverFeeDialog({
             <AdminButton onClick={onClose} type="button" variant="ghost">
               Cancel
             </AdminButton>
-            <AdminButton disabled={isLoading} type="submit">
+            <AdminButton disabled={isLoading} loading={isLoading} type="submit">
               {isLoading ? "Saving…" : "Save fee"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -455,7 +455,7 @@ export function DriverPaymentDialog({
             <AdminButton onClick={onClose} type="button" variant="ghost">
               Cancel
             </AdminButton>
-            <AdminButton disabled={isLoading} type="submit">
+            <AdminButton disabled={isLoading} loading={isLoading} type="submit">
               {isLoading ? "Recording…" : "Record payment"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -538,7 +538,7 @@ export function ReverseReasonDialog({
             <AdminButton onClick={onClose} type="button" variant="ghost">
               Cancel
             </AdminButton>
-            <AdminButton disabled={submitting} type="submit" variant="danger">
+            <AdminButton disabled={submitting} loading={submitting} type="submit" variant="danger">
               {submitting ? "Reversing…" : "Reverse payment"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -687,7 +687,7 @@ export function DriverFeeAdjustDialog({
             <AdminButton onClick={onClose} type="button" variant="ghost">
               Cancel
             </AdminButton>
-            <AdminButton disabled={isLoading} type="submit">
+            <AdminButton disabled={isLoading} loading={isLoading} type="submit">
               {isLoading ? "Saving…" : "Record adjustment"}
             </AdminButton>
           </ResponsiveDialogFooter>

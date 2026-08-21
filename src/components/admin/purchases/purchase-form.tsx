@@ -444,6 +444,7 @@ export function PurchaseCreate() {
             <AdminButton
               type="submit"
               disabled={saving}
+              loading={saving}
               size="lg"
             >
               {saving ? "Recording…" : "Record purchase"}

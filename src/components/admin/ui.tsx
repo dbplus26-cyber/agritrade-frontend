@@ -3,6 +3,7 @@ import React, { useId } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { HelpTip } from "@/components/admin/help-tip";
 import { cn } from "@/lib/utils";
@@ -448,8 +449,17 @@ export function AdminButton({
   variant = "primary",
   size = "md",
   className,
+  loading = false,
+  disabled,
+  children,
   ...props
 }: Omit<React.ComponentProps<typeof Button>, "size" | "variant"> & {
+  /**
+   * A pending state for the action this button fires: a spinner takes the
+   * icon slot, the button is disabled and announced busy, and the label
+   * stays so the button keeps its width.
+   */
+  loading?: boolean;
   /**
    * The console's THREE button heights, and the only three.
    *
@@ -507,8 +517,25 @@ export function AdminButton({
         variant === "gold" && "bg-console-gold text-white hover:bg-console-gold-deep",
         className,
       )}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
       {...props}
-    />
+    >
+      {/* ONE child, always: `asChild` hands the children to a Slot, which
+          accepts exactly one element, so the spinner joins the label inside
+          a fragment only while loading. */}
+      {loading ? (
+        <>
+          <Loader2
+            className="h-4 w-4 flex-none animate-spin"
+            aria-hidden="true"
+          />
+          {children}
+        </>
+      ) : (
+        children
+      )}
+    </Button>
   );
 }
 
@@ -783,7 +810,7 @@ export function EditableFormActions({
         >
           Cancel
         </AdminButton>
-        <AdminButton type="submit" disabled={saving} size="lg">
+        <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
           {saving ? "Saving…" : createLabel}
         </AdminButton>
       </div>
@@ -802,7 +829,7 @@ export function EditableFormActions({
         >
           Cancel
         </AdminButton>
-        <AdminButton type="submit" disabled={saving} size="lg">
+        <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
           {saving ? "Saving…" : "Save changes"}
         </AdminButton>
       </div>

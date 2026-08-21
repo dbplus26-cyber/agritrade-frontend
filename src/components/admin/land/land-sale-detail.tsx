@@ -202,7 +202,7 @@ function PaymentDialog({
             <AdminButton type="button" variant="outline" size="lg" onClick={onClose}>
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={isLoading} size="lg">
+            <AdminButton type="submit" disabled={isLoading} loading={isLoading} size="lg">
               {isLoading ? "Recording…" : "Record payment"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -337,7 +337,7 @@ function CancelDialog({
             <AdminButton type="button" variant="outline" size="lg" onClick={onClose}>
               Keep sale
             </AdminButton>
-            <AdminButton type="submit" variant="danger" disabled={isLoading} size="lg">
+            <AdminButton type="submit" variant="danger" disabled={isLoading} loading={isLoading} size="lg">
               {isLoading ? "Cancelling…" : "Cancel sale"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -552,6 +552,7 @@ export function LandSaleDetail({ id }: { id: string }) {
                     <AdminButton
                       variant={hasPayments ? "primary" : "outline"}
                       disabled={confirmState.isLoading}
+                      loading={confirmState.isLoading}
                       onClick={() => void onConfirm()}
                     >
                       {confirmState.isLoading ? "Confirming…" : "Confirm sale"}

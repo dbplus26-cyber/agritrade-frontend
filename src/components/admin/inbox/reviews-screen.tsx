@@ -399,7 +399,7 @@ function AddReviewDialog({
             >
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={isLoading}>
+            <AdminButton type="submit" disabled={isLoading} loading={isLoading}>
               {isLoading ? "Recording…" : "Record review"}
             </AdminButton>
           </ResponsiveDialogFooter>

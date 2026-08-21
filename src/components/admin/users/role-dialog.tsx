@@ -119,6 +119,7 @@ export function RoleChangeDialog({
           <AdminButton
             size="lg"
             disabled={isLoading || role === user.role}
+            loading={isLoading}
             onClick={() => void apply()}
           >
             {isLoading ? "Applying…" : "Change role"}

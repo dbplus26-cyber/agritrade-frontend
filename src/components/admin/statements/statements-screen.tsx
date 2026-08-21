@@ -246,7 +246,7 @@ function OpeningBalanceCard() {
             >
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={saveState.isLoading} size="lg">
+            <AdminButton type="submit" disabled={saveState.isLoading} loading={saveState.isLoading} size="lg">
               {saveState.isLoading ? "Saving…" : "Save opening position"}
             </AdminButton>
           </div>

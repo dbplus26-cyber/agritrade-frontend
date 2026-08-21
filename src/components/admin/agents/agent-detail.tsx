@@ -433,7 +433,7 @@ function TopUpDialog({
             <AdminButton type="button" variant="outline" size="lg" onClick={onClose}>
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={isLoading} size="lg">
+            <AdminButton type="submit" disabled={isLoading} loading={isLoading} size="lg">
               {isLoading ? "Topping up…" : "Top up float"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -620,6 +620,7 @@ function ReconcileDialog({
                 <AdminButton
                   type="submit"
                   disabled={isLoading}
+                  loading={isLoading}
                   size="lg"
                 >
                   {isLoading ? "Posting…" : "Post reconciliation"}

@@ -11,6 +11,7 @@ import {
   ToneBadge,
   adminInputClass,
 } from "@/components/admin/ui";
+import { ConsoleTabs, type ConsoleTab } from "@/components/admin/console-tabs";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -160,7 +161,7 @@ function SaveRow({
       >
         Discard
       </AdminButton>
-      <AdminButton size="lg" disabled={!dirty || saving} onClick={onSave}>
+      <AdminButton size="lg" disabled={!dirty || saving} loading={saving} onClick={onSave}>
         {saving ? "Saving…" : "Save changes"}
       </AdminButton>
     </div>
@@ -252,45 +253,36 @@ function RoleDefaults({
     <div>
       {/* Role picker: the same quiet segmented control the console uses for
           queues, with each segment carrying its live allowance count. */}
-      <div
-        role="tablist"
-        aria-label="Role"
-        className="mb-4 flex w-fit max-w-full gap-[3px] bg-adm-sunken p-[3px]"
-      >
-        {editableRoles.map((r) => {
+      <ConsoleTabs
+        variant="segmented"
+        label="Role"
+        className="mb-4"
+        tabs={editableRoles.map((r) => {
           const count = (drafts[r] ?? matrix[r] ?? []).length;
           const unsaved =
             drafts[r] !== undefined &&
             !sameSet(new Set(drafts[r]), new Set(matrix[r] ?? []));
-          return (
-            <button
-              key={r}
-              type="button"
-              role="tab"
-              aria-selected={role === r}
-              onClick={() => setRole(r)}
-              className={cn(
-                "flex cursor-pointer items-center gap-[7px] rounded-none px-3.5 py-[7px] text-[13px] leading-[1.4] font-[550]",
-                "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-console",
-                role === r
-                  ? "bg-adm-card text-adm-ink shadow-[0_1px_2px_rgba(0,0,0,.08)]"
-                  : "bg-transparent text-adm-muted",
-              )}
-            >
-              {ROLE_TITLE[r]}
-              <span className="font-adminmono rounded-full bg-adm-sunken px-[7px] py-px text-[10.5px] font-bold tabular-nums text-adm-body">
-                {count}
+          return {
+            value: r,
+            label: ROLE_TITLE[r],
+            trailing: (
+              <span className="flex items-center gap-[7px]">
+                <span className="font-adminmono rounded-full bg-adm-sunken px-[7px] py-px text-[10.5px] font-bold tabular-nums text-adm-body">
+                  {count}
+                </span>
+                {unsaved ? (
+                  <span
+                    aria-label="Unsaved changes"
+                    className="h-1.5 w-1.5 flex-none rounded-full bg-console-gold"
+                  />
+                ) : null}
               </span>
-              {unsaved ? (
-                <span
-                  aria-label="Unsaved changes"
-                  className="h-1.5 w-1.5 flex-none rounded-full bg-console-gold"
-                />
-              ) : null}
-            </button>
-          );
+            ),
+          };
         })}
-      </div>
+        value={role}
+        onChange={setRole}
+      />
 
       <AdminCard className="overflow-hidden">
         <div className="px-4 pt-4 pb-3.5 sm:px-5">
@@ -658,6 +650,11 @@ export function PermissionsSkeleton() {
 
 type PermissionsTab = "roles" | "people";
 
+const VIEW_TABS: readonly ConsoleTab<PermissionsTab>[] = [
+  { value: "roles", label: "Role defaults" },
+  { value: "people", label: "People" },
+];
+
 /**
  * The Permissions screen: what each ROLE may do (defaults every holder
  * starts from) and what one PERSON has been granted on top. Deep-linkable -
@@ -704,35 +701,14 @@ export function PermissionsScreen() {
         sub="Role defaults set what everyone with a role starts with; personal grants open single doors for single people."
       />
 
-      <div
-        role="tablist"
-        aria-label="Permissions view"
-        className="mb-4 flex w-fit max-w-full gap-[3px] bg-adm-sunken p-[3px]"
-      >
-        {(
-          [
-            ["roles", "Role defaults"],
-            ["people", "People"],
-          ] as const
-        ).map(([value, label]) => (
-          <button
-            key={value}
-            type="button"
-            role="tab"
-            aria-selected={tab === value}
-            onClick={() => goTo(value)}
-            className={cn(
-              "cursor-pointer rounded-none px-3.5 py-[7px] text-[13px] leading-[1.4] font-[550]",
-              "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-console",
-              tab === value
-                ? "bg-adm-card text-adm-ink shadow-[0_1px_2px_rgba(0,0,0,.08)]"
-                : "bg-transparent text-adm-muted",
-            )}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      <ConsoleTabs
+        variant="segmented"
+        label="Permissions view"
+        className="mb-4"
+        tabs={VIEW_TABS}
+        value={tab}
+        onChange={(value) => goTo(value)}
+      />
 
       {tab === "roles" ? (
         <RoleDefaults

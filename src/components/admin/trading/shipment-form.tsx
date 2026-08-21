@@ -1068,6 +1068,7 @@ export function ShipmentForm({
           <AdminButton
             type="submit"
             disabled={saving || overCapacity}
+            loading={saving}
             size="lg"
           >
             {editing

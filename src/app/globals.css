@@ -13,6 +13,17 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
+  /* Motion scale. One easing and three durations, so every transition in
+     the console pulls from the same vocabulary: `ease-console`,
+     `duration-fast|base|slow` are NOT tailwind namespaces, use the
+     variables through the default transition settings below and the
+     `animate-console-in` keyframes. */
+  --ease-console: cubic-bezier(0.2, 0, 0, 1);
+  --default-transition-duration: 150ms;
+  --default-transition-timing-function: var(--ease-console);
+  --animate-console-in: console-in 200ms var(--ease-console) both;
+  --animate-console-pop: console-pop 180ms var(--ease-console) both;
+
   /* Brand tokens - use these for page work; shadcn vars map onto them. */
   --color-surface: #eff1e8;
   --color-surface-alt: #e6eae0;
@@ -320,6 +331,29 @@
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* Console content entering: a short fade with a few pixels of lift. */
+@keyframes console-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* A count badge changing value: a small pop. */
+@keyframes console-pop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
   }
 }
 
