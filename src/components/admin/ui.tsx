@@ -379,6 +379,12 @@ export function AdminPageHeader({
  * Heading for a single record's page (detail, create, edit), under the
  * DetailNav: badges that identify the record's state, the title (wrapping,
  * never truncated), a meta line, and the record's actions grouped below.
+ *
+ * On phones the badges and the actions share one top row (badges left,
+ * buttons right) above the title: a status badge and a "View PDF" button are
+ * each a few characters wide, and giving them a row apiece stacked four thin
+ * rows where one structured header would do. From `md` the actions drop back
+ * under the meta line, where there is room for them to read as a toolbar.
  */
 export function DetailHeader({
   title,
@@ -398,12 +404,28 @@ export function DetailHeader({
   className?: string;
   hint?: string;
 }) {
+  const hasTopRow = Boolean(badges || actions);
   return (
-    <div className={cn("mb-6", className)}>
+    // Phone: a two-column grid so badges and actions can sit on one row while
+    // the DOM keeps its reading order (badges, title, actions). md+: a plain
+    // column, where the grid placements are ignored.
+    <div
+      className={cn(
+        "mb-6 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 md:flex md:flex-col md:items-stretch",
+        className,
+      )}
+    >
       {badges ? (
-        <div className="mb-2 flex flex-wrap items-center gap-2">{badges}</div>
+        <div className="col-start-1 row-start-1 flex flex-wrap items-center gap-2 md:mb-2">
+          {badges}
+        </div>
       ) : null}
-      <div className="min-w-0 space-y-2">
+      <div
+        className={cn(
+          "col-span-2 min-w-0 space-y-2",
+          hasTopRow && "row-start-2 mt-2 md:mt-0",
+        )}
+      >
         <h1 className="text-lg font-bold tracking-tight [overflow-wrap:anywhere] text-adm-ink sm:text-xl lg:text-2xl">
           {title}
           {hint ? (
@@ -421,7 +443,9 @@ export function DetailHeader({
         ) : null}
       </div>
       {actions ? (
-        <div className="mt-8 flex flex-wrap items-center gap-2">{actions}</div>
+        <div className="col-start-2 row-start-1 flex flex-wrap items-center justify-end gap-2 md:mt-8 md:justify-start">
+          {actions}
+        </div>
       ) : null}
     </div>
   );

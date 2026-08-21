@@ -114,7 +114,10 @@ function IdentityCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
             <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
               <h2
                 title={`${user.firstName} ${user.lastName}`}
-                className="line-clamp-2 max-w-full break-words text-[19px] leading-[1.3] font-bold tracking-[-0.01em] text-adm-ink"
+                // Full row on phones so the role/status badges sit together
+                // on the line below instead of one trailing the name and the
+                // other wrapping alone; inline beside the name from `sm`.
+                className="line-clamp-2 max-w-full basis-full break-words text-[19px] leading-[1.3] font-bold tracking-[-0.01em] text-adm-ink sm:basis-auto"
               >
                 {user.firstName} {user.lastName}
               </h2>
@@ -540,7 +543,7 @@ function ActionsCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
       {visible.map((row) => (
         <div
           key={row.key}
-          className="flex flex-col items-start gap-2.5 border-t border-adm-hairline px-4 py-3 first:border-t-0 sm:flex-row sm:items-center sm:gap-3 sm:px-6"
+          className="flex items-start gap-3 border-t border-adm-hairline px-4 py-3 first:border-t-0 sm:items-center sm:px-6"
         >
           <div className="min-w-0 flex-1">
             <div className="text-[13.5px] font-semibold text-adm-ink">
