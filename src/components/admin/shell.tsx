@@ -13,12 +13,13 @@ import {
   HandCoins,
   LayoutDashboard,
   LogOut,
-  type LucideIcon,
   MapPin,
+  Menu,
   Settings,
   ShieldCheck,
   Sprout,
   Store,
+  type LucideIcon,
   User as UserIcon,
 } from "lucide-react";
 import {
@@ -455,79 +456,26 @@ function ConsoleSidebar({ activeKey }: { activeKey: string }) {
   );
 }
 
-const MOBILE_TABS = [
-  { key: "dashboard", label: "Dashboard", href: ADMIN_HOME, icon: "▦" },
-  { key: "approvals", label: "Approvals", href: `${ADMIN_HOME}/approvals`, icon: "✓" },
-  { key: "purchases", label: "Purchases", href: `${ADMIN_HOME}/purchases`, icon: "⇄" },
-] as const;
-
-/** Bottom tabs (mobile) - the Menu tab opens the shadcn sidebar sheet. */
-function MobileTabs({ activeKey }: { activeKey: string }) {
-  const { openMobile, setOpenMobile } = useSidebar();
-  const pendingApprovals = usePendingApprovalsCount();
-  const { isSuperAdmin } = useAuthRole();
-  const { has } = usePermissions();
-  // Approvals is a decider's tab: for everyone else it opened onto a screen
-  // that could only refuse them, so it does not render at all.
-  const tabs = MOBILE_TABS.filter(
-    (t) =>
-      t.key !== "approvals" || isSuperAdmin || has("APPROVALS_DECIDE"),
-  );
+/** Phone-only hamburger on the top bar: opens the sidebar as a sheet. */
+function MobileMenuButton() {
+  const { setOpenMobile } = useSidebar();
   return (
-    <nav
-      aria-label="Console quick navigation"
-      className={cn(
-        "fixed inset-x-0 bottom-0 z-[60] grid h-[62px] border-t border-adm-line bg-adm-card pb-[env(safe-area-inset-bottom)] md:hidden",
-        tabs.length === 3 ? "grid-cols-4" : "grid-cols-3",
-      )}
+    <button
+      type="button"
+      onClick={() => setOpenMobile(true)}
+      aria-label="Open menu"
+      className="flex h-[30px] w-[30px] flex-none cursor-pointer items-center justify-center rounded-none border border-adm-line bg-adm-card text-adm-muted hover:bg-adm-sunken hover:text-adm-ink md:hidden"
     >
-      {tabs.map((tab) => {
-        const active = activeKey === tab.key && !openMobile;
-        return (
-          <Link
-            key={tab.key}
-            href={tab.href}
-            onClick={() => setOpenMobile(false)}
-            aria-current={active ? "page" : undefined}
-            className={cn(
-              "relative flex flex-col items-center justify-center gap-[3px]",
-              active ? "text-console" : "text-adm-muted",
-            )}
-          >
-            <span aria-hidden="true" className="text-[18px] leading-none">
-              {tab.icon}
-            </span>
-            <span className="text-[10.5px] font-semibold">{tab.label}</span>
-            {tab.key === "approvals" && pendingApprovals > 0 ? (
-              <span className="font-adminmono absolute right-[24%] top-2 flex h-[15px] min-w-[15px] items-center justify-center rounded-full bg-console-red text-[9.5px] font-bold text-white">
-                {pendingApprovals}
-              </span>
-            ) : null}
-          </Link>
-        );
-      })}
-      <button
-        type="button"
-        onClick={() => setOpenMobile(true)}
-        className={cn(
-          "flex cursor-pointer flex-col items-center justify-center gap-[3px]",
-          openMobile ? "text-console" : "text-adm-muted",
-        )}
-      >
-        <span aria-hidden="true" className="text-[18px] leading-none">
-          ☰
-        </span>
-        <span className="text-[10.5px] font-semibold">Menu</span>
-      </button>
-    </nav>
+      <Menu className="h-4 w-4" aria-hidden="true" />
+    </button>
   );
 }
 
 /**
  * The console chrome (from the DB Plus Console design), built on the shadcn
  * Sidebar: 224px white rail with collapsible grouped nav + a sign-out footer, a
- * 54px breadcrumb topbar with the account menu (top right, dms-frontend style),
- * and - on mobile - bottom tabs whose Menu tab opens the sidebar as a sheet.
+ * 54px breadcrumb topbar with the account menu (top right, dms-frontend style);
+ * on a phone a hamburger on the topbar opens the same rail as a sheet.
  */
 /** Breadcrumb beside the rail trigger: DB Plus / Section / (New | Detail).
  * The section links back to its register when a sub-page is open, and the
@@ -644,14 +592,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <ConsoleSidebar activeKey={activeKey} />
       </div>
 
-      {/* The bottom padding clears the fixed tab bar, which is 62px tall plus
-          its own safe-area inset - the footer used to add that inset on top,
-          and it is desktop-only now, so the full clearance belongs here. */}
-      <SidebarInset className="min-w-0 bg-transparent pb-[calc(env(safe-area-inset-bottom)+62px)] md:pb-0 print:pb-0">
+      <SidebarInset className="min-w-0 bg-transparent">
         <header className="sticky top-0 z-40 flex h-[54px] flex-none items-center gap-3 border-b border-adm-line bg-adm-card px-4 lg:px-[26px] print:hidden">
-          {/* Collapse/expand the rail (sheet on mobile) - dms behaviour in the
-              console skin, living on the topbar's left edge. */}
+          {/* Collapse/expand the rail from md up; on a phone the hamburger
+              opens it as a sheet. Both live on the topbar's left edge. */}
           <SidebarTrigger className="h-[30px] w-[30px] flex-none cursor-pointer rounded-none border border-adm-line bg-adm-card text-adm-muted hover:bg-adm-sunken hover:text-adm-ink max-md:hidden" />
+          <MobileMenuButton />
           {/* On a phone the bar's left edge carries the company mark instead
               of the page heading - every page already states its own name in
               its h1, and the account menu keeps the right edge to itself. */}
@@ -688,10 +634,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <ConsoleFooter />
         </div>
       </SidebarInset>
-
-      <div className="print:hidden">
-        <MobileTabs activeKey={activeKey} />
-      </div>
     </SidebarProvider>
   );
 }

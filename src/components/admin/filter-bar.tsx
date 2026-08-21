@@ -295,7 +295,11 @@ export function ConsoleFilterBar({
   inlineFilter?: ReactNode;
   /** `FilterChip`s for the filters currently applied. */
   chips?: ReactNode;
-  /** Grid layout for the desktop inline filter panel. */
+  /**
+   * Grid for the desktop filter panel. Four columns up to four cells, so two
+   * filters take the first two of four tracks rather than stretching across
+   * the row; past four, one column per cell ("lg:grid-cols-6" for six).
+   */
   panelClassName?: string;
   className?: string;
   /** The filter fields (ConsoleLabeledSelect, ConsoleDateField, ...). */

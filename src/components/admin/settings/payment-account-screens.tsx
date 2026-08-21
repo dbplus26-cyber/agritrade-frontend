@@ -247,7 +247,6 @@ export function PaymentAccountTable() {
               </Link>
             </AdminButton>
           }
-          panelClassName="sm:grid-cols-2"
           chips={
             <>
               {kindFilter !== "all" ? (

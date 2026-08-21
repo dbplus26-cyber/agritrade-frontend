@@ -556,7 +556,6 @@ export function ReviewsScreen() {
                 </AdminButton>
               ) : null
             }
-            panelClassName="sm:grid-cols-2"
             chips={
               <>
                 {filters.status !== "PENDING" ? (

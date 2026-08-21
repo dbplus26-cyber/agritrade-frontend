@@ -183,7 +183,7 @@ export function StockMovements({
         totalCount={totalCount}
         noun="movements"
         action={action}
-        panelClassName="sm:grid-cols-2 lg:grid-cols-6"
+        panelClassName="sm:grid-cols-2 lg:grid-cols-5"
         chips={
           <>
             {filters.type !== "all" ? (

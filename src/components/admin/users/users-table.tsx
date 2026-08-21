@@ -310,7 +310,6 @@ export function UsersTable() {
             </Link>
           </AdminButton>
         }
-        panelClassName="sm:grid-cols-2"
         chips={
           <>
             {roleFilter !== "all" ? (

@@ -230,7 +230,6 @@ export function CommodityTable() {
               </AdminButton>
             ) : null
           }
-          panelClassName="sm:grid-cols-2"
           chips={
             <>
               {statusFilter !== "all" ? (

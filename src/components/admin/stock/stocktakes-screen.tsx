@@ -194,7 +194,6 @@ export function StocktakesScreen() {
               </AdminButton>
             ) : null
           }
-          panelClassName="sm:grid-cols-2"
           chips={
             <>
               {filters.status !== "all" ? (

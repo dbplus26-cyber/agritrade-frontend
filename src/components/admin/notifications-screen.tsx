@@ -192,7 +192,6 @@ export function NotificationsScreen() {
           onClear={resetFilters}
           totalCount={total}
           noun="notifications"
-          panelClassName="sm:grid-cols-2"
           chips={
             <>
               {status !== "all" ? (

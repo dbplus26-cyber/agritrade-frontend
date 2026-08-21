@@ -253,7 +253,6 @@ export function FloatHoldersScreen() {
         searchPlaceholder="Name, email or phone…"
         totalCount={total}
         noun="float holders"
-        panelClassName="sm:grid-cols-2"
         chips={
           <>
             {filters.role !== "all" ? (

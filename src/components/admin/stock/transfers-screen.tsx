@@ -310,7 +310,7 @@ export function TransfersScreen() {
               </AdminButton>
             ) : null
           }
-          panelClassName="sm:grid-cols-2 lg:grid-cols-6"
+          panelClassName="sm:grid-cols-2 lg:grid-cols-5"
           chips={
             <>
               {filters.fromWh !== "all" ? (

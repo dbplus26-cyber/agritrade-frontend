@@ -740,7 +740,6 @@ function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
           onClear={resetFilters}
           totalCount={matched}
           noun="expenses"
-          panelClassName="sm:grid-cols-2"
           chips={
             <>
               {filters.from ? (
