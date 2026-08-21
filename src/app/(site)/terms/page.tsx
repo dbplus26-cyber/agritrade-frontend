@@ -95,7 +95,7 @@ export default async function TermsPage() {
       eyebrow="OFFICE · TERMS OF SERVICE"
       title="The terms we trade on."
       fileNo="DOC - TERMS OF SERVICE"
-      updated="11 JUL 2026"
+      updated="21 AUG 2026"
       intro="Plain language, the way we do business: what a quote is, how weighing works, when risk passes, how payment happens - and where the signed paperwork for your specific transaction takes over from this page."
       sections={buildSections(contact)}
     />

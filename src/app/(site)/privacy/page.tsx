@@ -87,7 +87,7 @@ export default async function PrivacyPage() {
       eyebrow="OFFICE · PRIVACY POLICY"
       title="What we keep, and why."
       fileNo="DOC - PRIVACY POLICY"
-      updated="11 JUL 2026"
+      updated="21 AUG 2026"
       intro="We're a trading house, not a data business. This page sets out the little we collect when you enquire or pay, what it's used for, how long it's kept, and the rights you have over it."
       sections={buildSections(contact)}
     />
