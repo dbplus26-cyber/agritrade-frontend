@@ -8,12 +8,12 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
   adminInputClass,
+  DetailHeader,
 } from "@/components/admin/ui";
 import { PaymentAccountField } from "@/components/admin/payment-account-field";
 import { SearchableSelect } from "@/components/admin/searchable-select";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { FilePicker } from "@/components/ui/FilePicker";
 import { Input } from "@/components/ui/input";
 import { formatCedis } from "@/lib/format-money";
@@ -186,8 +186,11 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
 
   return (
     <div className="max-w-[640px]">
-      <BackButton href={LIST} label="All repayments" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Repayments", href: LIST }]}
+        current="Record repayment"
+      />
+      <DetailHeader
         title="Record repayment"
         hint="Take back what a farmer owes, in produce or in cash."
         sub="What a farmer brought back against their grant - grain into the store, or money into an account"

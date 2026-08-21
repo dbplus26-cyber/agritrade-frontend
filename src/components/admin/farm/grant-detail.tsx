@@ -5,7 +5,7 @@ import {
   adminLinkClass,
   AdminButton,
   AdminCard,
-  AdminPageHeader,
+  DetailHeader,
   DetailGrid,
   DetailItem,
   DetailShell,
@@ -15,7 +15,7 @@ import { receiptPdfUrl } from "@/lib/receipt-pdf-url";
 import { cn } from "@/lib/utils";
 import { HelpTip } from "@/components/admin/help-tip";
 import { Money } from "@/components/admin/trading/sale-bits";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -52,24 +52,25 @@ export function GrantDetail({ id }: { id: string }) {
 
   return (
     <div className="max-w-[1120px]">
-      <BackButton href={LIST} label="All grants" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Grants", href: LIST }]}
+        current="Grant details"
+      />
+      <DetailHeader
         title="Grant details"
         hint="Inputs advanced to one farmer, and the terms for getting them back."
         sub={`Recorded ${formatDateTime(g.createdAt)}`}
+        badges={<GrantApprovalBadge status={g.approval?.status} />}
         actions={
-          <span className="flex flex-wrap items-center gap-1.5">
-            <GrantApprovalBadge status={g.approval?.status} />
-            <AdminButton variant="outline" asChild>
-              <a
-                href={receiptPdfUrl("grant", g.id)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View PDF
-              </a>
-            </AdminButton>
-          </span>
+          <AdminButton variant="outline" asChild>
+            <a
+              href={receiptPdfUrl("grant", g.id)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View PDF
+            </a>
+          </AdminButton>
         }
       />
 

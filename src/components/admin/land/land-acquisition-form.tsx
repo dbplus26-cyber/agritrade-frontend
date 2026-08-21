@@ -7,11 +7,11 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
+  DetailHeader,
   adminInputClass,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { Input } from "@/components/ui/input";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
@@ -97,8 +97,11 @@ export function LandAcquisitionForm() {
 
   return (
     <div className="max-w-[640px]">
-      <BackButton href={LIST} label="All acquisitions" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Acquisitions", href: LIST }]}
+        current="New land acquisition"
+      />
+      <DetailHeader
         title="New land acquisition"
         hint="Record land you are buying, and the price agreed with the seller."
         sub="Buying a plot from a seller. It enters the plot register once completed."

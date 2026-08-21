@@ -9,13 +9,13 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
+  DetailHeader,
   adminInputClass,
   adminSelectClass,
   Mono,
 } from "@/components/admin/ui";
 import { HelpTip } from "@/components/admin/help-tip";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { Input } from "@/components/ui/input";
 import { DateInput } from "@/components/ui/date-input";
 import { SimpleSelect } from "@/components/ui/simple-select";
@@ -155,8 +155,11 @@ export function PurchaseCreate() {
 
   return (
     <div className="max-w-[640px]">
-      <BackButton href={LIST} label="All purchases" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Purchases", href: LIST }]}
+        current="Record purchase"
+      />
+      <DetailHeader
         title="Record purchase"
         hint="Buy a load from a supplier or agent and take it into stock."
         sub="Goods bought and paid for - an agent-paid purchase debits their float immediately"

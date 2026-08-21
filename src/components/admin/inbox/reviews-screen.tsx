@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Plus } from "lucide-react";
 import {
   AdminButton,
   AdminCard,
@@ -17,6 +18,8 @@ import {
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
 import {
   ResponsiveDialog,
@@ -76,6 +79,11 @@ const ROLE_OPTIONS = [
   { value: "all", label: "All roles" },
   ...REVIEW_ROLES.map((r) => ({ value: r, label: REVIEW_ROLE_LABELS[r] })),
 ];
+
+const STATUS_OPTIONS = REVIEW_STATUSES.map((value) => ({
+  value,
+  label: REVIEW_STATUS_META[value].label,
+}));
 
 function ReviewStats() {
   const { data } = useGetReviewStatsQuery();
@@ -441,6 +449,7 @@ export function ReviewsScreen() {
   // Same cache entry as the ReviewStats tiles - RTK Query dedupes the hook.
   const { data: statsData } = useGetReviewStatsQuery();
   const reviews = data?.data ?? [];
+  const totalCount = data?.meta.total ?? 0;
   const totalPages = data?.meta.totalPages ?? 1;
   const isPendingView = filters.status === "PENDING";
   const activeFilterCount =
@@ -512,17 +521,6 @@ export function ReviewsScreen() {
         title="Reviews"
         hint="Customer reviews waiting to be published or already live."
         sub="Moderate what the website shows the world"
-        actions={
-          canModerate ? (
-            <AdminButton
-              onClick={() => {
-                setAdding(true);
-              }}
-            >
-              + Add review
-            </AdminButton>
-          ) : undefined
-        }
       />
 
       {pristine ? (
@@ -530,7 +528,7 @@ export function ReviewsScreen() {
           filtered={false}
           noun="reviews"
           description="Reviews submitted on the website land here for a decision - or record one the office took by phone or on paper."
-          actionLabel={canModerate ? "+ Add review" : undefined}
+          actionLabel={canModerate ? "Add review" : undefined}
           onAction={canModerate ? () => { setAdding(true); } : undefined}
         />
       ) : (
@@ -543,6 +541,36 @@ export function ReviewsScreen() {
             searchPlaceholder="Search name or words…"
             activeCount={activeFilterCount}
             onClear={resetFilters}
+            totalCount={totalCount}
+            noun="reviews"
+            action={
+              canModerate ? (
+                <AdminButton
+                  aria-label="Add review"
+                  onClick={() => {
+                    setAdding(true);
+                  }}
+                >
+                  <Plus className="h-4 w-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">Add review</span>
+                </AdminButton>
+              ) : null
+            }
+            panelClassName="sm:grid-cols-2"
+            chips={
+              <>
+                {filters.status !== "PENDING" ? (
+                  <FilterChip onRemove={() => setFilter("status", "PENDING")}>
+                    Status: {labelOf(STATUS_OPTIONS, filters.status)}
+                  </FilterChip>
+                ) : null}
+                {filters.role !== "all" ? (
+                  <FilterChip onRemove={() => setFilter("role", "all")}>
+                    Role: {labelOf(ROLE_OPTIONS, filters.role)}
+                  </FilterChip>
+                ) : null}
+              </>
+            }
           >
             {/* Status is a filter like any other - it lived as a row of tabs
                 above the toolbar, which was a second filtering vocabulary on
@@ -554,10 +582,7 @@ export function ReviewsScreen() {
               onChange={(v) => {
                 setFilter("status", v);
               }}
-              options={REVIEW_STATUSES.map((value) => ({
-                value,
-                label: REVIEW_STATUS_META[value].label,
-              }))}
+              options={STATUS_OPTIONS}
               active={filters.status !== "PENDING"}
             />
             <ConsoleLabeledSelect

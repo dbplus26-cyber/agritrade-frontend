@@ -5,7 +5,12 @@ import { useState } from "react";
 import { HelpWrap } from "@/components/admin/help-tip";
 import { ShipmentStatusBadge } from "@/components/admin/trading/shipment-bits";
 import { Money } from "@/components/admin/trading/sale-bits";
-import { adminLinkClass, AdminCard, Mono } from "@/components/admin/ui";
+import {
+  adminLinkClass,
+  AdminCard,
+  AdminPageHeader,
+  Mono,
+} from "@/components/admin/ui";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useAuthRole } from "@/hooks/use-auth-role";
@@ -225,18 +230,11 @@ export function DashboardLive() {
 
   return (
     <div>
-      <div className="mb-[18px] flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
-        <div className="min-w-0">
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            {greeting}
-            {user ? `, ${user.firstName}` : ""}
-          </h1>
-          <div className="mt-0.5 text-[13px] text-adm-muted">
-            Here is the state of the business at a glance
-          </div>
-        </div>
-        <DateRangeSelector onChange={setWindow} />
-      </div>
+      <AdminPageHeader
+        title={`${greeting}${user ? `, ${user.firstName}` : ""}`}
+        sub="Here is the state of the business at a glance"
+        actions={<DateRangeSelector onChange={setWindow} />}
+      />
 
       {/* Snapshot KPIs - the state of the business right now. Error is its
           own branch: `isLoading || !d` stays true forever after a failure,

@@ -5,7 +5,7 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
-import { HelpTip, HelpWrap } from "@/components/admin/help-tip";
+import { HelpWrap } from "@/components/admin/help-tip";
 import { PaidThroughSystemField } from "@/components/admin/paid-through-system-field";
 import { PaymentAccountField } from "@/components/admin/payment-account-field";
 import {
@@ -13,6 +13,7 @@ import {
   AdminCard,
   AdminField,
   Mono,
+  SectionHeading,
   ToneBadge,
   adminInputClass,
   adminSelectClass,
@@ -368,18 +369,17 @@ export function ExpenseSettlementCard({
 
   return (
     <AdminCard className="@container/settle p-5">
-      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
-        <h2 className="flex items-center gap-1.5 text-[15px] font-bold tracking-[-0.01em] text-adm-ink">
-          Settlement
-          <HelpTip
-            label="What is settlement?"
-            text="How much of this cost has actually been paid out, and what is still owed."
-          />
-        </h2>
-        <HelpWrap text={tone.hint}>
-          <ToneBadge tone={tone.tone}>{tone.label}</ToneBadge>
-        </HelpWrap>
-      </div>
+      <SectionHeading
+        className="mb-4"
+        hint="How much of this cost has actually been paid out, and what is still owed."
+        actions={
+          <HelpWrap text={tone.hint}>
+            <ToneBadge tone={tone.tone}>{tone.label}</ToneBadge>
+          </HelpWrap>
+        }
+      >
+        Settlement
+      </SectionHeading>
 
       {/* Outstanding leads, because that is what anyone opens this to find.
           A voided voucher shows nothing owing: it is not a cost. */}

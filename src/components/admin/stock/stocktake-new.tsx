@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import {
   AdminCard,
   AdminField,
-  AdminPageHeader,
   adminSelectClass,
+  DetailHeader,
   SectionHeading,
 } from "@/components/admin/ui";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { SimpleSelect } from "@/components/ui/simple-select";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
@@ -49,8 +49,11 @@ export function StocktakeNew() {
 
   return (
     <div className="max-w-[640px]">
-      <BackButton href={LIST} label="All stocktakes" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Stocktakes", href: LIST }]}
+        current="New stocktake"
+      />
+      <DetailHeader
         title="New stocktake"
         hint="Count what is physically in a warehouse. Approving corrects the system to match."
         sub="Count what is physically on the floor; the book is compared at submit"

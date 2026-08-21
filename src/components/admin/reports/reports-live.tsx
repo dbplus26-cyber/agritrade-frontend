@@ -17,6 +17,7 @@ import {
   adminLinkClass,
   AdminButton,
   AdminCard,
+  AdminPageHeader,
   Mono,
   ToneBadge,
 } from "@/components/admin/ui";
@@ -462,22 +463,20 @@ export function ReportsLive() {
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            Reports
-          </h1>
-          <p className="mt-0.5 text-[13px] text-adm-muted">
-            Profit, expenses, debtors and performance across the business
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <DateRangeSelector onChange={setWindow} />
-          <AdminButton variant="outline" asChild>
-            <a href={`${EXPORTS}/commodity-profit.csv${windowQs}`}>Profit CSV</a>
-          </AdminButton>
-        </div>
-      </div>
+      <AdminPageHeader
+        title="Reports"
+        sub="Profit, expenses, debtors and performance across the business"
+        actions={
+          <>
+            <DateRangeSelector onChange={setWindow} />
+            <AdminButton variant="outline" asChild>
+              <a href={`${EXPORTS}/commodity-profit.csv${windowQs}`}>
+                Profit CSV
+              </a>
+            </AdminButton>
+          </>
+        }
+      />
 
       <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
         <ReportKpi

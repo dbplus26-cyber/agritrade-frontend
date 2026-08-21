@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Plus } from "lucide-react";
 
 import { HelpTip } from "@/components/admin/help-tip";
 import { CardGridSkeleton } from "@/components/admin/skeletons";
@@ -420,11 +421,6 @@ export function DriverPoliciesScreen() {
   return (
     <div>
       <AdminPageHeader
-        actions={
-          <AdminButton onClick={() => setCreateOpen(true)}>
-            + New policy
-          </AdminButton>
-        }
         hint="When a driver gets paid for a trip: the advance and balance split."
         sub="The haulage terms trips resolve against (trip > driver > default)"
         title="Driver Payment Policies"
@@ -452,14 +448,27 @@ export function DriverPoliciesScreen() {
           onAction={() => setCreateOpen(true)}
         />
       ) : (
-        // Container queries, not viewport ones: the console shell's sidebar
-        // eats ~225px, so xl: would fire while the content area still had room
-        // for two columns and squeeze three into the width of two.
-        <div className="grid gap-4 @2xl/main:grid-cols-2 @5xl/main:grid-cols-3">
-          {policies.map((p) => (
-            <PolicyCard key={p.id} policy={p} />
-          ))}
-        </div>
+        <>
+          {/* No search or filters on this register, so the create action
+              takes the action row a toolbar would otherwise carry. */}
+          <div className="mb-6 flex items-center justify-end gap-1.5 sm:gap-2">
+            <AdminButton
+              onClick={() => setCreateOpen(true)}
+              aria-label="New policy"
+            >
+              <Plus className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden sm:inline">New policy</span>
+            </AdminButton>
+          </div>
+          {/* Container queries, not viewport ones: the console shell's sidebar
+              eats ~225px, so xl: would fire while the content area still had
+              room for two columns and squeeze three into the width of two. */}
+          <div className="grid gap-4 @2xl/main:grid-cols-2 @5xl/main:grid-cols-3">
+            {policies.map((p) => (
+              <PolicyCard key={p.id} policy={p} />
+            ))}
+          </div>
+        </>
       )}
 
       {createOpen ? (

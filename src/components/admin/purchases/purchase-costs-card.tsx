@@ -9,6 +9,7 @@ import {
   AdminCard,
   adminLinkClass,
   Mono,
+  SectionHeading,
   ToneBadge,
 } from "@/components/admin/ui";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -273,26 +274,25 @@ export function PurchaseCostsCard({
 
   return (
     <AdminCard className="@container/costs p-5">
-      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
-        <h2 className="flex min-w-0 items-center gap-1.5 text-[15px] font-bold tracking-[-0.01em] text-adm-ink">
-          <span className="min-w-0">What these goods have cost</span>
-          <HelpTip
-            label="What is this?"
-            text="The grain itself, plus the costs of getting it in. This is the figure a sale is measured against to say what was made on the load."
-          />
-        </h2>
-        {canRecord ? (
-          <AdminButton
-            onClick={() => {
-              setRecording(true);
-            }}
-            size="sm"
-            variant="secondary"
-          >
-            Record a cost
-          </AdminButton>
-        ) : null}
-      </div>
+      <SectionHeading
+        className="mb-4"
+        hint="The grain itself, plus the costs of getting it in. This is the figure a sale is measured against to say what was made on the load."
+        actions={
+          canRecord ? (
+            <AdminButton
+              onClick={() => {
+                setRecording(true);
+              }}
+              size="sm"
+              variant="secondary"
+            >
+              Record a cost
+            </AdminButton>
+          ) : null
+        }
+      >
+        What these goods have cost
+      </SectionHeading>
 
       {/* Said before the figures rather than left for the reader to infer from
           a greyed-out button. A struck-out purchase still shows what was once

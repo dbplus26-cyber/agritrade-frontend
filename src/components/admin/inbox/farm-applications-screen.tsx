@@ -8,6 +8,8 @@ import { ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
 import { AdminCard, AdminPageHeader, Mono } from "@/components/admin/ui";
 import { DateTimeCell } from "@/components/admin/date-cell";
@@ -244,18 +246,29 @@ export function FarmApplicationsScreen() {
               searchPlaceholder="Search name, phone, community…"
               activeCount={activeFilterCount}
               onClear={resetFilters}
-            >
-              <ConsoleLabeledSelect
-                label="Status"
-                value={statusFilter}
-                onChange={(v) => {
-                  setFilter("status", v);
-                }}
-                options={STATUS_OPTIONS}
-                active={statusFilter !== "all"}
-                className="lg:w-[160px]"
-              />
-            </ConsoleFilterBar>
+              totalCount={totalCount}
+              noun="applications"
+              inlineFilter={
+                <ConsoleLabeledSelect
+                  label="Status"
+                  value={statusFilter}
+                  onChange={(v) => {
+                    setFilter("status", v);
+                  }}
+                  options={STATUS_OPTIONS}
+                  active={statusFilter !== "all"}
+                />
+              }
+              chips={
+                <>
+                  {statusFilter !== "all" ? (
+                    <FilterChip onRemove={() => setFilter("status", "all")}>
+                      Status: {labelOf(STATUS_OPTIONS, statusFilter)}
+                    </FilterChip>
+                  ) : null}
+                </>
+              }
+            />
           )}
 
           {isLoading ? (

@@ -5,8 +5,8 @@ import Link from "next/link";
 import {
   AdminButton,
   AdminCard,
-  AdminPageHeader,
   DetailGrid,
+  DetailHeader,
   DetailItem,
   DetailShell,
   SectionHeading,
@@ -17,7 +17,7 @@ import {
   AttachmentList,
   AttachmentTile,
 } from "@/components/admin/attachments";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { FilePicker } from "@/components/ui/FilePicker";
@@ -282,15 +282,18 @@ export function PlotDetail({ id }: { id: string }) {
 
   return (
     <div className="max-w-[1120px]">
-      <BackButton href={LIST} label="All plots" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Plots", href: LIST }]}
+        current="Plot details"
+      />
+      <DetailHeader
         title="Plot details"
         hint="One piece of land you own, and whether it is listed publicly."
-        actions={
-          <span className="flex flex-wrap items-center gap-1.5">
+        badges={
+          <>
             {p.publishToWebsite ? <ToneBadge tone="sky">Live</ToneBadge> : null}
             <PlotStatusBadge status={p.status} />
-          </span>
+          </>
         }
       />
 

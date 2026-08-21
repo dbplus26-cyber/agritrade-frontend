@@ -117,48 +117,41 @@ function BareFrame({
 export function PageHeaderSkeleton({
   action = false,
 }: {
-  /** Registers carry a persistent "+ Add …" button beside the heading. */
+  /** Screens with a control beside the heading (the dashboard's date range). */
   action?: boolean;
 }) {
   return (
     <div
       aria-hidden="true"
-      className="mb-3.5 flex flex-wrap items-end justify-between gap-3"
+      className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between"
     >
       <div>
-        <Skeleton className="h-[22px] w-44" />
-        <Skeleton className="mt-1.5 h-3 w-72 max-w-full" />
+        <Skeleton className="h-8 w-44" />
+        <Skeleton className="mt-1 h-5 w-72 max-w-full" />
       </div>
-      {action ? <Skeleton className="h-8 w-32" /> : null}
+      {action ? <Skeleton className="h-[34px] w-32" /> : null}
     </div>
   );
 }
 
 /**
- * The filter toolbar, in the TWO BANDS the real one uses: search and the page
- * action on top, filters underneath.
- *
- * It has to mirror ConsoleFilterBar's own breakpoints or the page visibly
- * rearranges itself the moment the real toolbar mounts, which is the one thing
- * a skeleton exists to prevent. So the switches here are the same
- * `@min-[680px]/main` container queries, not the `lg:` viewport ones this used
- * to carry: the shell's sidebar eats ~225px, so `lg:` fires while the content
- * area is still narrow and the placeholder would sit in the wide arrangement
- * while the real toolbar sat in the narrow one.
+ * The list toolbar while a register boots: the count row with the page
+ * action, then the search box with the Filters toggle beside it, at the
+ * sizes the real ConsoleFilterBar uses so nothing shifts when it mounts.
+ * The filter panel itself is closed until toggled, so it has no placeholder.
  */
 export function FilterBarSkeleton({ filters = 2 }: { filters?: number }) {
   return (
-    <div aria-hidden="true" className="mb-3 flex flex-col gap-2">
-      <div className="flex flex-col gap-2 @min-[680px]/main:flex-row @min-[680px]/main:items-center">
-        <Skeleton className="h-9 w-full @min-[680px]/main:w-[30%] @min-[680px]/main:min-w-[240px] @min-[680px]/main:flex-none" />
-        <Skeleton className="h-9 w-32 @min-[680px]/main:ml-auto" />
+    <div aria-hidden="true" className="mb-6 space-y-3 sm:space-y-4">
+      <div className="flex items-center justify-between gap-2">
+        <Skeleton className="h-4 w-28" />
+        <Skeleton className="h-[34px] w-9 sm:w-36" />
       </div>
-      {/* Hidden behind the Filters toggle below 680px, exactly as the real
-          filters are, so nothing appears and then vanishes on mount. */}
-      <div className="hidden gap-2 @min-[680px]/main:grid @min-[680px]/main:grid-cols-[repeat(auto-fill,minmax(150px,190px))]">
-        {Array.from({ length: filters }, (_, i) => (
-          <Skeleton className="h-9 w-full" key={i} />
-        ))}
+      <div className="flex gap-2">
+        <Skeleton className="h-10 flex-1 sm:h-11" />
+        {filters > 0 ? (
+          <Skeleton className="h-10 w-10 sm:h-11 sm:w-[104px]" />
+        ) : null}
       </div>
     </div>
   );
@@ -180,7 +173,7 @@ export function RegisterSkeleton({
 }) {
   return (
     <div>
-      <PageHeaderSkeleton action />
+      <PageHeaderSkeleton />
       <FilterBarSkeleton filters={filters} />
       <ConsoleTableSkeleton columns={columns} rows={rows} />
     </div>

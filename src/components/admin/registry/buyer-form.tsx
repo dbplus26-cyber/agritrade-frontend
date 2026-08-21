@@ -8,7 +8,7 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
+  DetailHeader,
   EditableFormActions,
   adminInputClass,
 } from "@/components/admin/ui";
@@ -514,8 +514,9 @@ export function BuyerCreate() {
     <RecordShell
       backHref={LIST}
       backLabel="All buyers"
+      current="Add buyer"
       header={
-        <AdminPageHeader
+        <DetailHeader
           title="Add buyer"
           hint="Someone who buys from you. Their payment terms can be set here too."
           sub="A customer the business sells to"
@@ -547,7 +548,8 @@ export function BuyerEdit({ id }: { id: string }) {
     <RecordShell
       backHref={LIST}
       backLabel="All buyers"
-      header={<AdminPageHeader title={buyer.name} sub="Buyer record" />}
+      current={buyer.name}
+      header={<DetailHeader title={buyer.name} sub="Buyer record" />}
       aside={
         <>
           <RailStatus isActive={buyer.isActive} />

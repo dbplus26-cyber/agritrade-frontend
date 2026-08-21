@@ -6,17 +6,21 @@ import { useRouter } from "next/navigation";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
+import { Plus } from "lucide-react";
 import { ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleDateRange,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
 import {
   AdminButton,
   AdminCard,
   AdminField,
   AdminPageHeader,
+  DetailHeader,
   EditableFormActions,
   adminInputClass,
   adminSelectClass,
@@ -194,21 +198,10 @@ export function DriverTable() {
 
   return (
     <div>
-      <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            Drivers
-          </h1>
-          <p className="mt-0.5 text-[13px] text-adm-muted">
-            The trucking directory shipments pull their driver details from
-          </p>
-        </div>
-        {canManage ? (
-          <AdminButton asChild>
-            <Link href={`${LIST}/new`}>+ Add driver</Link>
-          </AdminButton>
-        ) : null}
-      </div>
+      <AdminPageHeader
+        title="Drivers"
+        sub="The trucking directory shipments pull their driver details from"
+      />
 
       {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
@@ -217,6 +210,37 @@ export function DriverTable() {
           searchPlaceholder="Search driver…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
+          totalCount={totalCount}
+          noun="drivers"
+          action={
+            canManage ? (
+              <AdminButton asChild aria-label="Add driver">
+                <Link href={`${LIST}/new`}>
+                  <Plus className="h-4 w-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">Add driver</span>
+                </Link>
+              </AdminButton>
+            ) : null
+          }
+          chips={
+            <>
+              {statusFilter !== "all" ? (
+                <FilterChip onRemove={() => setFilter("status", "all")}>
+                  Status: {labelOf(STATUS_FILTER_OPTIONS, statusFilter)}
+                </FilterChip>
+              ) : null}
+              {from ? (
+                <FilterChip onRemove={() => setFilter("from", "")}>
+                  Added from: {from}
+                </FilterChip>
+              ) : null}
+              {to ? (
+                <FilterChip onRemove={() => setFilter("to", "")}>
+                  Added to: {to}
+                </FilterChip>
+              ) : null}
+            </>
+          }
         >
           <ConsoleLabeledSelect
             label="Status"
@@ -224,7 +248,6 @@ export function DriverTable() {
             onChange={(v) => setFilter("status", v)}
             options={STATUS_FILTER_OPTIONS}
             active={statusFilter !== "all"}
-            className="lg:w-[150px]"
           />
           <ConsoleDateRange
             fromLabel="Added from"
@@ -711,9 +734,13 @@ export function DriverCreate() {
     <RecordShell
       backHref={LIST}
       backLabel="All drivers"
+      current="Add driver"
       header={
-        <AdminPageHeader title="Add driver"
-        hint="A haulier who moves your goods. Their payment terms can be set here." sub="A trucker the shipments module can pick from" />
+        <DetailHeader
+          title="Add driver"
+          hint="A haulier who moves your goods. Their payment terms can be set here."
+          sub="A trucker the shipments module can pick from"
+        />
       }
     >
       <DriverFormFields />
@@ -742,9 +769,8 @@ export function DriverEdit({ id }: { id: string }) {
     <RecordShell
       backHref={LIST}
       backLabel="All drivers"
-      header={
-        <AdminPageHeader title={driver.name} sub="Driver record" />
-      }
+      current={driver.name}
+      header={<DetailHeader title={driver.name} sub="Driver record" />}
       aside={
         <>
           <RailStatus isActive={driver.isActive} />

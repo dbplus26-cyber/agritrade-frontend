@@ -8,10 +8,10 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
+  DetailHeader,
   adminInputClass,
 } from "@/components/admin/ui";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { Input } from "@/components/ui/input";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
@@ -132,8 +132,11 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
 
   return (
     <div className="max-w-[640px]">
-      <BackButton href={LIST} label="All plots" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Plots", href: LIST }]}
+        current={plot ? "Edit plot" : "Add plot"}
+      />
+      <DetailHeader
         title={plot ? "Edit plot" : "Add plot"}
         sub={
           plot

@@ -4,11 +4,14 @@ import { useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Plus } from "lucide-react";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleDateRange,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
 import { Absent, columnMeta } from "@/components/admin/registry/registry-bits";
 import { TextCell } from "@/components/admin/table-cells";
@@ -18,6 +21,7 @@ import {
   AdminCard,
   AdminField,
   adminInputClass,
+  AdminPageHeader,
   Mono,
 } from "@/components/admin/ui";
 import {
@@ -283,30 +287,59 @@ export function TransfersScreen() {
     // Without this the widest table stretched the PAGE instead of scrolling
     // inside its own box, so a phone got a sideways-scrolling page.
     <div className="min-w-0">
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            Transfers
-          </h1>
-          <p className="mt-0.5 text-[13px] text-adm-muted">
-            Stock moved between warehouses - each posts an out and an in on the
-            ledger
-          </p>
-        </div>
-        {canManage ? (
-              <AdminButton onClick={() => setDialogOpen(true)}>
-                + New transfer
-              </AdminButton>
-            ) : undefined}
-      </div>
+      <AdminPageHeader
+        title="Transfers"
+        sub="Stock moved between warehouses - each posts an out and an in on the ledger"
+      />
 
       {pristine ? null : (
         <ConsoleFilterBar
-          search=""
-          onSearch={() => undefined}
           hideSearch
           activeCount={activeFilterCount}
           onClear={resetFilters}
+          totalCount={totalCount}
+          noun="transfers"
+          action={
+            canManage ? (
+              <AdminButton
+                onClick={() => setDialogOpen(true)}
+                aria-label="New transfer"
+              >
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">New transfer</span>
+              </AdminButton>
+            ) : null
+          }
+          panelClassName="sm:grid-cols-2 lg:grid-cols-6"
+          chips={
+            <>
+              {filters.fromWh !== "all" ? (
+                <FilterChip onRemove={() => setFilter("fromWh", "all")}>
+                  From warehouse: {labelOf(fromOptions, filters.fromWh)}
+                </FilterChip>
+              ) : null}
+              {filters.toWh !== "all" ? (
+                <FilterChip onRemove={() => setFilter("toWh", "all")}>
+                  To warehouse: {labelOf(toOptions, filters.toWh)}
+                </FilterChip>
+              ) : null}
+              {filters.commodity !== "all" ? (
+                <FilterChip onRemove={() => setFilter("commodity", "all")}>
+                  Commodity: {labelOf(commodityOptions, filters.commodity)}
+                </FilterChip>
+              ) : null}
+              {filters.from ? (
+                <FilterChip onRemove={() => setFilter("from", "")}>
+                  From: {filters.from}
+                </FilterChip>
+              ) : null}
+              {filters.to ? (
+                <FilterChip onRemove={() => setFilter("to", "")}>
+                  To: {filters.to}
+                </FilterChip>
+              ) : null}
+            </>
+          }
         >
           <ConsoleLabeledSelect
             label="From warehouse"
@@ -314,7 +347,6 @@ export function TransfersScreen() {
             onChange={(v) => setFilter("fromWh", v)}
             options={fromOptions}
             active={filters.fromWh !== "all"}
-            className="lg:w-[170px]"
           />
           <ConsoleLabeledSelect
             label="To warehouse"
@@ -322,7 +354,6 @@ export function TransfersScreen() {
             onChange={(v) => setFilter("toWh", v)}
             options={toOptions}
             active={filters.toWh !== "all"}
-            className="lg:w-[170px]"
           />
           <ConsoleLabeledSelect
             label="Commodity"
@@ -330,14 +361,12 @@ export function TransfersScreen() {
             onChange={(v) => setFilter("commodity", v)}
             options={commodityOptions}
             active={filters.commodity !== "all"}
-            className="lg:w-[170px]"
           />
           <ConsoleDateRange
             from={filters.from}
             to={filters.to}
             onFromChange={(v) => setFilter("from", v)}
             onToChange={(v) => setFilter("to", v)}
-            fieldClassName="lg:w-[150px]"
           />
         </ConsoleFilterBar>
       )}
@@ -355,7 +384,7 @@ export function TransfersScreen() {
           noun="transfers"
           description="Stock moved between warehouses is recorded here."
           filteredDescription="Nothing matches this filter."
-          actionLabel={canManage ? "+ New transfer" : undefined}
+          actionLabel={canManage ? "New transfer" : undefined}
           onAction={canManage ? () => setDialogOpen(true) : undefined}
           onClear={resetFilters}
         />

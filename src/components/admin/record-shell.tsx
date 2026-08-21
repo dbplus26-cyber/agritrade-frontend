@@ -1,7 +1,11 @@
 "use client";
 
 import { AdminCard, DetailShell, ToneBadge } from "@/components/admin/ui";
-import { BackButton } from "@/components/ui/BackButton";
+import {
+  DASHBOARD_CRUMB,
+  DetailNav,
+  type Crumb,
+} from "@/components/admin/detail-nav";
 import { cn } from "@/lib/utils";
 
 /**
@@ -19,24 +23,47 @@ import { cn } from "@/lib/utils";
  * Below xl the rail stacks on top, so status and actions stay above the fold
  * on a phone.
  */
+/** "All buyers" / "Back to buyers" -> "Buyers": the register's name as a crumb. */
+function crumbLabel(backLabel: string): string {
+  const bare = backLabel.replace(/^(all|back to)\s+/i, "").trim();
+  return bare ? bare.charAt(0).toUpperCase() + bare.slice(1) : backLabel;
+}
+
 export function RecordShell({
   aside,
   backHref,
   backLabel,
+  crumbs,
+  current,
   children,
   header,
 }: {
   /** Status, timestamps, lifecycle actions - the record's margin notes. */
   aside?: React.ReactNode;
+  /** The parent register: the phone back target and the parent crumb. */
   backHref: string;
   backLabel: string;
+  /** Ancestor crumbs; defaults to Dashboard › the parent register. */
+  crumbs?: Crumb[];
+  /** The current page's crumb label ("Expense details", "New buyer"). */
+  current?: string;
   /** The record's substance. */
   children: React.ReactNode;
   header: React.ReactNode;
 }) {
   return (
     <div className="min-w-0">
-      <BackButton className="mb-2" href={backHref} label={backLabel} />
+      <DetailNav
+        crumbs={
+          crumbs ?? [
+            DASHBOARD_CRUMB,
+            { label: crumbLabel(backLabel), href: backHref },
+          ]
+        }
+        current={current}
+        backHref={backHref}
+        backLabel={backLabel}
+      />
       {header}
       {aside ? (
         <DetailShell

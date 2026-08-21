@@ -7,15 +7,19 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
+import { Plus } from "lucide-react";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
 import {
   AdminButton,
   AdminCard,
   AdminField,
   AdminPageHeader,
+  DetailHeader,
   EditableFormActions,
   adminInputClass,
 } from "@/components/admin/ui";
@@ -163,37 +167,47 @@ export function LandSellerTable() {
 
   return (
     <div>
-      <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            Land sellers
-          </h1>
-          <p className="mt-0.5 text-[13px] text-adm-muted">
-            People and companies the business buys land from
-          </p>
-        </div>
-        {<AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ Add seller</Link>
-            </AdminButton>}
-      </div>
+      <AdminPageHeader
+        title="Land sellers"
+        sub="People and companies the business buys land from"
+      />
 
       {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
           search={searchInput}
           onSearch={setSearch}
-          searchPlaceholder="Search seller..."
+          searchPlaceholder="Search seller…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
-        >
-          <ConsoleLabeledSelect
-            label="Status"
-            value={statusFilter}
-            onChange={(v) => setFilter("status", v)}
-            options={STATUS_FILTER_OPTIONS}
-            active={statusFilter !== "all"}
-            className="lg:w-[150px]"
-          />
-        </ConsoleFilterBar>
+          totalCount={totalCount}
+          noun="sellers"
+          action={
+            <AdminButton asChild aria-label="Add seller">
+              <Link href={`${LIST}/new`}>
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Add seller</span>
+              </Link>
+            </AdminButton>
+          }
+          inlineFilter={
+            <ConsoleLabeledSelect
+              label="Status"
+              value={statusFilter}
+              onChange={(v) => setFilter("status", v)}
+              options={STATUS_FILTER_OPTIONS}
+              active={statusFilter !== "all"}
+            />
+          }
+          chips={
+            <>
+              {statusFilter !== "all" ? (
+                <FilterChip onRemove={() => setFilter("status", "all")}>
+                  Status: {labelOf(STATUS_FILTER_OPTIONS, statusFilter)}
+                </FilterChip>
+              ) : null}
+            </>
+          }
+        />
       )}
 
       {isLoading ? (
@@ -460,8 +474,9 @@ export function LandSellerCreate() {
     <RecordShell
       backHref={LIST}
       backLabel="All sellers"
+      current="Add seller"
       header={
-        <AdminPageHeader
+        <DetailHeader
           title="Add seller"
           hint="Someone you buy land from."
           sub="A landowner the business acquires plots from"
@@ -493,7 +508,8 @@ export function LandSellerEdit({ id }: { id: string }) {
     <RecordShell
       backHref={LIST}
       backLabel="All sellers"
-      header={<AdminPageHeader title={seller.name} sub="Seller record" />}
+      current={seller.name}
+      header={<DetailHeader title={seller.name} sub="Seller record" />}
       aside={
         <>
           <RailStatus isActive={seller.isActive} />

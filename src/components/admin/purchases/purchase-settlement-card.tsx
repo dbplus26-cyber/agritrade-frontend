@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { ReverseReasonDialog } from "@/components/admin/drivers/driver-settlement-dialogs";
-import { HelpTip, HelpWrap } from "@/components/admin/help-tip";
+import { HelpWrap } from "@/components/admin/help-tip";
 import { PaidThroughSystemField } from "@/components/admin/paid-through-system-field";
 import { PaymentAccountField } from "@/components/admin/payment-account-field";
 import {
@@ -16,6 +16,7 @@ import {
   adminInputClass,
   adminSelectClass,
   Mono,
+  SectionHeading,
   ToneBadge,
 } from "@/components/admin/ui";
 import { DateInput } from "@/components/ui/date-input";
@@ -366,18 +367,17 @@ export function PurchaseSettlementCard({
 
   return (
     <AdminCard className="@container/settle p-5">
-      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
-        <h2 className="flex items-center gap-1.5 text-[15px] font-bold tracking-[-0.01em] text-adm-ink">
-          Payment
-          <HelpTip
-            label="What is this?"
-            text="What has actually been paid for these goods, and what the supplier is still owed. Recording a purchase does not move money - paying for it does."
-          />
-        </h2>
-        <HelpWrap text={tone.hint}>
-          <ToneBadge tone={tone.tone}>{tone.label}</ToneBadge>
-        </HelpWrap>
-      </div>
+      <SectionHeading
+        className="mb-4"
+        hint="What has actually been paid for these goods, and what the supplier is still owed. Recording a purchase does not move money - paying for it does."
+        actions={
+          <HelpWrap text={tone.hint}>
+            <ToneBadge tone={tone.tone}>{tone.label}</ToneBadge>
+          </HelpWrap>
+        }
+      >
+        Payment
+      </SectionHeading>
 
       {/* Still owed leads, because that is what anyone opens this to find. */}
       {isVoided ? (

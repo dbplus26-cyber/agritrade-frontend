@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { useState } from "react";
 
+import { DASHBOARD_CRUMB } from "@/components/admin/detail-nav";
 import { RailCard, RecordShell } from "@/components/admin/record-shell";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import {
   adminLinkClass,
   AdminButton,
   AdminCard,
-  AdminPageHeader,
+  DetailHeader,
   Mono,
   PdfLink,
   SectionHeading,
@@ -68,12 +69,14 @@ export function ExpenseDetail({ id }: { id: string }) {
     <RecordShell
       backHref={LIST}
       backLabel="All expenses"
+      crumbs={[DASHBOARD_CRUMB, { label: "Expenses", href: LIST }]}
+      current="Expense details"
       header={
-        <AdminPageHeader
+        <DetailHeader
           title="Expense details"
           hint="One cost: what it was for, and what has been paid against it."
           actions={
-            <div className="flex flex-wrap items-center gap-2">
+            <>
               <PdfLink
                 href={`${env.SERVER_URI}/api/v1/admin/receipts/expense/${expense.id}.pdf`}
               >
@@ -87,7 +90,7 @@ export function ExpenseDetail({ id }: { id: string }) {
                   Edit
                 </AdminButton>
               ) : null}
-            </div>
+            </>
           }
         />
       }

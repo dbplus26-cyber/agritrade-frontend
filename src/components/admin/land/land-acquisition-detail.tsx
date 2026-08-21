@@ -9,7 +9,7 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
+  DetailHeader,
   DetailRow,
   DetailShell,
   Mono,
@@ -18,7 +18,7 @@ import {
   adminLinkClass,
   adminSelectClass,
 } from "@/components/admin/ui";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { DateOnlyCell } from "@/components/admin/date-cell";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -420,25 +420,26 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
 
   return (
     <div className="max-w-[1120px]">
-      <BackButton href={LIST} label="All acquisitions" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Acquisitions", href: LIST }]}
+        current="Acquisition details"
+      />
+      <DetailHeader
         title="Acquisition details"
         hint="One piece of land being bought: the seller, the agreed price and what has been paid."
+        badges={<LandAcquisitionStatusBadge status={a.status} />}
         actions={
-          <span className="flex flex-wrap items-center gap-1.5">
-            <LandAcquisitionStatusBadge status={a.status} />
-            {/* The whole record on paper: seller, plot facts and every
-                payment made so far, PAID-stamped once settled. */}
-            <AdminButton variant="outline" asChild>
-              <a
-                href={receiptPdfUrl("land-acquisition", a.id)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View PDF
-              </a>
-            </AdminButton>
-          </span>
+          /* The whole record on paper: seller, plot facts and every
+             payment made so far, PAID-stamped once settled. */
+          <AdminButton variant="outline" asChild>
+            <a
+              href={receiptPdfUrl("land-acquisition", a.id)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View PDF
+            </a>
+          </AdminButton>
         }
       />
 

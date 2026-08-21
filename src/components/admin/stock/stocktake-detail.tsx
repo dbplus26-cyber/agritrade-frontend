@@ -6,15 +6,15 @@ import {
   adminLinkClass,
   AdminButton,
   AdminCard,
-  AdminPageHeader,
   DetailGrid,
+  DetailHeader,
   DetailItem,
   Mono,
   SectionHeading,
 } from "@/components/admin/ui";
 import { Absent } from "@/components/admin/registry/registry-bits";
 import { HelpTip } from "@/components/admin/help-tip";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useAuthRole } from "@/hooks/use-auth-role";
@@ -256,11 +256,14 @@ export function StocktakeDetail({ id }: { id: string }) {
 
   return (
     <div className="max-w-[1120px]">
-      <BackButton href={LIST} label="All stocktakes" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Stocktakes", href: LIST }]}
+        current="Stocktake details"
+      />
+      <DetailHeader
         title="Stocktake details"
         hint="One physical count, and the difference from what the system expected."
-        actions={<StocktakeStatusBadge status={st.status} />}
+        badges={<StocktakeStatusBadge status={st.status} />}
       />
 
       {editing && st.status === StocktakeStatus.DRAFT ? (

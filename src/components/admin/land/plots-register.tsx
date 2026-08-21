@@ -3,11 +3,19 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
-import { AdminButton, Mono, ToneBadge } from "@/components/admin/ui";
+import {
+  AdminButton,
+  AdminPageHeader,
+  Mono,
+  ToneBadge,
+} from "@/components/admin/ui";
 import { RecordCardGridSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -56,6 +64,7 @@ export function PlotsRegister() {
     useGetPlotsQuery(queryArgs);
   const plots = data?.data ?? [];
   const meta = data?.meta;
+  const total = meta?.total ?? 0;
   const activeFilterCount = status !== "all" ? 1 : 0;
   const filtered = Boolean(search) || activeFilterCount > 0;
   // A register with nothing on file and no filters narrowing it shows ONLY
@@ -64,20 +73,10 @@ export function PlotsRegister() {
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            Land plots
-          </h1>
-          <p className="mt-0.5 text-[13px] text-adm-muted">
-            Every plot the business holds - photos, title documents and what is
-            published to the website
-          </p>
-        </div>
-        {<AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ Add plot</Link>
-            </AdminButton>}
-      </div>
+      <AdminPageHeader
+        title="Land plots"
+        sub="Every plot the business holds - photos, title documents and what is published to the website"
+      />
 
       {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
@@ -86,16 +85,35 @@ export function PlotsRegister() {
           searchPlaceholder="Search reference, location…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
-        >
-          <ConsoleLabeledSelect
-            label="Status"
-            value={status}
-            onChange={(v) => setFilter("status", v)}
-            options={PLOT_STATUS_FILTER_OPTIONS}
-            active={status !== "all"}
-            className="lg:w-[160px]"
-          />
-        </ConsoleFilterBar>
+          totalCount={total}
+          noun="plots"
+          action={
+            <AdminButton asChild aria-label="Add plot">
+              <Link href={`${LIST}/new`}>
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Add plot</span>
+              </Link>
+            </AdminButton>
+          }
+          inlineFilter={
+            <ConsoleLabeledSelect
+              label="Status"
+              value={status}
+              onChange={(v) => setFilter("status", v)}
+              options={PLOT_STATUS_FILTER_OPTIONS}
+              active={status !== "all"}
+            />
+          }
+          chips={
+            <>
+              {status !== "all" ? (
+                <FilterChip onRemove={() => setFilter("status", "all")}>
+                  Status: {labelOf(PLOT_STATUS_FILTER_OPTIONS, status)}
+                </FilterChip>
+              ) : null}
+            </>
+          }
+        />
       )}
 
       {isLoading ? (

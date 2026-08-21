@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import {
   AdminButton,
   AdminCard,
-  AdminPageHeader,
   DetailGrid,
+  DetailHeader,
   DetailItem,
   DetailShell,
   Mono,
@@ -16,7 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 import { HelpTip } from "@/components/admin/help-tip";
 import { Money } from "@/components/admin/trading/sale-bits";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { ConsoleTableSkeleton, DetailSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -108,14 +108,17 @@ export function SeasonDetail({ id }: { id: string }) {
 
   return (
     <div className="max-w-[1120px]">
-      <BackButton href={LIST} label="All seasons" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Seasons", href: LIST }]}
+        current="Season details"
+      />
+      <DetailHeader
         title="Season details"
         hint="One planting cycle. Grants and repayments are recorded against it."
         sub={`${formatFarmDate(s.startsOn)}${
           s.endsOn ? ` - ${formatFarmDate(s.endsOn)}` : ""
         }`}
-        actions={<ActiveBadge active={s.isActive} />}
+        badges={<ActiveBadge active={s.isActive} />}
       />
 
       {/* KPI strip - full width above the shell */}

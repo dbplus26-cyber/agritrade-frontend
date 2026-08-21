@@ -6,11 +6,18 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { useRouter } from "next/navigation";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
+import { Plus } from "lucide-react";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
-import { AdminButton, AdminCard } from "@/components/admin/ui";
+import {
+  AdminButton,
+  AdminCard,
+  AdminPageHeader,
+} from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -281,19 +288,7 @@ export function UsersTable() {
 
   return (
     <div>
-      <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            Users
-          </h1>
-          <p className="mt-0.5 text-[13px] text-adm-muted">
-            Staff accounts and permissions
-          </p>
-        </div>
-        <AdminButton asChild>
-          <Link href="/admin/users/new">+ Add user</Link>
-        </AdminButton>
-      </div>
+      <AdminPageHeader title="Users" sub="Staff accounts and permissions" />
 
       {/* dms rule: a pristine register or a failed plain load hides the
           toolbar - but when the user's own search/filters might be the cause,
@@ -305,6 +300,31 @@ export function UsersTable() {
         searchPlaceholder="Search user…"
         activeCount={activeFilterCount}
         onClear={resetFilters}
+        totalCount={totalCount}
+        noun="users"
+        action={
+          <AdminButton asChild aria-label="Add user">
+            <Link href="/admin/users/new">
+              <Plus className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Add user</span>
+            </Link>
+          </AdminButton>
+        }
+        panelClassName="sm:grid-cols-2"
+        chips={
+          <>
+            {roleFilter !== "all" ? (
+              <FilterChip onRemove={() => setFilter("role", "all")}>
+                Role: {labelOf(ROLE_FILTER_OPTIONS, roleFilter)}
+              </FilterChip>
+            ) : null}
+            {statusFilter !== "all" ? (
+              <FilterChip onRemove={() => setFilter("status", "all")}>
+                Status: {labelOf(STATUS_FILTER_OPTIONS, statusFilter)}
+              </FilterChip>
+            ) : null}
+          </>
+        }
       >
         <ConsoleLabeledSelect
           label="Role"
@@ -312,7 +332,6 @@ export function UsersTable() {
           onChange={(v) => setFilter("role", v)}
           options={ROLE_FILTER_OPTIONS}
           active={roleFilter !== "all"}
-          className="lg:w-[150px]"
         />
         <ConsoleLabeledSelect
           label="Status"
@@ -320,7 +339,6 @@ export function UsersTable() {
           onChange={(v) => setFilter("status", v)}
           options={STATUS_FILTER_OPTIONS}
           active={statusFilter !== "all"}
-          className="lg:w-[150px]"
         />
       </ConsoleFilterBar>
       )}

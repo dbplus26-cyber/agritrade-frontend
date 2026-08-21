@@ -8,10 +8,10 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
   adminInputClass,
+  DetailHeader,
 } from "@/components/admin/ui";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { Input } from "@/components/ui/input";
 import { DateInput } from "@/components/ui/date-input";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -133,8 +133,11 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
 
   return (
     <div className="max-w-[640px]">
-      <BackButton href={LIST} label="All farmers" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Farmers", href: LIST }]}
+        current={farmer ? "Edit farmer" : "Add farmer"}
+      />
+      <DetailHeader
         title={farmer ? "Edit farmer" : "Add farmer"}
         sub="The outgrower's identity, community and guarantors - every input grant is booked against this record"
       />

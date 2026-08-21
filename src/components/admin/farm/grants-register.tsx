@@ -5,14 +5,22 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
+import { CalendarClock, Plus } from "lucide-react";
 import {
   ConsoleDateRange,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { TextCell, TitleCell } from "@/components/admin/table-cells";
-import { AdminButton, AdminCard, Mono } from "@/components/admin/ui";
+import {
+  AdminButton,
+  AdminCard,
+  AdminPageHeader,
+  Mono,
+} from "@/components/admin/ui";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
@@ -182,29 +190,53 @@ export function GrantsRegister() {
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            Input grants
-          </h1>
-          <p className="mt-0.5 text-[13px] text-adm-muted">
-            Inputs given to farmers, carrying the cash value owed
-          </p>
-        </div>
-        {<span className="flex items-center gap-2">
-              <AdminButton asChild variant="ghost">
-                <Link href={`${LIST}/aging`}>Aging</Link>
-              </AdminButton>
-              <AdminButton asChild>
-                <Link href={`${LIST}/new`}>+ New grant</Link>
-              </AdminButton>
-            </span>}
-      </div>
+      <AdminPageHeader
+        title="Input grants"
+        sub="Inputs given to farmers, carrying the cash value owed"
+      />
 
       {pristine || (isError && activeFilterCount === 0) ? null : (
         <ConsoleFilterBar
+          hideSearch
           activeCount={activeFilterCount}
           onClear={resetFilters}
+          totalCount={totalCount}
+          noun="grants"
+          action={
+            <>
+              <AdminButton asChild variant="ghost" aria-label="Aging">
+                <Link href={`${LIST}/aging`}>
+                  <CalendarClock className="h-4 w-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">Aging</span>
+                </Link>
+              </AdminButton>
+              <AdminButton asChild aria-label="New grant">
+                <Link href={`${LIST}/new`}>
+                  <Plus className="h-4 w-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">New grant</span>
+                </Link>
+              </AdminButton>
+            </>
+          }
+          chips={
+            <>
+              {season !== "all" ? (
+                <FilterChip onRemove={() => setFilter("season", "all")}>
+                  Season: {labelOf(seasonOptions, season)}
+                </FilterChip>
+              ) : null}
+              {from ? (
+                <FilterChip onRemove={() => setFilter("from", "")}>
+                  From: {from}
+                </FilterChip>
+              ) : null}
+              {to ? (
+                <FilterChip onRemove={() => setFilter("to", "")}>
+                  To: {to}
+                </FilterChip>
+              ) : null}
+            </>
+          }
         >
           <ConsoleLabeledSelect
             label="Season"
@@ -212,14 +244,12 @@ export function GrantsRegister() {
             onChange={(v) => setFilter("season", v)}
             options={seasonOptions}
             active={season !== "all"}
-            className="lg:w-[200px]"
           />
           <ConsoleDateRange
             from={from}
             to={to}
             onFromChange={(v) => setFilter("from", v)}
             onToChange={(v) => setFilter("to", v)}
-            fieldClassName="lg:w-[150px]"
           />
         </ConsoleFilterBar>
       )}

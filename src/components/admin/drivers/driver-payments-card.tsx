@@ -3,7 +3,13 @@
 import { useState } from "react";
 
 import { HelpTip, HelpWrap } from "@/components/admin/help-tip";
-import { AdminCard, Mono, PdfLink, ToneBadge } from "@/components/admin/ui";
+import {
+  AdminCard,
+  Mono,
+  PdfLink,
+  SectionHeading,
+  ToneBadge,
+} from "@/components/admin/ui";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { ListPagination } from "@/components/ui/ListPagination";
@@ -153,18 +159,17 @@ export function DriverPaymentsCard({ driverId }: { driverId: string }) {
     // viewport does not describe, so every breakpoint inside it measures the
     // card rather than the window.
     <AdminCard className="@container/driverpay p-5">
-      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h2 className="flex items-center gap-1.5 text-[15px] font-bold tracking-[-0.01em] text-adm-ink">
-          Payments to this driver
-          <HelpTip
-            label="What is this?"
-            text="Every payment made to this driver, across every trip, with the receipt for each one."
-          />
-        </h2>
-        <p className="text-[12.5px] text-adm-muted">
-          {meta.total === 1 ? "1 payment" : `${String(meta.total)} payments`}
-        </p>
-      </div>
+      <SectionHeading
+        className="mb-4"
+        hint="Every payment made to this driver, across every trip, with the receipt for each one."
+        actions={
+          <p className="text-[12.5px] text-adm-muted">
+            {meta.total === 1 ? "1 payment" : `${String(meta.total)} payments`}
+          </p>
+        }
+      >
+        Payments to this driver
+      </SectionHeading>
 
       <div className="min-w-0">
         <div className="flex items-center gap-1.5">

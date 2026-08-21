@@ -4,10 +4,19 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AdminButton, AdminCard, AdminField, adminInputClass } from "@/components/admin/ui";
+import { Plus } from "lucide-react";
+import {
+  AdminButton,
+  AdminCard,
+  AdminField,
+  adminInputClass,
+  AdminPageHeader,
+} from "@/components/admin/ui";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
 import { HelpTip } from "@/components/admin/help-tip";
 import {
@@ -41,6 +50,11 @@ import { Kg } from "./stock-bits";
 import { StockMovements } from "./stock-movements";
 
 type Section = "balances" | "movements";
+
+const CLEARED_LINES_OPTIONS = [
+  { value: "hidden", label: "Hidden" },
+  { value: "shown", label: "Shown" },
+] as const;
 
 /** One column group of the balances matrix - a warehouse and its balances. */
 interface MatrixWarehouse {
@@ -171,24 +185,30 @@ export function StockView() {
     matrix.warehouses.length === 0 &&
     !balancesFiltered;
 
+  // The page's one action. It lives in the toolbar of whichever section is
+  // showing; where there is no toolbar to hold it (the pristine empty state)
+  // it gets its own row so it stays reachable.
+  const adjustButton = canAdjust ? (
+    <AdminButton
+      onClick={() => setAdjustOpen(true)}
+      aria-label="Request adjustment"
+    >
+      <Plus className="h-4 w-4" aria-hidden="true" />
+      <span className="hidden sm:inline">Request adjustment</span>
+    </AdminButton>
+  ) : null;
+  const adjustRow = adjustButton ? (
+    <div className="mb-6 flex items-center justify-end gap-1.5 sm:gap-2">
+      {adjustButton}
+    </div>
+  ) : null;
+
   return (
     <div>
-      <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            Stock
-          </h1>
-          <p className="mt-0.5 text-[13px] text-adm-muted">
-            On hand by warehouse - always the sum of the ledger, never a
-            stored number
-          </p>
-        </div>
-        {canAdjust ? (
-          <AdminButton onClick={() => setAdjustOpen(true)}>
-            + Request adjustment
-          </AdminButton>
-        ) : null}
-      </div>
+      <AdminPageHeader
+        title="Stock"
+        sub="On hand by warehouse - always the sum of the ledger, never a stored number"
+      />
 
       {/* Section toggle - balances / movements. */}
       <div className="mb-4 flex gap-1.5">
@@ -219,6 +239,7 @@ export function StockView() {
         <StockMovements
           warehouseOptions={warehouseOptions}
           commodityOptions={commodityOptions}
+          action={adjustButton}
         />
       ) : (
         <>
@@ -268,10 +289,10 @@ export function StockView() {
             </div>
           ) : null}
 
-          {balancesPristine ? null : (
+          {balancesPristine ? (
+            adjustRow
+          ) : (
           <ConsoleFilterBar
-            search=""
-            onSearch={() => undefined}
             hideSearch
             activeCount={
               (warehouseId !== "all" ? 1 : 0) +
@@ -283,6 +304,29 @@ export function StockView() {
               setCommodityId("all");
               setIncludeZero(false);
             }}
+            totalCount={balances.length}
+            noun="stock lines"
+            action={adjustButton}
+            chips={
+              <>
+                {warehouseId !== "all" ? (
+                  <FilterChip onRemove={() => setWarehouseId("all")}>
+                    Warehouse: {labelOf(warehouseOptions, warehouseId)}
+                  </FilterChip>
+                ) : null}
+                {commodityId !== "all" ? (
+                  <FilterChip onRemove={() => setCommodityId("all")}>
+                    Commodity: {labelOf(commodityOptions, commodityId)}
+                  </FilterChip>
+                ) : null}
+                {includeZero ? (
+                  <FilterChip onRemove={() => setIncludeZero(false)}>
+                    Cleared lines: Shown
+                    {clearedCount === 0 ? " (none)" : ` (${clearedCount})`}
+                  </FilterChip>
+                ) : null}
+              </>
+            }
           >
             <ConsoleLabeledSelect
               label="Warehouse"
@@ -298,37 +342,20 @@ export function StockView() {
               options={commodityOptions}
               active={commodityId !== "all"}
             />
-            {/* Kept, but named for what it does. A warehouse/commodity pair
-                that has been fully loaded out drops to a zero balance and the
-                API omits it, so an emptied warehouse reads as "nothing on
-                hand" - indistinguishable from one that never held the goods.
-                Turning this on brings those cleared lines back, which is how
-                the office proves a store was emptied rather than mislaid.
-                "Include empty" said none of that. */}
-            <label
-              title="Show warehouse/commodity lines that have been emptied to a zero balance"
-              className={cn(
-                "flex h-8 cursor-pointer items-center gap-2 rounded-none border bg-adm-card px-2.5 text-[13px] whitespace-nowrap transition-colors select-none",
-                includeZero
-                  ? "border-console/60 text-adm-ink"
-                  : "border-adm-line text-adm-muted",
-              )}
-            >
-              <input
-                type="checkbox"
-                checked={includeZero}
-                onChange={(e) => setIncludeZero(e.target.checked)}
-                className="h-3.5 w-3.5 accent-[var(--color-forest)]"
-              />
-              Show cleared lines
-              {/* The count is the whole point of showing it. Ticked with
-                  nothing to show, the toggle looked broken; now it says so. */}
-              {includeZero ? (
-                <span className="text-adm-faint">
-                  {clearedCount === 0 ? "none" : clearedCount}
-                </span>
-              ) : null}
-            </label>
+            {/* A warehouse/commodity pair that has been fully loaded out
+                drops to a zero balance and the API omits it, so an emptied
+                warehouse reads as "nothing on hand" - indistinguishable from
+                one that never held the goods. Showing cleared lines brings
+                them back, which is how the office proves a store was emptied
+                rather than mislaid. */}
+            <ConsoleLabeledSelect
+              label="Cleared lines"
+              hint="Show warehouse/commodity lines that have been emptied to a zero balance"
+              value={includeZero ? "shown" : "hidden"}
+              onChange={(v) => setIncludeZero(v === "shown")}
+              options={CLEARED_LINES_OPTIONS}
+              active={includeZero}
+            />
           </ConsoleFilterBar>
           )}
 

@@ -5,15 +5,24 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
+import { Plus } from "lucide-react";
 import {
   ConsoleDateRange,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
 import { HelpWrap } from "@/components/admin/help-tip";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { TitleCell } from "@/components/admin/table-cells";
-import { AdminButton, AdminCard, Mono, ToneBadge } from "@/components/admin/ui";
+import {
+  AdminButton,
+  AdminCard,
+  AdminPageHeader,
+  Mono,
+  ToneBadge,
+} from "@/components/admin/ui";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
@@ -173,24 +182,45 @@ export function RepaymentsRegister() {
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            Repayments
-          </h1>
-          <p className="mt-0.5 text-[13px] text-adm-muted">
-            What farmers have paid back on their grants, in produce or in cash
-          </p>
-        </div>
-        {<AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ Record repayment</Link>
-            </AdminButton>}
-      </div>
+      <AdminPageHeader
+        title="Repayments"
+        sub="What farmers have paid back on their grants, in produce or in cash"
+      />
 
       {pristine || (isError && activeFilterCount === 0) ? null : (
         <ConsoleFilterBar
+          hideSearch
           activeCount={activeFilterCount}
           onClear={resetFilters}
+          totalCount={totalCount}
+          noun="repayments"
+          action={
+            <AdminButton asChild aria-label="Record repayment">
+              <Link href={`${LIST}/new`}>
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Record repayment</span>
+              </Link>
+            </AdminButton>
+          }
+          chips={
+            <>
+              {season !== "all" ? (
+                <FilterChip onRemove={() => setFilter("season", "all")}>
+                  Season: {labelOf(seasonOptions, season)}
+                </FilterChip>
+              ) : null}
+              {from ? (
+                <FilterChip onRemove={() => setFilter("from", "")}>
+                  From: {from}
+                </FilterChip>
+              ) : null}
+              {to ? (
+                <FilterChip onRemove={() => setFilter("to", "")}>
+                  To: {to}
+                </FilterChip>
+              ) : null}
+            </>
+          }
         >
           <ConsoleLabeledSelect
             label="Season"
@@ -198,14 +228,12 @@ export function RepaymentsRegister() {
             onChange={(v) => setFilter("season", v)}
             options={seasonOptions}
             active={season !== "all"}
-            className="lg:w-[200px]"
           />
           <ConsoleDateRange
             from={from}
             to={to}
             onFromChange={(v) => setFilter("from", v)}
             onToChange={(v) => setFilter("to", v)}
-            fieldClassName="lg:w-[150px]"
           />
         </ConsoleFilterBar>
       )}

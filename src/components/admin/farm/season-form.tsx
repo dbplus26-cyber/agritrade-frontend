@@ -7,10 +7,10 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
   adminInputClass,
+  DetailHeader,
 } from "@/components/admin/ui";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { Input } from "@/components/ui/input";
 import { DateInput } from "@/components/ui/date-input";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -93,8 +93,11 @@ export function SeasonForm({ season }: { season?: ISeason }) {
 
   return (
     <div className="max-w-[640px]">
-      <BackButton href={LIST} label="All seasons" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Seasons", href: LIST }]}
+        current={season ? "Edit season" : "New season"}
+      />
+      <DetailHeader
         title={season ? "Edit season" : "New season"}
         sub="The planting season that grants and repayments are booked against"
       />

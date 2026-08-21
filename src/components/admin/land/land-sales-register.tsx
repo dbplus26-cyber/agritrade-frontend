@@ -5,12 +5,21 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
+import { Plus } from "lucide-react";
 import {
-  ConsoleDateField,
+  ConsoleDateRange,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
-import { adminLinkClass, AdminButton, AdminCard, Mono } from "@/components/admin/ui";
+import {
+  adminLinkClass,
+  AdminButton,
+  AdminCard,
+  AdminPageHeader,
+  Mono,
+} from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -38,8 +47,6 @@ export function LandSalesRegister() {
     setFilter,
     setPage,
     resetFilters,
-    search: searchInput,
-    setSearch,
   } = useTableQuery({ defaults: FILTER_DEFAULTS });
 
   const { status, from, to } = filters;
@@ -163,27 +170,45 @@ export function LandSalesRegister() {
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            Land sales
-          </h1>
-          <p className="mt-0.5 text-[13px] text-adm-muted">
-            Plots sold to buyers, their part-payments and what is still owed
-          </p>
-        </div>
-        {<AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ New land sale</Link>
-            </AdminButton>}
-      </div>
+      <AdminPageHeader
+        title="Land sales"
+        sub="Plots sold to buyers, their part-payments and what is still owed"
+      />
 
       {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
-          search={searchInput}
-          onSearch={setSearch}
           hideSearch
           activeCount={activeFilterCount}
           onClear={resetFilters}
+          totalCount={total}
+          noun="land sales"
+          action={
+            <AdminButton asChild aria-label="New land sale">
+              <Link href={`${LIST}/new`}>
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">New land sale</span>
+              </Link>
+            </AdminButton>
+          }
+          chips={
+            <>
+              {status !== "all" ? (
+                <FilterChip onRemove={() => setFilter("status", "all")}>
+                  Status: {labelOf(LAND_SALE_STATUS_FILTER_OPTIONS, status)}
+                </FilterChip>
+              ) : null}
+              {from ? (
+                <FilterChip onRemove={() => setFilter("from", "")}>
+                  From: {from}
+                </FilterChip>
+              ) : null}
+              {to ? (
+                <FilterChip onRemove={() => setFilter("to", "")}>
+                  To: {to}
+                </FilterChip>
+              ) : null}
+            </>
+          }
         >
           <ConsoleLabeledSelect
             label="Status"
@@ -191,21 +216,12 @@ export function LandSalesRegister() {
             onChange={(v) => setFilter("status", v)}
             options={LAND_SALE_STATUS_FILTER_OPTIONS}
             active={status !== "all"}
-            className="lg:w-[160px]"
           />
-          <ConsoleDateField
-            label="From"
-            value={from}
-            max={to || undefined}
-            onChange={(v) => setFilter("from", v)}
-            className="lg:w-[150px]"
-          />
-          <ConsoleDateField
-            label="To"
-            value={to}
-            min={from || undefined}
-            onChange={(v) => setFilter("to", v)}
-            className="lg:w-[150px]"
+          <ConsoleDateRange
+            from={from}
+            to={to}
+            onFromChange={(v) => setFilter("from", v)}
+            onToChange={(v) => setFilter("to", v)}
           />
         </ConsoleFilterBar>
       )}

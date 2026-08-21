@@ -15,12 +15,13 @@ import {
 } from "@/components/admin/cashbook/cash-book-dialogs";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import { DateOnlyCell } from "@/components/admin/date-cell";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import {
   AdminButton,
   AdminCard,
-  AdminPageHeader,
+  DetailHeader,
   Mono,
   SectionHeading,
 } from "@/components/admin/ui";
@@ -39,6 +40,7 @@ import {
 import type { ILedgerRow } from "@/types/cashbook.types";
 
 const FILTER_DEFAULTS = { size: "20" };
+const CASH_BOOK = "/admin/cash-book";
 
 /**
  * One account's statement: every movement in and out, newest first, each line
@@ -181,13 +183,17 @@ export function AccountLedgerScreen({ accountId }: { accountId: string }) {
 
   return (
     <div className="@container/ledger space-y-5">
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Cash book", href: CASH_BOOK }]}
+        current={label}
+      />
+      <DetailHeader
         title={label}
         hint={hint}
         sub="Every movement in and out of this account"
         actions={
           canPost ? (
-            <div className="flex flex-wrap gap-2">
+            <>
               <AdminButton onClick={() => setEntering(true)} type="button">
                 Record entry
               </AdminButton>
@@ -205,7 +211,7 @@ export function AccountLedgerScreen({ accountId }: { accountId: string }) {
               >
                 Check against books
               </AdminButton>
-            </div>
+            </>
           ) : null
         }
       />

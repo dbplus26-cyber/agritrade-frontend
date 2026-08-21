@@ -8,12 +8,21 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
+import { Plus } from "lucide-react";
 import {
   ConsoleFilterBar,
   ConsoleDateRange,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
-import { adminLinkClass, AdminButton, AdminCard, Mono } from "@/components/admin/ui";
+import {
+  adminLinkClass,
+  AdminButton,
+  AdminCard,
+  AdminPageHeader,
+  Mono,
+} from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
@@ -86,6 +95,20 @@ export function PurchasesTable() {
   // vocabulary at this scale; pickers in forms use the same source).
   const commodityOptions = useGetCommoditiesQuery({ limit: 100 });
   const warehouseOptions = useGetWarehousesQuery({ limit: 100 });
+  const commodityFilterOptions = [
+    { value: "all", label: "All commodities" },
+    ...(commodityOptions.data?.data ?? []).map((c) => ({
+      value: c.id,
+      label: c.name,
+    })),
+  ];
+  const warehouseFilterOptions = [
+    { value: "all", label: "All warehouses" },
+    ...(warehouseOptions.data?.data ?? []).map((w) => ({
+      value: w.id,
+      label: w.name,
+    })),
+  ];
 
   const queryArgs = useMemo<IPurchaseListQuery>(
     () => ({
@@ -251,22 +274,10 @@ export function PurchasesTable() {
 
   return (
     <div>
-      <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            Purchases
-          </h1>
-          <p className="mt-0.5 text-[13px] text-adm-muted">
-            Goods bought at the farm gate and beyond - money is real from the
-            moment a purchase is recorded
-          </p>
-        </div>
-        {canRecord ? (
-          <AdminButton asChild>
-            <Link href={`${LIST}/new`}>+ Record purchase</Link>
-          </AdminButton>
-        ) : null}
-      </div>
+      <AdminPageHeader
+        title="Purchases"
+        sub="Goods bought at the farm gate and beyond - money is real from the moment a purchase is recorded"
+      />
 
       {pristine || (isError && !search && activeFilterCount === 0) ? null : (
         <ConsoleFilterBar
@@ -275,6 +286,53 @@ export function PurchasesTable() {
           searchPlaceholder="Search supplier, notes…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
+          totalCount={totalCount}
+          noun="purchases"
+          action={
+            canRecord ? (
+              <AdminButton asChild aria-label="Record purchase">
+                <Link href={`${LIST}/new`}>
+                  <Plus className="h-4 w-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">Record purchase</span>
+                </Link>
+              </AdminButton>
+            ) : null
+          }
+          panelClassName="sm:grid-cols-2 lg:grid-cols-6"
+          chips={
+            <>
+              {status !== "all" ? (
+                <FilterChip onRemove={() => setFilter("status", "all")}>
+                  Status: {labelOf(PURCHASE_STATUS_FILTER_OPTIONS, status)}
+                </FilterChip>
+              ) : null}
+              {source !== "all" ? (
+                <FilterChip onRemove={() => setFilter("source", "all")}>
+                  Source: {labelOf(SOURCE_FILTER_OPTIONS, source)}
+                </FilterChip>
+              ) : null}
+              {commodity !== "all" ? (
+                <FilterChip onRemove={() => setFilter("commodity", "all")}>
+                  Commodity: {labelOf(commodityFilterOptions, commodity)}
+                </FilterChip>
+              ) : null}
+              {warehouse !== "all" ? (
+                <FilterChip onRemove={() => setFilter("warehouse", "all")}>
+                  Warehouse: {labelOf(warehouseFilterOptions, warehouse)}
+                </FilterChip>
+              ) : null}
+              {from ? (
+                <FilterChip onRemove={() => setFilter("from", "")}>
+                  From: {from}
+                </FilterChip>
+              ) : null}
+              {to ? (
+                <FilterChip onRemove={() => setFilter("to", "")}>
+                  To: {to}
+                </FilterChip>
+              ) : null}
+            </>
+          }
         >
           <ConsoleLabeledSelect
             label="Status"
@@ -282,7 +340,6 @@ export function PurchasesTable() {
             onChange={(v) => setFilter("status", v)}
             options={PURCHASE_STATUS_FILTER_OPTIONS}
             active={status !== "all"}
-            className="lg:w-[150px]"
           />
           <ConsoleLabeledSelect
             hint="Who the grain came from: an individual farmer, a company, or one of your own agents."
@@ -291,42 +348,26 @@ export function PurchasesTable() {
             onChange={(v) => setFilter("source", v)}
             options={SOURCE_FILTER_OPTIONS}
             active={source !== "all"}
-            className="lg:w-[150px]"
           />
           <ConsoleLabeledSelect
             label="Commodity"
             value={commodity}
             onChange={(v) => setFilter("commodity", v)}
-            options={[
-              { value: "all", label: "All commodities" },
-              ...(commodityOptions.data?.data ?? []).map((c) => ({
-                value: c.id,
-                label: c.name,
-              })),
-            ]}
+            options={commodityFilterOptions}
             active={commodity !== "all"}
-            className="lg:w-[170px]"
           />
           <ConsoleLabeledSelect
             label="Warehouse"
             value={warehouse}
             onChange={(v) => setFilter("warehouse", v)}
-            options={[
-              { value: "all", label: "All warehouses" },
-              ...(warehouseOptions.data?.data ?? []).map((w) => ({
-                value: w.id,
-                label: w.name,
-              })),
-            ]}
+            options={warehouseFilterOptions}
             active={warehouse !== "all"}
-            className="lg:w-[170px]"
           />
           <ConsoleDateRange
             from={from}
             to={to}
             onFromChange={(v) => setFilter("from", v)}
             onToChange={(v) => setFilter("to", v)}
-            fieldClassName="lg:w-[150px]"
           />
         </ConsoleFilterBar>
       )}

@@ -8,14 +8,14 @@ import { DetailSkeleton } from "@/components/admin/skeletons";
 import {
   AdminButton,
   AdminField,
-  AdminPageHeader,
+  DetailHeader,
   DetailRow,
   DetailShell,
   Mono,
   adminInputClass,
   adminSelectClass,
 } from "@/components/admin/ui";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
 import { SimpleSelect } from "@/components/ui/simple-select";
@@ -85,14 +85,22 @@ export function DisbursementDetail({ id }: { id: string }) {
 
   return (
     <div className="space-y-5">
-      <BackButton href={LIST} label="Money sent" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Money sent", href: LIST }]}
+        current="Payout details"
+      />
+      <DetailHeader
         title="Payout details"
         hint="One transfer sent out: where it went and whether it arrived."
-        sub={`${RAIL_LABEL[d.rail]} · ${d.transactionNo}`}
+        sub={
+          <>
+            <span>{RAIL_LABEL[d.rail]}</span>
+            <Mono>{d.transactionNo}</Mono>
+          </>
+        }
         actions={
           settled ? null : (
-            <div className="flex flex-wrap gap-2">
+            <>
               <AdminButton
                 disabled={checkState.isLoading}
                 onClick={() => void onCheck()}
@@ -104,7 +112,7 @@ export function DisbursementDetail({ id }: { id: string }) {
               <AdminButton onClick={() => setResolving(true)} type="button">
                 Resolve manually
               </AdminButton>
-            </div>
+            </>
           )
         }
       />

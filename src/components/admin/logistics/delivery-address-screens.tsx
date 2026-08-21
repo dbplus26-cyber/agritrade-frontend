@@ -6,17 +6,21 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
+import { Plus } from "lucide-react";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleDateRange,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
 import {
   AdminButton,
   AdminCard,
   AdminField,
   AdminPageHeader,
+  DetailHeader,
   EditableFormActions,
   adminInputClass,
 } from "@/components/admin/ui";
@@ -193,21 +197,10 @@ export function DeliveryAddressTable() {
 
   return (
     <div>
-      <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            Delivery addresses
-          </h1>
-          <p className="mt-0.5 text-[13px] text-adm-muted">
-            Saved destinations shipments deliver to, with the receiving contact
-          </p>
-        </div>
-        {canManage ? (
-          <AdminButton asChild>
-            <Link href={`${LIST}/new`}>+ Add address</Link>
-          </AdminButton>
-        ) : null}
-      </div>
+      <AdminPageHeader
+        title="Delivery addresses"
+        sub="Saved destinations shipments deliver to, with the receiving contact"
+      />
 
       {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
@@ -216,6 +209,37 @@ export function DeliveryAddressTable() {
           searchPlaceholder="Search address…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
+          totalCount={totalCount}
+          noun="addresses"
+          action={
+            canManage ? (
+              <AdminButton asChild aria-label="Add address">
+                <Link href={`${LIST}/new`}>
+                  <Plus className="h-4 w-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">Add address</span>
+                </Link>
+              </AdminButton>
+            ) : null
+          }
+          chips={
+            <>
+              {statusFilter !== "all" ? (
+                <FilterChip onRemove={() => setFilter("status", "all")}>
+                  Status: {labelOf(STATUS_FILTER_OPTIONS, statusFilter)}
+                </FilterChip>
+              ) : null}
+              {from ? (
+                <FilterChip onRemove={() => setFilter("from", "")}>
+                  Added from: {from}
+                </FilterChip>
+              ) : null}
+              {to ? (
+                <FilterChip onRemove={() => setFilter("to", "")}>
+                  Added to: {to}
+                </FilterChip>
+              ) : null}
+            </>
+          }
         >
           <ConsoleLabeledSelect
             label="Status"
@@ -223,7 +247,6 @@ export function DeliveryAddressTable() {
             onChange={(v) => setFilter("status", v)}
             options={STATUS_FILTER_OPTIONS}
             active={statusFilter !== "all"}
-            className="lg:w-[150px]"
           />
           <ConsoleDateRange
             fromLabel="Added from"
@@ -598,9 +621,13 @@ export function DeliveryAddressCreate() {
     <RecordShell
       backHref={LIST}
       backLabel="All addresses"
+      current="Add delivery address"
       header={
-        <AdminPageHeader title="Add delivery address"
-        hint="A saved drop-off point, with directions so a driver can find it." sub="A destination trucks deliver to, saved for reuse" />
+        <DetailHeader
+          title="Add delivery address"
+          hint="A saved drop-off point, with directions so a driver can find it."
+          sub="A destination trucks deliver to, saved for reuse"
+        />
       }
     >
       <DeliveryAddressFormFields />
@@ -629,8 +656,9 @@ export function DeliveryAddressEdit({ id }: { id: string }) {
     <RecordShell
       backHref={LIST}
       backLabel="All addresses"
+      current={address.label}
       header={
-        <AdminPageHeader title={address.label} sub="Delivery address record" />
+        <DetailHeader title={address.label} sub="Delivery address record" />
       }
       aside={
         <>

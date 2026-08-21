@@ -7,9 +7,17 @@ import { DateTimeCell } from "@/components/admin/date-cell";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
 import { HelpWrap } from "@/components/admin/help-tip";
-import { AdminCard, Mono, ToneBadge, type Tone } from "@/components/admin/ui";
+import {
+  AdminCard,
+  AdminPageHeader,
+  Mono,
+  ToneBadge,
+  type Tone,
+} from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -170,14 +178,10 @@ export function NotificationsScreen() {
 
   return (
     <div>
-      <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Notifications
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          Every SMS and email the system has sent, with its delivery status
-        </p>
-      </div>
+      <AdminPageHeader
+        title="Notifications"
+        sub="Every SMS and email the system has sent, with its delivery status"
+      />
 
       {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
@@ -186,6 +190,23 @@ export function NotificationsScreen() {
           searchPlaceholder="Search recipient…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
+          totalCount={total}
+          noun="notifications"
+          panelClassName="sm:grid-cols-2"
+          chips={
+            <>
+              {status !== "all" ? (
+                <FilterChip onRemove={() => setFilter("status", "all")}>
+                  Status: {labelOf(STATUS_OPTIONS, status)}
+                </FilterChip>
+              ) : null}
+              {channel !== "all" ? (
+                <FilterChip onRemove={() => setFilter("channel", "all")}>
+                  Channel: {labelOf(CHANNEL_OPTIONS, channel)}
+                </FilterChip>
+              ) : null}
+            </>
+          }
         >
           <ConsoleLabeledSelect
             label="Status"
@@ -193,7 +214,6 @@ export function NotificationsScreen() {
             onChange={(v) => setFilter("status", v)}
             options={STATUS_OPTIONS}
             active={status !== "all"}
-            className="lg:w-[150px]"
           />
           <ConsoleLabeledSelect
             label="Channel"
@@ -201,7 +221,6 @@ export function NotificationsScreen() {
             onChange={(v) => setFilter("channel", v)}
             options={CHANNEL_OPTIONS}
             active={channel !== "all"}
-            className="lg:w-[150px]"
           />
         </ConsoleFilterBar>
       )}

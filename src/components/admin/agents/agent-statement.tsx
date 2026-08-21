@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import {
-  adminLinkClass,
   AdminButton,
   AdminPageHeader,
   Mono,
 } from "@/components/admin/ui";
 import { ConsoleDateRange } from "@/components/admin/filter-bar";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { HelpWrap } from "@/components/admin/help-tip";
 import { DocumentSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -140,21 +139,43 @@ export function AgentStatement({ id }: { id: string }) {
 
   return (
     <div>
-      <div className="print:hidden">
-        <Link
-          href={`/admin/agents/${id}`}
-          className={cn(adminLinkClass, "mb-2 inline-block text-[13px]")}
-        >
-          ← Back to agent
-        </Link>
-        <AdminPageHeader
-          title="Agent float statement"
-          hint="Every movement in and out of this agent's money, in order."
-          sub="Every top-up, purchase and expense against the cash this agent holds, ready to print and sign"
-          actions={
-            // The server renders this ledger as a paginated A4 PDF, window
-            // and all - printing happens from the viewer, which previews the
-            // sheet true to size instead of the browser dialog's guesswork.
+      <DetailNav
+        className="print:hidden"
+        crumbs={[DASHBOARD_CRUMB, { label: "Agents", href: "/admin/agents" }]}
+        current="Statement"
+        backHref={`/admin/agents/${id}`}
+        backLabel="Back to agent"
+      />
+      <AdminPageHeader
+        className="print:hidden"
+        title="Agent float statement"
+        hint="Every movement in and out of this agent's money, in order."
+        sub="Every top-up, purchase and expense against the cash this agent holds, ready to print and sign"
+        actions={
+          <>
+            {/* The window belongs to the DOCUMENT, not to a list, so it is a
+                page-level control beside the heading rather than a toolbar
+                filter. */}
+            <ConsoleDateRange
+              from={from}
+              to={to}
+              onFromChange={setFrom}
+              onToChange={setTo}
+            />
+            {windowed ? (
+              <AdminButton
+                variant="outline"
+                onClick={() => {
+                  setFrom("");
+                  setTo("");
+                }}
+              >
+                All history
+              </AdminButton>
+            ) : null}
+            {/* The server renders this ledger as a paginated A4 PDF, window
+                and all - printing happens from the viewer, which previews the
+                sheet true to size instead of the browser dialog's guesswork. */}
             <AdminButton asChild>
               <a
                 href={receiptPdfUrl("agent-statement", id, { from, to })}
@@ -164,30 +185,9 @@ export function AgentStatement({ id }: { id: string }) {
                 View PDF
               </a>
             </AdminButton>
-          }
-        />
-        {/* The window belongs to the DOCUMENT, not to a list, so it sits with
-            the sheet rather than in a toolbar above the heading. */}
-        <div className="mb-4 flex flex-wrap items-center gap-2">
-          <ConsoleDateRange
-            from={from}
-            to={to}
-            onFromChange={setFrom}
-            onToChange={setTo}
-          />
-          {windowed ? (
-            <AdminButton
-              variant="outline"
-              onClick={() => {
-                setFrom("");
-                setTo("");
-              }}
-            >
-              All history
-            </AdminButton>
-          ) : null}
-        </div>
-      </div>
+          </>
+        }
+      />
 
       {/* Left-aligned like every other console page - the sheet keeps its own
           720px measure so it still reads as a piece of paper. */}

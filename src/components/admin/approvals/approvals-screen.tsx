@@ -13,6 +13,8 @@ import {
   ConsoleDateRange,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
 import { HelpTip } from "@/components/admin/help-tip";
 import { AdminPageHeader } from "@/components/admin/ui";
@@ -147,6 +149,7 @@ export function ApprovalsScreen() {
   const { data, isLoading, isError, error, refetch } =
     useGetApprovalsQuery(queryArgs);
   const approvals = useMemo(() => data?.data ?? [], [data]);
+  const totalCount = data?.meta.total ?? 0;
   const totalPages = data?.meta.totalPages ?? 1;
 
   // Selection and expansion are per-list. Both are cleared whenever the list
@@ -465,34 +468,31 @@ export function ApprovalsScreen() {
         sub="Decisions waiting on you. Approving applies the change, rejecting leaves everything as it stands."
       />
 
-      <div className="mb-[18px] flex flex-wrap items-center gap-3">
-        <div
-          role="tablist"
-          aria-label="Approval status"
-          className="flex gap-[3px] rounded-none bg-[var(--ap-tabs)] p-[3px]"
-        >
-          {TABS.map(([value, label]) => (
-            <StatusTab
-              key={value}
-              label={label}
-              active={status === value}
-              onSelect={() => {
-                setFilter("status", value);
-                setPage(1);
-              }}
-              status={value}
-              filters={{
-                ...(filters.action !== "all"
-                  ? { action: filters.action as ApprovalAction }
-                  : {}),
-                ...(search ? { search } : {}),
-                ...(filters.from ? { from: filters.from } : {}),
-                ...(filters.to ? { to: filters.to } : {}),
-              }}
-            />
-          ))}
-        </div>
-
+      <div
+        role="tablist"
+        aria-label="Approval status"
+        className="mb-6 flex gap-[3px] rounded-none bg-[var(--ap-tabs)] p-[3px]"
+      >
+        {TABS.map(([value, label]) => (
+          <StatusTab
+            key={value}
+            label={label}
+            active={status === value}
+            onSelect={() => {
+              setFilter("status", value);
+              setPage(1);
+            }}
+            status={value}
+            filters={{
+              ...(filters.action !== "all"
+                ? { action: filters.action as ApprovalAction }
+                : {}),
+              ...(search ? { search } : {}),
+              ...(filters.from ? { from: filters.from } : {}),
+              ...(filters.to ? { to: filters.to } : {}),
+            }}
+          />
+        ))}
       </div>
 
       {pristine ? null : (
@@ -502,6 +502,27 @@ export function ApprovalsScreen() {
           searchPlaceholder="Search commodity, amount, note…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
+          totalCount={totalCount}
+          noun="approvals"
+          chips={
+            <>
+              {filters.action !== "all" ? (
+                <FilterChip onRemove={() => setFilter("action", "all")}>
+                  Action: {labelOf(ACTION_FILTER_OPTIONS, filters.action)}
+                </FilterChip>
+              ) : null}
+              {filters.from ? (
+                <FilterChip onRemove={() => setFilter("from", "")}>
+                  From: {filters.from}
+                </FilterChip>
+              ) : null}
+              {filters.to ? (
+                <FilterChip onRemove={() => setFilter("to", "")}>
+                  To: {filters.to}
+                </FilterChip>
+              ) : null}
+            </>
+          }
         >
           <ConsoleLabeledSelect
             label="Action"
@@ -509,14 +530,12 @@ export function ApprovalsScreen() {
             onChange={(v) => setFilter("action", v)}
             options={ACTION_FILTER_OPTIONS}
             active={filters.action !== "all"}
-            className="lg:w-[210px]"
           />
           <ConsoleDateRange
             from={filters.from}
             to={filters.to}
             onFromChange={(v) => setFilter("from", v)}
             onToChange={(v) => setFilter("to", v)}
-            fieldClassName="lg:w-[150px]"
           />
         </ConsoleFilterBar>
       )}

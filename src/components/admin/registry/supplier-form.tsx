@@ -8,7 +8,7 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
+  DetailHeader,
   EditableFormActions,
   adminInputClass,
   adminSelectClass,
@@ -572,8 +572,9 @@ export function SupplierCreate() {
     <RecordShell
       backHref={LIST}
       backLabel="All suppliers"
+      current="Add supplier"
       header={
-        <AdminPageHeader
+        <DetailHeader
           title="Add supplier"
           hint="Someone you buy grain from."
           sub="A person or company the business buys from"
@@ -605,8 +606,9 @@ export function SupplierEdit({ id }: { id: string }) {
     <RecordShell
       backHref={LIST}
       backLabel="All suppliers"
+      current="Supplier details"
       header={
-        <AdminPageHeader
+        <DetailHeader
           title="Supplier details"
           hint="One person or co-op you buy from, and everything bought from them."
         />

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { Plus } from "lucide-react";
+import { ConsoleFilterBar } from "@/components/admin/filter-bar";
 import { AdminButton, AdminPageHeader, Mono } from "@/components/admin/ui";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
@@ -53,19 +55,23 @@ export function MySendsScreen({
   const rows = data?.data ?? [];
   const total = data?.meta.total ?? 0;
 
+  const sendButton = canSend ? (
+    <AdminButton
+      aria-label="Send money"
+      onClick={() => setSending(true)}
+      type="button"
+    >
+      <Plus className="h-4 w-4" aria-hidden="true" />
+      <span className="hidden sm:inline">Send money</span>
+    </AdminButton>
+  ) : null;
+
   return (
-    <div className="space-y-5">
+    <div>
       <AdminPageHeader
         title="My sends"
         hint="Money you personally have sent out, and whether it arrived."
         sub="Money you have sent, and what Hubtel said about each one"
-        actions={
-          canSend ? (
-            <AdminButton onClick={() => setSending(true)} type="button">
-              Send money
-            </AdminButton>
-          ) : undefined
-        }
       />
 
       {isLoading ? (
@@ -76,20 +82,34 @@ export function MySendsScreen({
           onRetry={() => void refetch()}
         />
       ) : total === 0 ? (
-        <RegisterEmpty
-          filtered={false}
-          noun="sends"
-          title="You have not sent anything yet"
-          description="Money you send from your float appears here, with its status."
-        />
+        <>
+          {sendButton ? (
+            <div className="mb-6 flex items-center justify-end gap-1.5 sm:gap-2">
+              {sendButton}
+            </div>
+          ) : null}
+          <RegisterEmpty
+            filtered={false}
+            noun="sends"
+            title="You have not sent anything yet"
+            description="Money you send from your float appears here, with its status."
+          />
+        </>
       ) : (
         <>
+          <ConsoleFilterBar
+            hideSearch
+            totalCount={total}
+            noun="sends"
+            action={sendButton}
+          />
           <div className="space-y-3">
             {rows.map((d) => (
               <SendCard key={d.id} send={d} />
             ))}
           </div>
           <ListPagination
+            className="mt-5"
             onPageChange={setPage}
             page={page}
             totalPages={Math.ceil(total / PAGE_SIZE)}

@@ -8,13 +8,13 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
+  DetailHeader,
   Mono,
   adminInputClass,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
 import { HelpTip } from "@/components/admin/help-tip";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { Input } from "@/components/ui/input";
 import { useGetBuyersQuery } from "@/redux/buyers/buyers-api";
 import { useGetCommoditiesQuery } from "@/redux/commodities/commodities-api";
@@ -166,8 +166,11 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
 
   return (
     <div className="max-w-[720px]">
-      <BackButton href={LIST} label="All sales" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Sales", href: LIST }]}
+        current={sale ? "Edit sale" : "New sale"}
+      />
+      <DetailHeader
         title={sale ? "Edit sale" : "New sale"}
         sub={
           sale

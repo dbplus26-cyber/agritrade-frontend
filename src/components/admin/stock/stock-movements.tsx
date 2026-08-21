@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
@@ -8,6 +8,8 @@ import {
   ConsoleDateRange,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
 import { adminLinkClass, AdminCard } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
@@ -39,9 +41,12 @@ const FILTER_DEFAULTS = {
 export function StockMovements({
   warehouseOptions,
   commodityOptions,
+  action,
 }: {
   warehouseOptions: readonly { value: string; label: string }[];
   commodityOptions: readonly { value: string; label: string }[];
+  /** The page's action ("Request adjustment"), shown in the toolbar. */
+  action?: ReactNode;
 }) {
   const { page, filters, setFilter, setPage, resetFilters } = useTableQuery({
     defaults: FILTER_DEFAULTS,
@@ -163,13 +168,51 @@ export function StockMovements({
 
   return (
     <div>
-      {pristine ? null : (
+      {pristine ? (
+        // No toolbar over an empty ledger, so the action gets its own row.
+        action ? (
+          <div className="mb-6 flex items-center justify-end gap-1.5 sm:gap-2">
+            {action}
+          </div>
+        ) : null
+      ) : (
       <ConsoleFilterBar
-        search=""
-        onSearch={() => undefined}
         hideSearch
         activeCount={activeFilterCount}
         onClear={resetFilters}
+        totalCount={totalCount}
+        noun="movements"
+        action={action}
+        panelClassName="sm:grid-cols-2 lg:grid-cols-6"
+        chips={
+          <>
+            {filters.type !== "all" ? (
+              <FilterChip onRemove={() => setFilter("type", "all")}>
+                Type: {labelOf(MOVE_TYPE_FILTER_OPTIONS, filters.type)}
+              </FilterChip>
+            ) : null}
+            {filters.warehouse !== "all" ? (
+              <FilterChip onRemove={() => setFilter("warehouse", "all")}>
+                Warehouse: {labelOf(warehouseOptions, filters.warehouse)}
+              </FilterChip>
+            ) : null}
+            {filters.commodity !== "all" ? (
+              <FilterChip onRemove={() => setFilter("commodity", "all")}>
+                Commodity: {labelOf(commodityOptions, filters.commodity)}
+              </FilterChip>
+            ) : null}
+            {filters.from ? (
+              <FilterChip onRemove={() => setFilter("from", "")}>
+                From: {filters.from}
+              </FilterChip>
+            ) : null}
+            {filters.to ? (
+              <FilterChip onRemove={() => setFilter("to", "")}>
+                To: {filters.to}
+              </FilterChip>
+            ) : null}
+          </>
+        }
       >
         <ConsoleLabeledSelect
           label="Type"
@@ -197,7 +240,6 @@ export function StockMovements({
           to={filters.to}
           onFromChange={(v) => setFilter("from", v)}
           onToChange={(v) => setFilter("to", v)}
-          fieldClassName="lg:w-[150px]"
         />
       </ConsoleFilterBar>
       )}

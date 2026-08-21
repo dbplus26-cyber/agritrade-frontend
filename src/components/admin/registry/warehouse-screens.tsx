@@ -7,20 +7,27 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
-import { ConsoleFilterBar, ConsoleLabeledSelect } from "@/components/admin/filter-bar";
+import { Plus } from "lucide-react";
+import {
+  ConsoleFilterBar,
+  ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
+} from "@/components/admin/filter-bar";
 import {
   AdminButton,
   AdminCard,
   AdminField,
   AdminPageHeader,
+  DetailHeader,
   EditableFormActions,
   SectionHeading,
   adminInputClass,
   adminLinkClass,
 } from "@/components/admin/ui";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { RecordFacts } from "@/components/admin/record-facts";
 import { TitleCell } from "@/components/admin/table-cells";
-import { BackButton } from "@/components/ui/BackButton";
 import { ConsoleTableSkeleton, DetailSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -162,21 +169,10 @@ export function WarehouseTable() {
 
   return (
     <div>
-      <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            Warehouses
-          </h1>
-          <p className="mt-0.5 text-[13px] text-adm-muted">
-            Where goods are received into and loaded out of
-          </p>
-        </div>
-        {canManage ? (
-              <AdminButton asChild>
-                <Link href={`${LIST}/new`}>+ Add warehouse</Link>
-              </AdminButton>
-            ) : null}
-      </div>
+      <AdminPageHeader
+        title="Warehouses"
+        sub="Where goods are received into and loaded out of"
+      />
 
       {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
@@ -185,16 +181,37 @@ export function WarehouseTable() {
           searchPlaceholder="Search warehouse…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
-        >
-          <ConsoleLabeledSelect
-            label="Status"
-            value={statusFilter}
-            onChange={(v) => setFilter("status", v)}
-            options={STATUS_FILTER_OPTIONS}
-            active={statusFilter !== "all"}
-            className="lg:w-[150px]"
-          />
-        </ConsoleFilterBar>
+          totalCount={totalCount}
+          noun="warehouses"
+          action={
+            canManage ? (
+              <AdminButton asChild aria-label="Add warehouse">
+                <Link href={`${LIST}/new`}>
+                  <Plus className="h-4 w-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">Add warehouse</span>
+                </Link>
+              </AdminButton>
+            ) : null
+          }
+          inlineFilter={
+            <ConsoleLabeledSelect
+              label="Status"
+              value={statusFilter}
+              onChange={(v) => setFilter("status", v)}
+              options={STATUS_FILTER_OPTIONS}
+              active={statusFilter !== "all"}
+            />
+          }
+          chips={
+            <>
+              {statusFilter !== "all" ? (
+                <FilterChip onRemove={() => setFilter("status", "all")}>
+                  Status: {labelOf(STATUS_FILTER_OPTIONS, statusFilter)}
+                </FilterChip>
+              ) : null}
+            </>
+          }
+        />
       )}
 
       {isLoading ? (
@@ -544,8 +561,11 @@ function WarehouseStockSection({ warehouseId }: { warehouseId: string }) {
 export function WarehouseCreate() {
   return (
     <div className="max-w-[640px]">
-      <BackButton href={LIST} label="All warehouses" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Warehouses", href: LIST }]}
+        current="Add warehouse"
+      />
+      <DetailHeader
         title="Add warehouse"
         hint="A storage location. Stock is counted separately per warehouse."
         sub="A storage location goods are received into and loaded out of"
@@ -575,8 +595,9 @@ export function WarehouseEdit({ id }: { id: string }) {
     <RecordShell
       backHref={LIST}
       backLabel="All warehouses"
+      current="Warehouse details"
       header={
-        <AdminPageHeader
+        <DetailHeader
           title="Warehouse details"
           hint="One storage location and what is currently in it."
           sub="Warehouse record and current stock"

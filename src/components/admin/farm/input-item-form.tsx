@@ -8,12 +8,12 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
   adminInputClass,
+  DetailHeader,
 } from "@/components/admin/ui";
 import { ActiveBadge } from "./farm-bits";
 import { RecordFacts } from "@/components/admin/record-facts";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { Input } from "@/components/ui/input";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -136,12 +136,15 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
   if (item && !isEditing) {
     return (
       <div className="max-w-[640px]">
-        <BackButton href={LIST} label="All items" className="mb-2" />
-        <AdminPageHeader
+        <DetailNav
+          crumbs={[DASHBOARD_CRUMB, { label: "Input items", href: LIST }]}
+          current="Input item details"
+        />
+        <DetailHeader
           title="Input item details"
           hint="One thing you advance to farmers, such as seed or fertiliser."
           sub={"An input the programme grants to farmers - what it is, and the unit it is issued in"}
-          actions={<ActiveBadge active={item.isActive} />}
+          badges={<ActiveBadge active={item.isActive} />}
         />
         <AdminCard className="px-5 py-4">
           <RecordFacts
@@ -163,11 +166,14 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
 
   return (
     <div className="max-w-[640px]">
-      <BackButton href={LIST} label="All items" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Input items", href: LIST }]}
+        current={item ? "Edit item" : "New input item"}
+      />
+      <DetailHeader
         title={item ? "Edit item" : "New input item"}
         sub="An input the programme grants to farmers - what it is, and the unit it is issued in"
-        actions={item ? <ActiveBadge active={item.isActive} /> : undefined}
+        badges={item ? <ActiveBadge active={item.isActive} /> : undefined}
       />
 
       {/* The name/unit pair measures against this form, not the viewport: the

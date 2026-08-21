@@ -5,8 +5,8 @@ import Link from "next/link";
 import {
   AdminButton,
   AdminCard,
-  AdminPageHeader,
   DetailGrid,
+  DetailHeader,
   DetailItem,
   DetailRow,
   DetailShell,
@@ -14,7 +14,7 @@ import {
   SectionHeading,
   adminLinkClass,
 } from "@/components/admin/ui";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import {
   AttachmentEmpty,
   AttachmentList,
@@ -1052,15 +1052,18 @@ export function ShipmentDetail({ id }: { id: string }) {
 
   return (
     <div className="max-w-[1120px]">
-      <BackButton href={LIST} label="All shipments" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Shipments", href: LIST }]}
+        current="Shipment details"
+      />
+      <DetailHeader
         title="Shipment details"
         hint="One truck: its load, its trip, its costs and what the driver is owed."
-        actions={
-          <span className="flex flex-wrap items-center gap-1.5">
+        badges={
+          <>
             <ShipmentStatusBadge status={s.status} />
             <CostBasisBadge basis={s.costBasis} />
-          </span>
+          </>
         }
       />
 

@@ -5,12 +5,19 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
+import { Plus } from "lucide-react";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
-import { AdminButton, AdminCard } from "@/components/admin/ui";
+import {
+  AdminButton,
+  AdminCard,
+  AdminPageHeader,
+} from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -115,19 +122,10 @@ export function SeasonsRegister() {
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            Seasons
-          </h1>
-          <p className="mt-0.5 text-[13px] text-adm-muted">
-            Farming seasons that grants and repayments are booked against
-          </p>
-        </div>
-        {<AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ New season</Link>
-            </AdminButton>}
-      </div>
+      <AdminPageHeader
+        title="Seasons"
+        sub="Farming seasons that grants and repayments are booked against"
+      />
 
       {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
@@ -136,16 +134,35 @@ export function SeasonsRegister() {
           searchPlaceholder="Search season…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
-        >
-          <ConsoleLabeledSelect
-            label="Status"
-            value={active}
-            onChange={(v) => setFilter("active", v)}
-            options={ACTIVE_FILTER_OPTIONS}
-            active={active !== "all"}
-            className="lg:w-[150px]"
-          />
-        </ConsoleFilterBar>
+          totalCount={totalCount}
+          noun="seasons"
+          action={
+            <AdminButton asChild aria-label="New season">
+              <Link href={`${LIST}/new`}>
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">New season</span>
+              </Link>
+            </AdminButton>
+          }
+          inlineFilter={
+            <ConsoleLabeledSelect
+              label="Status"
+              value={active}
+              onChange={(v) => setFilter("active", v)}
+              options={ACTIVE_FILTER_OPTIONS}
+              active={active !== "all"}
+            />
+          }
+          chips={
+            <>
+              {active !== "all" ? (
+                <FilterChip onRemove={() => setFilter("active", "all")}>
+                  Status: {labelOf(ACTIVE_FILTER_OPTIONS, active)}
+                </FilterChip>
+              ) : null}
+            </>
+          }
+        />
       )}
 
       {isLoading ? (

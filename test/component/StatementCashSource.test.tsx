@@ -165,8 +165,11 @@ beforeEach(() => {
 
 const openDrawingDialog = async () => {
   render(<DrawingsScreen />);
+  // The register is empty here, so the create action is the empty state's
+  // own ("Record the first drawing"); the toolbar button only shows once
+  // there is a ledger to count.
   await userEvent.click(
-    screen.getByRole("button", { name: /Record drawing/i }),
+    screen.getByRole("button", { name: /Record the first drawing/i }),
   );
   return screen.findByRole("dialog");
 };

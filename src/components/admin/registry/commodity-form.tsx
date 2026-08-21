@@ -9,12 +9,12 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
+  DetailHeader,
   EditableFormActions,
   adminInputClass,
 } from "@/components/admin/ui";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { RecordFacts } from "@/components/admin/record-facts";
-import { BackButton } from "@/components/ui/BackButton";
 import { FormSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { ViewablePhoto } from "@/components/admin/photo-view";
@@ -425,8 +425,11 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
 export function CommodityCreate() {
   return (
     <div className="max-w-[640px]">
-      <BackButton href={LIST} label="All commodities" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Commodities", href: LIST }]}
+        current="Add commodity"
+      />
+      <DetailHeader
         title="Add commodity"
         hint="A crop you trade in. It then appears wherever a commodity is chosen."
         sub="Name, variety and grade - how this commodity appears everywhere"
@@ -472,8 +475,11 @@ export function CommodityEdit({ id }: { id: string }) {
 
   return (
     <div className="max-w-[640px]">
-      <BackButton href={LIST} label="All commodities" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Commodities", href: LIST }]}
+        current="Commodity details"
+      />
+      <DetailHeader
         title="Commodity details"
         hint="One crop, and whether it is shown on the public website."
         sub="Edit the commodity, its website visibility and lifecycle"

@@ -16,14 +16,14 @@ import { Money } from "@/components/admin/trading/sale-bits";
 import {
   AdminButton,
   AdminCard,
-  AdminPageHeader,
+  DetailHeader,
   Mono,
   SectionHeading,
   ToneBadge,
   type Tone,
   adminLinkClass,
 } from "@/components/admin/ui";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -331,17 +331,18 @@ export function PaymentAccountDetail({ id }: { id: string }) {
 
   return (
     <div className="max-w-[1120px]">
-      <BackButton href={LIST} label="All accounts" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Accounts", href: LIST }]}
+        current="Payment account details"
+      />
+      <DetailHeader
         title="Payment account details"
         hint="One account customers pay into, and everything received through it."
+        badges={<ActiveBadge isActive={account.isActive} />}
         actions={
-          <span className="flex flex-wrap items-center gap-2">
-            <ActiveBadge isActive={account.isActive} />
-            <AdminButton asChild variant="outline">
-              <Link href={`${LIST}/${id}/edit`}>Edit account</Link>
-            </AdminButton>
-          </span>
+          <AdminButton asChild variant="outline">
+            <Link href={`${LIST}/${id}/edit`}>Edit account</Link>
+          </AdminButton>
         }
       />
 

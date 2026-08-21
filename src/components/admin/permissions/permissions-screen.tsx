@@ -7,6 +7,7 @@ import {
   AdminButton,
   AdminCard,
   AdminPageHeader,
+  SectionHeading,
   ToneBadge,
   adminInputClass,
 } from "@/components/admin/ui";
@@ -292,18 +293,20 @@ function RoleDefaults({
       </div>
 
       <AdminCard className="overflow-hidden">
-        <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1 px-4 pt-4 pb-3.5 sm:px-5">
-          <div className="min-w-0">
-            <h2 className="text-[15px] font-bold tracking-[-0.01em] text-adm-ink">
-              {ROLE_TITLE[role]}
-            </h2>
-            <p className="mt-0.5 max-w-[600px] text-[12.5px] leading-[1.55] text-adm-muted">
-              {ROLE_BLURB[role]}
-            </p>
-          </div>
-          <span className="font-adminmono flex-none text-[12px] font-semibold tabular-nums text-adm-body">
-            {current.size} of {total} allowed
-          </span>
+        <div className="px-4 pt-4 pb-3.5 sm:px-5">
+          <SectionHeading
+            className="mb-0"
+            actions={
+              <span className="font-adminmono text-[12px] font-semibold tabular-nums text-adm-body">
+                {current.size} of {total} allowed
+              </span>
+            }
+          >
+            {ROLE_TITLE[role]}
+          </SectionHeading>
+          <p className="mt-0.5 max-w-[600px] text-[12.5px] leading-[1.55] text-adm-muted">
+            {ROLE_BLURB[role]}
+          </p>
         </div>
         <PermissionGroups
           catalog={catalog}
@@ -462,22 +465,26 @@ function PersonEditor({
 
   return (
     <AdminCard className="overflow-hidden">
-      <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1 px-4 pt-4 pb-3.5 sm:px-5">
-        <div className="min-w-0">
-          <h2 className="flex flex-wrap items-center gap-2 text-[15px] font-bold tracking-[-0.01em] text-adm-ink">
-            {name}
-            <ToneBadge tone="slate">{ROLE_LABEL[user.role]}</ToneBadge>
-          </h2>
-          <p className="mt-0.5 max-w-[600px] text-[12.5px] leading-[1.55] text-adm-muted">
-            Switches here are personal grants on top of the{" "}
-            {ROLE_LABEL[user.role].toLowerCase()} defaults. Anything marked via
-            role is already allowed to the whole role - a personal grant keeps
-            working even if those defaults are later narrowed.
-          </p>
-        </div>
-        <span className="font-adminmono flex-none text-[12px] font-semibold tabular-nums text-adm-body">
-          {effectiveCount} of {total} allowed
-        </span>
+      <div className="px-4 pt-4 pb-3.5 sm:px-5">
+        <SectionHeading
+          className="mb-0"
+          actions={
+            <span className="font-adminmono text-[12px] font-semibold tabular-nums text-adm-body">
+              {effectiveCount} of {total} allowed
+            </span>
+          }
+        >
+          {name}{" "}
+          <ToneBadge className="align-middle" tone="slate">
+            {ROLE_LABEL[user.role]}
+          </ToneBadge>
+        </SectionHeading>
+        <p className="mt-0.5 max-w-[600px] text-[12.5px] leading-[1.55] text-adm-muted">
+          Switches here are personal grants on top of the{" "}
+          {ROLE_LABEL[user.role].toLowerCase()} defaults. Anything marked via
+          role is already allowed to the whole role - a personal grant keeps
+          working even if those defaults are later narrowed.
+        </p>
       </div>
       <PermissionGroups
         catalog={catalog}

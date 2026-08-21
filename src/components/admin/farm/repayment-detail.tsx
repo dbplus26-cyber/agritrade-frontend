@@ -4,8 +4,8 @@ import Link from "next/link";
 import {
   adminLinkClass,
   AdminCard,
-  AdminPageHeader,
   DetailGrid,
+  DetailHeader,
   DetailItem,
   DetailShell,
   Mono,
@@ -15,7 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import { HelpTip } from "@/components/admin/help-tip";
 import { Money } from "@/components/admin/trading/sale-bits";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -57,18 +57,23 @@ export function RepaymentDetail({ id }: { id: string }) {
 
   return (
     <div className="max-w-[1120px]">
-      <BackButton href={LIST} label="All repayments" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Repayments", href: LIST }]}
+        current="Repayment details"
+      />
+      <DetailHeader
         title="Repayment details"
         hint="One repayment from a farmer against their advance, in produce or in cash."
         sub={`Recorded ${formatDateTime(r.createdAt)}`}
-        actions={
-          <span className="flex flex-wrap items-center gap-1.5">
-            {isCash ? <ToneBadge tone="leaf">Repaid in cash</ToneBadge> : null}
-            {r.intoStock ? (
-              <ToneBadge tone="sky">Taken into stock</ToneBadge>
-            ) : null}
-          </span>
+        badges={
+          isCash || r.intoStock ? (
+            <>
+              {isCash ? <ToneBadge tone="leaf">Repaid in cash</ToneBadge> : null}
+              {r.intoStock ? (
+                <ToneBadge tone="sky">Taken into stock</ToneBadge>
+              ) : null}
+            </>
+          ) : null
         }
       />
 

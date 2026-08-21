@@ -3,7 +3,13 @@
 import { useState } from "react";
 
 import { HelpTip, HelpWrap } from "@/components/admin/help-tip";
-import { AdminButton, AdminCard, Mono, ToneBadge } from "@/components/admin/ui";
+import {
+  AdminButton,
+  AdminCard,
+  Mono,
+  SectionHeading,
+  ToneBadge,
+} from "@/components/admin/ui";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthRole } from "@/hooks/use-auth-role";
@@ -381,21 +387,20 @@ export function DriverSettlementCard({
     // viewport does not describe, so every breakpoint inside it measures the
     // card rather than the window.
     <AdminCard className="@container/settle p-5">
-      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h2 className="flex items-center gap-1.5 text-[15px] font-bold tracking-[-0.01em] text-adm-ink">
-          Driver settlement
-          <HelpTip
-            label="What is driver settlement?"
-            text="What this trip pays the haulier, and how much of it has actually gone out."
-          />
-        </h2>
-        {/* The driver's name belongs here rather than in the headline: the
-            trip already names them, and repeating it larger would compete
-            with the figure the card exists to show. */}
-        <p className="min-w-0 text-[12.5px] text-adm-muted [overflow-wrap:anywhere]">
-          {driver.name}
-        </p>
-      </div>
+      <SectionHeading
+        className="mb-4"
+        hint="What this trip pays the haulier, and how much of it has actually gone out."
+        actions={
+          // The driver's name belongs here rather than in the headline: the
+          // trip already names them, and repeating it larger would compete
+          // with the figure the card exists to show.
+          <p className="min-w-0 text-[12.5px] text-adm-muted [overflow-wrap:anywhere]">
+            {driver.name}
+          </p>
+        }
+      >
+        Driver settlement
+      </SectionHeading>
 
       <SettlementHeadline settlement={settlement} />
       <SettlementFacts departedAt={departedAt} settlement={settlement} />

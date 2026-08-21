@@ -9,8 +9,10 @@ import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
-import { AdminCard, Mono } from "@/components/admin/ui";
+import { AdminCard, AdminPageHeader, Mono } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -170,15 +172,10 @@ export function AgentsTable() {
 
   return (
     <div>
-      <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Agents &amp; Floats
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          Field buyers and the cash in their hands - balances derive from the
-          ledger, never a stored number
-        </p>
-      </div>
+      <AdminPageHeader
+        title="Agents & Floats"
+        sub="Field buyers and the cash in their hands - balances derive from the ledger, never a stored number"
+      />
 
       {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
@@ -187,16 +184,27 @@ export function AgentsTable() {
           searchPlaceholder="Search agent…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
-        >
-          <ConsoleLabeledSelect
-            label="Status"
-            value={statusFilter}
-            onChange={(v) => setFilter("status", v)}
-            options={STATUS_FILTER_OPTIONS}
-            active={statusFilter !== "all"}
-            className="lg:w-[150px]"
-          />
-        </ConsoleFilterBar>
+          totalCount={totalCount}
+          noun="agents"
+          inlineFilter={
+            <ConsoleLabeledSelect
+              label="Status"
+              value={statusFilter}
+              onChange={(v) => setFilter("status", v)}
+              options={STATUS_FILTER_OPTIONS}
+              active={statusFilter !== "all"}
+            />
+          }
+          chips={
+            <>
+              {statusFilter !== "all" ? (
+                <FilterChip onRemove={() => setFilter("status", "all")}>
+                  Status: {labelOf(STATUS_FILTER_OPTIONS, statusFilter)}
+                </FilterChip>
+              ) : null}
+            </>
+          }
+        />
       )}
 
       {isLoading ? (

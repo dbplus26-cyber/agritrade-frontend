@@ -10,11 +10,12 @@ import { DateOnlyCell } from "@/components/admin/date-cell";
 import {
   adminLinkClass,
   AdminCard,
+  AdminPageHeader,
   Mono,
   ToneBadge,
 } from "@/components/admin/ui";
 import { Money } from "@/components/admin/trading/sale-bits";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -204,15 +205,14 @@ export function GrantAging() {
 
   return (
     <div>
-      <BackButton href="/admin/grants" label="All grants" className="mb-2" />
-      <div className="mb-4">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Grant aging
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          Outstanding farm investment by how overdue it is - most overdue first
-        </p>
-      </div>
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Grants", href: "/admin/grants" }]}
+        current="Grant aging"
+      />
+      <AdminPageHeader
+        title="Grant aging"
+        sub="Outstanding farm investment by how overdue it is - most overdue first"
+      />
 
       {isLoading ? (
         <ConsoleTableSkeleton columns={5} />

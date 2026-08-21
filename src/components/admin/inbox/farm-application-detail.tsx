@@ -7,8 +7,8 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
   DetailGrid,
+  DetailHeader,
   DetailItem,
   DetailShell,
   Mono,
@@ -17,7 +17,7 @@ import {
   adminLinkClass,
   adminSelectClass,
 } from "@/components/admin/ui";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { SimpleSelect } from "@/components/ui/simple-select";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -153,12 +153,20 @@ function FarmApplicationDetailBody({
 
   return (
     <div>
-      <BackButton href={LIST} label="All applications" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Applications", href: LIST }]}
+        current="Application details"
+      />
+      <DetailHeader
         title="Application details"
         hint="One farmer applying to join the outgrower scheme."
-        sub={`Application ${application.reference} · received ${formatDateTime(application.createdAt)}`}
-        actions={<FarmApplicationStatusBadge status={application.status} />}
+        sub={
+          <>
+            <span>Application {application.reference}</span>
+            <span>Received {formatDateTime(application.createdAt)}</span>
+          </>
+        }
+        badges={<FarmApplicationStatusBadge status={application.status} />}
       />
 
       <DetailShell

@@ -12,7 +12,9 @@ import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
+import { Plus } from "lucide-react";
 import { ConsoleDataTable } from "@/components/admin/data-table";
+import { ConsoleFilterBar } from "@/components/admin/filter-bar";
 import {
   AdminButton,
   AdminCard,
@@ -851,10 +853,26 @@ export function FixedAssetsScreen() {
         title="Fixed Assets"
         hint="The equipment, vehicles and buildings the statements depreciate. Enter an asset once; every later book carries it."
         sub="The register behind the PPE note, depreciation and capital allowances"
-        actions={
-          <AdminButton onClick={() => { setAdding(true); }}>+ Record asset</AdminButton>
-        }
       />
+
+      {/* The empty state carries its own create action, so the toolbar
+          only shows once there is a register to count. */}
+      {!isLoading && !isError && assets.length === 0 ? null : (
+        <ConsoleFilterBar
+          hideSearch
+          totalCount={assets.length}
+          noun="assets"
+          action={
+            <AdminButton
+              aria-label="Record asset"
+              onClick={() => { setAdding(true); }}
+            >
+              <Plus className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Record asset</span>
+            </AdminButton>
+          }
+        />
+      )}
 
       {isLoading ? (
         <ConsoleTableSkeleton columns={6} />

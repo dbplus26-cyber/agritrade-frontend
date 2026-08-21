@@ -11,7 +11,9 @@ import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
+import { Plus } from "lucide-react";
 import { ConsoleDataTable } from "@/components/admin/data-table";
+import { ConsoleFilterBar } from "@/components/admin/filter-bar";
 import {
   AdminButton,
   AdminCard,
@@ -297,10 +299,26 @@ export function DrawingsScreen() {
         title="Drawings"
         hint="The proprietor's personal withdrawals. They reduce the capital account on the statements and never touch the P&L."
         sub={`The proprietor's withdrawals ledger${drawings.length > 0 ? ` · ${formatCedis(totalGhs)} drawn to date` : ""}`}
-        actions={
-          <AdminButton onClick={() => { setAdding(true); }}>+ Record drawing</AdminButton>
-        }
       />
+
+      {/* The empty state carries its own create action, so the toolbar
+          only shows once there is a ledger to count. */}
+      {!isLoading && !isError && drawings.length === 0 ? null : (
+        <ConsoleFilterBar
+          hideSearch
+          totalCount={drawings.length}
+          noun="drawings"
+          action={
+            <AdminButton
+              aria-label="Record drawing"
+              onClick={() => { setAdding(true); }}
+            >
+              <Plus className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Record drawing</span>
+            </AdminButton>
+          }
+        />
+      )}
 
       {isLoading ? (
         <ConsoleTableSkeleton columns={5} />

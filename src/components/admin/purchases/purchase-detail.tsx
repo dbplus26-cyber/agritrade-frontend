@@ -9,7 +9,7 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
+  DetailHeader,
   adminInputClass,
   adminLinkClass,
   DetailGrid,
@@ -18,7 +18,7 @@ import {
   SectionHeading,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import {
@@ -433,25 +433,30 @@ export function PurchaseDetail({ id }: { id: string }) {
 
   return (
     <div className="max-w-[1120px]">
-      <BackButton href={LIST} label="All purchases" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Purchases", href: LIST }]}
+        current="Purchase details"
+      />
+      <DetailHeader
         title="Purchase details"
         hint="One load bought: the weight, the price and where it was stored."
         sub={`${SOURCE_LABEL[p.source]} purchase from ${purchaseCounterparty(p)}`}
-        actions={
-          <span className="flex flex-wrap items-center gap-1.5">
+        badges={
+          <>
             <PurchaseStatusBadge status={p.status} />
             <ApprovalOverlayBadge approval={p.approval} />
-            <AdminButton variant="outline" asChild>
-              <a
-                href={receiptPdfUrl("purchase", p.id)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View PDF
-              </a>
-            </AdminButton>
-          </span>
+          </>
+        }
+        actions={
+          <AdminButton variant="outline" asChild>
+            <a
+              href={receiptPdfUrl("purchase", p.id)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View PDF
+            </a>
+          </AdminButton>
         }
       />
 

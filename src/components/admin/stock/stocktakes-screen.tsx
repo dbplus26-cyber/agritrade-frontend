@@ -4,14 +4,23 @@ import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
+import { Plus } from "lucide-react";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { DateTimeCell } from "@/components/admin/date-cell";
-import { AdminButton, adminLinkClass, AdminCard, Mono } from "@/components/admin/ui";
+import {
+  AdminButton,
+  adminLinkClass,
+  AdminCard,
+  AdminPageHeader,
+  Mono,
+} from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -163,30 +172,44 @@ export function StocktakesScreen() {
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            Stocktakes
-          </h1>
-          <p className="mt-0.5 text-[13px] text-adm-muted">
-            Physical counts checked against the book - approved differences post
-            as adjustments
-          </p>
-        </div>
-        {canCount ? (
-          <AdminButton asChild>
-            <Link href={`${LIST}/new`}>+ New stocktake</Link>
-          </AdminButton>
-        ) : null}
-      </div>
+      <AdminPageHeader
+        title="Stocktakes"
+        sub="Physical counts checked against the book - approved differences post as adjustments"
+      />
 
       {pristine ? null : (
         <ConsoleFilterBar
-          search=""
-          onSearch={() => undefined}
           hideSearch
           activeCount={activeFilterCount}
           onClear={resetFilters}
+          totalCount={totalCount}
+          noun="stocktakes"
+          action={
+            canCount ? (
+              <AdminButton asChild aria-label="New stocktake">
+                <Link href={`${LIST}/new`}>
+                  <Plus className="h-4 w-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">New stocktake</span>
+                </Link>
+              </AdminButton>
+            ) : null
+          }
+          panelClassName="sm:grid-cols-2"
+          chips={
+            <>
+              {filters.status !== "all" ? (
+                <FilterChip onRemove={() => setFilter("status", "all")}>
+                  Status:{" "}
+                  {labelOf(STOCKTAKE_STATUS_FILTER_OPTIONS, filters.status)}
+                </FilterChip>
+              ) : null}
+              {filters.warehouse !== "all" ? (
+                <FilterChip onRemove={() => setFilter("warehouse", "all")}>
+                  Warehouse: {labelOf(warehouseOptions, filters.warehouse)}
+                </FilterChip>
+              ) : null}
+            </>
+          }
         >
           <ConsoleLabeledSelect
             label="Status"
@@ -194,7 +217,6 @@ export function StocktakesScreen() {
             onChange={(v) => setFilter("status", v)}
             options={STOCKTAKE_STATUS_FILTER_OPTIONS}
             active={filters.status !== "all"}
-            className="lg:w-[160px]"
           />
           <ConsoleLabeledSelect
             label="Warehouse"
@@ -202,7 +224,6 @@ export function StocktakesScreen() {
             onChange={(v) => setFilter("warehouse", v)}
             options={warehouseOptions}
             active={filters.warehouse !== "all"}
-            className="lg:w-[190px]"
           />
         </ConsoleFilterBar>
       )}

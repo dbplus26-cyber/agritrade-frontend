@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { AdminButton, AdminCard, AdminPageHeader } from "@/components/admin/ui";
-import { BackButton } from "@/components/ui/BackButton";
+import { AdminButton, AdminCard, DetailHeader } from "@/components/admin/ui";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { useGetShipmentQuery } from "@/redux/shipments/shipments-api";
 import { ShipmentForm } from "./shipment-form";
 
@@ -31,7 +31,10 @@ export function ShipmentEdit({ id }: { id: string }) {
   if (isError || !shipment) {
     return (
       <div className="max-w-[640px]">
-        <BackButton href={LIST} label="All shipments" className="mb-2" />
+        <DetailNav
+          crumbs={[DASHBOARD_CRUMB, { label: "Shipments", href: LIST }]}
+          current="Edit shipment plan"
+        />
         <AdminCard className="px-5 py-4 text-[13px] text-console-red">
           Couldn&apos;t load this shipment. Reload and try again.
         </AdminCard>
@@ -42,12 +45,16 @@ export function ShipmentEdit({ id }: { id: string }) {
   if (shipment.status !== "PLANNED" && shipment.status !== "LOADING") {
     return (
       <div className="max-w-[640px]">
-        <BackButton
-          href={`${LIST}/${shipment.id}`}
-          label="Back to shipment"
-          className="mb-2"
+        <DetailNav
+          crumbs={[
+            DASHBOARD_CRUMB,
+            { label: "Shipments", href: LIST },
+            { label: shipment.transactionNo, href: `${LIST}/${shipment.id}` },
+          ]}
+          current="This plan is locked"
+          backLabel="Back to shipment"
         />
-        <AdminPageHeader
+        <DetailHeader
           title="This plan is locked"
           sub={`${shipment.transactionNo} has already dispatched - the plan can no longer be edited.`}
         />

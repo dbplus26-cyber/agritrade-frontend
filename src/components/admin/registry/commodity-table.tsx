@@ -5,11 +5,19 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
+import { Plus } from "lucide-react";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
-import { AdminButton, AdminCard, Mono } from "@/components/admin/ui";
+import {
+  AdminButton,
+  AdminCard,
+  AdminPageHeader,
+  Mono,
+} from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -198,22 +206,10 @@ export function CommodityTable() {
 
   return (
     <div>
-      <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            Commodities
-          </h1>
-          <p className="mt-0.5 text-[13px] text-adm-muted">
-            Everything the business trades - varieties, grades and website
-            visibility
-          </p>
-        </div>
-        {canManage ? (
-              <AdminButton asChild>
-                <Link href="/admin/commodities/new">+ Add commodity</Link>
-              </AdminButton>
-            ) : null}
-      </div>
+      <AdminPageHeader
+        title="Commodities"
+        sub="Everything the business trades - varieties, grades and website visibility"
+      />
 
       {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
@@ -222,6 +218,33 @@ export function CommodityTable() {
           searchPlaceholder="Search commodity…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
+          totalCount={totalCount}
+          noun="commodities"
+          action={
+            canManage ? (
+              <AdminButton asChild aria-label="Add commodity">
+                <Link href="/admin/commodities/new">
+                  <Plus className="h-4 w-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">Add commodity</span>
+                </Link>
+              </AdminButton>
+            ) : null
+          }
+          panelClassName="sm:grid-cols-2"
+          chips={
+            <>
+              {statusFilter !== "all" ? (
+                <FilterChip onRemove={() => setFilter("status", "all")}>
+                  Status: {labelOf(STATUS_FILTER_OPTIONS, statusFilter)}
+                </FilterChip>
+              ) : null}
+              {visibilityFilter !== "all" ? (
+                <FilterChip onRemove={() => setFilter("visibility", "all")}>
+                  Website: {labelOf(PUBLISH_FILTER_OPTIONS, visibilityFilter)}
+                </FilterChip>
+              ) : null}
+            </>
+          }
         >
           <ConsoleLabeledSelect
             label="Status"
@@ -229,7 +252,6 @@ export function CommodityTable() {
             onChange={(v) => setFilter("status", v)}
             options={STATUS_FILTER_OPTIONS}
             active={statusFilter !== "all"}
-            className="lg:w-[150px]"
           />
           <ConsoleLabeledSelect
             label="Website"
@@ -237,7 +259,6 @@ export function CommodityTable() {
             onChange={(v) => setFilter("visibility", v)}
             options={PUBLISH_FILTER_OPTIONS}
             active={visibilityFilter !== "all"}
-            className="lg:w-[165px]"
           />
         </ConsoleFilterBar>
       )}

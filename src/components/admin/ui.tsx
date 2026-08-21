@@ -315,7 +315,7 @@ export function SectionHeading({
         className,
       )}
     >
-      <h2 className="flex min-w-0 items-center gap-1.5 text-[15px] font-bold tracking-[-0.01em] text-adm-ink">
+      <h2 className="flex min-w-0 items-center gap-1.5 text-base font-semibold tracking-tight text-adm-ink">
         <span className="min-w-0 [overflow-wrap:anywhere]">{children}</span>
         {hint ? <HelpTip label={`About this section`} text={hint} /> : null}
       </h2>
@@ -324,7 +324,12 @@ export function SectionHeading({
   );
 }
 
-/** Page header: title + sub left, actions right. */
+/**
+ * Page heading for list, dashboard and settings screens: the title with its
+ * one-line description underneath, and nothing else in the row unless the
+ * page has a control that belongs at the top (the dashboard's date range).
+ * Register actions ("+ Add") live in the toolbar's count row, not here.
+ */
 export function AdminPageHeader({
   title,
   sub,
@@ -345,22 +350,60 @@ export function AdminPageHeader({
   return (
     <div
       className={cn(
-        "mb-4 flex flex-wrap items-end justify-between gap-x-6 gap-y-3",
+        "mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between",
         className,
       )}
     >
-      {/* A detail page is where a record is read IN FULL. Truncating its
-          title behind a tooltip meant the one thing identifying the page was
-          the one thing you could not read - so the heading wraps (to two
-          lines, so it stays a heading rather than a paragraph) and the
-          sub-line does the same.
-          
-          It takes the whole row that the actions leave it, rather than the
-          68ch it used to: on a 1216px console page that measured 404px, so
-          the heading and its description were folding inside a third of a
-          page whose tables and cards below them ran the full width. */}
-      <div className="min-w-0 flex-1">
-        <h1 className="line-clamp-2 text-[19px] leading-[1.3] font-bold text-adm-ink">
+      <div className="min-w-0">
+        <h1 className="text-2xl font-bold tracking-tight text-adm-ink">
+          {title}
+          {hint ? (
+            <HelpTip
+              className="ml-1.5 translate-y-[-1px]"
+              label={`What is the ${title} page for?`}
+              text={hint}
+            />
+          ) : null}
+        </h1>
+        {sub ? <p className="mt-1 text-sm text-adm-muted">{sub}</p> : null}
+      </div>
+      {actions ? (
+        <div className="flex flex-wrap items-center gap-2">{actions}</div>
+      ) : null}
+    </div>
+  );
+}
+
+/**
+ * Heading for a single record's page (detail, create, edit), under the
+ * DetailNav: badges that identify the record's state, the title (wrapping,
+ * never truncated), a meta line, and the record's actions grouped below.
+ */
+export function DetailHeader({
+  title,
+  sub,
+  badges,
+  actions,
+  className,
+  hint,
+}: {
+  title: string;
+  /** The meta line under the title: "Recorded 12 Mar 2026", a counterparty. */
+  sub?: React.ReactNode;
+  /** Status / approval badges, shown above the title. */
+  badges?: React.ReactNode;
+  /** Edit, PDF, lifecycle buttons. */
+  actions?: React.ReactNode;
+  className?: string;
+  hint?: string;
+}) {
+  return (
+    <div className={cn("mb-6", className)}>
+      {badges ? (
+        <div className="mb-2 flex flex-wrap items-center gap-2">{badges}</div>
+      ) : null}
+      <div className="min-w-0 space-y-2">
+        <h1 className="text-lg font-bold tracking-tight [overflow-wrap:anywhere] text-adm-ink sm:text-xl lg:text-2xl">
           {title}
           {hint ? (
             <HelpTip
@@ -371,12 +414,14 @@ export function AdminPageHeader({
           ) : null}
         </h1>
         {sub ? (
-          <p className="mt-0.5 line-clamp-2 text-[13px] text-adm-muted" title={sub}>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-adm-muted">
             {sub}
-          </p>
+          </div>
         ) : null}
       </div>
-      {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
+      {actions ? (
+        <div className="mt-8 flex flex-wrap items-center gap-2">{actions}</div>
+      ) : null}
     </div>
   );
 }

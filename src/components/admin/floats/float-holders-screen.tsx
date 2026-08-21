@@ -12,6 +12,8 @@ import {
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { TitleCell } from "@/components/admin/table-cells";
@@ -235,7 +237,7 @@ export function FloatHoldersScreen() {
   }
 
   return (
-    <div className="space-y-5">
+    <div>
       <AdminPageHeader
         title="Floats"
         hint="Money handed to agents to buy with, and what each still holds."
@@ -249,6 +251,23 @@ export function FloatHoldersScreen() {
         onSearch={setSearch}
         search={search}
         searchPlaceholder="Name, email or phone…"
+        totalCount={total}
+        noun="float holders"
+        panelClassName="sm:grid-cols-2"
+        chips={
+          <>
+            {filters.role !== "all" ? (
+              <FilterChip onRemove={() => setFilter("role", "all")}>
+                Role: {labelOf(ROLE_FILTER_OPTIONS, filters.role)}
+              </FilterChip>
+            ) : null}
+            {filters.funded !== "all" ? (
+              <FilterChip onRemove={() => setFilter("funded", "all")}>
+                Funded: {labelOf(FUNDED_FILTER_OPTIONS, filters.funded)}
+              </FilterChip>
+            ) : null}
+          </>
+        }
       >
         <ConsoleLabeledSelect
           active={filters.role !== "all"}

@@ -5,12 +5,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
+import { Plus } from "lucide-react";
 import {
   ConsoleDateRange,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
-import { AdminButton, AdminCard } from "@/components/admin/ui";
+import { AdminButton, AdminCard, AdminPageHeader } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -156,21 +159,10 @@ export function BuyerTable() {
 
   return (
     <div>
-      <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            Buyers
-          </h1>
-          <p className="mt-0.5 text-[13px] text-adm-muted">
-            Traders and companies the business sells to
-          </p>
-        </div>
-        {canManage ? (
-          <AdminButton asChild>
-            <Link href={`${LIST}/new`}>+ Add buyer</Link>
-          </AdminButton>
-        ) : null}
-      </div>
+      <AdminPageHeader
+        title="Buyers"
+        sub="Traders and companies the business sells to"
+      />
 
       {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
@@ -179,6 +171,37 @@ export function BuyerTable() {
           searchPlaceholder="Search buyer…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
+          totalCount={totalCount}
+          noun="buyers"
+          action={
+            canManage ? (
+              <AdminButton asChild aria-label="Add buyer">
+                <Link href={`${LIST}/new`}>
+                  <Plus className="h-4 w-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">Add buyer</span>
+                </Link>
+              </AdminButton>
+            ) : null
+          }
+          chips={
+            <>
+              {statusFilter !== "all" ? (
+                <FilterChip onRemove={() => setFilter("status", "all")}>
+                  Status: {labelOf(STATUS_FILTER_OPTIONS, statusFilter)}
+                </FilterChip>
+              ) : null}
+              {from ? (
+                <FilterChip onRemove={() => setFilter("from", "")}>
+                  Added from: {from}
+                </FilterChip>
+              ) : null}
+              {to ? (
+                <FilterChip onRemove={() => setFilter("to", "")}>
+                  Added to: {to}
+                </FilterChip>
+              ) : null}
+            </>
+          }
         >
           <ConsoleLabeledSelect
             label="Status"
@@ -186,7 +209,6 @@ export function BuyerTable() {
             onChange={(v) => setFilter("status", v)}
             options={STATUS_FILTER_OPTIONS}
             active={statusFilter !== "all"}
-            className="lg:w-[150px]"
           />
           <ConsoleDateRange
             fromLabel="Added from"

@@ -1,14 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { ConsoleDateRange } from "@/components/admin/filter-bar";
-import {
-  adminLinkClass,
-  AdminButton,
-  AdminPageHeader,
-  Mono,
-} from "@/components/admin/ui";
+import { AdminButton, AdminPageHeader, Mono } from "@/components/admin/ui";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { DocumentSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -62,56 +57,62 @@ export function FarmerStatement({
   return (
     <div>
       <div className="print:hidden">
-        <Link
-          href={`/admin/farmers/${id}`}
-          className={cn(adminLinkClass, "mb-2 inline-block text-[13px]")}
-        >
-          ← Back to farmer
-        </Link>
+        <DetailNav
+          className="print:hidden"
+          crumbs={[
+            DASHBOARD_CRUMB,
+            { label: "Farmers", href: "/admin/farmers" },
+            { label: st.farmer.name, href: `/admin/farmers/${id}` },
+          ]}
+          current="Statement"
+          backLabel="Farmer"
+        />
         <AdminPageHeader
           title="Farmer statement"
           hint="Everything advanced to this farmer and everything repaid, in order."
           sub="Every grant and repayment with a running balance, ready to print and sign"
           actions={
-            // The server renders this ledger as a paginated A4 PDF, window
-            // and all - printing happens from the viewer, which previews the
-            // sheet true to size instead of the browser dialog's guesswork.
-            <AdminButton asChild>
-              <a
-                href={receiptPdfUrl("farmer-statement", id, {
-                  from,
-                  seasonId,
-                  to,
-                })}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View PDF
-              </a>
-            </AdminButton>
+            <>
+              {/* The window belongs to the DOCUMENT, not to a list, so it is
+                  a page-level control beside the heading rather than a
+                  toolbar filter. */}
+              <ConsoleDateRange
+                from={from}
+                to={to}
+                onFromChange={setFrom}
+                onToChange={setTo}
+              />
+              {from || to ? (
+                <AdminButton
+                  variant="outline"
+                  onClick={() => {
+                    setFrom("");
+                    setTo("");
+                  }}
+                >
+                  All history
+                </AdminButton>
+              ) : null}
+              {/* The server renders this ledger as a paginated A4 PDF, window
+                  and all - printing happens from the viewer, which previews
+                  the sheet true to size instead of the browser dialog's
+                  guesswork. */}
+              <AdminButton asChild>
+                <a
+                  href={receiptPdfUrl("farmer-statement", id, {
+                    from,
+                    seasonId,
+                    to,
+                  })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View PDF
+                </a>
+              </AdminButton>
+            </>
           }
         />
-        {/* The window is part of the DOCUMENT, not a list filter, so it sits
-            with the sheet rather than in a toolbar above the heading. */}
-        <div className="mb-4 flex flex-wrap items-center gap-2">
-          <ConsoleDateRange
-            from={from}
-            to={to}
-            onFromChange={setFrom}
-            onToChange={setTo}
-          />
-          {from || to ? (
-            <AdminButton
-              variant="outline"
-              onClick={() => {
-                setFrom("");
-                setTo("");
-              }}
-            >
-              All history
-            </AdminButton>
-          ) : null}
-        </div>
       </div>
 
       {/* Left-aligned like every other console page - the sheet keeps its own

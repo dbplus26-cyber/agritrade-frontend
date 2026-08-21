@@ -10,11 +10,11 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
+  DetailHeader,
   adminInputClass,
   adminSelectClass,
 } from "@/components/admin/ui";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useCreateUserMutation } from "@/redux/users/users-api";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -119,8 +119,11 @@ export function UserForm() {
 
   return (
     <div className="max-w-[640px]">
-      <BackButton href="/admin/users" label="All users" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Users", href: "/admin/users" }]}
+        current="Add user"
+      />
+      <DetailHeader
         title="Add user"
         hint="Someone who can sign in, and what they are allowed to do."
         sub="Create a console account and hand over its first password"

@@ -6,16 +6,20 @@ import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
+import { Plus } from "lucide-react";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
 import {
   AdminButton,
   AdminCard,
   AdminField,
   AdminPageHeader,
+  DetailHeader,
   EditableFormActions,
   adminInputClass,
 } from "@/components/admin/ui";
@@ -24,7 +28,7 @@ import {
   RailStatus,
   RecordShell,
 } from "@/components/admin/record-shell";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -221,19 +225,10 @@ export function PaymentAccountTable() {
 
   return (
     <div>
-      <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            Payment accounts
-          </h1>
-          <p className="mt-0.5 text-[13px] text-adm-muted">
-            Where customers send money. These print on invoices and statements
-          </p>
-        </div>
-        {<AdminButton asChild>
-              <Link href={`${LIST}/new`}>+ Add account</Link>
-            </AdminButton>}
-      </div>
+      <AdminPageHeader
+        title="Payment accounts"
+        sub="Where customers send money. These print on invoices and statements"
+      />
 
       {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
@@ -242,6 +237,31 @@ export function PaymentAccountTable() {
           searchPlaceholder="Search account…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
+          totalCount={totalCount}
+          noun="accounts"
+          action={
+            <AdminButton asChild aria-label="Add account">
+              <Link href={`${LIST}/new`}>
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Add account</span>
+              </Link>
+            </AdminButton>
+          }
+          panelClassName="sm:grid-cols-2"
+          chips={
+            <>
+              {kindFilter !== "all" ? (
+                <FilterChip onRemove={() => setFilter("kind", "all")}>
+                  Kind: {labelOf(KIND_FILTER_OPTIONS, kindFilter)}
+                </FilterChip>
+              ) : null}
+              {statusFilter !== "all" ? (
+                <FilterChip onRemove={() => setFilter("status", "all")}>
+                  Status: {labelOf(STATUS_FILTER_OPTIONS, statusFilter)}
+                </FilterChip>
+              ) : null}
+            </>
+          }
         >
           <ConsoleLabeledSelect
             label="Kind"
@@ -249,7 +269,6 @@ export function PaymentAccountTable() {
             onChange={(v) => setFilter("kind", v)}
             options={KIND_FILTER_OPTIONS}
             active={kindFilter !== "all"}
-            className="lg:w-[160px]"
           />
           <ConsoleLabeledSelect
             label="Status"
@@ -257,7 +276,6 @@ export function PaymentAccountTable() {
             onChange={(v) => setFilter("status", v)}
             options={STATUS_FILTER_OPTIONS}
             active={statusFilter !== "all"}
-            className="lg:w-[150px]"
           />
         </ConsoleFilterBar>
       )}
@@ -662,8 +680,11 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
 export function PaymentAccountCreate() {
   return (
     <div className="max-w-[560px]">
-      <BackButton href={LIST} label="All accounts" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Accounts", href: LIST }]}
+        current="Add payment account"
+      />
+      <DetailHeader
         title="Add payment account"
         hint="A bank or mobile money account your customers pay into."
         sub="A destination customers send money to"
@@ -696,8 +717,14 @@ export function PaymentAccountEdit({ id }: { id: string }) {
     <RecordShell
       backHref={`${LIST}/${id}`}
       backLabel="Account details"
+      crumbs={[
+        DASHBOARD_CRUMB,
+        { label: "Accounts", href: LIST },
+        { label: "Account details", href: `${LIST}/${id}` },
+      ]}
+      current="Payment account details"
       header={
-        <AdminPageHeader
+        <DetailHeader
           title="Payment account details"
           hint="One account customers pay into, and everything received through it."
         />

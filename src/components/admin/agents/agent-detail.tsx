@@ -9,7 +9,7 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
+  DetailHeader,
   adminInputClass,
   adminSelectClass,
   DetailShell,
@@ -21,7 +21,7 @@ import {
 import { AgentMoneySummaryCard } from "@/components/admin/agents/agent-money-summary-card";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import { HelpTip } from "@/components/admin/help-tip";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { DetailSkeleton, LedgerSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { ListPagination } from "@/components/ui/ListPagination";
@@ -691,12 +691,15 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
 
   return (
     <div className="max-w-[1120px]">
-      <BackButton href={LIST} label="All agents" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Agents", href: LIST }]}
+        current="Agent details"
+      />
+      <DetailHeader
         title="Agent details"
         hint="One field buyer: the money they hold, what they spent it on, and the last count."
         actions={
-          <div className="flex flex-wrap gap-2">
+          <>
             {/* Statement is a read - anyone with agent access can print it. */}
             <AdminButton variant="secondary" asChild>
               <Link href={`/admin/agents/${agentUserId}/statement`}>
@@ -721,7 +724,7 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
                 </AdminButton>
               </>
             ) : null}
-          </div>
+          </>
         }
       />
 

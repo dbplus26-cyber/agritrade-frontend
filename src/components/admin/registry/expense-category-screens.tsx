@@ -7,16 +7,20 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
+import { Plus } from "lucide-react";
 import {
   ConsoleDateRange,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
 import {
   AdminButton,
   AdminCard,
   AdminField,
   AdminPageHeader,
+  DetailHeader,
   DetailShell,
   EditableFormActions,
   Mono,
@@ -27,7 +31,7 @@ import {
 import { RecordFacts } from "@/components/admin/record-facts";
 import { CategoryStatementFields } from "@/components/admin/registry/category-statement-fields";
 import { statementSectionLabel } from "@/lib/statement-section";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import {
   ConsoleTableSkeleton,
   FormSkeleton,
@@ -301,21 +305,10 @@ export function ExpenseCategoryTable() {
 
   return (
     <div>
-      <div className="mb-3.5 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            Expense Categories
-          </h1>
-          <p className="mt-0.5 text-[13px] text-adm-muted">
-            The vocabulary every recorded expense is filed under
-          </p>
-        </div>
-        {canManage ? (
-              <AdminButton onClick={() => setCreateOpen(true)}>
-                + Add category
-              </AdminButton>
-            ) : null}
-      </div>
+      <AdminPageHeader
+        title="Expense Categories"
+        sub="The vocabulary every recorded expense is filed under"
+      />
 
       {pristine || (isError && !registerFiltered) ? null : (
         <ConsoleFilterBar
@@ -324,16 +317,38 @@ export function ExpenseCategoryTable() {
           searchPlaceholder="Search category…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
-        >
-          <ConsoleLabeledSelect
-            label="Status"
-            value={statusFilter}
-            onChange={(v) => setFilter("status", v)}
-            options={STATUS_FILTER_OPTIONS}
-            active={statusFilter !== "all"}
-            className="lg:w-[150px]"
-          />
-        </ConsoleFilterBar>
+          totalCount={totalCount}
+          noun="categories"
+          action={
+            canManage ? (
+              <AdminButton
+                aria-label="Add category"
+                onClick={() => setCreateOpen(true)}
+              >
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Add category</span>
+              </AdminButton>
+            ) : null
+          }
+          inlineFilter={
+            <ConsoleLabeledSelect
+              label="Status"
+              value={statusFilter}
+              onChange={(v) => setFilter("status", v)}
+              options={STATUS_FILTER_OPTIONS}
+              active={statusFilter !== "all"}
+            />
+          }
+          chips={
+            <>
+              {statusFilter !== "all" ? (
+                <FilterChip onRemove={() => setFilter("status", "all")}>
+                  Status: {labelOf(STATUS_FILTER_OPTIONS, statusFilter)}
+                </FilterChip>
+              ) : null}
+            </>
+          }
+        />
       )}
 
       {isLoading ? (
@@ -563,8 +578,11 @@ function ExpenseCategoryFormFields({
 export function ExpenseCategoryCreate() {
   return (
     <div className="max-w-[560px]">
-      <BackButton href={LIST} label="All categories" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Categories", href: LIST }]}
+        current="Add expense category"
+      />
+      <DetailHeader
         title="Add expense category"
         hint="A heading costs are filed under, so spending can be grouped."
         sub="A bucket expenses are filed under in reports"
@@ -712,20 +730,31 @@ function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
 
       {/* Searching and the date window are the server's job here. Filtering
           12 rows in the browser would answer only for the page in hand, and
-          silently miss every voucher on the pages behind it.
-
-          fullWidthSearch: this toolbar lives in the LEFT column of a split
-          page, so the search owns the column's whole width and the date
-          window files underneath it, instead of a stubby 30% box with the
-          filters wrapping into the leftover. */}
+          silently miss every voucher on the pages behind it. */}
       {pristine ? null : (
         <ConsoleFilterBar
-          fullWidthSearch
           search={search}
           onSearch={setSearch}
           searchPlaceholder="Search voucher no. or description…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
+          totalCount={matched}
+          noun="expenses"
+          panelClassName="sm:grid-cols-2"
+          chips={
+            <>
+              {filters.from ? (
+                <FilterChip onRemove={() => setFilter("from", "")}>
+                  Incurred from: {filters.from}
+                </FilterChip>
+              ) : null}
+              {filters.to ? (
+                <FilterChip onRemove={() => setFilter("to", "")}>
+                  Incurred to: {filters.to}
+                </FilterChip>
+              ) : null}
+            </>
+          }
         >
           <ConsoleDateRange
             from={filters.from}
@@ -780,15 +809,11 @@ function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
               ))}
             </ul>
           </AdminCard>
-          <p className="mt-3 text-[11.5px] text-adm-faint">
-            {matched === 1 ? "1 expense" : `${String(matched)} expenses`}
-            {filtered ? " matched" : " filed"}
-          </p>
           <ListPagination
             page={page}
             totalPages={totalPages}
             onPageChange={setPage}
-            className="mt-1"
+            className="mt-3"
           />
         </>
       )}
@@ -815,8 +840,11 @@ export function ExpenseCategoryEdit({ id }: { id: string }) {
   const category = data.data.expenseCategory;
   return (
     <div className="max-w-[1180px]">
-      <BackButton href={LIST} label="All categories" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Categories", href: LIST }]}
+        current="Expense category details"
+      />
+      <DetailHeader
         title="Expense category details"
         hint="One heading, and every cost filed under it."
         sub="What this heading covers, and every cost filed under it"

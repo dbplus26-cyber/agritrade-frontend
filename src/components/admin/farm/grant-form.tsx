@@ -8,11 +8,11 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
   adminInputClass,
+  DetailHeader,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { FilePicker } from "@/components/ui/FilePicker";
 import { Input } from "@/components/ui/input";
 import { DateInput } from "@/components/ui/date-input";
@@ -138,8 +138,11 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
 
   return (
     <div className="max-w-[640px]">
-      <BackButton href={LIST} label="All grants" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Grants", href: LIST }]}
+        current="New input grant"
+      />
+      <DetailHeader
         title="New input grant"
         hint="Advance seed, fertiliser or tools to a farmer against this season."
         sub="Inputs handed to a farmer, valued in cedis and owed back at harvest"

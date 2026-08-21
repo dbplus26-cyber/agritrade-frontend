@@ -10,13 +10,13 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
+  DetailHeader,
   Mono,
   adminInputClass,
   adminSelectClass,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { Input } from "@/components/ui/input";
 import { DateInput } from "@/components/ui/date-input";
 import { SimpleSelect } from "@/components/ui/simple-select";
@@ -435,12 +435,20 @@ export function ShipmentForm({
 
   return (
     <div className="max-w-[760px]">
-      <BackButton
-        href={editing && shipment ? `${LIST}/${shipment.id}` : LIST}
-        label={editing ? "Back to shipment" : "All shipments"}
-        className="mb-2"
+      <DetailNav
+        crumbs={
+          editing && shipment
+            ? [
+                DASHBOARD_CRUMB,
+                { label: "Shipments", href: LIST },
+                { label: shipment.transactionNo, href: `${LIST}/${shipment.id}` },
+              ]
+            : [DASHBOARD_CRUMB, { label: "Shipments", href: LIST }]
+        }
+        current={editing ? "Edit shipment plan" : "Plan shipment"}
+        backLabel={editing ? "Back to shipment" : undefined}
       />
-      <AdminPageHeader
+      <DetailHeader
         title={editing ? "Edit shipment plan" : "Plan shipment"}
         hint={
           editing

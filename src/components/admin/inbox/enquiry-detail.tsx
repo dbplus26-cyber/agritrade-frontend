@@ -6,15 +6,15 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
   DetailGrid,
+  DetailHeader,
   DetailItem,
   DetailShell,
   SectionHeading,
   adminInputClass,
   adminSelectClass,
 } from "@/components/admin/ui";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { SimpleSelect } from "@/components/ui/simple-select";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -132,12 +132,15 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
 
   return (
     <div>
-      <BackButton href={LIST} label="All enquiries" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Enquiries", href: LIST }]}
+        current="Enquiry details"
+      />
+      <DetailHeader
         title="Enquiry details"
         hint="One website message and the replies sent back."
         sub={`Enquiry ${enquiry.reference}`}
-        actions={<EnquiryStatusBadge status={enquiry.status} />}
+        badges={<EnquiryStatusBadge status={enquiry.status} />}
       />
 
       <DetailShell

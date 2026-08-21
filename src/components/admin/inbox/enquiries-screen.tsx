@@ -9,6 +9,8 @@ import {
   ConsoleDateRange,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
 import { AdminCard, AdminPageHeader, Mono } from "@/components/admin/ui";
 import { DateTimeCell } from "@/components/admin/date-cell";
@@ -220,6 +222,27 @@ export function EnquiriesScreen() {
               searchPlaceholder="Search name, phone, message…"
               activeCount={activeFilterCount}
               onClear={resetFilters}
+              totalCount={totalCount}
+              noun="enquiries"
+              chips={
+                <>
+                  {statusFilter !== "all" ? (
+                    <FilterChip onRemove={() => setFilter("status", "all")}>
+                      Status: {labelOf(STATUS_OPTIONS, statusFilter)}
+                    </FilterChip>
+                  ) : null}
+                  {filters.from ? (
+                    <FilterChip onRemove={() => setFilter("from", "")}>
+                      From: {filters.from}
+                    </FilterChip>
+                  ) : null}
+                  {filters.to ? (
+                    <FilterChip onRemove={() => setFilter("to", "")}>
+                      To: {filters.to}
+                    </FilterChip>
+                  ) : null}
+                </>
+              }
             >
               <ConsoleLabeledSelect
                 label="Status"
@@ -229,7 +252,6 @@ export function EnquiriesScreen() {
                 }}
                 options={STATUS_OPTIONS}
                 active={statusFilter !== "all"}
-                className="lg:w-[160px]"
               />
               <ConsoleDateRange
                 from={filters.from}
@@ -240,7 +262,6 @@ export function EnquiriesScreen() {
                 onToChange={(v) => {
                   setFilter("to", v);
                 }}
-                fieldClassName="lg:w-[150px]"
               />
             </ConsoleFilterBar>
           )}

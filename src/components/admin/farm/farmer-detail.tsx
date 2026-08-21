@@ -6,13 +6,14 @@ import {
   adminLinkClass,
   AdminButton,
   AdminCard,
-  AdminPageHeader,
   DetailGrid,
+  DetailHeader,
   DetailItem,
   DetailShell,
   Mono,
   SectionHeading,
 } from "@/components/admin/ui";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { cn } from "@/lib/utils";
 import {
   AttachmentEmpty,
@@ -22,7 +23,6 @@ import {
 import { Absent } from "@/components/admin/registry/registry-bits";
 import { ViewablePhoto } from "@/components/admin/photo-view";
 import { Money } from "@/components/admin/trading/sale-bits";
-import { BackButton } from "@/components/ui/BackButton";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { FilePicker } from "@/components/ui/FilePicker";
@@ -259,11 +259,14 @@ export function FarmerDetail({ id }: { id: string }) {
 
   return (
     <div className="max-w-[1120px]">
-      <BackButton href={LIST} label="All farmers" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Farmers", href: LIST }]}
+        current="Farmer details"
+      />
+      <DetailHeader
         title="Farmer details"
         hint="One outgrower: what they were advanced and what they have brought back."
-        actions={<ActiveBadge active={f.isActive} />}
+        badges={<ActiveBadge active={f.isActive} />}
       />
 
       <DetailShell

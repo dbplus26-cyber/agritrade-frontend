@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import {
   adminLinkClass,
   AdminButton,
@@ -15,6 +16,8 @@ import {
   ConsoleDateRange,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -37,6 +40,12 @@ import { ExpenseFormDialog } from "./expense-form";
 const LIST = "/admin/expenses";
 
 const DEFAULTS = { categoryId: "", from: "", scope: "", to: "" };
+
+const SCOPE_OPTIONS = [
+  { label: "All spend", value: "" },
+  { label: "Operating costs", value: "standalone" },
+  { label: "Per-trip costs", value: "shipment" },
+] as const;
 
 /**
  * Operating costs. Every cost the business carries lands here - rent, salaries,
@@ -68,6 +77,13 @@ export function ExpensesRegister() {
     (filters.to ? 1 : 0);
 
   const categories = useGetExpenseCategoriesQuery({ isActive: true, limit: 100 });
+  const categoryOptions = [
+    { label: "All categories", value: "" },
+    ...(categories.data?.data ?? []).map((c) => ({
+      label: c.name,
+      value: c.id,
+    })),
+  ];
   const { data, error, isError, isFetching, isLoading, refetch } =
     useGetExpensesQuery({
       categoryId: String(queryParams.categoryId ?? "") || undefined,
@@ -217,19 +233,12 @@ export function ExpensesRegister() {
           title="Expenses"
           hint="Costs the business has incurred, and whether they have been paid."
           sub="Operating costs and per-trip spend"
-          actions={
-            canRecord ? (
-              <AdminButton onClick={() => { setCreating(true); }}>
-                + Record expense
-              </AdminButton>
-            ) : undefined
-          }
         />
         <RegisterEmpty
           filtered={false}
           noun="expenses"
           description="Record rent, salaries, fumigation and other running costs so the profit figure is honest."
-          actionLabel={canRecord ? "+ Record expense" : undefined}
+          actionLabel={canRecord ? "Record expense" : undefined}
           onAction={canRecord ? () => { setCreating(true); } : undefined}
         />
         <ExpenseFormDialog
@@ -247,13 +256,6 @@ export function ExpensesRegister() {
         title="Expenses"
         hint="Costs the business has incurred, and whether they have been paid."
         sub="Operating costs and per-trip spend"
-        actions={
-          canRecord ? (
-            <AdminButton onClick={() => { setCreating(true); }}>
-              + Record expense
-            </AdminButton>
-          ) : undefined
-        }
       />
 
       {isError && !search && activeFilterCount === 0 ? null : (
@@ -263,33 +265,58 @@ export function ExpensesRegister() {
           searchPlaceholder="Search description or voucher…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
+          totalCount={data?.meta.total ?? 0}
+          noun="expenses"
+          action={
+            canRecord ? (
+              <AdminButton
+                onClick={() => { setCreating(true); }}
+                aria-label="Record expense"
+              >
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Record expense</span>
+              </AdminButton>
+            ) : null
+          }
+          chips={
+            <>
+              {filters.categoryId ? (
+                <FilterChip onRemove={() => { setFilter("categoryId", ""); }}>
+                  Category: {labelOf(categoryOptions, filters.categoryId)}
+                </FilterChip>
+              ) : null}
+              {filters.scope ? (
+                <FilterChip onRemove={() => { setFilter("scope", ""); }}>
+                  Kind: {labelOf(SCOPE_OPTIONS, filters.scope)}
+                </FilterChip>
+              ) : null}
+              {filters.from ? (
+                <FilterChip onRemove={() => { setFilter("from", ""); }}>
+                  From: {filters.from}
+                </FilterChip>
+              ) : null}
+              {filters.to ? (
+                <FilterChip onRemove={() => { setFilter("to", ""); }}>
+                  To: {filters.to}
+                </FilterChip>
+              ) : null}
+            </>
+          }
         >
           <ConsoleLabeledSelect
             label="Category"
             value={filters.categoryId}
             onChange={(v) => { setFilter("categoryId", v); }}
-            options={[
-              { label: "All categories", value: "" },
-              ...(categories.data?.data ?? []).map((c) => ({
-                label: c.name,
-                value: c.id,
-              })),
-            ]}
+            options={categoryOptions}
             active={filters.categoryId !== ""}
-            className="lg:w-[180px]"
           />
           <ConsoleLabeledSelect
             hint="Splits running costs of the business from costs that belong to one truck trip."
             label="Kind"
             value={filters.scope}
             onChange={(v) => { setFilter("scope", v); }}
-            options={[
-              { label: "All spend", value: "" },
-              { label: "Operating costs", value: "standalone" },
-              { label: "Per-trip costs", value: "shipment" },
-            ]}
+            options={SCOPE_OPTIONS}
             active={filters.scope !== ""}
-            className="lg:w-[160px]"
           />
           <ConsoleDateRange
             from={filters.from}

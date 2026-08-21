@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Plus } from "lucide-react";
 import {
   AdminButton,
   AdminCard,
@@ -460,11 +461,6 @@ export function PaymentPoliciesScreen() {
         title="Payment Policies"
         hint="When a buyer has to pay you: the deposit and balance split."
         sub="The payment terms sales resolve against (sale > buyer > default)"
-        actions={
-          <AdminButton onClick={() => setCreateOpen(true)}>
-            + New policy
-          </AdminButton>
-        }
       />
 
       {/* Policies are immutable by design: sales freeze a snapshot of their
@@ -473,6 +469,20 @@ export function PaymentPoliciesScreen() {
         A policy can&apos;t be edited once created. Sales freeze their terms at
         confirmation, so create a new policy when the terms change.
       </p>
+
+      {/* No search or filters on this list, so the create action takes the
+          toolbar's place; the empty state carries its own. */}
+      {!isLoading && !isError && policies.length === 0 ? null : (
+        <div className="mb-6 flex items-center justify-end gap-1.5 sm:gap-2">
+          <AdminButton
+            aria-label="New policy"
+            onClick={() => setCreateOpen(true)}
+          >
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            <span className="hidden sm:inline">New policy</span>
+          </AdminButton>
+        </div>
+      )}
 
       {isLoading ? (
         <CardGridSkeleton cards={4} columns={2} />

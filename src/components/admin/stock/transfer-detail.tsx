@@ -9,7 +9,7 @@ import { DetailSkeleton } from "@/components/admin/skeletons";
 import {
   adminLinkClass,
   AdminCard,
-  AdminPageHeader,
+  DetailHeader,
   Mono,
   SectionHeading,
 } from "@/components/admin/ui";
@@ -46,8 +46,9 @@ export function TransferDetail({ id }: { id: string }) {
     <RecordShell
       backHref={LIST}
       backLabel="All transfers"
+      current="Transfer details"
       header={
-        <AdminPageHeader
+        <DetailHeader
           title="Transfer details"
           hint="One movement of stock from one warehouse to another."
           sub={`Transfer ${t.transactionNo}`}

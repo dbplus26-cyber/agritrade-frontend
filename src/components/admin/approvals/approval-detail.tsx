@@ -6,9 +6,9 @@ import {
   AdminButton,
   adminLinkClass,
   AdminCard,
-  AdminPageHeader,
+  DetailHeader,
 } from "@/components/admin/ui";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useGetApprovalQuery } from "@/redux/approvals/approvals-api";
@@ -57,8 +57,11 @@ export function ApprovalDetail({ id }: { id: string }) {
 
   return (
     <div className="max-w-[640px]">
-      <BackButton href={LIST} label="All approvals" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Approvals", href: LIST }]}
+        current="Approval details"
+      />
+      <DetailHeader
         title="Approval details"
         hint="One request waiting on a decision, with what it would change."
         sub={ACTION_LABEL[approval.action] ?? approval.action}

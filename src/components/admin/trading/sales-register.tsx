@@ -7,12 +7,20 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import { HelpTip } from "@/components/admin/help-tip";
+import { Plus } from "lucide-react";
 import {
-  ConsoleDateField,
+  ConsoleDateRange,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
-import { AdminButton, AdminCard, Mono } from "@/components/admin/ui";
+import {
+  AdminButton,
+  AdminCard,
+  AdminPageHeader,
+  Mono,
+} from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -254,65 +262,12 @@ export function SalesRegister() {
     [],
   );
 
-  const filterBar = (
-    <ConsoleFilterBar
-      search={searchInput}
-      onSearch={setSearch}
-      searchPlaceholder="Search buyer…"
-      activeCount={activeFilterCount}
-      onClear={resetFilters}
-    >
-      <ConsoleLabeledSelect
-        label="Status"
-        value={status}
-        onChange={(v) => setFilter("status", v)}
-        options={SALE_STATUS_FILTER_OPTIONS}
-        active={status !== "all"}
-        className="lg:w-[160px]"
-      />
-      <ConsoleLabeledSelect
-        hint="Narrows to orders a buyer still owes money on, so you can chase only those."
-        label="Balance"
-        value={outstanding}
-        onChange={(v) => setFilter("outstanding", v)}
-        options={OUTSTANDING_OPTIONS}
-        active={outstanding === "yes"}
-        className="lg:w-[170px]"
-      />
-      <ConsoleDateField
-        label="From"
-        value={from}
-        max={to || undefined}
-        onChange={(v) => setFilter("from", v)}
-        className="lg:w-[150px]"
-      />
-      <ConsoleDateField
-        label="To"
-        value={to}
-        min={from || undefined}
-        onChange={(v) => setFilter("to", v)}
-        className="lg:w-[150px]"
-      />
-    </ConsoleFilterBar>
-  );
-
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            Sales
-          </h1>
-          <p className="mt-0.5 text-[13px] text-adm-muted">
-            Agreements with buyers, payments and balances
-          </p>
-        </div>
-        {canManage ? (
-          <AdminButton asChild>
-            <Link href={`${LIST}/new`}>+ New sale</Link>
-          </AdminButton>
-        ) : null}
-      </div>
+      <AdminPageHeader
+        title="Sales"
+        sub="Agreements with buyers, payments and balances"
+      />
 
       {pristine ? (
         <RegisterEmpty
@@ -326,7 +281,73 @@ export function SalesRegister() {
         <>
           <SalesStats />
 
-          {isError && !search && activeFilterCount === 0 ? null : filterBar}
+          {isError && !search && activeFilterCount === 0 ? null : (
+            <ConsoleFilterBar
+              search={searchInput}
+              onSearch={setSearch}
+              searchPlaceholder="Search buyer…"
+              activeCount={activeFilterCount}
+              onClear={resetFilters}
+              totalCount={totalCount}
+              noun="sales"
+              action={
+                canManage ? (
+                  <AdminButton asChild aria-label="New sale">
+                    <Link href={`${LIST}/new`}>
+                      <Plus className="h-4 w-4" aria-hidden="true" />
+                      <span className="hidden sm:inline">New sale</span>
+                    </Link>
+                  </AdminButton>
+                ) : null
+              }
+              chips={
+                <>
+                  {status !== "all" ? (
+                    <FilterChip onRemove={() => setFilter("status", "all")}>
+                      Status: {labelOf(SALE_STATUS_FILTER_OPTIONS, status)}
+                    </FilterChip>
+                  ) : null}
+                  {outstanding === "yes" ? (
+                    <FilterChip onRemove={() => setFilter("outstanding", "no")}>
+                      Balance: {labelOf(OUTSTANDING_OPTIONS, outstanding)}
+                    </FilterChip>
+                  ) : null}
+                  {from ? (
+                    <FilterChip onRemove={() => setFilter("from", "")}>
+                      From: {from}
+                    </FilterChip>
+                  ) : null}
+                  {to ? (
+                    <FilterChip onRemove={() => setFilter("to", "")}>
+                      To: {to}
+                    </FilterChip>
+                  ) : null}
+                </>
+              }
+            >
+              <ConsoleLabeledSelect
+                label="Status"
+                value={status}
+                onChange={(v) => setFilter("status", v)}
+                options={SALE_STATUS_FILTER_OPTIONS}
+                active={status !== "all"}
+              />
+              <ConsoleLabeledSelect
+                hint="Narrows to orders a buyer still owes money on, so you can chase only those."
+                label="Balance"
+                value={outstanding}
+                onChange={(v) => setFilter("outstanding", v)}
+                options={OUTSTANDING_OPTIONS}
+                active={outstanding === "yes"}
+              />
+              <ConsoleDateRange
+                from={from}
+                to={to}
+                onFromChange={(v) => setFilter("from", v)}
+                onToChange={(v) => setFilter("to", v)}
+              />
+            </ConsoleFilterBar>
+          )}
 
           {isLoading ? (
             <ConsoleTableSkeleton columns={5} />

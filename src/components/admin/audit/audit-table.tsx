@@ -8,10 +8,18 @@ import {
   ConsoleDateRange,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
-import { AdminCard, Mono, ToneBadge, type Tone } from "@/components/admin/ui";
+import {
+  AdminCard,
+  AdminPageHeader,
+  Mono,
+  ToneBadge,
+  type Tone,
+} from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useGetAuditLogsQuery } from "@/redux/audit/audit-api";
 import { useTableQuery } from "@/hooks/use-table-query";
@@ -91,6 +99,14 @@ export function AuditTable() {
     (filters.category !== "all" ? 1 : 0) +
     (filters.from ? 1 : 0) +
     (filters.to ? 1 : 0);
+  // A log with nothing on file and nothing narrowing it shows ONLY the empty
+  // state - a filter bar filters nothing.
+  const pristine =
+    !isLoading &&
+    !isError &&
+    logs.length === 0 &&
+    !search &&
+    activeFilterCount === 0;
 
   const columns = useMemo<ColumnDef<IAuditLog, unknown>[]>(
     () => [
@@ -199,22 +215,39 @@ export function AuditTable() {
 
   return (
     <div>
-      <div className="mb-3.5">
-        <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-          Audit Log
-        </h1>
-        <p className="mt-0.5 text-[13px] text-adm-muted">
-          Every change, by whom, from where
-        </p>
-      </div>
+      <AdminPageHeader
+        title="Audit Log"
+        sub="Every change, by whom, from where"
+      />
 
-      {isError && !search && activeFilterCount === 0 ? null : (
+      {pristine || (isError && !search && activeFilterCount === 0) ? null : (
         <ConsoleFilterBar
           search={searchInput}
           onSearch={setSearch}
           searchPlaceholder="Search actor or action…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
+          totalCount={totalCount}
+          noun="entries"
+          chips={
+            <>
+              {filters.category !== "all" ? (
+                <FilterChip onRemove={() => setFilter("category", "all")}>
+                  Category: {labelOf(CATEGORY_OPTIONS, filters.category)}
+                </FilterChip>
+              ) : null}
+              {filters.from ? (
+                <FilterChip onRemove={() => setFilter("from", "")}>
+                  From: {filters.from}
+                </FilterChip>
+              ) : null}
+              {filters.to ? (
+                <FilterChip onRemove={() => setFilter("to", "")}>
+                  To: {filters.to}
+                </FilterChip>
+              ) : null}
+            </>
+          }
         >
           <ConsoleLabeledSelect
             label="Category"
@@ -222,14 +255,12 @@ export function AuditTable() {
             onChange={(v) => setFilter("category", v)}
             options={CATEGORY_OPTIONS}
             active={filters.category !== "all"}
-            className="lg:w-[170px]"
           />
           <ConsoleDateRange
             from={filters.from}
             to={filters.to}
             onFromChange={(v) => setFilter("from", v)}
             onToChange={(v) => setFilter("to", v)}
-            fieldClassName="lg:w-[150px]"
           />
         </ConsoleFilterBar>
       )}
@@ -242,30 +273,17 @@ export function AuditTable() {
           onRetry={() => void refetch()}
         />
       ) : logs.length === 0 ? (
-        <AdminCard className="overflow-hidden">
-          <EmptyState
-            variant="plain"
-            title={
-              search || activeFilterCount > 0
-                ? "No matching entries"
-                : "Nothing on file yet"
-            }
-            description={
-              search || activeFilterCount > 0
-                ? "Nothing matches this search and filter combination. Adjust the criteria or clear them."
-                : "Every sign-in, account change and security event will be filed here as it happens."
-            }
-            {...(search || activeFilterCount > 0
-              ? {
-                  actionLabel: "Clear search & filters",
-                  onAction: () => {
-                    setSearch("");
-                    resetFilters();
-                  },
-                }
-              : {})}
-          />
-        </AdminCard>
+        <RegisterEmpty
+          filtered={Boolean(search) || activeFilterCount > 0}
+          noun="entries"
+          title="Nothing on file yet"
+          description="Every sign-in, account change and security event will be filed here as it happens."
+          filteredDescription="Nothing matches this search and filter combination. Adjust the criteria or clear them."
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
+        />
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IAuditLog>

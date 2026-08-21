@@ -3,12 +3,15 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
 import {
-  ConsoleDateField,
+  ConsoleDateRange,
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
-import { AdminButton, Mono } from "@/components/admin/ui";
+import { AdminButton, AdminPageHeader, Mono } from "@/components/admin/ui";
 import { RecordCardGridSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -67,6 +70,7 @@ export function ShipmentsRegister() {
     useGetShipmentsQuery(queryArgs);
   const shipments = data?.data ?? [];
   const meta = data?.meta;
+  const totalCount = meta?.total ?? 0;
   const activeFilterCount =
     (status !== "all" ? 1 : 0) + (from ? 1 : 0) + (to ? 1 : 0);
   const filtered = Boolean(search) || activeFilterCount > 0;
@@ -77,21 +81,10 @@ export function ShipmentsRegister() {
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-[22px] font-bold tracking-[-0.01em] text-adm-ink">
-            Shipments
-          </h1>
-          <p className="mt-0.5 text-[13px] text-adm-muted">
-            Trucks loaded against confirmed sales, from warehouse to buyer
-          </p>
-        </div>
-        {canManage ? (
-          <AdminButton asChild>
-            <Link href={`${LIST}/new`}>+ Plan shipment</Link>
-          </AdminButton>
-        ) : null}
-      </div>
+      <AdminPageHeader
+        title="Shipments"
+        sub="Trucks loaded against confirmed sales, from warehouse to buyer"
+      />
 
       {pristine || (isError && !filtered) ? null : (
         <ConsoleFilterBar
@@ -100,28 +93,50 @@ export function ShipmentsRegister() {
           searchPlaceholder="Search truck, driver, buyer…"
           activeCount={activeFilterCount}
           onClear={resetFilters}
+          totalCount={totalCount}
+          noun="shipments"
+          action={
+            canManage ? (
+              <AdminButton asChild aria-label="Plan shipment">
+                <Link href={`${LIST}/new`}>
+                  <Plus className="h-4 w-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">Plan shipment</span>
+                </Link>
+              </AdminButton>
+            ) : null
+          }
+          chips={
+            <>
+              {status !== "all" ? (
+                <FilterChip onRemove={() => setFilter("status", "all")}>
+                  Status: {labelOf(SHIPMENT_STATUS_FILTER_OPTIONS, status)}
+                </FilterChip>
+              ) : null}
+              {from ? (
+                <FilterChip onRemove={() => setFilter("from", "")}>
+                  From: {from}
+                </FilterChip>
+              ) : null}
+              {to ? (
+                <FilterChip onRemove={() => setFilter("to", "")}>
+                  To: {to}
+                </FilterChip>
+              ) : null}
+            </>
+          }
         >
-          <ConsoleDateField
-            label="From"
-            value={from}
-            max={to || undefined}
-            onChange={(v) => setFilter("from", v)}
-            className="lg:w-[150px]"
-          />
-          <ConsoleDateField
-            label="To"
-            value={to}
-            min={from || undefined}
-            onChange={(v) => setFilter("to", v)}
-            className="lg:w-[150px]"
-          />
           <ConsoleLabeledSelect
             label="Status"
             value={status}
             onChange={(v) => setFilter("status", v)}
             options={SHIPMENT_STATUS_FILTER_OPTIONS}
             active={status !== "all"}
-            className="lg:w-[170px]"
+          />
+          <ConsoleDateRange
+            from={from}
+            to={to}
+            onFromChange={(v) => setFilter("from", v)}
+            onToChange={(v) => setFilter("to", v)}
           />
         </ConsoleFilterBar>
       )}

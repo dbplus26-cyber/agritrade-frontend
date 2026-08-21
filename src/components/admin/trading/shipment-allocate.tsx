@@ -6,12 +6,12 @@ import { Warehouse as WarehouseIcon } from "lucide-react";
 import {
   AdminButton,
   AdminCard,
-  AdminPageHeader,
+  DetailHeader,
   Mono,
   adminInputClass,
   adminSelectClass,
 } from "@/components/admin/ui";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { AllocateSkeleton, LotRowsSkeleton } from "@/components/admin/skeletons";
 import { HelpTip } from "@/components/admin/help-tip";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -526,12 +526,16 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
 
   return (
     <div className="max-w-[760px]">
-      <BackButton
-        href={`${LIST}/${shipment.id}`}
-        label="Back to shipment"
-        className="mb-2"
+      <DetailNav
+        crumbs={[
+          DASHBOARD_CRUMB,
+          { label: "Shipments", href: LIST },
+          { label: shipment.transactionNo, href: `${LIST}/${shipment.id}` },
+        ]}
+        current="Allocate lots"
+        backLabel="Back to shipment"
       />
-      <AdminPageHeader
+      <DetailHeader
         title="Allocate lots"
         hint="Choose which stock goes on this truck. Cost is taken from the lots you pick."
         sub={`Which warehouse lots fill each sale on ${shipment.truckReg} · ${shipment.originWarehouse.name} → ${shipment.destination}`}

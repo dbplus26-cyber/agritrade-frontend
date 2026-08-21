@@ -2,11 +2,14 @@
 
 import { useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
+import { Plus } from "lucide-react";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
+  FilterChip,
+  labelOf,
 } from "@/components/admin/filter-bar";
 import {
   AdminButton,
@@ -200,16 +203,11 @@ export function DisbursementsScreen() {
     filters.rail === "all" && filters.attention === "all";
 
   return (
-    <div className="space-y-5">
+    <div>
       <AdminPageHeader
         title="Money sent"
         hint="Every mobile money and bank transfer sent from the business."
         sub="Every payout made through Hubtel, by the owner, staff or an agent in the field"
-        actions={
-          <AdminButton onClick={() => setSending(true)} type="button">
-            Send money
-          </AdminButton>
-        }
       />
 
       {pristine ? (
@@ -229,6 +227,38 @@ export function DisbursementsScreen() {
             onSearch={setSearch}
             search={search}
             searchPlaceholder="Reference, recipient, number…"
+            totalCount={total}
+            noun="payouts"
+            action={
+              <AdminButton
+                aria-label="Send money"
+                onClick={() => setSending(true)}
+                type="button"
+              >
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Send money</span>
+              </AdminButton>
+            }
+            chips={
+              <>
+                {filters.status !== "all" ? (
+                  <FilterChip onRemove={() => setFilter("status", "all")}>
+                    Status: {labelOf(STATUS_FILTER_OPTIONS, filters.status)}
+                  </FilterChip>
+                ) : null}
+                {filters.rail !== "all" ? (
+                  <FilterChip onRemove={() => setFilter("rail", "all")}>
+                    Rail: {labelOf(RAIL_FILTER_OPTIONS, filters.rail)}
+                  </FilterChip>
+                ) : null}
+                {filters.attention !== "all" ? (
+                  <FilterChip onRemove={() => setFilter("attention", "all")}>
+                    Attention:{" "}
+                    {labelOf(ATTENTION_FILTER_OPTIONS, filters.attention)}
+                  </FilterChip>
+                ) : null}
+              </>
+            }
           >
             <ConsoleLabeledSelect
               active={filters.status !== "all"}

@@ -10,7 +10,7 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
+  DetailHeader,
   DetailRow,
   DetailShell,
   Mono,
@@ -19,7 +19,7 @@ import {
   adminLinkClass,
   adminSelectClass,
 } from "@/components/admin/ui";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { DateOnlyCell } from "@/components/admin/date-cell";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -409,28 +409,29 @@ export function LandSaleDetail({ id }: { id: string }) {
 
   return (
     <div className="max-w-[1120px]">
-      <BackButton href={LIST} label="All land sales" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Land sales", href: LIST }]}
+        current="Land sale details"
+      />
+      <DetailHeader
         title="Land sale details"
         hint="One plot sold: the buyer, the price and what they still owe."
+        badges={<LandSaleStatusBadge status={s.status} />}
         actions={
-          <span className="flex flex-wrap items-center gap-1.5">
-            <LandSaleStatusBadge status={s.status} />
-            {/* The server titles it for its state: a sale still owing prints
-                as the agreement (with every payment listed), a settled one
-                as the receipt. */}
-            {s.status !== "CANCELLED" ? (
-              <AdminButton variant="outline" asChild>
-                <a
-                  href={receiptPdfUrl("land-sale", s.id)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {s.balanceGhs === 0 ? "Receipt" : "Agreement"} PDF
-                </a>
-              </AdminButton>
-            ) : null}
-          </span>
+          /* The server titles it for its state: a sale still owing prints
+             as the agreement (with every payment listed), a settled one
+             as the receipt. */
+          s.status !== "CANCELLED" ? (
+            <AdminButton variant="outline" asChild>
+              <a
+                href={receiptPdfUrl("land-sale", s.id)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {s.balanceGhs === 0 ? "Receipt" : "Agreement"} PDF
+              </a>
+            </AdminButton>
+          ) : null
         }
       />
 

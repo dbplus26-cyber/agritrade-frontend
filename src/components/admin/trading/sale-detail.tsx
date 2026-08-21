@@ -8,7 +8,7 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
+  DetailHeader,
   DetailShell,
   Mono,
   SectionHeading,
@@ -16,7 +16,7 @@ import {
   adminInputClass,
 } from "@/components/admin/ui";
 import { HelpTip } from "@/components/admin/help-tip";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { DateOnlyCell } from "@/components/admin/date-cell";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -540,16 +540,15 @@ export function SaleDetail({
 
   return (
     <div className="max-w-[1120px]">
-      <BackButton href={LIST} label="All sales" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Sales", href: LIST }]}
+        current="Sale details"
+      />
+      <DetailHeader
         title="Sale details"
         hint="One order: what was agreed, what has shipped and what is still owed."
         sub={`Drafted ${formatSaleDate(sale.createdAt)}`}
-        actions={
-          <span className="flex flex-wrap items-center gap-1.5">
-            <SaleStatusBadge status={sale.status} />
-          </span>
-        }
+        badges={<SaleStatusBadge status={sale.status} />}
       />
 
       {sale.status === "CANCELLED" && sale.cancelReason ? (

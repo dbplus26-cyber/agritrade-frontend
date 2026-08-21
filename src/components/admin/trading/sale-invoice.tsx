@@ -1,10 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { AdminButton, AdminPageHeader,
-  adminLinkClass,
-} from "@/components/admin/ui";
-import { cn } from "@/lib/utils";
+import { AdminButton, DetailHeader } from "@/components/admin/ui";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import {
   AuthorisedSignature,
   DocumentLogo,
@@ -117,39 +114,44 @@ export function SaleInvoice({ id }: { id: string }) {
   // only gives the buyer a second, staler place to read them from.
   const accounts = isReceipt ? [] : (payable?.data.accounts ?? []);
 
+  const title = isReceipt ? "Receipt" : "Invoice";
+
   return (
     <div>
-      <div className="print:hidden">
-        <Link
-          href={`/admin/sales/${s.id}`}
-          className={cn(adminLinkClass, "mb-2 inline-block text-[13px]")}
-        >
-          ← Back to sale
-        </Link>
-        <AdminPageHeader
-          title={isReceipt ? "Receipt" : "Invoice"}
-          sub={
-            isReceipt
-              ? `Proof that ${s.buyer.name} settled this sale in full`
-              : `What ${s.buyer.name} still owes on this sale, and where to pay it`
-          }
-          actions={
-            // The server renders this same document as a real A4 PDF, so the
-            // one action opens that - the viewer previews it true to size and
-            // printing happens from there. The browser's own print dialog
-            // placed the sheet top-left with dead space around it.
-            <AdminButton asChild>
-              <a
-                href={saleInvoicePdfUrl(s.id)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View PDF
-              </a>
-            </AdminButton>
-          }
-        />
-      </div>
+      <DetailNav
+        className="print:hidden"
+        crumbs={[
+          DASHBOARD_CRUMB,
+          { label: "Sales", href: "/admin/sales" },
+          { label: s.transactionNo, href: `/admin/sales/${s.id}` },
+        ]}
+        current={title}
+        backLabel="Back to sale"
+      />
+      <DetailHeader
+        className="print:hidden"
+        title={title}
+        sub={
+          isReceipt
+            ? `Proof that ${s.buyer.name} settled this sale in full`
+            : `What ${s.buyer.name} still owes on this sale, and where to pay it`
+        }
+        actions={
+          // The server renders this same document as a real A4 PDF, so the
+          // one action opens that - the viewer previews it true to size and
+          // printing happens from there. The browser's own print dialog
+          // placed the sheet top-left with dead space around it.
+          <AdminButton asChild>
+            <a
+              href={saleInvoicePdfUrl(s.id)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View PDF
+            </a>
+          </AdminButton>
+        }
+      />
 
       {/* Left-aligned like every other console page - the sheet keeps its own
           720px measure so it still reads as a piece of paper. Squared and

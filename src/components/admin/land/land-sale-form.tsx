@@ -7,11 +7,11 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
+  DetailHeader,
   adminInputClass,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { Input } from "@/components/ui/input";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
@@ -76,8 +76,11 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
 
   return (
     <div className="max-w-[640px]">
-      <BackButton href={LIST} label="All land sales" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Land sales", href: LIST }]}
+        current="New land sale"
+      />
+      <DetailHeader
         title="New land sale"
         hint="Sell a plot to a buyer and set what they owe."
         sub="Agree a plot and price with a buyer - the plot is only reserved once you confirm the sale"

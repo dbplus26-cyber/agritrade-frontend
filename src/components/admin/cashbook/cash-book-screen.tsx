@@ -59,7 +59,7 @@ export function CashBookScreen() {
   const suspense = data?.data.suspenseGhs ?? 0;
 
   return (
-    <div className="@container/cashbook space-y-5">
+    <div className="@container/cashbook">
       <AdminPageHeader
         title="Cash book"
         hint="Every place the business's money can sit, what each holds, and every movement in and out."
@@ -73,42 +73,44 @@ export function CashBookScreen() {
         }
       />
 
-      <div className="grid grid-cols-1 gap-4 @2xl/cashbook:grid-cols-2">
-        <PositionCard
-          hint="Everything the business holds, across every account except suspense."
-          title="Money on hand"
-          value={data?.data.cashGhs ?? null}
-        />
-        <PositionCard
-          hint="Payments whose account nobody recorded. Not a loss - a question. Move each one to the account it actually went through."
-          title="Waiting to be placed"
-          value={data?.data.suspenseGhs ?? null}
-          warn={suspense !== 0}
-        />
-      </div>
+      <div className="space-y-5">
+        <div className="grid grid-cols-1 gap-4 @2xl/cashbook:grid-cols-2">
+          <PositionCard
+            hint="Everything the business holds, across every account except suspense."
+            title="Money on hand"
+            value={data?.data.cashGhs ?? null}
+          />
+          <PositionCard
+            hint="Payments whose account nobody recorded. Not a loss - a question. Move each one to the account it actually went through."
+            title="Waiting to be placed"
+            value={data?.data.suspenseGhs ?? null}
+            warn={suspense !== 0}
+          />
+        </div>
 
-      <AccountList
-        accounts={company}
-        emptyText="No company accounts yet. Add one on the Payment Accounts screen."
-        title="Company accounts"
-      />
-      {held.length > 0 ? (
         <AccountList
-          accounts={held}
-          emptyText=""
-          title="Money people are holding"
+          accounts={company}
+          emptyText="No company accounts yet. Add one on the Payment Accounts screen."
+          title="Company accounts"
         />
-      ) : null}
+        {held.length > 0 ? (
+          <AccountList
+            accounts={held}
+            emptyText=""
+            title="Money people are holding"
+          />
+        ) : null}
+
+        {isFetching ? (
+          <p className="text-[12.5px] text-adm-muted">Refreshing…</p>
+        ) : null}
+      </div>
 
       <TransferDialog
         accounts={accounts}
         onClose={() => setMoving(false)}
         open={moving}
       />
-
-      {isFetching ? (
-        <p className="text-[12.5px] text-adm-muted">Refreshing…</p>
-      ) : null}
     </div>
   );
 }

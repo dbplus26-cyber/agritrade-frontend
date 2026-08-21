@@ -10,7 +10,7 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
+  DetailHeader,
   DetailShell,
   SectionHeading,
   ToneBadge,
@@ -18,7 +18,7 @@ import {
 } from "@/components/admin/ui";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
-import { BackButton } from "@/components/ui/BackButton";
+import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import {
@@ -650,8 +650,11 @@ export function UserDetail({ id }: { id: string }) {
 
   return (
     <div className="w-full max-w-[1120px]">
-      <BackButton href="/admin/users" label="All users" className="mb-2" />
-      <AdminPageHeader
+      <DetailNav
+        crumbs={[DASHBOARD_CRUMB, { label: "Users", href: "/admin/users" }]}
+        current="User details"
+      />
+      <DetailHeader
         title="User details"
         hint="One person's access: their role and what they are allowed to do."
       />
