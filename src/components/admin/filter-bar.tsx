@@ -1,6 +1,13 @@
 "use client";
 
-import { Children, useId, useState, type ReactNode } from "react";
+import {
+  Children,
+  createContext,
+  useContext,
+  useId,
+  useState,
+  type ReactNode,
+} from "react";
 import { Search, SlidersHorizontal, X, type LucideIcon } from "lucide-react";
 import {
   Select,
@@ -29,6 +36,15 @@ const fieldBox =
   "flex h-11 w-full min-w-0 items-center rounded-none border bg-adm-card text-sm text-adm-ink transition-colors focus-within:border-console";
 
 const fieldLabel = "text-xs font-medium text-adm-ink sm:text-sm";
+
+/**
+ * Set by ConsoleFilterBar around a filter that sits BESIDE the search box.
+ * There the field has no room for a label on top (the search has none, and
+ * a labelled box next to an unlabelled one pushes the row out of line), so
+ * the label goes to screen readers only and the box takes the row's control
+ * height. Inside the panel and the drawer the same field keeps its label.
+ */
+const InlineFieldContext = createContext<{ heightClass: string } | null>(null);
 
 /** The display label of `value` in an options list (for filter chips). */
 export function labelOf(
@@ -77,11 +93,20 @@ export function ConsoleLabeledSelect({
   placeholder?: string;
 }) {
   const id = useId();
+  const inline = useContext(InlineFieldContext);
   return (
-    <div className={cn("min-w-0 space-y-1.5 sm:space-y-2", className)}>
-      <label htmlFor={id} className={cn(fieldLabel, "flex items-center gap-1")}>
+    <div
+      className={cn("min-w-0", !inline && "space-y-1.5 sm:space-y-2", className)}
+    >
+      <label
+        htmlFor={id}
+        className={cn(
+          fieldLabel,
+          inline ? "sr-only" : "flex items-center gap-1",
+        )}
+      >
         <span className="min-w-0 truncate">{label}</span>
-        {hint ? (
+        {hint && !inline ? (
           <HelpTip label={`What does the ${label} filter do?`} text={hint} />
         ) : null}
       </label>
@@ -95,6 +120,7 @@ export function ConsoleLabeledSelect({
           aria-label={`Filter by ${label.toLowerCase()}`}
           className={cn(
             fieldBox,
+            inline?.heightClass,
             active ? "border-console/60" : "border-adm-line",
             "cursor-pointer justify-between gap-1.5 pr-2.5 pl-3 font-normal [&_svg]:size-4 [&_svg]:text-adm-faint",
           )}
@@ -145,14 +171,24 @@ export function ConsoleDateField({
   className?: string;
 }) {
   const id = useId();
+  const inline = useContext(InlineFieldContext);
   return (
-    <div className={cn("min-w-0 space-y-1.5 sm:space-y-2", className)}>
-      <label htmlFor={id} className={cn(fieldLabel, "flex items-center gap-1")}>
+    <div
+      className={cn("min-w-0", !inline && "space-y-1.5 sm:space-y-2", className)}
+    >
+      <label
+        htmlFor={id}
+        className={cn(
+          fieldLabel,
+          inline ? "sr-only" : "flex items-center gap-1",
+        )}
+      >
         <span className="min-w-0 truncate">{label}</span>
       </label>
       <div
         className={cn(
           fieldBox,
+          inline?.heightClass,
           value ? "border-console/60" : "border-adm-line",
           "px-3",
         )}
@@ -399,7 +435,11 @@ export function ConsoleFilterBar({
 
   const inlineSlot =
     inlineFilter && !hasFields ? (
-      <div className="hidden w-44 shrink-0 sm:block lg:w-52">{inlineFilter}</div>
+      <div className="hidden w-44 shrink-0 sm:block lg:w-52">
+        <InlineFieldContext.Provider value={{ heightClass: controlHeight }}>
+          {inlineFilter}
+        </InlineFieldContext.Provider>
+      </div>
     ) : null;
 
   const filtersButton =
@@ -502,7 +542,7 @@ export function ConsoleFilterBar({
         {actionSlot ? (
           <div className="order-2 ml-auto lg:order-4 lg:ml-0">{actionSlot}</div>
         ) : null}
-        <div className="order-3 flex min-w-0 flex-1 basis-[60%] gap-2 lg:order-2 lg:ml-auto lg:flex-none lg:basis-auto">
+        <div className="order-3 flex min-w-0 flex-1 basis-[60%] items-center gap-2 lg:order-2 lg:ml-auto lg:flex-none lg:basis-auto">
           {searchField}
           {inlineSlot}
           {filtersButton}
@@ -521,7 +561,7 @@ export function ConsoleFilterBar({
             {actionSlot}
           </div>
         ) : null}
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           {searchField}
           {inlineSlot}
           {filtersButton}

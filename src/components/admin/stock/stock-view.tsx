@@ -72,10 +72,10 @@ interface MatrixCommodity {
 }
 
 /**
- * /admin/stock - the derived stock position. Balances render as one ledger
- * matrix (commodities as rows, warehouses as column groups on wide consoles,
- * compact per-warehouse sections below) under a per-commodity totals strip;
- * the movements ledger lives behind a section toggle. Corrections are
+ * /admin/stock - the derived stock position. Balances render as stacked
+ * per-warehouse sections, each a ruled table of its commodities, under a
+ * per-commodity totals strip; the movements ledger lives behind a section
+ * toggle that shares the toolbar row. Corrections are
  * REQUESTS: the adjustment dialog files an approval and nothing moves until
  * it is decided.
  */
@@ -445,84 +445,124 @@ function WarehouseSections({
   warehouses: MatrixWarehouse[];
   commodities: MatrixCommodity[];
 }) {
+  const headCell =
+    "h-[34px] px-4 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase";
   return (
-    // Sections tile on a wide console rather than running one-per-row down a
-    // long page; each keeps its own frame so the grid reads as a set of
-    // stores rather than one continuous ledger.
-    <div className="grid gap-px bg-adm-hairline @4xl/main:grid-cols-2">
-      {warehouses.map((w) => (
-        <section key={w.id} className="bg-adm-card">
-          {/* THREE LEVELS, and they have to look like three.
-              The warehouse was set in the same 11px micro-caps the console
-              uses for section labels, while the commodities under it were
-              13px - so the parent read smaller than its children and the eye
-              had nothing to climb. The place is a heading now, the goods are
-              rows, and every quantity lands in one right-hand column where
-              they can be compared down the page. */}
-          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-adm-hairline bg-adm-sunken px-4 py-3">
-            <div className="min-w-0">
-              <Link
-                href={`/admin/warehouses/${w.id}`}
-                className="block truncate text-[14px] font-semibold text-adm-ink underline-offset-2 hover:text-console hover:underline"
-                title={w.name}
-              >
-                {w.name}
-              </Link>
-              <span className="text-[11.5px] text-adm-muted">
-                {w.byCommodity.size}{" "}
-                {w.byCommodity.size === 1 ? "commodity" : "commodities"}
-              </span>
-            </div>
-            <div className="flex-none text-right">
-              <Kg
-                kg={w.subtotalKg}
-                className="block text-[15px] font-semibold text-adm-ink"
-              />
-              <span className="flex items-center justify-end gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-                <span className="min-w-0">On hand</span>
-                <HelpTip
-                  label="What does On hand count?"
-                  text="Everything this store is holding right now, added up across all its commodities."
+    // Warehouses STACK, one ruled section each, so every quantity lands in
+    // the same right-hand column down the whole page and a hundred stores
+    // cost height rather than width. Inside, the goods are table rows:
+    // commodity, what is on hand, and its share of that store as a bar, so
+    // a long list still reads top to bottom with nothing to hunt for.
+    <div className="divide-y divide-adm-line">
+      {warehouses.map((w) => {
+        const rows = commodities
+          .filter((c) => w.byCommodity.has(c.id))
+          .map((c) => ({ ...c, kg: w.byCommodity.get(c.id) ?? 0 }));
+        return (
+          <section key={w.id} aria-labelledby={`warehouse-${w.id}`}>
+            <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b border-adm-hairline bg-adm-sunken px-4 py-3">
+              <div className="min-w-0">
+                <Link
+                  id={`warehouse-${w.id}`}
+                  href={`/admin/warehouses/${w.id}`}
+                  className="block truncate text-[14px] font-semibold text-adm-ink underline-offset-2 hover:text-console hover:underline"
+                  title={w.name}
+                >
+                  {w.name}
+                </Link>
+                <span className="text-[11.5px] text-adm-muted">
+                  {rows.length} {rows.length === 1 ? "commodity" : "commodities"}
+                </span>
+              </div>
+              <div className="flex-none text-right">
+                <Kg
+                  kg={w.subtotalKg}
+                  className="block text-[15px] font-semibold text-adm-ink"
                 />
-              </span>
+                <span className="flex items-center justify-end gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+                  <span className="min-w-0">On hand</span>
+                  <HelpTip
+                    label="What does On hand count?"
+                    text="Everything this store is holding right now, added up across all its commodities."
+                  />
+                </span>
+              </div>
             </div>
-          </div>
-          {/* One column, read straight down. This was a CSS multi-column
-              list, and CSS columns flow top-to-bottom and THEN wrap to the
-              next column - so a reader looking for a commodity had no single
-              direction to scan, which is what made the panel feel scattered.
-              Width is spent on showing more warehouses side by side instead
-              (see the grid on the section list), where each one stays a plain
-              vertical list. */}
-          <div className="px-4 py-1">
-            {commodities
-              .filter((c) => w.byCommodity.has(c.id))
-              .map((c) => {
-                const kg = w.byCommodity.get(c.id) ?? 0;
-                return (
-                  <div
-                    key={c.id}
-                    className="flex break-inside-avoid items-baseline justify-between gap-4 border-b border-adm-hairline py-2 last:border-b-0"
+
+            <table className="w-full table-fixed">
+              <colgroup>
+                <col />
+                <col className="w-32 sm:w-40" />
+                <col className="hidden w-44 sm:table-column lg:w-56" />
+              </colgroup>
+              <thead>
+                <tr className="border-b border-adm-hairline">
+                  <th scope="col" className={cn(headCell, "text-left")}>
+                    Commodity
+                  </th>
+                  <th scope="col" className={cn(headCell, "text-right")}>
+                    On hand
+                  </th>
+                  <th
+                    scope="col"
+                    className={cn(headCell, "hidden text-right sm:table-cell")}
                   >
-                    <span
-                      className="min-w-0 [overflow-wrap:anywhere] md:truncate text-[13px] text-adm-body"
-                      title={c.name}
+                    Share of store
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((r) => {
+                  const share =
+                    w.subtotalKg > 0
+                      ? Math.min(100, Math.max(0, (r.kg / w.subtotalKg) * 100))
+                      : 0;
+                  const shareLabel =
+                    share > 0 && share < 1 ? "<1%" : `${Math.round(share)}%`;
+                  return (
+                    <tr
+                      key={r.id}
+                      className="border-b border-adm-hairline transition-colors last:border-b-0 hover:bg-adm-hover"
                     >
-                      {c.name}
-                    </span>
-                    <Kg
-                      kg={kg}
-                      className={cn(
-                        "flex-none text-[13px] font-semibold",
-                        kg === 0 ? "text-adm-faint" : "text-adm-ink",
-                      )}
-                    />
-                  </div>
-                );
-              })}
-          </div>
-        </section>
-      ))}
+                      <td
+                        className="px-4 py-2.5 text-[13px] text-adm-body [overflow-wrap:anywhere]"
+                        title={r.name}
+                      >
+                        {r.name}
+                      </td>
+                      <td className="px-4 py-2.5 text-right">
+                        <Kg
+                          kg={r.kg}
+                          className={cn(
+                            "text-[13px] font-semibold",
+                            r.kg === 0 ? "text-adm-faint" : "text-adm-ink",
+                          )}
+                        />
+                      </td>
+                      <td className="hidden px-4 py-2.5 sm:table-cell">
+                        <div className="flex items-center justify-end gap-2.5">
+                          <span
+                            aria-hidden="true"
+                            className="block h-1 w-20 overflow-hidden bg-adm-sunken lg:w-28"
+                          >
+                            <span
+                              className="block h-full bg-console-gold"
+                              style={{ width: `${String(share)}%` }}
+                            />
+                          </span>
+                          <span className="font-adminmono w-9 text-right text-[11.5px] tabular-nums text-adm-muted">
+                            {shareLabel}
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </section>
+        );
+      })}
     </div>
   );
 }
