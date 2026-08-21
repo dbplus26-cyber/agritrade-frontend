@@ -407,39 +407,37 @@ function PolicyCard({ policy }: { policy: IPaymentPolicy }) {
         ))}
       </ul>
 
-      {/* Plain text actions on one quiet line. Three filled and outlined
-          buttons in three colours were competing with the name and the bar
-          for the top of the reading order, on a card whose job is to be
-          scanned rather than acted on - the actions are the rarest thing
-          anyone does here. Destructive intent shows on hover, not at rest. */}
-      <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-4 text-[12.5px]">
+      {/* Quiet outline buttons at the foot of the card: they read as
+          buttons at rest, and Delete carries its red at rest too. */}
+      <div className="mt-auto flex flex-wrap items-center gap-2 pt-4">
         {!policy.isDefault && policy.isActive ? (
-          <button
-            type="button"
-            className="text-adm-muted transition-colors hover:text-console"
+          <AdminButton
+            size="sm"
+            variant="outline"
             onClick={() => void makeDefault()}
           >
             Make default
-          </button>
+          </AdminButton>
         ) : null}
         {!policy.isDefault ? (
-          <button
-            type="button"
-            className="text-adm-muted transition-colors hover:text-console"
+          <AdminButton
+            size="sm"
+            variant="outline"
             onClick={() => void toggleActive()}
           >
             {policy.isActive ? "Deactivate" : "Activate"}
-          </button>
+          </AdminButton>
         ) : null}
         {isSuperAdmin ? (
-          <button
-            type="button"
-            className="text-adm-muted transition-colors hover:text-console-red disabled:opacity-50"
+          <AdminButton
+            size="sm"
+            variant="outline"
+            className="text-console-red hover:bg-console-red/10 hover:text-console-red"
             disabled={deleteState.isLoading}
             onClick={() => void onDelete()}
           >
             Delete
-          </button>
+          </AdminButton>
         ) : null}
       </div>
       {confirmationDialog}

@@ -373,39 +373,40 @@ function PolicyCard({ policy }: { policy: IDriverPaymentPolicy }) {
         ))}
       </ul>
 
-      <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-4 text-[12.5px]">
+      <div className="mt-auto flex flex-wrap items-center gap-2 pt-4">
         {!policy.isDefault && policy.isActive ? (
-          <button
-            className="cursor-pointer text-adm-muted transition-colors hover:text-console"
+          <AdminButton
+            size="sm"
+            variant="outline"
             onClick={() => void patch({ isDefault: true }, "Now the default")}
-            type="button"
           >
             Make default
-          </button>
+          </AdminButton>
         ) : null}
         {!policy.isDefault ? (
-          <button
-            className="cursor-pointer text-adm-muted transition-colors hover:text-console"
+          <AdminButton
+            size="sm"
+            variant="outline"
             onClick={() =>
               void patch(
                 { isActive: !policy.isActive },
                 policy.isActive ? "Deactivated" : "Activated",
               )
             }
-            type="button"
           >
             {policy.isActive ? "Deactivate" : "Activate"}
-          </button>
+          </AdminButton>
         ) : null}
         {isSuperAdmin ? (
-          <button
-            className="cursor-pointer text-adm-muted transition-colors hover:text-console-red disabled:opacity-50"
+          <AdminButton
+            size="sm"
+            variant="outline"
+            className="text-console-red hover:bg-console-red/10 hover:text-console-red"
             disabled={deleteState.isLoading}
             onClick={() => void onDelete()}
-            type="button"
           >
             Delete
-          </button>
+          </AdminButton>
         ) : null}
       </div>
       {confirmationDialog}
