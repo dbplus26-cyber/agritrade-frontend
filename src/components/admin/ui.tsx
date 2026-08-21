@@ -405,25 +405,52 @@ export function DetailHeader({
   hint?: string;
 }) {
   const hasTopRow = Boolean(badges || actions);
+  // On phones the meta line ("Drafted 12 Mar 2026", the counterparty) sits
+  // beside the badges on the top row when there are badges to sit beside -
+  // one structured line instead of a badge, then a date, then a title, each
+  // on a row of its own. With no badges it stays under the title.
+  const subBesideBadges = Boolean(badges && sub);
   return (
-    // Phone: a two-column grid so badges and actions can sit on one row while
-    // the DOM keeps its reading order (badges, title, actions). md+: a plain
-    // column, where the grid placements are ignored.
+    // Phone: a two-column grid - badges+meta left and actions right on the top
+    // row, the title beneath - while the DOM keeps its reading order. md+: a
+    // plain column (badges, title, meta, actions by `order`), where the grid
+    // placements are ignored.
     <div
       className={cn(
-        "mb-6 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 md:flex md:flex-col md:items-stretch",
+        "mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 md:flex md:flex-col md:items-stretch",
         className,
       )}
     >
-      {badges ? (
-        <div className="col-start-1 row-start-1 flex flex-wrap items-center gap-2 md:mb-2">
-          {badges}
-        </div>
-      ) : null}
+      {/* Phone: badges and meta as one wrapping cluster; otherwise (and from
+          md) `contents`, so each takes its own place in the parent. */}
       <div
         className={cn(
-          "col-span-2 min-w-0 space-y-2",
-          hasTopRow && "row-start-2 mt-2 md:mt-0",
+          subBesideBadges
+            ? "col-start-1 row-start-1 flex flex-wrap items-center gap-x-3 gap-y-1"
+            : "contents",
+          "md:contents",
+        )}
+      >
+        {badges ? (
+          <div className="col-start-1 row-start-1 flex flex-wrap items-center gap-2 md:order-1 md:mb-2">
+            {badges}
+          </div>
+        ) : null}
+        {sub ? (
+          <div
+            className={cn(
+              "flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-adm-muted md:order-3 md:mt-2",
+              !subBesideBadges && "col-span-2 row-start-3 mt-2",
+            )}
+          >
+            {sub}
+          </div>
+        ) : null}
+      </div>
+      <div
+        className={cn(
+          "col-span-2 row-start-2 min-w-0 md:order-2",
+          hasTopRow && "mt-2 md:mt-0",
         )}
       >
         <h1 className="text-lg font-bold tracking-tight [overflow-wrap:anywhere] text-adm-ink sm:text-xl lg:text-2xl">
@@ -436,16 +463,11 @@ export function DetailHeader({
             />
           ) : null}
         </h1>
-        {sub ? (
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-adm-muted">
-            {sub}
-          </div>
-        ) : null}
       </div>
       {actions ? (
         <div
           className={cn(
-            "col-start-2 row-start-1 flex flex-wrap items-center justify-end gap-2 md:mt-8 md:justify-start",
+            "col-start-2 row-start-1 flex flex-wrap items-center justify-end gap-2 md:order-4 md:mt-8 md:justify-start",
             // With no badge beside them the buttons own the phone row, so
             // they share it equally instead of huddling at the right.
             !badges &&
