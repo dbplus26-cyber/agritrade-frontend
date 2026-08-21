@@ -88,11 +88,16 @@ const SALE = {
  * the document at this point. An unscoped query happens to resolve today only
  * because radix marks the underlying dialog aria-hidden while a second one is
  * open - far too incidental a thing for a money test to lean on.
+ *
+ * Found by its own title, not as "the last dialog": the form validates
+ * asynchronously before it asks, so right after the click the payment dialog
+ * may still be the only one mounted and a bare findAllByRole resolves on it.
  */
+const findConfirmation = () =>
+  screen.findByRole("dialog", { name: "Record this payment?" });
+
 const confirmWrite = async () => {
-  const dialogs = await screen.findAllByRole("dialog");
-  const confirmation = dialogs.at(-1);
-  if (!confirmation) throw new Error("no confirmation dialog opened");
+  const confirmation = await findConfirmation();
   await userEvent.click(
     within(confirmation).getByRole("button", { name: "Record payment" }),
   );
@@ -146,9 +151,7 @@ describe("PaymentDialog", () => {
     await userEvent.type(screen.getByLabelText(/AMOUNT/i), "500");
     await userEvent.click(screen.getByRole("button", { name: /Record/i }));
 
-    const dialogs = await screen.findAllByRole("dialog");
-    const confirmation = dialogs.at(-1);
-    if (!confirmation) throw new Error("no confirmation dialog opened");
+    const confirmation = await findConfirmation();
     await userEvent.click(
       within(confirmation).getByRole("button", { name: "Cancel" }),
     );
