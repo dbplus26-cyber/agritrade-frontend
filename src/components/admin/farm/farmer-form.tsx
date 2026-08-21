@@ -9,6 +9,7 @@ import {
   AdminCard,
   AdminField,
   adminInputClass,
+  CommitRow,
   DetailHeader,
 } from "@/components/admin/ui";
 import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
@@ -363,7 +364,7 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
 
         {/* Cancel returns to where the record is read rather than locking
             the form back down - there is no locked state any more. */}
-        <div className="flex flex-wrap justify-end gap-2">
+        <CommitRow>
           <AdminButton
             type="button"
             variant="outline"
@@ -375,7 +376,7 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
           <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
             {saving ? "Saving…" : farmer ? "Save changes" : "Add farmer"}
           </AdminButton>
-        </div>
+        </CommitRow>
       </form>
     </div>
   );

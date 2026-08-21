@@ -5,15 +5,16 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
 import {
+  ActionRow,
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
-  Mono,
-  ToneBadge,
   adminInputClass,
   adminLinkClass,
+  AdminPageHeader,
   adminSelectClass,
+  Mono,
+  ToneBadge,
 } from "@/components/admin/ui";
 import {
   ConsoleFilterBar,
@@ -186,7 +187,7 @@ function ReviewModCard({
         ) : null}
 
         {(isPending && canModerate) || canDelete ? (
-          <div className="mt-3 flex flex-wrap items-center gap-2">
+          <ActionRow className="mt-3">
             {isPending && canModerate ? (
               <>
                 <AdminButton
@@ -224,7 +225,7 @@ function ReviewModCard({
                 Delete
               </AdminButton>
             ) : null}
-          </div>
+          </ActionRow>
         ) : null}
       </div>
     </AdminCard>

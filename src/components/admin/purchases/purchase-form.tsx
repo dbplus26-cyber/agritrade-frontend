@@ -9,9 +9,10 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  DetailHeader,
   adminInputClass,
   adminSelectClass,
+  CommitRow,
+  DetailHeader,
   Mono,
 } from "@/components/admin/ui";
 import { HelpTip } from "@/components/admin/help-tip";
@@ -432,7 +433,7 @@ export function PurchaseCreate() {
             </AdminField>
           </section>
 
-          <div className="mt-1 flex justify-end gap-2">
+          <CommitRow className="mt-1">
             <AdminButton
               type="button"
               variant="outline"
@@ -449,7 +450,7 @@ export function PurchaseCreate() {
             >
               {saving ? "Recording…" : "Record purchase"}
             </AdminButton>
-          </div>
+          </CommitRow>
         </form>
       </AdminCard>
     </div>

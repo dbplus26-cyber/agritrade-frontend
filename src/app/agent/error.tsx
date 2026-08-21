@@ -3,7 +3,7 @@
 import { RefreshCw } from "lucide-react";
 import Link from "next/link";
 
-import { AdminButton, AdminCard, Mono } from "@/components/admin/ui";
+import { ActionRow, AdminButton, AdminCard, Mono } from "@/components/admin/ui";
 
 /**
  * The field app's error boundary. The console got one; /agent did not, so a
@@ -44,7 +44,7 @@ export default function AgentErrorBoundary({
             Reference <Mono className="text-adm-ink">{error.digest}</Mono>
           </p>
         ) : null}
-        <div className="mt-4 flex flex-wrap gap-2">
+        <ActionRow className="mt-4">
           <AdminButton onClick={reset}>
             <RefreshCw aria-hidden="true" data-slot="icon" />
             Try again
@@ -52,7 +52,7 @@ export default function AgentErrorBoundary({
           <AdminButton asChild variant="outline">
             <Link href="/agent">Back to my day</Link>
           </AdminButton>
-        </div>
+        </ActionRow>
       </AdminCard>
     </div>
   );

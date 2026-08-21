@@ -6,17 +6,18 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PaymentAccountField } from "@/components/admin/payment-account-field";
 import {
+  ActionRow,
   AdminButton,
   AdminCard,
   AdminField,
+  adminInputClass,
+  adminLinkClass,
+  adminSelectClass,
   DetailHeader,
   DetailRow,
   DetailShell,
   Mono,
   SectionHeading,
-  adminInputClass,
-  adminLinkClass,
-  adminSelectClass,
 } from "@/components/admin/ui";
 import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { DateOnlyCell } from "@/components/admin/date-cell";
@@ -392,7 +393,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
   const actions =
     a.status === "NEGOTIATING" || canPay || a.status === "AGREED" || canCancel ? (
       <div className="mt-3 border-t border-adm-hairline pt-3.5">
-        <div className="flex flex-wrap gap-2 xl:flex-col">
+        <ActionRow className="xl:flex-col">
           {a.status === "NEGOTIATING" ? (
             <AdminButton
               disabled={agreeState.isLoading}
@@ -425,7 +426,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
               Cancel
             </AdminButton>
           ) : null}
-        </div>
+        </ActionRow>
       </div>
     ) : null;
 

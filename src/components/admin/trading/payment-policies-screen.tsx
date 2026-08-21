@@ -6,13 +6,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Plus } from "lucide-react";
 import {
+  ActionRow,
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
-  ToneBadge,
   adminInputClass,
+  AdminPageHeader,
   adminSelectClass,
+  ToneBadge,
 } from "@/components/admin/ui";
 import { HelpTip } from "@/components/admin/help-tip";
 import { CardGridSkeleton } from "@/components/admin/skeletons";
@@ -409,7 +410,7 @@ function PolicyCard({ policy }: { policy: IPaymentPolicy }) {
 
       {/* Quiet outline buttons at the foot of the card: they read as
           buttons at rest, and Delete carries its red at rest too. */}
-      <div className="mt-auto flex flex-wrap items-center gap-2 pt-4">
+      <ActionRow className="mt-auto pt-4">
         {!policy.isDefault && policy.isActive ? (
           <AdminButton
             size="sm"
@@ -440,7 +441,7 @@ function PolicyCard({ policy }: { policy: IPaymentPolicy }) {
             Delete
           </AdminButton>
         ) : null}
-      </div>
+      </ActionRow>
       {confirmationDialog}
     </AdminCard>
   );

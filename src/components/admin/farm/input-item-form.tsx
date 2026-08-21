@@ -9,6 +9,7 @@ import {
   AdminCard,
   AdminField,
   adminInputClass,
+  CommitRow,
   DetailHeader,
 } from "@/components/admin/ui";
 import { ActiveBadge } from "./farm-bits";
@@ -240,7 +241,7 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
             clicking "Edit item" would flip that very element to
             type="submit" before the browser ran the click's default action
             and the form would PATCH itself while still locked. */}
-        <div className="flex flex-wrap justify-end gap-2">
+        <CommitRow>
           {item && !isEditing ? (
             <Fragment key="locked">
               <AdminButton
@@ -304,7 +305,7 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
               {saving ? "Saving…" : "Create item"}
             </AdminButton>
           )}
-        </div>
+        </CommitRow>
       </form>
 
       {confirmationDialog}

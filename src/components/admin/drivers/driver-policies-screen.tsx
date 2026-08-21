@@ -9,14 +9,15 @@ import { Plus } from "lucide-react";
 import { HelpTip } from "@/components/admin/help-tip";
 import { CardGridSkeleton } from "@/components/admin/skeletons";
 import {
+  ActionRow,
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
-  ToneBadge,
   adminInputClass,
   adminLinkClass,
+  AdminPageHeader,
   adminSelectClass,
+  ToneBadge,
 } from "@/components/admin/ui";
 import {
   ResponsiveDialog,
@@ -373,7 +374,7 @@ function PolicyCard({ policy }: { policy: IDriverPaymentPolicy }) {
         ))}
       </ul>
 
-      <div className="mt-auto flex flex-wrap items-center gap-2 pt-4">
+      <ActionRow className="mt-auto pt-4">
         {!policy.isDefault && policy.isActive ? (
           <AdminButton
             size="sm"
@@ -409,7 +410,7 @@ function PolicyCard({ policy }: { policy: IDriverPaymentPolicy }) {
             Delete
           </AdminButton>
         ) : null}
-      </div>
+      </ActionRow>
       {confirmationDialog}
     </AdminCard>
   );

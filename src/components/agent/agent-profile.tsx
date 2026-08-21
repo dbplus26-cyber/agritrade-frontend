@@ -180,7 +180,7 @@ function DetailsForm({
           <span className={errorClass}>{errors.phone.message}</span>
         ) : null}
       </label>
-      <div className="flex justify-end gap-2">
+      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <button
           type="button"
           disabled={isLoading}
@@ -367,7 +367,7 @@ function PasswordCard() {
             ) : null}
           </label>
         </div>
-        <div className="flex justify-end gap-2">
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <button
             type="button"
             disabled={isLoading}

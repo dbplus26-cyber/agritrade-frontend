@@ -4,12 +4,14 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Warehouse as WarehouseIcon } from "lucide-react";
 import {
+  ActionRow,
   AdminButton,
   AdminCard,
-  DetailHeader,
-  Mono,
   adminInputClass,
   adminSelectClass,
+  CommitRow,
+  DetailHeader,
+  Mono,
 } from "@/components/admin/ui";
 import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { AllocateSkeleton, LotRowsSkeleton } from "@/components/admin/skeletons";
@@ -686,7 +688,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
               picked changes this trip&apos;s profit, so review before saving -
               every weight stays editable.
             </p>
-            <div className="flex flex-wrap items-center gap-2">
+            <ActionRow>
               <AdminButton
                 type="button"
                 variant="outline"
@@ -724,7 +726,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                   Clear this sale
                 </AdminButton>
               ) : null}
-            </div>
+            </ActionRow>
             {/* The top-up, offered only when there is a real remainder AND
                 stock (and room) to cover some of it - `balancePlan` is null
                 otherwise. Its own row so the pill and its tip stay together as
@@ -888,7 +890,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
               capacityKg={shipment.truckCapacityKg}
               loadedLabel="Allocated"
             />
-            <div className="mt-2.5 flex flex-wrap justify-end gap-2">
+            <CommitRow className="mt-2.5">
               <AdminButton
                 type="button"
                 variant="outline"
@@ -906,7 +908,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
               >
                 {saving ? "Saving…" : "Save allocations"}
               </AdminButton>
-            </div>
+            </CommitRow>
           </div>
         </div>
       )}

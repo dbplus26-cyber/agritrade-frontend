@@ -3,15 +3,16 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  ActionRow,
   AdminButton,
   AdminCard,
+  adminLinkClass,
   DetailGrid,
   DetailHeader,
   DetailItem,
   DetailShell,
   Mono,
   SectionHeading,
-  adminLinkClass,
 } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
 import { HelpTip } from "@/components/admin/help-tip";
@@ -177,7 +178,7 @@ export function SeasonDetail({ id }: { id: string }) {
               </DetailItem>
             </DetailGrid>
             <div className="mt-3 border-t border-adm-hairline pt-3.5">
-              <div className="flex flex-wrap gap-2 xl:flex-col">
+              <ActionRow className="xl:flex-col">
                 <AdminButton variant="outline" asChild>
                   <Link href={`${LIST}/${s.id}/edit`}>Edit</Link>
                 </AdminButton>
@@ -201,7 +202,7 @@ export function SeasonDetail({ id }: { id: string }) {
                 >
                   Delete
                 </AdminButton>
-              </div>
+              </ActionRow>
             </div>
           </AdminCard>
         }

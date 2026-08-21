@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { RefreshCw } from "lucide-react";
-import { AdminButton, AdminCard, Mono } from "@/components/admin/ui";
+import { ActionRow, AdminButton, AdminCard, Mono } from "@/components/admin/ui";
 
 /**
  * The console's error boundary. Without one, a crash anywhere under /admin
@@ -40,7 +40,7 @@ export default function AdminErrorBoundary({
             Reference <Mono className="text-adm-ink">{error.digest}</Mono>
           </p>
         ) : null}
-        <div className="mt-4 flex flex-wrap gap-2">
+        <ActionRow className="mt-4">
           <AdminButton onClick={reset}>
             <RefreshCw aria-hidden="true" data-slot="icon" />
             Try again
@@ -48,7 +48,7 @@ export default function AdminErrorBoundary({
           <AdminButton asChild variant="outline">
             <Link href="/admin">Back to the dashboard</Link>
           </AdminButton>
-        </div>
+        </ActionRow>
       </AdminCard>
     </div>
   );

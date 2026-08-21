@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
+  ActionRow,
   AdminButton,
   AdminCard,
   DetailGrid,
@@ -238,7 +239,7 @@ export function PlotDetail({ id }: { id: string }) {
         </DetailItem>
       </DetailGrid>
       <div className="mt-3 border-t border-adm-hairline pt-3.5">
-        <div className="flex flex-wrap gap-2 xl:flex-col">
+        <ActionRow className="xl:flex-col">
           {p.status === "AVAILABLE" ? (
             <AdminButton asChild>
               <Link href={`/admin/land-sales/new?plotId=${p.id}`}>
@@ -276,7 +277,7 @@ export function PlotDetail({ id }: { id: string }) {
               {p.status === "ARCHIVED" ? "Restore" : "Archive"}
             </AdminButton>
           ) : null}
-        </div>
+        </ActionRow>
       </div>
     </AdminCard>
   );

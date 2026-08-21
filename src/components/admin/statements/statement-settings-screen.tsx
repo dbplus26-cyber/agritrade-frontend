@@ -14,9 +14,10 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
-  SectionHeading,
   adminInputClass,
+  AdminPageHeader,
+  CommitRow,
+  SectionHeading,
 } from "@/components/admin/ui";
 import { FormSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -354,7 +355,7 @@ function StatementSettingsForm({
 
       {/* Same keyed-branch discipline as the system settings form: an unkeyed
           swap would let the Edit button's DOM node become the submit. */}
-      <div className="flex justify-end gap-2">
+      <CommitRow>
         {isEditing ? (
           <Fragment key="editing">
             <AdminButton
@@ -385,7 +386,7 @@ function StatementSettingsForm({
             Edit statement settings
           </AdminButton>
         )}
-      </div>
+      </CommitRow>
     </form>
   );
 }

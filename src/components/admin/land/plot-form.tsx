@@ -8,8 +8,9 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  DetailHeader,
   adminInputClass,
+  CommitRow,
+  DetailHeader,
 } from "@/components/admin/ui";
 import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { Input } from "@/components/ui/input";
@@ -212,7 +213,7 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
             swap, so clicking "Edit plot" would flip that very element to
             type="submit" before the browser ran the click's default action
             and the form would PATCH itself while still locked. */}
-        <div className="flex flex-wrap justify-end gap-2">
+        <CommitRow>
           {!plot ? (
             <Fragment key="create">
               <AdminButton
@@ -242,7 +243,7 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
               </AdminButton>
             </Fragment>
           )}
-        </div>
+        </CommitRow>
       </form>
     </div>
   );

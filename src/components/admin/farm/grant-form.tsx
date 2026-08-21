@@ -9,6 +9,7 @@ import {
   AdminCard,
   AdminField,
   adminInputClass,
+  CommitRow,
   DetailHeader,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
@@ -345,7 +346,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
           flagged for approval.
         </p>
 
-        <div className="flex flex-wrap justify-end gap-2">
+        <CommitRow>
           <AdminButton
             type="button"
             variant="outline"
@@ -357,7 +358,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
           <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
             {saving ? "Saving…" : "Record grant"}
           </AdminButton>
-        </div>
+        </CommitRow>
       </form>
     </div>
   );

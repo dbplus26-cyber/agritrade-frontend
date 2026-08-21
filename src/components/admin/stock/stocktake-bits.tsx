@@ -6,6 +6,7 @@ import {
   AdminCard,
   AdminField,
   adminInputClass,
+  CommitRow,
   SectionHeading,
   ToneBadge,
   type Tone,
@@ -295,7 +296,7 @@ export function StocktakeCountSheet({
         </p>
       ) : null}
 
-      <div className="flex flex-wrap justify-end gap-2">
+      <CommitRow>
         <AdminButton
           type="button"
           variant="outline"
@@ -313,7 +314,7 @@ export function StocktakeCountSheet({
         >
           {saving ? "Saving…" : submitLabel}
         </AdminButton>
-      </div>
+      </CommitRow>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { HelpTip, HelpWrap } from "@/components/admin/help-tip";
 import {
+  ActionRow,
   AdminButton,
   AdminCard,
   Mono,
@@ -486,7 +487,7 @@ export function DriverSettlementCard({
 
       {manage ? (
         // Buttons wrap as whole pills rather than wrapping their own labels.
-        <div className="mt-5 flex flex-wrap gap-2">
+        <ActionRow className="mt-5">
           {dispatched && settlement.hasFee ? (
             <AdminButton
               onClick={() => setAdjustOpen(true)}
@@ -507,7 +508,7 @@ export function DriverSettlementCard({
               Record a payment
             </AdminButton>
           ) : null}
-        </div>
+        </ActionRow>
       ) : null}
 
       {feeOpen ? (

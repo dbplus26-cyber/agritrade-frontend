@@ -9,12 +9,14 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  ActionRow,
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
   adminInputClass,
   adminLinkClass,
+  AdminPageHeader,
+  CommitRow,
   DetailShell,
   Mono,
   SectionHeading,
@@ -233,7 +235,7 @@ function OpeningBalanceCard() {
               {...register("notes")}
             />
           </AdminField>
-          <div className="flex justify-end gap-2">
+          <CommitRow>
             <AdminButton
               type="button"
               variant="outline"
@@ -249,7 +251,7 @@ function OpeningBalanceCard() {
             <AdminButton type="submit" disabled={saveState.isLoading} loading={saveState.isLoading} size="lg">
               {saveState.isLoading ? "Saving…" : "Save opening position"}
             </AdminButton>
-          </div>
+          </CommitRow>
         </form>
       )}
     </AdminCard>
@@ -432,7 +434,7 @@ export function StatementsScreen() {
                       ? "This year is final - the book prints clean, with no watermark."
                       : "The year is still draft: every page carries a DRAFT watermark until you mark it final."}
                   </p>
-                  <div className="flex flex-wrap items-center gap-2">
+                  <ActionRow>
                     <AdminButton asChild disabled={errors.length > 0}>
                       <a
                         href={statementPdfUrl(year)}
@@ -448,7 +450,7 @@ export function StatementsScreen() {
                     >
                       {isFinal ? "Reopen the year" : "Mark year final"}
                     </AdminButton>
-                  </div>
+                  </ActionRow>
                 </AdminCard>
               </>
             ) : null}

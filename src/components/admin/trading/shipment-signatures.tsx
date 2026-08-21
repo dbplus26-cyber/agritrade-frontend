@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AdminButton, AdminCard, SectionHeading, adminLinkClass } from "@/components/admin/ui";
+import { ActionRow, AdminButton, AdminCard, adminLinkClass, SectionHeading } from "@/components/admin/ui";
 import { SignaturePad } from "@/components/ui/SignaturePad";
 import { FilePicker } from "@/components/ui/FilePicker";
 import { useAuthRole } from "@/hooks/use-auth-role";
@@ -284,7 +284,7 @@ export function ShipmentSignatures({ shipment }: { shipment: IShipment }) {
                   className="w-full rounded-none border border-adm-line bg-adm-card px-2.5 py-1.5 text-[13px] outline-none transition-colors placeholder:text-adm-faint focus:border-console"
                   placeholder="Signed by the wrong driver at the gate"
                 />
-                <div className="flex flex-wrap gap-2">
+                <ActionRow>
                   <AdminButton
                     disabled={reason.trim().length < 3 || revokeState.isLoading}
                     loading={revokeState.isLoading}
@@ -304,7 +304,7 @@ export function ShipmentSignatures({ shipment }: { shipment: IShipment }) {
                   >
                     Keep it
                   </AdminButton>
-                </div>
+                </ActionRow>
               </div>
             ) : (
               <button

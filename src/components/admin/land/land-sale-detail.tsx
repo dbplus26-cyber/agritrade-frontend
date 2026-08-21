@@ -7,17 +7,18 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PaymentAccountField } from "@/components/admin/payment-account-field";
 import {
+  ActionRow,
   AdminButton,
   AdminCard,
   AdminField,
+  adminInputClass,
+  adminLinkClass,
+  adminSelectClass,
   DetailHeader,
   DetailRow,
   DetailShell,
   Mono,
   SectionHeading,
-  adminInputClass,
-  adminLinkClass,
-  adminSelectClass,
 } from "@/components/admin/ui";
 import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { DateOnlyCell } from "@/components/admin/date-cell";
@@ -534,7 +535,7 @@ export function LandSaleDetail({ id }: { id: string }) {
             </div>
             {canAct ? (
               <div className="mt-3 border-t border-adm-hairline pt-3.5">
-                <div className="flex flex-wrap gap-2 xl:flex-col">
+                <ActionRow className="xl:flex-col">
                   {/* A DRAFT is PAYABLE, and has to be: confirming one is
                       refused until a deposit is on it (PAYMENT_REQUIRED), so
                       offering only "Confirm sale" here was a dead end - the
@@ -564,7 +565,7 @@ export function LandSaleDetail({ id }: { id: string }) {
                   >
                     Cancel sale
                   </AdminButton>
-                </div>
+                </ActionRow>
               </div>
             ) : null}
           </AdminCard>

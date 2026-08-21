@@ -109,10 +109,11 @@ function DialogFooter({
     <div
       data-slot="dialog-footer"
       className={cn(
-        // A row on every size, wrapping only when the labels genuinely run
-        // out of room - stacked full-width buttons on a phone spent three
-        // rows on what fits in one.
-        "-mx-4 -mb-4 flex flex-row flex-wrap justify-end gap-2 border-t border-dotted border-soil/40 bg-surface-alt/60 p-4",
+        // Phones stack the buttons full width, commit on top and cancel on
+        // the bottom edge (the confirm gate's reasoning: the safe button sits
+        // where the thumb rests). From `sm` a right-aligned row, wrapping
+        // only when the labels genuinely run out of room.
+        "-mx-4 -mb-4 flex flex-col-reverse gap-2 border-t border-dotted border-soil/40 bg-surface-alt/60 p-4 *:w-full sm:flex-row sm:flex-wrap sm:justify-end sm:*:w-auto",
         className
       )}
       {...props}

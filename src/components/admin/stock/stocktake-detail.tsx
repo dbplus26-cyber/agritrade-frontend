@@ -3,9 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  adminLinkClass,
+  ActionRow,
   AdminButton,
   AdminCard,
+  adminLinkClass,
   DetailGrid,
   DetailHeader,
   DetailItem,
@@ -332,7 +333,7 @@ export function StocktakeDetail({ id }: { id: string }) {
             </DetailGrid>
 
             {st.status === StocktakeStatus.DRAFT && canCount ? (
-              <div className="mt-4 flex flex-wrap gap-2 border-t border-adm-hairline pt-4">
+              <ActionRow className="mt-4 border-t border-adm-hairline pt-4">
                 <AdminButton disabled={busy} loading={submitState.isLoading} onClick={() => void onSubmit()}>
                   {submitState.isLoading ? "Submitting…" : "Submit"}
                 </AdminButton>
@@ -352,27 +353,30 @@ export function StocktakeDetail({ id }: { id: string }) {
                 >
                   {cancelState.isLoading ? "Cancelling…" : "Cancel stocktake"}
                 </AdminButton>
-              </div>
+              </ActionRow>
             ) : st.status === StocktakeStatus.SUBMITTED ? (
-              <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-adm-hairline pt-4">
-                {isSuperAdmin ? (
-                  <AdminButton disabled={busy} loading={approveState.isLoading} onClick={() => void onApprove()}>
-                    {approveState.isLoading ? "Approving…" : "Approve"}
-                  </AdminButton>
-                ) : (
-                  <p className="text-[12.5px] text-adm-muted">
+              <div className="mt-4 border-t border-adm-hairline pt-4">
+                {!isSuperAdmin ? (
+                  <p className="mb-3 text-[12.5px] text-adm-muted">
                     Waiting for the owner to approve or cancel this sheet.
                   </p>
-                )}
-                <AdminButton
-                  variant="outline"
-                  className="text-console-red hover:text-console-red"
-                  disabled={busy}
-                  loading={cancelState.isLoading}
-                  onClick={() => void onCancel()}
-                >
-                  {cancelState.isLoading ? "Cancelling…" : "Cancel stocktake"}
-                </AdminButton>
+                ) : null}
+                <ActionRow>
+                  {isSuperAdmin ? (
+                    <AdminButton disabled={busy} loading={approveState.isLoading} onClick={() => void onApprove()}>
+                      {approveState.isLoading ? "Approving…" : "Approve"}
+                    </AdminButton>
+                  ) : null}
+                  <AdminButton
+                    variant="outline"
+                    className="text-console-red hover:text-console-red"
+                    disabled={busy}
+                    loading={cancelState.isLoading}
+                    onClick={() => void onCancel()}
+                  >
+                    {cancelState.isLoading ? "Cancelling…" : "Cancel stocktake"}
+                  </AdminButton>
+                </ActionRow>
               </div>
             ) : (
               <p className="mt-4 border-t border-adm-hairline pt-4 text-[12.5px] text-adm-muted">

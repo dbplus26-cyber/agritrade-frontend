@@ -8,9 +8,10 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  AdminPageHeader,
-  SectionHeading,
   adminInputClass,
+  AdminPageHeader,
+  CommitRow,
+  SectionHeading,
 } from "@/components/admin/ui";
 import { FormSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -242,17 +243,9 @@ function SettingsForm({
           clicking "Edit settings" flipped that very element to type="submit"
           before the browser ran the click's default action and the form
           PATCHed itself while still locked. */}
-      <div className="flex gap-2">
+      <CommitRow className="sm:justify-start">
         {isEditing ? (
           <Fragment key="editing">
-            <AdminButton
-              type="submit"
-              disabled={saving || !isDirty}
-              loading={saving}
-              size="lg"
-            >
-              {saving ? "Saving…" : "Save settings"}
-            </AdminButton>
             <AdminButton
               type="button"
               variant="outline"
@@ -263,6 +256,14 @@ function SettingsForm({
               }}
             >
               Cancel
+            </AdminButton>
+            <AdminButton
+              type="submit"
+              disabled={saving || !isDirty}
+              loading={saving}
+              size="lg"
+            >
+              {saving ? "Saving…" : "Save settings"}
             </AdminButton>
           </Fragment>
         ) : (
@@ -276,7 +277,7 @@ function SettingsForm({
             Edit settings
           </AdminButton>
         )}
-      </div>
+      </CommitRow>
     </form>
   );
 }

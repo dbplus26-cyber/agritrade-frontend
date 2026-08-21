@@ -10,10 +10,11 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  DetailHeader,
-  Mono,
   adminInputClass,
   adminSelectClass,
+  CommitRow,
+  DetailHeader,
+  Mono,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
 import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
@@ -1054,7 +1055,7 @@ export function ShipmentForm({
           </section>
         </AdminCard>
 
-        <div className="flex flex-wrap justify-end gap-2">
+        <CommitRow>
           <AdminButton
             type="button"
             variant="outline"
@@ -1079,7 +1080,7 @@ export function ShipmentForm({
                 ? "Planning…"
                 : "Plan shipment"}
           </AdminButton>
-        </div>
+        </CommitRow>
       </form>
     </div>
   );

@@ -443,7 +443,15 @@ export function DetailHeader({
         ) : null}
       </div>
       {actions ? (
-        <div className="col-start-2 row-start-1 flex flex-wrap items-center justify-end gap-2 md:mt-8 md:justify-start">
+        <div
+          className={cn(
+            "col-start-2 row-start-1 flex flex-wrap items-center justify-end gap-2 md:mt-8 md:justify-start",
+            // With no badge beside them the buttons own the phone row, so
+            // they share it equally instead of huddling at the right.
+            !badges &&
+              "col-span-2 col-start-1 *:grow *:basis-[calc(50%-0.25rem)] md:*:grow-0 md:*:basis-auto",
+          )}
+        >
           {actions}
         </div>
       ) : null}
@@ -824,7 +832,7 @@ export function EditableFormActions({
   // action in the same place everywhere.
   if (mode === "create") {
     return (
-      <div key="create" className="mt-1 flex justify-end gap-2">
+      <CommitRow key="create" className="mt-1">
         <AdminButton
           type="button"
           variant="outline"
@@ -837,13 +845,13 @@ export function EditableFormActions({
         <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
           {saving ? "Saving…" : createLabel}
         </AdminButton>
-      </div>
+      </CommitRow>
     );
   }
 
   if (mode === "editing") {
     return (
-      <div key="editing" className="mt-1 flex justify-end gap-2">
+      <CommitRow key="editing" className="mt-1">
         <AdminButton
           type="button"
           variant="outline"
@@ -856,16 +864,53 @@ export function EditableFormActions({
         <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
           {saving ? "Saving…" : "Save changes"}
         </AdminButton>
-      </div>
+      </CommitRow>
     );
   }
 
   return (
-    <div key="locked" className="mt-1 flex justify-end gap-2">
+    <CommitRow key="locked" className="mt-1">
       <AdminButton type="button" variant="gold" size="lg" onClick={onEdit}>
         {editLabel}
       </AdminButton>
-    </div>
+    </CommitRow>
+  );
+}
+
+/**
+ * A row of a record's or a section's action buttons. On phones the buttons
+ * share the row's full width equally - two to a row, a lone one stretching
+ * across - so a short button never sits with empty space beside it. From `sm`
+ * they take their natural width again.
+ */
+export function ActionRow({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      className={cn(
+        "flex flex-wrap gap-2 *:grow *:basis-[calc(50%-0.25rem)] sm:*:grow-0 sm:*:basis-auto",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+/**
+ * The cancel/commit pair that ends a form (DOM order: cancel, then the
+ * commit). On phones the buttons stack full width with the commit on top and
+ * cancel on the bottom edge - the same shape as the confirm gate and the
+ * dialog footer, so every form in the console ends the same way; from `sm` a
+ * right-aligned row.
+ */
+export function CommitRow({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      className={cn(
+        "flex flex-col-reverse gap-2 *:w-full sm:flex-row sm:flex-wrap sm:justify-end sm:*:w-auto",
+        className,
+      )}
+      {...props}
+    />
   );
 }
 

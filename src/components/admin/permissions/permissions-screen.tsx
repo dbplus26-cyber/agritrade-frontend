@@ -6,10 +6,11 @@ import { Search, ShieldCheck } from "lucide-react";
 import {
   AdminButton,
   AdminCard,
+  adminInputClass,
   AdminPageHeader,
+  CommitRow,
   SectionHeading,
   ToneBadge,
-  adminInputClass,
 } from "@/components/admin/ui";
 import { ConsoleTabs, type ConsoleTab } from "@/components/admin/console-tabs";
 import { Input } from "@/components/ui/input";
@@ -147,9 +148,9 @@ function SaveRow({
   onSave: () => void;
 }) {
   return (
-    <div className="flex flex-wrap items-center justify-end gap-x-2 gap-y-2 border-t border-adm-line px-4 py-3.5 sm:px-5">
+    <CommitRow className="border-t border-adm-line px-4 py-3.5 sm:px-5">
       {dirty ? (
-        <span className="mr-auto text-[12px] font-medium text-console-gold">
+        <span className="order-last text-[12px] font-medium text-console-gold sm:order-first sm:mr-auto">
           Unsaved changes
         </span>
       ) : null}
@@ -164,7 +165,7 @@ function SaveRow({
       <AdminButton size="lg" disabled={!dirty || saving} loading={saving} onClick={onSave}>
         {saving ? "Saving…" : "Save changes"}
       </AdminButton>
-    </div>
+    </CommitRow>
   );
 }
 

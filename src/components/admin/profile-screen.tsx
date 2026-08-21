@@ -7,14 +7,16 @@ import { Pencil } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import {
+  ActionRow,
   AdminButton,
   AdminCard,
   AdminField,
+  adminInputClass,
   AdminPageHeader,
+  CommitRow,
   DetailShell,
   SectionHeading,
   ToneBadge,
-  adminInputClass,
 } from "@/components/admin/ui";
 import {
   IdentityFacts,
@@ -267,7 +269,7 @@ function ProfileEditForm({
           {...register("phone")}
         />
       </AdminField>
-      <div className="flex justify-end gap-2">
+      <CommitRow>
         <AdminButton
           type="button"
           variant="outline"
@@ -285,7 +287,7 @@ function ProfileEditForm({
         >
           {isLoading ? "Saving…" : "Save changes"}
         </AdminButton>
-      </div>
+      </CommitRow>
     </form>
   );
 }
@@ -393,7 +395,7 @@ function PasswordCard() {
               />
             </AdminField>
           </div>
-          <div className="flex justify-end gap-2">
+          <CommitRow>
             <AdminButton
               type="button"
               variant="outline"
@@ -410,7 +412,7 @@ function PasswordCard() {
             >
               {isLoading ? "Updating…" : "Update password"}
             </AdminButton>
-          </div>
+          </CommitRow>
         </form>
       ) : (
         <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -587,7 +589,7 @@ function TwoFactorCard() {
           </div>
         </div>
         {enabled ? (
-          <div className="flex flex-none flex-wrap gap-2">
+          <ActionRow className="w-full flex-none sm:w-auto">
             <AdminButton
               variant="secondary"
               className="whitespace-nowrap"
@@ -608,7 +610,7 @@ function TwoFactorCard() {
             >
               Turn off
             </AdminButton>
-          </div>
+          </ActionRow>
         ) : (
           <AdminButton
             className="flex-none whitespace-nowrap"
@@ -633,7 +635,7 @@ function TwoFactorCard() {
               className={adminInputClass}
             />
           </AdminField>
-          <div className="flex justify-end gap-2">
+          <CommitRow>
             <AdminButton
               variant="ghost"
               onClick={() => {
@@ -649,7 +651,7 @@ function TwoFactorCard() {
             >
               {isConfirming ? "Confirming…" : "Confirm & enable"}
             </AdminButton>
-          </div>
+          </CommitRow>
         </div>
       ) : null}
 
@@ -670,7 +672,7 @@ function TwoFactorCard() {
               className={adminInputClass}
             />
           </AdminField>
-          <div className="flex justify-end gap-2">
+          <CommitRow>
             <AdminButton
               variant="outline"
               onClick={() => {
@@ -696,7 +698,7 @@ function TwoFactorCard() {
                   ? "Generating…"
                   : "Generate new codes"}
             </AdminButton>
-          </div>
+          </CommitRow>
         </div>
       ) : null}
 

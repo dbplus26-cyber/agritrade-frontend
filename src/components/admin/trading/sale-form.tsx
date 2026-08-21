@@ -8,9 +8,10 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
+  adminInputClass,
+  CommitRow,
   DetailHeader,
   Mono,
-  adminInputClass,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
 import { HelpTip } from "@/components/admin/help-tip";
@@ -416,7 +417,7 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
           </section>
         </AdminCard>
 
-        <div className="flex flex-wrap justify-end gap-2">
+        <CommitRow>
           <AdminButton
             type="button"
             variant="outline"
@@ -428,7 +429,7 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
           <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
             {saving ? "Saving…" : sale ? "Save changes" : "Draft sale"}
           </AdminButton>
-        </div>
+        </CommitRow>
       </form>
     </div>
   );

@@ -107,7 +107,7 @@ export function RoleChangeDialog({
           </Select>
         </div>
 
-        <ResponsiveDialogFooter className="flex-row justify-end gap-2">
+        <ResponsiveDialogFooter className="gap-2">
           <AdminButton
             variant="outline"
             size="lg"

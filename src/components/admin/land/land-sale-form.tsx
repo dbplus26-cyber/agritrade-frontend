@@ -7,8 +7,9 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  DetailHeader,
   adminInputClass,
+  CommitRow,
+  DetailHeader,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
 import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
@@ -155,7 +156,7 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
           </section>
         </AdminCard>
 
-        <div className="flex flex-wrap justify-end gap-2">
+        <CommitRow>
           <AdminButton
             type="button"
             variant="outline"
@@ -167,7 +168,7 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
           <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
             {saving ? "Saving…" : "Draft sale"}
           </AdminButton>
-        </div>
+        </CommitRow>
       </form>
     </div>
   );

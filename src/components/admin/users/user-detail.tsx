@@ -10,11 +10,12 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
+  adminInputClass,
+  CommitRow,
   DetailHeader,
   DetailShell,
   SectionHeading,
   ToneBadge,
-  adminInputClass,
 } from "@/components/admin/ui";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -263,7 +264,7 @@ function EditDetailsForm({
         />
       </AdminField>
 
-      <div className="flex justify-end gap-2">
+      <CommitRow>
         <AdminButton
           type="button"
           variant="outline"
@@ -281,7 +282,7 @@ function EditDetailsForm({
         >
           {isLoading ? "Saving…" : "Save changes"}
         </AdminButton>
-      </div>
+      </CommitRow>
     </form>
   );
 }

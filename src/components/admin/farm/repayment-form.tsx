@@ -9,6 +9,7 @@ import {
   AdminCard,
   AdminField,
   adminInputClass,
+  CommitRow,
   DetailHeader,
 } from "@/components/admin/ui";
 import { PaymentAccountField } from "@/components/admin/payment-account-field";
@@ -458,7 +459,7 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
           </section>
         </AdminCard>
 
-        <div className="flex flex-wrap justify-end gap-2">
+        <CommitRow>
           <AdminButton
             type="button"
             variant="outline"
@@ -470,7 +471,7 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
           <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
             {saving ? "Saving…" : "Record repayment"}
           </AdminButton>
-        </div>
+        </CommitRow>
       </form>
     </div>
   );

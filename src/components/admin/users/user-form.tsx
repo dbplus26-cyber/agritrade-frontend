@@ -10,9 +10,10 @@ import {
   AdminButton,
   AdminCard,
   AdminField,
-  DetailHeader,
   adminInputClass,
   adminSelectClass,
+  CommitRow,
+  DetailHeader,
 } from "@/components/admin/ui";
 import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { useConfirm } from "@/hooks/use-confirm";
@@ -245,7 +246,7 @@ export function UserForm() {
             </div>
           </section>
 
-          <div className="flex justify-end gap-2">
+          <CommitRow>
             <AdminButton
               type="button"
               variant="outline"
@@ -262,7 +263,7 @@ export function UserForm() {
             >
               {isLoading ? "Creating…" : "Create user"}
             </AdminButton>
-          </div>
+          </CommitRow>
         </form>
       </AdminCard>
       {confirmationDialog}

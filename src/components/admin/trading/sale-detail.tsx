@@ -5,15 +5,16 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  ActionRow,
   AdminButton,
   AdminCard,
   AdminField,
+  adminInputClass,
   DetailHeader,
   DetailShell,
   Mono,
   SectionHeading,
   ToneBadge,
-  adminInputClass,
 } from "@/components/admin/ui";
 import { HelpTip } from "@/components/admin/help-tip";
 import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
@@ -262,7 +263,7 @@ export function SaleDetail({
   };
 
   const actions = (
-    <div className="flex flex-wrap gap-2 xl:flex-col">
+    <ActionRow className="xl:flex-col">
       {isDraft ? (
         <>
           <AdminButton
@@ -306,7 +307,7 @@ export function SaleDetail({
           </Link>
         </AdminButton>
       ) : null}
-    </div>
+    </ActionRow>
   );
 
   const aside = (

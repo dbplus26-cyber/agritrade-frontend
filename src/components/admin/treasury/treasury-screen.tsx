@@ -16,12 +16,13 @@ import {
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import {
+  ActionRow,
   AdminButton,
   AdminField,
+  adminInputClass,
   AdminPageHeader,
   DetailRow,
   Mono,
-  adminInputClass,
 } from "@/components/admin/ui";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -186,7 +187,7 @@ export function TreasuryScreen() {
         hint="The business's own balance, and moving money between its accounts."
         sub="What the business holds at Hubtel, and moving it where it is needed"
         actions={
-          <div className="flex flex-wrap gap-2">
+          <ActionRow>
             <AdminButton
               disabled={treasury.isFetching}
               onClick={() => void treasury.refetch()}
@@ -198,7 +199,7 @@ export function TreasuryScreen() {
             <AdminButton onClick={() => setTransferring(true)} type="button">
               Move funds across
             </AdminButton>
-          </div>
+          </ActionRow>
         }
       />
 

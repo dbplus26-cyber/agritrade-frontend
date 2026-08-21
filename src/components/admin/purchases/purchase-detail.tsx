@@ -6,13 +6,14 @@ import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  ActionRow,
   AdminButton,
   AdminCard,
   AdminField,
-  DetailHeader,
   adminInputClass,
   adminLinkClass,
   DetailGrid,
+  DetailHeader,
   DetailItem,
   DetailShell,
   SectionHeading,
@@ -409,7 +410,7 @@ export function PurchaseDetail({ id }: { id: string }) {
 
   const actions =
     canTransit || canReceive || canVoid ? (
-      <div className="flex flex-wrap gap-2 xl:flex-col">
+      <ActionRow className="xl:flex-col">
         {canTransit ? (
           <AdminButton
             variant="secondary"
@@ -433,7 +434,7 @@ export function PurchaseDetail({ id }: { id: string }) {
             Void purchase
           </AdminButton>
         ) : null}
-      </div>
+      </ActionRow>
     ) : null;
 
   return (

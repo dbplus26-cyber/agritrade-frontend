@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { AdminButton } from "@/components/admin/ui";
+import { ActionRow, AdminButton } from "@/components/admin/ui";
 import { useAuthRole } from "@/hooks/use-auth-role";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -89,7 +89,7 @@ export function LifecycleActions({
 
   return (
     <div className="mt-4">
-      <div className="flex flex-wrap gap-2">
+      <ActionRow>
         <AdminButton
           type="button"
           variant="outline"
@@ -105,7 +105,7 @@ export function LifecycleActions({
         >
           Delete
         </AdminButton>
-      </div>
+      </ActionRow>
       {/* What the ungated button does, standing where it is read before the
           tap. This is the sentence the deactivate dialog used to carry. */}
       <p className="mt-2 text-[12.5px] text-adm-muted">
