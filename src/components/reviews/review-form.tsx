@@ -290,6 +290,7 @@ export function ReviewForm() {
                   className={cn(inputClass, "cursor-pointer")}
                   value={field.value}
                   onChange={field.onChange}
+                  placeholder="Choose how you dealt with us"
                   options={REVIEW_ROLES.map((role) => ({
                     value: role,
                     label: REVIEW_ROLE_LABELS[role],

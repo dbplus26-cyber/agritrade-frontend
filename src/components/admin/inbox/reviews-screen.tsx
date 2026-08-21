@@ -322,6 +322,7 @@ function AddReviewDialog({
                       className={adminSelectClass}
                       value={field.value}
                       onChange={field.onChange}
+                      placeholder="Choose how they dealt with us"
                       options={REVIEW_ROLES.map((r) => ({
                         value: r,
                         label: REVIEW_ROLE_LABELS[r],

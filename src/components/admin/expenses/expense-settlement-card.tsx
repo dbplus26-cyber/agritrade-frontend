@@ -224,6 +224,7 @@ function PayDialog({
               <AdminField error={errors.paidAt?.message} label="Paid on">
                 <DateInput
                   className={adminInputClass}
+                  placeholder="Pick the payment date"
                   {...register("paidAt")}
                 />
               </AdminField>
@@ -239,6 +240,7 @@ function PayDialog({
                   className={adminSelectClass}
                   value={field.value}
                   onChange={field.onChange}
+                  placeholder="Choose how it was paid"
                   options={PAYMENT_METHOD_OPTIONS}
                 />
               )}

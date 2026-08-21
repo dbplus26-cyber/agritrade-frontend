@@ -171,7 +171,7 @@ export function AgentExpenseForm() {
               className={cn(agentInputClass, errors.categoryId && "border-error")}
               value={field.value}
               onChange={field.onChange}
-              placeholder="Choose…"
+              placeholder="Choose a category…"
               options={(categories.data?.data.expenseCategories ?? []).map(
                 (c) => ({ value: c.id, label: c.name }),
               )}
@@ -194,6 +194,7 @@ export function AgentExpenseForm() {
               className={agentInputClass}
               value={field.value || NO_PURCHASE}
               onChange={(v) => field.onChange(v === NO_PURCHASE ? "" : v)}
+              placeholder="Choose the purchase"
               options={[
                 { value: NO_PURCHASE, label: NO_PURCHASE_LABEL },
                 ...(purchases.isLoading
@@ -272,6 +273,7 @@ export function AgentExpenseForm() {
           <AgentLabel htmlFor="incurredAt">Date</AgentLabel>
           <DateInput
             id="incurredAt"
+            placeholder="Pick the day it was paid"
             className={cn(agentInputClass, errors.incurredAt && "border-error")}
             {...register("incurredAt")}
           />

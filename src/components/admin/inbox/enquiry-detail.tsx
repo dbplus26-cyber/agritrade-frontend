@@ -299,6 +299,7 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
                       setStatus(v as EnquiryStatus);
                     }}
                     className={cn(adminSelectClass, "w-full")}
+                    placeholder="Choose a status"
                     options={ENQUIRY_STATUSES.map((s) => ({
                       value: s,
                       label: ENQUIRY_STATUS_META[s].label,

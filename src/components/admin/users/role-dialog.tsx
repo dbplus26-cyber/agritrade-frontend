@@ -95,7 +95,7 @@ export function RoleChangeDialog({
           </span>
           <Select value={role} onValueChange={(v) => setRole(v as UserRole)}>
             <SelectTrigger className={cn(adminSelectClass, "w-full")}>
-              <SelectValue />
+              <SelectValue placeholder="Choose an access level" />
             </SelectTrigger>
             <SelectContent>
               {ROLE_OPTIONS.map((r) => (

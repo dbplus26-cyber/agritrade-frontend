@@ -126,12 +126,14 @@ function AddDrawingDialog({ onClose }: { onClose: () => void }) {
               <Input
                 autoFocus
                 inputMode="decimal"
+                placeholder="0.00"
                 className={cn(adminInputClass, errors.amountGhs && "border-console-red")}
                 {...register("amountGhs")}
               />
             </AdminField>
             <AdminField label="Date" error={errors.occurredAt?.message}>
               <DateInput
+                placeholder="Pick the date taken"
                 className={cn(adminInputClass, errors.occurredAt && "border-console-red")}
                 {...register("occurredAt")}
               />

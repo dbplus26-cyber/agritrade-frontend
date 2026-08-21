@@ -296,6 +296,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
                 optional
               >
                 <DateInput
+                  placeholder="Pick the due date"
                   className={cn(adminInputClass, errors.dueDate && "border-console-red")}
                   {...register("dueDate")}
                 />

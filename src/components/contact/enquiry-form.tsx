@@ -240,6 +240,7 @@ export function EnquiryForm({
                   className={cn(inputClass, "cursor-pointer")}
                   value={field.value}
                   onChange={field.onChange}
+                  placeholder="Choose a subject"
                   options={ENQUIRY_SUBJECTS.map((subject) => ({
                     value: subject,
                     label: subject,

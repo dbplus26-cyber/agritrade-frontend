@@ -208,6 +208,7 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
                         className={cn(adminSelectClass, "w-full min-w-0")}
                         value={triggerField.value}
                         onChange={triggerField.onChange}
+                        placeholder="Choose when it is due"
                         options={TRIGGER_OPTIONS}
                       />
                     )}

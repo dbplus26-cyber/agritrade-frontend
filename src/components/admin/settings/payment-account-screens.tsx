@@ -490,6 +490,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
                     )}
                     value={field.value}
                     onChange={field.onChange}
+                    placeholder="Choose bank or mobile money"
                     options={KIND_OPTIONS}
                   />
                 )}

@@ -416,6 +416,7 @@ function TopUpDialog({
                   className={cn(adminSelectClass, "w-full")}
                   value={field.value}
                   onChange={field.onChange}
+                  placeholder="Choose cash, MoMo or bank"
                   options={TENDER_OPTIONS}
                 />
               )}

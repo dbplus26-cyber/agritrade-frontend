@@ -162,6 +162,7 @@ function PaymentDialog({
             <Input
               inputMode="decimal"
               className={cn(adminInputClass, errors.amountGhs && "border-console-red")}
+              placeholder="0.00"
               {...register("amountGhs")}
             />
           </AdminField>
@@ -174,6 +175,7 @@ function PaymentDialog({
                   className={cn(adminSelectClass, "w-full")}
                   value={field.value}
                   onChange={field.onChange}
+                  placeholder="Choose the method"
                   options={PAYMENT_METHOD_OPTIONS}
                 />
               )}
@@ -189,11 +191,16 @@ function PaymentDialog({
             value={watch("paymentAccountId") ?? ""}
           />
           <AdminField label="Reference" optional>
-            <Input className={adminInputClass} {...register("reference")} />
+            <Input
+              className={adminInputClass}
+              placeholder="e.g. TRF884512"
+              {...register("reference")}
+            />
           </AdminField>
           <AdminField label="Payment date" optional>
             <DateInput
               className={adminInputClass}
+              placeholder="Pick the payment date"
               {...register("paidAt")}
             />
           </AdminField>
@@ -261,6 +268,7 @@ function CancelDialog({
           <AdminField label="Reason" error={errors.reason?.message}>
             <Input
               className={cn(adminInputClass, errors.reason && "border-console-red")}
+              placeholder="e.g. Seller withdrew the plot"
               {...register("reason")}
             />
           </AdminField>

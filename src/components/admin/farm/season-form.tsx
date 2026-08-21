@@ -144,6 +144,7 @@ export function SeasonForm({ season }: { season?: ISeason }) {
             <div className="grid grid-cols-1 gap-5 @min-[440px]:grid-cols-2">
               <AdminField label="Starts on" error={errors.startsOn?.message}>
                 <DateInput
+                  placeholder="Pick the start date"
                   className={cn(
                     adminInputClass,
                     errors.startsOn && "border-console-red",
@@ -153,6 +154,7 @@ export function SeasonForm({ season }: { season?: ISeason }) {
               </AdminField>
               <AdminField label="Ends on" optional error={errors.endsOn?.message}>
                 <DateInput
+                  placeholder="Pick the end date"
                   className={cn(
                     adminInputClass,
                     errors.endsOn && "border-console-red",

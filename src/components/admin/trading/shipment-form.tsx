@@ -880,17 +880,23 @@ export function ShipmentForm({
                     adminInputClass,
                     errors.truckCapacityKg && "border-console-red",
                   )}
+                  placeholder="e.g. 30000"
                   {...register("truckCapacityKg")}
                 />
               </AdminField>
               <AdminField label="Expected arrival" optional>
                 <DateInput
                   className={adminInputClass}
+                  placeholder="Pick the arrival date"
                   {...register("expectedArrivalAt")}
                 />
               </AdminField>
               <AdminField label="Notes" optional>
-                <Input className={adminInputClass} {...register("notes")} />
+                <Input
+                  className={adminInputClass}
+                  placeholder="Anything the driver or office should know"
+                  {...register("notes")}
+                />
               </AdminField>
             </div>
             {selected.length > 0 && (hasCapacity || selectedKg > 0) ? (
@@ -981,6 +987,7 @@ export function ShipmentForm({
                       adminInputClass,
                       errors.driverName && "border-console-red",
                     )}
+                    placeholder="e.g. Abukari Yakubu"
                     {...register("driverName")}
                   />
                 </AdminField>
@@ -991,6 +998,7 @@ export function ShipmentForm({
                       adminInputClass,
                       errors.driverPhone && "border-console-red",
                     )}
+                    placeholder="e.g. 024 000 0000"
                     {...register("driverPhone")}
                   />
                 </AdminField>
@@ -1005,6 +1013,7 @@ export function ShipmentForm({
                       adminInputClass,
                       errors.driverEmail && "border-console-red",
                     )}
+                    placeholder="e.g. yakubu@example.com"
                     {...register("driverEmail")}
                   />
                 </AdminField>
@@ -1015,21 +1024,28 @@ export function ShipmentForm({
                 >
                   <Input
                     className={adminInputClass}
+                    placeholder="e.g. Northern Haulage Ltd"
                     {...register("driverCompany")}
                   />
                 </AdminField>
                 <AdminField label="City" optional>
-                  <Input className={adminInputClass} {...register("driverCity")} />
+                  <Input
+                    className={adminInputClass}
+                    placeholder="e.g. Tamale"
+                    {...register("driverCity")}
+                  />
                 </AdminField>
                 <AdminField label="Licence no" optional>
                   <Input
                     className={adminInputClass}
+                    placeholder="e.g. DL-0000000"
                     {...register("driverLicenseNo")}
                   />
                 </AdminField>
                 <AdminField label="ID number" optional>
                   <Input
                     className={adminInputClass}
+                    placeholder="e.g. GHA-000000000-0"
                     {...register("driverIdNumber")}
                   />
                 </AdminField>

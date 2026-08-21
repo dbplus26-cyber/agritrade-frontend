@@ -143,6 +143,7 @@ export function EntryDialog({
             <SimpleSelect
               className={adminSelectClass}
               onChange={(v) => form.setValue("type", v as AccountEntryType)}
+              placeholder="Choose the kind of entry"
               options={ENTRY_TYPE_OPTIONS.map((o) => ({
                 label: o.label,
                 value: o.value,
@@ -177,6 +178,7 @@ export function EntryDialog({
             >
               <DateInput
                 className={adminInputClass}
+                placeholder="Pick the date it moved"
                 {...form.register("occurredAt")}
               />
             </AdminField>
@@ -356,6 +358,7 @@ export function TransferDialog({
             >
               <DateInput
                 className={adminInputClass}
+                placeholder="Pick the date it moved"
                 {...form.register("occurredAt")}
               />
             </AdminField>
@@ -516,6 +519,7 @@ export function ReconcileDialog({
             >
               <DateInput
                 className={adminInputClass}
+                placeholder="Pick the statement date"
                 {...form.register("asOf")}
               />
             </AdminField>

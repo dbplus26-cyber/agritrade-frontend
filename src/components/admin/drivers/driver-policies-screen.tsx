@@ -206,6 +206,7 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
                         className={adminSelectClass}
                         value={field.value}
                         onChange={field.onChange}
+                        placeholder="Choose when it falls due"
                         options={DRIVER_TRIGGER_OPTIONS}
                       />
                     )}

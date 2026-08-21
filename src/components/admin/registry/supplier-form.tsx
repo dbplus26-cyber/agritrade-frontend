@@ -371,7 +371,7 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
                     disabled={readOnly}
                   >
                     <SelectTrigger className={cn(adminSelectClass, roCls, "w-full")}>
-                      <SelectValue />
+                      <SelectValue placeholder="Choose a source type" />
                     </SelectTrigger>
                     <SelectContent>
                       {SOURCE_OPTIONS.map((source) => (

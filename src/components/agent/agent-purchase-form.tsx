@@ -151,7 +151,7 @@ export function AgentPurchaseForm() {
               className={cn(agentInputClass, errors.commodityId && "border-error")}
               value={field.value}
               onChange={field.onChange}
-              placeholder="Choose…"
+              placeholder="Choose a commodity…"
               options={(commodities.data?.data.commodities ?? []).map((c) => ({
                 value: c.id,
                 label: c.name,
@@ -248,6 +248,7 @@ export function AgentPurchaseForm() {
                   { label: "Cash", value: "CASH" },
                   { label: "Mobile money", value: "MOMO" },
                 ]}
+                placeholder="Choose how you paid"
                 value={field.value}
               />
             )}
@@ -267,6 +268,7 @@ export function AgentPurchaseForm() {
         <AgentLabel htmlFor="purchasedAt">Purchase date</AgentLabel>
         <DateInput
           id="purchasedAt"
+          placeholder="Pick the purchase date"
           className={cn(agentInputClass, errors.purchasedAt && "border-error")}
           {...register("purchasedAt")}
         />

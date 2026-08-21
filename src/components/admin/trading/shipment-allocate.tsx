@@ -708,6 +708,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                   className={cn(adminSelectClass, "h-9 w-auto")}
                   value={scope}
                   onChange={(v) => setScope(v as FillScope)}
+                  placeholder="Choose which sales"
                   options={[
                     { value: "ACTIVE", label: "This sale" },
                     { value: "ALL", label: "Every sale on the truck" },

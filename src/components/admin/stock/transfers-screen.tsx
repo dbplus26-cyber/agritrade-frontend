@@ -574,6 +574,7 @@ function TransferDialog({
                 error={errors.occurredAt?.message}
               >
                 <DateInput
+                  placeholder="Pick the day it moved"
                   className={adminInputClass}
                   {...register("occurredAt")}
                 />

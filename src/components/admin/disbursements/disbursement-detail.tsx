@@ -315,6 +315,7 @@ function ResolveDialog({
                   className={adminSelectClass}
                   value={field.value}
                   onChange={field.onChange}
+                  placeholder="Choose what happened to the money"
                   options={[
                     { value: "SUCCESS", label: "The money reached the recipient" },
                     { value: "FAILED", label: "It never went out (refund the float)" },

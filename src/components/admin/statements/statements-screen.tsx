@@ -187,6 +187,7 @@ function OpeningBalanceCard() {
             error={errors.asOfDate?.message}
           >
             <DateInput
+              placeholder="Pick the year-end date"
               className={cn(adminInputClass, errors.asOfDate && "border-console-red")}
               {...register("asOfDate")}
             />
@@ -195,6 +196,7 @@ function OpeningBalanceCard() {
             <AdminField label="Inventory (GHS)" error={errors.inventoryGhs?.message}>
               <Input
                 inputMode="decimal"
+                placeholder="0.00"
                 className={cn(adminInputClass, errors.inventoryGhs && "border-console-red")}
                 {...register("inventoryGhs")}
               />
@@ -205,6 +207,7 @@ function OpeningBalanceCard() {
             >
               <Input
                 inputMode="decimal"
+                placeholder="0.00"
                 className={cn(adminInputClass, errors.receivablesGhs && "border-console-red")}
                 {...register("receivablesGhs")}
               />
@@ -212,6 +215,7 @@ function OpeningBalanceCard() {
             <AdminField label="Payables (GHS)" error={errors.payablesGhs?.message}>
               <Input
                 inputMode="decimal"
+                placeholder="0.00"
                 className={cn(adminInputClass, errors.payablesGhs && "border-console-red")}
                 {...register("payablesGhs")}
               />
@@ -223,7 +227,11 @@ function OpeningBalanceCard() {
             the cash book instead.
           </p>
           <AdminField label="Notes" optional error={errors.notes?.message}>
-            <Input className={adminInputClass} {...register("notes")} />
+            <Input
+              placeholder="e.g. Stock counted at the Tamale warehouse"
+              className={adminInputClass}
+              {...register("notes")}
+            />
           </AdminField>
           <div className="flex justify-end gap-2">
             <AdminButton
@@ -307,6 +315,7 @@ export function StatementsScreen() {
                 onChange={(v) => {
                   setYear(Number(v));
                 }}
+                placeholder="Choose a year"
                 className="h-[34px] cursor-pointer rounded-none border border-adm-line bg-adm-card px-2.5 text-[13.5px] font-semibold text-adm-ink outline-none focus:border-console"
                 options={years.map((y) => ({
                   value: String(y),

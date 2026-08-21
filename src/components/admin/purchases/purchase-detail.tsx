@@ -198,6 +198,7 @@ function ReceiveDialog({
               <Input
                 inputMode="decimal"
                 className={cn(adminInputClass, errors.receivedKg && "border-console-red")}
+                placeholder="e.g. 1200"
                 {...register("receivedKg")}
               />
             </AdminField>
@@ -237,6 +238,7 @@ function ReceiveDialog({
             <AdminField label="Received date" optional>
               <DateInput
                 className={adminInputClass}
+                placeholder="Pick the received date"
                 {...register("receivedAt")}
               />
             </AdminField>

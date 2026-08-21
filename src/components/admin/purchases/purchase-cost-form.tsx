@@ -239,6 +239,7 @@ export function PurchaseCostDialog({
                 className={adminInputClass}
                 id="purchase-cost-date"
                 max={todayInputValue()}
+                placeholder="Pick the date incurred"
                 {...register("incurredAt")}
               />
             </AdminField>

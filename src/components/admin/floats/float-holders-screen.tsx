@@ -735,6 +735,7 @@ function GiveMoneyDialog({
                           className={adminSelectClass}
                           onChange={field.onChange}
                           options={E_CASH_TENDERS}
+                          placeholder="Choose the wallet or bank"
                           value={field.value}
                         />
                       )}

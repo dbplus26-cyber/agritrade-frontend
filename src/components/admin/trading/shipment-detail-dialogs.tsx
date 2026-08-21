@@ -146,11 +146,16 @@ export function ExpenseDialog({
             <Input
               inputMode="decimal"
               className={cn(adminInputClass, errors.amountGhs && "border-console-red")}
+              placeholder="0.00"
               {...register("amountGhs")}
             />
           </AdminField>
           <AdminField label="Description" optional>
-            <Input className={adminInputClass} {...register("description")} />
+            <Input
+              className={adminInputClass}
+              placeholder="e.g. Loading boys at Tamale"
+              {...register("description")}
+            />
           </AdminField>
           <ResponsiveDialogFooter className="gap-2">
             <AdminButton
@@ -441,6 +446,7 @@ export function CancelDialog({
           <AdminField label="Reason" error={errors.reason?.message}>
             <Input
               className={cn(adminInputClass, errors.reason && "border-console-red")}
+              placeholder="e.g. Buyer postponed collection"
               {...register("reason")}
             />
           </AdminField>
@@ -531,6 +537,7 @@ export function VoidExpenseDialog({
           <AdminField label="Reason" error={errors.reason?.message}>
             <Input
               className={cn(adminInputClass, errors.reason && "border-console-red")}
+              placeholder="e.g. Wrong amount keyed"
               {...register("reason")}
             />
           </AdminField>

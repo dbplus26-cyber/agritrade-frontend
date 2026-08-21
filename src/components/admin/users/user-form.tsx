@@ -201,6 +201,7 @@ export function UserForm() {
                     className={cn(adminSelectClass, "w-full")}
                     value={field.value}
                     onChange={field.onChange}
+                    placeholder="Choose an access level"
                     options={ROLE_OPTIONS.map((role) => ({
                       value: role,
                       label: ROLE_LABEL[role],

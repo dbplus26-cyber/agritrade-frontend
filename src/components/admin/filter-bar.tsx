@@ -39,6 +39,15 @@ export function labelOf(
 }
 
 /** Dropdown filter: label on top, the value text alone in the box. */
+/**
+ * Radix reserves the empty string for "nothing selected", so a filter whose
+ * "all" option is `""` is carried under this sentinel inside the select and
+ * mapped back at the edges; callers keep their own values.
+ */
+const EMPTY_VALUE = "__console_filter_empty__";
+const toSelect = (v: string) => (v === "" ? EMPTY_VALUE : v);
+const fromSelect = (v: string) => (v === EMPTY_VALUE ? "" : v);
+
 export function ConsoleLabeledSelect({
   label,
   value,
@@ -47,6 +56,7 @@ export function ConsoleLabeledSelect({
   active = false,
   className,
   hint,
+  placeholder,
 }: {
   label: string;
   value: string;
@@ -60,6 +70,11 @@ export function ConsoleLabeledSelect({
    * whose effect a reader cannot guess from the option names.
    */
   hint?: string;
+  /**
+   * Shown in the box while the value matches no option (e.g. before the
+   * option list has loaded). Defaults to "Any {label}".
+   */
+  placeholder?: string;
 }) {
   const id = useId();
   return (
@@ -70,7 +85,10 @@ export function ConsoleLabeledSelect({
           <HelpTip label={`What does the ${label} filter do?`} text={hint} />
         ) : null}
       </label>
-      <Select value={value} onValueChange={onChange}>
+      <Select
+        value={toSelect(value)}
+        onValueChange={(v) => onChange(fromSelect(v))}
+      >
         <SelectTrigger
           id={id}
           unstyled
@@ -82,12 +100,18 @@ export function ConsoleLabeledSelect({
           )}
         >
           <span className="min-w-0 truncate text-left">
-            <SelectValue />
+            <SelectValue
+              placeholder={placeholder ?? `Any ${label.toLowerCase()}`}
+            />
           </span>
         </SelectTrigger>
         <SelectContent>
           {options.map((o) => (
-            <SelectItem key={o.value} value={o.value} className="text-sm">
+            <SelectItem
+              key={o.value || EMPTY_VALUE}
+              value={toSelect(o.value)}
+              className="text-sm"
+            >
               {o.label}
             </SelectItem>
           ))}
@@ -133,7 +157,7 @@ export function ConsoleDateField({
           "px-3",
         )}
       >
-        <span className="relative h-full w-full min-w-0">
+        <span className="relative flex h-full w-full min-w-0 items-center">
           <input
             id={id}
             type="date"

@@ -292,6 +292,7 @@ function FarmApplicationDetailBody({
                       isConverted &&
                         "disabled:cursor-default disabled:opacity-100",
                     )}
+                    placeholder="Choose a status"
                     options={FARM_APPLICATION_STATUSES.map((s) => ({
                       value: s,
                       label: FARM_APPLICATION_STATUS_META[s].label,

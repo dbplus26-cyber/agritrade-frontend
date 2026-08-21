@@ -220,12 +220,14 @@ function AddAssetDialog({ onClose }: { onClose: () => void }) {
               <AdminField label="Cost (GHS)" error={errors.costGhs?.message}>
                 <Input
                   inputMode="decimal"
+                  placeholder="0.00"
                   className={cn(adminInputClass, errors.costGhs && "border-console-red")}
                   {...assetForm.register("costGhs")}
                 />
               </AdminField>
               <AdminField label="Acquired on" error={errors.acquiredAt?.message}>
                 <DateInput
+                  placeholder="Pick the purchase date"
                   className={cn(adminInputClass, errors.acquiredAt && "border-console-red")}
                   {...assetForm.register("acquiredAt")}
                 />
@@ -253,7 +255,11 @@ function AddAssetDialog({ onClose }: { onClose: () => void }) {
               reasonError={errors.noCashReason?.message}
             />
             <AdminField label="Notes" optional error={errors.notes?.message}>
-              <Input className={adminInputClass} {...assetForm.register("notes")} />
+              <Input
+                placeholder="e.g. Chassis number, who it is assigned to"
+                className={adminInputClass}
+                {...assetForm.register("notes")}
+              />
             </AdminField>
             <ResponsiveDialogFooter className="gap-2">
               <AdminButton type="button" variant="outline" size="lg" onClick={onClose}>
@@ -289,6 +295,7 @@ function AddAssetDialog({ onClose }: { onClose: () => void }) {
               >
                 <Input
                   inputMode="decimal"
+                  placeholder="e.g. 10"
                   className={adminInputClass}
                   {...classForm.register("depreciationRatePct")}
                 />
@@ -300,6 +307,7 @@ function AddAssetDialog({ onClose }: { onClose: () => void }) {
               >
                 <Input
                   inputMode="decimal"
+                  placeholder="e.g. 30"
                   className={adminInputClass}
                   {...classForm.register("capitalAllowanceRatePct")}
                 />
@@ -410,6 +418,7 @@ function DisposeDialog({
           <div className="grid gap-5 sm:grid-cols-2">
             <AdminField label="Disposed on" error={errors.disposedAt?.message}>
               <DateInput
+                placeholder="Pick the disposal date"
                 className={cn(adminInputClass, errors.disposedAt && "border-console-red")}
                 {...register("disposedAt")}
               />
@@ -561,6 +570,7 @@ function EditAssetDialog({
           <AdminField label="Asset" error={errors.name?.message}>
             <Input
               autoFocus
+              placeholder="e.g. Two Haojue motorbikes"
               className={cn(adminInputClass, errors.name && "border-console-red")}
               {...register("name")}
             />
@@ -621,6 +631,7 @@ function EditAssetDialog({
               <AdminField label="Cost (GHS)" error={errors.costGhs?.message}>
                 <Input
                   inputMode="decimal"
+                  placeholder="0.00"
                   className={cn(
                     adminInputClass,
                     errors.costGhs && "border-console-red",
@@ -630,6 +641,7 @@ function EditAssetDialog({
               </AdminField>
               <AdminField label="Acquired on" error={errors.acquiredAt?.message}>
                 <DateInput
+                  placeholder="Pick the purchase date"
                   className={cn(
                     adminInputClass,
                     errors.acquiredAt && "border-console-red",
@@ -640,7 +652,11 @@ function EditAssetDialog({
             </div>
           )}
           <AdminField label="Notes" optional error={errors.notes?.message}>
-            <Input className={adminInputClass} {...register("notes")} />
+            <Input
+              placeholder="e.g. Chassis number, who it is assigned to"
+              className={adminInputClass}
+              {...register("notes")}
+            />
           </AdminField>
           <ResponsiveDialogFooter className="gap-2">
             <AdminButton type="button" variant="outline" size="lg" onClick={onClose}>

@@ -193,6 +193,7 @@ export function PurchaseCreate() {
                       )}
                       value={field.value}
                       onChange={field.onChange}
+                      placeholder="Choose the source"
                       options={SOURCE_OPTIONS.map((s) => ({
                         value: s,
                         label: SOURCE_LABEL[s],
@@ -354,6 +355,7 @@ export function PurchaseCreate() {
                     adminInputClass,
                     errors.purchasedAt && "border-console-red",
                   )}
+                  placeholder="Pick the purchase date"
                   {...register("purchasedAt")}
                 />
               </AdminField>

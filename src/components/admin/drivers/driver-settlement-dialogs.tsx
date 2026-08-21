@@ -354,6 +354,7 @@ export function DriverPaymentDialog({
               <AdminField error={errors.paidAt?.message} label="Paid on">
                 <DateInput
                   className={adminInputClass}
+                  placeholder="Pick the payment date"
                   {...register("paidAt")}
                 />
               </AdminField>
@@ -398,6 +399,7 @@ export function DriverPaymentDialog({
                   className={adminSelectClass}
                   value={field.value}
                   onChange={field.onChange}
+                  placeholder="Choose how it was paid"
                   options={PAYMENT_METHOD_OPTIONS}
                 />
               )}
@@ -643,6 +645,7 @@ export function DriverFeeAdjustDialog({
                   className={adminSelectClass}
                   value={field.value}
                   onChange={field.onChange}
+                  placeholder="Choose which way it goes"
                   options={[
                     { value: "down", label: "Reduce what the driver is owed" },
                     { value: "up", label: "Increase what the driver is owed" },

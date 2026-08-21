@@ -298,6 +298,7 @@ export function ExpenseFormDialog({
                   id="expense-date"
                   max={today()}
                   className={adminInputClass}
+                  placeholder="Pick the date it was incurred"
                   {...register("incurredAt")}
                 />
               </AdminField>
@@ -356,6 +357,7 @@ export function ExpenseFormDialog({
                           className={adminSelectClass}
                           id="expense-method"
                           onChange={field.onChange}
+                          placeholder="Choose how it was paid"
                           options={PAYMENT_METHOD_OPTIONS}
                           value={field.value}
                         />

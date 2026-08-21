@@ -211,6 +211,7 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
                 error={errors.dateOfBirth?.message}
               >
                 <DateInput
+                  placeholder="Pick the date of birth"
                   className={cn(
                     adminInputClass,
                     errors.dateOfBirth && "border-console-red",

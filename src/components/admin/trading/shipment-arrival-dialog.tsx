@@ -192,6 +192,7 @@ function SaleArrival({
                   adminInputClass,
                   "font-adminmono pr-10 text-[15px] tabular-nums",
                 )}
+                placeholder="e.g. 1200"
                 {...register(`sales.${index}.lines.${i}.receivedKg`)}
               />
               <span
@@ -261,6 +262,7 @@ function SaleArrival({
               adminInputClass,
               "font-adminmono h-[46px] pl-[46px] text-[17px] font-bold tabular-nums",
             )}
+            placeholder="0.00"
             {...settledInput}
             onChange={(e) => {
               setOverridden(true);

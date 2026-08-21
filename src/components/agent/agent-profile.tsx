@@ -146,14 +146,22 @@ function DetailsForm({
       <div className="grid gap-3 sm:grid-cols-2">
         <label>
           <span className={labelClass}>First name</span>
-          <input className={fieldClass} {...register("firstName")} />
+          <input
+            className={fieldClass}
+            placeholder="e.g. Abukari"
+            {...register("firstName")}
+          />
           {errors.firstName ? (
             <span className={errorClass}>{errors.firstName.message}</span>
           ) : null}
         </label>
         <label>
           <span className={labelClass}>Last name</span>
-          <input className={fieldClass} {...register("lastName")} />
+          <input
+            className={fieldClass}
+            placeholder="e.g. Yakubu"
+            {...register("lastName")}
+          />
           {errors.lastName ? (
             <span className={errorClass}>{errors.lastName.message}</span>
           ) : null}
@@ -323,6 +331,7 @@ function PasswordCard() {
           <input
             type="password"
             autoComplete="current-password"
+            placeholder="Your current password"
             className={fieldClass}
             {...register("currentPassword")}
           />
@@ -336,6 +345,7 @@ function PasswordCard() {
             <input
               type="password"
               autoComplete="new-password"
+              placeholder="At least 8 characters"
               className={fieldClass}
               {...register("newPassword")}
             />
@@ -348,6 +358,7 @@ function PasswordCard() {
             <input
               type="password"
               autoComplete="new-password"
+              placeholder="Repeat the new password"
               className={fieldClass}
               {...register("confirm")}
             />

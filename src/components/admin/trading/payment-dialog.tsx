@@ -389,6 +389,7 @@ export function PaymentDialog({
                       className={cn(adminSelectClass, "w-full")}
                       value={field.value}
                       onChange={field.onChange}
+                      placeholder="Choose the method"
                       options={PAYMENT_METHOD_OPTIONS}
                     />
                   )}
@@ -404,6 +405,7 @@ export function PaymentDialog({
               >
                 <DateInput
                   className={adminInputClass}
+                  placeholder="Pick the payment date"
                   {...register("paidAt")}
                 />
               </AdminField>
