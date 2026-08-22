@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Check } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { routes } from "@/lib/routes";
 import { cn } from "@/lib/utils";
@@ -72,9 +73,9 @@ export function AudienceCards() {
               >
                 <span
                   aria-hidden="true"
-                  className={cn("font-bold", audience.tickClass)}
+                  className={cn("flex-none", audience.tickClass)}
                 >
-                  ✓
+                  <Check className="mt-[3px] h-3.5 w-3.5" />
                 </span>
                 {point}
               </li>

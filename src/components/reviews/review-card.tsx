@@ -1,3 +1,4 @@
+import { Check, Star } from "lucide-react";
 import { DocCard } from "@/components/ui/DocCard";
 import {
   REVIEW_ROLE_LABELS,
@@ -5,7 +6,7 @@ import {
 } from "@/types/public-review.types";
 import { cn } from "@/lib/utils";
 
-/** Accessible star row: one label for screen readers, glyphs hidden. */
+/** Accessible star row: one label for screen readers, the stars hidden. */
 function StarRow({ rating }: { rating: number }) {
   const clamped = Math.min(5, Math.max(0, Math.round(rating)));
   return (
@@ -20,7 +21,7 @@ function StarRow({ rating }: { rating: number }) {
           aria-hidden="true"
           className={star <= clamped ? "text-harvest" : "text-soil/30"}
         >
-          ★
+          <Star className="h-4 w-4" fill="currentColor" />
         </span>
       ))}
     </span>
@@ -52,8 +53,9 @@ export function ReviewCard({
       <div className="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <StarRow rating={review.rating} />
         {review.verified ? (
-          <span className="stencil rounded-[2px] border border-leaf/55 px-2 py-1 text-[9px] leading-none tracking-[0.12em] text-forest">
-            VERIFIED TRANSACTION ✓
+          <span className="stencil inline-flex items-center gap-1 rounded-[2px] border border-leaf/55 px-2 py-1 text-[9px] leading-none tracking-[0.12em] text-forest">
+            VERIFIED TRANSACTION
+            <Check className="h-2.5 w-2.5" aria-hidden="true" />
           </span>
         ) : review.source === "ADMIN" ? (
           <span className="stencil rounded-[2px] border border-soil/40 px-2 py-1 text-[9px] leading-none tracking-[0.12em] text-soil">

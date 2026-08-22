@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { X } from "lucide-react";
 import {
   ActionRow,
   AdminButton,
@@ -189,9 +190,9 @@ export function PlotDetail({ id }: { id: string }) {
         type="button"
         aria-label="Remove photo"
         onClick={() => void onRemovePhoto(ph.id)}
-        className="absolute right-1 top-1 cursor-pointer rounded bg-black/60 px-1.5 text-[11px] text-white hover:bg-black/80"
+        className="absolute right-1 top-1 cursor-pointer rounded bg-black/60 px-1.5 py-[3px] text-white hover:bg-black/80"
       >
-        ✕
+        <X className="h-[11px] w-[11px]" aria-hidden="true" />
       </button>
     </div>
   );

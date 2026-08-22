@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Check } from "lucide-react";
 import { PlotGallery } from "@/components/land/plot-gallery";
 import { plotPhotos } from "@/components/land/plot-files";
 import { BackButton } from "@/components/ui/BackButton";
@@ -105,9 +106,10 @@ export async function PlotDetail({ plot }: { plot: PublicLandPlot }) {
                   {["Site plan", "Indenture"].map((paper) => (
                     <span
                       key={paper}
-                      className="stencil rounded-[2px] border border-leaf/55 px-2 py-1 text-[9px] leading-none tracking-[0.12em] text-forest"
+                      className="stencil inline-flex items-center gap-1 rounded-[2px] border border-leaf/55 px-2 py-1 text-[9px] leading-none tracking-[0.12em] text-forest"
                     >
-                      {paper.toUpperCase()} ✓
+                      {paper.toUpperCase()}
+                      <Check className="h-2.5 w-2.5" aria-hidden="true" />
                     </span>
                   ))}
                   <span className="text-[12.5px] text-soil">on file</span>

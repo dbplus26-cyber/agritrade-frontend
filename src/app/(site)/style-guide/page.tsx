@@ -1,3 +1,4 @@
+import { Check } from "lucide-react";
 import { AvailabilityBoard } from "@/components/home/availability-board";
 import { availabilityBoard } from "@/static-data/availability";
 import { InteractiveDemos } from "@/components/style-guide/interactive-demos";
@@ -273,7 +274,7 @@ export default function StyleGuidePage() {
               <div className="flex flex-col gap-1.5">
                 <span className="stencil text-[11px] tracking-[0.14em] text-harvest-deep">VALID</span>
                 <span className="flex items-center justify-between rounded-[2px] border-[1.5px] border-leaf/60 bg-paper px-3.5 py-[13px] text-[15px] text-ink">
-                  024 123 4567 <span className="text-leaf">✓</span>
+                  024 123 4567 <Check className="h-3.5 w-3.5 text-leaf" aria-hidden="true" />
                 </span>
               </div>
             </div>

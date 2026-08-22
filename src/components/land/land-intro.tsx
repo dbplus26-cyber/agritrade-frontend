@@ -1,3 +1,4 @@
+import { Square } from "lucide-react";
 import { DocCard } from "@/components/ui/DocCard";
 import { StencilLabel } from "@/components/ui/StencilLabel";
 
@@ -53,8 +54,8 @@ export function LandIntro() {
                     : ""
                 }`}
               >
-                <span aria-hidden="true" className="stencil text-[14px] text-leaf">
-                  ☐
+                <span aria-hidden="true" className="flex-none text-leaf">
+                  <Square className="mt-[3px] h-3.5 w-3.5" />
                 </span>
                 {item}
               </div>

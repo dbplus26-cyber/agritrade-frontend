@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus } from "lucide-react";
+import { Plus, Star } from "lucide-react";
 import {
   ActionRow,
   AdminButton,
@@ -367,7 +367,7 @@ function AddReviewDialog({
                             star <= field.value ? "text-console-gold" : "text-adm-faint",
                           )}
                         >
-                          ★
+                          <Star className="h-[26px] w-[26px]" fill="currentColor" />
                         </span>
                       </label>
                     ))}

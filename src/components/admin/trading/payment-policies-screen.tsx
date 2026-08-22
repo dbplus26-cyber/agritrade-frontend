@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import {
   ActionRow,
   AdminButton,
@@ -221,7 +221,7 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
                       onClick={() => remove(i)}
                       className="cursor-pointer px-1 text-[12px] text-console-red"
                     >
-                      ✕
+                      <X className="h-3 w-3" aria-hidden="true" />
                     </button>
                   ) : (
                     <span />

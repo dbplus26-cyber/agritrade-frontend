@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { X } from "lucide-react";
 import {
   AdminButton,
   AdminCard,
@@ -553,10 +554,10 @@ export function ShipmentDetail({ id }: { id: string }) {
                           onClick={() =>
                             void onRemoveSale(sale.id, sale.transactionNo)
                           }
-                          className="cursor-pointer text-[12px] text-console-red hover:underline"
+                          className="cursor-pointer text-[12px] text-console-red hover:opacity-70"
                           aria-label={`Remove ${sale.transactionNo} from this shipment`}
                         >
-                          ✕
+                          <X className="h-3 w-3" aria-hidden="true" />
                         </button>
                       </HelpWrap>
                     ) : null}

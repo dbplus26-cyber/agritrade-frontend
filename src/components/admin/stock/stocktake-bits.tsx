@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { X } from "lucide-react";
 import {
   AdminButton,
   AdminCard,
@@ -217,7 +218,7 @@ export function StocktakeCountSheet({
           aria-label={`Remove ${name} from the sheet`}
           className="flex-none cursor-pointer text-[12px] text-console-red"
         >
-          ✕
+          <X className="h-3 w-3" aria-hidden="true" />
         </button>
       ) : null}
       <Input

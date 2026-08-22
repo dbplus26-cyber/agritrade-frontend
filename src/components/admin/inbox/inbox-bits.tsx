@@ -1,3 +1,4 @@
+import { Star } from "lucide-react";
 import { AdminCard, Mono, ToneBadge, type Tone } from "@/components/admin/ui";
 import { HelpTip, HelpWrap } from "@/components/admin/help-tip";
 import { Absent } from "@/components/admin/registry/registry-bits";
@@ -110,7 +111,7 @@ export function StarRow({ rating }: { rating: number }) {
           aria-hidden="true"
           className={star <= clamped ? "text-console-gold" : "text-adm-faint"}
         >
-          ★
+          <Star className="h-[15px] w-[15px]" fill="currentColor" />
         </span>
       ))}
     </span>

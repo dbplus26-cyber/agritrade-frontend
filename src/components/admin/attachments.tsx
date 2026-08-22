@@ -9,8 +9,8 @@ import { cn } from "@/lib/utils";
  * The console's attachment idiom: every private document on a detail page -
  * agreements, waybills, indentures - renders as a FILE, not as a text link.
  *
- * A flat row (green link, date, an ✕) reads as one more line of prose in a
- * page full of prose, so an attachment earns a tile instead: a
+ * A flat row (green link, date, a remove control) reads as one more line of
+ * prose in a page full of prose, so an attachment earns a tile instead: a
  * file-type plate, the document's name, the filed-at stamp, and a download
  * glyph that says "this fetches a file" before anything is hovered. The whole
  * tile opens the document; remove stays its own small target.

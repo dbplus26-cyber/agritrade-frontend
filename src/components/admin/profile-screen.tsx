@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Pencil } from "lucide-react";
+import { Check, Pencil } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import {
@@ -704,7 +704,7 @@ function TwoFactorCard() {
 
       {enabled && freshCodes === null && step === "idle" ? (
         <div className="mt-3 flex items-center gap-2 rounded-none bg-[#E6F0E9] px-3 py-[9px] text-[12.5px] text-[#2F5E3D]">
-          <span className="font-bold">✓</span>
+          <Check className="h-3.5 w-3.5 flex-none" aria-hidden="true" />
           <span>
             Two-factor authentication is on. Lost your recovery codes? Generate
             a new set above.

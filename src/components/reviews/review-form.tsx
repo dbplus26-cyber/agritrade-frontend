@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DocCard } from "@/components/ui/DocCard";
 import { FieldError } from "@/components/ui/FieldError";
@@ -72,7 +73,7 @@ function StarRating({
               star <= value ? "text-harvest" : "text-soil/30",
             )}
           >
-            ★
+            <Star className="h-[30px] w-[30px]" fill="currentColor" />
           </span>
         </label>
       ))}
