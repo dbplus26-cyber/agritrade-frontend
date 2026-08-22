@@ -341,11 +341,10 @@ function PolicyCard({ policy }: { policy: IPaymentPolicy }) {
     // every card to the tallest in its row, and the column layout lets the
     // actions take mt-auto and sit on the bottom edge of all of them.
     //
-    // At most ONE tag, and dimming carries the rest. The card used to show
-    // "Default" and "Inactive" as two pills in the same corner, which is two
-    // things asking to be read before the name is. They are mutually
-    // exclusive in practice, so the corner holds whichever applies and an
-    // inactive card additionally recedes.
+    // At most ONE tag, and dimming carries the rest. "Default" and "Inactive"
+    // as two pills in the same corner is two things asking to be read before
+    // the name is, and they are mutually exclusive in practice - so the corner
+    // holds whichever applies and an inactive card additionally recedes.
     <AdminCard
       className={cn(
         "flex h-full flex-col p-5",
@@ -353,7 +352,7 @@ function PolicyCard({ policy }: { policy: IPaymentPolicy }) {
       )}
     >
       <div className="flex items-start justify-between gap-3">
-        {/* No clamp and no truncation: a policy name is the thing you are
+        {/* No clamp and no truncation: a policy name is what the reader is
             looking for, and half of it is no use. It wraps. Two lines are
             reserved so most cards still start their bar at the same height,
             and a longer name simply takes the room it needs. */}
@@ -389,8 +388,8 @@ function PolicyCard({ policy }: { policy: IPaymentPolicy }) {
       </div>
 
       {/* One line per milestone, not two, and no rules between them. The bar
-          above already separates the shares, so dividers were drawing the
-          same boundary twice. */}
+          above already separates the shares, so dividers would draw the same
+          boundary twice. */}
       <ul className="mt-3.5 flex flex-col gap-2">
         {policy.milestones.map((m, i) => (
           <li
@@ -454,9 +453,9 @@ export function PaymentPoliciesScreen() {
   const policies = data?.data ?? [];
 
   return (
-    // No 680px cap. It was narrower than one card plus a gutter at some
-    // widths, so the grid was being asked for three columns inside the width
-    // of roughly one and a half.
+    // No 680px cap: at some widths that is narrower than one card plus a
+    // gutter, which asks the grid for three columns inside the width of
+    // roughly one and a half.
     <div>
       <AdminPageHeader
         title="Payment Policies"
@@ -502,13 +501,12 @@ export function PaymentPoliciesScreen() {
           onAction={() => setCreateOpen(true)}
         />
       ) : (
-        // Two things were fighting the alignment here. `items-start` told the
-        // grid NOT to stretch its cards, which is the setting that guarantees
-        // ragged bottoms. And the breakpoints were viewport ones inside a
-        // shell with a ~225px sidebar, so `xl:grid-cols-3` fired while the
-        // content area still only had room for two - three columns squeezed
-        // into the width of two is most of what read as "scattered".
-        // Container queries measure the content area itself.
+        // Two things fight the alignment here. `items-start` tells the grid
+        // NOT to stretch its cards, which guarantees ragged bottoms. And
+        // viewport breakpoints inside a shell with a ~225px sidebar fire
+        // `xl:grid-cols-3` while the content area still only has room for two,
+        // squeezing three columns into the width of two. Container queries
+        // measure the content area itself.
         <div className="grid gap-4 @2xl/main:grid-cols-2 @5xl/main:grid-cols-3">
           {policies.map((p) => (
             <PolicyCard key={p.id} policy={p} />

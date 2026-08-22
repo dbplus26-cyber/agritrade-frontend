@@ -90,7 +90,7 @@ export function AgentExpenseForm() {
   } = useForm<AgentExpenseValues>({
     resolver: zodResolver(agentExpenseSchema),
     // Spread over the defaults rather than replacing them, so a draft saved
-    // on this phone before the purchase fields existed still loads whole.
+    // on this phone by an older build of the form still loads whole.
     defaultValues: {
       categoryId: "",
       purchaseId: "",
@@ -118,8 +118,8 @@ export function AgentExpenseForm() {
     setSubmitError(null);
     try {
       // Both attribution keys travel together or not at all: an ordinary
-      // field cost goes over the wire exactly as it did before the picker
-      // existed, and the treatment is only a fact once a purchase is named.
+      // field cost carries neither, and the treatment is only a fact once a
+      // purchase is named.
       const treatment = v.treatment ?? "goods";
       const attribution = v.purchaseId
         ? { purchaseId: v.purchaseId, capitalise: treatmentToCapitalise(treatment) }

@@ -29,9 +29,9 @@ const inputClass =
 const labelClass = "stencil text-[11px] tracking-[0.14em] text-harvest-deep";
 
 /**
- * The enquiry form document. Validates on submit then live per-field (design
- * rule: error text sits under the field, never as a toast - the toast is for
- * transport failures only). Success swaps the sheet for the "RECEIVED" file.
+ * The enquiry form document. Validates on submit then live per-field: error
+ * text sits under the field, never as a toast - the toast is for transport
+ * failures only. Success swaps the sheet for the "RECEIVED" file.
  *
  * Bot protection mirrors the backend's: a hidden honeypot field bots fill and
  * people never see, plus Cloudflare Turnstile when a site key is configured

@@ -7,8 +7,8 @@ import {
 import { expenseCategorySchema } from "@/validations/registry-schema";
 
 // Where a category files is the one fact on this form the financial
-// statements read. Neither field used to exist on any screen, so every
-// category filed as running costs whatever it was.
+// statements read. Unasked, every category files as running costs whatever
+// it is.
 describe("an expense category says where it files", () => {
   it("requires a section and takes the heading as optional", () => {
     const ok = expenseCategorySchema.safeParse({

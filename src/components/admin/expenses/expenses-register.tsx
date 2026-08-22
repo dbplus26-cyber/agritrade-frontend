@@ -121,8 +121,8 @@ export function ExpensesRegister() {
         id: "category",
         header: "Category",
         // What the money was for, with the voucher's own words underneath.
-        // The description had a column of its own and, being prose, was the
-        // column that decided how wide this table got.
+        // The description gets no column of its own: prose has no natural
+        // width, so a column for it decides how wide the whole table gets.
         cell: ({ row }) => (
           <TitleCell
             href={`${LIST}/${row.original.id}`}
@@ -338,7 +338,7 @@ export function ExpensesRegister() {
         <>
           {/* The number the screen exists to answer: what did we spend over this
               window? Aggregated server-side across the whole filtered set, so it
-              does not change as you page. */}
+              does not change from page to page. */}
           {showMoney && windowTotal !== null && windowTotal !== undefined ? (
             <div className="mb-3 flex items-baseline gap-2">
               <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">

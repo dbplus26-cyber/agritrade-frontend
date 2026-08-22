@@ -34,9 +34,9 @@ import type { IUser } from "@/types/user.types";
 import { RoleChangeDialog } from "./role-dialog";
 
 /**
- * Per-row actions menu (dms-frontend convention): view/edit, send reset link,
- * unblock, deactivate/activate, delete - each behind its confirm gate. Role
- * changes live on the detail page (they carry more context).
+ * Per-row actions menu: view/edit, send reset link, unblock,
+ * deactivate/activate, delete - each behind its confirm gate. Role changes
+ * live on the detail page (they carry more context).
  */
 export function UserActionsDropdown({ user }: { user: IUser }) {
   const router = useRouter();

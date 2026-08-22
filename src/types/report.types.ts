@@ -1,6 +1,6 @@
 // src/types/report.types.ts
 //
-// The reporting reads (design doc 9), mirroring the backend. Money is
+// The reporting reads, mirroring the backend. Money is
 // `number | null` (redacted per financial visibility); weights and counts are
 // always present.
 

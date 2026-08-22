@@ -10,10 +10,9 @@ const OFFICE_LNG = -0.84911;
 const OFFICE_LABEL = "DB Plus Trading Ltd";
 
 /**
- * Live Google Maps embed (website-frontend's LocationMap pattern, worn in
- * this design's paperwork style): `q=label@lat,lng` drops a labelled pin,
- * the map sits desaturated at rest so it stays in-palette and clears to full
- * colour on hover, and a directions pill is always reachable.
+ * Live Google Maps embed in the paperwork style: `q=label@lat,lng` drops a
+ * labelled pin, the map sits desaturated at rest so it stays in-palette and
+ * clears to full colour on hover, and a directions pill is always reachable.
  */
 export function LocationMap() {
   const [isLoading, setIsLoading] = useState(true);

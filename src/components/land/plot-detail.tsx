@@ -60,8 +60,8 @@ export async function PlotDetail({ plot }: { plot: PublicLandPlot }) {
         </h1>
 
         <div className="mt-8 flex flex-col gap-8 lg:mt-10 lg:gap-10">
-          {/* No conditional here any more, and no wrapper of our own. The
-              gallery renders null - border included - when there is no
+          {/* No conditional here, and no wrapper around it. The gallery
+              renders null - border included - when there is no
               photograph to show, which it is the only one in a position to
               know: a plot can arrive with photos on file whose URLs have since
               stopped resolving, and that only surfaces in the browser. A frame

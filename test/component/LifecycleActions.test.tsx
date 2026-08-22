@@ -11,11 +11,11 @@
 //     fires from a single tap on a phone is the failure this row exists to
 //     prevent;
 //   * deactivating is undone by the same button, so it is NOT held behind
-//     anything. It used to be, and a dialog on the button people actually use,
-//     sitting beside the button that destroys, teaches them to dismiss the
-//     dialog in this row on the way to what they wanted;
-//   * the sentence that dialog carried is still on screen, where it is read
-//     before the tap rather than after it.
+//     anything: a dialog on the button people actually use, sitting beside the
+//     button that destroys, only teaches them to dismiss the dialog in this
+//     row on the way to what they wanted;
+//   * the sentence such a dialog would carry is on screen instead, where it is
+//     read before the tap rather than after it.
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEventBase from "@testing-library/user-event";

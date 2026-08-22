@@ -63,9 +63,9 @@ function Figure({
 }
 
 /**
- * A print-friendly agent float statement (design doc 5.2, ADR-004): every
- * top-up, purchase, expense and adjustment with a running balance, from live
- * data. A4-styled via `print:` utilities.
+ * A print-friendly agent float statement: every top-up, purchase, expense and
+ * adjustment with a running balance, from live data. A4-styled via `print:`
+ * utilities.
  *
  * Money arrives as `number | null` - null means the reader has no financial
  * visibility. A redacted amount cannot be added up, so the running balance is
@@ -79,9 +79,9 @@ export function AgentStatement({ id }: { id: string }) {
   const float = useGetAgentFloatQuery({
     agentUserId: id,
     params: {
-      // The API caps a page at 100. It used to ask for 500, which failed
-      // validation, so the statement silently printed "No float activity yet"
-      // over a real balance - the one thing a statement must never do.
+      // The API caps a page at 100. Asking for more fails validation, which
+      // would leave the statement printing "No float activity yet" over a real
+      // balance - the one thing a statement must never do.
       limit: PAGE_LIMIT,
       ...(from ? { from } : {}),
       ...(to ? { to } : {}),
@@ -343,7 +343,7 @@ export function AgentStatement({ id }: { id: string }) {
               </div>
               {/* The rows' own movement: the closing figure minus what was
                   carried in, so it stays a period total even though the
-                  balance column now starts from the opening balance. */}
+                  balance column starts from the opening balance. */}
               <div className="flex items-baseline justify-between gap-4 border-t border-adm-line py-1.5 text-[12.5px]">
                 <span className="text-adm-muted">
                   <HelpWrap text="Everything handed to the agent in these dates, less everything they spent or sent.">

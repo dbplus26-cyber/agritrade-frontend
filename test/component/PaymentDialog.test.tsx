@@ -58,9 +58,9 @@ vi.mock("@/lib/notify", () => ({
 
 /**
  * No inter-keystroke delay. userEvent's default waits between characters, and
- * typing an amount into a radix dialog was slow enough that this file passed
- * alone and timed out at 5s once the suite ran its files in parallel. Nothing
- * here depends on typing being paced.
+ * typing an amount into a radix dialog is slow enough to blow the 5s timeout
+ * once the suite runs its files in parallel. Nothing here depends on typing
+ * being paced.
  */
 const userEvent = userEventBase.setup({ delay: null });
 

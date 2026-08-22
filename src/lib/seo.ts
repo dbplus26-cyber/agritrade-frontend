@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { siteConfig } from "@/lib/site";
 
 /**
- * Shared per-page metadata builder (khadys-kitchen / dms-frontend convention).
+ * Shared per-page metadata builder.
  *
  * - `title` gets the brand suffix and is set `absolute` so it bypasses the
  *   root layout's title template.

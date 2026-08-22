@@ -287,12 +287,12 @@ export function StocktakeDetail({ id }: { id: string }) {
         // ONE COLUMN, not a rail. A stocktake is a warehouse, a date and a
         // list of counts - the list is short by nature (a warehouse holds a
         // handful of commodities, not a hundred), so pairing it with a rail
-        // guaranteed a stunted left column beside a tall right one. Stretching
-        // the sheet to match only moved the empty space inside it.
+        // gives a stunted left column beside a tall right one, and stretching
+        // the sheet to match only moves the empty space inside it.
         //
         // The facts read across the top where they take one line each, the
         // actions sit under them, and the counts get the full width - which is
-        // where the width was wanted anyway, since that is the table with four
+        // where the width is wanted anyway, since that is the table with four
         // columns in it. Balanced at one line or twenty, because there is no
         // second column left to be out of step with.
         <div className="flex flex-col gap-4">
@@ -323,8 +323,8 @@ export function StocktakeDetail({ id }: { id: string }) {
                 {st.decidedAt ? formatDateTime(st.decidedAt) : <Absent />}
               </DetailItem>
               {/* Notes take the row. A count sheet's note is a sentence about
-                  what was found, and beside a one-line fact it left the label
-                  stranded at the top of a deep cell. */}
+                  what was found, and beside a one-line fact it leaves the
+                  label stranded at the top of a deep cell. */}
               {st.notes ? (
                 <DetailItem full label="Notes">
                   {st.notes}

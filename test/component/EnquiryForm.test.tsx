@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { EnquiryForm } from "@/components/contact/enquiry-form";
 
-// Mock the data layer so the form is tested in isolation — no store/network.
+// Mock the data layer so the form is tested in isolation - no store/network.
 const { sendTrigger } = vi.hoisted(() => ({ sendTrigger: vi.fn() }));
 
 vi.mock("@/redux/enquiries/enquiries-api", () => ({

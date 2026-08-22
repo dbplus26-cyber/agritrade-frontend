@@ -86,8 +86,8 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
   const [updateSupplier, updateState] = useUpdateSupplierMutation();
   const saving = createState.isLoading || updateState.isLoading;
 
-  // Photo travels WITH the save (multipart payload + file, the profile-photo
-  // convention); `removePhoto` clears an existing one server-side.
+  // Photo travels WITH the save (multipart payload + file, the same shape as
+  // a profile photo); `removePhoto` clears an existing one server-side.
   const {
     fileInputRef,
     photoFile,
@@ -114,7 +114,7 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
 
   // The sync callback tracks a record bumped by a background refetch (another
   // tab, a lifecycle action) while reading; the hook never runs it during an
-  // in-progress edit, which is why the parent no longer key-remounts the form
+  // in-progress edit, which is why the parent does not key-remount the form
   // on updatedAt. It also drops any staged file from the native input, so
   // re-picking the same photo later still fires onChange.
   const { isEditing, setIsEditing, readOnly, roCls, mode } =
@@ -221,15 +221,15 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
     }
   };
 
-  // At rest an existing record READS. The form is what you get after
-  // pressing Edit, not a greyed-out copy of the page you were already on.
+  // At rest an existing record READS. The form arrives on Edit, rather than
+  // standing in as a greyed-out copy of the page just left.
   if (isEdit && !isEditing && supplier) {
     return (
       <AdminCard className="max-w-[640px] px-5 py-[18px]">
         {/* The photograph belongs on the READ view, not only behind Edit.
-            It was rendered inside the form, so at rest - which is how this
-            page is nearly always seen - the record showed no picture at all,
-            and the only way to look at one was to start editing. */}
+            Rendered inside the form it would be absent at rest - which is how
+            this page is nearly always seen - leaving no way to look at the
+            picture without starting an edit. */}
         <div className="mb-4 flex items-center gap-3.5">
           <ViewablePhoto
             name={supplier.name}
@@ -271,8 +271,8 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
   return (
     <AdminCard className="max-w-[640px] px-5 py-[18px]">
       {/* Field pairs measure against this form, not the viewport: the console
-          shell keeps a ~225px rail beside it, so `sm:` paired fields up while
-          the column was still too narrow to carry two of them. */}
+          shell keeps a ~225px rail beside it, so `sm:` would pair fields up
+          while the column is still too narrow to carry two of them. */}
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}

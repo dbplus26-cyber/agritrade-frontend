@@ -29,10 +29,9 @@ export enum PaymentMethod {
  * One line of what somebody is holding for the business.
  *
  * Mirrors the backend `toHeldMovementDTO`. It carries WHICH of their accounts
- * moved, which the float row it replaces could not: a single balance covering
- * cash in a pocket and money in a wallet is exactly what made an agent's
- * position unreadable, and a statement that does not say which pot moved
- * reproduces the problem one row at a time.
+ * moved: a single balance covering cash in a pocket and money in a wallet
+ * makes an agent's position unreadable, and a statement that does not say
+ * which pot moved reproduces that one row at a time.
  */
 export interface IFloatTransaction {
   account: { id: string; kind: string; label: string };
@@ -78,9 +77,9 @@ export interface IAgentSummary {
  * Never folded into the balance beside it. What somebody HOLDS is money in
  * their own accounts and falls when they spend it; an allowance is a licence
  * to draw on an account belonging to the business, and what falls when it is
- * used is the company's. The float was one number for both, which is why an
- * agent handed GHS 5,000 cash who then sent GHS 3,000 by mobile money had his
- * own cash shown as 2,000 while the 5,000 was still in his hand.
+ * used is the company's. One number for both is how an agent handed GHS 5,000
+ * cash who then sends GHS 3,000 by mobile money ends up with his own cash
+ * shown as 2,000 while the 5,000 is still in his hand.
  */
 export interface IHolderAuthority {
   /** Null means UNCAPPED. A cap of zero is refused: that is a suspension. */
@@ -175,10 +174,9 @@ export interface IAgentDetailResponse {
  * One place a person actually keeps the business's money.
  *
  * There is a row per pot because cash in a pocket, money in their own wallet
- * and money in their own bank are three different things, and the single
- * figure that used to cover all three is what made an agent's position
- * unreadable: cash he was still holding read as spent because a mobile-money
- * send had come off the same total.
+ * and money in their own bank are three different things, and a single figure
+ * covering all three makes an agent's position unreadable: cash he is still
+ * holding reads as spent because a mobile-money send came off the same total.
  */
 export interface IHeldPot {
   balanceGhs: number;
@@ -229,8 +227,8 @@ export interface IFloatLedgerResponse {
     accountActive?: boolean;
     /**
      * One row per pot. `balanceGhs` above is their sum and stays, because "how
-     * much of the company's money am I holding" is a real question - it is
-     * just no longer the only answer available.
+     * much of the company's money am I holding" is a real question - just not
+     * the only one.
      */
     pots?: IHeldPot[];
   };
@@ -238,9 +236,8 @@ export interface IFloatLedgerResponse {
 
 /**
  * What recording a field expense answers with. `data.expense`, mirroring the
- * agent controller - NOT a float transaction, which is what the old
- * IFloatTransactionResponse wrongly claimed for this and the top-ups (which
- * return data.transfer, see IAccountTransferResponse).
+ * agent controller - NOT a float transaction. Top-ups answer with
+ * data.transfer instead, see IAccountTransferResponse.
  */
 export interface IFieldExpenseResponse {
   message: string;
@@ -289,11 +286,11 @@ export interface IFloatLedgerQuery {
 /**
  * Mirrors backend `topUpSchema`.
  *
- * `fromAccountId` is REQUIRED, and that is the whole point of the shape. A
- * top-up used to say only how much and by what method, so money appeared in an
- * agent's hands and left no company account - the business's own position never
- * fell by what it had just given away. Naming the source makes it a transfer,
- * which is what it always was.
+ * `fromAccountId` is REQUIRED, and that is the whole point of the shape.
+ * Without it a top-up says only how much and by what method, so money appears
+ * in an agent's hands and leaves no company account - the business's own
+ * position never falls by what it has just given away. Naming the source makes
+ * it the transfer it is.
  */
 export interface ITopUpInput {
   amountGhs: number;
@@ -339,7 +336,7 @@ export interface IAgentExpenseInput {
  *
  * Reported per account rather than as one figure because notes in a pocket and
  * money on somebody's own wallet are different money, and a single number for
- * both is what made a person's position unreadable in the first place. Amounts
+ * both makes a person's position unreadable. Amounts
  * are null for a reader without money visibility; the account itself stays,
  * because WHICH accounts somebody holds is operational truth.
  */
@@ -358,7 +355,7 @@ export interface IHeldAccountSummary {
  * `held` is money they are carrying and will be asked to produce. `sent` is the
  * company's money they were allowed to move on authority - none of it ever
  * reached their hands, and what remains of a cap is permission, not cash.
- * Summing them is the confusion the old single float number was.
+ * Summing them is the confusion a single float figure produces.
  */
 export interface IAgentMoneySummary {
   held: {

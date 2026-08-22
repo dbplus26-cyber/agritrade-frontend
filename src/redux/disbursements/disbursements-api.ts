@@ -170,9 +170,9 @@ export const disbursementsApi = apiSlice.injectEndpoints({
         { type: "Disbursements", id: "MINE" },
         { type: "Disbursements", id: "LIST" },
         { type: "FloatLedger", id: "LIST" },
-        // The agent surface's own money views provide MINE, not the dead
-        // {Agents, ME} this used to name - the "what you can still send"
-        // figure sat stale on the very screen the send happened from.
+        // The agent surface's own money views provide MINE: without it the
+        // remaining-to-send figure sits stale on the very screen the send
+        // happened from.
         { type: "FloatLedger", id: "MINE" },
         "CashBook",
       ],

@@ -81,8 +81,8 @@ function PayToCard({
 }
 
 /**
- * A print-friendly invoice / receipt for a sale (design doc ADR-004): live
- * data, A4-styled via `print:` utilities. The console chrome is hidden when
+ * A print-friendly invoice / receipt for a sale: live data, A4-styled via
+ * `print:` utilities. The console chrome is hidden when
  * printing; only the document remains. A fully-paid sale reads as a receipt,
  * an outstanding one as an invoice.
  */
@@ -140,7 +140,7 @@ export function SaleInvoice({ id }: { id: string }) {
           // The server renders this same document as a real A4 PDF, so the
           // one action opens that - the viewer previews it true to size and
           // printing happens from there. The browser's own print dialog
-          // placed the sheet top-left with dead space around it.
+          // places the sheet top-left with dead space around it.
           <AdminButton asChild>
             <a
               href={saleInvoicePdfUrl(s.id)}

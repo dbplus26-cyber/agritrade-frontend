@@ -116,7 +116,7 @@ const fillMomo = async () => {
   );
 };
 
-/** The form's own submit. On its own this now only raises the confirm gate. */
+/** The form's own submit. On its own this only raises the confirm gate. */
 const submit = () =>
   userEvent.click(screen.getAllByRole("button", { name: "Send money" })[0]);
 
@@ -222,7 +222,7 @@ describe("SendMoneyDialog - rail rules", () => {
   it("never lets an abandoned MoMo number ride along on a bank send", async () => {
     render(<SendMoneyDialog onClose={vi.fn()} open surface="company" />);
 
-    // Start down the MoMo path, then change your mind.
+    // Start down the MoMo path, then switch to a bank send.
     await userEvent.type(
       screen.getByLabelText(/Mobile money number/i),
       "233249111411",
@@ -265,8 +265,8 @@ describe("SendMoneyDialog - the confirm gate", () => {
     await fillMomo();
     await submit();
 
-    // A valid form is no longer a send. What is on screen at this point is the
-    // whole point of the gate: who, how much, and down which number.
+    // A valid form is not a send on its own. What is on screen at this point
+    // is the whole point of the gate: who, how much, and down which number.
     expect(createCompany).not.toHaveBeenCalled();
     expect(
       await screen.findByText(/GH₵ 850.00 to Ibrahim Fuseini/),
@@ -340,10 +340,10 @@ describe("SendMoneyDialog - idempotency key lifecycle", () => {
   it("turns a rapid double-tap on Send into ONE payout", async () => {
     // The submit button only disables once the mutation reports in-flight, and
     // zod validation runs async first, so a fast second tap does reach the
-    // handler. It no longer reaches Hubtel: both taps queue behind the one
-    // gate, and the single confirmation releases a single send. The key check
-    // stays because the backend's dedupe is still the last line if anything
-    // ever slips past.
+    // handler. It does not reach Hubtel: both taps queue behind the one gate,
+    // and the single confirmation releases a single send. The key is checked
+    // as well because the backend's dedupe is the last line if anything ever
+    // slips past.
     let resolveSend: (v: unknown) => void = () => undefined;
     createCompany.mockReturnValue({
       unwrap: () =>

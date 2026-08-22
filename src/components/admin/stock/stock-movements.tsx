@@ -107,9 +107,9 @@ export function StockMovements({
         enableSorting: false,
         meta: columnMeta({ className: "py-2", stretch: true }),
         // Commodity leads, its warehouse sits underneath as the quiet second
-        // line - the register convention. The two used to run together on one
-        // unbounded line, so a long commodity name and a long warehouse name
-        // between them decided how wide this table got.
+        // line - the register convention. Run together on one unbounded line,
+        // a long commodity name and a long warehouse name between them would
+        // decide how wide this table gets.
         cell: ({ row }) => (
           // The commodity carries the row's link (TitleCell keeps a table's
           // identity column in ink by design). The warehouse underneath is
@@ -280,10 +280,9 @@ export function StockMovements({
           }}
         />
       ) : (
-        // On a card, like every other register - and like this screen's own
-        // empty state, which was already carded while the table beside it was
-        // not. The rows sat directly on the page background with no sheet
-        // under them, which is why this tab did not look like the rest.
+        // On a card, like every other register and like this screen's own
+        // empty state. Rows sitting directly on the page background with no
+        // sheet under them read as a different kind of screen.
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable
             columns={columns}

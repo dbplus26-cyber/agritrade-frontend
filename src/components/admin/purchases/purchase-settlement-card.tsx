@@ -50,11 +50,11 @@ import { PAYMENT_METHOD_OPTIONS, todayInputValue } from "../trading/sale-bits";
 /**
  * What has actually been paid for these goods.
  *
- * A purchase used to move money by itself: an agent's float was debited the
- * instant the row was written, and an OFFICE purchase debited nothing at all,
- * ever - so the largest regular flow in the business touched no account and no
- * supplier was ever owed by anybody. A purchase is a document now, and this is
- * the ledger that says whether it has been paid for.
+ * A purchase is a document and moves no money by itself; this is the ledger
+ * that says whether it has been paid for. A purchase that debited an agent's
+ * float the instant the row was written - and debited nothing at all when the
+ * buyer was the OFFICE - would leave the largest regular flow in the business
+ * touching no account, with no supplier owed by anybody.
  *
  * Deliberately the same shape as the expense settlement card: it is the same
  * operation pointed at a different payable, and somebody who has settled one

@@ -1,9 +1,9 @@
 // src/types/admin-shipment.types.ts
 //
-// The admin shipments surface (design doc 5.4, 5.6), mirroring the backend
-// DTOs. Money fields (lot costs, expenses, profit) are `number | null` -
-// redacted for callers without financial visibility (8.3); weights and the
-// goods manifest are operational and always present.
+// The admin shipments surface, mirroring the backend DTOs. Money fields (lot
+// costs, expenses, profit) are `number | null` - redacted for callers without
+// financial visibility; weights and the goods manifest are operational and
+// always present.
 import type { IPaginationMeta } from "./api";
 import type { SaleStatus } from "./admin-sale.types";
 

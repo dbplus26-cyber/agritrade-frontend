@@ -112,7 +112,7 @@ export function PaymentDialog({
    * The quick fills that actually apply, resolved to a list so the layout can
    * be driven by how MANY there are. Two of them split the dialog exactly in
    * half and one takes the whole width - which is the point: as loose inline
-   * buttons they wrapped into a ragged half-row that read as an afterthought
+   * buttons they wrap into a ragged half-row that reads as an afterthought
    * next to the amount they fill.
    */
   const quickFills: { amount: number; key: string; label: string }[] = [];
@@ -175,7 +175,7 @@ export function PaymentDialog({
     <ResponsiveDialog open={open} onOpenChange={(o) => !o && onClose()}>
       {/* Wider than the console's standard dialog: this one carries a money
           readout, a large amount field and two side-by-side quick fills, and
-          at 480px all three were fighting for the same measure. */}
+          at 480px all three fight for the same measure. */}
       <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[580px]">
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Record a payment</ResponsiveDialogTitle>

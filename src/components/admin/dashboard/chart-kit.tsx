@@ -67,9 +67,8 @@ export function CardHeader({
   return (
     // The heading never wraps and never shrinks; whatever sits on the right
     // (a legend, a link) takes the room that is left and wraps there instead.
-    // Previously both sides could shrink, so a long legend squeezed "Volume
-    // bought (t)" into a three-line column - the heading, the one fixed thing
-    // on the card, was the piece being pushed around.
+    // Letting both sides shrink squeezes a heading like "Volume bought (t)"
+    // into a three-line column, pushing around the one fixed thing on the card.
     //
     // items-start, not centre: when the right-hand side wraps to two or three
     // lines, centring drags the heading down to float in the middle of them.
@@ -121,8 +120,8 @@ export function LegendItem({
   return (
     // min-w-0 on BOTH the row and the label. A flex item defaults to
     // `min-width: auto`, meaning it refuses to shrink below its content - so
-    // `truncate` on the label had nothing to clamp against and a long
-    // commodity name ran straight out past the card's edge.
+    // without it `truncate` on the label has nothing to clamp against and a
+    // long commodity name runs straight out past the card's edge.
     <span className={cn("flex min-w-0 items-center gap-1.5 text-[11.5px] text-adm-muted", className)}>
       <span
         aria-hidden="true"
@@ -151,10 +150,10 @@ export function ChartNote({ children }: { children: React.ReactNode }) {
 /**
  * The no-data state for a dashboard or report widget - one shape everywhere.
  *
- * Widgets used to say "nothing here" three different ways (ChartNote, a bare
- * muted paragraph, or nothing at all), so an empty board read as several
- * different products. This is the registers' folder mark scaled to widget
- * size, with the same title/hint hierarchy as EmptyState. Keep ChartNote for
+ * One shape and not three (ChartNote, a bare muted paragraph, or nothing at
+ * all), so an empty board does not read as several different products. This is
+ * the registers' folder mark scaled to widget size, with the same title/hint
+ * hierarchy as EmptyState. Keep ChartNote for
  * REDACTION notes ("hidden for your role") - that is a different message from
  * "there is no data", and the two must not look alike.
  *
@@ -193,10 +192,10 @@ export function WidgetEmpty({
 /**
  * The failure state for a dashboard widget that owns its own query.
  *
- * These widgets all used to branch on `isLoading || !data`, which is TRUE
- * forever once a request has failed - so a dead endpoint left a skeleton
- * pulsing indefinitely, or worse, fell through to an empty state that read
- * as a real zero. On a board of money figures, "we could not load this" and
+ * Branching on `isLoading || !data` is not enough: that is TRUE forever once
+ * a request has failed, so a dead endpoint leaves a skeleton pulsing
+ * indefinitely, or worse, falls through to an empty state that reads as a
+ * real zero. On a board of money figures, "we could not load this" and
  * "this is nothing" must never look the same. Sized to sit inside a widget
  * card without resizing the row it lives in.
  */

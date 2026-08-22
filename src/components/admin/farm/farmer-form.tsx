@@ -70,8 +70,8 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
 
   // Always editable. This route is reached from the farmer's own detail page,
   // which is where the record is READ - so opening locked, on top of a
-  // read-only copy of facts the reader has just come from, asked for a second
-  // click to do the one thing the page is for.
+  // read-only copy of facts the reader has just come from, would ask for a
+  // second click to do the one thing the page is for.
 
   const {
     register,
@@ -89,8 +89,7 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
   };
 
   const onSubmit = async (values: FarmerValues) => {
-    // Empty optional fields are omitted (same shaping as before the profile
-    // fields were added).
+    // Empty optional fields are omitted.
     const trimmed = (v: string | undefined) => v?.trim() ?? "";
     const body: ICreateFarmerInput = {
       name: values.name,
@@ -144,8 +143,8 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
       />
 
       {/* Field pairs are measured against this form, not the viewport. The
-          console shell keeps a ~225px rail beside it, so `sm:` fired while the
-          column was still too narrow to carry two labelled inputs. */}
+          console shell keeps a ~225px rail beside it, so `sm:` would fire while
+          the column is still too narrow to carry two labelled inputs. */}
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
@@ -363,7 +362,7 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
         </AdminCard>
 
         {/* Cancel returns to where the record is read rather than locking
-            the form back down - there is no locked state any more. */}
+            the form back down: this route has no locked state. */}
         <CommitRow>
           <AdminButton
             type="button"

@@ -16,12 +16,12 @@ export const LOT_PAGE_SIZE = 9;
  * paths (never filed, or filed but no longer resolving), so the card keeps one
  * height whatever the records hold.
  *
- * The frame is a RATIO, not a minimum. It used to be `min-h-[150px]` in a
- * row the text below it sized, which meant the picture absorbed whatever
- * height the description left over: a lot with two lines of copy printed a
- * tall photograph and the lot beside it a short one, off the same grid. A
- * 4:3 box crops a portrait and a landscape original to the same shape, so
- * every thumbnail in the row is the same picture size.
+ * The frame is a RATIO, not a minimum. A minimum height in a row the text
+ * below it sizes lets the picture absorb whatever height the description
+ * leaves over: a lot with two lines of copy prints a tall photograph and the
+ * lot beside it a short one, off the same grid. A 4:3 box crops a portrait and
+ * a landscape original to the same shape, so every thumbnail in the row is the
+ * same picture size.
  */
 function ThumbFrame({ children }: { children: React.ReactNode }) {
   return (
@@ -36,12 +36,10 @@ function ThumbFrame({ children }: { children: React.ReactNode }) {
 /**
  * One lot in the register, as a SUMMARY that opens its page.
  *
- * The card used to print the whole record - variety, grade and the full
- * description - because there was nowhere else for that text to live. Now
- * there is: everything past the identifying facts moves to the lot's own page,
- * and the card carries what a reader needs to choose between lots. The
- * description is clamped here, so a long one cannot set the height of the row
- * it sits in.
+ * Everything past the identifying facts - variety, grade and the full
+ * description - lives on the lot's own page; the card carries what a reader
+ * needs to choose between lots. The description is clamped here, so a long one
+ * cannot set the height of the row it sits in.
  *
  * h-full + flex-col is what lines a row of these up: the grid stretches every
  * card to the tallest in its row, the column layout lets the stock/READ MORE

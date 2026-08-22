@@ -2,9 +2,9 @@
 //
 // The form must refuse a weight or price the backend would 400 on: prices are
 // capped at 10,000/kg (moneyField(10_000)) and both weight and price are 2dp
-// (multipleOf 0.01, rejected not rounded). The create form's shared validator
-// carried neither, so a 3dp price or a 50,000/kg price passed the form and met a
-// raw 400 the user could not read.
+// (multipleOf 0.01, rejected not rounded). Without both rules in the create
+// form's shared validator, a 3dp price or a 50,000/kg price passes the form and
+// meets a raw 400 the user cannot read.
 import { describe, expect, it } from "vitest";
 
 import { purchaseSchema } from "@/validations/purchase-schema";

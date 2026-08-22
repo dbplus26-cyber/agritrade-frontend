@@ -323,7 +323,7 @@ function PolicyCard({ policy }: { policy: IDriverPaymentPolicy }) {
       )}
     >
       <div className="flex items-start justify-between gap-3">
-        {/* No clamp and no truncation: the name is the thing you are looking
+        {/* No clamp and no truncation: the name is what the reader is looking
             for, and half of it is no use. Two lines are reserved so most cards
             start their bar at the same height. */}
         <h2 className="min-h-[2.6em] text-[15px] leading-[1.3] font-semibold text-adm-ink [overflow-wrap:anywhere]">

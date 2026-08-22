@@ -51,8 +51,8 @@ const EXPORTS = `${env.SERVER_URI}/api/v1/admin/reports/exports`;
 /**
  * A KPI tile on the reports header. Money is compacted at scale (GH¢ 12.3M)
  * with the exact figure on hover, and the type size adapts to the figure's
- * length - a phone tile is ~130px wide, and a fixed 18px eight-digit amount
- * was the one stat row in the console that could still overflow it.
+ * length - a phone tile is ~130px wide, and an eight-digit amount at a fixed
+ * 18px overflows it.
  */
 function ReportKpi({
   accent = false,

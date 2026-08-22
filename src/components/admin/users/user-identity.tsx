@@ -69,7 +69,6 @@ export function IdentityAvatar({
   );
 }
 
-/** Full-size square view of a profile photo, opened from the avatar. */
 /** One labelled fact in the identity grid. */
 function Fact({
   label,

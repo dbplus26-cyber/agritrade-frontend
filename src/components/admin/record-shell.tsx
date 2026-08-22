@@ -11,10 +11,9 @@ import { cn } from "@/lib/utils";
 /**
  * The standard layout for a single record's page.
  *
- * These pages used to be a 560px column of label/value pairs with two thirds
- * of the screen left empty beside it, and every element - the facts, the
- * timestamps, the lifecycle buttons - carrying identical weight down a single
- * stack. It read as a printout of the row rather than a page about it.
+ * A single stack of label/value pairs gives the facts, the timestamps and the
+ * lifecycle buttons identical weight, and reads as a printout of the row
+ * rather than a page about it.
  *
  * So: the record's substance goes in the main column, and everything ABOUT
  * the record rather than IN it - its status, when it was filed, the actions

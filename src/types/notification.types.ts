@@ -1,7 +1,7 @@
 // src/types/notification.types.ts
 //
-// The notifications log (design doc 5.8), mirroring the backend
-// NotificationLog DTO. Owner monitoring view; no money redaction.
+// The notifications log, mirroring the backend NotificationLog DTO. Owner
+// monitoring view; no money redaction.
 import type { IPaginationMeta } from "./api";
 
 export type NotifChannel = "EMAIL" | "SMS";

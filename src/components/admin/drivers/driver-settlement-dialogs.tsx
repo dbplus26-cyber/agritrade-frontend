@@ -47,7 +47,7 @@ import {
  * Both dialogs hold the amount as a STRING and convert on submit. Clamping a
  * number field in onChange (`Math.max(0, Number(v))`) makes the field
  * impossible to clear, because deleting the last digit immediately rewrites it
- * to "0" - a bug this codebase has hit before.
+ * to "0".
  */
 
 const feeSchema = z.object({

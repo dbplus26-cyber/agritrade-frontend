@@ -108,7 +108,7 @@ export function resolveSiteContact(api: null | PublicContact): ResolvedContact {
       ? `https://wa.me/${whatsappIntl}`
       : siteConfig.whatsappHref,
     // Only worth showing as its own channel when it is a different line;
-    // otherwise the footer used to announce "WhatsApp same" against nothing.
+    // otherwise the footer announces "WhatsApp same" against nothing.
     whatsappIsSeparate: whatsapp.length > 0 && whatsapp !== phone,
   };
 }

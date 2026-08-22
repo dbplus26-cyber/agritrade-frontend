@@ -5,10 +5,9 @@ import type { PaymentAccountKind } from "./payment-account.types";
 
 /**
  * Just enough of an account to name it beside a figure (the backend's
- * AccountRefDTO). Every register entry that moved money now says which
- * account it moved through: a row that shows an amount and stays silent about
- * where it came from is the bug this whole surface exists to close, one line
- * at a time.
+ * AccountRefDTO). Every register entry that moved money says which account it
+ * moved through: a row that shows an amount and stays silent about where it
+ * came from is exactly what this surface exists to prevent.
  */
 export interface IAccountRef {
   id: string;

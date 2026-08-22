@@ -1,8 +1,8 @@
 // test/component/ExpenseFormDialog.test.tsx
 //
-// Recording a cost now pays it in the same act, which turns a form that only
-// wrote a row into a form that moves money. Three things follow, and they are
-// what this file pins:
+// Recording a cost pays it in the same act, which makes this a form that
+// moves money rather than one that only writes a row. Three things follow,
+// and they are what this file pins:
 //
 //   * every submission carries an idempotency key, and a retry after a failed
 //     one carries the SAME key. Without that, a double tap or a resend on a

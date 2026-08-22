@@ -5,7 +5,7 @@ import { slugify } from "@/lib/slug";
 /**
  * The live plot register behind /land, fetched from the real backend under the
  * `land-plots` cache tag (same seam as public-commodities). The endpoint ships
- * with the backend's land module (M11) - until it exists the fetch reads as
+ * with the backend's land module - until it exists the fetch reads as
  * unavailable and the page renders its empty register.
  *
  * Emptiness is honest BY DESIGN: no published plots (or the API down) renders
@@ -15,8 +15,8 @@ import { slugify } from "@/lib/slug";
 export type PublicPlotStatus = "AVAILABLE" | "RESERVED";
 
 /**
- * Wire contract for the backend's public land-plots DTO (design doc 5.9):
- * published, non-sold plots only; `priceGhs` is a decimal string present
+ * Wire contract for the backend's public land-plots DTO: published,
+ * non-sold plots only; `priceGhs` is a decimal string present
  * only when the owner shows that plot's price; ownership documents are
  * never part of this payload.
  */

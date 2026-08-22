@@ -27,10 +27,10 @@ export interface ConfirmationDialogProps {
 }
 
 /**
- * The confirm gate (dms-frontend convention, worn in this design's paperwork
- * style): title, plain-language consequence, optional type-to-confirm, and a
- * destructive variant that goes error-red. A centred card on desktop, a
- * bottom sheet on phones - compact either way.
+ * The confirm gate, in this design's paperwork style: title, plain-language
+ * consequence, optional type-to-confirm, and a destructive variant that goes
+ * error-red. A centred card on desktop, a bottom sheet on phones - compact
+ * either way.
  */
 export function ConfirmationDialog({
   open,

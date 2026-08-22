@@ -6,7 +6,7 @@
 //   * an empty table MEANS two different things, and the shell must render
 //     them differently: nothing on file at all gets the empty state ALONE
 //     (no headings standing over nothing, no pager - the header row, not
-//     the content, was what once made an empty register scroll sideways),
+//     the content, is what makes an empty register scroll sideways),
 //     while nothing-matching-a-filter keeps the headings, because the
 //     columns are what the reader just filtered on;
 //   * a refetch dims the CURRENT rows rather than blanking them - the
@@ -64,7 +64,7 @@ describe("ConsoleDataTable - what an empty table means", () => {
     );
 
     expect(screen.getByText("Nothing on file yet.")).toBeInTheDocument();
-    // No table furniture: headings over an absent body are what made an
+    // No table furniture: headings over an absent body are what make an
     // empty register scroll sideways, and a pager over zero rows is noise.
     expect(screen.queryByRole("columnheader")).not.toBeInTheDocument();
     expect(
@@ -202,7 +202,7 @@ describe("ConsoleDataTable - server pagination wiring", () => {
       />,
     );
 
-    // dms rule: two items never get a pager. The footer degrades to a count.
+    // Two items never get a pager. The footer degrades to a count.
     expect(
       screen.queryByRole("navigation", { name: "Pagination" }),
     ).not.toBeInTheDocument();
@@ -224,8 +224,8 @@ describe("ConsoleDataTable - keyboard row navigation", () => {
       />,
     );
 
-    // The row announces itself as a link and sits in the tab order - the
-    // register used to be mouse-only, with no keyboard path to any detail.
+    // The row announces itself as a link and sits in the tab order: a
+    // mouse-only register has no keyboard path to any detail.
     const links = screen.getAllByRole("link");
     expect(links.length).toBeGreaterThanOrEqual(2);
     links[0].focus();

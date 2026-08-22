@@ -3,8 +3,8 @@ import { StencilLabel } from "@/components/ui/StencilLabel";
 import type { CommodityLine } from "@/static-data/availability";
 
 /** The commodities page opens ON the register - eyebrow, H1 and the filed
- * rows. Same restraint as the home section, and the same document tint: the
- * near-black band this used to sit in was the heaviest thing on either page. */
+ * rows. Same restraint as the home section, and the same document tint: a
+ * near-black band here would be the heaviest thing on either page. */
 export function BoardHeader({
   updatedOn,
   lines,

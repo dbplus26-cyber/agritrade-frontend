@@ -48,8 +48,8 @@ const footerLink =
 export async function SiteFooter() {
   const contact = await getSiteContact();
   return (
-    // No bottom reservation any more: the mobile contact rail hugs the right
-    // edge instead of a full-width bar, so the footer runs to the page end.
+    // No bottom reservation: the mobile contact rail hugs the right edge
+    // instead of a full-width bar, so the footer runs to the page end.
     <footer className="texture-grain-dark bg-footer text-surface/70">
       <div className="mx-auto max-w-[1312px] px-5 pb-8 pt-10 lg:px-8 lg:pt-12">
         <div className="grid gap-10 border-b border-dashed border-surface/25 pb-8 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr] lg:gap-12">

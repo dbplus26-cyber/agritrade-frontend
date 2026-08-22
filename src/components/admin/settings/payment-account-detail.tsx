@@ -371,8 +371,8 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         <RecordFacts
           columns={3}
           facts={[
-            // What staff call this account. It was the page heading; the
-            // heading now says what the page is, so the record says which.
+            // What staff call this account. The heading says what the page
+            // is, so the record says which account it is about.
             { label: "Label", value: account.label },
             {
               label: "Account number",

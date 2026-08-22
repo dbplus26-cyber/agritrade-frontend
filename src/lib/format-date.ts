@@ -19,8 +19,7 @@ export function formatDateTime(iso: null | string | undefined): string {
 
 /**
  * Table date line, e.g. "Jul 12, 2026". Data tables stack this over
- * `formatTableTime` (dms-frontend pattern); detail pages keep the older
- * single-line helpers above.
+ * `formatTableTime`; detail pages use the single-line helpers above.
  */
 export function formatTableDate(iso: null | string | undefined): string {
   if (!iso) return "";

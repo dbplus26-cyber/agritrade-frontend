@@ -36,9 +36,9 @@ export function LoginClient({ redirectTo }: { redirectTo: string }) {
     // The two halves of the persisted session expire differently: the hint
     // cookie lasts 7 days, the stored user in localStorage never expires. Once
     // the cookie is gone but the user isn't, redirecting on the cached user
-    // alone looped forever - the proxy bounced /admin to /login, this effect
-    // bounced straight back, and RequireAuth (the only code that revalidates
-    // and clears a stale user) never got to mount. Re-setting the hint lets
+    // alone loops forever - the proxy bounces /admin to /login, this effect
+    // bounces straight back, and RequireAuth (the only code that revalidates
+    // and clears a stale user) never gets to mount. Re-setting the hint lets
     // the console actually load, and RequireAuth's GET /auth/me settles it: a
     // dead session is cleared there and lands back here as a real sign-in.
     dispatch(userLoggedIn({ user: cachedUser }));

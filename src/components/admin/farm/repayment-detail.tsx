@@ -85,9 +85,9 @@ export function RepaymentDetail({ id }: { id: string }) {
               <SectionHeading className="mb-2">
                 Who repaid what
               </SectionHeading>
-              {/* The photo sits BESIDE the link, not inside it: it is now a
-                  ViewablePhoto, which is a button when there is something to
-                  open, and a button nested in an anchor is invalid markup.
+              {/* The photo sits BESIDE the link, not inside it: a
+                  ViewablePhoto is a button when there is something to open,
+                  and a button nested in an anchor is invalid markup.
                   Keeping them siblings also keeps the underline on the NAME. */}
               <div className="flex min-w-0 items-center gap-2.5">
                 <ViewablePhoto

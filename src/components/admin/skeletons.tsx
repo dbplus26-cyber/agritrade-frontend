@@ -5,13 +5,13 @@ import { cn } from "@/lib/utils";
 /**
  * The console's loading shapes.
  *
- * One generic table skeleton used to stand in for every screen, so a detail
- * page, a dashboard and a printed statement all flashed a grid of table rows
- * that then vanished - the layout jumped on arrival and, worse, the shimmer
- * told you nothing about what was coming. Each skeleton here mirrors ONE real
- * layout in this console, so what you see while waiting is the shape of what
- * lands. Screens that genuinely share a layout share a skeleton; screens that
- * do not, must not.
+ * One generic table skeleton standing in for every screen makes a detail
+ * page, a dashboard and a printed statement all flash a grid of table rows
+ * that then vanishes - the layout jumps on arrival and the shimmer says
+ * nothing about what is coming. Each skeleton here mirrors ONE real layout in
+ * this console, so what shows while waiting is the shape of what lands.
+ * Screens that genuinely share a layout share a skeleton; screens that do
+ * not, must not.
  *
  * All of them are `aria-hidden`: a screen reader gets the region's `aria-busy`
  * from the screen, not a tree of meaningless boxes.

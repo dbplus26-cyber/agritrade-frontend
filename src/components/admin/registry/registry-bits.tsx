@@ -54,7 +54,7 @@ const REVEAL_AT = {
   "2xl": "hidden 2xl:table-cell",
 } as const;
 
-/** Column meta shared by every register table (users-table convention). */
+/** Column meta shared by every register table. */
 export const columnMeta = (opts?: {
   /** Show this column only from a breakpoint up. */
   at?: keyof typeof REVEAL_AT;
@@ -70,10 +70,10 @@ export const columnMeta = (opts?: {
 }) => ({
   className: cn(
     // No font size here. The shared table body is 14px (data-table.tsx td);
-    // a `text-[13px]` in this meta silently overrode it on every register
-    // that used columnMeta while screens without it stayed at 14px - and the
-    // phone card view (which ignores meta) stayed at 14px everywhere. One
-    // table, two sizes, depending on how wide your screen was.
+    // a `text-[13px]` in this meta silently overrides it on every register
+    // that uses columnMeta while screens without it stay at 14px - and the
+    // phone card view (which ignores meta) stays at 14px everywhere. One
+    // table, two sizes, depending on the width of the screen.
     "px-4 py-0",
     opts?.at
       ? REVEAL_AT[opts.at]

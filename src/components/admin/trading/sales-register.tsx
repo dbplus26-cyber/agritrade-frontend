@@ -226,7 +226,8 @@ export function SalesRegister() {
         cell: ({ row }) => {
           // Against what the sale is payable at, so this column agrees with
           // the balance on the sale itself and with the API's overpayment
-          // guard - all three used to read one field, and now there are two.
+          // guard - a sale carries two totals, and all three resolve them the
+          // same way.
           const b = saleBalanceGhs(row.original);
           return (
             <Mono

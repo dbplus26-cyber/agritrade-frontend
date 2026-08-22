@@ -41,10 +41,9 @@ const NO_ACCOUNT = "__no_account__";
  * What naming a held account commits the person to, said in the direction the
  * money actually travelled.
  *
- * This is the one thing the old register-backed picker could never say, and
- * the reason it has to be said: a held account is not a filing choice, it is a
- * statement that a named person is carrying company money and will be asked to
- * produce it.
+ * It has to be said in full because a held account is not a filing choice: it
+ * is a statement that a named person is carrying company money and will be
+ * asked to produce it.
  */
 const holderNote = (direction: "in" | "out", name: string): string =>
   direction === "in"
@@ -183,8 +182,8 @@ function AccountSelect({
  * The settlement rows carry NO account number and NO balance, by contract:
  * this picker is offered to anyone who may record a payment, and a figure here
  * would leak what money visibility deliberately nulls. There is therefore no
- * masked-number hint under the field any more - the only thing worth saying
- * about a chosen account is who is holding it.
+ * masked-number hint under the field - the only thing worth saying about a
+ * chosen account is who is holding it.
  */
 export function PaymentAccountField({
   direction,
@@ -202,9 +201,8 @@ export function PaymentAccountField({
   label?: string;
   /**
    * Narrows the list to the kinds this method can touch. OMIT to offer every
-   * live account: handing an agent cash you withdrew from the bank leaves a
-   * BANK account, so the source is not decided by what the agent ends up
-   * holding.
+   * live account: cash handed to an agent may have been withdrawn from a BANK
+   * account, so the source is not decided by what the agent ends up holding.
    */
   method?: "BANK" | "CASH" | "MOMO";
   onChange: (value: string) => void;

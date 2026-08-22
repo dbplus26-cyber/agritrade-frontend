@@ -15,10 +15,10 @@ import { ApprovalStatus } from "@/types/approval.types";
 import { WidgetCard, WidgetEmpty, WidgetError } from "./chart-kit";
 
 /**
- * The four oldest pending approvals, previewed on the dashboard (design doc
- * 5.8) with a link into the full inbox. Each row is the inbox card's header
- * + title zones in miniature: action badge with the arrival stamp on line
- * one, the mono headline with requester/detail beneath.
+ * The four oldest pending approvals, previewed on the dashboard with a link
+ * into the full inbox. Each row is the inbox card's header + title zones in
+ * miniature: action badge with the arrival stamp on line one, the mono
+ * headline with requester/detail beneath.
  */
 export function ApprovalsPreview() {
   const { data, isError, isLoading, refetch } = useGetApprovalsQuery({

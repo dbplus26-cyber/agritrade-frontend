@@ -16,7 +16,7 @@ import { ApprovalAction, ApprovalStatus, type IApproval } from "@/types/approval
  */
 
 /**
- * The redesign's palette, declared as CSS custom properties on the page
+ * The queue's palette, declared as CSS custom properties on the page
  * wrapper rather than in globals.css.
  *
  * Why scoped: these values are CLOSE to the console's existing pale-husk
@@ -29,11 +29,9 @@ import { ApprovalAction, ApprovalStatus, type IApproval } from "@/types/approval
 type CssVars = React.CSSProperties & Record<`--${string}`, string>;
 
 export const APPROVAL_TOKENS: CssVars = {
-  // Meridian neutrals. This module used to carry a warm palette of its own -
-  // paper #f2f1ec, hairlines the colour of string, a different forest - which
-  // is why the approvals queue read as a different product from every other
-  // screen. The names stay (the module's rails and chips are built on them);
-  // only the values move onto the console system.
+  // Meridian neutrals. The names are this module's own (its rails and chips
+  // are built on them); the values are the console system's, so the queue does
+  // not read as a different product from every other screen.
   "--ap-paper": "#fafaf8",
   "--ap-surface": "#ffffff",
   "--ap-surface-alt": "#f5f7f9",
@@ -140,12 +138,12 @@ const MONETARY = new Set<ApprovalAction>([
 /**
  * The headline figure. A stock adjustment has no money at all and leads with
  * its signed quantity; a monetary rule with a null amount was REDACTED and
- * must say so, because "hidden from you" and "there is none" are different
- * facts and a ledger may not blur them.
+ * must say so, because "hidden from this reader" and "there is none" are
+ * different facts and a ledger may not blur them.
  */
 export function headlineFigure(a: IApproval): string {
   // Compact at scale: the queue cell is ~130px on a phone, and a full
-  // eight-figure amount broke mid-number across two lines - the one way a
+  // eight-figure amount breaks mid-number across two lines - the one way a
   // money figure must never fail. The expanded panel prints it exactly.
   if (a.amount !== null) return formatCedisCompact(a.amount);
   if (a.quantityLabel) return a.quantityLabel;
@@ -309,7 +307,7 @@ export function auditTrail(a: IApproval): string {
   return `${raised} · Decided ${stamp(a.decidedAt)} by ${a.decidedBy?.name ?? "an unknown user"}${self}`;
 }
 
-/** Button styling from spec 10 - base, primary and danger share one shape. */
+/** Button styling: base, primary and danger share one shape. */
 export const apButton =
   "inline-flex items-center justify-center rounded-none border px-[13px] py-1.5 text-[12.5px] leading-[1.4] font-[550] whitespace-nowrap cursor-pointer " +
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ap-forest)] " +

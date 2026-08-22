@@ -21,10 +21,10 @@ import { cn } from "@/lib/utils";
  *
  * Measured against its CONTAINER, not the viewport. These rows live mostly in
  * the 340px side rail, and a viewport query is always satisfied on a desktop -
- * so a note or a warehouse name was pushed into a narrow right-hand column
- * while its label sat alone at the top of a cell several lines deep. The pair
- * read as broken, which is exactly the complaint. Sized by the rail, a long
- * value takes the row under its label instead.
+ * so a note or a warehouse name is pushed into a narrow right-hand column
+ * while its label sits alone at the top of a cell several lines deep, and the
+ * pair reads as broken. Sized by the rail, a long value takes the row under
+ * its label instead.
  *
  * `mono` sets the numeric face; `strong` enlarges/bolds the value.
  */
@@ -260,10 +260,10 @@ export function ToneBadge({
 /**
  * Console card: a white sheet with a hairline border and the faintest lift.
  *
- * It used to be the public site's filed document - tinted paper, 1.5px soil
- * border, hard offset shadow, squared corners. A page carrying six of those
- * reads as six slabs shouting at each other; the console is read for hours and
- * wants surfaces that sit quietly under the data. Screens own their padding.
+ * Not the public site's filed document - tinted paper, 1.5px soil border,
+ * hard offset shadow, squared corners. A page carrying six of those reads as
+ * six slabs shouting at each other; the console is read for hours and wants
+ * surfaces that sit quietly under the data. Screens own their padding.
  */
 export function AdminCard({
   className,
@@ -287,11 +287,10 @@ export function AdminCard({
 /**
  * The heading of a section INSIDE a detail page.
  *
- * Sections used to be titled with a 10.5px muted uppercase eyebrow, which is
- * the same treatment the fact labels underneath it get. So a card announced
- * itself no louder than the smallest thing inside it, and a long page read as
- * one undifferentiated column with no way to find "Payments" by scanning. A
- * section title is a heading and now looks like one.
+ * A section title is a heading and looks like one. Titled with the 10.5px
+ * muted uppercase eyebrow the fact labels underneath it wear, a card announces
+ * itself no louder than the smallest thing inside it, and a long page reads as
+ * one undifferentiated column with no way to find "Payments" by scanning.
  *
  * Renders a real `<h2>`, so the page also has an outline a screen reader can
  * navigate rather than a run of styled spans.
@@ -344,7 +343,7 @@ export function AdminPageHeader({
   className?: string;
   /**
    * One sentence on what this screen is for, shown on hover beside the title.
-   * The sub-line says what is ON the page; this says why you would come here.
+   * The sub-line says what is ON the page; this says why anyone comes here.
    */
   hint?: string;
 }) {
@@ -517,12 +516,12 @@ export function AdminButton({
   /**
    * The console's THREE button heights, and the only three.
    *
-   * An audit found eight different pixel heights across the screens, spelled
-   * eleven ways (`h-9` beside `h-[36px]`, `h-8` beside `h-[32px]`…), because
-   * every screen was picking its own number via className. Sizes are now
-   * semantic: `md` (34px) is every standing action - toolbars, rails, inline;
-   * `lg` (38px, matching the 38px inputs it sits under) is the commit row of
-   * a form or dialog; `sm` (28px) is a compact affordance inside a dense row.
+   * A screen picking its own number via className is how eight different
+   * pixel heights spelled eleven ways (`h-9` beside `h-[36px]`, `h-8` beside
+   * `h-[32px]`…) get across the console. Sizes are semantic: `md` (34px) is
+   * every standing action - toolbars, rails, inline; `lg` (38px, matching the
+   * 38px inputs it sits under) is the commit row of a form or dialog; `sm`
+   * (28px) is a compact affordance inside a dense row.
    */
   size?: "lg" | "md" | "sm";
   variant?: "danger" | "ghost" | "gold" | "outline" | "primary" | "secondary";
@@ -542,9 +541,9 @@ export function AdminButton({
               : "default"
       }
       className={cn(
-        // Meridian controls: 34px, 6px radius, no offset shadow anywhere. The
-        // console's buttons used to shift on hover like a stamped plate, which
-        // is charming once and tiring on the fortieth click of a working day.
+        // Meridian controls: 34px, 6px radius, no offset shadow anywhere. A
+        // button that shifts on hover like a stamped plate is charming once
+        // and tiring on the fortieth click of a working day.
         "gap-1.5 rounded-none font-semibold shadow-none transition-[color,background-color,border-color,opacity,transform] duration-150 ease-out hover:translate-x-0 hover:translate-y-0 hover:shadow-none active:scale-[0.98]",
         size === "md" && "h-[34px] px-3.5 text-[13.5px]",
         size === "lg" && "h-[38px] px-[18px] text-[13.5px]",
@@ -559,11 +558,11 @@ export function AdminButton({
           "bg-console text-white hover:bg-console-hover",
         (variant === "secondary" || variant === "outline") &&
           "border border-adm-line bg-adm-card text-adm-body hover:bg-adm-sunken hover:text-adm-ink",
-        // A light border at REST. Ghost used to be bare text that only grew a
-        // background on hover, so until the pointer arrived it did not read as
-        // a button at all - and on a touch screen the pointer never arrives.
-        // Transparent rather than filled is what still separates it from
-        // `secondary`, which sits on the card colour.
+        // A light border at REST. Bare text that only grows a background on
+        // hover does not read as a button until the pointer arrives - and on a
+        // touch screen the pointer never arrives. Transparent rather than
+        // filled is what separates it from `secondary`, which sits on the card
+        // colour.
         variant === "ghost" &&
           "border border-adm-line bg-transparent text-adm-body hover:bg-adm-sunken hover:text-adm-ink",
         variant === "danger" &&
@@ -622,22 +621,21 @@ export function AdminField({
   // Wire the invalid state AND the hint onto the control itself rather than
   // leaving it to each of the ~40 forms to remember.
   //
-  // A field in error used to be signalled by RED TEXT ALONE: the control kept
-  // its normal border (the `aria-invalid:border-console-red` in
-  // adminInputClass had nothing setting aria-invalid to react to), and a
-  // screen reader moving back to the input announced a plain, valid-looking
-  // field with no hint that anything was wrong or what. Colour is not a
-  // status, and the error message is not much use if it is never associated
-  // with the thing it is about.
+  // A field in error signalled by RED TEXT ALONE leaves the control on its
+  // normal border (the `aria-invalid:border-console-red` in adminInputClass
+  // has nothing setting aria-invalid to react to), and a screen reader moving
+  // back to the input announces a plain, valid-looking field with no hint that
+  // anything is wrong or what. Colour is not a status, and the error message
+  // is not much use if it is never associated with the thing it is about.
   //
   // The hint travels the same way: its visible affordance is a pointer-only
   // tooltip icon (see HelpTip's inLabel note - a button or aria-label inside
   // the label would hijack the field's own name), so the TEXT reaches
   // assistive tech as the control's description instead.
   //
-  // Cloning here means every AdminField gets it - including the ones written
-  // before this existed - and a control that already sets either prop keeps
-  // its own value. Components that ignore the props are unharmed.
+  // Cloning here means every AdminField gets it, and a control that already
+  // sets either prop keeps its own value. Components that ignore the props are
+  // unharmed.
   const describedBy =
     [hint ? hintId : null, error ? errorId : null]
       .filter(Boolean)
@@ -659,8 +657,8 @@ export function AdminField({
   return (
     // A flex COLUMN filling its grid cell, with the whole field content
     // anchored to the bottom (justify-end). When two fields share a grid row
-    // and only one carries a hint, the extra text used to push that field's
-    // control below its neighbour's, so every mixed row came out stepped.
+    // and only one carries a hint, the extra text would push that field's
+    // control below its neighbour's and the mixed row would come out stepped.
     // Grid rows stretch both cells to the same height; bottom-anchoring the
     // shorter field's CONTENT - label and control together - lands both
     // inputs on one line with each label sitting directly on its own input,
@@ -671,10 +669,10 @@ export function AdminField({
       // wrapper divs would only invite circular-sizing surprises.
       //
       // items-stretch and gap-0 are load-bearing, not decoration: the base
-      // Label ships `flex items-center gap-2`, which the old `block` display
-      // kept dormant. Switching to flex-col woke both up - items-center
-      // shrank every control to content width and centred it, gap-2 padded
-      // the label/hint/control rhythm the mb-* utilities already set.
+      // Label ships `flex items-center gap-2`, which a `block` display keeps
+      // dormant and flex-col wakes up - items-center shrinks every control to
+      // content width and centres it, gap-2 pads the label/hint/control rhythm
+      // the mb-* utilities already set.
       className={cn(
         "flex flex-col items-stretch justify-end gap-0 font-normal leading-normal",
         className,
@@ -682,8 +680,8 @@ export function AdminField({
     >
       {/* ONE line of text per field: the label. A hint is a tooltip beside
           it (hover on desktop, tap on mobile), never a paragraph of its own -
-          a form where every field carried a sentence of guidance read as a
-          wall of prose, and the reader could no longer tell the questions
+          a form where every field carries a sentence of guidance reads as a
+          wall of prose, and the reader can no longer tell the questions
           from the commentary. The label is ink and sentence case: it is the
           question being asked. "Optional" stays faint, because it qualifies
           the label rather than competing with it. */}
@@ -790,7 +788,7 @@ export function ChoiceCards<T extends string>({
 /**
  * The console control: 36px tall, 6px radius, hairline border, white ground.
  * Meridian sizes controls for density - the 42px squared field on tinted paper
- * was a public-site form control standing in a working tool.
+ * is a public-site form control, not one for a working tool.
  */
 export const adminInputClass =
   "h-[38px] w-full rounded-none border border-adm-line bg-adm-card px-3 text-[14.5px] font-medium text-adm-ink shadow-none outline-none transition-[border-color,box-shadow] placeholder:text-adm-faint focus:border-console focus:shadow-[0_0_0_3px_rgba(30,61,43,0.12)] focus-visible:border-console focus-visible:ring-0 aria-invalid:border-console-red";
@@ -801,10 +799,10 @@ export const adminSelectClass = cn(adminInputClass, "cursor-pointer");
  * The console's one cross-reference link: a record named somewhere it is not
  * the subject, pointing at the page where it IS.
  *
- * These used to be ink-coloured with an underline that appeared on hover,
- * which meant the only way to discover that a supplier, a warehouse or a
- * shipment was reachable was to sweep the pointer over the page and watch for
- * something to move. A link has to read as a link AT REST, so it carries the
+ * Ink-coloured with an underline that only appears on hover, the one way to
+ * discover that a supplier, a warehouse or a shipment is reachable is to
+ * sweep the pointer over the page and watch for something to move. A link has
+ * to read as a link AT REST, so it carries the
  * console green - the one accent the reader already reads as "the system's own
  * colour" - and keeps the underline for hover so the resting page is not a
  * field of rules.
@@ -825,9 +823,9 @@ export const adminLinkClass =
  *
  * The `key` on each branch is load-bearing, not decoration. Without it React
  * reuses the SAME <button> element across a branch swap: clicking "Edit"
- * flipped that element to type="submit" before the browser ran the click's
- * own default action, so the form submitted itself the instant you tried to
- * unlock it - the field stayed disabled and a "saved" toast appeared over a
+ * flips that element to type="submit" before the browser runs the click's
+ * own default action, so the form submits itself the instant somebody tries to
+ * unlock it - the fields stay disabled and a "saved" toast appears over a
  * PATCH nobody asked for. Distinct keys make React build a fresh element.
  *
  * `onSubmitGuard` is the second belt: a submit that arrives while the form is
@@ -939,16 +937,16 @@ export function CommitRow({ className, ...props }: React.ComponentProps<"div">) 
 /**
  * Opens a server-rendered PDF in a new tab.
  *
- * The console's one way of handing over a document. Printing a screen was the
- * other way, and it was the wrong one: the browser captured whatever was on
- * the page - rail, topbar, crumbs, footer - and the reader got the console
- * with a document somewhere in the middle of it. The API already renders these
+ * The console's one way of handing over a document. Printing a screen is the
+ * wrong way: the browser captures whatever is on the page - rail, topbar,
+ * crumbs, footer - and the reader gets the console with a document somewhere
+ * in the middle of it. The API already renders these
  * as real PDFs (`/admin/receipts/<type>/<id>.pdf`), correctly paginated, with
  * nothing on them that is not the document, and reaching one is a link rather
  * than a print dialog and a set of browser settings to get right.
  *
  * Styled as a quiet action, not a button: on every screen that has one there
- * is already a primary action beside it, and the document is a thing you
+ * is already a primary action beside it, and the document is something to
  * fetch, not the thing the page is for.
  */
 export function PdfLink({

@@ -172,13 +172,12 @@ export function ShipmentsRegister() {
                 : sh.sales.map((sale) => sale.buyer.name).join(", ");
             return (
               /* FOUR ZONES, separated by space rather than run together.
-                 This card used to join the sale count, every buyer's name and
-                 the weight into one muted `·` string and clamp it - three
-                 unrelated facts read as one sentence, which is what made it
-                 feel crowded. The load figures are their own line now, the
-                 buyers are theirs, and the footer carries the date. Reads the
-                 way the reviews card does: subject on the left, meta on the
-                 right, and room between the zones. */
+                 Joining the sale count, every buyer's name and the weight into
+                 one muted `·` string reads three unrelated facts as one
+                 sentence, and crowds the card. The load figures take their own
+                 line, the buyers theirs, and the footer carries the date -
+                 like the reviews card: subject on the left, meta on the right,
+                 and room between the zones. */
               <Link
                 key={sh.id}
                 href={`${LIST}/${sh.id}`}

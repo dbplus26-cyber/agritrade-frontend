@@ -6,7 +6,7 @@ import { siteUrl } from "@/lib/site";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  // Every published commodity and plot has a page of its own now. Both reads
+  // Every published commodity and plot has a page of its own. Both reads
   // are the cached public feeds, so the sitemap costs no extra request and
   // follows the same purge as the pages it lists. A down API simply yields no
   // detail entries rather than failing the sitemap.
@@ -22,7 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}${routes.land}`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     { url: `${siteUrl}${routes.farmingInvestment}`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     // The apply page is indexable and is the one conversion page on the
-    // farming side - it was reachable from the site but absent from here.
+    // farming side, so it is listed in its own right.
     { url: `${siteUrl}${routes.farmingApply}`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
     { url: `${siteUrl}${routes.about}`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${siteUrl}${routes.reviews}`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },

@@ -65,8 +65,8 @@ export function AgentPurchaseForm() {
       unitPriceGhs: "",
       purchasedAt: today(),
       // Cash at the scale is the ordinary field case, so it is the default -
-      // but it is now a CHOICE, because a farmer paid at the weekend is real
-      // and used to have nowhere to be recorded.
+      // but it is a CHOICE, because a farmer paid at the weekend is real and
+      // has to be recordable too.
       paidNow: true,
       paymentMethod: "CASH",
       notes: "",
@@ -76,9 +76,9 @@ export function AgentPurchaseForm() {
   // Persist every change (photo excluded - a File can't survive a reload).
   // The ref gates the effect after success: react-hook-form re-renders once
   // more before router.replace unmounts the form, and without the gate that
-  // re-render re-saved the cleared draft - with its SPENT idempotency key -
-  // so the next purchase submitted under it and was silently swallowed by
-  // the backend's replay lookup.
+  // re-render re-saves the cleared draft - with its SPENT idempotency key -
+  // so the next purchase submits under it and is silently swallowed by the
+  // backend's replay lookup.
   const submitted = useRef(false);
   const values = watch();
   useEffect(() => {
@@ -199,8 +199,8 @@ export function AgentPurchaseForm() {
         </span>
       </div>
 
-      {/* Recording a purchase used to charge the float by itself, so a farmer
-          paid at the weekend had nowhere to be recorded. Two big taps, because
+      {/* Recording a purchase does not charge the float by itself: a farmer
+          paid at the weekend has to be recordable too. Two big taps, because
           this is answered with a thumb at a village scale. */}
       <div>
         <AgentLabel>Did you pay for this?</AgentLabel>

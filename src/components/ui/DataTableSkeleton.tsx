@@ -10,9 +10,9 @@ import {
 import { cn } from "@/lib/utils";
 
 /**
- * Loading shape for tabular data (dms-frontend convention): the real Table
- * chrome with shimmering ledger rows, so the layout never jumps when data
- * lands. Column count/rows mirror the table it stands in for.
+ * Loading shape for tabular data: the real Table chrome with shimmering
+ * ledger rows, so the layout never jumps when data lands. Column count/rows
+ * mirror the table it stands in for.
  */
 export function DataTableSkeleton({
   columns = 5,

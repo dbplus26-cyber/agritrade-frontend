@@ -118,8 +118,8 @@ export function FloatHoldersScreen() {
   // `accessorFn`, not the `accessorKey` shorthand. The mobile card renderer
   // decides what is a DATA row (label + value) versus a trailing ACTION by
   // testing `columnDef.accessorFn`, and the shorthand leaves that undefined -
-  // which silently tipped every column into the actions row and produced a
-  // card with no labels and no truncation.
+  // which silently tips every column into the actions row and produces a card
+  // with no labels and no truncation.
   const columns = useMemo<ColumnDef<IFloatHolder, unknown>[]>(() => {
     const base: ColumnDef<IFloatHolder, unknown>[] = [
       {
@@ -132,9 +132,8 @@ export function FloatHoldersScreen() {
           <TitleCell
             // A field agent goes to the agent profile, which holds their float
             // ledger and their reconciliations; office staff have no such page,
-            // so they go to their user record instead. Every holder is somebody
-            // the console can show you - the two just live in different
-            // registers.
+            // so they go to their user record instead. Every holder has a page
+            // in the console - the two just live in different registers.
             href={
               row.original.role === UserRole.AGENT
                 ? `/admin/agents/${row.original.userId}`
@@ -168,7 +167,7 @@ export function FloatHoldersScreen() {
     ];
 
     // The money column is dropped ENTIRELY rather than filled with "Hidden"
-    // placeholders when the caller may not see figures (design doc 8.3).
+    // placeholders when the caller may not see figures.
     if (showMoney) {
       base.push({
         id: "balance",
@@ -191,9 +190,9 @@ export function FloatHoldersScreen() {
         ),
       });
 
-      // Beside the balance and never added to it. These are the two numbers
-      // the float made into one, and a column that summed or blurred them
-      // would put the original bug back on the owner's first screen.
+      // Beside the balance and never added to it. Held money and spending
+      // authority are two different figures, and a column that summed or
+      // blurred them would put them back into one on the owner's first screen.
       base.push({
         id: "allowance",
         accessorFn: (h) => h.authority?.remainingGhs ?? 0,
@@ -298,9 +297,8 @@ export function FloatHoldersScreen() {
           }}
         />
       ) : (
-        // Every other register files its rows on an AdminCard. This screen and
-        // the payout register rendered the table bare, so the two money
-        // surfaces were the only ones with no sheet under the rows.
+        // Every register files its rows on an AdminCard, the money surfaces
+        // included - a bare table is the one shape that reads as unfiled.
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IFloatHolder>
             columns={columns}
@@ -440,20 +438,18 @@ function HolderActions({
 /**
  * One dialog for every way money reaches a holder.
  *
- * There used to be two, and the split was along the wrong seam. "Top up" and
- * "Send limit" are not two features, they are three DIFFERENT ACTS that the
- * console asked about in two places:
+ * "Top up" and "Send limit" are not two features, they are three DIFFERENT
+ * ACTS:
  *
  *   1. notes handed across a desk,
  *   2. e-cash transferred to their MoMo or bank,
  *   3. permission to spend the company's money without holding any of it.
  *
- * Anyone reading two buttons had to already know which of the three they
- * wanted before they could find it. Worse, the old Send limit dialog asked
- * which account the sending drew on, which invited the one answer that cannot
- * work: a send is a Hubtel API call against the Hubtel disbursement wallet, so
- * an allowance pointed at the company MoMo booked the debit somewhere the money
- * had never left. There is no picker here, because there is no choice.
+ * Split across two buttons, choosing one means already knowing which of the
+ * three is wanted before it can be found. An allowance also names no account:
+ * a send is a Hubtel API call against the Hubtel disbursement wallet, so an
+ * allowance pointed at the company MoMo would book the debit somewhere the
+ * money never left. There is no picker here, because there is no choice.
  *
  * So: ask what KIND of giving this is first, and let that decide the fields.
  * The three branches map onto what the server already models - a transfer into

@@ -99,8 +99,7 @@ export interface ConsoleColumnMeta {
    * the minimum's favour: `min-width` beats `max-width`, so the content keeps
    * the floor's width however narrow the column gets, `truncate` then clips
    * against the FLOOR rather than the cell, and the text runs out over the
-   * next column. The transfers register did exactly that with a
-   * `md:min-w-[11rem]` route. `min-w-0` is right; a floor never is.
+   * next column. `min-w-0` is right; a floor never is.
    *
    * Exactly one column per table. Mark the one that says WHICH row this is.
    */
@@ -204,22 +203,22 @@ function CardField({
 }
 
 /**
- * The console data table (dms-frontend's TanStack + shadcn Table pattern in
- * the DB Plus skin). Screens own their search inputs and filters (pass the
+ * The console data table: TanStack Table on the shadcn Table primitives, in
+ * the DB Plus skin. Screens own their search inputs and filters (pass the
  * query via `globalFilter`); the table owns sorting, selection and paging:
  *
  * - `enableSelection` injects the checkbox column; `renderBulkActions`
  *   receives the selected rows (and a clear function) and is rendered as a
  *   toolbar row while anything is selected - the home of "Delete selected".
  * - Pagination is the shared DataTablePagination footer with a rows-per-page
- *   selector, and - dms rule - it only appears once there are more rows than
+ *   selector, and it only appears once there are more rows than
  *   the smallest page size. Two items never get a pager.
  */
 /**
  * The props that make a click-navigable row or card reachable by keyboard.
  *
- * Row navigation was mouse-only: registers had no keyboard path to their
- * detail pages at all. A retrofit link inside a TanStack row is invasive, so
+ * A TanStack row that navigates on click has no keyboard path to its detail
+ * page. A retrofit link inside such a row is invasive, so
  * the surface itself becomes a link: focusable, announced as one, opened with
  * Enter (role=link semantics - Space stays with buttons). The keydown only
  * fires when the row ITSELF is focused, so Enter on a button inside a row
@@ -324,8 +323,8 @@ export function ConsoleDataTable<TData>({
    * Extra classes for a TABLE ROW. Deliberately NOT applied to the mobile card:
    * every caller passes a fixed height here (`h-12`, `h-14`) because that is
    * what a `<tr>` wants, and clamping a card holding five stacked label/value
-   * rows to 48px made them overlap each other - the cramped, unreadable mobile
-   * list this fixes. The card owns its own vertical rhythm.
+   * rows to 48px makes them overlap each other. The card owns its own vertical
+   * rhythm.
    */
   rowClassName?: (row: TData) => string | undefined;
   emptyState?: React.ReactNode;
@@ -338,7 +337,7 @@ export function ConsoleDataTable<TData>({
     clearSelection: () => void,
   ) => React.ReactNode;
   /**
-   * Server mode (dms pattern): searching/filtering/paging happen backend-side;
+   * Server mode: searching/filtering/paging happen backend-side;
    * `data` is exactly the current page and the footer drives these callbacks.
    */
   serverPagination?: ServerPagination;
@@ -355,9 +354,9 @@ export function ConsoleDataTable<TData>({
    * different message entirely - the headings stay, because the columns are
    * what the reader just filtered on.
    *
-   * Without this the shell always drew the full table furniture around an
-   * empty body, which is what made a register with no rows still scroll
-   * sideways: the header row, not the content, was setting the width.
+   * Without it the shell draws the full table furniture around an empty body,
+   * which is what makes a register with no rows still scroll sideways: the
+   * header row, not the content, sets the width.
    */
   isFiltered?: boolean;
 }) {
@@ -453,7 +452,7 @@ export function ConsoleDataTable<TData>({
     .getSelectedRowModel()
     .rows.map((r) => r.original);
 
-  // dms rule: no pager for a page that couldn't possibly need one.
+  // No pager for a page that couldn't possibly need one.
   const showPagination = total > Math.min(...PAGE_SIZE_OPTIONS);
 
   // A register with nothing in it and nothing filtering it shows the empty
@@ -528,10 +527,9 @@ export function ConsoleDataTable<TData>({
                 .getVisibleCells()
                 .filter((c) => c.column.id !== "select");
               // A DATA column carries an accessor - either form TanStack accepts,
-              // accessorFn or accessorKey. Checking only accessorFn mistook an
-              // accessorKey column (the expenses register's Voucher) for a row
-              // action and dropped it to the card foot. An ACTION column is a
-              // display column with neither.
+              // accessorFn or accessorKey. Checking only accessorFn mistakes an
+              // accessorKey column for a row action and drops it to the card
+              // foot. An ACTION column is a display column with neither.
               const isData = (c: (typeof visible)[number]) => {
                 const def = c.column.columnDef as {
                   accessorFn?: unknown;

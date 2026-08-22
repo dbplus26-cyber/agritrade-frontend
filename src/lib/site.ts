@@ -3,9 +3,9 @@ import { routes } from "@/lib/routes";
 /**
  * Central site config - canonical URL, brand strings, and SEO defaults.
  *
- * The base URL comes from `NEXT_PUBLIC_BASE_URL`, centralised here
- * (khadys-kitchen convention) so nothing redeclares origins. Trailing slash is
- * stripped so `${siteUrl}/path` is always safe.
+ * The base URL comes from `NEXT_PUBLIC_BASE_URL`, centralised here so nothing
+ * redeclares origins. Trailing slash is stripped so `${siteUrl}/path` is
+ * always safe.
  */
 
 // NEXT_PUBLIC_BASE_URL is the source of truth and should be set in
@@ -14,8 +14,9 @@ import { routes } from "@/lib/routes";
 // The fallback is the business's REAL domain - dbplus.org is registered and
 // live, so a deploy that forgets the env var still stamps its own SEO
 // surface rather than a deployment-specific *.vercel.app host that crawlers
-// cannot reach through deployment protection. (An earlier guessed-domain
-// fallback was removed while no domain was confirmed; this one is confirmed.)
+// cannot reach through deployment protection. Only a confirmed domain belongs
+// here: a guessed one would stamp the whole SEO surface with an address the
+// business does not own.
 export const siteUrl = (
   process.env.NEXT_PUBLIC_BASE_URL || "https://dbplus.org"
 ).replace(/\/$/, "");
@@ -51,11 +52,10 @@ export const siteConfig = {
    * line. A BLANK entry renders NO icon at all, never a link to a profile
    * that does not exist.
    *
-   * BLANK until each handle is confirmed to belong to DB Plus. They were
-   * guessed from the trading name and never verified, so shipping them meant
-   * the company footer might link customers to a stranger's page - and a
-   * wrong social link is harder to notice, and does more damage, than a
-   * missing one. Fill in each URL as the owner confirms it.
+   * BLANK until each handle is confirmed to belong to DB Plus. A handle
+   * inferred from the trading name can point the company footer at a
+   * stranger's page, and a wrong social link is harder to notice, and does
+   * more damage, than a missing one. Fill in each URL as the owner confirms it.
    */
   social: {
     facebook: "",

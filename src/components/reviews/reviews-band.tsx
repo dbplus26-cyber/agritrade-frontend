@@ -38,13 +38,13 @@ export async function ReviewsBand() {
             </Link>
           </div>
           {/* On a phone the band is a HORIZONTAL rail, not a tall stack: three
-              full-length reviews down the page pushed everything below them
+              full-length reviews down the page push everything below them
               out of reach, and swiping sideways through them is the gesture
               the shape already suggests. The rail bleeds to both screen edges
               (-mx-5 against the section's px-5) so a card can sit flush while
               the next one peeks in and advertises the swipe. From sm up it is
               the ordinary grid again. The /reviews page keeps its vertical
-              register - that is the page you go to in order to read them all.
+              register - that is where they are all read.
               Cards stretch to a common height, so the rail stays a straight
               line however long one review runs. */}
           <div className="-mx-5 flex snap-x snap-mandatory items-stretch gap-4 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:grid sm:snap-none sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3 lg:gap-6">

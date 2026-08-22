@@ -14,8 +14,8 @@
 //
 // Real draft-storage against jsdom's real localStorage - the persistence IS
 // the subject. Mocked at the RTK hook boundary like PaymentDialog.test.tsx;
-// FilePicker is stubbed because the photo-staging path is its own screen
-// (and under separate construction), not part of the key lifecycle.
+// FilePicker is stubbed because the photo-staging path is its own screen, not
+// part of the key lifecycle.
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEventBase from "@testing-library/user-event";
@@ -145,13 +145,13 @@ describe("AgentPurchaseForm - key lifecycle", () => {
   });
 
   it("the cleared draft STAYS cleared through the post-success re-render, and the next visit mints a fresh key", async () => {
-    // Regression pin: the `watch()` persist effect used to re-run on the
-    // re-render react-hook-form schedules after submit - after clearDraft but
-    // before navigation unmounted the form - writing the old values AND the
-    // spent idempotency key back into localStorage. The next visit then
-    // submitted under that spent key, the backend's dedupe returned the
-    // ORIGINAL purchase, and the new one was silently never recorded. The
-    // persist effect is now gated shut the moment success is confirmed.
+    // Ungated, the `watch()` persist effect re-runs on the re-render
+    // react-hook-form schedules after submit - after clearDraft but before
+    // navigation unmounts the form - writing the old values AND the spent
+    // idempotency key back into localStorage. The next visit then submits
+    // under that spent key, the backend's dedupe returns the ORIGINAL
+    // purchase, and the new one is silently never recorded. So the persist
+    // effect is gated shut the moment success is confirmed.
     const first = render(<AgentPurchaseForm />);
     await fillForm();
     await submit();

@@ -412,8 +412,8 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
     }
   };
 
-  // At rest an existing record READS - the form is what you get after
-  // pressing Edit, not a greyed-out version of the page you were already on.
+  // At rest an existing record READS - the form arrives on Edit, rather than
+  // standing in as a greyed-out version of the page just left.
   if (isEdit && !isEditing && address) {
     return (
       <AdminCard className="max-w-[640px] px-5 py-[18px]">
@@ -450,8 +450,8 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
   return (
     <AdminCard className="max-w-[640px] px-5 py-[18px]">
       {/* Field pairs measure against this form, not the viewport: the console
-          shell keeps a ~225px rail beside it, so `sm:` paired fields up while
-          the column was still too narrow to carry two of them. */}
+          shell keeps a ~225px rail beside it, so `sm:` would pair fields up
+          while the column is still too narrow to carry two of them. */}
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}

@@ -61,15 +61,12 @@ const DEFAULTS: DisbursementValues = {
 };
 
 /**
- * The error codes worth explaining rather than echoing. A send has two
- * separate limits and a bare "conflict" leaves the sender guessing which one
- * stopped them - and, more importantly, guessing what to DO about it.
- */
-/**
- * Refusals worth rewriting in the sender's own terms. Keyed on the API's
- * `code`, which only reaches us for 4xx codes the backend allowlists
- * (CLIENT_ACTIONABLE_CODES in its error handler) - so a new entry here needs
- * the code added there too, or it silently never fires.
+ * Refusals worth rewriting in the sender's own terms. A send has two separate
+ * limits, and a bare "conflict" leaves the sender guessing which one stopped
+ * them and what to DO about it. Keyed on the API's `code`, which only reaches
+ * the client for 4xx codes the backend allowlists (CLIENT_ACTIONABLE_CODES in
+ * its error handler) - so a new entry here needs the code added there too, or
+ * it silently never fires.
  *
  * COMPANY_BALANCE_UNKNOWN and HUBTEL_NOT_CONFIGURED are 503s, and the backend
  * strips `code` from every 5xx by design. Their entries are therefore

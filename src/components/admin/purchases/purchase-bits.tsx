@@ -129,8 +129,8 @@ export function todayInputValue(): string {
  *
  * Kept beside the status badge rather than folded into it: a purchase's
  * LOGISTICS state (recorded, in transit, received) and whether the money has
- * gone out are two different facts, and the system used to hold only the
- * first. The status survives money redaction, so a staff member without
+ * gone out are two different facts. The status survives money redaction, so a
+ * staff member without
  * financial visibility can still see that somebody is owed.
  */
 export function SettlementBadge({
@@ -161,7 +161,7 @@ export function SettlementBadge({
 export interface IPurchaseCostSummary {
   /** Costs taken into the goods. Null when any of them was redacted. */
   capitalisedGhs: number | null;
-  /** The grain plus the costs taken into it - the figure the owner asked for. */
+  /** The grain plus the costs taken into it - what the load cost to acquire. */
   goodsCostGhs: number | null;
   /** The vouchers that still count: a voided one is not a cost. */
   live: IPurchaseCost[];

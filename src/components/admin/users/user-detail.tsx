@@ -573,9 +573,9 @@ function ActionsCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
 /* ── Loading shape ───────────────────────────────────────────────────────── */
 
 /**
- * Skeleton mirroring the detail layout (dms convention: every screen loads in
- * its own silhouette, never a generic spinner) - banner, overlapping avatar,
- * fact grid and the role/actions cards, so nothing jumps when data lands.
+ * Skeleton mirroring the detail layout: every screen loads in its own
+ * silhouette, never a generic spinner - banner, overlapping avatar, fact grid
+ * and the role/actions cards, so nothing jumps when data lands.
  */
 function UserDetailSkeleton() {
   return (

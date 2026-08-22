@@ -14,11 +14,11 @@ import type { ExpenseCategoryValues } from "@/validations/registry-schema";
 /**
  * The two facts about a category the financial statements read.
  *
- * Neither used to be on any screen, so every category filed as running costs
- * whatever it was: haulage inflated gross profit, and there was no way at all
- * to say that a category was tax rather than a cost of the year. The section
- * is asked as sentences, in the owner's words, because it is the one field on
- * this form that changes what the year's profit says.
+ * Unasked, every category files as running costs whatever it is: haulage
+ * inflates gross profit, and nothing can say that a category is tax rather
+ * than a cost of the year. The section is asked as sentences, in the owner's
+ * words, because it is the one field on this form that changes what the
+ * year's profit says.
  *
  * Shared by the quick-add dialog and the full page form so the question is
  * asked identically in both.

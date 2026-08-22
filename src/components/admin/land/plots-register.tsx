@@ -142,7 +142,7 @@ export function PlotsRegister() {
               key={p.id}
               href={`${LIST}/${p.id}`}
               // Squared off and 1.5px-bordered to match AdminCard, which every other
-              // surface in the console uses. These were the only rounded cards.
+              // surface in the console uses.
               className="shadow-[0_1px_2px_rgba(16,24,40,0.05)] overflow-hidden rounded-none border border-adm-line bg-adm-card transition-colors hover:border-adm-line"
             >
               {p.photos[0] ? (

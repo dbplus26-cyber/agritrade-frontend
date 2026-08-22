@@ -1,9 +1,8 @@
 /**
- * The console's navigation registry (from the DB Plus Console design): five
- * groups, one entry per module. `key` doubles as the register slug for the
- * config-driven modules; custom screens (dashboard, purchases, sales,
- * shipments, approvals, reports, settings, notifications, profile) have their
- * own routes.
+ * The console's navigation registry: five groups, one entry per module. `key`
+ * doubles as the register slug for the config-driven modules; the custom
+ * screens (dashboard, purchases, sales, shipments, approvals, reports,
+ * settings, notifications, profile) have their own routes.
  */
 import type { Permission } from "@/types/permission.types";
 
@@ -58,7 +57,7 @@ const item = (
 /**
  * Only BUILT modules appear in the rail - the sidebar is the honest map of
  * what the system can do today, so an unbuilt tab never masquerades as a
- * feature. Groups render as collapsible dropdowns (dms-frontend convention);
+ * feature. Groups render as collapsible dropdowns;
  * Land and Farm are separate dropdowns of their own.
  */
 export const adminNavGroups: AdminNavGroup[] = [
@@ -156,7 +155,7 @@ export const adminNavGroups: AdminNavGroup[] = [
       item("audit", "Audit Log", "A record of who changed what, and when.", { ownerOnly: true }),
       item("notifications", "Notifications", "Every email and text the system has tried to send.", { ownerOnly: true }),
       // "My profile" and "Settings" deliberately absent: both live behind
-      // the navbar avatar menu (dms-frontend convention), not the rail.
+      // the navbar avatar menu, not the rail.
     ],
   },
 ];
@@ -171,7 +170,7 @@ export function activeNavKey(pathname: string): string {
 /** Breadcrumb title for the topbar. */
 export function screenTitle(pathname: string): string {
   const key = activeNavKey(pathname);
-  // settings: fall back gracefully now that it lives outside the nav groups.
+  // settings sits outside the nav groups, so it falls back to its own title.
   if (key === "settings") return "Settings";
   if (key === "profile") return "My profile";
   for (const group of adminNavGroups) {

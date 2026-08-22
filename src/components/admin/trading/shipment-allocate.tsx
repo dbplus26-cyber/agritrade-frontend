@@ -240,10 +240,10 @@ const planBalance = ({
 };
 
 /**
- * Allocate lots to the sales on a truck - a full PAGE, not a dialog. It used
- * to be a dialog with its own inner scroll inside the scrolling shipment page,
- * which on a phone meant two scrollbars fighting over one thumb and lot rows
- * that could not be reached. On save it returns to the shipment.
+ * Allocate lots to the sales on a truck - a full PAGE, not a dialog. A dialog
+ * here carries its own inner scroll inside the scrolling shipment page, which
+ * on a phone means two scrollbars fighting over one thumb and lot rows that
+ * cannot be reached. On save it returns to the shipment.
  */
 export function ShipmentAllocate({ id }: { id: string }) {
   const { data, error, isError, isLoading, refetch } = useGetShipmentQuery(id);
@@ -593,8 +593,8 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                   )}
                 >
                   {/* The BUYER leads. Three near-identical 11px lines with
-                      the document number on top made every tab look the same
-                      until you read it; the name is what tells them apart. */}
+                      the document number on top leave every tab looking the
+                      same until it is read; the name tells them apart. */}
                   <span
                     className={cn(
                       "block max-w-[150px] min-w-0 text-[12.5px] font-semibold line-clamp-1 whitespace-normal [overflow-wrap:anywhere]",

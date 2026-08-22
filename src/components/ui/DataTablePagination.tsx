@@ -27,9 +27,9 @@ const pad = (n: number, width: number) => String(n).padStart(width, "0");
  * The one table-pagination footer, in the DB Plus ledger idiom: the showing
  * range in micro-label + mono on the left, a dashed-underline rows-per-page
  * control, and round ghost nav around a zero-padded page readout with a
- * progress track showing how far through the ledger you are. The range
- * ("Showing 1-20 of 214") is the ONLY place the total prints - a second
- * count marker restated the same figure a hand-width away. On phones the
+ * progress track showing how far through the ledger the reader is. The range
+ * ("Showing 1-20 of 214") is the ONLY place the total prints - a second count
+ * marker would restate the same figure a hand-width away. On phones the
  * footer is one row: range left, prev/next right; the rows-per-page control
  * (a wide-screen convenience) and first/last jumps wait for the room.
  * Driven by plain props so it works for client-side tables today and

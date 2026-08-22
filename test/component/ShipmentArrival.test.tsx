@@ -1,8 +1,8 @@
 // test/component/ShipmentArrival.test.tsx
 //
 // The dialog that decides what a buyer is actually billed. Grain is weighed at
-// the origin and again on arrival, and the two figures differ; the console used
-// to know only the first, so it billed a number nobody was going to pay.
+// the origin and again on arrival, and the two figures differ; billing on the
+// origin weight alone bills a number nobody is going to pay.
 //
 // What is pinned here is what neither the schema nor the server can say:
 //

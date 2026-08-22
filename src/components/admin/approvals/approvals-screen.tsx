@@ -448,20 +448,18 @@ export function ApprovalsScreen() {
   return (
     // Geometry comes from the console shell, not from here.
     //
-    // This block used to add `max-w-[1180px] mx-auto`, its own `px-6`, and
-    // `pt-8 pb-20` on top of the shell's `<main>`, which already centres at
-    // 1360px and pads at 26px. Every one of those stacked: the queue sat
-    // narrower than the rest of the console, further in from the left edge,
-    // lower than every other page's first line, and above 80px of dead space.
-    // The colours were reconciled onto the console system a while back
-    // (see APPROVAL_TOKENS) and this was the last thing still making the
-    // screen read as a different product.
+    // The shell's `<main>` already centres at 1360px and pads at 26px, so a
+    // `max-w-[1180px] mx-auto`, an extra `px-6` or a `pt-8 pb-20` here stacks
+    // on top of it: the queue would sit narrower than the rest of the console,
+    // further in from the left edge, lower than every other page's first line,
+    // and above 80px of dead space.
     <div
       style={APPROVAL_TOKENS}
       className="font-admin text-[14px] leading-[1.5] text-[var(--ap-ink)] antialiased"
     >
-      {/* The shared header, at the shared size. The bespoke 26px h1 here was
-          the largest heading in the console; every other page titles at 19px. */}
+      {/* The shared header, at the shared size. A bespoke 26px h1 here would
+          be the largest heading in the console; every other page titles at
+          19px. */}
       <AdminPageHeader
         title="Approvals"
         hint="Requests waiting on your decision. Approving applies the change straight away."

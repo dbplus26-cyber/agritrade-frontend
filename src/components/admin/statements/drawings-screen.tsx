@@ -4,9 +4,9 @@
 // other money record, feeding the capital account on the statements - never
 // the P&L, which is the whole reason this is not an expense category.
 //
-// Every drawing now names the account it came out of, or says why none did.
-// Until it did, the cash-flow statement subtracted every drawing while no
-// balance anywhere fell by a pesewa.
+// Every drawing names the account it came out of, or says why none did:
+// unnamed, the cash-flow statement subtracts the drawing while no balance
+// anywhere falls by a pesewa.
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -139,9 +139,9 @@ function AddDrawingDialog({ onClose }: { onClose: () => void }) {
               />
             </AdminField>
           </div>
-          {/* The question the ledger never asked. The owner taking GHS 5,000
-              out of the business took it out of SOMETHING, and until this was
-              asked the cash book never heard about it. */}
+          {/* The owner taking GHS 5,000 out of the business takes it out of
+              SOMETHING, and unless this is asked the cash book never hears
+              about it. */}
           <CashSourceField
             accountError={errors.paymentAccountId?.message}
             accountId={watch("paymentAccountId") ?? ""}

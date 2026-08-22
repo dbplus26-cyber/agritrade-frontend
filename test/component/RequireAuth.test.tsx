@@ -1,14 +1,13 @@
 // test/component/RequireAuth.test.tsx
 //
-// The console's gate, which documents its own past production regression in
-// its comments and had no test holding any of it. Four states matter:
+// The console's gate. Four states matter:
 //
 //   * a validated session renders the console;
 //   * a persisted user renders optimistically while /me revalidates - but a
 //     SETTLED failure clears the session and bounces to /login?from=...;
 //   * the bounce must wait for the failure to SETTLE: acting on a cached 401
-//     while the refetch is in flight is the recorded regression (it revoked
-//     the brand-new session right after login);
+//     while the refetch is in flight revokes a brand-new session right after
+//     login;
 //   * first load with no persisted user shows only the loading screen -
 //     nothing of the console leaks before the check answers.
 import { render, screen, waitFor } from "@testing-library/react";
@@ -82,9 +81,9 @@ describe("RequireAuth", () => {
   });
 
   it("does NOT act on a cached failure while the refetch is in flight", () => {
-    // The recorded regression: after logout -> login, the cache still holds
-    // the logout's 401 while /me revalidates. Treating that as a verdict
-    // revoked the brand-new session. isError && isFetching must do nothing.
+    // After logout -> login the cache still holds the logout's 401 while /me
+    // revalidates. Treating that as a verdict revokes the brand-new session,
+    // so isError && isFetching must do nothing.
     meState.value = { data: undefined, isError: true, isFetching: true };
     render(<RequireAuth><div data-testid="console" /></RequireAuth>);
     expect(logoutMock).not.toHaveBeenCalled();

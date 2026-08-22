@@ -1,8 +1,7 @@
 // test/unit/api-slice-reauth.test.ts
 //
-// The 401-refresh machinery every console request rides through. This repo
-// has a recorded history of auth-guard regressions (the RTK cached-error
-// remount gotcha), and the failure modes here are all quiet ones:
+// The 401-refresh machinery every console request rides through. Its failure
+// modes are all quiet ones:
 //
 //   * a refresh STAMPEDE - N concurrent 401s each firing their own
 //     `auth/refresh-token` call - would trip the backend's rotation replay
@@ -141,7 +140,7 @@ describe("baseQueryWithReauth - refresh failure", () => {
     store.dispatch(userLoggedIn({ user: USER }));
 
     // Seed the cache with a resolved query BEFORE the session dies: this is
-    // the "still-resolved getMe" that once kept RequireAuth rendering the
+    // the "still-resolved getMe" that would keep RequireAuth rendering the
     // console after logout. Authorize just this one call.
     probeAuthorized = true;
     await store.dispatch(testApi.endpoints.probe.initiate("seed"));

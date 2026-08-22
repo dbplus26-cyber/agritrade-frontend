@@ -83,11 +83,11 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
       </div>
       )}
 
-      {/* A failed request must NEVER read as "everyone is paid up". This
-          used to fall through to the empty state, so a dropped connection
-          told the owner every debt on both books had been collected - on the
-          one screen that decision gets made from. Error is checked before
-          empty, and never conflated with it. */}
+      {/* A failed request must NEVER read as "everyone is paid up". Falling
+          through to the empty state would tell the owner, on the one screen
+          that decision gets made from, that a dropped connection had collected
+          every debt on both books. Error is checked before empty, and never
+          conflated with it. */}
       {isError ? (
         <ErrorMessage
           className="py-8"
@@ -116,7 +116,7 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
         <>
         {/* Phones get a row list, messaging-app style: buyer and the balance
             owed on line one, book/ref/paid on line two. The 720px table only
-            offered a 300px window onto itself down here, with the Balance -
+            offers a 300px window onto itself down here, with the Balance -
             the whole point of the section - always off-screen. */}
         <ul className="flex flex-col md:hidden">
           {rows.map((r) => (
@@ -153,10 +153,10 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
         </ul>
         <div className="hidden overflow-x-auto md:block">
           {/* Fixed layout with declared column widths. Left to itself the
-              browser sized every column from its content, so the buyer name -
-              the one unbounded value here - took roughly three quarters of
-              the row and squeezed the figures into columns so narrow that
-              "GHS 59,377.38" wrapped. The figures are why this table exists;
+              browser sizes every column from its content, so the buyer name -
+              the one unbounded value here - takes roughly three quarters of
+              the row and squeezes the figures into columns so narrow that
+              "GHS 59,377.38" wraps. The figures are why this table exists;
               they get the room they need first, and the name takes what is
               left and wraps to at most two lines. */}
           <table className="w-full min-w-[720px] table-fixed text-[14px]">
@@ -228,7 +228,7 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
                     </span>
                   </td>
                   {/* Compact at scale: an eight-figure exact amount is wider
-                      than the 8rem column and spilled into its neighbour. The
+                      than the 8rem column and spills into its neighbour. The
                       exact figure rides the hover title. */}
                   <td className="py-1.5 pr-3 whitespace-nowrap text-adm-muted">
                     <Money compact value={r.agreedGhs} />

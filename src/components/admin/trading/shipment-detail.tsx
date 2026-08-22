@@ -169,10 +169,9 @@ export function ShipmentDetail({ id }: { id: string }) {
   const anyDriverExtra = Boolean(
     s.driverEmail ?? s.driverCity ?? s.driverLicenseNo ?? s.driverIdNumber,
   );
-  // The half-empty-truck warning the owner asked for: a stated capacity the
-  // planned sales don't come close to filling means another order should ride
-  // along. It warns, never blocks - the admin may know the truck is going
-  // regardless.
+  // The half-empty-truck warning: a stated capacity the planned sales don't
+  // come close to filling means another order should ride along. It warns,
+  // never blocks - the admin may know the truck is going regardless.
   const plannedKg = plannedWeightOf(s);
   const roomLeftKg =
     s.truckCapacityKg !== null ? s.truckCapacityKg - plannedKg : 0;
@@ -316,7 +315,7 @@ export function ShipmentDetail({ id }: { id: string }) {
     }
   };
 
-  /* Every action here says on hover what it DOES and what it commits you to.
+  /* Every action here says on hover what it DOES and what it commits to.
      These buttons move stock and money, and the label alone ("Close", "Mark
      arrived") cannot carry that. HelpWrap rather than a HelpTip icon: the
      button label is already on screen, and half of these render as links -
@@ -328,12 +327,12 @@ export function ShipmentDetail({ id }: { id: string }) {
     <div className="flex flex-wrap gap-2 xl:flex-col">
       {beforeDispatch && canManage ? (
         <>
-          {/* Exactly ONE primary action per state. Allocating and dispatching
-              were both filled amber, so the rail offered two equally loud
-              answers to "what do I do next" - and dispatch is the one that
-              moves stock, which makes it the one that should look decisive.
+          {/* Exactly ONE primary action per state. Filling both allocate and
+              dispatch offers two equally loud answers to "what do I do next" -
+              and dispatch is the one that moves stock, which makes it the one
+              that should look decisive.
               A page, not a dialog, for allocation: the lot list is long, and a
-              dialog's inner scroll inside the scrolling page was unusable on a
+              dialog's inner scroll inside the scrolling page is unusable on a
               phone. */}
           <HelpWrap
             className="inline-flex flex-none xl:w-full"
@@ -368,9 +367,9 @@ export function ShipmentDetail({ id }: { id: string }) {
               {dispatchState.isLoading ? "Dispatching…" : "Dispatch"}
             </AdminButton>
           </HelpWrap>
-          {/* Cancel ends the trip. It read as just another quiet bordered
-              pill beside Allocate lots, which is the wrong promise for the
-              one button here that throws the shipment away. */}
+          {/* Cancel ends the trip. A quiet bordered pill beside Allocate lots
+              is the wrong promise for the one button here that throws the
+              shipment away. */}
           <HelpWrap
             className="inline-flex flex-none xl:w-full"
             text="Calls this trip off with a reason on file. The sales go back to the pool and can ride another truck."
@@ -663,16 +662,15 @@ export function ShipmentDetail({ id }: { id: string }) {
       </AdminCard>
 
       {/* Logistics */}
-      {/* ONE card for the trip and the person driving it, not two.
-          Logistics and Driver were separate sheets of four short facts each,
-          which put two headings and two borders around what a reader treats
-          as a single question: what is this truck, and who has it. They keep
-          their own labels inside, so the grouping survives without the second
-          frame.
+      {/* ONE card for the trip and the person driving it, not two. Separate
+          Logistics and Driver sheets of four short facts each put two headings
+          and two borders around what a reader treats as a single question:
+          what is this truck, and who has it. They keep their own labels
+          inside, so the grouping survives without the second frame.
 
-          The truck and the route live here now. They were dropped when the
-          page header carried them; the header says what KIND of page this is,
-          so the record has to say which shipment. */}
+          The truck and the route live here rather than in the page header,
+          which says what KIND of page this is; the record has to say which
+          shipment. */}
       <AdminCard className="p-5">
         <SectionHeading hint="Which truck this is, where it is going and when it moved.">
           Trip
@@ -734,9 +732,9 @@ export function ShipmentDetail({ id }: { id: string }) {
           ) : null}
         </DetailGrid>
 
-        {/* The rule that split the trip from the driver sat ON the old
-            eyebrow. SectionHeading owns its bottom margin, so the divider
-            moves out to this wrapper to keep the two blocks apart. */}
+        {/* SectionHeading owns its bottom margin, so the rule that splits the
+            trip from the driver sits on this wrapper rather than on the
+            heading, to keep the two blocks apart. */}
         <div className="mt-4 border-t border-adm-hairline pt-4">
           <SectionHeading hint="Who has the truck, as recorded when this trip was booked.">
             Driver
@@ -836,18 +834,16 @@ export function ShipmentDetail({ id }: { id: string }) {
         )}
       </AdminCard>
 
-      {/* Signatures come BEFORE the documents drawer, because they are now the
+      {/* Signatures come BEFORE the documents drawer, because they are the
           normal way a waybill gets signed and the drawer is the fallback for a
-          sheet somebody photographed. Putting the fallback first taught the
+          sheet somebody photographed. Putting the fallback first teaches the
           depot to print. */}
       <ShipmentSignatures shipment={s} />
 
-      {/* Retargeted, not removed. The instruction here used to be "download the
-          waybill, sign it with the driver, upload the signed copy" - a loop the
-          signature slots above have replaced, and one that kept teaching the
-          depot to print something it no longer needs to. What the drawer is
-          actually for is the paperwork a trip picks up on the road, which has
-          nowhere else to live. */}
+      {/* The drawer is NOT the signing loop - the signature slots above are.
+          It carries the paperwork a trip picks up on the road, which has
+          nowhere else to live; pointing it at the waybill would only teach the
+          depot to print something it does not need to. */}
       <AdminCard className="p-5">
         <SectionHeading
           className="mb-1.5"
@@ -1024,11 +1020,11 @@ export function ShipmentDetail({ id }: { id: string }) {
     </div>
   );
 
-  // The ANSWER first, its workings under it. This was a 2x2 grid where profit
-  // sat in the fourth cell carrying the same weight as the three figures it is
-  // derived from - so the one number the owner opened the page for had to be
-  // found among its own inputs. Profit leads at display size now; revenue,
-  // cost and expenses follow as the quiet lines that explain it.
+  // The ANSWER first, its workings under it. Profit leads at display size;
+  // revenue, cost and expenses follow as the quiet lines that explain it. In a
+  // flat grid profit carries the same weight as the three figures it is
+  // derived from, leaving the one number the owner opened the page for to be
+  // found among its own inputs.
   const aside = (
     <AdminCard className="p-5">
       <div className="flex items-center gap-2 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">

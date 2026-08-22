@@ -137,10 +137,10 @@ export function StockView() {
    * pair emptied to zero. Only ever above zero while the toggle is on, since
    * the API omits them otherwise.
    *
-   * Counted so the toggle can SAY when it found none. It is wired end to end
-   * and always was, but a filter whose effect is invisible is indistinguishable
-   * from one that is broken: you tick it, nothing moves, and you conclude the
-   * control is dead rather than that the warehouse has never been emptied.
+   * Counted so the toggle can SAY when it found none: a filter whose effect is
+   * invisible is indistinguishable from one that is broken - it is ticked,
+   * nothing moves, and the reader concludes the control is dead rather than
+   * that the warehouse has never been emptied.
    */
   const clearedCount = useMemo(
     () => balances.filter((row) => row.balanceKg === 0).length,

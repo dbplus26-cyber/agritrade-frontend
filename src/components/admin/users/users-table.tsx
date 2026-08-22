@@ -75,7 +75,7 @@ const statusToQuery = (status: StatusFilter): Partial<IUserListQuery> => {
 };
 
 /**
- * The live Users register, fully server-driven (dms pattern): the debounced
+ * The live Users register, fully server-driven: the debounced
  * search, the role/status facets, the page and the page size all travel to
  * GET /admin/users, and the table renders exactly the page the backend
  * returns. While a refetch is in flight the current list stays visible
@@ -86,10 +86,9 @@ export function UsersTable() {
   const router = useRouter();
   const me = useCurrentUser();
 
-  // URL-synced + session-remembered table state (khadys/dms convention):
-  // paginate to page 4, open a detail page or another tab, come back - the
-  // table is exactly where you left it. The navbar's global search seeds the
-  // same `search` param.
+  // URL-synced + session-remembered table state: paginate to page 4, open a
+  // detail page or another tab, come back, and the table is exactly where it
+  // was left. The navbar's global search seeds the same `search` param.
   const {
     page,
     search: searchInput,
@@ -290,9 +289,9 @@ export function UsersTable() {
     <div>
       <AdminPageHeader title="Users" sub="Staff accounts and permissions" />
 
-      {/* dms rule: a pristine register or a failed plain load hides the
-          toolbar - but when the user's own search/filters might be the cause,
-          it stays so they can clear or adjust them. */}
+      {/* A pristine register or a failed plain load hides the toolbar - but
+          when the user's own search/filters might be the cause, it stays so
+          they can clear or adjust them. */}
       {pristine || (isError && !filtered) ? null : (
       <ConsoleFilterBar
         search={searchInput}

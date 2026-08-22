@@ -71,20 +71,19 @@ const FILTER_DEFAULTS = {
  *
  * Uses `truncate`, NOT `line-clamp-1`. The two cannot be combined with
  * `block`: line-clamp works by setting `display: -webkit-box`, which the
- * `block` utility then overrides, so the clamp silently does nothing. That is
- * what produced this register's worst bug - the route column, starved of
- * width by an unbounded commodity column beside it, wrapped one character per
- * line and pushed rows past 700px tall.
+ * `block` utility then overrides, so the clamp silently does nothing - and a
+ * route column starved of width by an unbounded commodity column beside it
+ * then wraps one character per line and pushes rows past 700px tall.
  */
 function Route({ from, to }: { from: string; to: string }) {
   return (
     // The accessible reading lives on the span itself, NOT in an `sr-only`
     // child. `sr-only` is `position: absolute`, and this span is not a
-    // positioned ancestor, so the child's containing block was the page
-    // shell: it escaped the truncation clip entirely and sat at the
+    // positioned ancestor, so such a child's containing block is the page
+    // shell: it escapes the truncation clip entirely and sits at the
     // x-position of the UNTRUNCATED text, dragging the page's scroll width
-    // out to 723px on a phone. An invisible element should never be able to
-    // widen the page.
+    // out past the viewport on a phone. An invisible element should never be
+    // able to widen the page.
     <span
       aria-label={`${from} to ${to}`}
       className="block @2xl/table:max-w-[90%] min-w-0 [overflow-wrap:anywhere] @2xl/table:truncate text-adm-ink"
@@ -231,8 +230,8 @@ export function TransfersScreen() {
         accessorFn: (t) => t.commodity.name,
         enableSorting: false,
         meta: columnMeta(),
-        // Bounded: an unbounded commodity name is what starved the route
-        // column in the first place.
+        // Bounded: an unbounded commodity name starves the route column
+        // beside it.
         cell: ({ row }) => (
           <TextCell value={row.original.commodity.name} width="label" />
         ),
@@ -297,8 +296,8 @@ export function TransfersScreen() {
   return (
     // min-w-0: the console shell lays pages out with flex, and a flex item
     // defaults to `min-width: auto` - it refuses to shrink below its content.
-    // Without this the widest table stretched the PAGE instead of scrolling
-    // inside its own box, so a phone got a sideways-scrolling page.
+    // Without this the widest table stretches the PAGE instead of scrolling
+    // inside its own box, so a phone gets a sideways-scrolling page.
     <div className="min-w-0">
       <AdminPageHeader
         title="Transfers"

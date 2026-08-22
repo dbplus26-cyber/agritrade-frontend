@@ -129,9 +129,9 @@ function RailPager({
 
 export function FarmerDetail({ id }: { id: string }) {
   const { data, isLoading, isError, error, refetch } = useGetFarmerQuery(id);
-  // Both rails page against the server. They were capped at 50 and rendered
-  // whole, which silently became "the last 50" the moment a farmer passed
-  // that - and nothing on screen said so.
+  // Both rails page against the server. A fixed cap rendered whole silently
+  // becomes "the last N" the moment a farmer passes it, with nothing on screen
+  // saying so.
   const [grantPage, setGrantPage] = useState(1);
   const [repaymentPage, setRepaymentPage] = useState(1);
   const grants = useGetGrantsQuery({
@@ -191,8 +191,8 @@ export function FarmerDetail({ id }: { id: string }) {
   };
 
   // An agreement document is evidence, so removing one is gated on typing its
-  // name - the X sits inches from a download link, and a mis-click used to
-  // delete the file outright with nothing asked.
+  // name - the X sits inches from a download link, and an ungated mis-click
+  // would delete the file outright.
   const onRemoveDocument = async (doc: { id: string; name: string }) => {
     const ok = await confirm({
       title: "Remove this document?",
@@ -222,10 +222,10 @@ export function FarmerDetail({ id }: { id: string }) {
     );
   };
 
-  // The rail carries the portrait and the three things you can DO. It used to
-  // repeat the name under the photo and the phone under that, both of which
-  // the page header already says one column to the left - so the reader met
-  // the same two facts twice before reaching anything new.
+  // The rail carries the portrait and the three available actions. It does not
+  // repeat the name or the phone, both of which the page header already says
+  // one column to the left - repeating them would meet the reader with the
+  // same two facts twice before anything new.
   const aside = (
     <AdminCard className="px-5 py-5">
       <div className="flex flex-col items-center text-center">
@@ -355,9 +355,9 @@ export function FarmerDetail({ id }: { id: string }) {
                           - free text and controls never compete for width on a
                           phone. The details go into a LABELLED grid rather
                           than a stack of look-alike grey lines: five kinds of
-                          fact (phone, ID, address, occupation, notes) used to
-                          render in the same 12px muted grey, so nothing said
-                          which line was which. */}
+                          fact (phone, ID, address, occupation, notes) in the
+                          same 12px muted grey leaves nothing saying which line
+                          is which. */}
                       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
                         <div className="min-w-0">
                           <p className="text-[14px] font-semibold text-adm-ink [overflow-wrap:anywhere]">
@@ -487,8 +487,8 @@ export function FarmerDetail({ id }: { id: string }) {
                         <div className="flex items-center justify-between gap-2">
                           {/* The input item stays plain: the register has no
                               read page, only an edit form, and a fact on a
-                              farmer's card should not open something you can
-                              type into. */}
+                              farmer's card should not open an editable
+                              field. */}
                           <span className="font-semibold text-adm-ink">{g.item.name}</span>
                           <Mono className="text-adm-ink">
                             <Money value={g.valueGhs} />

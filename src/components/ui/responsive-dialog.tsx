@@ -78,12 +78,11 @@ function ResponsiveDialogContent({
       </SheetContent>
     );
   }
-  // The desktop dialog is centred and sized by its content, so a form taller
-  // than the viewport simply ran off the top and bottom with no way to reach
-  // either end - the sheet had `max-h`/`overflow-y-auto` and this branch had
-  // neither. Capped and scrolled here rather than at each call site, because
-  // "is this dialog tall enough to overflow" depends on the reader's screen
-  // and on content that grows later, which no call site can know.
+  // The desktop dialog is centred and sized by its content, so uncapped a
+  // form taller than the viewport runs off the top and bottom with no way to
+  // reach either end. Capped and scrolled here rather than at each call site,
+  // because "is this dialog tall enough to overflow" depends on the reader's
+  // screen and on content that grows later, which no call site can know.
   //
   // Declared BEFORE the caller's classes so a call site can still override the
   // cap deliberately; tailwind-merge keeps the last one.

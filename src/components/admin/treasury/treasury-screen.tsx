@@ -110,9 +110,9 @@ export function TreasuryScreen() {
         // and there is nothing left to bound.
         meta: columnMeta({ stretch: true, wide: true }),
         cell: ({ row }) => (
-          // A bare `truncate` here did nothing: with no width to truncate
-          // AGAINST, the column simply grew to the longest description and
-          // took the table with it.
+          // A bare `truncate` does nothing here: with no width to truncate
+          // AGAINST, the column simply grows to the longest description and
+          // takes the table with it.
           <span
             className="block @2xl/table:max-w-[90%] [overflow-wrap:anywhere] @2xl/table:truncate text-left"
             title={row.original.description}

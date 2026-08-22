@@ -1,7 +1,7 @@
 // src/types/ops.types.ts
 //
-// The stock-operations wave (warehouse transfers, stocktakes) plus the two
-// derived money reads that shipped with it (grant aging, cashflow forecast),
+// The stock operations (warehouse transfers, stocktakes) plus the two derived
+// money reads beside them (grant aging, cashflow forecast),
 // mirroring the backend DTOs. Money is `number | null` - redacted per
 // financial visibility; weights and counts are always present.
 import type { IPaginationMeta } from "./api";

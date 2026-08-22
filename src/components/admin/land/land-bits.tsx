@@ -12,7 +12,7 @@ const PLOT_TONE: Record<PlotStatus, { label: string; tone: Tone }> = {
   SOLD: { label: "Sold", tone: "forest" },
 };
 
-/** Whether the plot is yours to sell, and to whom. */
+/** Whether the plot is the business's to sell, and to whom. */
 const PLOT_HELP: Record<PlotStatus, string> = {
   ARCHIVED: "Taken off the working list and kept only for the record.",
   AVAILABLE: "On your books and free to sell to a buyer.",

@@ -47,7 +47,7 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
 
   // Always editable. The plot has a detail page of its own, so opening the
   // form locked on top of a read-only copy of what the reader just came from
-  // asked for a second click to do the one thing this route is for.
+  // would ask for a second click to do the one thing this route is for.
 
   const {
     register,
@@ -79,8 +79,8 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
       if (plot) {
         // `reference` is deliberately absent from the update body. The backend's
         // update schema has no such key, so Zod strips it silently: sending an
-        // edited reference told staff "Plot updated" while the register code
-        // stayed exactly as it was. The field is locked on edit to match.
+        // edited reference tells staff "Plot updated" while the register code
+        // stays exactly as it was. The field is locked on edit to match.
         await updatePlot({ id: plot.id, body }).unwrap();
         notify.success("Plot updated");
         router.push(`${LIST}/${plot.id}`);
@@ -147,8 +147,8 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
       />
 
       {/* Field pairs measure against this form, not the viewport: the console
-          shell keeps a ~225px rail beside it, so `sm:` paired fields up while
-          the column was still too narrow to carry two of them. */}
+          shell keeps a ~225px rail beside it, so `sm:` would pair fields up
+          while the column is still too narrow to carry two of them. */}
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}

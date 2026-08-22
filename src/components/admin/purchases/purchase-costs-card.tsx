@@ -209,12 +209,11 @@ export function PurchaseGoodsCostSummary({
  * What this load has actually cost: the grain, plus the costs taken into it.
  *
  * The headline is the whole point of the section rather than a footnote at the
- * bottom of a list. A purchase used to state one figure - weight times price -
- * and the haulage, loading and porterage that got the grain into the shed were
- * operating spend of whatever month they were paid in. So a load bought in the
- * harvest window printed a loss in the buying month and a flattering margin
- * whenever it finally sold, and "what did we make on that purchase" had no
- * answer at all.
+ * bottom of a list. Stating one figure - weight times price - and leaving the
+ * haulage, loading and porterage that got the grain into the shed as operating
+ * spend of whatever month they were paid in prints a loss in the buying month
+ * for a load bought in the harvest window, a flattering margin whenever it
+ * finally sells, and no answer at all to "what did we make on that purchase".
  *
  * The purchase price stays on the page underneath it, in full and clearly
  * labelled. It is the figure a supplier is paid against and somebody

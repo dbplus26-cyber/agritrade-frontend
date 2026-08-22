@@ -61,11 +61,10 @@ export function ReviewCard({
           </span>
         ) : null}
       </div>
-      {/* The review is shown in FULL. It used to clamp with the rest hidden
-          behind a title tooltip, which no touch device can open and no screen
-          reader announces reliably - so on a phone the end of every long
-          review was simply unreadable. The 450-character cap is what keeps a
-          card a card. */}
+      {/* The review is shown in FULL. Clamping it and hiding the rest behind a
+          title tooltip leaves the end of a long review unreadable on a phone:
+          no touch device opens that tooltip and no screen reader announces it
+          reliably. The 450-character cap is what keeps a card a card. */}
       <blockquote className="mb-4 min-w-0 text-[14px] leading-[1.7] text-ink [overflow-wrap:anywhere]">
         &ldquo;{review.text}&rdquo;
       </blockquote>

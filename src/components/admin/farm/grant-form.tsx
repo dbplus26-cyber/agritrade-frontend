@@ -150,8 +150,8 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
       />
 
       {/* Field pairs measure against this form, not the viewport: the console
-          shell keeps a ~225px rail beside it, so `sm:` paired fields up while
-          the column was still too narrow to carry two of them. */}
+          shell keeps a ~225px rail beside it, so `sm:` would pair fields up
+          while the column is still too narrow to carry two of them. */}
       <form
         noValidate
         // Surface the missing file alongside RHF's own errors: on an invalid
@@ -252,9 +252,9 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
             </AdminField>
           </section>
 
-          {/* The question the grant book never asked. Funding a farmer costs
-              the business money, and until this was asked the statement spent
-              every cedi of it while the cash book heard nothing. */}
+          {/* Funding a farmer costs the business money, and without this
+              question the statement spends every cedi of it while the cash
+              book hears nothing. */}
           <section className="flex flex-col gap-5 border-t border-adm-hairline pt-5">
             <GrantCashSourceField
               accountError={errors.paymentAccountId?.message}

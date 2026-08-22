@@ -18,9 +18,6 @@ import { cn } from "@/lib/utils";
  * portrait, a supplier's shop front, a driver's licence photo - and a dialog
  * that changed shape per image would make a gallery of them read as a jumble.
  * The frame is fixed and the picture fills it.
- *
- * Lived in users/user-identity until suppliers, buyers and drivers each
- * reached across for it; it is shared, so it lives somewhere shared.
  */
 export function PhotoViewDialog({
   name,
@@ -60,8 +57,7 @@ export function PhotoViewDialog({
  * are inert, since there is nothing to open.
  *
  * One component so the behaviour cannot differ between a user, a supplier and
- * a farmer - it was previously hand-wired on the three screens that had it and
- * simply absent on the rest.
+ * a farmer.
  */
 export function ViewablePhoto({
   className,

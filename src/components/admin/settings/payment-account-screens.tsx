@@ -329,9 +329,9 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
   const [updateAccount, updateState] = useUpdatePaymentAccountMutation();
   const saving = createState.isLoading || updateState.isLoading;
 
-  // Always editable. The account has a detail page of its own, so this route
-  // showing a locked copy of it first was a second click before the page would
-  // do the one thing it is for.
+  // Always editable. The account has a detail page of its own, so a locked
+  // copy of it here would be a second click before the page does the one thing
+  // it is for.
 
   const {
     register,
@@ -451,8 +451,8 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
   return (
     <AdminCard className="max-w-[640px] px-5 py-[18px]">
       {/* Field pairs measure against this form, not the viewport: the console
-          shell keeps a ~225px rail beside it, so `sm:` paired fields up while
-          the column was still too narrow to carry two of them. */}
+          shell keeps a ~225px rail beside it, so `sm:` would pair fields up
+          while the column is still too narrow to carry two of them. */}
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
@@ -659,8 +659,8 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
         </section>
 
         <div className="pt-3 sm:pt-6">
-          {/* Never "locked" - there is no locked state on this route any more.
-              Cancel returns to the record, which is where it is read. */}
+          {/* Never "locked" - this route has no locked state. Cancel returns
+              to the record, which is where it is read. */}
           <EditableFormActions
             mode={isEdit ? "editing" : "create"}
             saving={saving}

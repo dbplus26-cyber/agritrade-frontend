@@ -1,10 +1,10 @@
 // test/unit/sale-payable.test.ts
 //
 // The frontend half of the backend's `salePayableTotal`. A sale carries two
-// totals now - what both sides shook hands on, and what the buyer will pay
-// once the load was re-weighed on arrival - and five screens derive "what is
-// still owed" from them. They agreed while there was one column to read; the
-// moment there are two, agreeing becomes something somebody has to remember.
+// totals - what both sides shook hands on, and what the buyer will pay once
+// the load has been re-weighed on arrival - and five screens derive "what is
+// still owed" from them. With two columns to read, five screens agreeing on
+// which one answers the question is something somebody has to remember.
 //
 // So the rules live here, and every screen calls them:
 //

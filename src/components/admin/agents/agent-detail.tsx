@@ -65,7 +65,7 @@ import { formatConsoleDate } from "@/components/admin/purchases/purchase-bits";
 
 const LIST = "/admin/agents";
 
-// The ledger is the CASH BOOK now, so its lines are movement types rather than
+// The ledger is the CASH BOOK, so its lines are movement types rather than
 // float types. An unknown type falls back rather than throwing: the cash book
 // gains types over time and a ledger that crashes on one it has not met is
 // worse than one that renders it plainly.
@@ -128,8 +128,8 @@ function TxMarker({ type }: { type: string }) {
 /**
  * Where handed-over money LANDS. Not "how it was sent" - what the agent is now
  * holding, and where. Notes in a pocket, their own wallet and their bank are
- * three different pots, and the single float balance that covered all three is
- * exactly what made an agent's position impossible to read.
+ * three different pots, and a single float balance covering all three makes
+ * an agent's position impossible to read.
  */
 const TENDER_OPTIONS = [
   { label: "Cash in hand", value: "CASH" },
@@ -235,13 +235,13 @@ function LedgerHead({ withBalance }: { withBalance: boolean }) {
  *
  * The money tracks are minmax(124px, max-content), NOT a flat 124px. A fixed
  * track does not grow, and the figures inside it are whitespace-nowrap - so a
- * float in the millions rendered past the end of its own column and over the
+ * float in the millions renders past the end of its own column and over the
  * one beside it. The floor keeps ordinary rows aligned on the same edge; the
  * max-content ceiling lets one large figure widen the track for every row at
- * once, which keeps the column straight instead of ragged. The grid is what makes the ledger read as a ledger - the
- * old flex row let the description push the amount around, so no two rows'
- * figures sat on the same edge and the running balance hid in a "Bal …" scrap
- * of body text.
+ * once, which keeps the column straight instead of ragged. The grid is what
+ * makes the ledger read as a ledger: a flex row lets the description push the
+ * amount around, so no two rows' figures sit on the same edge and the running
+ * balance hides in a "Bal …" scrap of body text.
  *
  * `balanceAfter` is undefined when the running balance is not knowable (later
  * pages, or a redacted ledger); the column is then simply absent rather than
@@ -534,9 +534,9 @@ function ReconcileDialog({
         ) : (
           <>
             {/* The workings, as a statement rather than a grey block. Rows
-                were 2px apart with the label and its figure at almost the
-                same weight, so the whole computation read as one texture and
-                the total - the only line anyone needs - sat inside it. */}
+                2px apart with the label and its figure at almost the same
+                weight read as one texture, burying the total - the only line
+                anyone needs - inside it. */}
             <div className="rounded-none border border-adm-line bg-adm-sunken px-4 py-1">
               {line(
                 p.since
@@ -708,8 +708,8 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
                 Statement
               </Link>
             </AdminButton>
-            {/* Float money moves are owner actions (design doc 4: staff view
-                only). The API enforces it; hiding the buttons keeps staff from
+            {/* Float money moves are owner actions; staff only ever view
+                them. The API enforces it; hiding the buttons keeps staff from
                 being offered an action that can only 403. */}
             {isSuperAdmin ? (
               <>
@@ -817,8 +817,8 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
               </div>
               {/* The figures as ONE block: the headline float, then the
                   supporting numbers as ruled label/value lines sharing a right
-                  edge - previously these were three loose sentences and the
-                  eye had to hunt for the money in each one. */}
+                  edge. As three loose sentences the eye has to hunt for the
+                  money in each one. */}
               <p className="flex min-w-0 items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 <span className="min-w-0">Cash in hand</span>
                 <HelpTip

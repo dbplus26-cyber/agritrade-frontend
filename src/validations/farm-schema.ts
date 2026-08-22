@@ -72,12 +72,12 @@ export const guarantorSchema = z.object({
  * Mirrors backend `createGrantSchema` - the signed agreement file is
  * validated separately (it rides as the multipart `agreement` part).
  *
- * A grant is money the business spent funding a farmer, and until now it named
- * no account and moved nothing. That was never neutral: the statement counts an
- * outstanding grant as a receivable and a rising receivable reads as cash gone,
- * so the statement said the money had left while the cash book said every
- * account was untouched. `cashSource` is the answer picked, the field under it
- * is the answer given, and the backend refuses both or neither
+ * A grant is money the business spent funding a farmer, so it has to name the
+ * account it came out of. A grant that names none is not neutral: the statement
+ * counts an outstanding grant as a receivable and a rising receivable reads as
+ * cash gone, so the statement would say the money had left while the cash book
+ * said every account was untouched. `cashSource` is the answer picked, the
+ * field under it is the answer given, and the backend refuses both or neither
  * (CASH_SOURCE_AMBIGUOUS / CASH_SOURCE_REQUIRED).
  */
 export const grantSchema = z
@@ -147,8 +147,7 @@ export const repaymentSchema = z
   .object({
     farmerId: z.string().min(1, "Choose the farmer"),
     seasonId: z.string().min(1, "Choose the season"),
-    // `kind` defaults to PRODUCE, the only repayment this book could express
-    // until now.
+    // `kind` defaults to PRODUCE, the ordinary repayment on this book.
     kind: z.enum(repaymentKinds).default("PRODUCE"),
     commodityId: optionalText,
     weightKg: optionalText,

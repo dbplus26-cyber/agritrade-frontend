@@ -11,8 +11,8 @@ import "./globals.css";
 
 // Display face: Barlow Condensed - the TALL grotesque of crate markings and
 // shipping manifests, which is exactly the paperwork world this site is drawn
-// from. It replaced Archivo (and the design file's Bricolage before it): both
-// read squat at size where this one carries headlines upright.
+// from. Squatter grotesques read heavy at display size; this one carries
+// headlines upright.
 const barlowCondensed = Barlow_Condensed({
   variable: "--font-barlow-condensed",
   subsets: ["latin"],

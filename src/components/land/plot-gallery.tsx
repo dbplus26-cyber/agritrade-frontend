@@ -17,7 +17,7 @@ export interface PlotPhoto {
  *
  * Every photo is mounted in the same fixed-height frame and only the current
  * one is shown, so stepping never shifts the card. A single photo renders
- * exactly as before: no controls, no count.
+ * bare: no controls, no count.
  *
  * NOTHING ON FILE MEANS NO FRAME. The gallery renders null when there is no
  * photograph to show, and it owns its own border so that the frame goes with
@@ -26,10 +26,10 @@ export interface PlotPhoto {
  *
  * "Nothing to show" covers two cases the reader cannot tell apart: no photo
  * was ever filed, and every filed photo has stopped resolving. Only the first
- * was handled before, because it is the only one visible from the server. A
- * plot whose upload had since been deleted still drew the full bordered frame
- * and filled it with the PHOTO TO FOLLOW panel, which is exactly the empty
- * rectangle the frame was supposed to spare the reader.
+ * is visible from the server, so the second is caught here: a plot whose
+ * upload has been deleted would otherwise draw the full bordered frame around
+ * the PHOTO TO FOLLOW panel, which is exactly the empty rectangle the frame
+ * exists to spare the reader.
  */
 export function PlotGallery({
   className,

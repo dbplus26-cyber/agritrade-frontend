@@ -63,8 +63,8 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
   const [updateCommodity, updateState] = useUpdateCommodityMutation();
   const saving = createState.isLoading || updateState.isLoading;
 
-  // Photo travels WITH the save (multipart payload + file, the profile-photo
-  // convention); `removePhoto` clears an existing one server-side.
+  // Photo travels WITH the save as a multipart payload + file; `removePhoto`
+  // clears an existing one server-side.
   const {
     fileInputRef,
     photoFile,
@@ -172,8 +172,8 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
     }
   };
 
-  // At rest an existing record READS. The form is what you get after
-  // pressing Edit, not a greyed-out copy of the page you were already on.
+  // At rest an existing record READS. The form appears after Edit is pressed,
+  // rather than as a greyed-out copy of the record already on screen.
   if (isEdit && !isEditing && commodity) {
     return (
       <AdminCard className="px-5 py-[18px]">

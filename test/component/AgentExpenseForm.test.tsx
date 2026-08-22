@@ -1,11 +1,10 @@
 // test/component/AgentExpenseForm.test.tsx
 //
-// The field expense form, and the one thing this round added to it: an
-// expense may name the purchase it was incurred for, and say where the cost
-// belongs. What must NOT change is everything else - an ordinary porter's
-// fee has to travel exactly as it did before the purchase picker existed
-// (no attribution keys on the wire at all), and the retry-safe idempotency
-// key has to survive the new fields as it survived the old ones.
+// The field expense form. An expense may name the purchase it was incurred
+// for, and say where the cost belongs - and nothing else about the form
+// changes for it: an ordinary porter's fee still travels with no attribution
+// keys on the wire at all, and the retry-safe idempotency key still holds
+// across the attribution fields.
 //
 // Same rig as AgentPurchaseForm.test.tsx: real draft-storage against jsdom's
 // localStorage, mocked at the RTK hook boundary.

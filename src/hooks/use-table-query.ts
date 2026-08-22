@@ -5,8 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useDebounce } from "./use-debounce";
 
 /**
- * URL-synced table state: page + a debounced search + string filters
- * (khadys-frontend's use-table-query, verbatim behaviour).
+ * URL-synced table state: page + a debounced search + string filters.
  *
  * Local state is the source of truth; it seeds once from the URL, then mirrors
  * changes back into the query string. The mirror effect reads the *live* URL
@@ -15,7 +14,7 @@ import { useDebounce } from "./use-debounce";
  * actually differs (`router.replace(..., { scroll: false })` - no page jump).
  *
  * Session memory: re-entering a table through the sidebar (a bare URL, no
- * params) restores where you left it - page, search and filters - while an
+ * params) restores where it was left - page, search and filters - while an
  * explicit URL always wins and a fresh browser session starts clean.
  *
  * `search` is the immediate input value; `queryParams.search` is the debounced

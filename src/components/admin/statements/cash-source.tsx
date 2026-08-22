@@ -2,11 +2,11 @@
 
 // "Which account did this money come out of, and if none, why not?"
 //
-// The drawings ledger and the asset register each held a money figure and
-// moved no money at all, while the statements spent every pesewa of both: the
-// owner took GHS 5,000 out of the bank and the cash book said the bank was
-// unchanged. Both registers now ask this question, and neither can be saved
-// without an answer.
+// The drawings ledger and the asset register each carry a money figure that
+// the statements spend every pesewa of, so a figure with no account behind it
+// lets the owner take GHS 5,000 out of the bank while the cash book says the
+// bank is unchanged. Both registers ask this question, and neither can be
+// saved without an answer.
 //
 // The second answer is REAL, not a formality, and it is presented as one. The
 // business genuinely owned assets before the books started - their cash left
@@ -59,10 +59,9 @@ const COPY: Record<
 /**
  * The exclusive-or, asked once.
  *
- * Deliberately ONE question with two answers rather than two optional fields:
- * two optional fields is the state both registers were already in. The chosen
- * answer decides which field appears under it, so naming both is not a shape
- * the form can produce - the backend refuses it (CASH_SOURCE_AMBIGUOUS), but
+ * Deliberately ONE question with two answers rather than two optional fields,
+ * which would leave both answerable at once. The chosen answer decides which
+ * field appears under it, so naming both is not a shape the form can produce - the backend refuses it (CASH_SOURCE_AMBIGUOUS), but
  * a refusal is a poor way to learn a rule.
  */
 export function CashSourceField({
@@ -105,7 +104,7 @@ export function CashSourceField({
         </legend>
         {/* Stacked at every width, never two-up: both answers are sentences,
             and a phone splits a sentence across three lines to save a row it
-            did not need. The whole tap target is the row, not the 16px dot. */}
+            does not need. The whole tap target is the row, not the 16px dot. */}
         <div className="flex flex-col gap-1.5">
           {options.map((option) => (
             <label
@@ -216,7 +215,7 @@ export const cashSourceBody = (values: {
 /**
  * Which account moved, or the reason none did, beside the figure it belongs
  * to. A register that shows an amount and says nothing about where it came
- * from reproduces the original bug one row at a time.
+ * from spends money the cash book never sees, one row at a time.
  *
  * Truncated only in the TABLE view: the phone card is the primary layout and
  * a 300-character reason wraps there in full, where there is room for it.
@@ -251,8 +250,8 @@ export function CashSourceNote({
       </span>
     );
   }
-  // Recorded before the register asked. Left blank rather than guessed at:
-  // these are the rows whose money never moved anywhere, and saying so would
+  // Rows recorded before the register carried this question. Left blank
+  // rather than guessed at: claiming their money never moved anywhere would
   // be inventing a fact the record does not carry.
   return <span className="text-adm-faint">-</span>;
 }

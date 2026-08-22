@@ -18,15 +18,14 @@ const amountField = (label: string) =>
 const optionalText = (max: number) =>
   z.string().trim().max(max).or(z.literal("")).optional();
 
-/** Owner cash to an agent. */
 /**
  * Handing somebody money to spend for the business.
  *
  * `fromAccountId` is required: money in an agent's hands came out of a company
  * account, and saying which one is what turns a bare credit into a transfer.
  * `toKind` says where it landed - notes in their pocket, their own wallet,
- * their bank - because those are different money and one number for all three
- * is what made an agent's position unreadable.
+ * their bank - because those are different money, and one number covering all
+ * three makes an agent's position unreadable.
  */
 export const topUpSchema = z.object({
   amountGhs: amountField("top-up amount"),

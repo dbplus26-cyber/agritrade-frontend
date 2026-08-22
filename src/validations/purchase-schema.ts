@@ -58,10 +58,10 @@ export const agentPurchaseSchema = z.object({
   /**
    * Whether the money changed hands at the scale.
    *
-   * Recording a purchase used to charge the agent's float by itself, so the
-   * two were the same act and a farmer paid at the weekend had nowhere to be
-   * recorded. Defaults to yes because cash at the scale IS the ordinary field
-   * case - the convenience belongs in the form, not silently in the model.
+   * Recording a purchase and paying for it are separate acts: a farmer paid
+   * days after the weighing has to be recordable. Defaults to yes because cash
+   * at the scale IS the ordinary field case - the convenience belongs in the
+   * form, not silently in the model.
    */
   paidNow: z.boolean(),
   paymentMethod: z.enum(["CASH", "MOMO"]),

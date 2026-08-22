@@ -43,7 +43,7 @@ import {
 /**
  * What this trip owes its driver, and what has been paid.
  *
- * The reading order is the one the owner asked for and it is the whole design:
+ * The reading order is the whole design:
  * WHO drove, on WHAT terms, PAID how much, and what is LEFT. So the outstanding
  * balance leads at the largest size on the card - it is the only figure anyone
  * opens this to find - and everything else is subordinate to it.

@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
  *
  * Native date inputs ignore the `placeholder` attribute, and mobile browsers
  * render an EMPTY one as a blank box - so on a phone, half the console's date
- * fields looked like dead inputs. Same remedy as the toolbar's
+ * fields would read as dead inputs. Same remedy as the toolbar's
  * ConsoleDateField: while empty and unfocused the native text is hidden and
  * our own placeholder overlays it; focusing (or picking a value) hands the
  * field back to the native editor.

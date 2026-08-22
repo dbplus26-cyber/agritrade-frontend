@@ -54,9 +54,9 @@ import {
 /**
  * What has actually been paid against this cost.
  *
- * An expense used to be a figure the P&L counted with nothing recording
- * whether the money had gone out, so "have we settled this?" was a question
- * somebody answered from memory. The ledger below is the same append-only
+ * Without a record of whether the money has gone out, an expense is a figure
+ * the P&L counts and "have we settled this?" is a question somebody answers
+ * from memory. The ledger below is the same append-only
  * shape sales and driver fees use, and the outstanding balance is derived from
  * it rather than stored, so no two screens can disagree about it.
  */

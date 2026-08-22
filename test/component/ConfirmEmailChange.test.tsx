@@ -1,8 +1,8 @@
 // test/component/ConfirmEmailChange.test.tsx
 //
-// The email-change confirmation page's working half. The backend has emailed
-// `${FRONTEND_URL}/confirm-email-change?token=...` all along; the route only
-// now exists, so this pins the two properties that make it safe to exist:
+// The email-change confirmation page's working half. The backend emails
+// `${FRONTEND_URL}/confirm-email-change?token=...`, and this pins the two
+// properties that make the route safe to exist:
 //
 //   * the single-use token is spent by a BUTTON PRESS, never on render - mail
 //     scanners follow every link in a message before the person sees it, and a

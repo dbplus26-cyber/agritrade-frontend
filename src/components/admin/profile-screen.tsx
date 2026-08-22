@@ -219,8 +219,8 @@ function ProfileEditForm({
 
   return (
     // Field pairs measure against this form, not the viewport: the console
-    // shell keeps a ~225px rail beside it, so `sm:` paired the names up while
-    // the column was still too narrow for two.
+    // shell keeps a ~225px rail beside it, so `sm:` would pair the names up
+    // while the column is still too narrow for two.
     <form
       noValidate
       onSubmit={handleSubmit(onSubmit)}

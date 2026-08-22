@@ -108,8 +108,7 @@ export const apiSlice = createApi({
   tagTypes: apiSliceTags,
   // Reconnect refetch, deliberately WITHOUT focus refetch.
   //
-  // `setupListeners` was already wired in the store but neither behaviour was
-  // enabled anywhere, so it did nothing at all. Reconnect is the one that
+  // `setupListeners` is wired in the store; reconnect is the behaviour that
   // earns its keep here: field agents and the Tamale office drop off the
   // network constantly, and coming back to a console showing pre-outage
   // stock and balances is exactly how someone acts on a stale figure.

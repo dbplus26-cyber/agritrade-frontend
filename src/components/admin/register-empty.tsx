@@ -8,9 +8,6 @@ import { EmptyState } from "@/components/ui/EmptyState";
  * which: nothing on file at all (a register waiting to be started - show the
  * create action), or nothing matching an active search/filter (the reader's
  * criteria, not the register, produced the blank - offer to clear them).
- * Before this component each screen wrote its own AdminCard + EmptyState
- * ternary and the two meanings drifted; several screens told a filtered-empty
- * reader "nothing on file yet".
  *
  * Pair it with the pristine rule from the grants register: when `filtered` is
  * false the caller should also be hiding its ConsoleFilterBar, so the create

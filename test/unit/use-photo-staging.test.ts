@@ -1,8 +1,9 @@
 // usePhotoStaging owns the staged-photo lifecycle for the record forms
 // (supplier, buyer, driver, commodity). The object-URL assertions are the
-// point of the hook: the pre-hook forms never revoked their preview URLs, so
-// the replace/unmount revocations are pinned here. jsdom does not implement
-// object URLs, so URL.createObjectURL/revokeObjectURL are mocked.
+// point of the hook: a form that never revokes its preview URLs leaks them for
+// the tab's life, so the replace/unmount revocations are pinned here. jsdom
+// does not implement object URLs, so URL.createObjectURL/revokeObjectURL are
+// mocked.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook } from "@testing-library/react";
 import { usePhotoStaging } from "@/hooks/use-photo-staging";

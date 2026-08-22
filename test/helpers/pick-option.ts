@@ -3,9 +3,8 @@ import userEvent from "@testing-library/user-event";
 
 /**
  * Drive the rendered SimpleSelect the way a user does: open the trigger,
- * click the named option. Replaces `userEvent.selectOptions`, which only
- * works on native <select> elements - and those are gone; every dropdown
- * renders through ui/select now.
+ * click the named option. `userEvent.selectOptions` cannot: it works only on
+ * native <select> elements, and every dropdown renders through ui/select.
  */
 export async function pickOption(
   trigger: HTMLElement,

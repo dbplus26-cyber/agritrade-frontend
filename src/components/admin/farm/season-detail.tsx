@@ -159,7 +159,7 @@ export function SeasonDetail({ id }: { id: string }) {
           <AdminCard className="px-5 py-3">
             <SectionHeading className="mb-1">Season</SectionHeading>
             <DetailGrid columns={2}>
-              {/* The name is here rather than in the page heading, which now
+              {/* The name is here rather than in the page heading, which
                   says what KIND of page this is. Something has to say which
                   season. */}
               <DetailItem full label="Name" strong>
@@ -219,7 +219,7 @@ export function SeasonDetail({ id }: { id: string }) {
               </p>
               {/* Four facts, so they keep a four-column grid rather than
                   DetailGrid's auto-fit - but the pairs themselves are
-                  DetailItems, which they used to hand-roll a size adrift. */}
+                  DetailItems rather than hand-rolled markup a size adrift. */}
               <div className="grid grid-cols-2 gap-x-8 gap-y-1 sm:grid-cols-4">
                 <DetailItem
                   label="Expected yield"

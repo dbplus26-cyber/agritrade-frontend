@@ -63,7 +63,7 @@ function WaybillSignature({
 }
 
 /**
- * A print-friendly loading sheet / waybill (design doc ADR-004): live data,
+ * A print-friendly loading sheet / waybill: live data,
  * A4-styled via `print:` utilities so the office can print-to-PDF. The console
  * chrome is hidden when printing; only this sheet remains.
  */
@@ -100,10 +100,9 @@ export function Waybill({ id }: { id: string }) {
         sub="Open the PDF, print it from the viewer and have the driver sign"
         actions={
           // The server's own A4 rendering is the ONLY way out to paper.
-          // Screen-printing this page was the other way, and it was the
-          // wrong one: the browser dialog placed the sheet top-left with
-          // dead space around it. The PDF viewer previews true to size
-          // and its own print button does it right.
+          // Screen-printing this page is not: the browser dialog places the
+          // sheet top-left with dead space around it, while the PDF viewer
+          // previews true to size and its own print button does it right.
           <AdminButton asChild>
             <a
               href={shipmentWaybillPdfUrl(s.id)}

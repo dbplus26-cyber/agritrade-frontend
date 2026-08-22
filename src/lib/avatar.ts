@@ -6,10 +6,6 @@
  * Deterministic on purpose. The same farmer wears the same colour on every
  * screen and across reloads, so the swatch becomes a recognisable handle in a
  * long list rather than decoration that shuffles under the reader.
- *
- * Previously lived in `static-data/admin/registers.ts` alongside the stub
- * register fixtures. Those modules are all backend-driven now and the fixtures
- * are gone; this is the one piece of that file that was ever real.
  */
 
 const AVATAR_PALETTE = [

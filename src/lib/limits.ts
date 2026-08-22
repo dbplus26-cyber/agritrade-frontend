@@ -3,28 +3,28 @@
  * place so the two cannot drift apart silently.
  *
  * A review is a recommendation, not an essay, and the public site renders
- * three of them beside each other - which is what the old 2000-character cap
- * could never be laid out inside. The card clamps at seven lines, so anything
- * past this is only ever read by the moderator. Mirrors REVIEW_MAX_CHARS in
- * the backend's `validations/review-validation.ts` and the width of
- * `Review.text`.
+ * three of them beside each other - which a cap in the thousands of
+ * characters could never be laid out inside. The card clamps at seven lines,
+ * so anything past this is only ever read by the moderator. Mirrors
+ * REVIEW_MAX_CHARS in the backend's `validations/review-validation.ts` and the
+ * width of `Review.text`.
  */
 export const REVIEW_MAX_CHARS = 450;
 
 /**
  * How long a reviewer's name may be. Mirrors REVIEWER_NAME_MAX in the
  * backend's `validations/review-validation.ts` and the width of
- * `Review.authorName`. A name, not a sentence: at 150 it took the whole
- * footer line of the public review card and pushed the role/date stamp onto a
- * row of its own.
+ * `Review.authorName`. A name, not a sentence: much longer and it takes the
+ * whole footer line of the public review card, pushing the role/date stamp
+ * onto a row of its own.
  */
 export const REVIEWER_NAME_MAX = 50;
 
 /**
  * How long a buyer's name may be. Mirrors BUYER_NAME_MAX in the backend's
- * `validations/buyer-validation.ts` and the width of `Buyer.name`. The old
- * 150 was a paragraph, not a name, and the debtors report paid for it by
- * handing this one column most of the row.
+ * `validations/buyer-validation.ts` and the width of `Buyer.name`. A cap in
+ * the hundreds is a paragraph, not a name, and the debtors report pays for it
+ * by handing this one column most of the row.
  */
 export const BUYER_NAME_MAX = 80;
 
@@ -43,8 +43,8 @@ export const COMMODITY_NAME_MAX = 45;
  * COMMODITY_DESCRIPTION_MAX in the backend's
  * `validations/commodity-validation.ts` and the width of
  * `Commodity.description`. It is the SEASON note on the public lot file, not
- * the whole standard operating procedure: at 1000 it filled the file with a
- * wall of prose that pushed the enquiry button off the first screen.
+ * the whole standard operating procedure: much longer and it fills the file
+ * with a wall of prose that pushes the enquiry button off the first screen.
  */
 export const COMMODITY_DESCRIPTION_MAX = 350;
 
@@ -52,8 +52,8 @@ export const COMMODITY_DESCRIPTION_MAX = 350;
  * How long a land plot's display title may be. Mirrors LAND_PLOT_TITLE_MAX in
  * the backend's `validations/land-plot-validation.ts` and the width of
  * `LandPlot.locationText`. It heads the public plot card ("Kumbungu Road,
- * Plot 14") and is a title, not a description: at 200 it wrapped to four lines
- * and pushed the plot's own facts down the card.
+ * Plot 14") and is a title, not a description: much longer and it wraps to
+ * four lines, pushing the plot's own facts down the card.
  */
 export const LAND_PLOT_TITLE_MAX = 120;
 
@@ -61,8 +61,8 @@ export const LAND_PLOT_TITLE_MAX = 120;
  * How long a land plot's description may be. Mirrors
  * LAND_PLOT_DESCRIPTION_MAX in the backend's
  * `validations/land-plot-validation.ts` and the width of
- * `LandPlot.description`. Halved from 2000 because the public plot card prints
- * it IN FULL - a plot has no page of its own to carry the rest.
+ * `LandPlot.description`. Kept short because the public plot card prints it
+ * IN FULL - a plot has no page of its own to carry the rest.
  */
 export const LAND_PLOT_DESCRIPTION_MAX = 1000;
 
@@ -72,8 +72,8 @@ export const LAND_PLOT_DESCRIPTION_MAX = 1000;
  *
  * Checked client-side so an oversized pick fails at the moment it is picked,
  * naming the actual problem. Without it a field agent on a rural connection
- * uploaded a 15MB scan for a minute before the server rejected it, and the
- * only thing the app could say afterwards was that something went wrong.
+ * spends a minute uploading a 15MB scan before the server rejects it, and the
+ * only thing the app can say afterwards is that something went wrong.
  * The server limit is still the one that counts - this just stops the wasted
  * round trip, and it cannot be the only check.
  *

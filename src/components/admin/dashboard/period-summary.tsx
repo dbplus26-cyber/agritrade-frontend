@@ -47,8 +47,8 @@ function Tile({
     figure === null ? MONEY_HIDDEN : (format ?? formatCedisCompact)(figure);
   return (
     <AdminCard className="min-w-0 px-3 py-2.5">
-      {/* The label owns its own line. Sharing a row with the trend badge made
-          them collide at 280px ("PURCHASE▲33.8%"), and the badge reads better
+      {/* The label owns its own line. Sharing a row with the trend badge
+          collides at 280px ("PURCHASE▲33.8%"), and the badge reads better
           beside the figure it describes anyway. */}
       <div className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         <span className="min-w-0">{label}</span>
@@ -74,8 +74,8 @@ function Tile({
 }
 
 /**
- * The windowed flow strip (design doc 9): money out, money in, sales confirmed
- * and expenses over the selected window, each with a period-over-period trend.
+ * The windowed flow strip: money out, money in, sales confirmed and expenses
+ * over the selected window, each with a period-over-period trend.
  * Owns its own query so it loads independently of the rest of the board.
  */
 export function PeriodSummary({ window }: { window: IReportWindow }) {

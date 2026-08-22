@@ -77,15 +77,14 @@ function ActiveTag({ label }: { label: string }) {
 
 /**
  * One line in the mobile menu. The drawer is a plain list of destinations and
- * nothing else: it used to carry two stencilled group captions, a numeral or a
- * gold dash in a left column, a tinted active row with a rail AND an
- * ink-stroke under the label, and rules between every entry - so choosing a
- * page meant reading past five kinds of decoration to find seven words.
+ * nothing else: group captions, left-column numerals, tinted active rows and
+ * rules between entries would all be decoration to read past on the way to
+ * seven words.
  *
- * What is left is the word, at a size worth tapping, on 56px rows with no
- * dividers. The current page is still marked by SHAPE as well as colour - a
- * single gold rail on the leading edge, plus the heavier weight - and still
- * carries aria-current for assistive tech.
+ * So each row is the word alone, at a size worth tapping, on 56px rows with no
+ * dividers. The current page is marked by SHAPE as well as colour - a single
+ * gold rail on the leading edge, plus the heavier weight - and carries
+ * aria-current for assistive tech.
  */
 function MobileNavItem({
   active,
@@ -245,8 +244,8 @@ export function SiteHeader() {
       <div className="flex h-16 items-center justify-between border-b border-soil/16 px-5 lg:hidden">
         <BrandMark />
         <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-          {/* Icon only - the word "MENU" alongside it was noise. The label
-              lives on aria-label so the control still announces itself. */}
+          {/* Icon only, with the label on aria-label so the control still
+              announces itself. */}
           <SheetTrigger
             aria-label="Open menu"
             className="flex size-11 cursor-pointer items-center justify-center rounded-[2px] border-2 border-forest text-forest shadow-doc-sm transition-colors active:bg-harvest/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
@@ -266,7 +265,7 @@ export function SiteHeader() {
             // No gradient here: `.texture-grain` owns background-image (it is
             // declared after Tailwind's utilities and wins), and tailwind-merge
             // reads the v3-era `bg-gradient-to-b` as a background COLOUR, which
-            // silently dropped `bg-surface` and left the panel see-through.
+            // would silently drop `bg-surface` and leave the panel see-through.
             className="texture-grain flex flex-col gap-0 border-l-0 bg-surface p-0 shadow-[-10px_0_34px_-16px_rgb(31_33_28/0.6)] duration-[280ms] ease-[cubic-bezier(.22,.9,.3,1)] data-[side=right]:w-[min(330px,86vw)] data-[state=open]:slide-in-from-right-full data-[state=closed]:slide-out-to-right-full"
           >
             {/* A gold thread runs under the brand: one warm line is what stops
@@ -284,9 +283,10 @@ export function SiteHeader() {
               </div>
               <SheetTitle className="sr-only">Site menu</SheetTitle>
             </SheetHeader>
-            {/* One flat list, in the order the site is read. Services used to
-                sit in their own captioned branch, which cost two extra rows of
-                chrome to say something the page titles already say. */}
+            {/* One flat list, in the order the site is read. The services sit
+                inline rather than in a captioned branch of their own, which
+                would cost two extra rows of chrome to say something the page
+                titles already say. */}
             <nav
               aria-label="Primary"
               className="flex flex-1 flex-col py-3 overflow-y-auto overscroll-contain"
@@ -308,9 +308,9 @@ export function SiteHeader() {
             </nav>
             {/* One action, pinned clear of the home indicator: calling is what
                 a visitor on a phone actually wants, and WhatsApp follows as a
-                quiet second line rather than a second slab. The stencilled
-                caption and the address that used to sit here were repeating
-                the contact page at the bottom of a menu. */}
+                quiet second line rather than a second slab. No stencilled
+                caption and no address: that is the contact page repeated at
+                the bottom of a menu. */}
             <div className="mt-auto border-t border-soil/12 bg-surface-alt/50 px-6 pb-[calc(20px+env(safe-area-inset-bottom,0px))] pt-4">
               {contact.hasPhone ? (
                 <a

@@ -352,10 +352,10 @@ export function ArrivalDialog({
 
   /** The "weigh it later" path the backend explicitly allows. */
   const onArriveWithoutFigures = async () => {
-    // The owner's own example of a one-click, one-way action. It is the whole
-    // transition on a single tap - and on a phone it is a text link sitting a
-    // scroll away from a form the operator may have half filled, so it is the
-    // easiest button on this screen to hit by accident.
+    // A one-click, one-way action: the whole transition on a single tap - and
+    // on a phone it is a text link sitting a scroll away from a form the
+    // operator may have half filled, so it is the easiest button on this
+    // screen to hit by accident.
     const ok = await confirm({
       title: "Mark this trip arrived?",
       description: `${shipment.transactionNo} stops being on the road and the goods count as delivered${

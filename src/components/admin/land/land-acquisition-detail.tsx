@@ -477,7 +477,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
       <DetailShell
         aside={
           <AdminCard className="px-5 py-3">
-            {/* Which plot, from whom - what the heading used to carry. */}
+            {/* Which plot, and from whom. */}
             <Row label="Reference">{a.reference}</Row>
             <Row label="Seller">
               <Link

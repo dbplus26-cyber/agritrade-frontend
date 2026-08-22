@@ -348,8 +348,8 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
     }
   };
 
-  // At rest an existing record READS. The form is what you get after
-  // pressing Edit, not a greyed-out copy of the page you were already on.
+  // At rest an existing record READS. The form appears after Edit is pressed,
+  // rather than as a greyed-out copy of the record already on screen.
   if (isEdit && !isEditing && seller) {
     return (
       <AdminCard className="max-w-[640px] px-5 py-[18px]">

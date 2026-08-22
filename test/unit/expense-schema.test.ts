@@ -1,7 +1,7 @@
 // test/unit/expense-schema.test.ts
 //
-// Recording a cost now moves money in the same act, so the form carries the
-// payment rules the settlement screen used to carry alone. The two that matter
+// Recording a cost moves money in the same act, so the form carries the
+// payment rules the settlement screen carries. The two that matter
 // are the two the server refuses on (ACCOUNT_REQUIRED, REFERENCE_REQUIRED): a
 // bank or mobile-money payment has to say which account it moved on and quote
 // the reference the statement will be matched against. Cash needs neither -

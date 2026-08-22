@@ -1,10 +1,10 @@
 // test/component/FarmCashSource.test.tsx
 //
-// The farming-investment book, once it can say where the money went and where
-// it came from. What is pinned here is what the schemas alone cannot say - that
-// the forms ASK, that the answers reach the wire in the one shape the API
-// accepts, and that a cash repayment READS correctly everywhere the old
-// produce-only fields used to be printed straight:
+// The farming-investment book saying where the money went and where it came
+// from. What is pinned here is what the schemas alone cannot say - that the
+// forms ASK, that the answers reach the wire in the one shape the API accepts,
+// and that a cash repayment READS correctly wherever the produce fields are
+// printed:
 //
 //   * a grant names the account that funded it OR says why no company money
 //     moved, never both and never neither (CASH_SOURCE_AMBIGUOUS /

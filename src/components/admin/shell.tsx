@@ -134,7 +134,7 @@ function UserAvatar({ size = 30 }: { size?: number }) {
   );
 }
 
-/** Top-right profile menu (dms-frontend convention): avatar trigger opening
+/** Top-right profile menu: avatar trigger opening
  * an account card with the profile link and sign out. */
 function NavbarUser() {
   const user = useCurrentUser();
@@ -277,7 +277,7 @@ const GROUP_ICON: Record<string, LucideIcon> = {
 };
 
 /** The rail itself - shadcn Sidebar pinned to the console's exact look, with
- * each nav group rendered as a collapsible dropdown (dms-frontend convention).
+ * each nav group rendered as a collapsible dropdown.
  * The group that owns the active screen starts open and reopens on navigation.
  * On mobile shadcn renders it as a sheet, opened from the Menu tab below. */
 function ConsoleSidebar({ activeKey }: { activeKey: string }) {
@@ -485,10 +485,10 @@ function MobileMenuButton() {
 }
 
 /**
- * The console chrome (from the DB Plus Console design), built on the shadcn
- * Sidebar: 224px white rail with collapsible grouped nav + a sign-out footer, a
- * 54px breadcrumb topbar with the account menu (top right, dms-frontend style);
- * on a phone a hamburger on the topbar opens the same rail as a sheet.
+ * The console chrome, built on the shadcn Sidebar: 224px white rail with
+ * collapsible grouped nav + a sign-out footer, a 54px breadcrumb topbar with
+ * the account menu (top right); on a phone a hamburger on the topbar opens the
+ * same rail as a sheet.
  */
 /** Breadcrumb beside the rail trigger: DB Plus / Section / (New | Detail).
  * The section links back to its register when a sub-page is open, and the
@@ -548,10 +548,10 @@ function Crumbs() {
  * on screen.
  *
  * Desktop only. On a phone or tablet the credit line is dead weight at the end
- * of every scroll, and below `md` it sat on top of the tab bar's clearance as
- * well. `hidden` is display:none, so the manuru link leaves the tab order with
- * it - nothing to trap focus. The tab-bar clearance it used to carry now lives
- * on SidebarInset, which is the element that still needs it.
+ * of every scroll, and below `md` it would sit on top of the tab bar's
+ * clearance. `hidden` is display:none, so the manuru link leaves the tab order
+ * with it - nothing to trap focus. The tab-bar clearance itself lives on
+ * SidebarInset, the element that needs it.
  */
 function ConsoleFooter() {
   return (
@@ -594,12 +594,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const activeKey = activeNavKey(pathname);
 
   return (
-    // PRINT DROPS THE CONSOLE. A statement or a waybill is a document, and
-    // printing one used to put the rail, the topbar, the crumbs and the footer
-    // on the paper with it - the screens each hid their own chrome with
-    // `print:hidden`, but nothing hid the shell they sit inside, which is
-    // most of what ends up on the page. Hidden here, once, rather than by
-    // every printable screen remembering to reach up and do it.
+    // PRINT DROPS THE CONSOLE. A statement or a waybill is a document, so the
+    // rail, the topbar, the crumbs and the footer must not land on the paper
+    // with it - each screen hides its own chrome with `print:hidden`, but only
+    // this hides the shell they sit inside, which is most of what would end up
+    // on the page. Hidden here, once, rather than by every printable screen
+    // remembering to reach up and do it.
     <SidebarProvider style={SIDEBAR_VARS}>
       <div className="contents print:hidden">
         <ConsoleSidebar activeKey={activeKey} />
@@ -629,9 +629,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </span>
           <Crumbs />
           <div className="flex-1" />
-          {/* The notifications bell returns here when the notifications feed
-              ships (Step 7) - an inert bell with a badge would advertise an
-              unbuilt feature. */}
+          {/* The notifications bell belongs here once the notifications feed
+              ships - an inert bell with a badge would advertise an unbuilt
+              feature. */}
           <NavbarUser />
         </header>
 

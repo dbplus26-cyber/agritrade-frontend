@@ -19,7 +19,7 @@ import { useGetFarmerStatementQuery } from "@/redux/farm/farm-books-api";
 import { formatFarmDate } from "./farm-bits";
 
 /**
- * A print-friendly farmer statement (design doc 5.11, ADR-004): every grant
+ * A print-friendly farmer statement: every grant
  * (+value owed) and repayment (-value) with a running balance, from live data.
  * A4-styled via `print:` utilities. Optionally scoped to one season.
  */
@@ -30,9 +30,8 @@ export function FarmerStatement({
   id: string;
   seasonId?: string;
 }) {
-  // Empty means "all history", which is what the statement used to be able to
-  // print and nothing else. A window narrows it to a period the office is
-  // actually reconciling.
+  // Empty means "all history". A window narrows the statement to a period the
+  // office is actually reconciling.
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const { data, isLoading, isError, error, refetch } =

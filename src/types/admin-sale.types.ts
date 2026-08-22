@@ -1,8 +1,8 @@
 // src/types/admin-sale.types.ts
 //
-// The admin sales surface (design doc 5.5), mirroring the backend DTOs. Every
-// money field is `number | null`: the API redacts prices, totals and balances
-// for staff without financial visibility (design doc 8.3), just like purchases.
+// The admin sales surface, mirroring the backend DTOs. Every money field is
+// `number | null`: the API redacts prices, totals and balances for staff
+// without financial visibility, just like purchases.
 import type { IPaginationMeta } from "./api";
 import type { ShipmentStatus } from "./admin-shipment.types";
 

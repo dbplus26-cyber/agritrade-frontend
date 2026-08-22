@@ -1,19 +1,18 @@
 // test/unit/farm-schema.test.ts
 //
-// The two things the farming-investment book could not say.
+// The two things the farming-investment book has to be able to say.
 //
-// A grant is money the business spent funding a farmer, and it used to name no
-// account at all - so the financial statement counted the outstanding grant as
-// a receivable and read it as cash gone, while the cash book said every account
-// was untouched. A grant now names the account that funded it, or says why no
-// company money moved, and never both (CASH_SOURCE_AMBIGUOUS /
-// CASH_SOURCE_REQUIRED).
+// A grant is money the business spent funding a farmer, so it names the
+// account that funded it, or says why no company money moved, and never both
+// (CASH_SOURCE_AMBIGUOUS / CASH_SOURCE_REQUIRED). A grant naming no account at
+// all leaves the financial statement counting the outstanding grant as a
+// receivable and reading it as cash gone, while the cash book says every
+// account is untouched.
 //
-// A repayment used to take a commodity, a weight and a rate and nothing else,
-// so a farmer who had a bad season and settled in cash had nowhere in the
-// system to be recorded. It now arrives in one of two shapes and the shapes do
-// not mix (REPAYMENT_SHAPE): a cash repayment carrying a weight would put grain
-// the farmer never delivered into the season's yield.
+// A repayment arrives in one of two shapes and the shapes do not mix
+// (REPAYMENT_SHAPE): a farmer who had a bad season settles in cash, and a cash
+// repayment carrying a commodity, a weight and a rate would put grain the
+// farmer never delivered into the season's yield.
 //
 // Tested at the schema rather than through the forms on purpose: these are the
 // rules, the forms only render them. The backend refuses the same mistakes, but

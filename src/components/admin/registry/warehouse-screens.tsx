@@ -89,7 +89,7 @@ export function WarehouseTable() {
     resetFilters,
     queryParams,
   } = useTableQuery({ defaults: FILTER_DEFAULTS });
-  // Only the owner edits this vocabulary (design doc 4).
+  // Only the owner edits this vocabulary.
   const { isSuperAdmin } = useAuthRole();
   const { has } = usePermissions();
   const canManage = isSuperAdmin || has("VOCABULARY_MANAGE");
@@ -292,7 +292,7 @@ function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
 
   // A background refetch can bump the record (another tab, a lifecycle
   // action). Track the fresh values while reading, but never clobber an
-  // in-progress edit - which is why the parent no longer key-remounts the
+  // in-progress edit - which is why the parent does not key-remount the
   // form on updatedAt.
   useEffect(() => {
     if (!isEditing) reset(toWarehouseValues(warehouse));
@@ -337,8 +337,8 @@ function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
     }
   };
 
-  // At rest an existing record READS. The form is what you get after
-  // pressing Edit, not a greyed-out copy of the page you were already on.
+  // At rest an existing record READS. The form appears after Edit is pressed,
+  // rather than as a greyed-out copy of the record already on screen.
   if (isEdit && !isEditing && warehouse) {
     return (
       <AdminCard className="px-5 py-[18px]">

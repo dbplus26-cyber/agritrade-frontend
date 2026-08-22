@@ -1,9 +1,9 @@
 /**
- * Retry-safe draft persistence for the field forms (design doc 8.1): the
- * form's values AND its idempotency key survive reloads and dead zones in
- * localStorage, and are cleared only on a confirmed success. The same key
- * retried against the backend returns the original record - never a
- * duplicate charge on the float.
+ * Retry-safe draft persistence for the field forms: the form's values AND its
+ * idempotency key survive reloads and dead zones in localStorage, and are
+ * cleared only on a confirmed success. The same key retried against the
+ * backend returns the original record - never a duplicate charge on the
+ * float.
  */
 
 export interface Draft<T> {

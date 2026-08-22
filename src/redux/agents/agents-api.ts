@@ -44,8 +44,8 @@ export const agentsApi = apiSlice.injectEndpoints({
     /**
      * Both pots at once: what this person is HOLDING and what they have SENT of
      * the company's money. The float ledger beside it walks held accounts only,
-     * and a send on authority never touches one - so on its own it showed a
-     * person who had moved thousands as having spent nothing.
+     * and a send on authority never touches one - so on its own it shows a
+     * person who has moved thousands as having spent nothing.
      *
      * Tagged with FloatLedger so a top-up or a reconciliation refreshes the
      * summary in the same beat as the ledger under it; a card that disagrees

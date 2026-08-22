@@ -240,9 +240,9 @@ function SettingsForm({
           because there is no create mode and Save is additionally gated on
           isDirty. The key on every branch is load-bearing: an unkeyed branch
           lets React reuse the same <button> DOM node across the swap, so
-          clicking "Edit settings" flipped that very element to type="submit"
-          before the browser ran the click's default action and the form
-          PATCHed itself while still locked. */}
+          clicking "Edit settings" flips that very element to type="submit"
+          before the browser runs the click's default action and the form
+          PATCHes itself while still locked. */}
       <CommitRow className="sm:justify-start">
         {isEditing ? (
           <Fragment key="editing">

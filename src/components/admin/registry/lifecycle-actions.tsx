@@ -39,13 +39,12 @@ export function LifecycleActions({
    * Deliberately NOT gated by a confirmation.
    *
    * Retiring is undone by the same button, which turns into Activate the
-   * moment it lands - and it used to raise a dialog while sitting in the same
-   * row, at the same weight, as Delete. Deactivate is the one of the pair
-   * people actually use, so that dialog was teaching them that the dialog in
-   * this row is the thing you dismiss on the way to what you wanted. The
-   * sentence it carried is now printed under the buttons where it is read
-   * BEFORE the click rather than after it, and the friction is spent where it
-   * cannot be won back: on Delete.
+   * moment it lands. Deactivate is the one of the pair people actually use, so
+   * a dialog on it - sitting in the same row, at the same weight, as Delete -
+   * would only teach them that the dialog in this row is the one to dismiss on
+   * the way to what they wanted. The sentence such a dialog would carry is
+   * printed under the buttons instead, where it is read BEFORE the click, and
+   * the friction is spent where it cannot be won back: on Delete.
    */
   const toggleActive = async () => {
     try {
@@ -61,8 +60,8 @@ export function LifecycleActions({
   const remove = async () => {
     // The server refuses this while anything references the record, so the
     // dialog says what that check means rather than repeating it: a delete
-    // that goes through took a record nothing was using, and a delete that is
-    // refused is telling you to deactivate instead.
+    // that goes through took a record nothing was using, and a refused delete
+    // means deactivating is the answer instead.
     const ok = await confirm({
       title: `Delete ${name}?`,
       description: `This takes the ${noun} off the register for good. The server refuses it while anything at all still references the record, so if it goes through, nothing was using it - and deactivating is the answer for a ${noun} that something was.`,
@@ -82,8 +81,7 @@ export function LifecycleActions({
     }
   };
 
-  // The register vocabulary is the owner's to change (design doc 4); staff
-  // read it. The API refuses these writes either way - this keeps staff from
+  // The register vocabulary is the owner's to change; staff read it. The API refuses these writes either way - this keeps staff from
   // being offered a button that can only fail.
   if (!isSuperAdmin) return null;
 
@@ -107,7 +105,7 @@ export function LifecycleActions({
         </AdminButton>
       </ActionRow>
       {/* What the ungated button does, standing where it is read before the
-          tap. This is the sentence the deactivate dialog used to carry. */}
+          tap rather than inside a dialog after it. */}
       <p className="mt-2 text-[12.5px] text-adm-muted">
         {isActive
           ? `Deactivating stops new transactions offering this ${noun}; history and reports keep it, and you can activate it again from here.`

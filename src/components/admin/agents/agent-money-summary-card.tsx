@@ -14,14 +14,14 @@ import type { IAgentMoneySummary } from "@/types/agent.types";
  *
  * The float ledger below this card walks their held accounts, and a send made
  * on spending authority debits the company's Hubtel wallet without ever
- * touching one. So the ledger alone showed an agent who had moved thousands of
- * the company's money as having spent nothing, and there was nothing on the
- * page to say a second pot existed at all.
+ * touching one. The ledger alone therefore reads an agent who has moved
+ * thousands of the company's money as having spent nothing, and says nothing
+ * about the second pot existing at all.
  *
  * The two pots are laid out side by side and DELIBERATELY never added. A
  * balance is money the person must produce at a handover; a cap is permission
- * that expires unused. One number for both is exactly what the old float was,
- * and what everything since has been unpicking.
+ * that expires unused. One number for both makes an agent's position
+ * unreadable.
  */
 
 /**
@@ -186,8 +186,8 @@ export function AgentMoneySummaryCard({ agentUserId }: { agentUserId: string }) 
         </div>
       </div>
 
-      {/* Said outright, because the whole reason this card exists is that the
-          two used to be one number. */}
+      {/* Said outright, because the whole reason this card exists is to keep
+          the two figures apart. */}
       <p className="mt-3 border-t border-adm-line pt-2 text-[11.5px] text-adm-faint">
         These two are never added. What they hold is cash they must produce;
         what they may send is permission that leaves nothing in their hands.

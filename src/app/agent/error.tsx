@@ -6,12 +6,12 @@ import Link from "next/link";
 import { ActionRow, AdminButton, AdminCard, Mono } from "@/components/admin/ui";
 
 /**
- * The field app's error boundary. The console got one; /agent did not, so a
- * crash out in the field fell all the way to the ROOT boundary and painted
- * the public site's paper-and-stamp card - customer wording, customer
- * chrome, and a link to the contact page rather than a way back to work.
- * This boundary sits inside the agent layout, so the shell and the bottom
- * tabs stay put and only the failed screen is replaced.
+ * The field app's error boundary. Without it a crash out in the field falls
+ * all the way to the ROOT boundary and paints the public site's
+ * paper-and-stamp card - customer wording, customer chrome, and a link to
+ * the contact page rather than a way back to work. This boundary sits inside
+ * the agent layout, so the shell and the bottom tabs stay put and only the
+ * failed screen is replaced.
  *
  * The wording matters more here than in the console: an agent whose purchase
  * screen just died is standing at a village scale with a farmer waiting, and

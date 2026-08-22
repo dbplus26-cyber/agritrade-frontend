@@ -60,7 +60,7 @@ export function CommodityTable() {
     resetFilters,
     queryParams,
   } = useTableQuery({ defaults: FILTER_DEFAULTS });
-  // Only the owner edits this vocabulary (design doc 4).
+  // Only the owner edits this vocabulary.
   const { isSuperAdmin } = useAuthRole();
   const { has } = usePermissions();
   const canManage = isSuperAdmin || has("VOCABULARY_MANAGE");

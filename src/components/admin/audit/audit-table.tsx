@@ -52,10 +52,9 @@ const actionLabel = (action: string): string => {
   return words.charAt(0).toUpperCase() + words.slice(1);
 };
 
-// columnMeta lives in registry-bits and is shared by every register table.
-// This file used to keep a private copy of it, which had already drifted -
-// it never gained `at` or `className`, so the audit log could not express a
-// breakpoint other than xl, and a stretch column was not expressible at all.
+// columnMeta lives in registry-bits and is shared by every register table, so
+// the audit log can express any breakpoint through `at` and a stretch column
+// through `className`.
 
 /**
  * The audit-log register (super-admin): server-driven like the users table -
@@ -112,8 +111,8 @@ export function AuditTable() {
     () => [
       // Every column declares an accessorFn: the mobile card renderer tells a
       // labelled DATA row from a trailing ACTION by its presence, and without
-      // it every column tipped into the unlabelled actions bucket - which is
-      // what made an audit row on a phone read as a scattered pile of values.
+      // it every column tips into the unlabelled actions bucket - which makes
+      // an audit row on a phone read as a scattered pile of values.
       {
         id: "time",
         accessorFn: (log) => log.createdAt,

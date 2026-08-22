@@ -14,7 +14,7 @@ import { notify } from "@/lib/notify";
  * The field app's chrome: one slim top bar (brand, who is signed in, profile,
  * sign out) over a narrow column. Deliberately light - agents work on slow
  * rural connections, so no sidebar, no heavy tables, no decoration that costs
- * bytes (design doc 8.6).
+ * bytes.
  */
 export function AgentShell({ children }: { children: ReactNode }) {
   const router = useRouter();

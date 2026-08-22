@@ -141,8 +141,7 @@ export const driverSettlementApi = apiSlice.injectEndpoints({
         { type: "Shipments", id: shipmentId },
         { type: "DriverSettlement", id: "UNSETTLED" },
         // Money left (or came back to) a company account: the account's
-        // history and every cash-book view moved with it. The sale and land
-        // books already invalidated both; this book silently did not.
+        // history and every cash-book view moved with it.
         { type: "PaymentAccounts", id: "HISTORY" },
         "CashBook",
       ],
@@ -162,8 +161,7 @@ export const driverSettlementApi = apiSlice.injectEndpoints({
         { type: "Shipments", id: shipmentId },
         { type: "DriverSettlement", id: "UNSETTLED" },
         // Money left (or came back to) a company account: the account's
-        // history and every cash-book view moved with it. The sale and land
-        // books already invalidated both; this book silently did not.
+        // history and every cash-book view moved with it.
         { type: "PaymentAccounts", id: "HISTORY" },
         "CashBook",
       ],

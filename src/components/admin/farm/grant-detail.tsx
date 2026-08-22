@@ -80,9 +80,9 @@ export function GrantDetail({ id }: { id: string }) {
             {/* Who took what */}
             <AdminCard className="px-5 py-4">
               <SectionHeading className="mb-2">Who took what</SectionHeading>
-              {/* The photo sits BESIDE the link, not inside it: it is now a
-                  ViewablePhoto, which is a button when there is something to
-                  open, and a button nested in an anchor is invalid markup.
+              {/* The photo sits BESIDE the link, not inside it: a
+                  ViewablePhoto is a button when there is something to open,
+                  and a button nested in an anchor is invalid markup.
                   Keeping them siblings also keeps the underline on the NAME. */}
               <div className="flex min-w-0 items-center gap-2.5">
                 <ViewablePhoto
@@ -111,8 +111,8 @@ export function GrantDetail({ id }: { id: string }) {
                 </Link>
               </div>
               <DetailGrid className="mt-3 border-t border-adm-hairline pt-1">
-                {/* The grant's own number. It was the page heading; the
-                    heading names the page now, so the record names itself. */}
+                {/* The grant's own number, filed as a fact: the page heading
+                    names the page, so the record names itself here. */}
                 <DetailItem label="Grant no" mono strong>
                   {g.transactionNo}
                 </DetailItem>
@@ -136,9 +136,9 @@ export function GrantDetail({ id }: { id: string }) {
                   <Money value={g.valueGhs} />
                 </DetailItem>
                 {/* Beside the figure it belongs to. A grant that shows what it
-                    cost and says nothing about where that came from is the
-                    record this page used to keep: the statement spent it, the
-                    cash book never heard of it. `full` only when a reason has
+                    cost and says nothing about where that came from leaves the
+                    statement spending money the cash book never heard of.
+                    `full` only when a reason has
                     to be read - an account label is a phrase, a reason is up to
                     300 characters of prose and takes the row. */}
                 <DetailItem

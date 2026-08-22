@@ -21,8 +21,8 @@ export interface SimpleSelectOption {
  * One rendered control wrapping ui/select, so every dropdown in the system
  * opens the same squared panel as the account menu - the same top hairline,
  * the same forest base rule, no shadow - instead of the platform's own
- * picker. Native `<select>`s used to sit beside rendered ones and every OS
- * drew its popup differently; this is the replacement for all of them.
+ * picker. A native `<select>` beside a rendered one has its popup drawn by
+ * the OS, differently on every one of them.
  *
  * Drop-in for a styled native select: string value in, string value out.
  * Pass the same field class the native select wore (adminSelectClass, a form
@@ -46,7 +46,7 @@ export function SimpleSelect({
   value: string | undefined;
   onChange: (value: string) => void;
   options: readonly SimpleSelectOption[];
-  /** Shown while no value is picked (the old empty first option's text). */
+  /** Shown while no value is picked. */
   placeholder?: string;
   disabled?: boolean;
   id?: string;

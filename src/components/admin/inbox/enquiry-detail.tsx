@@ -63,13 +63,13 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
   /**
    * Sends the reply and records it.
    *
-   * This used to be a `mailto:` link. That hands the job to whatever mail
-   * client the machine has - nothing at all on a machine with none configured,
-   * which is why it looked like the button did nothing - and whatever was
-   * eventually typed lived in one person's sent folder, so the console still
-   * showed the enquiry as unanswered. The endpoint behind this sends the email
-   * AND stores the text, and it reports `delivered` from the real outcome, so
-   * a bounce is visible rather than assumed away.
+   * Not a `mailto:` link: that hands the job to whatever mail client the
+   * machine has - nothing at all on a machine with none configured, so the
+   * button reads as dead - and whatever is eventually typed lives in one
+   * person's sent folder, leaving the console showing the enquiry as
+   * unanswered. The endpoint behind this sends the email AND stores the text,
+   * and it reports `delivered` from the real outcome, so a bounce is visible
+   * rather than assumed away.
    */
   const onReply = async () => {
     const body = replyBody.trim();
@@ -150,9 +150,9 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
             {/* The message itself, filed as a document. */}
             <AdminCard className="px-5 py-[18px]">
               {/* The subject titles the message, so it is the card's heading -
-                  as a muted uppercase eyebrow it read quieter than the
+                  as a muted uppercase eyebrow it reads quieter than the
                   "replies sent" heading a few lines below it, and uppercasing
-                  a sentence the sender wrote themselves lost their emphasis. */}
+                  a sentence the sender wrote themselves loses their emphasis. */}
               <SectionHeading className="mb-3">
                 {enquiry.subject}
               </SectionHeading>
@@ -240,9 +240,9 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
             </AdminCard>
 
             {/* Provenance as a fact GRID, not label-left/value-right rows.
-                Spreading each pair to opposite edges of a full-width card put
+                Spreading each pair to opposite edges of a full-width card puts
                 40rem of nothing between "Reference" and its value, so nothing
-                read as a pair; DetailItem stacks the label directly
+                reads as a pair; DetailItem stacks the label directly
                 over its value with a hairline under each, and the grid packs
                 three of them per row on a wide console. */}
             <AdminCard className="px-5 py-3">
@@ -250,8 +250,8 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
                 Sender &amp; provenance
               </SectionHeading>
               <DetailGrid>
-                {/* Who sent it. This was the page heading; the heading now
-                    names the page, so the record names the sender. */}
+                {/* Who sent it: the heading names the page, so the record
+                    names the sender. */}
                 <DetailItem label="From" strong>
                   {enquiry.fullName}
                 </DetailItem>

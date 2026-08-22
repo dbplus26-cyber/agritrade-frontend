@@ -2,11 +2,11 @@
 //
 // The picker that answers "where did this money actually end up".
 //
-// It used to offer the payment-accounts register, which answers a different
-// question - where customers send money - and so could only ever name a
-// company account. An agent who collects GHS 3,000 at a roadside is holding
-// it, and booking that to the office till says the money is in a box it is
-// not in. What is worth pinning here:
+// Not the payment-accounts register, which answers a different question -
+// where customers send money - and so can only ever name a company account.
+// An agent who collects GHS 3,000 at a roadside is holding it, and booking
+// that to the office till says the money is in a box it is not in. What is
+// worth pinning here:
 //
 //   * held accounts are offered, kept under their own heading, and read as
 //     the person holding the money;

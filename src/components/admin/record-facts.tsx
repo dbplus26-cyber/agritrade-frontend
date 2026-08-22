@@ -4,15 +4,14 @@ import { cn } from "@/lib/utils";
 /**
  * The resting state of a record's detail page.
  *
- * These screens used to show their EDIT FORM at rest, greyed out - every
- * value sealed inside a disabled input, long ones clipped at the input's
- * edge with no way to read the rest, and a page of identical grey boxes with
- * no visual hierarchy at all. It looked like a form somebody had switched
- * off, because that is exactly what it was.
+ * A record at rest should READ, not sit in a greyed-out edit form: a disabled
+ * input seals its value in, clips a long one at the input's edge with no way
+ * to read the rest, and turns the page into identical grey boxes with no
+ * hierarchy at all.
  *
- * A record at rest should READ. So the locked state renders the facts
- * plainly: label above value, values free to wrap to their full length, and
- * the empty ones honestly marked rather than shown as an empty box. The form
+ * So the locked state renders the facts plainly: label above value, values
+ * free to wrap to their full length, and the empty ones honestly marked
+ * rather than shown as an empty box. The form
  * appears only once Edit is pressed, when a form is actually what the reader
  * wants.
  */
@@ -47,21 +46,19 @@ export function RecordFacts({
   return (
     // Its OWN container, and container queries rather than `xl:`.
     //
-    // The split used to be `xl:grid-cols-2`, which fires on the VIEWPORT. On a
-    // detail page the facts often sit in a ~340px rail beside the main column,
-    // so a wide window forced that rail into two ~155px columns: a name took
-    // half a card it should have had all of, and wrapped inside it. The width
-    // that decides whether two columns fit is this block's own, never the
-    // window's.
+    // A viewport query (`xl:grid-cols-2`) is wrong here. On a detail page the
+    // facts often sit in a ~340px rail beside the main column, so a wide window
+    // would force that rail into two ~155px columns: a name takes half a card
+    // it should have all of, and wraps inside it. The width that decides
+    // whether two columns fit is this block's own, never the window's.
     //
     // Splitting at @lg (32rem) means each column still clears ~15rem after the
-    // gap - the floor the old auto-fit `minmax` was there to guarantee. Below
-    // that it is one full-width column, which is what a rail always gets.
-    // Fixed tracks also settle the other half of that old problem: DetailItem
-    // wraps values with `overflow-wrap: anywhere`, whose min-content is a
-    // single character, and a content-sized track collapses that far - a whole
-    // record once rendered as a column of single letters. `grid-cols-*` tracks
-    // are `minmax(0,1fr)`, so they hold their share regardless.
+    // gap. Below that it is one full-width column, which is what a rail always
+    // gets. Fixed tracks matter as much as the breakpoint: DetailItem wraps
+    // values with `overflow-wrap: anywhere`, whose min-content is a single
+    // character, so a content-sized track collapses that far and renders a
+    // whole record as a column of single letters. `grid-cols-*` tracks are
+    // `minmax(0,1fr)`, so they hold their share regardless.
     <div className={cn("@container", className)}>
       <div
         className={cn(

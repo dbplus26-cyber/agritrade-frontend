@@ -161,7 +161,7 @@ export function ExpenseDetail({ id }: { id: string }) {
 
       {/* Whether the money has actually gone out. Directly under the figure
           because "we owe this" and "we have paid this" are one thought, and
-          the page used to answer only the first half of it. */}
+          the page has to answer both halves of it. */}
       <ExpenseSettlementCard
         amountGhs={showMoney ? expense.amountGhs : null}
         expenseId={expense.id}

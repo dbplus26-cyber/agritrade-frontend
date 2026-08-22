@@ -134,12 +134,12 @@ export function SearchableSelect({
         // and responsive bottom sheets (z-[70]).
         // Exactly the trigger's width, with no floor under it.
         //
-        // It used to carry `min-w-[min(92vw,240px)]`, and a min-width outranks
-        // the width beside it: any control narrower than 240px - a picker in a
-        // detail rail, one half of a 2-up field pair on a phone - opened a
-        // panel wider than itself, overhanging the control it belonged to. The
-        // 92vw cap stays only as a last guard against a trigger that is itself
-        // near the screen width.
+        // No min-width: a min-width outranks the width beside it, so any
+        // control narrower than the floor - a picker in a detail rail, one half
+        // of a 2-up field pair on a phone - would open a panel wider than
+        // itself, overhanging the control it belongs to. The 92vw cap stays
+        // only as a last guard against a trigger that is itself near the screen
+        // width.
         className="z-[80] w-[var(--radix-popover-trigger-width)] max-w-[92vw] min-w-0 rounded-none border-0 border-t-[1.5px] border-b-[3px] border-t-soil/50 border-b-forest bg-surface p-0 shadow-none ring-0"
       >
         {/* shouldFilter={false} in remote mode: the server has already
@@ -186,13 +186,13 @@ export function SearchableSelect({
                   {o.label}
                 </span>
                 {/* The hint has to be able to GIVE WAY.
-                    It was flex-none, so a long one took whatever width it
-                    wanted and squeezed the label beside it - and the label
-                    wraps with `overflow-wrap: anywhere`, whose min-content is
-                    a single character. A plot reference next to a long
-                    location came out as one letter per line, reading
-                    vertically down the row. Capped at 40% and truncating, the
-                    label always keeps the greater share. */}
+                    Left flex-none, a long one takes whatever width it wants
+                    and squeezes the label beside it - and the label wraps with
+                    `overflow-wrap: anywhere`, whose min-content is a single
+                    character, so a plot reference next to a long location
+                    comes out as one letter per line, reading vertically down
+                    the row. Capped at 40% and truncating, the label always
+                    keeps the greater share. */}
                 {o.hint ? (
                   <span
                     className="ml-auto max-w-[40%] flex-none truncate pl-2 text-right text-[12px] text-adm-muted/80"

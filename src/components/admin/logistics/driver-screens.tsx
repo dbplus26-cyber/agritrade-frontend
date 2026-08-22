@@ -314,8 +314,8 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
   const { isEditing, setIsEditing, readOnly, roCls, mode } =
     useEditableRecordForm(driver);
 
-  // Photo travels WITH the save (multipart payload + file, the profile-photo
-  // convention); `removePhoto` clears an existing one server-side.
+  // Photo travels WITH the save as a multipart payload + file; `removePhoto`
+  // clears an existing one server-side.
   const {
     fileInputRef,
     photoFile,
@@ -429,15 +429,15 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
     }
   };
 
-  // At rest an existing record READS. The form is what you get after
-  // pressing Edit, not a greyed-out copy of the page you were already on.
+  // At rest an existing record READS. The form arrives after Edit is pressed,
+  // rather than as a greyed-out copy of the page already on screen.
   if (isEdit && !isEditing && driver) {
     return (
       <AdminCard className="max-w-[640px] px-5 py-[18px]">
         {/* The photograph belongs on the READ view, not only behind Edit.
-            It was rendered inside the form, so at rest - which is how this
-            page is nearly always seen - the record showed no picture at all,
-            and the only way to look at one was to start editing. */}
+            Rendered inside the form it appears only while editing, so at rest
+            - which is how this page is nearly always seen - the record would
+            show no picture at all. */}
         <div className="mb-4 flex items-center gap-3.5 border-b border-adm-hairline pb-4">
           <ViewablePhoto
             name={driver.name}
@@ -476,8 +476,8 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
   return (
     <AdminCard className="max-w-[640px] px-5 py-[18px]">
       {/* Field pairs measure against this form, not the viewport: the console
-          shell keeps a ~225px rail beside it, so `sm:` paired fields up while
-          the column was still too narrow to carry two of them. */}
+          shell keeps a ~225px rail beside it, so `sm:` pairs fields up while
+          the column is still too narrow to carry two of them. */}
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}

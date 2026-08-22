@@ -69,9 +69,9 @@ const POT_LABEL: Record<string, string> = {
  *
  * Separately, deliberately. Cash in a pocket, money in an agent's own wallet
  * and money in their own bank are three different things to somebody standing
- * at a village scale, and the single figure that used to cover all three is
- * what made their position unreadable: cash still in hand read as spent
- * because a mobile-money send had come off the same total.
+ * at a village scale, and a single figure covering all three makes their
+ * position unreadable: cash still in hand reads as spent because a
+ * mobile-money send came off the same total.
  */
 function Pot({ pot }: { pot: IHeldPot }) {
   return (
@@ -103,8 +103,8 @@ function Pot({ pot }: { pot: IHeldPot }) {
  * Its own card, its own words, never a figure beside the pots. Money somebody
  * holds falls when they spend it; an allowance is permission to draw on an
  * account belonging to the business, and what falls when it is used is the
- * company's account. Showing them as one number is the bug this whole rework
- * exists to end, and two cards that merely sit near each other is how it comes
+ * company's account. Showing them as one number is the mistake this split
+ * exists to prevent, and two cards that merely sit near each other bring it
  * back.
  */
 function SendingAllowance() {

@@ -5,7 +5,7 @@
 // Decimal.toDecimalPlaces(2) and rejects any payment amount that is not a whole
 // number of pesewas (moneyField's multipleOf(0.01)). The naive JS product
 // carries float noise (6 x 4.20 = 25.200000000000003), which is not a multiple
-// of 0.01, so the field flow 400d for a large share of ordinary inputs.
+// of 0.01, so the field flow would 400 for a large share of ordinary inputs.
 //
 // These pin that cedisProduct reproduces the server's total to the pesewa, so
 // the payment neither trips the 2dp check nor over/under-pays the purchase.

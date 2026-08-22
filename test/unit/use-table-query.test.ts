@@ -8,7 +8,7 @@
 //     LIVE URL, not the reactive searchParams, precisely so writing the URL
 //     cannot re-trigger a write - a loop here is an infinite replace());
 //   * search reaches the query debounced, so typing isn't a request per key;
-//   * a bare sidebar URL restores where you left the table (sessionStorage),
+//   * a bare sidebar URL restores where the table was left (sessionStorage),
 //     while an EXPLICIT url always wins over that memory;
 //   * browser back/forward adopts the popped URL without minting an extra
 //     history entry.

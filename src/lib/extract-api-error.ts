@@ -2,7 +2,7 @@
  * Normalizes any thrown/returned error into a predictable shape for toasts and
  * inline form errors. Handles plain strings, `Error`, `{ message }` objects, and
  * RTK-Query-style errors (`FETCH_ERROR`/`TIMEOUT_ERROR`, `{ status, data }`
- * envelopes with field errors). Ready for when the backend is connected.
+ * envelopes with field errors).
  */
 export interface NormalizedError {
   message: string;
@@ -111,9 +111,8 @@ export function extractApiError(error: unknown): NormalizedError {
         status: typeof rtkStatus === "number" ? rtkStatus : undefined,
         code: typeof data.code === "string" ? data.code : undefined,
         // The backend names the correlation id differently per environment:
-        // `errorId` in development, `requestId` in production. Reading only
-        // the first meant no id ever reached a real bug report - exactly where
-        // it is needed. Prefer errorId, fall back to requestId.
+        // `errorId` in development, `requestId` in production. Both are read
+        // so an id always reaches a bug report: errorId first, then requestId.
         errorId:
           (typeof data.errorId === "string" ? data.errorId : undefined) ??
           (typeof data.requestId === "string" ? data.requestId : undefined),

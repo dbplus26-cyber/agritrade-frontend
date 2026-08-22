@@ -573,10 +573,10 @@ export function ReviewsScreen() {
               </>
             }
           >
-            {/* Status is a filter like any other - it lived as a row of tabs
-                above the toolbar, which was a second filtering vocabulary on
-                a screen that already had one. The default is still what
-                needs deciding (PENDING). */}
+            {/* Status is a filter like any other, so it sits with the rest
+                rather than as a second row of tabs above the toolbar - one
+                filtering vocabulary per screen. The default is what needs
+                deciding (PENDING). */}
             <ConsoleLabeledSelect
               label="Status"
               value={filters.status}

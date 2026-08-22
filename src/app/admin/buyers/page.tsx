@@ -5,7 +5,7 @@ import { RegisterSkeleton } from "@/components/admin/skeletons";
 
 export const metadata: Metadata = { title: "Buyers" };
 
-/** The live Buyers directory - replaces the config-driven stub. */
+/** The live Buyers directory. */
 export default function BuyersPage() {
   return (
     <Suspense fallback={<RegisterSkeleton columns={5} filters={3} />}>

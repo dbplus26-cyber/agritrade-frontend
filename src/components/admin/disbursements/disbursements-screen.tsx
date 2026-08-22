@@ -285,9 +285,9 @@ export function DisbursementsScreen() {
             />
           </ConsoleFilterBar>
 
-          {/* Every other register files its rows on an AdminCard. This one
-              and the float register rendered the table bare, so the two money
-              surfaces were the only screens with no sheet under the rows. */}
+          {/* Every other register files its rows on an AdminCard, and the
+              money surfaces are no exception: a bare table would leave them
+              the only screens with no sheet under the rows. */}
           <AdminCard className="overflow-hidden">
             <ConsoleDataTable<IDisbursement>
               columns={columns}

@@ -32,8 +32,8 @@ const shortWhen = (iso: string): string =>
   });
 
 /**
- * Recent activity feed from the audit trail (design doc 5.8): the newest
- * mutating events, each with the acting user and when. Carries no money.
+ * Recent activity feed from the audit trail: the newest mutating events, each
+ * with the acting user and when. Carries no money.
  */
 export function ActivityFeed() {
   const { data, isError, isLoading, refetch } = useGetActivityQuery({

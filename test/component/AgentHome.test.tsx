@@ -1,13 +1,12 @@
 // test/component/AgentHome.test.tsx
 //
-// The field app's home screen, and the one thing it must never say again.
+// The field app's home screen, and the one thing it must never say.
 //
-// It used to render a single figure labelled "My float". That figure covered
-// cash in a pocket, money in the agent's own mobile-money wallet and money in
-// their own bank, all added together - which is the exact conflation the whole
-// money rework exists to end. An agent handed GHS 5,000 cash who then sent
-// GHS 3,000 by mobile money saw 2,000, while the 5,000 was still in his hand
-// and the company's wallet was the thing that had emptied.
+// A single figure labelled "My float" covers cash in a pocket, money in the
+// agent's own mobile-money wallet and money in their own bank, all added
+// together: an agent handed GHS 5,000 cash who then sends GHS 3,000 by mobile
+// money reads 2,000, while the 5,000 is still in his hand and the company's
+// wallet is the thing that emptied.
 //
 // Two facts, kept apart: what he is HOLDING, pot by pot, and what he may still
 // SEND, which is permission to draw on the company's money and holds nothing.

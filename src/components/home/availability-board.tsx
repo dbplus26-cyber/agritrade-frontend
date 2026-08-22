@@ -10,9 +10,9 @@ import type { CommodityLine } from "@/static-data/availability";
  * the updated stamp and a single action (FULL BOARD). Prices and the rest of
  * the register live on /commodities, so this never reads as a wall of buttons.
  *
- * The section sits on the document tint now rather than the old near-black
- * band. One heavy dark block directly under the hero was the loudest thing on
- * the page and the only one of its kind on the site; the alternating husk tone
+ * The section sits on the document tint rather than a near-black band. One
+ * heavy dark block directly under the hero would be the loudest thing on the
+ * page and the only one of its kind on the site; the alternating husk tone
  * still separates the section from the hero above it, and lets the register
  * read as paper like every other document here.
  */

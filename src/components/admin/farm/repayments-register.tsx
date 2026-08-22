@@ -121,10 +121,10 @@ export function RepaymentsRegister() {
         ),
       },
       {
-        // Not "Produce" any more: a farmer who had a bad season settles in
-        // money, and a column that can only name a crop had nowhere to put
-        // them - it printed a null or a zero weight, which reads as a farmer
-        // who handed over nothing.
+        // Not "Produce": a farmer who had a bad season settles in money, and
+        // a column that can only name a crop has nowhere to put them - it
+        // prints a null or a zero weight, which reads as a farmer who handed
+        // over nothing.
         id: "repaidIn",
         header: columnHelp(
           "Repaid in",

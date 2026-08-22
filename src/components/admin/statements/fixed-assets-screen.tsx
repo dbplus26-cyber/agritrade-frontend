@@ -4,10 +4,10 @@
 // classes (depreciation + capital-allowance vocabulary). An asset is entered
 // once and flows into every later book until disposed of.
 //
-// Every asset now names the account that paid for it, or says why none did,
-// and a disposal names where its proceeds landed. Until it did, a truck cost
-// GHS 80,000 and left every account exactly where it was while the investing
-// line of the cash-flow statement subtracted the lot.
+// Every asset names the account that paid for it, or says why none did, and a
+// disposal names where its proceeds landed: unnamed, a truck costs GHS 80,000
+// and leaves every account exactly where it was while the investing line of
+// the cash-flow statement subtracts the lot.
 import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -233,10 +233,10 @@ function AddAssetDialog({ onClose }: { onClose: () => void }) {
                 />
               </AdminField>
             </div>
-            {/* The question the register never asked. A truck costs GHS
-                80,000 and that money left an account - or the business already
-                owned the truck when the books started, in which case its money
-                left before day one and posting it now would spend it twice. */}
+            {/* A truck costs GHS 80,000 and that money left an account - or
+                the business already owned the truck when the books started, in
+                which case its money left before day one and posting it now
+                would spend it twice. */}
             <CashSourceField
               accountError={errors.paymentAccountId?.message}
               accountId={assetForm.watch("paymentAccountId") ?? ""}

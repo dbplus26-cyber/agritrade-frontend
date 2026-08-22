@@ -3,16 +3,14 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 /**
- * The console's table-cell vocabulary, ported from the dms-frontend column
- * discipline.
+ * The console's table-cell vocabulary.
  *
  * The rule the whole file exists to enforce: A COLUMN MUST HAVE AN OPINION
  * ABOUT ITS WIDTH. Left to itself a table sizes each column to its widest
  * cell, so one long description drags the table past the viewport and every
  * reader pays for it with a horizontal scrollbar - or, worse, the column is
  * pinched narrow instead and the text wraps to five lines, leaving a row four
- * times taller than its neighbours. The transfers register had exactly that
- * second failure on its route column.
+ * times taller than its neighbours.
  *
  * So each cell wrapper here carries a min AND a max width. The minimum means
  * short values ("Tamale", "GH0.00", a date) are never squeezed; the maximum
@@ -65,8 +63,8 @@ const CELL_WIDTHS = {
  *
  * Table view only, like every clamp in this file. In the phone card the cell
  * sits inside a shrink-to-fit flex item, and a percentage max-width there
- * resolves against the item's own content-derived width - it shaved even a
- * two-word value by 8% and wrapped its last word while half the row stood
+ * resolves against the item's own content-derived width - it shaves even a
+ * two-word value by 8% and wraps its last word while half the row stands
  * empty beside the label.
  */
 const TITLE_CLAMP = "@2xl/table:max-w-[92%]";
@@ -107,8 +105,8 @@ export type CellWidth = keyof typeof CELL_WIDTHS;
  *
  * When the row HAS a detail page, dumping the full value into a tooltip is the
  * wrong help: it hands back one field of a record whose other twenty fields
- * are one click away, and it teaches the reader that hovering is how you read
- * this table. So a linked cell says what to do instead.
+ * are one click away, and it teaches the reader that hovering is how this
+ * table is read. So a linked cell says what to do instead.
  *
  * When the row has NO detail page the tooltip is the only place the full value
  * exists, so it shows the value. Removing it there would genuinely lose

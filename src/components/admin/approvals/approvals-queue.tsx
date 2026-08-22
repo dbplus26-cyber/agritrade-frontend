@@ -179,9 +179,9 @@ export function ApprovalsQueue({ table }: { table: Table<IApproval> }) {
                         "min-w-0",
                         // Narrow: the checkbox column disappears - bulk select
                         // is a wide-screen workflow, and its 26px column plus
-                        // the grid gap squeezed every stacked cell 40px off the
-                        // row edge on a phone. The cells own the full width;
-                        // the checkbox returns with the full grid.
+                        // the grid gap would push every stacked cell 40px off
+                        // the row edge on a phone. The cells own the full
+                        // width; the checkbox returns with the full grid.
                         cellIndex === 0 && "hidden @min-[900px]/main:block",
                         cell.column.columnDef.meta?.className,
                       )}
@@ -205,8 +205,8 @@ export function ApprovalsQueue({ table }: { table: Table<IApproval> }) {
 
 /**
  * The expanded panel. Height is not animated on purpose - a row that snaps
- * open is instantly legible, and an animated one makes a queue you are
- * skimming feel slower than it is.
+ * open is instantly legible, and an animated one makes a queue being skimmed
+ * feel slower than it is.
  */
 export function ApprovalDetailPanel({
   approval,

@@ -1,7 +1,7 @@
 /**
  * Typed, fail-fast access to the public env vars - mirrors the backend `ENV`
- * pattern (and mhp/website-frontend) so config lives in one place and is never
- * read via bare `process.env` scattered around the app. Importing this module
+ * module so config lives in one place and is never read via bare
+ * `process.env` scattered around the app. Importing this module
  * validates the required vars, so a misconfigured deployment fails at load
  * rather than silently issuing requests to `undefined/api/v1`.
  */

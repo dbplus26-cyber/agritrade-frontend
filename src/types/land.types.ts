@@ -1,6 +1,6 @@
 // src/types/land.types.ts
 //
-// The admin land module (design doc 5.10), mirroring the backend DTOs. Money
+// The admin land module, mirroring the backend DTOs. Money
 // (prices, cost, margin) is `number | null` - redacted per financial visibility
 // (though the land register is owner-only, so in practice always visible).
 import type { IPaginationMeta } from "./api";

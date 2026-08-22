@@ -456,7 +456,7 @@ export function LandSaleDetail({ id }: { id: string }) {
       <DetailShell
         aside={
           <AdminCard className="px-5 py-3">
-            {/* Which plot, to whom - what the heading used to carry. */}
+            {/* Which plot, to whom - the two facts the heading cannot hold. */}
             <Row label="Plot">
               <Link className={adminLinkClass} href={`/admin/plots/${s.plot.id}`}>
                 {s.plot.reference}
@@ -538,10 +538,10 @@ export function LandSaleDetail({ id }: { id: string }) {
                 <ActionRow className="xl:flex-col">
                   {/* A DRAFT is PAYABLE, and has to be: confirming one is
                       refused until a deposit is on it (PAYMENT_REQUIRED), so
-                      offering only "Confirm sale" here was a dead end - the
-                      button told you to record a payment and the screen gave
-                      you nowhere to record it. The deposit comes first, so it
-                      leads; confirm follows it. */}
+                      offering only "Confirm sale" here is a dead end - the
+                      button asks for a payment the screen gives nowhere to
+                      record. The deposit comes first, so it leads; confirm
+                      follows it. */}
                   {s.status === "DRAFT" || s.status === "CONFIRMED" ? (
                     <AdminButton
                       onClick={() => setPayOpen(true)}

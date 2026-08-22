@@ -1,4 +1,4 @@
-/** Central route table - links never hardcode paths (dms-frontend convention). */
+/** Central route table - links never hardcode paths. */
 export const routes = {
   home: "/",
   about: "/about",

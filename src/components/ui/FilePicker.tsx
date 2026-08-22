@@ -11,11 +11,11 @@ import { cn } from "@/lib/utils";
 /**
  * Choose a file, LOOK at it, then decide.
  *
- * The pattern this replaces was select-and-send: the native picker's onChange
- * fired the upload directly, so a mis-tapped file was already in Cloudinary and
- * attached to the record before the user saw what they had picked. On a phone,
- * where the gallery is a grid of near-identical weigh-slip photos, that is a
- * routine mistake with no undo short of deleting the uploaded asset.
+ * Select-and-send - firing the upload straight from the native picker's
+ * onChange - puts a mis-tapped file in Cloudinary and on the record before the
+ * user has seen what they picked. On a phone, where the gallery is a grid of
+ * near-identical weigh-slip photos, that is a routine mistake with no undo
+ * short of deleting the uploaded asset.
  *
  * So: pick → preview → Save or Clear. Nothing leaves the browser until the
  * user confirms. Images preview as a thumbnail (after downscaling, so the

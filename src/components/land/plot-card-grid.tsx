@@ -25,10 +25,10 @@ function PlotCard({ plot }: { plot: PublicLandPlot }) {
   const available = plot.status === "AVAILABLE";
   const cover = plotPhotos(plot)[0];
   return (
-    // A SUMMARY of the plot, opening its own page. The card used to carry the
-    // gallery, the papers row and the whole description, which a documented
-    // plot has far too much of to fit under a photograph; what is left is what
-    // a buyer chooses between plots on.
+    // A SUMMARY of the plot, opening its own page. The gallery, the papers row
+    // and the full description belong there: a documented plot has far too much
+    // of all three to fit under a photograph. What the card carries is what a
+    // buyer chooses between plots on.
     //
     // h-full is what lines a row of them up: the grid stretches every card to
     // the tallest in its row and the inner column pins READ MORE to the bottom
@@ -37,9 +37,9 @@ function PlotCard({ plot }: { plot: PublicLandPlot }) {
     <article className="shadow-doc group relative grid h-full grid-cols-[26px_1fr] border border-soil/35 bg-paper transition-[transform,box-shadow] duration-150 focus-within:shadow-[3px_3px_0_rgb(31_33_28/0.18)] hover:-translate-y-px hover:shadow-[3px_3px_0_rgb(31_33_28/0.18)]">
       <PerforatedEdge />
       <div className="flex min-w-0 flex-col">
-        {/* A ratio, not a height: the photograph was 180/210px tall, which
-            held across cards but cropped a portrait original to a letterbox.
-            16:9 gives every plot the same picture shape at every width. */}
+        {/* A ratio, not a fixed height: a pixel height holds across cards but
+            crops a portrait original to a letterbox. 16:9 gives every plot the
+            same picture shape at every width. */}
         <div className="relative aspect-[16/9] w-full overflow-hidden border-b-[1.5px] border-soil/50">
           {cover ? (
             // "Reserved" is carried by the stamp and the muted action, never
@@ -76,11 +76,11 @@ function PlotCard({ plot }: { plot: PublicLandPlot }) {
               {plot.name}
             </Link>
           </h3>
-          {/* Two facts, on one line each, and nothing else. The card carried
-              labelled ledger rows for size and price and a papers row of its
-              own, which is a document rather than a summary - all of that is
-              on the plot's page now. The size row holds two lines whether or
-              not a use is on file. */}
+          {/* Two facts, on one line each, and nothing else. Labelled ledger
+              rows for size and price plus a papers row would make this a
+              document rather than a summary, and all of that is on the plot's
+              page. The size row holds two lines whether or not a use is on
+              file. */}
           <p className="mb-1 min-h-[3.1em] line-clamp-2 text-[13px] leading-[1.55] text-soil [overflow-wrap:anywhere]">
             {plot.use ? `${plot.sizeText} · ${plot.use}` : plot.sizeText}
           </p>

@@ -1,7 +1,7 @@
 // test/unit/money-rendering.test.ts
 //
-// The two choke points every money figure on screen passes through, which had
-// no tests: format-money.ts (rendering, redaction placeholder, compaction) and
+// The two choke points every money figure on screen passes through:
+// format-money.ts (rendering, redaction placeholder, compaction) and
 // use-money-visibility (who sees money columns at all). A regression in either
 // shows wrong figures - or someone else's figures - on every screen at once.
 import { renderHook } from "@testing-library/react";

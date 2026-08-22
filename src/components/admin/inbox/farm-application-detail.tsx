@@ -57,10 +57,10 @@ function SectionCard({
     <AdminCard className="px-5 py-4">
       <SectionHeading className="mb-1.5">{title}</SectionHeading>
       {/* auto-fit with a real floor, not a fixed 3 columns. A rigid
-          three-column grid gave every field the same narrow slot, so a long
-          free-text answer - previous experience, items needed - became a
+          three-column grid gives every field the same narrow slot, so a long
+          free-text answer - previous experience, items needed - becomes a
           400px-tall ribbon of text with two empty columns sitting beside it.
-          Short facts now share a row; prose takes the whole width. */}
+          Short facts share a row; prose takes the whole width. */}
       <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,14rem),1fr))] gap-x-8">
         {children}
       </div>

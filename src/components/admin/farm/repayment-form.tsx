@@ -41,10 +41,9 @@ const RECEIPT_MISSING = "Upload the signed receipt or weigh slip";
  * Record a repayment, in either of the two things a farmer can hand back.
  * `farmerId` may be pre-filled from a farmer's page.
  *
- * The book took a commodity, a weight and a valuation rate and nothing else, so
- * a farmer who had a bad season and settled in cash had nowhere in the system
- * to be recorded at all. Either shape clears the same debt: the season balance
- * is computed from the value, which both carry.
+ * A farmer who had a bad season settles in cash rather than in produce, so
+ * both shapes have to be recordable. Either one clears the same debt: the
+ * season balance is computed from the value, which both carry.
  */
 export function RepaymentForm({ farmerId }: { farmerId?: string }) {
   const router = useRouter();
@@ -198,8 +197,8 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
       />
 
       {/* Field pairs measure against this form, not the viewport: the console
-          shell keeps a ~225px rail beside it, so `sm:` paired fields up while
-          the column was still too narrow to carry two of them. */}
+          shell keeps a ~225px rail beside it, so `sm:` would pair fields up
+          while the column is still too narrow to carry two of them. */}
       <form
         noValidate
         // Surface the missing file alongside RHF's own errors: on an invalid
@@ -348,7 +347,7 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
                   </AdminField>
                 </div>
                 {/* The running total sits with the two figures it is worked out
-                    from, not at the foot of the form where it read as a stray. */}
+                    from, not at the foot of the form where it reads as a stray. */}
                 <div className="flex items-center justify-between gap-3 rounded-none border border-adm-hairline bg-adm-sunken px-4 py-3 text-[13px]">
                   <span className="font-semibold text-adm-muted">
                     Value credited

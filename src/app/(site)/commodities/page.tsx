@@ -52,8 +52,8 @@ export default async function CommoditiesPage({
   });
   // The register at the top stays a glance, not a list: at most 3 lines. Every
   // lot then files into the card grid, and each card opens the lot's own page
-  // - which is where the full record is read now, rather than three of them
-  // being unrolled inline while the rest were summarised.
+  // - which is where the full record is read, rather than a few of them being
+  // unrolled inline while the rest are summarised.
   return (
     <div className="texture-grain bg-surface">
       <BoardHeader updatedOn={updatedOn} lines={lines.slice(0, 3)} />

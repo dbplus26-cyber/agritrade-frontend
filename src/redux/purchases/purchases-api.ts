@@ -94,8 +94,8 @@ export const purchasesApi = apiSlice.injectEndpoints({
       }),
       // Receiving is the STOCK event: the backend mints the lot and writes a
       // PURCHASE_RECEIPT movement in the same transaction. Without these two
-      // the stock register and the movement log kept serving pre-receipt
-      // figures until something else happened to invalidate them.
+      // the stock register and the movement log keep serving pre-receipt
+      // figures until something else happens to invalidate them.
       invalidatesTags: (_r, _e, { id }) => [
         { type: "Purchases", id },
         { type: "Purchases", id: "LIST" },
@@ -194,8 +194,8 @@ export const purchasesApi = apiSlice.injectEndpoints({
      *
      * Its own read rather than a slice of the purchase, exactly as the payment
      * ledger is: what a load COST to acquire and what the document says it was
-     * bought for are two facts, and folding the first into the second is what
-     * left "how much did we make on that purchase" unanswerable.
+     * bought for are two facts, and folding the first into the second leaves
+     * "how much did we make on that purchase" unanswerable.
      */
     getPurchaseCosts: builder.query<IPurchaseCostsResponse, string>({
       query: (purchaseId) => `admin/purchases/${purchaseId}/expenses`,

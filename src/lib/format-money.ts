@@ -9,19 +9,19 @@ export const MONEY_HIDDEN = "Hidden";
  * Console tables state money in MAJOR units (e.g. price/kg 4.20).
  *
  * Accepts null because every money field on the wire is nullable: the API
- * strips prices, totals and balances for staff without financial visibility
- * (design doc 8.3). Formatting is therefore the one place redaction has to be
- * handled, and every call site gets it for free.
+ * strips prices, totals and balances for staff without financial visibility.
+ * Formatting is therefore the one place redaction has to be handled, and every
+ * call site gets it for free.
  */
 /**
  * The product of a weight and a per-unit price, rounded to whole pesewas the
  * same way the backend rounds it (Decimal.toDecimalPlaces(2), half-up).
  *
  * Both inputs are 2dp, so their scaled-integer product is exact and dividing by
- * 100 with a half-up round reproduces the server's total to the pesewa. The
- * naive `weightKg * unitPriceGhs` did not: JS float noise (6 x 4.20 =
+ * 100 with a half-up round reproduces the server's total to the pesewa. A
+ * naive `weightKg * unitPriceGhs` does not: JS float noise (6 x 4.20 =
  * 25.200000000000003) is not a multiple of 0.01, and the backend's moneyField
- * rejects anything past 2dp - so an agent's "buy and pay now" 400d for a large
+ * rejects anything past 2dp - so an agent's "buy and pay now" 400s for a large
  * share of ordinary weight/price pairs. Rounding here matches the total the
  * purchase will actually carry, so the payment neither over- nor under-pays.
  */
@@ -47,9 +47,9 @@ export function formatKg(kg: number): string {
  * A money figure short enough to survive a stat tile on a 280px phone.
  *
  * Below 100k the exact amount fits, so it is shown in full. Above that the
- * figure is compacted (GH₵ 344.7k, GH₵ 1.2M) because the alternative is what
- * this replaces: "GH₵ 344,680.6…" clipped mid-number, which is worse than
- * rounded - a truncated figure reads as a DIFFERENT, smaller amount.
+ * figure is compacted (GH₵ 344.7k, GH₵ 1.2M) because the alternative is worse
+ * than rounded: "GH₵ 344,680.6…" clipped mid-number reads as a DIFFERENT,
+ * smaller amount.
  *
  * Always pair with `formatCedis` in a `title` attribute so the exact value is
  * one hover (or one detail page) away.

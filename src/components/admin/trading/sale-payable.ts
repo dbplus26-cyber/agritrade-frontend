@@ -11,15 +11,14 @@
 //
 // The register's balance column, the sale's balance row, the invoice's
 // "receipt or invoice" decision, and the payment dialog's readout and its
-// full-balance quick fill all answer the same question. They agreed only
-// because there was a single field for them to read. With a second field,
-// "they all read the same one" stops being a guarantee and becomes something
-// somebody has to remember - so it is stated once, here.
+// full-balance quick fill all answer the same question. With two totals on
+// the record, "they all read the same field" is no guarantee and would be
+// something somebody has to remember - so the answer is stated once, here.
 
 /**
  * The two totals a payable read needs. Both are `number | null` because every
  * money field on the wire is redacted to null for staff without financial
- * visibility (design doc 8.3).
+ * visibility.
  *
  * `settledTotalGhs` is optional so a payload from an API build that does not
  * carry the column yet still reads as "not weighed", never as "settled at

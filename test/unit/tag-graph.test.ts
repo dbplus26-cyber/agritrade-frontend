@@ -4,12 +4,10 @@
 //
 // RTK Query invalidations are stringly-typed: a mutation that invalidates
 // {Reports, "LIST"} while every reports query provides {Reports, "DASHBOARD"}
-// is a silent no-op, and the screen it meant to refresh goes stale. The audit
-// found four of those (Reports/LIST, Sales/DEBTORS, Agents/ME, and the
-// CashBook family), each shipped with a comment describing the refresh it was
-// not doing. Nothing in the type system catches it, so this test does: every
-// LITERAL id a mutation invalidates must be provided, literally, by some query
-// of the same type.
+// is a silent no-op, and the screen it meant to refresh goes stale - typically
+// under a comment describing a refresh that never happens. Nothing in the type
+// system catches it, so this test does: every LITERAL id a mutation
+// invalidates must be provided, literally, by some query of the same type.
 //
 // Dynamic ids (template strings, variables) are exempt on both sides - a row
 // id can only be checked at runtime. The convention this codebase keeps is

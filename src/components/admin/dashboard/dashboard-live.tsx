@@ -137,9 +137,9 @@ function AgentFloatsCard() {
         agents.map((a) => (
           // The FIGURE is what this list is for, so it is the part that
           // never gives way: flex-none and no wrapping. The name takes what
-          // is left and truncates. Before, both sides could shrink and the
-          // name - being longer - won, squeezing the amount until it wrapped
-          // its currency symbol onto a line of its own.
+          // is left and truncates. Let both sides shrink and the name - being
+          // longer - wins, squeezing the amount until it wraps its currency
+          // symbol onto a line of its own.
           <div
             key={a.userId}
             className="flex items-baseline justify-between gap-3 border-b border-adm-hairline py-1.5 text-[13px] last:border-b-0"
@@ -252,7 +252,7 @@ export function DashboardLive() {
 
       {/* Snapshot KPIs - the state of the business right now. Error is its
           own branch: `isLoading || !d` stays true forever after a failure,
-          so this used to pulse an empty skeleton with nothing to act on. */}
+          which would leave an empty skeleton pulsing with nothing to act on. */}
       {isError ? (
         <div className="mb-5">
           <WidgetError what="the snapshot figures" onRetry={() => void refetch()} />

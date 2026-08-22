@@ -90,11 +90,11 @@ function SelectContent({
           data-position={position}
           className={cn(
             // The Content above opens AT LEAST trigger-wide and grows only as
-            // far as its longest option, capped at 20rem. It was pinned to the
-            // trigger's exact width for a while, but a trigger narrower than a
-            // two-word option then wrapped that option mid-row ("Last 30 /
-            // days") - and short labels must hold their line. The cap is what
-            // keeps a 150px filter from opening a list twice the screen.
+            // far as its longest option, capped at 20rem. Pinned to the
+            // trigger's exact width, a trigger narrower than a two-word option
+            // wraps that option mid-row ("Last 30 / days") - and short labels
+            // must hold their line. The cap is what keeps a 150px filter from
+            // opening a list twice the screen.
             "data-[position=popper]:h-(--radix-select-trigger-height) data-[position=popper]:w-full data-[position=popper]:min-w-0",
             position === "popper" && ""
           )}
@@ -142,8 +142,8 @@ function SelectItem({
           <CheckIcon className="pointer-events-none" />
         </SelectPrimitive.ItemIndicator>
       </span>
-      {/* The panel no longer widens for a long option, so the option has to
-          give way instead: two lines, then ellipsis, wrapping mid-token so an
+      {/* The panel does not widen for a long option, so the option gives way
+          instead: two lines, then ellipsis, wrapping mid-token so an
           unbroken value cannot push a horizontal scrollbar into the list. */}
       <SelectPrimitive.ItemText>
         <span className="min-w-0 flex-1 line-clamp-2 whitespace-normal [overflow-wrap:break-word]">

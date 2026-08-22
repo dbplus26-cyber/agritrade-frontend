@@ -69,7 +69,7 @@ export function BusinessLines() {
           {/* On lg this card stands beside a stack of two file cards and is
               therefore taller than its own content. The slack goes to the
               PHOTO rather than to a band of empty paper between the picture
-              and the copy, which is what `flex-1` on the text block used to
+              and the copy, which is what `flex-1` on the text block would
               produce. */}
           <div className="relative h-[200px] border-b-[1.5px] border-soil/50 sm:h-[290px] lg:h-auto lg:min-h-[290px] lg:flex-1">
             <Photo

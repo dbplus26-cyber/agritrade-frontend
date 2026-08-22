@@ -10,11 +10,10 @@ import { cn } from "@/lib/utils";
 /**
  * One commodity, read in full.
  *
- * This is the document treatment the register used to give its first few lots
- * inline - photograph, filed paper, stock stamp - now that every lot has a page
- * of its own to carry it. The register's cards hold the identifying facts and
- * a clamped line or two of the description; everything the office keeps on the
- * record is here.
+ * The full document treatment - photograph, filed paper, stock stamp - which
+ * every lot gets on its own page. The register's cards hold the identifying
+ * facts and a clamped line or two of the description; everything the office
+ * keeps on the record is here.
  */
 export function LotDetail({ lot }: { lot: PublicLot }) {
   const specs = [

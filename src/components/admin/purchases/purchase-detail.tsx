@@ -387,7 +387,7 @@ export function PurchaseDetail({ id }: { id: string }) {
     (p.status === PurchaseStatus.RECORDED ||
       p.status === PurchaseStatus.IN_TRANSIT);
   // Voiding reverses the float and stock ledgers with compensating entries -
-  // the owner's correction path (design doc 5.1), enforced by the API too.
+  // the owner's correction path, enforced by the API too.
   const canVoid = p.status !== PurchaseStatus.VOIDED && isSuperAdmin;
 
   const onMarkInTransit = async () => {
@@ -500,7 +500,7 @@ export function PurchaseDetail({ id }: { id: string }) {
                 Weights &amp; variance
               </SectionHeading>
               <DetailGrid>
-                {/* What was bought - the heading names the page now. */}
+                {/* What was bought - the heading names the page. */}
                 <DetailItem label="Commodity" strong>
                   <Link
                     className={adminLinkClass}
@@ -543,10 +543,10 @@ export function PurchaseDetail({ id }: { id: string }) {
                 Money
               </SectionHeading>
               <DetailGrid>
-                {/* Left saying "Total" and left meaning exactly what it always
-                    meant. It is the figure a supplier's invoice is checked
-                    against, and quietly turning it into the landed cost would
-                    have broken every reconciliation that reads this line. */}
+                {/* "Total" is the purchase price and nothing else: it is the
+                    figure a supplier's invoice is checked against, and turning
+                    it into the landed cost would break every reconciliation
+                    that reads this line. */}
                 <DetailItem label="Purchase price" mono strong>
                   {formatCedis(p.totalGhs)}
                 </DetailItem>
@@ -569,8 +569,7 @@ export function PurchaseDetail({ id }: { id: string }) {
             />
 
             {/* What was AGREED is above; what has actually been handed over is
-                its own ledger, because they are different facts and the
-                system used to hold only the first. */}
+                its own ledger, because they are different facts. */}
             <PurchaseSettlementCard
               isVoided={p.voidedAt !== null}
               payeeName={purchaseCounterparty(p)}

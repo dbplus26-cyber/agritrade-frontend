@@ -15,8 +15,8 @@ export const readOnlyControlClass =
  * tab, a lifecycle action, the publish toggle): the caller resets its form to
  * the fresh values and clears the photo input. INVARIANT: it runs only while
  * NOT editing - an in-progress edit must never be clobbered, which is why
- * these forms are no longer key-remounted on updatedAt. Callers that still
- * key-remount instead (driver) simply pass no callback.
+ * these forms are not key-remounted on updatedAt. Callers that key-remount
+ * instead (driver) simply pass no callback.
  */
 export function useEditableRecordForm<TRecord>(
   record: TRecord | undefined,

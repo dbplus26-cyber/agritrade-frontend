@@ -1,9 +1,9 @@
 // test/unit/statement-schema.test.ts
 //
-// The two registers that used to hold a money figure and move no money at
-// all. Both now have to answer one question before they can be saved - which
-// account did this come out of, and if none, why not - and a disposal has to
-// say where its proceeds landed.
+// The two registers that hold a money figure without moving money themselves.
+// Both have to answer one question before they can be saved - which account
+// did this come out of, and if none, why not - and a disposal has to say
+// where its proceeds landed.
 //
 // Tested at the schema rather than through the dialogs on purpose: these are
 // the rules, the dialogs only render them. The backend refuses the same

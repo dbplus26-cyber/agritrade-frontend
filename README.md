@@ -15,8 +15,7 @@ farm input-lending book. The console runs all of it; the public site is the
 shop window onto the parts that are published.
 
 Built with **Next.js 16 (App Router) · React 19 · TypeScript · Tailwind v4 ·
-shadcn/ui (radix) · RTK Query · react-hook-form + Zod · Vitest**, following the
-conventions shared with `dms-frontend` and `khadys-kitchen-frontend`.
+shadcn/ui (radix) · RTK Query · react-hook-form + Zod · Vitest**.
 
 ## Getting started
 

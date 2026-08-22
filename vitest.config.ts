@@ -16,9 +16,9 @@ export default defineConfig({
     env: { NEXT_PUBLIC_SERVER_URI: "http://localhost:4060" },
     // Component tests drive radix dialogs through jsdom, which is slow enough
     // that the 5s default is not a bug signal but a load signal: a file that
-    // finishes in 100ms alone intermittently blew the budget once vitest ran
-    // the suite's files in parallel, and CI runners are slower again. A real
-    // hang still fails, just later. Matches agritrade-backend's config.
+    // finishes in 100ms alone can blow the budget once vitest runs the suite's
+    // files in parallel, and CI runners are slower again. A real hang still
+    // fails, just later.
     testTimeout: 20000,
   },
 });

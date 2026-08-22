@@ -220,7 +220,7 @@ export function ExpenseCategoryTable() {
     resetFilters,
     queryParams,
   } = useTableQuery({ defaults: FILTER_DEFAULTS });
-  // Only the owner edits this vocabulary (design doc 4).
+  // Only the owner edits this vocabulary.
   const { isSuperAdmin } = useAuthRole();
   const { has } = usePermissions();
   const canManage = isSuperAdmin || has("VOCABULARY_MANAGE");
@@ -276,8 +276,8 @@ export function ExpenseCategoryTable() {
         header: "Expenses filed",
         enableSorting: false,
         meta: columnMeta(),
-        // The register used to be three thin columns of name/date/badge -
-        // nothing said whether a heading was a workhorse or an empty bucket.
+        // Name, date and badge alone say nothing about whether a heading is
+        // a workhorse or an empty bucket; the count does.
         cell: ({ row }) => (
           <Mono className="tabular-nums">
             {row.original.expenseCount ?? 0}
@@ -486,8 +486,8 @@ function ExpenseCategoryFormFields({
     }
   };
 
-  // At rest an existing record READS. The form is what you get after
-  // pressing Edit, not a greyed-out copy of the page you were already on.
+  // At rest an existing record READS. The form arrives on Edit, rather than
+  // standing in as a greyed-out copy of the page just left.
   if (isEdit && !isEditing && category) {
     return (
       <AdminCard className="px-5 py-[18px]">
@@ -641,16 +641,15 @@ function ExpenseLine({ expense }: { expense: IExpense }) {
  * The expenses filed under this category - proof of what the bucket actually
  * holds, with the whole-window total the backend aggregates server-side.
  *
- * A STATEMENT, not a gallery. These were voucher tiles in a two-or-three
- * column grid, which reads fine at twelve and badly at one: a category with a
- * single expense put one small tile in the first cell and left the other two
- * columns empty, next to a side rail three times its height. The gap was the
- * layout telling the truth about a grid with nothing to fill it.
+ * A STATEMENT, not a gallery. Voucher tiles in a two-or-three column grid
+ * read fine at twelve and badly at one: a category with a single expense puts
+ * one small tile in the first cell and leaves the other two columns empty,
+ * next to a side rail three times its height.
  *
  * A costs list is a ledger, and a ledger is rows. One row spans the full
  * width, so one expense looks deliberate and twelve look like a statement;
  * the figures line up in a single right-hand column where they can be
- * compared, which tiles never allowed; and the count no longer changes the
+ * compared, which tiles do not allow; and the count does not change the
  * shape of the page.
  */
 /**
@@ -701,12 +700,10 @@ function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
 
   return (
     // Fills the column so the statement ends where the record rail beside it
-    // does. A category with one expense left a short card at the top of the
-    // left column with the rail running past it - the same imbalance the tile
-    // grid had, in a different shape.
+    // does. Otherwise a category with one expense leaves a short card at the
+    // top of the left column with the rail running past it.
     <div className="flex h-full flex-col">
-      {/* The same heading component every other section uses - this card had
-          hand-rolled its own copy of it. */}
+      {/* The same heading component every other section uses. */}
       <SectionHeading
         className="mb-2"
         actions={
@@ -768,7 +765,7 @@ function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
 
       {isLoading ? (
         // A ledger skeleton, matching what actually arrives. A card-grid
-        // skeleton here promised tiles and then delivered rows, which is a
+        // skeleton here would promise tiles and then deliver rows, which is a
         // visible jump on every load.
         <AdminCard className="overflow-hidden px-4">
           <LedgerSkeleton rows={6} />
@@ -850,7 +847,8 @@ export function ExpenseCategoryEdit({ id }: { id: string }) {
       />
       {/* The record is two short fields; the spend under it is the page's
           substance, so the record takes the rail and the vouchers take the
-          width. On a phone the rail stacks first - you came here to edit. */}
+          width. On a phone the rail stacks first: editing is what this route
+          is for. */}
       <DetailShell
         main={<CategoryExpensesCard categoryId={id} />}
         aside={

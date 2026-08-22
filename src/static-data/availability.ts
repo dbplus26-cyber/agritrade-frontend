@@ -4,13 +4,12 @@
  *
  * The live site NEVER reads the sample: the register is built from the
  * published commodities in `lib/public-commodities`, and each line is
- * described by its own variety and grade. The hand-written lot files that used
- * to live here - "grades", "season", "sold as" - were merged over the feed and
- * put paragraphs on the page that nobody had entered in the console and the
- * office could not correct, so they are gone.
+ * described by its own variety and grade. Nothing on a line may be
+ * hand-written here - copy the console cannot reach is copy the office cannot
+ * correct.
  *
- * Design rule: a commodity never disappears from the register; it degrades
- * from "AVAILABLE NOW" to "ASK US".
+ * A commodity never disappears from the register; it degrades from
+ * "AVAILABLE NOW" to "ASK US".
  */
 export interface CommodityLine {
   name: string;

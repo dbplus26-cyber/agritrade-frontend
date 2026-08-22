@@ -83,11 +83,11 @@ export async function fetchPublicCommoditiesPage(window: {
  * returns [] - StockRegister renders its one honest empty line, never a
  * stand-in list.
  *
- * The context line under each name is the commodity's OWN variety and grade.
- * It used to prefer a hand-written line of market copy where the name matched
- * a launch commodity ("Main harvest from September"), which meant the site
- * could contradict the register: the office edits a commodity in the console
- * and the board keeps announcing something nobody typed.
+ * The context line under each name is the commodity's OWN variety and grade,
+ * never a hand-written line of market copy ("Main harvest from September").
+ * Copy the register does not hold is copy the site can contradict: the office
+ * edits a commodity in the console and the board goes on announcing something
+ * nobody typed.
  */
 export function toBoardLines(
   commodities: PublicCommodity[] | null,
@@ -106,10 +106,10 @@ export function toBoardLines(
 /**
  * A lot file on /commodities. Every field is the commodity's OWN record, as
  * the office keeps it in the console: name, variety, quality grade,
- * description, photo and whether it is available. Nothing else - the page used
- * to merge a bundle of hand-written "grades / season / sold as" copy over the
- * feed, so a reader was shown paragraphs about moisture readings and truckload
- * terms that nobody had entered anywhere and the office could not correct.
+ * description, photo and whether it is available. Nothing else: a bundle of
+ * hand-written "grades / season / sold as" copy merged over the feed would
+ * show a reader paragraphs about moisture readings and truckload terms that
+ * nobody had entered anywhere and the office could not correct.
  */
 export interface PublicLot {
   /** The commodity's API id - the stable render key. */

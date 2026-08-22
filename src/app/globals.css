@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /**
- * DB Plus - "Pale Husk" palette v2.1 (from the Claude Design project).
+ * DB Plus - "Pale Husk" palette v2.1.
  * A trading-house paper aesthetic: husk surfaces, viridian bands, ochre-gold
  * tags, ledger rules and hard offset shadows. Light theme only by design.
  */
@@ -45,13 +45,13 @@
   --font-mono: ui-monospace, monospace;
   --font-heading: var(--font-barlow-condensed);
 
-  /* Console (admin) - the "Meridian" console system from the Claude Design
-     project, not the public site's husk palette.
+  /* Console (admin) - the "Meridian" console system, not the public site's
+     husk palette.
      
      The two sides are deliberately different objects. The public site is
      printed paper: husk grounds, hard offset shadows, squared corners. The
      console is a working tool read for hours at a time, and dressing it as
-     paperwork made it loud - every card a tinted slab with a drop shadow,
+     paperwork makes it loud - every card a tinted slab with a drop shadow,
      every corner squared, every rule the colour of soil. Meridian is a
      near-neutral cool slate: white cards on a warm off-white page, hairline
      borders, soft radii, and ONE accent doing the pointing. The accent stays
@@ -245,9 +245,9 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22150%22%3E%3Cfilter id=%22m%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%222%22/%3E%3CfeColorMatrix values=%220 0 0 0 1 0 0 0 0 1 0 0 0 0 0.9 0 0 0 0.04 0%22/%3E%3C/filter%3E%3Crect width=%22150%22 height=%22150%22 filter=%22url(%23m)%22/%3E%3C/svg%3E");
   }
   /* Hard offset "paperwork" shadows - the design never blurs card shadows.
-     Kept HARD (the signature), but slimmed: the old 5-6px offsets at heavy
-     opacity read as a thick slab under every card, and with a page full of
-     cards the effect stacked into visual noise. A 2px offset at lower opacity
+     Kept HARD (the signature), but slim: a 5-6px offset at heavy opacity
+     reads as a thick slab under every card, and with a page full of cards the
+     effect stacks into visual noise. A 2px offset at lower opacity
      still lifts the card off the paper and still reads as printed stock,
      without any single card shouting. */
   .shadow-doc {
@@ -282,12 +282,11 @@
     font-weight: 700;
     text-transform: uppercase;
   }
-  /* Photos render CLEAN. This used to be a full forest→soil wash (0.3/0.36)
-     laid over every image, which fogged real photographs of real goods and
-     real land - exactly the thing a buyer is trying to judge. The texture
-     language lives on the page shells and dark bands instead. What is left
-     here is a faint foot fade, for the few places that print a caption over
-     the bottom of a photo. */
+  /* Photos render CLEAN. A full forest→soil wash laid over every image fogs
+     real photographs of real goods and real land - exactly the thing a buyer
+     is trying to judge. The texture language lives on the page shells and
+     dark bands instead. What is left here is a faint foot fade, for the few
+     places that print a caption over the bottom of a photo. */
   .photo-treatment {
     background: linear-gradient(to bottom, transparent 62%, rgb(31 33 28 / 0.22));
   }

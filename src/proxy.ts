@@ -3,9 +3,8 @@ import type { NextRequest } from "next/server";
 
 /**
  * Next.js Proxy - the first, cheap gate for the admin console and the agent
- * field app. A visitor with
- * no sign of a session is redirected to /login before the admin bundle is
- * ever sent.
+ * field app. A visitor with no sign of a session is redirected to /login
+ * before the admin bundle is ever sent.
  *
  * Two cookies count as "sign of a session":
  *  - `refreshToken` - the real httpOnly session cookie, visible here only when

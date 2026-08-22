@@ -67,8 +67,8 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
   const [updateBuyer, updateState] = useUpdateBuyerMutation();
   const saving = createState.isLoading || updateState.isLoading;
 
-  // Photo travels WITH the save (multipart payload + file, the profile-photo
-  // convention); `removePhoto` clears an existing one server-side.
+  // Photo travels WITH the save as a multipart payload + file; `removePhoto`
+  // clears an existing one server-side.
   const {
     fileInputRef,
     photoFile,
@@ -95,7 +95,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
 
   // The sync callback tracks a record bumped by a background refetch (another
   // tab, a lifecycle action) while reading; the hook never runs it during an
-  // in-progress edit, which is why the parent no longer key-remounts the form
+  // in-progress edit, which is why the parent does not key-remount the form
   // on updatedAt. It also drops any staged file from the native input, so
   // re-picking the same photo later still fires onChange.
   const { isEditing, setIsEditing, readOnly, roCls, mode } =
@@ -198,15 +198,15 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
     }
   };
 
-  // At rest an existing record READS. The form is what you get after
-  // pressing Edit, not a greyed-out copy of the page you were already on.
+  // At rest an existing record READS. The form appears after Edit is pressed,
+  // rather than as a greyed-out copy of the record already on screen.
   if (isEdit && !isEditing && buyer) {
     return (
       <AdminCard className="max-w-[640px] px-5 py-[18px]">
         {/* The photograph belongs on the READ view, not only behind Edit.
-            It was rendered inside the form, so at rest - which is how this
-            page is nearly always seen - the record showed no picture at all,
-            and the only way to look at one was to start editing. */}
+            Rendered inside the form, it is absent at rest - which is how this
+            page is nearly always seen - leaving the record with no picture
+            unless somebody starts editing. */}
         <div className="mb-4 flex items-center gap-3.5">
           <ViewablePhoto
             name={buyer.name}

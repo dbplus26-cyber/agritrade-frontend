@@ -8,9 +8,9 @@ import { z } from "zod";
 
 /**
  * Amounts are held as STRINGS through the form and converted once on submit.
- * A number input bound to a number clamps as you type, which makes the field
- * impossible to clear and turns "12" into "12" the moment you try to reach
- * "1.25".
+ * A number input bound to a number clamps on every keystroke, which makes the
+ * field impossible to clear and rewrites a half-typed figure before the rest
+ * of it can be entered.
  */
 const amountText = z
   .string()

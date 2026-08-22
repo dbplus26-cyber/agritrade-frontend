@@ -34,8 +34,8 @@ export function RequireAuth({ children }: { children: ReactNode }) {
     // Act only on a SETTLED failure. On remount RTK Query serves the cached
     // result instantly while revalidating - after a logout→login round trip
     // that cache holds the logout's 401, and treating it as a verdict here
-    // fired a logout that revoked the brand-new session (login said success,
-    // console never appeared until a hard refresh cleared the store).
+    // fires a logout that revokes the brand-new session: login reports success
+    // and the console never appears until a hard refresh clears the store.
     if (isError && !isFetching && !handled.current) {
       handled.current = true;
       // The session is invalid (commonly a stale cookie from a reset DB). Clear

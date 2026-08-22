@@ -1,5 +1,5 @@
 /**
- * Inline field error - sits under the input, never as a toast (design rule).
+ * Inline field error - sits under the input, never as a toast.
  * Rendered conditionally so an empty message adds no DOM.
  */
 export function FieldError({

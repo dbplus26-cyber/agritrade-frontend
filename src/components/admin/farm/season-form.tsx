@@ -49,7 +49,7 @@ export function SeasonForm({ season }: { season?: ISeason }) {
 
   // Always editable. This route is reached from the season's own detail page,
   // which is where the record is READ - so opening the form locked, on top of
-  // a read-only copy of facts the reader has just come from, asked for a
+  // a read-only copy of facts the reader has just come from, would ask for a
   // second click to do the one thing the page is for.
 
   const {
@@ -104,8 +104,8 @@ export function SeasonForm({ season }: { season?: ISeason }) {
       />
 
       {/* The date pair measures against this form, not the viewport: the
-          console shell keeps a ~225px rail beside it, so `sm:` paired the two
-          dates up while the column was still too narrow for both. */}
+          console shell keeps a ~225px rail beside it, so `sm:` would pair the
+          two dates up while the column is still too narrow for both. */}
       <form
         noValidate
         onSubmit={handleSubmit(onSubmit)}
@@ -168,7 +168,7 @@ export function SeasonForm({ season }: { season?: ISeason }) {
         </AdminCard>
 
         {/* Cancel returns to where the record is read rather than locking
-            the form back down - there is no locked state any more. */}
+            the form back down: this route has no locked state. */}
         <CommitRow>
           <AdminButton
             type="button"

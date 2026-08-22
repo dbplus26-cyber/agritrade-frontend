@@ -60,10 +60,9 @@ export const floatsApi = apiSlice.injectEndpoints({
      * Handing somebody money, which is a TRANSFER: it leaves a named company
      * account and lands in one of theirs.
      *
-     * `fromAccountId` is required by the server and used not to be sent at
-     * all, so this call refused every time it was made - a top-up that names
-     * no source is a bare credit, and the business's own position never fell
-     * by what it had just handed over. `toKind` says which of their pots it
+     * `fromAccountId` is required by the server: a top-up that names no source
+     * is a bare credit, and the business's own position never falls by what it
+     * has just handed over. `toKind` says which of their pots it
      * landed in, because a pocket, a wallet and a bank are different money.
      */
     topUpHolderFloat: builder.mutation<
@@ -97,16 +96,16 @@ export const floatsApi = apiSlice.injectEndpoints({
      * What somebody may SEND, and out of which company account.
      *
      * A separate act from handing them money, deliberately: one is permission
-     * and the other is cash, and the float made them the same thing, so a
-     * top-up silently widened what an agent could draw on the company wallet.
+     * and the other is cash, and a single float figure for both lets a top-up
+     * silently widen what an agent may draw on the company wallet.
      *
      * `capGhs: null` CLEARS the cap rather than setting it to nothing. A cap of
      * zero is refused by the server: zero is not a cap, it is a suspension, and
      * there is a switch for that below.
      *
      * There is no account to name. A send is a Hubtel API call against the
-     * Hubtel disbursement wallet, so an allowance pointed anywhere else booked
-     * the debit against an account the money had never left.
+     * Hubtel disbursement wallet, so an allowance pointed anywhere else books
+     * the debit against an account the money never left.
      */
     setHolderAuthority: builder.mutation<
       IMessageResponse,

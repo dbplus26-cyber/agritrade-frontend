@@ -53,8 +53,8 @@ export function HelpTip({
    * True when this tip sits INSIDE a `<label>` that implicitly labels its
    * control (AdminField). A `<button>` there is fatal twice over: implicit
    * association binds a label to its FIRST labelable descendant, so the
-   * label named the help icon and the field lost its name; and any
-   * aria-label echoing the field label made two elements answer to it. So
+   * label would name the help icon and the field would lose its name; and any
+   * aria-label echoing the field label makes two elements answer to it. So
    * in-label the trigger is a plain aria-hidden span - a pointer-and-touch
    * affordance only - and the CALLER must expose the same text to assistive
    * tech on the control itself (AdminField wires it via aria-describedby,

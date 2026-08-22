@@ -59,8 +59,8 @@ function TrendTooltip({
 }
 
 /**
- * Month-over-month sales-in vs purchases-out trend (design doc 9). Owns its own
- * query with a 6/12-month toggle; redaction-aware.
+ * Month-over-month sales-in vs purchases-out trend. Owns its own query with a
+ * 6/12-month toggle; redaction-aware.
  */
 export function PlTrendChart() {
   const [months, setMonths] = useState<12 | 6>(6);

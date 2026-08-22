@@ -57,8 +57,8 @@ import { saleBalanceGhs } from "./sale-payable";
  * counts allocated lots only, so a planned-but-unallocated truck would read as
  * empty against its capacity. Reconstructing it from `lines[]` is the trap:
  * `agreedKg` is a sale's weight across ALL trucks, so the moment one sale
- * spreads over two trips (design doc 5.4 allows it; only today's
- * full-coverage dispatch rule holds it back) the meter would show a truck over
+ * spreads over two trips (the backend allows it; only today's full-coverage
+ * dispatch rule holds it back) the meter would show a truck over
  * capacity on a load the backend accepts - the UI contradicting the very rule
  * it exists to explain. `plannedWeightKg` IS the figure OVER_CAPACITY is
  * judged on, so meter and refusal cannot drift apart.
@@ -177,8 +177,8 @@ export function ExpenseDialog({
 }
 
 /**
- * Add more confirmed sales to a truck that has not dispatched. The owner's
- * case: a sale is planned, the truck is half empty, and sending it that way
+ * Add more confirmed sales to a truck that has not dispatched. The case it
+ * serves: a sale is planned, the truck is half empty, and sending it that way
  * burns the trip's margin. The list is the SAME eligible pool the planner
  * uses (confirmed, payment terms met, unshipped, not on another truck), and
  * each row shows what the sale still needs so it can be fitted to the room

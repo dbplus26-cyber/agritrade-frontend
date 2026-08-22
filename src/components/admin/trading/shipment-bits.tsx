@@ -14,7 +14,7 @@ const SHIPMENT_STATUS: Record<ShipmentStatus, { label: string; tone: Tone }> = {
   PLANNED: { label: "Planned", tone: "harvest" },
 };
 
-/** Where the truck is in its trip, and what the state lets you do next. */
+/** Where the truck is in its trip, and what the state allows next. */
 const SHIPMENT_STATUS_HELP: Record<ShipmentStatus, string> = {
   ARRIVED:
     "The truck reached the drop-off point; the delivery still has to be signed off.",

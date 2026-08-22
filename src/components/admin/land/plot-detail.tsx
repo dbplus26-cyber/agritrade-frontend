@@ -77,8 +77,8 @@ export function PlotDetail({ id }: { id: string }) {
   };
 
   // An ownership document is the paper behind the plot, so removing one is
-  // gated on typing its name. The X sits beside a download link and used to
-  // delete the file on a single click with nothing asked.
+  // gated on typing its name. The X sits beside a download link, close enough
+  // that a single unguarded click would be easy to make by mistake.
   const onRemoveDocument = async (doc: { id: string; name: string }) => {
     const ok = await confirm({
       title: "Remove this document?",
@@ -200,7 +200,7 @@ export function PlotDetail({ id }: { id: string }) {
     <AdminCard className="px-5 py-3">
       <SectionHeading className="mb-1">Pricing & status</SectionHeading>
       <DetailGrid columns={2}>
-        {/* The plot's location and reference: what the heading used to say. */}
+        {/* The plot's location and reference, filed under the pricing card. */}
         <DetailItem full label="Location" strong>
           {p.locationText}
         </DetailItem>

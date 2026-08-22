@@ -9,7 +9,7 @@ import { plotPhotos, type PublicLandPlot } from "@/lib/public-land";
 /**
  * Re-export kept for existing imports (the plot detail page reads a plot's
  * photo set through this module). The implementation lives in the public-land
- * lib now, beside the type it serves.
+ * lib, beside the type it serves.
  */
 export { plotPhotos };
 

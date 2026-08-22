@@ -6,17 +6,15 @@ import { cn } from "@/lib/utils";
 /**
  * The availability board, filed as a document.
  *
- * This used to be a near-black band of tilted wooden planks with stencilled
- * names, gold tags nailed on at an angle and a vertical grain stripe running
- * through the text. It was the loudest thing on the site and the only heavy
- * dark block on an otherwise pale page, and the metaphor was carrying more
- * weight than the information: what a buyer wants from this section is what is
- * in the warehouse today, which is a register.
- *
- * So it is one now - a bordered sheet with a dotted rule between entries, the
- * commodity in the house display face, its variety and grade beneath, and the
- * availability chip on the right in the same vocabulary the lot cards on
+ * What a buyer wants from this section is what is in the warehouse today,
+ * which is a register: a bordered sheet with a dotted rule between entries,
+ * the commodity in the house display face, its variety and grade beneath, and
+ * the availability chip on the right in the same vocabulary the lot cards on
  * /commodities already use. Same content, same words, read at a glance.
+ *
+ * Not a near-black band of stencilled planks and gold tags: a heavy dark block
+ * on an otherwise pale page is the loudest thing on the site, and the metaphor
+ * then carries more weight than the information.
  */
 
 /**
@@ -92,8 +90,8 @@ function RegisterRow({
 
           From sm up this column sizes to its own text, so the cap has to be an
           absolute length: a percentage max-width here would resolve against a
-          width that is itself derived from this text, which is what used to
-          clip short entries. 42rem is roughly where a single line stops being
+          width that is itself derived from this text, which is what clips
+          short entries. 42rem is roughly where a single line stops being
           readable at a glance on a full-width row. */}
       <span className="min-w-0 basis-full pr-[80px] sm:basis-auto sm:max-w-[42rem] sm:pr-0">
         {/* The whole row is the target when the line has a page behind it -
@@ -113,9 +111,9 @@ function RegisterRow({
 
             The clamp is `line-clamp-1` over wrapping text, never `truncate`.
             `truncate`'s `nowrap` makes each line's min-content the whole
-            string, so a short "Maize" was measured as wide as its longest
+            string, so a short "Maize" is measured as wide as its longest
             sibling line and then cut against a fraction of that - short
-            entries came out clipped. Wrapping text measures as one word, so
+            entries come out clipped. Wrapping text measures as one word, so
             the column only ever narrows when the text genuinely does not
             fit. */}
         <span

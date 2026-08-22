@@ -1,6 +1,6 @@
 // src/types/farm.types.ts
 //
-// The admin farm investment module (design doc 5.11), mirroring the backend
+// The admin farm investment module, mirroring the backend
 // DTOs. Money (grant/repayment values, plan expectations, balances) is
 // `number | null` - redacted per financial visibility, though the whole farm
 // namespace is owner-only so in practice always visible.
@@ -268,9 +268,8 @@ export interface ICreateGrantInput {
 // ── Repayments ────────────────────────────────────────────────────
 /**
  * What the farmer handed back. PRODUCE turns a receivable into stock and moves
- * no money; CASH lands in an account and posts a receipt. A farmer who had a
- * bad season and settled in money had nowhere to be recorded until CASH
- * existed.
+ * no money; CASH lands in an account and posts a receipt - the shape a farmer
+ * who had a bad season and settled in money is recorded under.
  */
 export type RepaymentKind = "CASH" | "PRODUCE";
 export interface IRepayment {
@@ -336,7 +335,7 @@ export interface IRepaymentListQuery {
 export interface ICreateRepaymentInput {
   farmerId: string;
   seasonId: string;
-  /** Defaults to PRODUCE server-side, the only repayment this book once had. */
+  /** Defaults to PRODUCE server-side, the ordinary repayment on this book. */
   kind?: RepaymentKind;
   /** PRODUCE only - the server refuses a cash repayment carrying any of them. */
   commodityId?: string;

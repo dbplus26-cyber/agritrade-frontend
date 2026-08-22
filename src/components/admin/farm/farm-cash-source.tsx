@@ -7,14 +7,14 @@
 // `components/admin/statements/cash-source.tsx` asks the first question already
 // and is reused whole for DISPLAY (see FarmCashSourceNote below). Its FIELD is
 // not reused: its copy lives in a module-private COPY map keyed by
-// `"asset" | "drawing"`, with no seam for a third register's wording, and the
-// statements module is out of this change's reach. A grant asked "How was this
-// asset paid for?" would be a worse form than one that asks about inputs, and
-// the escape hatch's examples ("Owned before the books started") are answers no
-// storekeeper would ever give. So the question is asked here in the grant's own
-// words, over the same radio-card structure and the same accessibility
-// decisions, and the ANSWER travels through the shared `cashSourceBody` so both
-// registers put the exclusive-or on the wire the same way.
+// `"asset" | "drawing"`, with no seam for a third register's wording. A grant
+// asked "How was this asset paid for?" would be a worse form than one that
+// asks about inputs, and the escape hatch's examples ("Owned before the books
+// started") are answers no storekeeper would ever give. So the question is
+// asked here in the grant's own words, over the same radio-card structure and
+// the same accessibility decisions, and the ANSWER travels through the shared
+// `cashSourceBody` so both registers put the exclusive-or on the wire the same
+// way.
 import { PaymentAccountField } from "@/components/admin/payment-account-field";
 import { CashSourceNote } from "@/components/admin/statements/cash-source";
 import {

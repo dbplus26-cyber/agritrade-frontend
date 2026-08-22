@@ -113,8 +113,8 @@ export function GrantsRegister() {
         meta: columnMeta({ stretch: true }),
         // The season rides under the farmer's name rather than holding a
         // column of its own: it is context for the row, not a fact anybody
-        // scans down, and season names here run long enough to have been one
-        // of the columns forcing this table off the side of the screen.
+        // scans down, and season names here run long enough to force the
+        // table off the side of the screen from a column of their own.
         cell: ({ row }) => (
           <TitleCell
             href={`${LIST}/${row.original.id}`}
@@ -152,9 +152,8 @@ export function GrantsRegister() {
       },
       {
         // A register that shows an amount and stays silent about where it came
-        // from reproduces the bug this column exists to close, one row at a
-        // time: the value was always counted as spent, and nothing on the page
-        // said out of what.
+        // from counts the value as spent while saying nothing about out of
+        // what, one row at a time.
         id: "fundedFrom",
         header: columnHelp(
           "Funded from",

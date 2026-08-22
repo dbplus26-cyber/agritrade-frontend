@@ -7,9 +7,9 @@ import { z } from "zod";
  * refuse what the server would refuse, and say so before the round trip.
  *
  * The last four fields are the PAYMENT half. Recording a cost and settling it
- * used to be two screens, so a cost paid on the spot - which is most of them -
- * was entered here and then chased on the voucher's own page, and any that was
- * not chased read as owing money that had in fact gone out. There is
+ * across two screens leaves a cost paid on the spot - which is most of them -
+ * entered here and then chased on the voucher's own page, and any that is not
+ * chased reads as owing money that has in fact gone out. There is
  * deliberately no amount among them: the server settles the whole cost, and
  * asking for the same figure twice is how a part payment gets recorded by
  * accident.
@@ -28,7 +28,7 @@ export const makeExpenseSchema = (options?: {
         .min(1, "Enter the amount")
         .refine((v) => Number(v) > 0, "The amount must be more than zero")
         // The backend's moneyField ceiling - uncapped here, a fat-fingered
-        // amount met a raw 400 instead of a field message.
+        // amount meets a raw 400 instead of a field message.
         .refine(
           (v) => Number(v) <= 10_000_000,
           "Enter an amount up to 10,000,000",

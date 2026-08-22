@@ -84,7 +84,7 @@ export function ShipmentForm({
   const stock = useGetStockBalancesQuery();
   // Both directories are open registers: a haulier keeps adding drivers and
   // depots and never removes the old ones. Fetching a page and filtering it
-  // in the browser meant everything past the limit was invisible AND
+  // in the browser leaves everything past the limit invisible AND
   // unselectable, with the picker reporting "no matches" for records that
   // exist. So the typed text goes to the server. See useRemoteSearch.
   const driverSearch = useRemoteSearch();
