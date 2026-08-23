@@ -1,11 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
-import { Plus } from "lucide-react";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
@@ -28,12 +25,13 @@ import { extractApiError } from "@/lib/extract-api-error";
 import { useGetInputItemsQuery } from "@/redux/farm/input-items-api";
 import type { IInputItem, IInputItemListQuery } from "@/types/farm.types";
 import { ACTIVE_FILTER_OPTIONS, ActiveBadge } from "./farm-bits";
+import { InputItemDialog } from "./input-item-dialog";
 
 const LIST = "/admin/input-items";
 const FILTER_DEFAULTS = { active: "all", size: "10" };
 
 export function InputItemsRegister() {
-  const router = useRouter();
+  const [createOpen, setCreateOpen] = useState(false);
   const {
     page,
     filters,
@@ -137,11 +135,8 @@ export function InputItemsRegister() {
           totalCount={totalCount}
           noun="items"
           action={
-            <AdminButton asChild aria-label="New item">
-              <Link href={`${LIST}/new`}>
-                <Plus className="h-4 w-4" aria-hidden="true" />
-                <span className="hidden sm:inline">New item</span>
-              </Link>
+            <AdminButton onClick={() => setCreateOpen(true)} type="button">
+              New item
             </AdminButton>
           }
           inlineFilter={
@@ -179,7 +174,7 @@ export function InputItemsRegister() {
           title="No input items yet"
           description="Add the inputs you grant to farmers."
           actionLabel="New item"
-          onAction={() => router.push(`${LIST}/new`)}
+          onAction={() => setCreateOpen(true)}
           onClear={() => {
             setSearch("");
             resetFilters();
@@ -203,6 +198,11 @@ export function InputItemsRegister() {
           />
         </AdminCard>
       )}
+
+      <InputItemDialog
+        onClose={() => setCreateOpen(false)}
+        open={createOpen}
+      />
     </div>
   );
 }

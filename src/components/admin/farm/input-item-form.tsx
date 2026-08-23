@@ -21,7 +21,6 @@ import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import {
-  useCreateInputItemMutation,
   useDeleteInputItemMutation,
   useSetInputItemActiveMutation,
   useUpdateInputItemMutation,
@@ -31,18 +30,15 @@ import { inputItemSchema, type InputItemValues } from "@/validations/farm-schema
 
 const LIST = "/admin/input-items";
 
-export function InputItemForm({ item }: { item?: IInputItem }) {
+export function InputItemForm({ item }: { item: IInputItem }) {
   const router = useRouter();
-  const [createItem, createState] = useCreateInputItemMutation();
-  const [updateItem, updateState] = useUpdateInputItemMutation();
+  const [updateItem, { isLoading: saving }] = useUpdateInputItemMutation();
   const [setActive] = useSetInputItemActiveMutation();
   const [deleteItem, deleteState] = useDeleteInputItemMutation();
   const { confirm, confirmationDialog } = useConfirm();
-  const saving = createState.isLoading || updateState.isLoading;
 
-  // Edit opens READ-ONLY; the Edit button unlocks the inputs. Create is
-  // always editable.
-  const [isEditing, setIsEditing] = useState(item === undefined);
+  // The record opens READ-ONLY; the Edit button unlocks the inputs.
+  const [isEditing, setIsEditing] = useState(false);
   const readOnly = !isEditing;
   // Keep disabled inputs legible as a read view rather than a greyed-out form.
   const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
@@ -54,20 +50,18 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
     formState: { errors },
   } = useForm<InputItemValues>({
     resolver: zodResolver(inputItemSchema),
-    defaultValues: item
-      ? {
-          description: item.description ?? "",
-          name: item.name,
-          unitLabel: item.unitLabel,
-        }
-      : { description: "", name: "", unitLabel: "" },
+    defaultValues: {
+      description: item.description ?? "",
+      name: item.name,
+      unitLabel: item.unitLabel,
+    },
   });
 
   // A background refetch can bump the record (e.g. the activate/deactivate
   // actions below). Track the fresh values while reading, but never clobber
   // an in-progress edit.
   useEffect(() => {
-    if (item && !isEditing)
+    if (!isEditing)
       reset({
         description: item.description ?? "",
         name: item.name,
@@ -79,22 +73,13 @@ export function InputItemForm({ item }: { item?: IInputItem }) {
     try {
       // Empty clears the column on an edit; on a create it is simply omitted.
       const description = values.description?.trim() ?? "";
-      if (item) {
-        await updateItem({
-          id: item.id,
-          body: { ...values, description: description || null },
-        }).unwrap();
-        notify.success("Item updated");
-        // This screen doubles as the item's read view - drop back into it.
-        setIsEditing(false);
-      } else {
-        await createItem({
-          ...values,
-          ...(description ? { description } : {}),
-        }).unwrap();
-        notify.success("Item created");
-        router.push(LIST);
-      }
+      await updateItem({
+        id: item.id,
+        body: { ...values, description: description || null },
+      }).unwrap();
+      notify.success("Item updated");
+      // This screen doubles as the item's read view - drop back into it.
+      setIsEditing(false);
     } catch (err) {
       notify.error("Couldn't save the item", {
         description: extractApiError(err).message,

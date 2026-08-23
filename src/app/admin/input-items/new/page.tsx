@@ -1,8 +1,6 @@
-import type { Metadata } from "next";
-import { InputItemForm } from "@/components/admin/farm/input-item-form";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "New input item" };
-
+/** Adding an input item is a dialog on the register now. */
 export default function NewInputItemPage() {
-  return <InputItemForm />;
+  redirect("/admin/input-items");
 }
