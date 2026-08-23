@@ -60,7 +60,10 @@ export function FilePicker({
   capture?: "environment" | "user";
   className?: string;
   confirmLabel?: string;
-  hint?: string;
+  /** A node, so a caller can hang a help tip off the end of the sentence
+   * rather than beside the whole picker, where it wraps onto a line of its
+   * own the moment the hint stacks. */
+  hint?: React.ReactNode;
   /** Receives the prepared file - on confirm, or immediately when staging. */
   onConfirm: (file: null | File) => Promise<void> | void;
   optimize?: boolean;

@@ -129,41 +129,41 @@ function SaleSettlement({ sale }: { sale: IShipmentSale }) {
         </ul>
       ) : null}
       {!settled ? null : (
-      <dl className="mt-1 flex flex-col gap-0.5 text-[11px]">
-        <div className="flex items-baseline justify-between gap-2">
-          <dt className="text-adm-muted">Agreed</dt>
-          <dd className="flex-none">
-            <Mono className="text-adm-ink">
-              <Money value={sale.agreedTotalGhs} />
-            </Mono>
-          </dd>
-        </div>
-        <div className="flex items-baseline justify-between gap-2">
-          <dt className="text-adm-muted">Settled</dt>
-          <dd className="flex-none">
-            <Mono className="font-semibold text-adm-ink">
-              <Money value={sale.settledTotalGhs} />
-            </Mono>
-          </dd>
-        </div>
-        {delta !== null && delta !== 0 ? (
+        <dl className="mt-1 flex flex-col gap-0.5 text-[11px]">
           <div className="flex items-baseline justify-between gap-2">
-            <dt className="text-adm-muted">
-              {delta < 0 ? "Short by" : "Over by"}
-            </dt>
+            <dt className="text-adm-muted">Agreed</dt>
             <dd className="flex-none">
-              <Mono
-                className={cn(
-                  "font-semibold",
-                  delta < 0 ? "text-console-red" : "text-console",
-                )}
-              >
-                <Money value={Math.abs(delta)} />
+              <Mono className="text-adm-ink">
+                <Money value={sale.agreedTotalGhs} />
               </Mono>
             </dd>
           </div>
-        ) : null}
-      </dl>
+          <div className="flex items-baseline justify-between gap-2">
+            <dt className="text-adm-muted">Settled</dt>
+            <dd className="flex-none">
+              <Mono className="font-semibold text-adm-ink">
+                <Money value={sale.settledTotalGhs} />
+              </Mono>
+            </dd>
+          </div>
+          {delta !== null && delta !== 0 ? (
+            <div className="flex items-baseline justify-between gap-2">
+              <dt className="text-adm-muted">
+                {delta < 0 ? "Short by" : "Over by"}
+              </dt>
+              <dd className="flex-none">
+                <Mono
+                  className={cn(
+                    "font-semibold",
+                    delta < 0 ? "text-console-red" : "text-console",
+                  )}
+                >
+                  <Money value={Math.abs(delta)} />
+                </Mono>
+              </dd>
+            </div>
+          ) : null}
+        </dl>
       )}
     </div>
   );
@@ -378,11 +378,7 @@ export function ShipmentDetail({ id }: { id: string }) {
             className="inline-flex flex-none xl:w-full"
             text="Pick which stock lots fill each sale, so the trip is costed on the goods you actually load."
           >
-            <AdminButton
-              className="xl:w-full"
-              variant="secondary"
-              asChild
-            >
+            <AdminButton className="xl:w-full" variant="secondary" asChild>
               <Link href={`${LIST}/${s.id}/allocate`}>Allocate lots</Link>
             </AdminButton>
           </HelpWrap>
@@ -429,7 +425,10 @@ export function ShipmentDetail({ id }: { id: string }) {
           className="inline-flex flex-none xl:w-full"
           text="Records what actually came off the truck and what each buyer will pay for it. You can mark it arrived and weigh it later."
         >
-          <AdminButton className="xl:w-full" onClick={() => setArriveOpen(true)}>
+          <AdminButton
+            className="xl:w-full"
+            onClick={() => setArriveOpen(true)}
+          >
             Mark arrived
           </AdminButton>
         </HelpWrap>
@@ -818,7 +817,8 @@ export function ShipmentDetail({ id }: { id: string }) {
               </DetailItem>
             ) : null}
             <DetailItem label="Company">
-              {s.driverCompany ?? (anyDriverExtra ? "Solo operator" : <Absent />)}
+              {s.driverCompany ??
+                (anyDriverExtra ? "Solo operator" : <Absent />)}
             </DetailItem>
             {s.driverCity ? (
               <DetailItem label="City">{s.driverCity}</DetailItem>
@@ -866,55 +866,71 @@ export function ShipmentDetail({ id }: { id: string }) {
             from the oldest stock (flagged estimated).
           </p>
         ) : (
+          // The commodity gets its own line, and everything that qualifies it
+          // wraps beneath. Run inline, a long name and a price shared a row
+          // and broke it mid-phrase on a phone - and both can be long.
           s.allocations.map((a) => (
             <div
               key={a.id}
-              className="flex items-baseline justify-between gap-3 border-b border-adm-hairline py-2 last:border-b-0"
+              className="flex flex-col gap-1.5 border-b border-adm-hairline py-2.5 last:border-b-0 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3"
             >
               <div className="min-w-0">
                 <Link
-                  className={cn(adminLinkClass, "font-medium")}
+                  className={cn(
+                    adminLinkClass,
+                    "block font-medium [overflow-wrap:anywhere]",
+                  )}
                   href={`/admin/commodities/${a.commodity.id}`}
                 >
                   {a.commodity.name}
                 </Link>
-                <Mono className="ml-2 text-[11px] text-adm-muted">
-                  {formatKg(a.weightKg)} @{" "}
-                  <Money value={a.unitCostSnapshotGhs} />
-                </Mono>
-                <Link
-                  className={cn(
-                    adminLinkClass,
-                    "font-adminmono ml-2 text-[10.5px] tabular-nums",
-                  )}
-                  href={`/admin/sales/${a.sale.id}`}
-                >
-                  {a.sale.transactionNo}
-                </Link>
-                {/* Where this slice was picked up. A trip that loads at two
+                <div className="mt-0.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                  <Mono className="text-[11px] text-adm-muted">
+                    {formatKg(a.weightKg)} @{" "}
+                    <Money value={a.unitCostSnapshotGhs} />
+                  </Mono>
+                  <Link
+                    className={cn(
+                      adminLinkClass,
+                      "font-adminmono text-[10.5px] tabular-nums",
+                    )}
+                    href={`/admin/sales/${a.sale.id}`}
+                  >
+                    {a.sale.transactionNo}
+                  </Link>
+                  {/* Where this slice was picked up. A trip that loads at two
                     sheds, or collects half its load at a farm gate, otherwise
                     reads as one undifferentiated pile. */}
-                <span className="ml-2 text-[10.5px] text-adm-muted">
-                  {a.source.kind === "SUPPLIER" ? "collected at " : "from "}
-                  {a.source.id ? (
-                    <Link
-                      className={adminLinkClass}
-                      href={
-                        a.source.kind === "SUPPLIER"
-                          ? `/admin/suppliers/${a.source.id}`
-                          : `/admin/warehouses/${a.source.id}`
-                      }
-                    >
-                      {a.source.name}
-                    </Link>
-                  ) : (
-                    a.source.name
-                  )}
-                </span>
+                  <span className="text-[10.5px] text-adm-muted">
+                    {a.source.kind === "SUPPLIER" ? "collected at " : "from "}
+                    {a.source.id ? (
+                      <Link
+                        className={adminLinkClass}
+                        href={
+                          a.source.kind === "SUPPLIER"
+                            ? `/admin/suppliers/${a.source.id}`
+                            : `/admin/warehouses/${a.source.id}`
+                        }
+                      >
+                        {a.source.name}
+                      </Link>
+                    ) : (
+                      a.source.name
+                    )}
+                  </span>
+                </div>
               </div>
-              <Mono className="whitespace-nowrap text-[11.5px] text-adm-ink">
-                <Money value={a.lineCostGhs} />
-              </Mono>
+              {/* On a phone the line cost takes a row of its own and says what
+                  it is: a bare figure under a wrapped name is not readable as
+                  the cost of it. */}
+              <div className="flex items-baseline justify-between gap-3 sm:block sm:flex-none">
+                <span className="text-[10px] font-bold tracking-[0.08em] text-adm-muted uppercase sm:hidden">
+                  Line cost
+                </span>
+                <Mono className="text-[11.5px] whitespace-nowrap text-adm-ink">
+                  <Money value={a.lineCostGhs} />
+                </Mono>
+              </div>
             </div>
           ))
         )}
@@ -976,17 +992,22 @@ export function ShipmentDetail({ id }: { id: string }) {
                 accept="image/*,application/pdf"
                 busy={addDocState.isLoading}
                 confirmLabel="Upload"
-                hint="PDF or a photo of the ticket, receipt or note"
+                hint={
+                  // The tip hangs off the END of the sentence rather than
+                  // sitting beside the picker: as a sibling it wrapped onto a
+                  // line of its own once the hint stacked, a lone question
+                  // mark with nothing next to it.
+                  <span className="inline-flex items-baseline gap-1">
+                    <span>PDF or a photo of the ticket, receipt or note</span>
+                    <HelpTip
+                      label="About adding a document"
+                      text="Files a copy of this paperwork against the trip - you see the file before anything is uploaded."
+                    />
+                  </span>
+                }
                 onConfirm={onUploadDocument}
                 optimize={false}
                 triggerLabel="Choose document"
-              />
-              {/* An icon rather than HelpWrap here: the picker renders a block
-                  of its own, and a tooltip trigger cannot wrap it without
-                  putting a <div> inside a <span>. */}
-              <HelpTip
-                label="About adding a document"
-                text="Files a copy of this paperwork against the trip - you see the file before anything is uploaded."
               />
             </div>
             <div className="mt-3 border-t border-adm-hairline pt-3">
@@ -997,7 +1018,10 @@ export function ShipmentDetail({ id }: { id: string }) {
                 <button
                   type="button"
                   onClick={() => setSigning((v) => !v)}
-                  className={cn(adminLinkClass, "cursor-pointer text-[11px] font-semibold")}
+                  className={cn(
+                    adminLinkClass,
+                    "cursor-pointer text-[11px] font-semibold",
+                  )}
                   aria-expanded={signing}
                 >
                   {signing ? "Hide signature pad" : "Or sign on this screen"}
@@ -1048,64 +1072,75 @@ export function ShipmentDetail({ id }: { id: string }) {
           Expenses
         </SectionHeading>
         {s.expenses.length === 0 ? (
-          <p className="py-2 text-[11.5px] text-adm-muted">No expenses recorded.</p>
+          <p className="py-2 text-[11.5px] text-adm-muted">
+            No expenses recorded.
+          </p>
         ) : (
-          s.expenses.map((e) => (
-            <div
-              key={e.id}
-              className="flex items-baseline justify-between gap-3 border-b border-adm-hairline py-2 last:border-b-0"
-            >
-              {/* The category leads; its note follows on a quieter second
+          // A card each, and two lines inside it: what the cost was and how to
+          // strike it, then what it came to and whether it has been paid.
+          // Squeezed onto one line the name lost its width to a badge, a
+          // figure and a button, and one hairline between rows left four
+          // costs reading as one.
+          <div className="flex flex-col gap-2">
+            {s.expenses.map((e) => (
+              <div
+                key={e.id}
+                className="flex flex-col gap-2 rounded-none border border-adm-line bg-adm-card p-3"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  {/* The category leads; its note follows on a quieter second
                   line, clamped to two. Run inline and unclamped, a full-length
                   voucher note turned every row into a six-line paragraph and
                   buried the amounts the list exists to show. The full text
                   stays one hover away. */}
-              <div className="min-w-0">
-                <Link
-                  className={cn(adminLinkClass, "block truncate")}
-                  href={`/admin/expense-categories/${e.category.id}`}
-                >
-                  {e.category.name}
-                </Link>
-                {e.description ? (
-                  <span
-                    className="mt-0.5 line-clamp-2 text-[11px] text-adm-muted"
-                    title={e.description}
-                  >
-                    {e.description}
-                  </span>
-                ) : null}
-              </div>
-              <div className="flex items-center gap-3">
-                {/* Whether the money has actually gone. A trip cost recorded
+                  <div className="min-w-0">
+                    <Link
+                      className={cn(adminLinkClass, "block truncate")}
+                      href={`/admin/expense-categories/${e.category.id}`}
+                    >
+                      {e.category.name}
+                    </Link>
+                    {e.description ? (
+                      <span
+                        className="mt-0.5 line-clamp-2 text-[11px] text-adm-muted"
+                        title={e.description}
+                      >
+                        {e.description}
+                      </span>
+                    ) : null}
+                  </div>
+                  {/* Voiding is owner-only (like the general expense void):
+                    striking out a cost moves the trip's profit. */}
+                  {isSuperAdmin ? (
+                    <HelpWrap
+                      className="inline-flex flex-none"
+                      text="Strikes this cost off the trip's profit with a reason. The voucher stays on record, never erased."
+                    >
+                      <AdminButton
+                        type="button"
+                        variant="danger"
+                        size="sm"
+                        className="flex-none"
+                        onClick={() => setVoidingExpense(e)}
+                      >
+                        Void
+                      </AdminButton>
+                    </HelpWrap>
+                  ) : null}
+                </div>
+                <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1.5 border-t border-adm-hairline pt-2">
+                  {/* Whether the money has actually gone. A trip cost recorded
                     and never settled is money the books say has left and the
                     cash book has never seen, and this list is where somebody
                     would notice. */}
-                <SettlementBadge status={e.settlement.status} />
-                <Mono className="whitespace-nowrap text-[11.5px] text-adm-ink">
-                  <Money value={e.amountGhs} />
-                </Mono>
-                {/* Voiding is owner-only (like the general expense void):
-                    striking out a cost moves the trip's profit. */}
-                {isSuperAdmin ? (
-                  <HelpWrap
-                    className="inline-flex flex-none"
-                    text="Strikes this cost off the trip's profit with a reason. The voucher stays on record, never erased."
-                  >
-                    <AdminButton
-                      type="button"
-                      variant="danger"
-                      size="sm"
-                      className="flex-none"
-                      onClick={() => setVoidingExpense(e)}
-                    >
-                      Void
-                    </AdminButton>
-                  </HelpWrap>
-                ) : null}
+                  <SettlementBadge status={e.settlement.status} />
+                  <Mono className="text-[12px] font-semibold whitespace-nowrap text-adm-ink">
+                    <Money value={e.amountGhs} />
+                  </Mono>
+                </div>
               </div>
-            </div>
-          ))
+            ))}
+          </div>
         )}
       </AdminCard>
     </div>
