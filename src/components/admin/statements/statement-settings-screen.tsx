@@ -20,6 +20,7 @@ import {
   SectionHeading,
 } from "@/components/admin/ui";
 import { FormSkeleton } from "@/components/admin/skeletons";
+import { RecordFacts } from "@/components/admin/record-facts";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import {
   useGetSettingsQuery,
@@ -185,8 +186,6 @@ function StatementSettingsForm({
 }) {
   const [updateSettings, { isLoading: saving }] = useUpdateSettingsMutation();
   const [isEditing, setIsEditing] = useState(false);
-  const readOnly = !isEditing;
-  const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
 
   const {
     register,
@@ -230,13 +229,112 @@ function StatementSettingsForm({
     }
   };
 
+  /** A block of the cover, named. Three unlabelled boxes said nothing about
+   * which of them carried what. */
+  const section = (
+    title: string,
+    note: string,
+    body: React.ReactNode,
+  ) => (
+    <AdminCard className="px-5 py-[18px]">
+      <SectionHeading className="mb-0.5">{title}</SectionHeading>
+      <p className="mb-4 text-[11px] leading-[1.5] text-adm-muted">{note}</p>
+      {body}
+    </AdminCard>
+  );
+
+  /** A saved block as it will print, or an honest gap. */
+  const printed = (value: string) =>
+    value.trim() ? (
+      <span className="whitespace-pre-line">{value}</span>
+    ) : null;
+
+  // At rest the settings READ. A disabled copy of the form seals each value
+  // into a box the width of the input, greys the whole page to one tone, and
+  // gives a reader no way to see a long address in full - which is the same
+  // reason every record page in the console opens as facts and unlocks on
+  // Edit.
+  if (!isEditing) {
+    return (
+      <div className="flex flex-col gap-4">
+        {section(
+          "The business",
+          "The name and activity printed on the cover and the certificate.",
+          <RecordFacts
+            facts={[
+              {
+                label: "Business name",
+                value: printed(settings.statementBusinessName),
+              },
+              {
+                full: true,
+                label: "Principal business activity",
+                value: printed(settings.statementPrincipalActivity),
+              },
+            ]}
+          />,
+        )}
+        {section(
+          "The proprietor",
+          "Who the books belong to, as they sign them.",
+          <RecordFacts
+            facts={[
+              {
+                label: "Proprietor's name",
+                value: printed(settings.statementProprietorName),
+              },
+              {
+                full: true,
+                label: "Proprietor's address",
+                value: printed(settings.statementProprietorAddress),
+              },
+            ]}
+          />,
+        )}
+        {section(
+          "Bankers and accountants",
+          "The blocks on the cover and the certificate's signature lines. Both optional.",
+          <RecordFacts
+            facts={[
+              {
+                full: true,
+                label: "Bankers",
+                value: printed(settings.statementBankersBlock),
+              },
+              {
+                full: true,
+                label: "Accountants",
+                value: printed(settings.statementAccountantsBlock),
+              },
+            ]}
+          />,
+        )}
+        <CommitRow>
+          <AdminButton
+            key="locked"
+            type="button"
+            variant="gold"
+            size="lg"
+            onClick={() => {
+              setIsEditing(true);
+            }}
+          >
+            Edit statement settings
+          </AdminButton>
+        </CommitRow>
+      </div>
+    );
+  }
+
   return (
     <form
       noValidate
       onSubmit={handleSubmit(onSubmit)}
-      className="flex max-w-[640px] flex-col gap-4"
+      className="flex flex-col gap-4"
     >
-      <AdminCard className="px-5 py-[18px]">
+      {section(
+        "The business",
+        "The name and activity printed on the cover and the certificate.",
         <div className="flex flex-col gap-5">
           <AdminField
             label="Business name"
@@ -245,10 +343,8 @@ function StatementSettingsForm({
           >
             <Input
               placeholder="e.g. DB Plus Business"
-              disabled={readOnly}
               className={cn(
                 adminInputClass,
-                roCls,
                 errors.statementBusinessName && "border-console-red",
               )}
               {...register("statementBusinessName")}
@@ -262,19 +358,19 @@ function StatementSettingsForm({
             <textarea
               rows={3}
               placeholder="e.g. Farming, agribusiness, general merchant…"
-              disabled={readOnly}
               className={cn(
                 textareaClass,
-                roCls,
                 errors.statementPrincipalActivity && "border-console-red",
               )}
               {...register("statementPrincipalActivity")}
             />
           </AdminField>
-        </div>
-      </AdminCard>
+        </div>,
+      )}
 
-      <AdminCard className="px-5 py-[18px]">
+      {section(
+        "The proprietor",
+        "Who the books belong to, as they sign them.",
         <div className="flex flex-col gap-5">
           <AdminField
             label="Proprietor's name"
@@ -283,10 +379,8 @@ function StatementSettingsForm({
           >
             <Input
               placeholder="e.g. Hassan Issah"
-              disabled={readOnly}
               className={cn(
                 adminInputClass,
-                roCls,
                 errors.statementProprietorName && "border-console-red",
               )}
               {...register("statementProprietorName")}
@@ -300,20 +394,20 @@ function StatementSettingsForm({
             <textarea
               rows={3}
               placeholder={"H/No. …\nTown - Region"}
-              disabled={readOnly}
               className={cn(
                 textareaClass,
-                roCls,
                 errors.statementProprietorAddress && "border-console-red",
               )}
               {...register("statementProprietorAddress")}
             />
           </AdminField>
-        </div>
-      </AdminCard>
+        </div>,
+      )}
 
-      <AdminCard className="px-5 py-[18px]">
-        <div className="flex flex-col gap-5">
+      {section(
+        "Bankers and accountants",
+        "The blocks on the cover and the certificate's signature lines. Both optional.",
+        <div className="grid gap-5 @2xl:grid-cols-2">
           <AdminField
             label="Bankers"
             optional
@@ -321,12 +415,10 @@ function StatementSettingsForm({
             error={errors.statementBankersBlock?.message}
           >
             <textarea
-              rows={3}
+              rows={4}
               placeholder={"Bank name\nBranch\nTown - Region"}
-              disabled={readOnly}
               className={cn(
                 textareaClass,
-                roCls,
                 errors.statementBankersBlock && "border-console-red",
               )}
               {...register("statementBankersBlock")}
@@ -341,17 +433,15 @@ function StatementSettingsForm({
             <textarea
               rows={4}
               placeholder={"Firm name\n(Chartered Accountants)\nP. O. Box …\nCity - Country"}
-              disabled={readOnly}
               className={cn(
                 textareaClass,
-                roCls,
                 errors.statementAccountantsBlock && "border-console-red",
               )}
               {...register("statementAccountantsBlock")}
             />
           </AdminField>
-        </div>
-      </AdminCard>
+        </div>,
+      )}
 
       {/* Same keyed-branch discipline as the system settings form: an unkeyed
           swap would let the Edit button's DOM node become the submit. */}
@@ -411,7 +501,10 @@ export function StatementSettingsScreen() {
           onRetry={() => void refetch()}
         />
       ) : (
-        <div className="flex max-w-[640px] flex-col gap-4">
+        // @container so the bankers/accountants pair measures against this
+        // column and not the window: the rail-less page is wider than the
+        // form wants to be, and the pair only fits past 42rem of it.
+        <div className="@container flex max-w-[860px] flex-col gap-4">
           <LogoCard settings={data.data.settings} />
           <StatementSettingsForm
             settings={data.data.settings}
