@@ -397,7 +397,7 @@ export function DetailHeader({
   title: string;
   /** The meta line under the title: "Recorded 12 Mar 2026", a counterparty. */
   sub?: React.ReactNode;
-  /** Status / approval badges, shown above the title. */
+  /** Status / approval badges, shown on the row beneath the meta line. */
   badges?: React.ReactNode;
   /** Edit, PDF, lifecycle buttons. */
   actions?: React.ReactNode;
@@ -405,76 +405,49 @@ export function DetailHeader({
   hint?: string;
 }) {
   const hasTopRow = Boolean(badges || actions);
-  // On phones the meta line ("Drafted 12 Mar 2026", the counterparty) sits
-  // beside the badges on the top row when there are badges to sit beside -
-  // one structured line instead of a badge, then a date, then a title, each
-  // on a row of its own. With no badges it stays under the title.
-  const subBesideBadges = Boolean(badges && sub);
   return (
-    // Phone: a two-column grid - badges+meta left and actions right on the top
-    // row, the title beneath - while the DOM keeps its reading order. md+: a
-    // plain column (badges, title, meta, actions by `order`), where the grid
-    // placements are ignored.
-    <div
-      className={cn(
-        "mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 md:flex md:flex-col md:items-stretch",
-        className,
-      )}
-    >
-      {/* Phone: badges and meta as one wrapping cluster; otherwise (and from
-          md) `contents`, so each takes its own place in the parent. */}
-      <div
-        className={cn(
-          subBesideBadges
-            ? "col-start-1 row-start-1 flex flex-wrap items-center gap-x-3 gap-y-1"
-            : "contents",
-          "md:contents",
-        )}
-      >
-        {badges ? (
-          <div className="col-start-1 row-start-1 flex flex-wrap items-center gap-2 md:order-1 md:mb-2">
-            {badges}
-          </div>
+    // One reading order at every width: what this page is, what this record
+    // is, then its state and what can be done about it. The state of a record
+    // is not the first thing to say about it, and a badge sitting above the
+    // title made the title look like a caption on the badge.
+    <div className={cn("mb-6", className)}>
+      <h1 className="text-lg font-bold tracking-tight [overflow-wrap:anywhere] text-adm-ink sm:text-xl lg:text-2xl">
+        {title}
+        {hint ? (
+          <HelpTip
+            className="ml-1.5 translate-y-[-1px]"
+            label={`What is the ${title} page for?`}
+            text={hint}
+          />
         ) : null}
-        {sub ? (
-          <div
-            className={cn(
-              "flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-adm-muted md:order-3 md:mt-2",
-              !subBesideBadges && "col-span-2 row-start-3 mt-2",
-            )}
-          >
-            {sub}
-          </div>
-        ) : null}
-      </div>
-      <div
-        className={cn(
-          "col-span-2 row-start-2 min-w-0 md:order-2",
-          hasTopRow && "mt-2 md:mt-0",
-        )}
-      >
-        <h1 className="text-lg font-bold tracking-tight [overflow-wrap:anywhere] text-adm-ink sm:text-xl lg:text-2xl">
-          {title}
-          {hint ? (
-            <HelpTip
-              className="ml-1.5 translate-y-[-1px]"
-              label={`What is the ${title} page for?`}
-              text={hint}
-            />
+      </h1>
+      {sub ? (
+        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-adm-muted">
+          {sub}
+        </div>
+      ) : null}
+      {hasTopRow ? (
+        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+          {badges ? (
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
+              {badges}
+            </div>
           ) : null}
-        </h1>
-      </div>
-      {actions ? (
-        <div
-          className={cn(
-            "col-start-2 row-start-1 flex flex-wrap items-center justify-end gap-2 md:order-4 md:mt-8 md:justify-start",
-            // With no badge beside them the buttons own the phone row, so
-            // they share it equally instead of huddling at the right.
-            !badges &&
-              "col-span-2 col-start-1 *:grow *:basis-[calc(50%-0.25rem)] md:*:grow-0 md:*:basis-auto",
-          )}
-        >
-          {actions}
+          {actions ? (
+            <div
+              className={cn(
+                "flex flex-wrap items-center gap-2",
+                // Beside a badge the buttons take the far end of the row, so
+                // the two read as one line rather than a huddle. With no badge
+                // to sit beside, they own the phone row and share it equally.
+                badges
+                  ? "ml-auto"
+                  : "w-full *:grow *:basis-[calc(50%-0.25rem)] sm:w-auto sm:*:grow-0 sm:*:basis-auto",
+              )}
+            >
+              {actions}
+            </div>
+          ) : null}
         </div>
       ) : null}
     </div>
