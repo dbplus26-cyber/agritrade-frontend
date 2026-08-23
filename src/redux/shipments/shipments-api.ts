@@ -5,6 +5,7 @@ import type {
   IAddShipmentSalesInput,
   IAllocationInput,
   IArriveShipmentInput,
+  IRecordArrivalInput,
   IAvailableLotsResponse,
   ICreateShipmentInput,
   IDispatchShipmentInput,
@@ -207,6 +208,35 @@ export const shipmentsApi = apiSlice.injectEndpoints({
       ],
     }),
 
+    /**
+     * The figures for a trip already marked arrived, or a correction to ones
+     * recorded earlier. A trip is routinely marked arrived from the yard,
+     * before the weighbridge ticket reaches the office, and without this the
+     * buyer would stay billed at the loaded weight for good.
+     *
+     * Invalidates exactly what `arriveShipment` does with figures: these move
+     * the same settled totals.
+     */
+    recordArrivalFigures: builder.mutation<
+      IShipmentResponse,
+      IRecordArrivalInput
+    >({
+      query: ({ id, sales }) => ({
+        url: `admin/shipments/${id}/arrival-figures`,
+        method: "PATCH",
+        body: { sales },
+      }),
+      invalidatesTags: (_r, _e, { id, sales }) => [
+        { type: "Shipments", id },
+        { type: "Shipments", id: "LIST" },
+        ...sales.map((s) => ({ type: "Sales" as const, id: s.saleId })),
+        { type: "Sales" as const, id: "LIST" },
+        { type: "Reports" as const, id: "DEBTORS" },
+        { type: "SaleStats" as const, id: "SUMMARY" },
+        { type: "Reports" as const, id: "LIST" },
+      ],
+    }),
+
     closeShipment: builder.mutation<IShipmentResponse, string>({
       query: (id) => ({ url: `admin/shipments/${id}/close`, method: "PATCH" }),
       invalidatesTags: (_r, _e, id) => [
@@ -381,6 +411,7 @@ export const {
   useSetAllocationsMutation,
   useDispatchShipmentMutation,
   useArriveShipmentMutation,
+  useRecordArrivalFiguresMutation,
   useCloseShipmentMutation,
   useCancelShipmentMutation,
   useAddShipmentExpenseMutation,

@@ -181,6 +181,7 @@ export function ShipmentDetail({ id }: { id: string }) {
   const { isSuperAdmin } = useAuthRole();
   const [addSalesOpen, setAddSalesOpen] = useState(false);
   const [arriveOpen, setArriveOpen] = useState(false);
+  const [figuresOpen, setFiguresOpen] = useState(false);
   const [expenseOpen, setExpenseOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
   /** The server's SALES_UNPAID words, while the refusal is on screen. */
@@ -225,6 +226,10 @@ export function ShipmentDetail({ id }: { id: string }) {
   // sellers it collects from. A trip that stops at two places moves goods out
   // of both, and a dialog naming only the origin describes half the movement.
   const loadsFrom = loadingFrom(s);
+  // Whether anybody has weighed this trip in yet. It decides whether the
+  // arrival action reads as recording a first figure or correcting one, and a
+  // button that says "correct" over a blank record teaches the wrong thing.
+  const weighedIn = s.sales.some((sale) => sale.arrivalLines.length > 0);
 
   const onDispatch = async () => {
     const ok = await confirm({
@@ -426,6 +431,28 @@ export function ShipmentDetail({ id }: { id: string }) {
         >
           <AdminButton className="xl:w-full" onClick={() => setArriveOpen(true)}>
             Mark arrived
+          </AdminButton>
+        </HelpWrap>
+      ) : null}
+      {/* A trip is routinely marked arrived from the yard, before the
+          weighbridge ticket reaches the office. Without this the buyer would
+          stay billed at the loaded weight for good - and a ticket read wrong
+          would have nowhere to be corrected either. */}
+      {s.status === "ARRIVED" && canManage ? (
+        <HelpWrap
+          className="inline-flex flex-none xl:w-full"
+          text={
+            weighedIn
+              ? "Changes what came off the truck and what each buyer pays for it. A figure below what a buyer has already paid is refused."
+              : "Records what actually came off the truck and what each buyer will pay for it, in place of the agreed price."
+          }
+        >
+          <AdminButton
+            className="xl:w-full"
+            variant={weighedIn ? "secondary" : "primary"}
+            onClick={() => setFiguresOpen(true)}
+          >
+            {weighedIn ? "Correct arrival figures" : "Record arrival figures"}
           </AdminButton>
         </HelpWrap>
       ) : null}
@@ -1179,6 +1206,13 @@ export function ShipmentDetail({ id }: { id: string }) {
           // straight into filing that evidence.
           onArrived={() => setDocName("Signed delivery note")}
           onClose={() => setArriveOpen(false)}
+        />
+      ) : null}
+      {figuresOpen ? (
+        <ArrivalDialog
+          mode="FIGURES"
+          shipment={s}
+          onClose={() => setFiguresOpen(false)}
         />
       ) : null}
       {closeBlocked !== null ? (

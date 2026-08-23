@@ -26,13 +26,15 @@ import userEventBase from "@testing-library/user-event";
 import { ArrivalDialog } from "@/components/admin/trading/shipment-arrival-dialog";
 import type { IShipment } from "@/types/admin-shipment.types";
 
-const { arriveTrigger, saleQuery } = vi.hoisted(() => ({
+const { arriveTrigger, figuresTrigger, saleQuery } = vi.hoisted(() => ({
   arriveTrigger: vi.fn(),
+  figuresTrigger: vi.fn(),
   saleQuery: vi.fn(),
 }));
 
 vi.mock("@/redux/shipments/shipments-api", () => ({
   useArriveShipmentMutation: () => [arriveTrigger, { isLoading: false }],
+  useRecordArrivalFiguresMutation: () => [figuresTrigger, { isLoading: false }],
 }));
 
 vi.mock("@/redux/sales/admin-sales-api", () => ({
@@ -119,6 +121,8 @@ const shipment = (paidGhs: null | number = 0): IShipment =>
     sales: [
       {
         agreedTotalGhs: 12_000,
+        // Nothing weighed in yet: the form starts from what was LOADED.
+        arrivalLines: [],
         balanceGhs: 12_000 - (paidGhs ?? 0),
         buyer: { id: "buyer-1", name: "Kofi Trading", phone: null },
         id: "sale-1",
@@ -139,6 +143,8 @@ const paymentBox = () => screen.getByLabelText(/Payment to expect/i);
 beforeEach(() => {
   arriveTrigger.mockReset();
   arriveTrigger.mockReturnValue({ unwrap: () => Promise.resolve({}) });
+  figuresTrigger.mockReset();
+  figuresTrigger.mockReturnValue({ unwrap: () => Promise.resolve({}) });
   saleQuery.mockReturnValue(SALE_DETAIL);
 });
 
@@ -341,5 +347,105 @@ describe("ArrivalDialog", () => {
     expect(await screen.findByText("loaded 1,000 kg")).toBeInTheDocument();
     expect(screen.queryByText("Suggested")).not.toBeInTheDocument();
     expect(paymentBox()).toHaveValue("");
+  });
+});
+
+/**
+ * The second pass: a trip already marked arrived, being weighed in afterwards.
+ *
+ * A truck is routinely marked arrived from the yard, before the weighbridge
+ * ticket reaches the office. What is pinned here is that this path posts to
+ * the FIGURES endpoint rather than the arrival one - marking a trip arrived
+ * twice is not a thing - and that a correction starts from the figures already
+ * on the record instead of from what was loaded, which is a different number
+ * and would silently undo the first reading.
+ */
+describe("ArrivalDialog, recording the figures afterwards", () => {
+  /** The same trip, weighed in at 900 kg maize and settled at 11,000. */
+  const weighedShipment = (): IShipment => {
+    const base = shipment();
+    return {
+      ...base,
+      sales: [
+        {
+          ...base.sales[0],
+          arrivalLines: [
+            {
+              commodityId: "maize",
+              commodityName: "Maize",
+              dispatchedKg: 1000,
+              lossValueGhs: null,
+              receivedKg: 900,
+            },
+          ],
+          settledTotalGhs: 11_000,
+        },
+      ],
+      status: "ARRIVED",
+    };
+  };
+
+  const submitFigures = async () => {
+    await userEvent.click(
+      screen.getAllByRole("button", { name: "Record figures" })[0],
+    );
+    await clearGate(/Bill these figures/i, "Record figures");
+  };
+
+  it("posts the figures without marking the trip arrived again", async () => {
+    render(
+      <ArrivalDialog mode="FIGURES" onClose={vi.fn()} shipment={shipment()} />,
+    );
+
+    await userEvent.clear(maizeBox());
+    await userEvent.type(maizeBox(), "950");
+    await userEvent.clear(soyaBox());
+    await userEvent.type(soyaBox(), "500");
+    await submitFigures();
+
+    expect(arriveTrigger).not.toHaveBeenCalled();
+    expect(figuresTrigger).toHaveBeenCalledTimes(1);
+    expect(figuresTrigger.mock.calls[0][0]).toEqual({
+      id: "shp-1",
+      sales: [
+        {
+          lines: [
+            { commodityId: "maize", receivedKg: 950 },
+            { commodityId: "soya", receivedKg: 500 },
+          ],
+          saleId: "sale-1",
+          settledTotalGhs: 11_500,
+        },
+      ],
+    });
+  });
+
+  it("starts a correction from what was already recorded, not from what was loaded", async () => {
+    render(
+      <ArrivalDialog
+        mode="FIGURES"
+        onClose={vi.fn()}
+        shipment={weighedShipment()}
+      />,
+    );
+
+    // 900, the figure on the record - not the 1,000 that went on the truck.
+    expect(maizeBox()).toHaveValue("900");
+    expect(paymentBox()).toHaveValue("11000.00");
+  });
+
+  it("offers no way to skip the figures - the trip has already arrived", async () => {
+    render(
+      <ArrivalDialog mode="FIGURES" onClose={vi.fn()} shipment={shipment()} />,
+    );
+
+    expect(
+      screen.queryByRole("button", {
+        name: /mark arrived and record this later/i,
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Mark arrived" }),
+    ).not.toBeInTheDocument();
   });
 });

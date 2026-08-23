@@ -31,7 +31,10 @@ import { formatCedis, formatKg } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import { useGetSaleQuery } from "@/redux/sales/admin-sales-api";
-import { useArriveShipmentMutation } from "@/redux/shipments/shipments-api";
+import {
+  useArriveShipmentMutation,
+  useRecordArrivalFiguresMutation,
+} from "@/redux/shipments/shipments-api";
 import type { IShipment, IShipmentSale } from "@/types/admin-shipment.types";
 import {
   arriveShipmentSchema,
@@ -300,16 +303,28 @@ function SaleArrival({
  * the road.
  */
 export function ArrivalDialog({
+  mode = "ARRIVE",
   shipment,
   onArrived,
   onClose,
 }: {
+  /**
+   * ARRIVE marks the trip arrived and records the figures in one act. FIGURES
+   * is the second pass on a trip already arrived: the weights alone, either
+   * because nobody had them at the gate or because a ticket was read wrong.
+   * The form is identical; what differs is the wording and where it posts,
+   * since one of them takes a truck off the road and the other does not.
+   */
+  mode?: "ARRIVE" | "FIGURES";
   shipment: IShipment;
   /** Fired only when the trip actually reached ARRIVED, never on a cancel. */
   onArrived?: () => void;
   onClose: () => void;
 }) {
-  const [arrive, { isLoading }] = useArriveShipmentMutation();
+  const [arrive, arriveState] = useArriveShipmentMutation();
+  const [recordFigures, figuresState] = useRecordArrivalFiguresMutation();
+  const isLoading = arriveState.isLoading || figuresState.isLoading;
+  const secondPass = mode === "FIGURES";
   const { confirm, confirmationDialog } = useConfirm();
   const [serverError, setServerError] = useState<null | string>(null);
   /** Sales the admin is settling below what the buyer has already handed over. */
@@ -327,14 +342,25 @@ export function ArrivalDialog({
     resolver: zodResolver(arriveShipmentSchema),
     defaultValues: {
       sales: loaded.map((l) => ({
-        // Pre-filled with what was loaded: on a good trip nothing was lost, and
-        // the admin confirms rather than copies figures off a waybill.
-        lines: l.lines.map((line) => ({
-          commodityId: line.commodityId,
-          receivedKg: String(line.loadedKg),
-        })),
+        // Pre-filled with what was already recorded when there is such a
+        // figure - a correction starts from what is on the record, not from a
+        // blank box - and otherwise with what was LOADED: on a good trip
+        // nothing was lost, and the admin confirms rather than copies figures
+        // off a waybill.
+        lines: l.lines.map((line) => {
+          const recorded = l.sale.arrivalLines.find(
+            (a) => a.commodityId === line.commodityId,
+          );
+          return {
+            commodityId: line.commodityId,
+            receivedKg: String(recorded?.receivedKg ?? line.loadedKg),
+          };
+        }),
         saleId: l.sale.id,
-        settledTotalGhs: "",
+        settledTotalGhs:
+          l.sale.settledTotalGhs === null
+            ? ""
+            : l.sale.settledTotalGhs.toFixed(2),
       })),
     },
   });
@@ -399,27 +425,43 @@ export function ArrivalDialog({
       (sum, sale) => sum + Number(sale.settledTotalGhs),
       0,
     );
+    const saleCount = values.sales?.length ?? 0;
     const ok = await confirm({
       title: "Bill these figures?",
-      description: `${formatCedis(billed)} across ${values.sales?.length ?? 0} sale${
-        (values.sales?.length ?? 0) === 1 ? "" : "s"
-      } on ${shipment.transactionNo}. That is what each buyer owes from now on, in place of the agreed price, and the trip is marked arrived. Correcting it afterwards means reversing payments first.`,
-      confirmText: "Record arrival",
+      description: `${formatCedis(billed)} across ${saleCount} sale${
+        saleCount === 1 ? "" : "s"
+      } on ${shipment.transactionNo}. That is what each buyer owes from now on, in place of the agreed price${
+        secondPass
+          ? ", replacing anything recorded before. A figure below what a buyer has already paid is refused: reverse the payment first."
+          : ", and the trip is marked arrived. Correcting it afterwards means reversing payments first."
+      }`,
+      confirmText: secondPass ? "Record figures" : "Record arrival",
     });
     if (!ok) return;
 
-    try {
-      await arrive({
-        id: shipment.id,
-        sales: (values.sales ?? []).map((s) => ({
-          lines: s.lines.map((l) => ({
-            commodityId: l.commodityId,
-            receivedKg: Number(l.receivedKg),
-          })),
-          saleId: s.saleId,
-          settledTotalGhs: Number(s.settledTotalGhs),
+    const payload = {
+      id: shipment.id,
+      sales: (values.sales ?? []).map((s) => ({
+        lines: s.lines.map((l) => ({
+          commodityId: l.commodityId,
+          receivedKg: Number(l.receivedKg),
         })),
-      }).unwrap();
+        saleId: s.saleId,
+        settledTotalGhs: Number(s.settledTotalGhs),
+      })),
+    };
+    try {
+      if (secondPass) {
+        await recordFigures(payload).unwrap();
+        notify.success("Arrival figures recorded", {
+          description:
+            "Each buyer on this trip now owes the figure you entered, not the agreed price.",
+        });
+        onArrived?.();
+        onClose();
+        return;
+      }
+      await arrive(payload).unwrap();
       finish();
     } catch (err) {
       // SETTLED_BELOW_PAID, SALE_NOT_ON_SHIPMENT and COMMODITY_NOT_LOADED all
@@ -435,19 +477,25 @@ export function ArrivalDialog({
       <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[520px]">
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>
-            Arrival - {shipment.transactionNo}
+            {secondPass ? "Arrival figures" : "Arrival"} -{" "}
+            {shipment.transactionNo}
           </ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
             What came off the truck, and what each buyer will pay for it. The
             agreed price stays on the record either way.
+            {secondPass
+              ? " This trip has already arrived; recording these does not change that."
+              : ""}
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
 
         {loaded.length === 0 ? (
           <p className="text-[13px] text-adm-muted">
             No lots were allocated on this trip, so there is nothing to weigh
-            in. Mark it arrived and record the figures once the goods are
-            allocated.
+            in.
+            {secondPass
+              ? ""
+              : " Mark it arrived and record the figures once the goods are allocated."}
           </p>
         ) : (
           <form
@@ -494,7 +542,7 @@ export function ArrivalDialog({
             screen the two would end up a thumb's width apart - and one of them
             writes money onto every sale on the trip while the other skips the
             figures entirely. Its own line, under a rule, at link weight. */}
-        {loaded.length > 0 ? (
+        {loaded.length > 0 && !secondPass ? (
           <div className="border-t border-adm-hairline pt-3">
             <button
               type="button"
@@ -527,9 +575,13 @@ export function ArrivalDialog({
               disabled={isLoading}
               loading={isLoading}
             >
-              {isLoading ? "Recording…" : "Record arrival"}
+              {isLoading
+                ? "Recording…"
+                : secondPass
+                  ? "Record figures"
+                  : "Record arrival"}
             </AdminButton>
-          ) : (
+          ) : secondPass ? null : (
             <AdminButton
               type="button"
               size="lg"

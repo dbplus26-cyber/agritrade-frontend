@@ -411,6 +411,17 @@ export interface IArrivalSaleInput {
 }
 
 /**
+ * The figures for a trip already marked arrived, or a correction to ones
+ * recorded earlier. `sales` is required: this request is nothing but the
+ * figures, so an empty one is a mistake rather than the "not weighed yet"
+ * case the arrival itself allows.
+ */
+export interface IRecordArrivalInput {
+  id: string;
+  sales: IArrivalSaleInput[];
+}
+
+/**
  * Mark a dispatched trip arrived. `sales` is optional: the load is on the
  * ground whether or not anybody has weighed it yet, and the figures can be
  * recorded later.
