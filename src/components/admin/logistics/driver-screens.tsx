@@ -754,7 +754,7 @@ export function DriverEdit({ id }: { id: string }) {
   const [deactivate] = useDeactivateDriverMutation();
   const [remove] = useDeleteDriverMutation();
 
-  if (isLoading) return <FormSkeleton fields={6} />;
+  if (isLoading) return <FormSkeleton fields={6} rail />;
   if (isError || !data) {
     return (
       <ErrorMessage

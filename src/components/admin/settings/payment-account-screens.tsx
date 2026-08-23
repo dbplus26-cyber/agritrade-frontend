@@ -701,7 +701,7 @@ export function PaymentAccountEdit({ id }: { id: string }) {
   const [deactivate] = useDeactivatePaymentAccountMutation();
   const [remove] = useDeletePaymentAccountMutation();
 
-  if (isLoading) return <FormSkeleton fields={8} />;
+  if (isLoading) return <FormSkeleton fields={8} rail />;
   if (isError || !data)
     return (
       <ErrorMessage

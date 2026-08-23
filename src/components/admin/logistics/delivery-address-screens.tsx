@@ -641,7 +641,7 @@ export function DeliveryAddressEdit({ id }: { id: string }) {
   const [deactivate] = useDeactivateDeliveryAddressMutation();
   const [remove] = useDeleteDeliveryAddressMutation();
 
-  if (isLoading) return <FormSkeleton fields={8} />;
+  if (isLoading) return <FormSkeleton fields={8} rail />;
   if (isError || !data) {
     return (
       <ErrorMessage

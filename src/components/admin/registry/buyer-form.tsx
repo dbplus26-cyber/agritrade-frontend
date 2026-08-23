@@ -534,7 +534,7 @@ export function BuyerEdit({ id }: { id: string }) {
   const [deactivate] = useDeactivateBuyerMutation();
   const [remove] = useDeleteBuyerMutation();
 
-  if (isLoading) return <FormSkeleton fields={10} />;
+  if (isLoading) return <FormSkeleton fields={10} rail />;
   if (isError || !data)
     return (
       <ErrorMessage

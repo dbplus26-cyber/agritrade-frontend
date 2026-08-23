@@ -494,7 +494,7 @@ export function LandSellerEdit({ id }: { id: string }) {
   const [deactivate] = useDeactivateLandSellerMutation();
   const [remove] = useDeleteLandSellerMutation();
 
-  if (isLoading) return <FormSkeleton fields={5} />;
+  if (isLoading) return <FormSkeleton fields={5} rail />;
   if (isError || !data)
     return (
       <ErrorMessage

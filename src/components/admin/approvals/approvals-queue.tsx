@@ -59,7 +59,7 @@ import {
  * where it goes through its own meta className, so the placement lives with
  * the column it belongs to.
  */
-const GRID =
+export const GRID =
   "grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2 " +
   "@min-[900px]/main:grid-cols-[34px_190px_1fr_150px_118px_190px_26px] " +
   "@min-[900px]/main:items-center @min-[900px]/main:gap-x-[14px] @min-[900px]/main:gap-y-[14px]";

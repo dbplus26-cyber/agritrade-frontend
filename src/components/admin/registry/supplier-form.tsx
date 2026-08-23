@@ -592,7 +592,7 @@ export function SupplierEdit({ id }: { id: string }) {
   const [deactivate] = useDeactivateSupplierMutation();
   const [remove] = useDeleteSupplierMutation();
 
-  if (isLoading) return <FormSkeleton fields={10} />;
+  if (isLoading) return <FormSkeleton fields={10} rail />;
   if (isError || !data)
     return (
       <ErrorMessage

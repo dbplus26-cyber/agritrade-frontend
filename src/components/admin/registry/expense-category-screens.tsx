@@ -824,7 +824,7 @@ export function ExpenseCategoryEdit({ id }: { id: string }) {
   const [deactivate] = useDeactivateExpenseCategoryMutation();
   const [remove] = useDeleteExpenseCategoryMutation();
 
-  if (isLoading) return <FormSkeleton fields={2} />;
+  if (isLoading) return <FormSkeleton fields={2} rail />;
   if (isError || !data)
     return (
       <ErrorMessage

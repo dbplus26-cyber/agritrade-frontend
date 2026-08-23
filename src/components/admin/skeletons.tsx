@@ -26,10 +26,16 @@ const width = (seed: number, base = 55, step = 15, buckets = 3): string =>
    ──────────────────────────────────────────────────────────────────── */
 
 /**
- * The register table as `ConsoleDataTable` actually renders it: stacked
- * label/value cards while the container is narrow, the real header + rows
- * once it is wide, and the row-count footer under both. Lives inside an
- * `AdminCard`, exactly like the table it stands in for, so nothing shifts.
+ * The register table as `ConsoleDataTable` actually renders it: summary cards
+ * while the container is narrow, the real header + rows once it is wide, and
+ * the pager under both. Lives inside an `AdminCard`, exactly like the table it
+ * stands in for, so nothing shifts.
+ *
+ * The proportions are the table's own, not a grid of equal bars. One column
+ * carries the row's identity and takes 40% of the width with two lines in it;
+ * the rest are narrow and one of them is a right-aligned figure. A skeleton of
+ * five equal columns promises a layout the data then contradicts, which is the
+ * jump these exist to prevent.
  */
 export function ConsoleTableSkeleton({
   columns = 5,
@@ -49,24 +55,27 @@ export function ConsoleTableSkeleton({
       {/* The same @container/table switch the real table uses, so the
           skeleton and the data agree about which view is showing. */}
       <div aria-hidden="true" className="@container/table">
-        <div className="flex flex-col gap-2 p-2 @2xl/table:hidden">
+        {/* The card view: a chip and a figure on the opening line, the row's
+            identity under it, then the quiet meta line. The same three-part
+            shape the real card has, so nothing re-flows when it lands. */}
+        <div className="flex flex-col gap-2 py-2 @2xl/table:hidden">
           {Array.from({ length: Math.min(rows, 5) }, (_, row) => (
             <div
               key={row}
-              className="rounded-none border border-adm-line bg-adm-card px-3 py-2"
+              className="rounded-none border border-adm-line bg-adm-card px-3.5 py-2.5"
             >
-              {Array.from({ length: Math.min(columns, 4) }, (_, line) => (
-                <div
-                  key={line}
-                  className="flex items-center justify-between gap-3 border-b border-adm-hairline py-[7px] last:border-b-0"
-                >
-                  <Skeleton className="h-2.5 w-20" />
-                  <Skeleton
-                    className="h-3"
-                    style={{ width: width(row + line, 28, 12) }}
-                  />
-                </div>
-              ))}
+              <div className="flex items-center justify-between gap-2">
+                <Skeleton className="h-[18px] w-16 rounded-[2px]" />
+                <Skeleton className="h-3 w-20" />
+              </div>
+              <Skeleton
+                className="mt-2 h-3.5"
+                style={{ width: width(row, 45, 15) }}
+              />
+              <Skeleton
+                className="mt-1.5 h-2.5"
+                style={{ width: width(row + 1, 60, 12) }}
+              />
             </div>
           ))}
         </div>
@@ -74,19 +83,39 @@ export function ConsoleTableSkeleton({
         <div className="hidden @2xl/table:block">
           <div className="flex h-[38px] items-center gap-3 border-b border-adm-line bg-adm-sunken px-3">
             {Array.from({ length: columns }, (_, col) => (
-              <Skeleton key={col} className="h-2.5 flex-1" />
+              <Skeleton
+                key={col}
+                className={cn("h-2.5", col === 0 ? "w-2/5 flex-none" : "flex-1")}
+              />
             ))}
           </div>
           {Array.from({ length: rows }, (_, row) => (
             <div
               key={row}
-              className="flex h-12 items-center gap-3 border-b border-adm-hairline px-3"
+              className="flex min-h-[46px] items-center gap-3 border-b border-adm-hairline px-3 py-2.5"
             >
-              {Array.from({ length: columns }, (_, col) => (
-                <div key={col} className="flex-1">
+              {/* The identity column: 40% of the table, and two lines - a
+                  title over its quiet second line, which is what TitleCell
+                  renders on nearly every register. */}
+              <div className="w-2/5 flex-none">
+                <Skeleton className="h-3" style={{ width: width(row, 55) }} />
+                <Skeleton
+                  className="mt-1.5 h-2.5"
+                  style={{ width: width(row + 2, 35, 10) }}
+                />
+              </div>
+              {Array.from({ length: Math.max(columns - 1, 1) }, (_, col) => (
+                <div
+                  key={col}
+                  className={cn(
+                    "flex-1",
+                    // The last column is a figure, and figures sit right.
+                    col === columns - 2 && "flex justify-end",
+                  )}
+                >
                   <Skeleton
                     className="h-3"
-                    style={{ width: width(row + col) }}
+                    style={{ width: width(row + col, 45, 20) }}
                   />
                 </div>
               ))}
@@ -94,8 +123,18 @@ export function ConsoleTableSkeleton({
           ))}
         </div>
 
-        <div className="border-t border-adm-line px-4 py-2.5">
-          <Skeleton className="h-3 w-24" />
+        {/* The pager: the count and rows-per-page on the left, the page
+            buttons on the right, at the height the real bar occupies. */}
+        <div className="flex items-center justify-between gap-4 border-t border-adm-line bg-adm-sunken/60 px-4 py-2.5">
+          <div className="flex items-center gap-5">
+            <Skeleton className="h-3 w-28" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+          <div className="flex items-center gap-1">
+            {Array.from({ length: 4 }, (_, i) => (
+              <Skeleton key={i} className="h-7 w-7" />
+            ))}
+          </div>
         </div>
       </div>
     </Frame>
@@ -270,13 +309,24 @@ export function RecordCardGridSkeleton({
    Stat tiles
    ──────────────────────────────────────────────────────────────────── */
 
-/** The strip of figure tiles above a register or dashboard section. */
+/**
+ * The strip of figure tiles above a register or dashboard section: an
+ * uppercase label over a large figure, in a card padded the way a tile is.
+ *
+ * The share bar is off by default because most tiles do not have one - only
+ * the stock register's per-commodity strip draws it, and reserving 3px on
+ * every other screen means every tile settles by that much when the data
+ * lands.
+ */
 export function StatTilesSkeleton({
   tiles = 4,
   className,
+  bar = false,
 }: {
   tiles?: number;
   className?: string;
+  /** Tiles that carry a share bar under the figure (the stock strip). */
+  bar?: boolean;
 }) {
   return (
     <div
@@ -287,10 +337,12 @@ export function StatTilesSkeleton({
       )}
     >
       {Array.from({ length: tiles }, (_, i) => (
-        <AdminCard key={i} className="px-3 py-2.5">
+        <AdminCard key={i} className="px-4 py-3">
           <Skeleton className="h-2.5 w-20" />
-          <Skeleton className="mt-2 h-4 w-24" />
-          <Skeleton className="mt-2 h-[3px] w-full" />
+          {/* The figure is 19px type, so the bar standing in for it is the
+              height of the line it fills, not of a body line. */}
+          <Skeleton className="mt-1 h-5" style={{ width: width(i, 45, 15) }} />
+          {bar ? <Skeleton className="mt-1.5 h-[3px] w-full" /> : null}
         </AdminCard>
       ))}
     </div>
@@ -304,13 +356,20 @@ export function StatTilesSkeleton({
 /** One card of label-over-value facts, as `DetailGrid` lays them out. */
 function FactGridSkeleton({ facts = 6 }: { facts?: number }) {
   return (
-    <div className="grid grid-cols-1 gap-x-8 gap-y-1 sm:grid-cols-2">
-      {Array.from({ length: facts }, (_, i) => (
-        <div key={i} className="border-b border-adm-hairline py-2">
-          <Skeleton className="h-2.5 w-16" />
-          <Skeleton className="mt-1.5 h-3.5" style={{ width: width(i, 45) }} />
-        </div>
-      ))}
+    // RecordFacts pairs on its OWN width, not the window's: inside a detail
+    // card beside a 340px rail a viewport `sm:` splits into two columns while
+    // the card is still one, and the facts re-flow the moment they arrive.
+    <div className="@container">
+      <div className="grid grid-cols-1 gap-x-8 @lg:grid-cols-2">
+        {Array.from({ length: facts }, (_, i) => (
+          <div key={i} className="border-b border-adm-hairline py-2">
+            {/* A 10.5px uppercase label over a 12px value, the shape every
+                fact on a record page has. */}
+            <Skeleton className="h-2.5 w-16" />
+            <Skeleton className="mt-1 h-3" style={{ width: width(i, 45) }} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -362,7 +421,7 @@ export function DetailSkeleton({
       <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="order-2 flex min-w-0 flex-col gap-5 xl:order-1">
           {Array.from({ length: Math.max(cards, 1) }, (_, i) => (
-            <AdminCard key={i} className="px-5 py-4">
+            <AdminCard key={i} className="px-5 py-[18px]">
               <Skeleton className="h-2.5 w-24" />
               <div className="mt-3">
                 {main === "media" ? (
@@ -384,13 +443,28 @@ export function DetailSkeleton({
           {table ? <ConsoleTableSkeleton columns={4} rows={4} /> : null}
         </div>
 
-        <div className="order-1 min-w-0 self-start xl:order-2">
-          <AdminCard className="px-5 py-4">
+        {/* The rail is a STACK of small cards - status, then filed, then the
+            lifecycle actions - not one tall one. Standing in for three with a
+            single card means the page grows by two card heights on arrival,
+            and the rail is the half of the screen a reader is watching while
+            they wait for the status. */}
+        <div className="order-1 flex min-w-0 flex-col gap-4 self-start xl:order-2">
+          <AdminCard className="px-4 py-3">
+            <Skeleton className="h-2.5 w-16" />
+            <Skeleton className="mt-2 h-[18px] w-24 rounded-[2px]" />
+          </AdminCard>
+          <AdminCard className="px-4 py-3">
+            <Skeleton className="h-2.5 w-14" />
+            <div className="mt-2 flex flex-col gap-1.5">
+              <Skeleton className="h-2.5 w-full" />
+              <Skeleton className="h-2.5 w-2/3" />
+            </div>
+          </AdminCard>
+          <AdminCard className="px-4 py-3">
             <Skeleton className="h-2.5 w-20" />
-            <Skeleton className="mt-2 h-7 w-36" />
-            <div className="mt-4 flex flex-col gap-2 border-t border-adm-hairline pt-3">
-              <Skeleton className="h-3 w-full" />
-              <Skeleton className="h-3 w-2/3" />
+            <div className="mt-2 flex flex-col gap-2">
+              <Skeleton className="h-[34px] w-full" />
+              <Skeleton className="h-[34px] w-full" />
             </div>
           </AdminCard>
         </div>
@@ -438,32 +512,76 @@ export function LedgerSkeleton({ rows = 6 }: { rows?: number }) {
    ──────────────────────────────────────────────────────────────────── */
 
 /**
- * A record form: back link, heading, a card of stencil-label + field pairs
- * (two columns from `sm`, like every console form card) and the action row.
+ * A record form: back link, heading, a card of label + field pairs and the
+ * action row.
+ *
+ * The measurements are the form's own - a 38px control under an 11.5px label,
+ * paired at the width the real fields pair at, in a card padded the way
+ * AdminCard pads a form. A skeleton with taller controls and tighter gaps
+ * moves every field on the page the moment the data lands.
+ *
+ * `max-w` is a CHOICE the caller makes, not a default: a create page carries
+ * its own measure, while an edit page sits beside a rail and fills its column.
+ * A capped skeleton in front of a filling form is a jump the width of the
+ * difference.
  */
 export function FormSkeleton({
   fields = 6,
   className,
+  rail = false,
 }: {
   fields?: number;
   className?: string;
+  /**
+   * The record sits beside a rail (status, filed, lifecycle) and its form
+   * fills the column. Without this the skeleton is a lone narrow card and the
+   * page arrives as two columns - a jump the width of the rail.
+   */
+  rail?: boolean;
 }) {
-  return (
-    <div aria-hidden="true" className={cn("max-w-[560px]", className)}>
-      <Skeleton className="mb-2 h-3 w-28" />
-      <PageHeaderSkeleton />
-      <AdminCard className="grid grid-cols-1 gap-3 px-5 py-4 sm:grid-cols-2">
+  const card = (
+    <>
+      <AdminCard className="@container grid grid-cols-1 gap-5 px-5 py-[18px] @min-[440px]:grid-cols-2">
         {Array.from({ length: fields }, (_, i) => (
           <div key={i}>
-            <Skeleton className="mb-[7px] h-2.5 w-20" />
-            <Skeleton className="h-[42px] w-full" />
+            <Skeleton className="mb-1 h-2.5 w-20" />
+            <Skeleton className="h-[38px] w-full" />
           </div>
         ))}
       </AdminCard>
       <div className="mt-4 flex justify-end gap-2">
-        <Skeleton className="h-10 w-24" />
-        <Skeleton className="h-10 w-28" />
+        <Skeleton className="h-[38px] w-24" />
+        <Skeleton className="h-[38px] w-28" />
       </div>
+    </>
+  );
+
+  return (
+    <div
+      aria-hidden="true"
+      // The measure RecordShell gives a page with no rail. Beside a rail the
+      // form fills its column instead, so the cap is dropped there.
+      className={cn(!rail && "max-w-[760px]", className)}
+    >
+      <Skeleton className="mb-2 h-3 w-28" />
+      <PageHeaderSkeleton />
+      {rail ? (
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
+          <div className="order-2 min-w-0 xl:order-1">{card}</div>
+          {/* Status, filed, lifecycle: three short cards, the rail every
+              record page carries. */}
+          <div className="order-1 flex min-w-0 flex-col gap-4 self-start xl:order-2">
+            {[0, 1, 2].map((i) => (
+              <AdminCard key={i} className="px-4 py-3">
+                <Skeleton className="h-2.5 w-16" />
+                <Skeleton className="mt-2 h-4" style={{ width: width(i, 45, 20) }} />
+              </AdminCard>
+            ))}
+          </div>
+        </div>
+      ) : (
+        card
+      )}
     </div>
   );
 }

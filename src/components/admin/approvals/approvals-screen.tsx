@@ -38,7 +38,7 @@ import {
   type IApprovalListQuery,
 } from "@/types/approval.types";
 import { ACTION_LABEL } from "./approval-bits";
-import { ApprovalsQueue } from "./approvals-queue";
+import { ApprovalsQueue, GRID } from "./approvals-queue";
 import {
   ageLabel,
   apButton,
@@ -808,17 +808,53 @@ const EMPTY_COPY: Record<ApprovalStatus, { body: string; title: string }> = {
 };
 
 /** Six rows at the real row height - a spinner would say nothing about shape. */
+/**
+ * The queue while it loads, on the queue's OWN grid.
+ *
+ * It imports the same GRID the rows use rather than approximating it, so the
+ * two cannot drift: a skeleton with its own column template is a promise about
+ * the layout that the data then breaks, which is the jump a skeleton exists to
+ * prevent. The cells carry the same placement classes as the real ones, so the
+ * narrow view pairs the chip with the figure exactly as the row will.
+ */
 function QueueSkeleton() {
+  const bar = "block rounded-none bg-[var(--ap-track)]";
   return (
     <div className="overflow-hidden rounded-none border border-[var(--ap-hair)] bg-[var(--ap-surface)]">
       {Array.from({ length: 6 }, (_, i) => (
         <div
           key={i}
-          className="grid h-[62px] grid-cols-[110px_1fr] items-center gap-3.5 border-b border-[var(--ap-hair-soft)] px-4 last:border-b-0 @min-[900px]/main:grid-cols-[34px_190px_1fr]"
+          className={cn(
+            GRID,
+            "border-b border-[var(--ap-hair-soft)] px-4 py-[13px] last:border-b-0",
+          )}
         >
+          {/* The checkbox column, wide screens only. */}
           <span className="hidden @min-[900px]/main:block" />
-          <span className="block h-3.5 w-[120px] rounded-none bg-[var(--ap-track)]" />
-          <span className="block h-3.5 w-[60%] rounded-none bg-[var(--ap-track)]" />
+          {/* The figure: top right on a phone, its own column from 900px. */}
+          <span className="order-2 justify-self-end @min-[900px]/main:order-none @min-[900px]/main:justify-self-auto">
+            <span className={cn(bar, "h-4 w-[92px]")} />
+            <span className={cn(bar, "mt-1.5 h-1 w-[110px]")} />
+          </span>
+          {/* What changed, over its detail line. */}
+          <span className="order-3 col-span-2 @min-[900px]/main:order-none @min-[900px]/main:col-span-1">
+            <span className={cn(bar, "h-3.5")} style={{ width: `${String(58 + (i % 3) * 12)}%` }} />
+            <span className={cn(bar, "mt-1.5 h-2.5 w-2/5")} />
+          </span>
+          {/* The rule chip, which opens the line on a phone. */}
+          <span
+            className={cn(bar, "order-1 h-[18px] w-[104px] @min-[900px]/main:order-none")}
+          />
+          {/* Who raised it and how long ago. */}
+          <span className="order-4 col-span-2 @min-[900px]/main:order-none @min-[900px]/main:col-span-1">
+            <span className={cn(bar, "h-3 w-24")} />
+          </span>
+          {/* The decision pair. */}
+          <span className="order-5 col-span-2 flex gap-1.5 @min-[900px]/main:order-none @min-[900px]/main:col-span-1 @min-[900px]/main:justify-end">
+            <span className={cn(bar, "h-8 w-[86px]")} />
+            <span className={cn(bar, "h-8 w-[86px]")} />
+          </span>
+          <span className="hidden @min-[900px]/main:block" />
         </div>
       ))}
     </div>
