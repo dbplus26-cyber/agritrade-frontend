@@ -449,7 +449,7 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
   };
 
   return (
-    <AdminCard className="max-w-[640px] px-5 py-[18px]">
+    <AdminCard className="px-5 py-[18px]">
       {/* Field pairs measure against this form, not the viewport: the console
           shell keeps a ~225px rail beside it, so `sm:` would pair fields up
           while the column is still too narrow to carry two of them. */}

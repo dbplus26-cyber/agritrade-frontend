@@ -64,13 +64,21 @@ export function RecordShell({
         backLabel={backLabel}
       />
       {header}
+      {/* The MEASURE is the shell's, not the content's.
+          A record card that caps itself at 640px inside a column that is 1000px
+          wide leaves a band of empty page between it and the rail, and the page
+          reads as two things that failed to meet rather than one document with
+          a margin. So: with a rail beside it the main column fills, and the
+          rail IS the margin; without one the stack carries its own measure,
+          because a lone form run to the full width of a desktop is a different
+          kind of unreadable. Either way it is decided in one place. */}
       {aside ? (
         <DetailShell
           aside={<div className="space-y-4">{aside}</div>}
           main={<div className="space-y-4">{children}</div>}
         />
       ) : (
-        <div className="space-y-4">{children}</div>
+        <div className="max-w-[760px] space-y-4">{children}</div>
       )}
     </div>
   );

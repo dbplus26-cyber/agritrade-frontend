@@ -219,9 +219,9 @@ function EditDetailsForm({
     <form
       noValidate
       onSubmit={handleSubmit(onSubmit)}
-      className="grid max-w-[560px] gap-5"
+      className="@container grid gap-5"
     >
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid gap-5 @min-[440px]:grid-cols-2">
         <AdminField label="First name" error={errors.firstName?.message}>
           <Input
             placeholder="e.g. Amina"

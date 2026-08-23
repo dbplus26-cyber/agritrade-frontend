@@ -352,7 +352,7 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
   // rather than as a greyed-out copy of the record already on screen.
   if (isEdit && !isEditing && seller) {
     return (
-      <AdminCard className="max-w-[640px] px-5 py-[18px]">
+      <AdminCard className="px-5 py-[18px]">
         <RecordFacts
           facts={[
             { label: "Name", value: seller.name },
@@ -372,7 +372,7 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
   }
 
   return (
-    <AdminCard className="max-w-[640px] px-5 py-[18px]">
+    <AdminCard className="px-5 py-[18px]">
       {/* Field pairs measure against this form, not the viewport: the console
           shell keeps a ~225px rail beside it, so `sm:` paired fields up while
           the column was still too narrow to carry two of them. */}

@@ -433,7 +433,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
   // rather than as a greyed-out copy of the page already on screen.
   if (isEdit && !isEditing && driver) {
     return (
-      <AdminCard className="max-w-[640px] px-5 py-[18px]">
+      <AdminCard className="px-5 py-[18px]">
         {/* The photograph belongs on the READ view, not only behind Edit.
             Rendered inside the form it appears only while editing, so at rest
             - which is how this page is nearly always seen - the record would
@@ -474,7 +474,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
   }
 
   return (
-    <AdminCard className="max-w-[640px] px-5 py-[18px]">
+    <AdminCard className="px-5 py-[18px]">
       {/* Field pairs measure against this form, not the viewport: the console
           shell keeps a ~225px rail beside it, so `sm:` pairs fields up while
           the column is still too narrow to carry two of them. */}

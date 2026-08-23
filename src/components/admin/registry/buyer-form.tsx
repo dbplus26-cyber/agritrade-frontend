@@ -202,7 +202,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
   // rather than as a greyed-out copy of the record already on screen.
   if (isEdit && !isEditing && buyer) {
     return (
-      <AdminCard className="max-w-[640px] px-5 py-[18px]">
+      <AdminCard className="px-5 py-[18px]">
         {/* The photograph belongs on the READ view, not only behind Edit.
             Rendered inside the form, it is absent at rest - which is how this
             page is nearly always seen - leaving the record with no picture
@@ -246,7 +246,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
   }
 
   return (
-    <AdminCard className="max-w-[640px] px-5 py-[18px]">
+    <AdminCard className="px-5 py-[18px]">
       {/* Field pairs measure against this form, not the viewport: the console
           shell keeps a ~225px rail beside it, so `sm:` paired fields up while
           the column was still too narrow to carry two of them. */}

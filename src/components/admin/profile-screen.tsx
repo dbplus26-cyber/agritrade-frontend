@@ -224,7 +224,7 @@ function ProfileEditForm({
     <form
       noValidate
       onSubmit={handleSubmit(onSubmit)}
-      className="@container grid max-w-[560px] gap-5"
+      className="@container grid gap-5"
     >
       <SectionHeading className="mb-0">Your details</SectionHeading>
       <div className="grid gap-5 @min-[440px]:grid-cols-2">
