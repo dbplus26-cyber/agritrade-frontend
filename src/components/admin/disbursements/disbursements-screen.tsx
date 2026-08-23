@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Plus } from "lucide-react";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import {
@@ -231,12 +230,10 @@ export function DisbursementsScreen() {
             noun="payouts"
             action={
               <AdminButton
-                aria-label="Send money"
-                onClick={() => setSending(true)}
+                          onClick={() => setSending(true)}
                 type="button"
               >
-                <Plus className="h-4 w-4" aria-hidden="true" />
-                <span className="hidden sm:inline">Send money</span>
+                Send money
               </AdminButton>
             }
             chips={

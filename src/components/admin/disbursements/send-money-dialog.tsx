@@ -208,8 +208,8 @@ export function SendMoneyDialog({
         : (values.bankAccountNumber ?? "");
     const via =
       values.rail === "MOMO"
-        ? (MOMO_CHANNEL_OPTIONS.find((o) => o.value === values.channel)?.label ??
-          "mobile money")
+        ? (MOMO_CHANNEL_OPTIONS.find((o) => o.value === values.channel)
+            ?.label ?? "mobile money")
         : (bankOptions.find((o) => o.value === values.bankCode)?.label ??
           "their bank");
 
@@ -252,7 +252,10 @@ export function SendMoneyDialog({
     try {
       const res =
         surface === "company"
-          ? await createCompany({ body, idempotencyKey: idempotencyKey() }).unwrap()
+          ? await createCompany({
+              body,
+              idempotencyKey: idempotencyKey(),
+            }).unwrap()
           : await createMine({
               body,
               idempotencyKey: idempotencyKey(),
@@ -303,7 +306,7 @@ export function SendMoneyDialog({
           className="space-y-5 px-4 pb-2 sm:px-0"
           onSubmit={(e) => void form.handleSubmit(onSubmit)(e)}
         >
-          <section className="space-y-5">
+          <section className="grid gap-5 sm:grid-cols-2">
             <AdminField label="How are they being paid?">
               <Controller
                 control={form.control}
@@ -342,10 +345,9 @@ export function SendMoneyDialog({
                 {...form.register("amountGhs")}
               />
             </AdminField>
-
           </section>
 
-          <section className="space-y-5">
+          <section className="grid gap-5">
             <AdminField
               label="Recipient's name"
               error={form.formState.errors.recipientName?.message}
@@ -360,35 +362,37 @@ export function SendMoneyDialog({
 
             {rail === "MOMO" ? (
               <>
-                <AdminField
-                  label="Network"
-                  error={form.formState.errors.channel?.message}
-                >
-                  <Controller
-                    control={form.control}
-                    name="channel"
-                    render={({ field }) => (
-                      <SimpleSelect
-                        className={adminSelectClass}
-                        value={field.value}
-                        onChange={field.onChange}
-                        placeholder="Choose a network"
-                        options={MOMO_CHANNEL_OPTIONS}
-                      />
-                    )}
-                  />
-                </AdminField>
-                <AdminField
-                  label="Mobile money number"
-                  error={form.formState.errors.recipientMsisdn?.message}
-                >
-                  <Input
-                    className={cn(adminInputClass, "font-adminmono")}
-                    inputMode="numeric"
-                    placeholder="e.g. 233249111411"
-                    {...form.register("recipientMsisdn")}
-                  />
-                </AdminField>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <AdminField
+                    label="Network"
+                    error={form.formState.errors.channel?.message}
+                  >
+                    <Controller
+                      control={form.control}
+                      name="channel"
+                      render={({ field }) => (
+                        <SimpleSelect
+                          className={adminSelectClass}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Choose a network"
+                          options={MOMO_CHANNEL_OPTIONS}
+                        />
+                      )}
+                    />
+                  </AdminField>
+                  <AdminField
+                    label="Mobile money number"
+                    error={form.formState.errors.recipientMsisdn?.message}
+                  >
+                    <Input
+                      className={cn(adminInputClass, "font-adminmono")}
+                      inputMode="numeric"
+                      placeholder="e.g. 233249111411"
+                      {...form.register("recipientMsisdn")}
+                    />
+                  </AdminField>
+                </div>
                 <RecipientNameHint
                   channel={form.watch("channel") ?? ""}
                   currentName={form.watch("recipientName")}
@@ -402,7 +406,7 @@ export function SendMoneyDialog({
                 />
               </>
             ) : (
-              <>
+              <div className="grid gap-5 sm:grid-cols-2">
                 <AdminField
                   label="Bank"
                   error={form.formState.errors.bankCode?.message}
@@ -430,12 +434,11 @@ export function SendMoneyDialog({
                     {...form.register("bankAccountNumber")}
                   />
                 </AdminField>
-              </>
+              </div>
             )}
-
           </section>
 
-          <section className="space-y-5">
+          <section className="grid gap-5">
             <AdminField
               label="What is it for?"
               error={form.formState.errors.description?.message}

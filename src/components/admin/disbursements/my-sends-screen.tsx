@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Plus } from "lucide-react";
 import { ConsoleFilterBar } from "@/components/admin/filter-bar";
 import { AdminButton, AdminPageHeader, Mono } from "@/components/admin/ui";
 import { DateTimeCell } from "@/components/admin/date-cell";
@@ -57,12 +56,10 @@ export function MySendsScreen({
 
   const sendButton = canSend ? (
     <AdminButton
-      aria-label="Send money"
       onClick={() => setSending(true)}
       type="button"
     >
-      <Plus className="h-4 w-4" aria-hidden="true" />
-      <span className="hidden sm:inline">Send money</span>
+      Send money
     </AdminButton>
   ) : null;
 
