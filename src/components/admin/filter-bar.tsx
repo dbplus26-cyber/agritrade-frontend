@@ -44,6 +44,29 @@ const fieldLabel = "text-[11px] font-medium text-adm-ink sm:text-[12px]";
  */
 const InlineFieldContext = createContext<{ heightClass: string } | null>(null);
 
+/**
+ * Puts labelled filter fields at a given control height, for a toolbar that
+ * builds its own row rather than going through ConsoleFilterBar.
+ *
+ * A filter field is a form field by default - a 44px box under its label -
+ * because most of them stand in a panel. On a toolbar it stands beside a
+ * select and a button, and a box two sizes taller than the things it lines up
+ * with is the whole reason a row looks assembled from parts.
+ */
+export function ConsoleFieldHeight({
+  children,
+  height = "h-[34px]",
+}: {
+  children: React.ReactNode;
+  height?: string;
+}) {
+  return (
+    <InlineFieldContext.Provider value={{ heightClass: height }}>
+      {children}
+    </InlineFieldContext.Provider>
+  );
+}
+
 /** The display label of `value` in an options list (for filter chips). */
 export function labelOf(
   options: readonly { value: string; label: string }[],

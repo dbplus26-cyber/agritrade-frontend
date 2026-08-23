@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { ConsoleDateField } from "@/components/admin/filter-bar";
+import {
+  ConsoleDateField,
+  ConsoleFieldHeight,
+} from "@/components/admin/filter-bar";
 import { AdminButton } from "@/components/admin/ui";
 import {
   Select,
@@ -98,9 +101,13 @@ export function DateRangeSelector({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    // items-end, because the date boxes carry a label and the select and Apply
+    // do not: aligning the tops would hang the two bare controls off the top
+    // of the row. Every box in the row is one height (34px, the console's
+    // standing control) and every box sits on one baseline.
+    <div className="flex flex-wrap items-end gap-2">
       <Select value={preset} onValueChange={(v) => choosePreset(v as RangePreset)}>
-        <SelectTrigger className="h-9 w-full cursor-pointer text-[11.5px] sm:w-[164px]">
+        <SelectTrigger className="h-[34px] w-full cursor-pointer text-[11.5px] sm:w-[164px]">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -117,22 +124,24 @@ export function DateRangeSelector({
         // in the same labelled boxed shape as the register filters, with
         // Apply sitting level with the boxes.
         <div className="flex w-full flex-wrap items-end gap-2 sm:w-auto">
-          <div className="grid min-w-0 flex-1 grid-cols-2 gap-2 sm:w-[320px] sm:flex-none">
-            <ConsoleDateField
-              label="Start date"
-              value={customFrom}
-              max={customTo || undefined}
-              onChange={setCustomFrom}
-              placeholder="Pick a date"
-            />
-            <ConsoleDateField
-              label="End date"
-              value={customTo}
-              min={customFrom || undefined}
-              onChange={setCustomTo}
-              placeholder="Pick a date"
-            />
-          </div>
+          <ConsoleFieldHeight>
+            <div className="grid min-w-0 flex-1 grid-cols-2 gap-2 sm:w-[320px] sm:flex-none">
+              <ConsoleDateField
+                label="Start date"
+                value={customFrom}
+                max={customTo || undefined}
+                onChange={setCustomFrom}
+                placeholder="Pick a date"
+              />
+              <ConsoleDateField
+                label="End date"
+                value={customTo}
+                min={customFrom || undefined}
+                onChange={setCustomTo}
+                placeholder="Pick a date"
+              />
+            </div>
+          </ConsoleFieldHeight>
           <AdminButton
             onClick={applyCustom}
             disabled={!customFrom || !customTo}
