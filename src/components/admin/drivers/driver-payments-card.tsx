@@ -184,7 +184,7 @@ export function DriverPaymentsCard({ driverId }: { driverId: string }) {
         {/* The headline: 26px because it is the one figure somebody opens this
             card to find. */}
         <Figure
-          className="text-[26px] leading-[1.15] font-bold text-adm-ink"
+          className="text-[19px] leading-[1.15] font-bold text-adm-ink sm:text-[26px]"
           value={summary.paidGhs}
         />
       </div>

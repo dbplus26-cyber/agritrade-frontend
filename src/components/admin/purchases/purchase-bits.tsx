@@ -209,7 +209,10 @@ export function summarisePurchaseCosts(
  * amount rather than as something cut off.
  */
 export function goodsCostValueCls(rendered: string): string {
-  if (rendered.length <= 16) return "text-[26px]";
-  if (rendered.length <= 20) return "text-[21px]";
-  return "text-[17px]";
+  // Each step also steps DOWN on a phone: the rail is the full width of the
+  // screen there, but the screen is 360px and a 26px figure is a headline the
+  // page has not earned.
+  if (rendered.length <= 16) return "text-[19px] sm:text-[26px]";
+  if (rendered.length <= 20) return "text-[17px] sm:text-[21px]";
+  return "text-[15px] sm:text-[17px]";
 }

@@ -291,7 +291,7 @@ function BalanceCard({
         ) : (
           <p
             className={cn(
-              "font-adminmono text-[26px] font-bold tabular-nums",
+              "font-adminmono text-[19px] font-bold tabular-nums sm:text-[26px]",
               warn && amount === 0 ? "text-console-red" : "text-adm-ink",
             )}
           >

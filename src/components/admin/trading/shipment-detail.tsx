@@ -1163,7 +1163,7 @@ export function ShipmentDetail({ id }: { id: string }) {
       <div className="flex items-center gap-2 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         Profit <CostBasisBadge basis={s.profit.costBasis} />
       </div>
-      <Mono className="mt-1 block text-[26px] leading-[1.15] font-semibold tabular-nums text-adm-ink">
+      <Mono className="mt-1 block text-[19px] leading-[1.15] font-semibold tabular-nums text-adm-ink sm:text-[26px]">
         <Money value={s.profit.profitGhs} />
       </Mono>
       <div className="mt-3 border-t border-adm-hairline pt-1">

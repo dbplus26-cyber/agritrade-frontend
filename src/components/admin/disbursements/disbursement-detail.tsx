@@ -242,7 +242,7 @@ export function DisbursementDetail({ id }: { id: string }) {
           a payment is queried. */}
       <AdminCard className="p-5">
         <Money
-          className="block text-[30px] leading-[1.1] font-semibold text-adm-ink"
+          className="block text-[21px] leading-[1.1] font-semibold text-adm-ink sm:text-[30px]"
           value={d.amountGhs}
         />
         <p className="mt-2 text-[12px] text-adm-body">

@@ -221,7 +221,7 @@ export function AccountLedgerScreen({ accountId }: { accountId: string }) {
           Balance now
         </p>
         <p className="mt-1.5">
-          <Balance className="text-[26px] font-bold" value={balance} />
+          <Balance className="text-[19px] font-bold sm:text-[26px]" value={balance} />
         </p>
         {balance !== null && balance < 0 ? (
           <p className="mt-1.5 text-[11px] text-console-red">

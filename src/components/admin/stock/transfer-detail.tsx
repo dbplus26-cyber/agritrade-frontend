@@ -57,7 +57,7 @@ export function TransferDetail({ id }: { id: string }) {
       aside={
         <>
           <RailCard title="Moved">
-            <p className="font-adminmono text-[20px] font-bold text-adm-ink tabular-nums">
+            <p className="font-adminmono text-[16px] font-bold text-adm-ink tabular-nums sm:text-[20px]">
               {formatKg(t.weightKg)}
             </p>
           </RailCard>

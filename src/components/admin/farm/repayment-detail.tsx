@@ -354,7 +354,7 @@ export function RepaymentDetail({ id }: { id: string }) {
                 text="What this repayment was worth when it came in, and so how much it takes off what the farmer owes. The same figure whichever way the farmer settled."
               />
             </p>
-            <p className="font-adminmono mt-1 text-[26px] font-bold text-console tabular-nums">
+            <p className="font-adminmono mt-1 text-[19px] font-bold text-console tabular-nums sm:text-[26px]">
               <Money value={r.valueGhs} />
             </p>
             {/* How the figure above was arrived at. On a cash repayment there

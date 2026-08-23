@@ -398,7 +398,7 @@ export function PurchaseSettlementCard({
             </dt>
             <dd className="mt-0.5">
               <Figure
-                className="text-[22px] leading-[1.15] font-bold text-adm-ink"
+                className="text-[17px] leading-[1.15] font-bold text-adm-ink sm:text-[22px]"
                 value={settlement.outstandingGhs}
               />
             </dd>

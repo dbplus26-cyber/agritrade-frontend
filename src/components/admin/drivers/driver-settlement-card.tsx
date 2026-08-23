@@ -88,11 +88,11 @@ function SettlementHeadline({ settlement }: { settlement: IDriverSettlement }) {
             agreed shows a dash instead of a zero, which would read as settled. */}
         {settlement.hasFee ? (
           <Figure
-            className="text-[26px] leading-[1.15] font-bold text-adm-ink"
+            className="text-[19px] leading-[1.15] font-bold text-adm-ink sm:text-[26px]"
             value={settlement.outstandingGhs}
           />
         ) : (
-          <p className="text-[26px] leading-[1.15] font-bold text-adm-faint">
+          <p className="text-[19px] leading-[1.15] font-bold text-adm-faint sm:text-[26px]">
             &mdash;
           </p>
         )}

@@ -137,7 +137,7 @@ export function ExpenseDetail({ id }: { id: string }) {
           avoid. */}
       <AdminCard className="p-5">
         {showMoney ? (
-          <Mono className="block text-[30px] leading-[1.1] font-semibold tabular-nums text-adm-ink">
+          <Mono className="block text-[21px] leading-[1.1] font-semibold tabular-nums text-adm-ink sm:text-[30px]">
             {formatCedis(expense.amountGhs)}
           </Mono>
         ) : (
