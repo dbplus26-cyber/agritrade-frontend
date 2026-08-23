@@ -161,7 +161,7 @@ export function FloatHoldersScreen() {
           "Whether this person has been given company money to spend, and whether they can still spend it.",
         ),
         enableSorting: false,
-        meta: columnMeta({ card: "meta", at: "md" }),
+        meta: columnMeta({ card: "badge", at: "md" }),
         cell: ({ row }) => <HolderState holder={row.original} />,
       },
     ];
@@ -201,7 +201,7 @@ export function FloatHoldersScreen() {
           "How much of the COMPANY's money this person may still send. Nothing to do with what they are holding: a send takes money out of a company account, not out of their pocket.",
         ),
         enableSorting: false,
-        meta: columnMeta({ card: "meta" }),
+        meta: columnMeta({ card: "trailing" }),
         cell: ({ row }) => <HolderAllowance holder={row.original} />,
       });
     }
@@ -211,9 +211,9 @@ export function FloatHoldersScreen() {
     if (canManage) {
       base.push({
         id: "actions",
-        header: "",
+        header: "Actions",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ className: "whitespace-nowrap text-right" }),
         cell: ({ row }) => (
           <HolderActions
             holder={row.original}
@@ -411,7 +411,10 @@ function HolderActions({
   };
 
   return (
-    <div className="flex flex-wrap justify-end gap-2">
+    // One line on the table, wrapping only on the card where the row has the
+    // width to spare: two half-width buttons stacked in every desktop row is
+    // the column giving way when the table should simply be wider.
+    <div className="flex flex-wrap justify-end gap-2 @2xl/table:flex-nowrap">
       {/* One door. Handing over notes, transferring e-cash and widening what
           somebody may spend of the company's money are three different acts
           with three different entries in the books - but a reader should not

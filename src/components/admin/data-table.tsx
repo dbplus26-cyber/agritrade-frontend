@@ -139,8 +139,11 @@ export interface ConsoleColumnMeta {
  *   badge     a state chip, top left. Usually one; a second is allowed where
  *             a row really does carry two states (a status and what it is
  *             waiting on), and they sit side by side.
- *   trailing  the one figure that belongs beside them, top right - a total, a
- *             weight, a count. At most one.
+ *   trailing  the figure that belongs beside them, top right - a total, a
+ *             weight, a count. Usually one; where a row genuinely carries two
+ *             money figures they stack there together, because the one place
+ *             a reader looks for money on a card should be the only place it
+ *             appears.
  *   title     which row this is. Exactly one, and it reads first.
  *   meta      the supporting facts, joined into one quiet line under the
  *             title. Two or three; past that the line stops being scannable.
@@ -313,22 +316,26 @@ function summaryCard<TData>(
   }
 
   const badges = slotted.filter((c) => slotOf(c) === "badge" && filled(c));
-  const trailing = slotted.find((c) => slotOf(c) === "trailing");
+  const trailing = slotted.filter((c) => slotOf(c) === "trailing" && filled(c));
   const title = slotted.find((c) => slotOf(c) === "title");
   const meta = slotted.filter((c) => slotOf(c) === "meta" && filled(c));
 
   return (
     <>
-      {badges.length > 0 || trailing ? (
+      {badges.length > 0 || trailing.length > 0 ? (
         <div className="flex items-center justify-between gap-2">
           <span className="flex min-w-0 flex-wrap items-center gap-1.5">
             {badges.map((cell) => (
               <span key={cell.id}>{render(cell)}</span>
             ))}
           </span>
-          {trailing && filled(trailing) ? (
-            <span className="flex-none text-[11px] font-semibold text-adm-ink">
-              {render(trailing)}
+          {trailing.length > 0 ? (
+            // Stacked, not spread: a second figure beside the first reads as
+            // one number split in two.
+            <span className="flex flex-none flex-col items-end gap-0.5 text-[11px] font-semibold text-adm-ink">
+              {trailing.map((cell) => (
+                <span key={cell.id}>{render(cell)}</span>
+              ))}
             </span>
           ) : null}
         </div>
