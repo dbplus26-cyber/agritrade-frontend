@@ -344,9 +344,16 @@ export function ApprovalsScreen() {
                 {headlineSublabel(row.original)}
               </span>
             ) : null}
-            <OverageMeter approval={row.original} className="mt-1.5" />
+            <OverageMeter
+              approval={row.original}
+              className="mt-1.5 ml-auto @min-[900px]/main:ml-0"
+            />
           </>
         ),
+        meta: {
+          className:
+            "order-2 justify-self-end text-right @min-[900px]/main:order-none @min-[900px]/main:justify-self-auto @min-[900px]/main:text-left",
+        },
       },
       {
         id: "subject",
@@ -363,6 +370,10 @@ export function ApprovalsScreen() {
             ) : null}
           </>
         ),
+        meta: {
+          className:
+            "order-3 col-span-2 @min-[900px]/main:order-none @min-[900px]/main:col-span-1",
+        },
       },
       {
         id: "rule",
@@ -373,20 +384,34 @@ export function ApprovalsScreen() {
           />
         ),
         cell: ({ row }) => <RuleBadge action={row.original.action} />,
+        meta: { className: "order-1 @min-[900px]/main:order-none" },
       },
       {
         id: "raisedBy",
         header: () => "Raised by",
         cell: ({ row }) => (
-          <>
-            <span className="block text-[12.5px] leading-[1.4] text-[var(--ap-ink-2)] [overflow-wrap:anywhere]">
+          // Who and when are two short facts, and on a phone they read as one
+          // line - "Kwame Mensah · 3 days ago" - rather than two thirds of an
+          // inch of vertical space between the subject and the buttons.
+          <span className="flex flex-wrap items-baseline gap-x-1.5 @min-[900px]/main:block">
+            <span className="text-[12.5px] leading-[1.4] text-[var(--ap-ink-2)] [overflow-wrap:anywhere]">
               {shortName(row.original.requestedBy?.name)}
             </span>
-            <span className="block font-adminmono text-[11.5px] leading-[1.4] tabular-nums text-[var(--ap-muted)]">
+            <span
+              aria-hidden="true"
+              className="text-[11px] text-[var(--ap-muted)] @min-[900px]/main:hidden"
+            >
+              ·
+            </span>
+            <span className="font-adminmono text-[11.5px] leading-[1.4] tabular-nums text-[var(--ap-muted)]">
               {ageLabel(row.original)}
             </span>
-          </>
+          </span>
         ),
+        meta: {
+          className:
+            "order-4 col-span-2 @min-[900px]/main:order-none @min-[900px]/main:col-span-1",
+        },
       },
       {
         id: "decision",
@@ -406,7 +431,8 @@ export function ApprovalsScreen() {
           />
         ),
         meta: {
-          className: "flex min-w-0 justify-start gap-1.5 @min-[900px]/main:justify-end",
+          className:
+            "order-5 col-span-2 flex min-w-0 justify-start gap-1.5 @min-[900px]/main:order-none @min-[900px]/main:col-span-1 @min-[900px]/main:justify-end",
           headerClassName: "text-right",
         },
       },

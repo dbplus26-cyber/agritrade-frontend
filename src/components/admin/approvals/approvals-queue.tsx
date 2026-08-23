@@ -50,11 +50,19 @@ import {
  * window leaves the table barely 635px - a viewport query would keep the
  * seven fixed columns in place at exactly the width where they no longer fit.
  * Narrow is the base case; the full grid is the enhancement.
+ *
+ * Narrow is TWO columns, not one. Stacking every cell put the rule badge, the
+ * figure, what changed, who raised it and the buttons on five separate lines,
+ * so four requests filled a phone screen and a queue meant to be skimmed had
+ * to be scrolled. The short things pair up instead: the rule chip sits beside
+ * the figure on the opening line, and only the prose spans. Each cell says
+ * where it goes through its own meta className, so the placement lives with
+ * the column it belongs to.
  */
 const GRID =
-  "grid grid-cols-1 items-start gap-[14px] gap-y-2.5 " +
+  "grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2 " +
   "@min-[900px]/main:grid-cols-[34px_190px_1fr_150px_118px_190px_26px] " +
-  "@min-[900px]/main:items-center @min-[900px]/main:gap-y-[14px]";
+  "@min-[900px]/main:items-center @min-[900px]/main:gap-x-[14px] @min-[900px]/main:gap-y-[14px]";
 
 /**
  * How a request arrives in and leaves the queue.
