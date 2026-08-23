@@ -215,7 +215,7 @@ function PaymentDialog({
               Cancel
             </AdminButton>
             <AdminButton type="submit" disabled={isLoading} loading={isLoading} size="lg">
-              {isLoading ? "Recording..." : "Record payment"}
+              {isLoading ? "Recording…" : "Record payment"}
             </AdminButton>
           </ResponsiveDialogFooter>
         </form>
@@ -289,7 +289,7 @@ function CancelDialog({
               loading={isLoading}
               size="lg"
             >
-              {isLoading ? "Cancelling..." : "Cancel acquisition"}
+              {isLoading ? "Cancelling…" : "Cancel acquisition"}
             </AdminButton>
           </ResponsiveDialogFooter>
         </form>
@@ -400,7 +400,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
               loading={agreeState.isLoading}
               onClick={() => void onAgree()}
             >
-              {agreeState.isLoading ? "Saving..." : "Mark agreed"}
+              {agreeState.isLoading ? "Saving…" : "Mark agreed"}
             </AdminButton>
           ) : null}
           {canPay ? (
@@ -415,7 +415,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
               loading={completeState.isLoading}
               onClick={() => void onComplete()}
             >
-              {completeState.isLoading ? "Completing..." : "Complete"}
+              {completeState.isLoading ? "Completing…" : "Complete"}
             </AdminButton>
           ) : null}
           {canCancel ? (

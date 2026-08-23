@@ -177,7 +177,7 @@ export function SupplierTable() {
         accessorFn: (s) => `${s.name} ${s.community ?? ""}`,
         header: "Supplier",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) => {
           const s = row.original;
           return (
@@ -204,7 +204,7 @@ export function SupplierTable() {
         accessorFn: (s) => s.phone ?? "",
         header: "Phone",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) =>
           row.original.phone ? (
             <span className="font-adminmono whitespace-nowrap text-adm-muted">
@@ -222,7 +222,7 @@ export function SupplierTable() {
           "What kind of seller this is: an individual farmer, a company, or one of your own agents.",
         ),
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
         cell: ({ row }) => (
           <span className="block @2xl/table:max-w-[22rem] [overflow-wrap:anywhere] @2xl/table:truncate text-adm-muted">
             {SOURCE_LABEL[row.original.sourceType]}
@@ -241,7 +241,7 @@ export function SupplierTable() {
         id: "status",
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => <ActiveBadge isActive={row.original.isActive} />,
       },
     ],

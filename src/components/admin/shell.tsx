@@ -601,6 +601,18 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     // on the page. Hidden here, once, rather than by every printable screen
     // remembering to reach up and do it.
     <SidebarProvider style={SIDEBAR_VARS}>
+      {/* The way past the rail. Every console page puts a sidebar of some
+          eighty links between the top of the document and the thing the page
+          is actually about, and tabbing through them to reach a register is
+          the whole day for somebody who cannot use a mouse. Off-screen until
+          it takes focus, first in the tab order, and the print rule keeps it
+          off paper. */}
+      <a
+        href="#console-main"
+        className="sr-only z-50 focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:rounded-none focus:border focus:border-console focus:bg-adm-card focus:px-3 focus:py-2 focus:text-[13px] focus:font-semibold focus:text-console print:hidden"
+      >
+        Skip to main content
+      </a>
       <div className="contents print:hidden">
         <ConsoleSidebar activeKey={activeKey} />
       </div>
@@ -641,7 +653,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             768px tablet a viewport-based `md:` fires while the content area is
             only ~512px wide, which is exactly how a table ends up rendered
             into half the room it was designed for. */}
-        <main className="@container/main mx-auto w-full min-w-0 max-w-[1360px] flex-1 p-4 lg:p-[26px] print:max-w-none print:p-0">
+        <main
+          id="console-main"
+          // Focusable only as a skip-link target: without it the browser moves
+          // the ring but not the keyboard, and the next Tab goes back to the
+          // rail the reader just skipped.
+          tabIndex={-1}
+          className="@container/main mx-auto w-full min-w-0 max-w-[1360px] flex-1 p-4 outline-none lg:p-[26px] print:max-w-none print:p-0"
+        >
           <PageTransition>{children}</PageTransition>
         </main>
         <div className="print:hidden">

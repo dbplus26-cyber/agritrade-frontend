@@ -75,7 +75,7 @@ export function InputItemsRegister() {
         id: "name",
         header: "Item",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         // The description rides underneath rather than holding a column of
         // its own. Prose has no natural width, so given a column it is always
         // the one that pushes the table off the side of the screen; under the
@@ -96,7 +96,7 @@ export function InputItemsRegister() {
           "How this item is handed out and counted: a bag, a litre, a piece.",
         ),
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => (
           <span className="text-adm-muted">{row.original.unitLabel}</span>
         ),
@@ -106,14 +106,14 @@ export function InputItemsRegister() {
         accessorFn: (i) => i.createdAt,
         header: "Added",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => <ActiveBadge active={row.original.isActive} />,
       },
     ],

@@ -443,6 +443,7 @@ export function FarmerDetail({ id }: { id: string }) {
               )}
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <input
+                  aria-label="Document name"
                   value={docName}
                   onChange={(e) => setDocName(e.target.value)}
                   placeholder="Document name (e.g. Grant agreement)"

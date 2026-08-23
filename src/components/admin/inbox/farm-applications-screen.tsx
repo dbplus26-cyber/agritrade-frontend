@@ -135,7 +135,7 @@ export function FarmApplicationsScreen() {
         accessorFn: (a) => `${a.name} ${a.reference}`,
         header: "Applicant",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         // A real anchor, as every other register's identity column has: the
         // row's own click handler gives no keyboard target, no middle-click
         // and nothing to copy a link from. Ink, not green - see adminLinkClass
@@ -172,7 +172,7 @@ export function FarmApplicationsScreen() {
         accessorFn: (a) => a.community ?? "",
         header: "Community",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
         cell: ({ row }) =>
           row.original.community ? (
             <span className="block @2xl/table:max-w-[160px] [overflow-wrap:anywhere] @2xl/table:truncate text-adm-muted">
@@ -187,7 +187,7 @@ export function FarmApplicationsScreen() {
         accessorFn: (a) => a.farmSizeAcres ?? "",
         header: "Farm size",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "trailing" }),
         cell: ({ row }) =>
           row.original.farmSizeAcres !== null ? (
             <Mono className="whitespace-nowrap text-adm-muted">
@@ -202,7 +202,7 @@ export function FarmApplicationsScreen() {
         accessorFn: (a) => a.status,
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => (
           <FarmApplicationStatusBadge status={row.original.status} />
         ),
@@ -212,7 +212,7 @@ export function FarmApplicationsScreen() {
         accessorFn: (a) => a.createdAt,
         header: "Received",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
     ],

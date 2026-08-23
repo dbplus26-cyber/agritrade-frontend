@@ -126,7 +126,7 @@ export function WarehouseTable() {
         accessorFn: (w) => w.name,
         header: "Warehouse",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) => (
           <TitleCell
             href={`${LIST}/${row.original.id}`}
@@ -140,7 +140,7 @@ export function WarehouseTable() {
         accessorFn: (w) => w.location ?? "",
         header: "Location",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) =>
           row.original.location ? (
             <span className="block @2xl/table:max-w-[17rem] [overflow-wrap:anywhere] @2xl/table:truncate text-adm-muted">{row.original.location}</span>
@@ -153,14 +153,14 @@ export function WarehouseTable() {
         accessorFn: (w) => w.createdAt,
         header: "Added",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => <ActiveBadge isActive={row.original.isActive} />,
       },
     ],

@@ -118,7 +118,7 @@ export function AuditTable() {
         accessorFn: (log) => log.createdAt,
         header: "Time",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
@@ -129,7 +129,7 @@ export function AuditTable() {
           "Who did it: the person signed in at the time, or the system itself.",
         ),
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "meta", stretch: true }),
         cell: ({ row }) => {
           const actor = row.original.actor;
           if (!actor) {
@@ -161,7 +161,7 @@ export function AuditTable() {
         accessorFn: (log) => log.action,
         header: columnHelp("Action", "What they did, in plain words."),
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "title" }),
         cell: ({ row }) => (
           <ToneBadge tone={actionTone(row.original.action)}>
             {actionLabel(row.original.action)}
@@ -176,7 +176,7 @@ export function AuditTable() {
           "Which thing in the system was touched, and its reference.",
         ),
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
         cell: ({ row }) => (
           <div className="whitespace-nowrap">
             <span className="text-adm-muted">{row.original.entity}</span>
@@ -201,7 +201,7 @@ export function AuditTable() {
           "The internet address they were connecting from, useful for spotting a sign-in from somewhere odd.",
         ),
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
         cell: ({ row }) => (
           <Mono className="whitespace-nowrap text-adm-muted">
             {row.original.ip ?? "-"}

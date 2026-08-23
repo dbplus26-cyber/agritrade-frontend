@@ -111,7 +111,7 @@ export function NotificationsScreen() {
         id: "event",
         header: "Notification",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) => (
           <div className="min-w-0 @2xl/table:max-w-[90%]">
             <div className="font-medium text-adm-ink">
@@ -129,7 +129,7 @@ export function NotificationsScreen() {
         id: "recipient",
         header: "To",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
         cell: ({ row }) => (
           <Mono className="text-adm-muted">
             {row.original.recipient}
@@ -140,7 +140,7 @@ export function NotificationsScreen() {
         id: "channel",
         header: "Channel",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => (
           <ToneBadge tone={row.original.channel === "SMS" ? "sky" : "slate"}>
             {row.original.channel}
@@ -151,7 +151,7 @@ export function NotificationsScreen() {
         id: "status",
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => {
           const s = STATUS_TONE[row.original.status];
           return (
@@ -169,7 +169,7 @@ export function NotificationsScreen() {
         id: "when",
         header: "When",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
     ],

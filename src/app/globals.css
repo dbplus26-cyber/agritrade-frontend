@@ -84,8 +84,10 @@
   /* Explicit family fallbacks so portaled overlays (Radix dialogs render on
      <body>, outside the admin layout's next/font variable scope) keep the
      console fonts - the @font-face family names are global and stable. */
-  --font-admin: var(--font-hanken, "Hanken Grotesk", "Hanken Grotesk Fallback");
-  --font-adminmono: var(--font-jetbrains, "JetBrains Mono", "JetBrains Mono Fallback");
+  --font-admin: var(--font-geist, "Geist", "Geist Fallback"), ui-sans-serif,
+    system-ui, sans-serif;
+  --font-adminmono: var(--font-geist-mono, "Geist Mono", "Geist Mono Fallback"),
+    ui-monospace, monospace;
 
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -169,6 +171,12 @@
   }
   html {
     @apply font-sans;
+    /* Kills the 300ms wait a touch browser spends deciding whether a tap was
+       a double-tap to zoom. Every control in the console is tapped dozens of
+       times a shift, and a third of a second of nothing on each one is what
+       makes a web app feel unlike an app. Zoom itself is untouched: pinch
+       still works, which is the accessibility line that matters. */
+    touch-action: manipulation;
   }
 }
 

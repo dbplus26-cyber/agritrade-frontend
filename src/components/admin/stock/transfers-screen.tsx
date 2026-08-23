@@ -216,7 +216,7 @@ export function TransfersScreen() {
         ),
         accessorFn: (t) => `${t.fromWarehouse.name} → ${t.toWarehouse.name}`,
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) => (
           <Route
             from={row.original.fromWarehouse.name}
@@ -229,7 +229,7 @@ export function TransfersScreen() {
         header: "Commodity",
         accessorFn: (t) => t.commodity.name,
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         // Bounded: an unbounded commodity name starves the route column
         // beside it.
         cell: ({ row }) => (
@@ -241,7 +241,7 @@ export function TransfersScreen() {
         header: "Weight",
         accessorFn: (t) => t.weightKg,
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "trailing" }),
         cell: ({ row }) => (
           <Kg
             kg={row.original.weightKg}
@@ -257,7 +257,7 @@ export function TransfersScreen() {
         ),
         accessorFn: (t) => t.occurredAt,
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => <DateOnlyCell value={row.original.occurredAt} />,
       },
       {

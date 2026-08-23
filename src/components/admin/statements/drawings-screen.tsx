@@ -220,7 +220,7 @@ export function DrawingsScreen() {
         accessorFn: (d) => d.transactionNo,
         header: "No.",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => (
           <Mono className="tabular-nums">{row.original.transactionNo}</Mono>
         ),
@@ -230,7 +230,7 @@ export function DrawingsScreen() {
         accessorFn: (d) => d.notes ?? "",
         header: "Note",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) =>
           row.original.notes ? (
             <span className="block @2xl/table:max-w-[90%] [overflow-wrap:anywhere] @2xl/table:truncate" title={row.original.notes}>
@@ -245,7 +245,7 @@ export function DrawingsScreen() {
         accessorFn: (d) => d.occurredAt,
         header: "Date",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => <DateOnlyCell value={row.original.occurredAt} />,
       },
       {
@@ -253,7 +253,7 @@ export function DrawingsScreen() {
         accessorFn: (d) => d.amountGhs,
         header: "Amount",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "trailing" }),
         cell: ({ row }) => (
           <Mono className="font-semibold tabular-nums">
             {formatCedis(row.original.amountGhs)}
@@ -265,7 +265,7 @@ export function DrawingsScreen() {
         accessorFn: (d) => d.paymentAccount?.label ?? d.noCashReason ?? "",
         header: "Taken from",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => (
           <CashSourceNote
             account={row.original.paymentAccount}

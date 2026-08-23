@@ -63,7 +63,7 @@ export function SupplierHoldings({
           "Whose yard the goods are standing in, and what they are.",
         ),
         enableSorting: false,
-        meta: columnMeta({ className: "py-2", stretch: true }),
+        meta: columnMeta({ card: "title", className: "py-2", stretch: true }),
         cell: ({ row }) => (
           <TitleCell
             href={`/admin/suppliers/${row.original.supplierId}`}
@@ -80,7 +80,7 @@ export function SupplierHoldings({
           "How many separate purchases make up this weight.",
         ),
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => (
           <span className="text-[13px] text-adm-body">{row.original.lots}</span>
         ),
@@ -92,7 +92,7 @@ export function SupplierHoldings({
           "What is still there to collect, after anything already loaded out.",
         ),
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "trailing" }),
         cell: ({ row }) => <Kg kg={row.original.remainingKg} />,
       },
     ],

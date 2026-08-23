@@ -174,7 +174,7 @@ export function UsersTable() {
         accessorFn: (u) => `${u.firstName} ${u.lastName} ${u.email}`,
         header: "User",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) => {
           const u = row.original;
           return (
@@ -219,7 +219,7 @@ export function UsersTable() {
           "What this person is allowed to do: agents only ever see their own float and purchases.",
         ),
         enableSorting: false,
-        meta: columnMeta({ at: "lg" }),
+        meta: columnMeta({ card: "meta", at: "lg" }),
         cell: ({ row }) => (
           <span className="whitespace-nowrap text-adm-muted">
             {ROLE_LABEL[row.original.role]}
@@ -246,7 +246,7 @@ export function UsersTable() {
           "The last time this person signed in, so you can spot accounts nobody uses.",
         ),
         enableSorting: false,
-        meta: columnMeta({ at: "xl" }),
+        meta: columnMeta({ card: "meta", at: "xl" }),
         cell: ({ row }) => (
           <span className="whitespace-nowrap text-adm-muted">
             {lastActiveLabel(row.original)}
@@ -265,7 +265,7 @@ export function UsersTable() {
         id: "status",
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => <StatusBadge user={row.original} />,
       },
       {

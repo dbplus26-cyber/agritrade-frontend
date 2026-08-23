@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowDown, ArrowUp } from "lucide-react";
 import {
   AnimatePresence,
   motion,
@@ -9,6 +10,7 @@ import {
   useReducedMotion,
 } from "motion/react";
 import {
+  type Cell,
   type ColumnDef,
   flexRender,
   getCoreRowModel,
@@ -72,6 +74,12 @@ export function columnHelp(label: string, text: string) {
 
 /** Per-column console styling carried on TanStack column meta. */
 export interface ConsoleColumnMeta {
+  /**
+   * Which slot this column fills on the phone card. Omitted means the column
+   * is a table-only detail: it is on the record and on the detail screen, and
+   * a phone list is not where it earns its room.
+   */
+  card?: CardSlot;
   /** Applied to both th and td (alignment, mono, responsive hiding). */
   className?: string;
   /** Applied to th only. */
@@ -106,10 +114,145 @@ export interface ConsoleColumnMeta {
   stretch?: boolean;
 }
 
+/**
+ * Where a column appears on the phone card - the summary a row collapses to
+ * when there is no room for a table.
+ *
+ * A narrow screen does not get a smaller table; it gets a DIFFERENT thing. A
+ * register listing every column as a labelled pair reads as a form, one
+ * screenful per row, and the reader scrolls past four rows looking for one.
+ * The card answers the only question a list is asked - which row is this, and
+ * what state is it in - and the detail view answers the rest.
+ *
+ * So a column names the slot it fills, and anything unslotted is simply absent
+ * from the card. That is the point: choosing what to drop is the work.
+ *
+ *   badge     a state chip, top left. Usually one; a second is allowed where
+ *             a row really does carry two states (a status and what it is
+ *             waiting on), and they sit side by side.
+ *   trailing  the one figure that belongs beside them, top right - a total, a
+ *             weight, a count. At most one.
+ *   title     which row this is. Exactly one, and it reads first.
+ *   meta      the supporting facts, joined into one quiet line under the
+ *             title. Two or three; past that the line stops being scannable.
+ */
+export type CardSlot = "badge" | "meta" | "title" | "trailing";
+
 declare module "@tanstack/react-table" {
   // The standard TanStack meta-augmentation shape - params/emptiness required.
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-object-type
   interface ColumnMeta<TData, TValue> extends ConsoleColumnMeta {}
+}
+
+/** Which slot a column asked for, or nothing when it is table-only. */
+const slotOf = <TData,>(cell: Cell<TData, unknown>): CardSlot | undefined =>
+  cell.column.columnDef.meta?.card;
+
+/**
+ * A row as a card: the summary a person scans, not the row transposed.
+ *
+ * Shape, top to bottom: the state chip and its one figure on a line together,
+ * then which row this is, then the quiet line of supporting facts. Empty slots
+ * collapse - a card with no badge starts at the title, and no space is
+ * reserved for something that is not there.
+ *
+ * A column that named no slot is absent by design; the whole card is a link to
+ * the row's detail view, which is where the rest of the record lives.
+ *
+ * Falls back to the old labelled pairs only when a table has annotated
+ * nothing, so a screen written before the slots exists still renders its data
+ * rather than an empty card.
+ */
+function summaryCard<TData>(
+  cells: Cell<TData, unknown>[],
+  headerLabel: Map<string, React.ReactNode>,
+  selectCell: Cell<TData, unknown> | undefined,
+  actionCells: Cell<TData, unknown>[],
+) {
+  const render = (cell: Cell<TData, unknown>) =>
+    flexRender(cell.column.columnDef.cell, cell.getContext());
+  // A slot with nothing in it is not a slot: an empty badge would hold a line
+  // open, and an empty meta entry would leave a stray separator behind.
+  const filled = (cell: Cell<TData, unknown>) => {
+    const raw = cell.getValue();
+    return raw !== null && raw !== undefined && raw !== "";
+  };
+
+  const slotted = cells.filter((c) => slotOf(c) !== undefined);
+  if (slotted.length === 0) {
+    return (
+      <>
+        {selectCell ? (
+          <div className="mb-1.5 flex justify-end">{render(selectCell)}</div>
+        ) : null}
+        {cells.filter(filled).map((cell) => (
+          <CardField key={cell.id} label={headerLabel.get(cell.column.id)}>
+            {render(cell)}
+          </CardField>
+        ))}
+        {actionCells.length > 0 ? (
+          <div className="mt-1.5 flex flex-wrap justify-end gap-1.5 border-t border-adm-hairline pt-1.5">
+            {actionCells.map((cell) => (
+              <span key={cell.id}>{render(cell)}</span>
+            ))}
+          </div>
+        ) : null}
+      </>
+    );
+  }
+
+  const badges = slotted.filter((c) => slotOf(c) === "badge" && filled(c));
+  const trailing = slotted.find((c) => slotOf(c) === "trailing");
+  const title = slotted.find((c) => slotOf(c) === "title");
+  const meta = slotted.filter((c) => slotOf(c) === "meta" && filled(c));
+
+  return (
+    <>
+      {badges.length > 0 || trailing || selectCell ? (
+        <div className="flex items-center justify-between gap-2">
+          <span className="flex min-w-0 flex-wrap items-center gap-1.5">
+            {selectCell ? render(selectCell) : null}
+            {badges.map((cell) => (
+              <span key={cell.id}>{render(cell)}</span>
+            ))}
+          </span>
+          {trailing && filled(trailing) ? (
+            <span className="flex-none text-[12.5px] font-semibold text-adm-ink">
+              {render(trailing)}
+            </span>
+          ) : null}
+        </div>
+      ) : null}
+      {title ? (
+        <div className="min-w-0 text-[14px] leading-[1.35] font-medium text-adm-ink">
+          {render(title)}
+        </div>
+      ) : null}
+      {meta.length > 0 ? (
+        // Separated by a middle dot rather than stacked: three short facts on
+        // one quiet line is one glance, and three lines is three.
+        <div className="flex min-w-0 flex-wrap items-baseline gap-x-1.5 text-[12px] text-adm-muted">
+          {meta.map((cell, index) => (
+            <span key={cell.id} className="flex min-w-0 items-baseline gap-1.5">
+              {index > 0 ? (
+                <span aria-hidden="true" className="text-adm-faint">
+                  ·
+                </span>
+              ) : null}
+              <span className="min-w-0 truncate">{render(cell)}</span>
+            </span>
+          ))}
+        </div>
+      ) : null}
+      {actionCells.length > 0 ? (
+        <div className="flex flex-wrap justify-end gap-1.5 pt-0.5">
+          {actionCells.map((cell) => (
+            <span key={cell.id}>{render(cell)}</span>
+          ))}
+        </div>
+      ) : null}
+    </>
+  );
 }
 
 /**
@@ -498,7 +641,12 @@ export function ConsoleDataTable<TData>({
           wherever the table is placed, and there is exactly ONE rule setting
           `display` per view (a viewport fallback alongside would race it,
           with whichever lands later in the stylesheet silently winning). */}
-      <div
+      <ul
+        // A list, and announced as one: the card view is the phone rendering of
+        // a table's rows, so "list, 12 items" is the count a screen reader user
+        // needs before deciding to read on. `role="list"` is explicit because
+        // the list-style reset Tailwind applies strips it in Safari.
+        role="list"
         className={cn(
           // `relative` anchors a leaving card: AnimatePresence pops it out of
           // the flow so its neighbours can slide up at once, and it needs a
@@ -509,11 +657,13 @@ export function ConsoleDataTable<TData>({
         aria-busy={isFetching || undefined}
       >
         {rows.length === 0 ? (
-          (emptyState ?? (
-            <div className="px-4 py-12 text-center text-[14px] text-adm-muted">
-              Nothing here yet.
-            </div>
-          ))
+          <li>
+            {emptyState ?? (
+              <div className="px-4 py-12 text-center text-[14px] text-adm-muted">
+                Nothing here yet.
+              </div>
+            )}
+          </li>
         ) : (
           // `initial={false}`: the first paint arrives whole; only cards that
           // appear AFTER mount play the entrance.
@@ -543,7 +693,7 @@ export function ConsoleDataTable<TData>({
               const cells = visible.filter(isData);
               const actionCells = visible.filter((c) => !isData(c));
               return (
-                <motion.div
+                <motion.li
                   key={row.id}
                   // Position only: a card whose content changes size snaps to
                   // it rather than stretching its text through a scale.
@@ -554,6 +704,7 @@ export function ConsoleDataTable<TData>({
                       ? { duration: 0 }
                       : { type: "spring", stiffness: 500, damping: 40 },
                   }}
+                  data-slot-card=""
                   data-state={row.getIsSelected() ? "selected" : undefined}
                   {...rowNavProps(href, (h) => router.push(h))}
                   className={cn(
@@ -564,51 +715,13 @@ export function ConsoleDataTable<TData>({
                       "cursor-pointer hover:border-adm-strong focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-console",
                   )}
                 >
-                  {selectCell ? (
-                    <div className="mb-1.5 flex justify-end">
-                      {flexRender(
-                        selectCell.column.columnDef.cell,
-                        selectCell.getContext(),
-                      )}
-                    </div>
-                  ) : null}
-                  {cells.map((cell) => {
-                    const label = headerLabel.get(cell.column.id);
-                    // Drop rows with nothing in them: a stack of
-                    // "DESCRIPTION -" placeholders is pure noise on a phone,
-                    // and reserved slots that never fill are exactly the
-                    // "unintentional negative space" to avoid.
-                    const raw = cell.getValue();
-                    if (raw === null || raw === undefined || raw === "") {
-                      return null;
-                    }
-                    return (
-                      <CardField key={cell.id} label={label}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </CardField>
-                    );
-                  })}
-                  {actionCells.length > 0 ? (
-                    <div className="mt-1.5 flex flex-wrap justify-end gap-1.5 border-t border-adm-hairline pt-1.5">
-                      {actionCells.map((cell) => (
-                        <span key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                </motion.div>
+                  {summaryCard(cells, headerLabel, selectCell, actionCells)}
+                </motion.li>
               );
             })}
           </AnimatePresence>
         )}
-      </div>
+      </ul>
 
       {/* Wide container: the real table, horizontally scrollable only as a
           last resort on genuinely wide content. */}
@@ -633,25 +746,52 @@ export function ConsoleDataTable<TData>({
                 return (
                   <TableHead
                     key={header.id}
+                    // The sorted state, said rather than drawn: an arrow beside
+                    // the label tells a person looking at the screen and nobody
+                    // else, and a column header is exactly the thing a screen
+                    // reader user needs the state of before reading the rows.
+                    aria-sort={
+                      dir === "asc"
+                        ? "ascending"
+                        : dir === "desc"
+                          ? "descending"
+                          : sortable
+                            ? "none"
+                            : undefined
+                    }
                     className={cn(
                       "h-[38px] px-3 text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted",
-                      sortable && "cursor-pointer select-none",
                       meta?.className,
                       meta?.headerClassName,
                       // Last, so the share wins over any width in the meta.
                       meta?.stretch && "w-2/5",
                     )}
-                    onClick={
-                      sortable
-                        ? header.column.getToggleSortingHandler()
-                        : undefined
-                    }
                   >
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext(),
+                    {sortable ? (
+                      // A real button, not a click handler on the cell. Sorting
+                      // is an action, and an action reachable only by mouse is
+                      // one a keyboard user simply does not have.
+                      <button
+                        type="button"
+                        onClick={header.column.getToggleSortingHandler()}
+                        className="-mx-1 inline-flex cursor-pointer select-none items-center gap-1 rounded-none px-1 py-1 font-[inherit] text-[inherit] tracking-[inherit] uppercase hover:text-adm-ink focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-console"
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                        {dir === "asc" ? (
+                          <ArrowUp aria-hidden="true" className="h-3 w-3" />
+                        ) : dir === "desc" ? (
+                          <ArrowDown aria-hidden="true" className="h-3 w-3" />
+                        ) : null}
+                      </button>
+                    ) : (
+                      flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )
                     )}
-                    {dir === "asc" ? " ↑" : dir === "desc" ? " ↓" : null}
                   </TableHead>
                 );
               })}

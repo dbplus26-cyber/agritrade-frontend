@@ -103,7 +103,7 @@ export function CommodityTable() {
         accessorFn: (c) => `${c.name} ${c.variety ?? ""}`,
         header: "Commodity",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) => {
           const c = row.original;
           return (
@@ -148,7 +148,7 @@ export function CommodityTable() {
           "The quality this crop is bought and sold at, in the words buyers use for it.",
         ),
         enableSorting: false,
-        meta: columnMeta({ at: "xl" }),
+        meta: columnMeta({ card: "meta", at: "xl" }),
         cell: ({ row }) =>
           row.original.qualityGrade ? (
             <span className="block @2xl/table:max-w-[22rem] [overflow-wrap:anywhere] @2xl/table:truncate text-adm-muted">
@@ -180,7 +180,7 @@ export function CommodityTable() {
         id: "website",
         header: "Website",
         enableSorting: false,
-        meta: columnMeta({ at: "xl" }),
+        meta: columnMeta({ card: "badge", at: "xl" }),
         cell: ({ row }) => (
           <PublishedBadge published={row.original.publishToWebsite} />
         ),
@@ -190,14 +190,14 @@ export function CommodityTable() {
         accessorFn: (c) => c.createdAt,
         header: "Added",
         enableSorting: false,
-        meta: columnMeta({ at: "2xl" }),
+        meta: columnMeta({ card: "meta", at: "2xl" }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => <ActiveBadge isActive={row.original.isActive} />,
       },
     ],

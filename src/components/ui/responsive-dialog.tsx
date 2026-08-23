@@ -61,7 +61,10 @@ function ResponsiveDialogContent({
         overlayClassName={cn("z-[70]", overlayClassName)}
         className={cn(
           "shadow-doc gap-4 rounded-t-none border-t-[1.5px] border-soil/40 bg-paper p-4 pt-2.5 text-sm text-ink",
-          "max-h-[88dvh] overflow-y-auto pb-[max(1rem,env(safe-area-inset-bottom))]",
+          // `overscroll-contain`: a sheet scrolled to its end must not hand
+          // the gesture to the page behind it, which on a phone reads as the
+          // sheet dragging the whole console around under itself.
+          "max-h-[88dvh] overscroll-contain overflow-y-auto pb-[max(1rem,env(safe-area-inset-bottom))]",
           className,
           // Declared after the caller's classes so tailwind-merge keeps
           // these: the sheet must span the viewport even when a call site
@@ -88,7 +91,7 @@ function ResponsiveDialogContent({
   // cap deliberately; tailwind-merge keeps the last one.
   return (
     <DialogContent
-      className={cn("max-h-[88dvh] overflow-y-auto", className)}
+      className={cn("max-h-[88dvh] overscroll-contain overflow-y-auto", className)}
       showCloseButton={showCloseButton}
       overlayClassName={overlayClassName}
       style={style}

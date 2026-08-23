@@ -131,7 +131,7 @@ export function EnquiriesScreen() {
         accessorFn: (e) => `${e.fullName} ${e.reference}`,
         header: "Name",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "title" }),
         // A real anchor, as every other register's identity column has: the
         // row's own click handler gives no keyboard target, no middle-click
         // and nothing to copy a link from. Ink, not green - see adminLinkClass
@@ -168,7 +168,7 @@ export function EnquiriesScreen() {
         accessorFn: (e) => e.subject,
         header: "Subject",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "meta", stretch: true }),
         cell: ({ row }) => (
           <span className="block @2xl/table:max-w-[90%] [overflow-wrap:anywhere] @2xl/table:truncate text-adm-muted">
             {row.original.subject}
@@ -180,7 +180,7 @@ export function EnquiriesScreen() {
         accessorFn: (e) => e.status,
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => <EnquiryStatusBadge status={row.original.status} />,
       },
       {
@@ -188,7 +188,7 @@ export function EnquiriesScreen() {
         accessorFn: (e) => e.receivedAt,
         header: "Received",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
         cell: ({ row }) => <DateTimeCell value={row.original.receivedAt} />,
       },
     ],

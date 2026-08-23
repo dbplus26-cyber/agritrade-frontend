@@ -108,7 +108,7 @@ export function RepaymentsRegister() {
         id: "farmer",
         header: "Farmer",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         // The season sits under the farmer rather than holding its own
         // column: context for the row, not something anybody scans down.
         cell: ({ row }) => (
@@ -131,7 +131,7 @@ export function RepaymentsRegister() {
           "What the farmer handed back: grain, with its weight, or money and the account it landed in.",
         ),
         enableSorting: false,
-        meta: columnMeta({ at: "lg" }),
+        meta: columnMeta({ card: "meta", at: "lg" }),
         cell: ({ row }) => (
           <RepaymentSettlement
             commodity={row.original.commodity}
@@ -148,7 +148,7 @@ export function RepaymentsRegister() {
           "What this repayment was credited at, which is how much it takes off what the farmer owes - the same figure whichever way they settled.",
         ),
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "trailing" }),
         cell: ({ row }) => (
           <Mono className="whitespace-nowrap text-console">
             <Money value={row.original.valueGhs} />
@@ -162,7 +162,7 @@ export function RepaymentsRegister() {
           "The day the produce or the money actually came in, not the day it was typed in here.",
         ),
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => <DateTimeCell value={row.original.receivedAt} />,
       },
       {
@@ -178,7 +178,7 @@ export function RepaymentsRegister() {
         id: "stock",
         header: "",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) =>
           row.original.intoStock ? (
             <HelpWrap text="This produce was added to warehouse stock, not just credited against the grant.">

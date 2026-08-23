@@ -731,7 +731,7 @@ export function FixedAssetsScreen() {
         accessorFn: (a) => a.name,
         header: "Asset",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) => (
           <TitleCell
             title={row.original.name}
@@ -745,7 +745,7 @@ export function FixedAssetsScreen() {
         accessorFn: (a) => a.className,
         header: "Class",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => row.original.className,
       },
       {
@@ -753,7 +753,7 @@ export function FixedAssetsScreen() {
         accessorFn: (a) => a.costGhs,
         header: "Cost",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "trailing" }),
         cell: ({ row }) => (
           <Mono className="tabular-nums">{formatCedis(row.original.costGhs)}</Mono>
         ),
@@ -763,7 +763,7 @@ export function FixedAssetsScreen() {
         accessorFn: (a) => a.paymentAccount?.label ?? a.noCashReason ?? "",
         header: "Paid from",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => (
           <CashSourceNote
             account={row.original.paymentAccount}
@@ -776,7 +776,7 @@ export function FixedAssetsScreen() {
         accessorFn: (a) => a.acquiredAt,
         header: "Acquired",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
         cell: ({ row }) => <DateOnlyCell value={row.original.acquiredAt} />,
       },
       {
@@ -784,7 +784,7 @@ export function FixedAssetsScreen() {
         accessorFn: (a) => (a.disposedAt ? "disposed" : "held"),
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => {
           const asset = row.original;
           if (!asset.disposedAt) {

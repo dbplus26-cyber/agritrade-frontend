@@ -127,7 +127,7 @@ export function FloatHoldersScreen() {
         accessorFn: (h) => `${h.firstName} ${h.lastName}`,
         header: "Person",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) => (
           <TitleCell
             // A field agent goes to the agent profile, which holds their float
@@ -150,7 +150,7 @@ export function FloatHoldersScreen() {
           h.role === UserRole.AGENT ? "Field agent" : "Office staff",
         header: "Role",
         enableSorting: false,
-        meta: columnMeta({ at: "lg" }),
+        meta: columnMeta({ card: "meta", at: "lg" }),
       },
       {
         id: "float",
@@ -161,7 +161,7 @@ export function FloatHoldersScreen() {
           "Whether this person has been given company money to spend, and whether they can still spend it.",
         ),
         enableSorting: false,
-        meta: columnMeta({ at: "md" }),
+        meta: columnMeta({ card: "meta", at: "md" }),
         cell: ({ row }) => <HolderState holder={row.original} />,
       },
     ];
@@ -177,7 +177,7 @@ export function FloatHoldersScreen() {
           "What is left of the money handed to this person, after everything they have spent or sent.",
         ),
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "trailing" }),
         cell: ({ row }) => (
           <Money
             className={cn(
@@ -201,7 +201,7 @@ export function FloatHoldersScreen() {
           "How much of the COMPANY's money this person may still send. Nothing to do with what they are holding: a send takes money out of a company account, not out of their pocket.",
         ),
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => <HolderAllowance holder={row.original} />,
       });
     }

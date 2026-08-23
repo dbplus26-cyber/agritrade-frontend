@@ -88,7 +88,7 @@ export function BuyerTable() {
         accessorFn: (b) => `${b.name} ${b.city ?? ""}`,
         header: "Buyer",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) => {
           const b = row.original;
           return (
@@ -115,7 +115,7 @@ export function BuyerTable() {
         accessorFn: (b) => b.phone ?? "",
         header: "Phone",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) =>
           row.original.phone ? (
             <span className="font-adminmono whitespace-nowrap text-adm-muted">
@@ -143,14 +143,14 @@ export function BuyerTable() {
         accessorFn: (b) => b.createdAt,
         header: "Added",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => <ActiveBadge isActive={row.original.isActive} />,
       },
     ],

@@ -108,7 +108,7 @@ export function DisbursementsScreen() {
           "The number Hubtel gives this payout, so you can trace it with them.",
         ),
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => <Mono>{row.original.transactionNo}</Mono>,
       },
       {
@@ -116,7 +116,7 @@ export function DisbursementsScreen() {
         accessorFn: (d) => d.recipientName,
         header: "Recipient",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) => (
           <span className="block w-full min-w-0 text-left">
             <span
@@ -146,7 +146,7 @@ export function DisbursementsScreen() {
         accessorFn: (d) => d.amountGhs,
         header: "Amount",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "trailing" }),
         cell: ({ row }) => <Money value={row.original.amountGhs} />,
       },
       {
@@ -166,7 +166,7 @@ export function DisbursementsScreen() {
         accessorFn: (d) => d.status,
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => (
           <DisbursementStatusBadge
             needsAttention={row.original.needsAttention}
@@ -179,7 +179,7 @@ export function DisbursementsScreen() {
         accessorFn: (d) => d.createdAt,
         header: "Sent",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
     ],

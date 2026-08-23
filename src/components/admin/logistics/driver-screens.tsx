@@ -130,7 +130,7 @@ export function DriverTable() {
         accessorFn: (d) => `${d.name} ${d.company ?? ""}`,
         header: "Driver",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) => {
           const d = row.original;
           return (
@@ -157,7 +157,7 @@ export function DriverTable() {
         accessorFn: (d) => d.phone,
         header: "Phone",
         enableSorting: false,
-        meta: columnMeta({ at: "lg" }),
+        meta: columnMeta({ card: "meta", at: "lg" }),
         cell: ({ row }) => (
           <span className="font-adminmono whitespace-nowrap text-adm-muted">
             {row.original.phone}
@@ -169,7 +169,7 @@ export function DriverTable() {
         accessorFn: (d) => d.city ?? "",
         header: "City",
         enableSorting: false,
-        meta: columnMeta({ at: "xl" }),
+        meta: columnMeta({ card: "meta", at: "xl" }),
         cell: ({ row }) =>
           row.original.city ? (
             <TextCell className="text-adm-muted" value={row.original.city} width="label" />
@@ -189,7 +189,7 @@ export function DriverTable() {
         id: "status",
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => <ActiveBadge isActive={row.original.isActive} />,
       },
     ],

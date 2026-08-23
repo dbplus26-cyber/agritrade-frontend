@@ -150,7 +150,7 @@ export function PurchasesTable() {
         accessorFn: (p) => p.commodity.name,
         header: "Purchase",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) => {
           const p = row.original;
           return (
@@ -188,7 +188,7 @@ export function PurchasesTable() {
           "The price of the grain itself: the weight bought times the price per kg. Haulage, loading and the rest of what it cost to get it in are not in this figure - open the purchase to see those.",
         ),
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "trailing" }),
         cell: ({ row }) => (
           <Mono className="whitespace-nowrap text-adm-ink">
             <CompactCedis amount={row.original.totalGhs} />
@@ -203,7 +203,7 @@ export function PurchasesTable() {
           "Whether the supplier has actually been paid. Recording a purchase does not move money - paying for it does.",
         ),
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => (
           <SettlementBadge settlement={row.original.settlement} />
         ),
@@ -213,7 +213,7 @@ export function PurchasesTable() {
         accessorFn: (p) => p.purchasedAt,
         header: "Date",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => <DateOnlyCell value={row.original.purchasedAt} />,
       },
       {
@@ -236,7 +236,7 @@ export function PurchasesTable() {
         accessorFn: (p) => p.warehouse?.name ?? "",
         header: "Warehouse",
         enableSorting: false,
-        meta: columnMeta({ at: "lg" }),
+        meta: columnMeta({ at: "lg", card: "meta" }),
         cell: ({ row }) =>
           row.original.warehouse ? (
             // The row itself navigates to the purchase, so the warehouse has
@@ -256,7 +256,7 @@ export function PurchasesTable() {
         id: "status",
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => (
           <span className="flex flex-wrap items-center gap-1">
             <PurchaseStatusBadge status={row.original.status} />

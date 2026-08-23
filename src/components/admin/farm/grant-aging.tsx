@@ -95,7 +95,7 @@ export function GrantAging() {
         header: "Farmer",
         accessorFn: (r) => r.farmer.name,
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) => (
           <div className="min-w-0 w-full">
             <Link
@@ -119,7 +119,7 @@ export function GrantAging() {
         header: "Season",
         accessorFn: (r) => r.season.name,
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => (
           <Link
             className={adminLinkClass}
@@ -138,7 +138,7 @@ export function GrantAging() {
         ),
         accessorFn: (r) => r.investedGhs ?? 0,
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
         cell: ({ row }) => (
           <Mono className="whitespace-nowrap text-adm-muted">
             <Money value={row.original.investedGhs} compact />
@@ -153,7 +153,7 @@ export function GrantAging() {
         ),
         accessorFn: (r) => r.recoveredGhs ?? 0,
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
         cell: ({ row }) => (
           <Mono className="whitespace-nowrap text-adm-muted">
             <Money value={row.original.recoveredGhs} compact />
@@ -168,7 +168,7 @@ export function GrantAging() {
         ),
         accessorFn: (r) => r.outstandingGhs ?? 0,
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "trailing" }),
         cell: ({ row }) => (
           <Mono className="whitespace-nowrap font-semibold text-adm-ink">
             <Money value={row.original.outstandingGhs} compact />
@@ -183,7 +183,7 @@ export function GrantAging() {
         ),
         accessorFn: (r) => r.dueDate ?? "",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => <DateOnlyCell value={row.original.dueDate} />,
       },
       {
@@ -194,7 +194,7 @@ export function GrantAging() {
         ),
         accessorFn: (r) => r.daysOverdue,
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => (
           <OverdueChip daysOverdue={row.original.daysOverdue} />
         ),

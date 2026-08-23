@@ -125,7 +125,7 @@ export function DeliveryAddressTable() {
         accessorFn: (a) => `${a.label} ${a.city}`,
         header: "Address",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) => {
           const a = row.original;
           return (
@@ -143,7 +143,7 @@ export function DeliveryAddressTable() {
         accessorFn: (a) => `${a.contactName ?? ""} ${a.contactPhone ?? ""}`,
         header: "Contact",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => {
           const a = row.original;
           if (!a.contactName && !a.contactPhone) return <Absent />;
@@ -181,14 +181,14 @@ export function DeliveryAddressTable() {
         accessorFn: (a) => a.createdAt,
         header: "Added",
         enableSorting: false,
-        meta: columnMeta({ at: "2xl" }),
+        meta: columnMeta({ card: "meta", at: "2xl" }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => <ActiveBadge isActive={row.original.isActive} />,
       },
     ],

@@ -189,7 +189,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         header: "Date",
         enableSorting: false,
         cell: ({ row }) => <DateOnlyCell value={row.original.paidAt} />,
-        meta: { className: "px-4 whitespace-nowrap" },
+        meta: { card: "meta", className: "px-4 whitespace-nowrap" },
       },
       {
         accessorFn: (m) => m.transactionNo,
@@ -206,7 +206,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
             ) : null}
           </span>
         ),
-        meta: { className: "px-4" },
+        meta: { card: "meta", className: "px-4" },
       },
       {
         accessorFn: (m) => m.source,
@@ -217,7 +217,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
           const s = sourceOf(row.original.source);
           return <ToneBadge tone={s.tone}>{s.label}</ToneBadge>;
         },
-        meta: { className: "px-4" },
+        meta: { card: "meta", className: "px-4" },
       },
       {
         accessorFn: (m) => m.counterparty,
@@ -229,7 +229,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
             {row.original.counterparty}
           </span>
         ),
-        meta: { stretch: true, className: "px-4" },
+        meta: { card: "title", stretch: true, className: "px-4" },
       },
       {
         accessorFn: (m) => m.parentNo,
@@ -257,7 +257,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
             </Link>
           );
         },
-        meta: { className: "px-4" },
+        meta: { card: "meta", className: "px-4" },
       },
       {
         accessorFn: (m) => m.method,
@@ -267,7 +267,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         cell: ({ row }) => (
           <span className="text-adm-ink">{row.original.method}</span>
         ),
-        meta: { className: "px-4" },
+        meta: { card: "meta", className: "px-4" },
       },
       {
         accessorFn: (m) => m.reference ?? "",
@@ -285,7 +285,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         // Reconciliation detail: only in genuinely wide containers. The empty
         // accessor value also drops the row from the mobile card when there is
         // no reference to show.
-        meta: { className: "hidden px-4 2xl:table-cell" },
+        meta: { card: "meta", className: "hidden px-4 2xl:table-cell" },
       },
       {
         accessorFn: (m) => accountDelta(m) ?? 0,
@@ -310,7 +310,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
             </Mono>
           );
         },
-        meta: { className: "px-4" },
+        meta: { card: "trailing", className: "px-4" },
       },
     ],
     [],

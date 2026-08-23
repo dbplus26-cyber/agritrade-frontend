@@ -114,7 +114,7 @@ export function ExpensesRegister() {
         id: "incurredAt",
         header: "Date",
         cell: ({ row }) => <DateOnlyCell value={row.original.incurredAt} />,
-        meta: { className: "px-4 whitespace-nowrap" },
+        meta: { card: "meta", className: "px-4 whitespace-nowrap" },
       },
       {
         accessorFn: (r) => r.category.name,
@@ -131,7 +131,7 @@ export function ExpensesRegister() {
             stretch
           />
         ),
-        meta: { stretch: true, className: "px-4" },
+        meta: { card: "title", stretch: true, className: "px-4" },
       },
       {
         accessorFn: (r) => r.shipment?.transactionNo ?? "",
@@ -166,7 +166,7 @@ export function ExpensesRegister() {
         // td - `headerClassName` reaches only the header, which would hide the
         // heading while leaving its cells in place and shift every column after
         // it out of alignment.
-        meta: { className: "hidden px-4 2xl:table-cell" },
+        meta: { card: "meta", className: "hidden px-4 2xl:table-cell" },
       },
       {
         id: "actions",
@@ -207,7 +207,7 @@ export function ExpensesRegister() {
               cell: ({ row }: { row: { original: IExpense } }) => (
                 <Mono>{formatCedis(row.original.amountGhs)}</Mono>
               ),
-              meta: { className: "px-4" },
+              meta: { card: "trailing", className: "px-4" },
             } as ColumnDef<IExpense, unknown>,
           ]
         : []),

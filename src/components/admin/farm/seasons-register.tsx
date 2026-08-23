@@ -74,7 +74,7 @@ export function SeasonsRegister() {
         id: "name",
         header: "Season",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         // Real anchor - keyboard, middle-click and open-in-new-tab.
         cell: ({ row }) => (
           <Link
@@ -91,14 +91,14 @@ export function SeasonsRegister() {
         id: "starts",
         header: "Starts",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => <DateOnlyCell value={row.original.startsOn} />,
       },
       {
         id: "ends",
         header: "Ends",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
         cell: ({ row }) => <DateOnlyCell value={row.original.endsOn} />,
       },
       {
@@ -113,7 +113,7 @@ export function SeasonsRegister() {
         id: "status",
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => <ActiveBadge active={row.original.isActive} />,
       },
     ],

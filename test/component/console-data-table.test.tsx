@@ -246,3 +246,141 @@ describe("ConsoleDataTable - keyboard row navigation", () => {
     expect(screen.queryAllByRole("link")).toHaveLength(0);
   });
 });
+
+/**
+ * The phone card: what a row collapses to when there is no room for a table.
+ *
+ * A narrow screen does not get a smaller table, it gets a summary - so what is
+ * pinned here is the CHOOSING. A column that named no slot is absent from the
+ * card entirely, which is the whole point: a register that transposes every
+ * column into a labelled pair is a form, one screenful per row, and the reader
+ * scrolls past four rows looking for one. The rest of the record is a tap away
+ * on the detail view.
+ */
+describe("ConsoleDataTable - the phone card", () => {
+  interface Load {
+    id: string;
+    note: string;
+    ref: string;
+    status: string;
+    title: string;
+    total: string;
+  }
+
+  const LOAD: Load = {
+    id: "l1",
+    note: "Nothing to report",
+    ref: "PUR-2026-00317",
+    status: "Received",
+    title: "Maize, Tolon",
+    total: "GHS 4,000",
+  };
+
+  const SLOTTED: ColumnDef<Load, unknown>[] = [
+    {
+      id: "status",
+      accessorFn: (r) => r.status,
+      header: "Status",
+      meta: { card: "badge" },
+      enableSorting: false,
+    },
+    {
+      id: "total",
+      accessorFn: (r) => r.total,
+      header: "Total",
+      meta: { card: "trailing" },
+      enableSorting: false,
+    },
+    {
+      id: "title",
+      accessorFn: (r) => r.title,
+      header: "Load",
+      meta: { card: "title" },
+      enableSorting: false,
+    },
+    {
+      id: "ref",
+      accessorFn: (r) => r.ref,
+      header: "Reference",
+      meta: { card: "meta" },
+      enableSorting: false,
+    },
+    // No slot: on the record, on the detail screen, not on the card.
+    {
+      id: "note",
+      accessorFn: (r) => r.note,
+      header: "Note",
+      enableSorting: false,
+    },
+  ];
+
+  /** What the card shows, as opposed to the table rendered beside it. */
+  const cardText = (): string => {
+    const cards = document.querySelectorAll("[data-slot-card]");
+    return [...cards].map((c) => c.textContent ?? "").join(" ");
+  };
+
+  it("shows the slotted facts and drops the rest", () => {
+    render(
+      <ConsoleDataTable<Load>
+        columns={SLOTTED}
+        data={[LOAD]}
+        itemNoun="loads"
+      />,
+    );
+
+    // Every slot is on the card ...
+    expect(cardText()).toContain("Maize, Tolon");
+    expect(cardText()).toContain("Received");
+    expect(cardText()).toContain("GHS 4,000");
+    expect(cardText()).toContain("PUR-2026-00317");
+    // ... and the unslotted column is not, though the table beside it has it.
+    expect(cardText()).not.toContain("Nothing to report");
+    expect(screen.getAllByText("Nothing to report").length).toBeGreaterThan(0);
+  });
+
+  it("never labels a card field - a summary is not a form", () => {
+    render(
+      <ConsoleDataTable<Load>
+        columns={SLOTTED}
+        data={[LOAD]}
+        itemNoun="loads"
+      />,
+    );
+
+    // The column headings belong to the table. Repeating them once per row is
+    // the key-value shape this replaces.
+    expect(cardText()).not.toContain("Reference");
+    expect(cardText()).not.toContain("Status");
+  });
+
+  it("leaves out a slot the row has nothing for", () => {
+    render(
+      <ConsoleDataTable<Load>
+        columns={SLOTTED}
+        data={[{ ...LOAD, ref: "", status: "" }]}
+        itemNoun="loads"
+      />,
+    );
+
+    // An empty badge would hold a line open and an empty meta entry would
+    // leave a stray separator behind.
+    expect(cardText()).toContain("Maize, Tolon");
+    expect(cardText()).not.toContain("·");
+  });
+
+  it("falls back to labelled pairs for a table that slots nothing", () => {
+    render(
+      <ConsoleDataTable<Row>
+        columns={COLUMNS}
+        data={[ROWS[0]]}
+        itemNoun="lots"
+      />,
+    );
+
+    // Written before the slots existed: it still renders its data rather than
+    // an empty card.
+    expect(cardText()).toContain("Maize, Tolon");
+    expect(cardText()).toContain("Name");
+  });
+});

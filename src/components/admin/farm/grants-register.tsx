@@ -110,7 +110,7 @@ export function GrantsRegister() {
         id: "farmer",
         header: "Farmer",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         // The season rides under the farmer's name rather than holding a
         // column of its own: it is context for the row, not a fact anybody
         // scans down, and season names here run long enough to force the
@@ -128,7 +128,7 @@ export function GrantsRegister() {
         id: "item",
         header: "Item",
         enableSorting: false,
-        meta: columnMeta({ at: "xl" }),
+        meta: columnMeta({ card: "meta", at: "xl" }),
         cell: ({ row }) => (
           <TextCell
             value={`${row.original.item.name} · ${String(row.original.quantity)} ${row.original.item.unitLabel}`}
@@ -143,7 +143,7 @@ export function GrantsRegister() {
           "What these inputs were worth in cash, which is what the farmer owes back.",
         ),
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "trailing" }),
         cell: ({ row }) => (
           <Mono className="whitespace-nowrap text-adm-ink">
             <Money value={row.original.valueGhs} />
@@ -175,7 +175,7 @@ export function GrantsRegister() {
           "The day the farmer actually took the inputs, not the day it was typed in here.",
         ),
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => <DateTimeCell value={row.original.grantedAt} />,
       },
       {
@@ -191,7 +191,7 @@ export function GrantsRegister() {
         id: "flag",
         header: "",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => (
           <GrantApprovalBadge status={row.original.approval?.status} />
         ),

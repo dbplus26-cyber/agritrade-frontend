@@ -85,7 +85,7 @@ export function LandSalesRegister() {
         id: "plot",
         header: "Plot",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         // Real anchor - keyboard, middle-click and open-in-new-tab.
         cell: ({ row }) => (
           <Link
@@ -106,7 +106,7 @@ export function LandSalesRegister() {
         id: "buyer",
         header: "Buyer",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
         // The row navigates to the sale, so the buyer stops the click first.
         cell: ({ row }) => (
           <Link
@@ -126,7 +126,7 @@ export function LandSalesRegister() {
           "The price the buyer agreed to pay for the plot, before anything was paid.",
         ),
         enableSorting: false,
-        meta: columnMeta({ at: "xl" }),
+        meta: columnMeta({ card: "trailing", at: "xl" }),
         cell: ({ row }) => (
           <Mono className="whitespace-nowrap text-adm-ink">
             <Money value={row.original.agreedPriceGhs} />
@@ -140,7 +140,7 @@ export function LandSalesRegister() {
           "What the buyer still owes you on this plot after the payments made so far.",
         ),
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => {
           const b = row.original.balanceGhs;
           return (
@@ -166,7 +166,7 @@ export function LandSalesRegister() {
         id: "status",
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => <LandSaleStatusBadge status={row.original.status} />,
       },
     ],

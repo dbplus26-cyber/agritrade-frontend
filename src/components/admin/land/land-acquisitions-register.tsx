@@ -104,7 +104,7 @@ export function LandAcquisitionsRegister() {
         id: "acquisition",
         header: "Plot / seller",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) => (
           <div className="min-w-0 @2xl/table:max-w-[90%]">
             <Mono className="font-semibold text-console">
@@ -132,7 +132,7 @@ export function LandAcquisitionsRegister() {
           "The price you settled with the seller for this land, before anything was paid.",
         ),
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "trailing", wide: true }),
         cell: ({ row }) => (
           <Mono className="whitespace-nowrap text-adm-ink">
             <Money value={row.original.agreedCostGhs} />
@@ -146,7 +146,7 @@ export function LandAcquisitionsRegister() {
           "What you still owe the seller on this land after the payments made so far.",
         ),
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => {
           const b = row.original.balanceGhs;
           return (
@@ -165,14 +165,14 @@ export function LandAcquisitionsRegister() {
         id: "date",
         header: "Date",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => (
           <LandAcquisitionStatusBadge status={row.original.status} />
         ),

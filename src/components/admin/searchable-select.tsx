@@ -151,7 +151,7 @@ export function SearchableSelect({
         >
           <CommandInput
             autoFocus
-            placeholder="Type to search..."
+            placeholder="Type to search…"
             value={remote ? query : undefined}
             onValueChange={
               remote

@@ -252,7 +252,7 @@ export function LandAcquisitionForm() {
             Cancel
           </AdminButton>
           <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
-            {saving ? "Saving..." : "Record acquisition"}
+            {saving ? "Saving…" : "Record acquisition"}
           </AdminButton>
         </CommitRow>
       </form>

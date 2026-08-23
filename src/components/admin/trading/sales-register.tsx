@@ -174,7 +174,7 @@ export function SalesRegister() {
         accessorFn: (s) => s.buyer.name,
         header: "Buyer",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         // A real anchor, not just a clickable row: keyboard focus, middle-click
         // and "open in new tab" all come free from it, and none of them work on
         // a div with an onClick. stopPropagation so the row handler doesn't
@@ -198,7 +198,7 @@ export function SalesRegister() {
           "The full price the buyer agreed to pay for this order. It stands whatever the load weighed on arrival.",
         ),
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "trailing", wide: true }),
         // The agreement, and under it what the load settled at once it was
         // weighed in - never in place of it. Absent where nothing has been
         // weighed, so the column stays one line on most rows.
@@ -222,7 +222,7 @@ export function SalesRegister() {
           "What the buyer still owes you on this order after everything they have paid.",
         ),
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => {
           // Against what the sale is payable at, so this column agrees with
           // the balance on the sale itself and with the API's overpayment
@@ -249,14 +249,14 @@ export function SalesRegister() {
         id: "date",
         header: "Date",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => <SaleStatusBadge status={row.original.status} />,
       },
     ],

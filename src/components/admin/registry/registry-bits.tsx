@@ -1,3 +1,4 @@
+import type { CardSlot } from "@/components/admin/data-table";
 import { cn } from "@/lib/utils";
 import { HelpWrap } from "@/components/admin/help-tip";
 import { ToneBadge } from "@/components/admin/ui";
@@ -58,6 +59,12 @@ const REVEAL_AT = {
 export const columnMeta = (opts?: {
   /** Show this column only from a breakpoint up. */
   at?: keyof typeof REVEAL_AT;
+  /**
+   * Which slot this column fills on the phone card - see CardSlot. A column
+   * that names none is table-only: it stays on the record and on the detail
+   * screen, and does not crowd a list a person is scanning on a phone.
+   */
+  card?: CardSlot;
   className?: string;
   /**
    * Marks this as the table's primary column: 40% of the table width, with
@@ -84,6 +91,7 @@ export const columnMeta = (opts?: {
   ),
   headerClassName:
     "h-[38px] whitespace-nowrap bg-adm-sunken py-0 text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted",
+  ...(opts?.card ? { card: opts.card } : {}),
   ...(opts?.stretch ? { stretch: true as const } : {}),
 });
 

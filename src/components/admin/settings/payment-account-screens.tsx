@@ -143,7 +143,7 @@ export function PaymentAccountTable() {
         accessorFn: (a) => `${a.label} ${a.accountName}`,
         header: "Account",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) => {
           const a = row.original;
           return (
@@ -167,7 +167,7 @@ export function PaymentAccountTable() {
         accessorFn: (a) => a.accountNumber,
         header: "Number",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => (
           <span className="font-adminmono block [overflow-wrap:anywhere] @2xl/table:truncate text-adm-ink">
             {row.original.accountNumber}
@@ -179,7 +179,7 @@ export function PaymentAccountTable() {
         accessorFn: (a) => a.bankName ?? a.provider ?? "",
         header: "Bank / network",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
         cell: ({ row }) => {
           const a = row.original;
           const where = a.bankName ?? a.provider;
@@ -204,7 +204,7 @@ export function PaymentAccountTable() {
           "Whether this account is printed on invoices for customers to pay into, or kept internal.",
         ),
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) =>
           row.original.showOnInvoice ? (
             <span className="text-adm-ink">Printed</span>
@@ -216,7 +216,7 @@ export function PaymentAccountTable() {
         id: "status",
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => <ActiveBadge isActive={row.original.isActive} />,
       },
     ],

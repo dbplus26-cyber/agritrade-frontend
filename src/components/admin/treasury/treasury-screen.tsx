@@ -89,7 +89,7 @@ export function TreasuryScreen() {
           "The number Hubtel gives this movement, so you can trace it with them.",
         ),
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => <Mono>{row.original.transactionNo}</Mono>,
       },
       {
@@ -97,7 +97,7 @@ export function TreasuryScreen() {
         accessorFn: (t) => t.amountGhs,
         header: "Amount",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "trailing" }),
         cell: ({ row }) => <Money value={row.original.amountGhs} />,
       },
       {
@@ -108,7 +108,7 @@ export function TreasuryScreen() {
         // The one free-text column here, so it takes the stretch share. It
         // stays xl-only: below that the row is all references and figures,
         // and there is nothing left to bound.
-        meta: columnMeta({ stretch: true, wide: true }),
+        meta: columnMeta({ card: "title", stretch: true, wide: true }),
         cell: ({ row }) => (
           // A bare `truncate` does nothing here: with no width to truncate
           // AGAINST, the column simply grows to the longest description and
@@ -126,7 +126,7 @@ export function TreasuryScreen() {
         accessorFn: (t) => t.status,
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => (
           <TransferStatusBadge
             needsAttention={row.original.needsAttention}
@@ -139,14 +139,14 @@ export function TreasuryScreen() {
         accessorFn: (t) => t.requestedByName ?? "Unknown",
         header: "Moved by",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
       },
       {
         id: "when",
         accessorFn: (t) => t.createdAt,
         header: "When",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
     ],

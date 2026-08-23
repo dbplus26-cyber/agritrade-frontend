@@ -105,7 +105,7 @@ export function StockMovements({
           "One line of the stock ledger: which commodity moved, and at which warehouse.",
         ),
         enableSorting: false,
-        meta: columnMeta({ className: "py-2", stretch: true }),
+        meta: columnMeta({ card: "title", className: "py-2", stretch: true }),
         // Commodity leads, its warehouse sits underneath as the quiet second
         // line - the register convention. Run together on one unbounded line,
         // a long commodity name and a long warehouse name between them would
@@ -126,7 +126,7 @@ export function StockMovements({
         id: "type",
         header: "Type",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => <MoveTypeBadge type={row.original.type} />,
       },
       {
@@ -136,14 +136,14 @@ export function StockMovements({
           "How much weight this line added to the warehouse or took out of it.",
         ),
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "trailing" }),
         cell: ({ row }) => <SignedKg kg={row.original.deltaKg} />,
       },
       {
         id: "when",
         header: "When",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => <DateTimeCell value={row.original.occurredAt} />,
       },
       {
@@ -155,7 +155,7 @@ export function StockMovements({
         enableSorting: false,
         // A secondary column, hidden below xl - so it keeps a fixed cap rather
         // than a share. Only the always-visible primary column stretches.
-        meta: columnMeta({ at: "xl" }),
+        meta: columnMeta({ card: "meta", at: "xl" }),
         cell: ({ row }) =>
           row.original.reason ? (
             <TextCell

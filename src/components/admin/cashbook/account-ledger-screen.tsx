@@ -84,7 +84,7 @@ export function AccountLedgerScreen({ accountId }: { accountId: string }) {
         accessorFn: (r) => r.paidAt,
         header: "Date",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => <DateOnlyCell value={row.original.paidAt} />,
       },
       {
@@ -95,7 +95,7 @@ export function AccountLedgerScreen({ accountId }: { accountId: string }) {
           "The document number this line came from - what you quote when tracing it.",
         ),
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => <Mono>{row.original.transactionNo}</Mono>,
       },
       {
@@ -105,7 +105,7 @@ export function AccountLedgerScreen({ accountId }: { accountId: string }) {
         enableSorting: false,
         // The one free-text column, so it takes the stretch share and is the
         // only thing allowed to be long.
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) => {
           const r = row.original;
           return (
@@ -129,7 +129,7 @@ export function AccountLedgerScreen({ accountId }: { accountId: string }) {
         accessorFn: (r) => r.amountGhs,
         header: "In / out",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "trailing" }),
         cell: ({ row }) => {
           const r = row.original;
           const amount = r.amountGhs;
@@ -160,7 +160,7 @@ export function AccountLedgerScreen({ accountId }: { accountId: string }) {
           "What the account held after this line. Follow it down the page to see where the money went.",
         ),
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => <Balance value={row.original.balanceGhs} />,
       },
     ],

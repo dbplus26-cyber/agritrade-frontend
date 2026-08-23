@@ -103,14 +103,14 @@ export function FarmersRegister() {
         id: "farmer",
         header: "Farmer",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) => <FarmerCell farmer={row.original} />,
       },
       {
         id: "community",
         header: "Community",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
         cell: ({ row }) => (
           <span className="text-adm-muted">
             {row.original.community ?? "-"}
@@ -122,14 +122,14 @@ export function FarmersRegister() {
         accessorFn: (f) => f.createdAt,
         header: "Added",
         enableSorting: false,
-        meta: columnMeta({ at: "2xl" }),
+        meta: columnMeta({ card: "meta", at: "2xl" }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => <ActiveBadge active={row.original.isActive} />,
       },
     ],

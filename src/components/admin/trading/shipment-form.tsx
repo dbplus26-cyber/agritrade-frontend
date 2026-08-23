@@ -581,6 +581,7 @@ export function ShipmentForm({
               >
                 <div className="border-b border-adm-hairline p-2">
                   <Input
+                    aria-label="Search sales by number or buyer"
                     value={saleSearch}
                     onChange={(e) => setSaleSearch(e.target.value)}
                     placeholder="Search sale no. or buyer…"

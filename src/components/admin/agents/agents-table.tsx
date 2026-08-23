@@ -97,7 +97,7 @@ export function AgentsTable() {
         accessorFn: (a) => `${a.firstName} ${a.lastName}`,
         header: "Agent",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) => {
           const a = row.original;
           return (
@@ -130,7 +130,7 @@ export function AgentsTable() {
           "Company money still in this agent's hands: what you gave them, less what they have spent.",
         ),
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "trailing" }),
         cell: ({ row }) => <BalanceCell amount={row.original.balanceGhs} />,
       },
       {
@@ -138,7 +138,7 @@ export function AgentsTable() {
         accessorFn: (a) => a.phone ?? "",
         header: "Phone",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
         cell: ({ row }) =>
           row.original.phone ? (
             <Mono className="whitespace-nowrap text-adm-muted">
@@ -153,14 +153,14 @@ export function AgentsTable() {
         accessorFn: (a) => a.createdAt,
         header: "Added",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => <ActiveBadge isActive={row.original.isActive} />,
       },
     ];

@@ -114,7 +114,7 @@ export function StocktakesScreen() {
         ),
         accessorFn: (s) => s.transactionNo,
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "title" }),
         cell: ({ row }) => (
           <Mono className="whitespace-nowrap text-adm-ink">
             {row.original.transactionNo}
@@ -126,7 +126,7 @@ export function StocktakesScreen() {
         header: "Warehouse",
         accessorFn: (s) => s.warehouse.name,
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "meta", stretch: true }),
         // The row navigates to the stocktake, so the warehouse has to stop
         // the click reaching it or the two destinations race.
         cell: ({ row }) => (
@@ -148,7 +148,7 @@ export function StocktakesScreen() {
         header: "Status",
         accessorFn: (s) => s.status,
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => (
           <StocktakeStatusBadge status={row.original.status} />
         ),
@@ -161,7 +161,7 @@ export function StocktakesScreen() {
         ),
         accessorFn: (s) => s.lines.length,
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "trailing" }),
         cell: ({ row }) => (
           <Mono className="text-adm-ink">
             {row.original.lines.length}
@@ -173,7 +173,7 @@ export function StocktakesScreen() {
         header: "Created",
         accessorFn: (s) => s.createdAt,
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
     ],

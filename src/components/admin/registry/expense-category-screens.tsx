@@ -257,7 +257,7 @@ export function ExpenseCategoryTable() {
         accessorFn: (c) => c.name,
         header: "Category",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         // What belongs in the category rides under its name instead of
         // holding a column: prose has no natural width, so on its own it is
         // always the column that pushes the table sideways.
@@ -275,7 +275,7 @@ export function ExpenseCategoryTable() {
         accessorFn: (c) => c.expenseCount ?? 0,
         header: "Expenses filed",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "trailing" }),
         // Name, date and badge alone say nothing about whether a heading is
         // a workhorse or an empty bucket; the count does.
         cell: ({ row }) => (
@@ -289,14 +289,14 @@ export function ExpenseCategoryTable() {
         accessorFn: (c) => c.createdAt,
         header: "Added",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => <ActiveBadge isActive={row.original.isActive} />,
       },
     ],

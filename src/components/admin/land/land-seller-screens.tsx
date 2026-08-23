@@ -110,7 +110,7 @@ export function LandSellerTable() {
         accessorFn: (s) => `${s.name} ${s.community ?? ""}`,
         header: "Seller",
         enableSorting: false,
-        meta: columnMeta({ stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) => {
           const s = row.original;
           return (
@@ -136,7 +136,7 @@ export function LandSellerTable() {
         accessorFn: (s) => s.phone ?? "",
         header: "Phone",
         enableSorting: false,
-        meta: columnMeta({ wide: true }),
+        meta: columnMeta({ card: "meta", wide: true }),
         cell: ({ row }) =>
           row.original.phone ? (
             <span className="font-adminmono whitespace-nowrap text-adm-muted">
@@ -151,14 +151,14 @@ export function LandSellerTable() {
         accessorFn: (s) => s.createdAt,
         header: "Added",
         enableSorting: false,
-        meta: columnMeta({ at: "2xl" }),
+        meta: columnMeta({ card: "meta", at: "2xl" }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
         id: "status",
         header: "Status",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => <ActiveBadge isActive={row.original.isActive} />,
       },
     ],
