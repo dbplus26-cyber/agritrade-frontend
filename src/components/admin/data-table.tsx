@@ -198,7 +198,11 @@ function SummaryCard<TData>({
   selectionActive: boolean;
 }) {
   const selected = row.getIsSelected();
-  const toggle = selectable ? () => { row.toggleSelected(); } : undefined;
+  const toggle = selectable
+    ? () => {
+        row.toggleSelected();
+      }
+    : undefined;
   const { consumedHold, holdProps } = useHoldToSelect(toggle);
 
   // While a selection is being built, a tap adds to it rather than leaving the
@@ -246,11 +250,13 @@ function SummaryCard<TData>({
         }
       }}
       role={href ? "link" : undefined}
-      tabIndex={href ?? toggle ? 0 : undefined}
+      tabIndex={(href ?? toggle) ? 0 : undefined}
       className={cn(
         // Squared with a 1.5px border to match AdminCard, the surface every
         // other console screen is filed on.
-        "rounded-none border border-adm-line bg-adm-card px-3.5 py-2.5 shadow-[0_1px_2px_rgba(16,24,40,0.05)]",
+        // A COLUMN with a gap: the sections used to sit flush, so a title
+        // carrying an avatar pressed against the badge row above it.
+        "flex flex-col gap-1.5 rounded-none border border-adm-line bg-adm-card px-3.5 py-2.5 shadow-[0_1px_2px_rgba(16,24,40,0.05)]",
         // The selected state has to carry on its own now that no box does: a
         // filled tint, a full-strength border, and a bar down the leading edge
         // that survives being read in sunlight.
@@ -326,24 +332,37 @@ function summaryCard<TData>(
   const title = slotted.find((c) => slotOf(c) === "title");
   const meta = slotted.filter((c) => slotOf(c) === "meta" && filled(c));
 
+  // The actions ride the figures row rather than a row of their own. Alone at
+  // the foot they left a card with its amount pinned top right and its
+  // buttons bottom right, an empty band between them and nothing in it.
+  const topRow =
+    badges.length > 0 || trailing.length > 0 || actionCells.length > 0;
+
   return (
     <>
-      {badges.length > 0 || trailing.length > 0 ? (
-        <div className="flex items-center justify-between gap-2">
+      {topRow ? (
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
           <span className="flex min-w-0 flex-wrap items-center gap-1.5">
             {badges.map((cell) => (
               <span key={cell.id}>{render(cell)}</span>
             ))}
           </span>
-          {trailing.length > 0 ? (
-            // Stacked, not spread: a second figure beside the first reads as
-            // one number split in two.
-            <span className="flex flex-none flex-col items-end gap-0.5 text-[11px] font-semibold text-adm-ink">
-              {trailing.map((cell) => (
-                <span key={cell.id}>{render(cell)}</span>
-              ))}
-            </span>
-          ) : null}
+          <span className="flex flex-none flex-wrap items-center justify-end gap-x-3 gap-y-1.5">
+            {trailing.length > 0 ? (
+              // Stacked, not spread: a second figure beside the first reads as
+              // one number split in two.
+              <span className="flex flex-col items-end gap-0.5 text-[11px] font-semibold text-adm-ink">
+                {trailing.map((cell) => (
+                  <span key={cell.id}>{render(cell)}</span>
+                ))}
+              </span>
+            ) : null}
+            {/* Wraps under the figure when a long amount leaves no room for
+                them, which is the only time the two cannot share the line. */}
+            {actionCells.map((cell) => (
+              <span key={cell.id}>{render(cell)}</span>
+            ))}
+          </span>
         </div>
       ) : null}
       {title ? (
@@ -364,13 +383,6 @@ function summaryCard<TData>(
               ) : null}
               <span className="min-w-0 truncate">{render(cell)}</span>
             </span>
-          ))}
-        </div>
-      ) : null}
-      {actionCells.length > 0 ? (
-        <div className="flex flex-wrap justify-end gap-1.5 pt-0.5">
-          {actionCells.map((cell) => (
-            <span key={cell.id}>{render(cell)}</span>
           ))}
         </div>
       ) : null}
@@ -428,8 +440,7 @@ function CardField({
     // `items-start` puts both boxes at the top of their flex line, so the
     // value sits lower than the label exactly when it wrapped to its own
     // line (1px of tolerance for rounding).
-    const measure = () =>
-      setStacked(valueEl.offsetTop > labelEl.offsetTop + 1);
+    const measure = () => setStacked(valueEl.offsetTop > labelEl.offsetTop + 1);
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(valueEl);
@@ -796,9 +807,7 @@ export function ConsoleDataTable<TData>({
     ? serverPagination.totalCount
     : table.getFilteredRowModel().rows.length;
   const { pageIndex } = table.getState().pagination;
-  const selectedRows = table
-    .getSelectedRowModel()
-    .rows.map((r) => r.original);
+  const selectedRows = table.getSelectedRowModel().rows.map((r) => r.original);
 
   // No pager for a page that couldn't possibly need one.
   const showPagination = total > Math.min(...PAGE_SIZE_OPTIONS);
@@ -935,150 +944,150 @@ export function ConsoleDataTable<TData>({
         )}
         aria-busy={isFetching || undefined}
       >
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow
-              key={headerGroup.id}
-              className="border-adm-line bg-adm-sunken hover:bg-adm-sunken"
-            >
-              {headerGroup.headers.map((header) => {
-                const meta = header.column.columnDef.meta;
-                const sortable = header.column.getCanSort();
-                const dir = header.column.getIsSorted();
-                return (
-                  <TableHead
-                    key={header.id}
-                    // The sorted state, said rather than drawn: an arrow beside
-                    // the label tells a person looking at the screen and nobody
-                    // else, and a column header is exactly the thing a screen
-                    // reader user needs the state of before reading the rows.
-                    aria-sort={
-                      dir === "asc"
-                        ? "ascending"
-                        : dir === "desc"
-                          ? "descending"
-                          : sortable
-                            ? "none"
-                            : undefined
-                    }
-                    className={cn(
-                      "h-[38px] px-3 text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted",
-                      meta?.className,
-                      meta?.headerClassName,
-                      // Last, so the share wins over any width in the meta.
-                      // Header and body carry the same floor, or the two
-                      // disagree about the column's width.
-                      meta?.stretch && "w-2/5 min-w-[15rem]",
-                    )}
-                  >
-                    {sortable ? (
-                      // A real button, not a click handler on the cell. Sorting
-                      // is an action, and an action reachable only by mouse is
-                      // one a keyboard user simply does not have.
-                      <button
-                        type="button"
-                        onClick={header.column.getToggleSortingHandler()}
-                        className="-mx-1 inline-flex cursor-pointer select-none items-center gap-1 rounded-none px-1 py-1 font-[inherit] text-[inherit] tracking-[inherit] uppercase hover:text-adm-ink focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-console"
-                      >
-                        {flexRender(
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow
+                key={headerGroup.id}
+                className="border-adm-line bg-adm-sunken hover:bg-adm-sunken"
+              >
+                {headerGroup.headers.map((header) => {
+                  const meta = header.column.columnDef.meta;
+                  const sortable = header.column.getCanSort();
+                  const dir = header.column.getIsSorted();
+                  return (
+                    <TableHead
+                      key={header.id}
+                      // The sorted state, said rather than drawn: an arrow beside
+                      // the label tells a person looking at the screen and nobody
+                      // else, and a column header is exactly the thing a screen
+                      // reader user needs the state of before reading the rows.
+                      aria-sort={
+                        dir === "asc"
+                          ? "ascending"
+                          : dir === "desc"
+                            ? "descending"
+                            : sortable
+                              ? "none"
+                              : undefined
+                      }
+                      className={cn(
+                        "h-[38px] px-3 text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted",
+                        meta?.className,
+                        meta?.headerClassName,
+                        // Last, so the share wins over any width in the meta.
+                        // Header and body carry the same floor, or the two
+                        // disagree about the column's width.
+                        meta?.stretch && "w-2/5 min-w-[15rem]",
+                      )}
+                    >
+                      {sortable ? (
+                        // A real button, not a click handler on the cell. Sorting
+                        // is an action, and an action reachable only by mouse is
+                        // one a keyboard user simply does not have.
+                        <button
+                          type="button"
+                          onClick={header.column.getToggleSortingHandler()}
+                          className="-mx-1 inline-flex cursor-pointer select-none items-center gap-1 rounded-none px-1 py-1 font-[inherit] text-[inherit] tracking-[inherit] uppercase hover:text-adm-ink focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-console"
+                        >
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                          {dir === "asc" ? (
+                            <ArrowUp aria-hidden="true" className="h-3 w-3" />
+                          ) : dir === "desc" ? (
+                            <ArrowDown aria-hidden="true" className="h-3 w-3" />
+                          ) : null}
+                        </button>
+                      ) : (
+                        flexRender(
                           header.column.columnDef.header,
                           header.getContext(),
-                        )}
-                        {dir === "asc" ? (
-                          <ArrowUp aria-hidden="true" className="h-3 w-3" />
-                        ) : dir === "desc" ? (
-                          <ArrowDown aria-hidden="true" className="h-3 w-3" />
-                        ) : null}
-                      </button>
-                    ) : (
-                      flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )
-                    )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {rows.length === 0 ? (
-            <TableRow className="hover:bg-transparent">
-              <TableCell colSpan={allColumns.length} className="p-0">
-                {emptyState ?? (
-                  <div className="px-4 py-12 text-center text-[12px] text-adm-muted">
-                    Nothing here yet.
-                  </div>
-                )}
-              </TableCell>
-            </TableRow>
-          ) : (
-            // A `<tr>` fades in and out where a card also lifts and slides:
-            // table rows do not animate transform or height reliably, so
-            // neighbours snap into place once a leaving row has faded.
-            // `motion.tr` stands in for the shadcn TableRow with the same
-            // data-slot and base classes, so its styling is unchanged.
-            <AnimatePresence initial={false}>
-              {rows.map((row, index) => {
-                const href = rowHref?.(row.original);
-                return (
-                  <motion.tr
-                    key={row.id}
-                    {...rowMotion(index, reducedMotion, false)}
-                    data-slot="table-row"
-                    data-state={row.getIsSelected() ? "selected" : undefined}
-                    {...rowNavProps(href, (h) => router.push(h))}
-                    className={cn(
-                      "border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted",
-                      "border-adm-hairline data-[state=selected]:bg-console/5",
-                      href &&
-                        "cursor-pointer transition-colors duration-150 hover:bg-adm-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-console",
-                      rowClassName?.(row.original),
-                    )}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        className={cn(
-                          // Two lines is the ceiling for ANY cell. A row is a
-                          // scan target, not a paragraph: let one cell run to
-                          // four lines and every row beside it inherits the
-                          // height, and the table stops being scannable. Cells
-                          // that want a single line clamp themselves; this is
-                          // the backstop for the ones that do not.
-                          "px-3 py-2.5 text-[12px] text-adm-body [&_p]:line-clamp-2",
-                          cell.column.columnDef.meta?.className,
-                          // max-w-0 is not cosmetic: without it the cell's
-                          // min-content width beats w-2/5 and the column grows
-                          // back to whatever the longest value wants.
-                          // The floor is what stops the column collapsing.
-                          // `w-2/5` is a SHARE of a table that fits; when the
-                          // other columns want more than the remaining 60%
-                          // there is no share to be had, and `max-w-0` leaves
-                          // this cell with no min-content of its own to hold
-                          // it open - so the name a person is scanning for was
-                          // clipped after four or five letters. A floor lets
-                          // the table grow past its container instead, which
-                          // the wrapper already scrolls.
-                          cell.column.columnDef.meta?.stretch &&
-                            "w-2/5 max-w-0 min-w-[15rem]",
-                        )}
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    ))}
-                  </motion.tr>
-                );
-              })}
-            </AnimatePresence>
-          )}
-        </TableBody>
-      </Table>
+                        )
+                      )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {rows.length === 0 ? (
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={allColumns.length} className="p-0">
+                  {emptyState ?? (
+                    <div className="px-4 py-12 text-center text-[12px] text-adm-muted">
+                      Nothing here yet.
+                    </div>
+                  )}
+                </TableCell>
+              </TableRow>
+            ) : (
+              // A `<tr>` fades in and out where a card also lifts and slides:
+              // table rows do not animate transform or height reliably, so
+              // neighbours snap into place once a leaving row has faded.
+              // `motion.tr` stands in for the shadcn TableRow with the same
+              // data-slot and base classes, so its styling is unchanged.
+              <AnimatePresence initial={false}>
+                {rows.map((row, index) => {
+                  const href = rowHref?.(row.original);
+                  return (
+                    <motion.tr
+                      key={row.id}
+                      {...rowMotion(index, reducedMotion, false)}
+                      data-slot="table-row"
+                      data-state={row.getIsSelected() ? "selected" : undefined}
+                      {...rowNavProps(href, (h) => router.push(h))}
+                      className={cn(
+                        "border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted",
+                        "border-adm-hairline data-[state=selected]:bg-console/5",
+                        href &&
+                          "cursor-pointer transition-colors duration-150 hover:bg-adm-hover focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-console",
+                        rowClassName?.(row.original),
+                      )}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell
+                          key={cell.id}
+                          className={cn(
+                            // Two lines is the ceiling for ANY cell. A row is a
+                            // scan target, not a paragraph: let one cell run to
+                            // four lines and every row beside it inherits the
+                            // height, and the table stops being scannable. Cells
+                            // that want a single line clamp themselves; this is
+                            // the backstop for the ones that do not.
+                            "px-3 py-2.5 text-[12px] text-adm-body [&_p]:line-clamp-2",
+                            cell.column.columnDef.meta?.className,
+                            // max-w-0 is not cosmetic: without it the cell's
+                            // min-content width beats w-2/5 and the column grows
+                            // back to whatever the longest value wants.
+                            // The floor is what stops the column collapsing.
+                            // `w-2/5` is a SHARE of a table that fits; when the
+                            // other columns want more than the remaining 60%
+                            // there is no share to be had, and `max-w-0` leaves
+                            // this cell with no min-content of its own to hold
+                            // it open - so the name a person is scanning for was
+                            // clipped after four or five letters. A floor lets
+                            // the table grow past its container instead, which
+                            // the wrapper already scrolls.
+                            cell.column.columnDef.meta?.stretch &&
+                              "w-2/5 max-w-0 min-w-[15rem]",
+                          )}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      ))}
+                    </motion.tr>
+                  );
+                })}
+              </AnimatePresence>
+            )}
+          </TableBody>
+        </Table>
       </div>
 
       {showPagination ? (

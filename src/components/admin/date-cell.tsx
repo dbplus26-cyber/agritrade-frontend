@@ -34,7 +34,10 @@ export function DateTimeCell({ value, muted }: IDateCellProps) {
       >
         {formatTableDate(value)}
       </span>
-      <span className="block whitespace-nowrap text-[10.5px] text-adm-faint">
+      {/* Phones lose the clock. A minute past the hour decides nothing an
+          admin does from a list - the day does - and the second line cost
+          every row of every register its height on the smallest screen. */}
+      <span className="hidden whitespace-nowrap text-[10.5px] text-adm-faint sm:block">
         {formatTableTime(value)}
       </span>
     </span>
