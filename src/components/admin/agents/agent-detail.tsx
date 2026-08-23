@@ -20,7 +20,7 @@ import {
   type Tone,
 } from "@/components/admin/ui";
 import { AgentMoneySummaryCard } from "@/components/admin/agents/agent-money-summary-card";
-import { DateTimeCell } from "@/components/admin/date-cell";
+import { DateOnlyCell } from "@/components/admin/date-cell";
 import { HelpTip } from "@/components/admin/help-tip";
 import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { DetailSkeleton, LedgerSkeleton } from "@/components/admin/skeletons";
@@ -285,7 +285,7 @@ function LedgerRow({
         </p>
         <div className="mt-0.5 flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
           <Mono className="text-[10.5px] text-adm-faint">{tx.transactionNo}</Mono>
-          <DateTimeCell value={tx.occurredAt} muted />
+          <DateOnlyCell value={tx.occurredAt} muted />
           {/* WHICH pot moved. Cash in a pocket and money in a wallet are
               different money, and a line that does not say which is the same
               conflation the single float balance made. */}

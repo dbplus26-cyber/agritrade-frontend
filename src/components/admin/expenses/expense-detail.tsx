@@ -115,6 +115,17 @@ export function ExpenseDetail({ id }: { id: string }) {
                   <DateTimeCell value={expense.createdAt} muted />
                 </div>
               </div>
+              {/* Only once it differs from the filing. On a voucher nobody has
+                  touched the two timestamps are the same moment, and printing
+                  it twice says an edit happened that did not. */}
+              {expense.updatedAt !== expense.createdAt ? (
+                <div>
+                  <div className="text-[10.5px] text-adm-muted">Updated</div>
+                  <div className="mt-0.5 text-[11.5px] text-adm-ink">
+                    <DateTimeCell value={expense.updatedAt} muted />
+                  </div>
+                </div>
+              ) : null}
             </div>
           </RailCard>
         </>
@@ -146,16 +157,51 @@ export function ExpenseDetail({ id }: { id: string }) {
         </Link>
 
         {/* The rule stays on the wrapper: it separates the reason from the
-            figure above it, and SectionHeading owns the gap beneath itself. */}
-        <div className="mt-4 border-t border-adm-hairline pt-4">
-          <SectionHeading>What it was for</SectionHeading>
-          {expense.description ? (
-            <p className="text-[11.5px] leading-[1.55] text-adm-body [overflow-wrap:anywhere]">
-              {expense.description}
-            </p>
-          ) : (
-            <p className="text-[11.5px] text-adm-faint">Not recorded</p>
-          )}
+            figure above it, and SectionHeading owns the gap beneath itself.
+            The trip rides beside the reason rather than in a card of its own:
+            a shipment number, a destination and a truck registration do not
+            fill a row of the page, and neither does a sentence of reason -
+            side by side they fill it between them. */}
+        <div className="@container mt-4 border-t border-adm-hairline pt-4">
+          <div
+            className={cn(
+              "grid gap-x-8 gap-y-4",
+              expense.shipment && "@2xl:grid-cols-2",
+            )}
+          >
+            <div className="min-w-0">
+              <SectionHeading>What it was for</SectionHeading>
+              {expense.description ? (
+                <p className="text-[11.5px] leading-[1.55] text-adm-body [overflow-wrap:anywhere]">
+                  {expense.description}
+                </p>
+              ) : (
+                <p className="text-[11.5px] text-adm-faint">Not recorded</p>
+              )}
+            </div>
+            {/* Only when the cost belongs to a trip. A heading reading "not
+                attached to anything" is a reserved slot that never fills. */}
+            {expense.shipment ? (
+              <div className="min-w-0">
+                <SectionHeading hint="This cost rides on a shipment, so it lands in that trip's profit rather than in general overheads.">
+                  Charged to a trip
+                </SectionHeading>
+                <Link
+                  href={`/admin/shipments/${expense.shipment.id}`}
+                  className={cn(adminLinkClass, "block text-[12px] font-medium")}
+                >
+                  {expense.shipment.transactionNo}
+                </Link>
+                <div className="mt-1 text-[11.5px] text-adm-body [overflow-wrap:anywhere]">
+                  {expense.shipment.destination}
+                  <span className="text-adm-muted">
+                    {" · "}
+                    {expense.shipment.truckReg}
+                  </span>
+                </div>
+              </div>
+            ) : null}
+          </div>
         </div>
       </AdminCard>
 
@@ -168,30 +214,6 @@ export function ExpenseDetail({ id }: { id: string }) {
         isVoided={expense.voidedAt !== null}
         subject={`${expense.transactionNo} (${expense.category.name})`}
       />
-
-      {/* Only when the cost belongs to a trip. An "Operating cost" card
-          saying nothing more than "not attached to anything" is a reserved
-          slot that never fills, which reads as a gap rather than a fact. */}
-      {expense.shipment ? (
-        <AdminCard className="p-5">
-          <SectionHeading hint="This cost rides on a shipment, so it lands in that trip's profit rather than in general overheads.">
-            Charged to a trip
-          </SectionHeading>
-          <Link
-            href={`/admin/shipments/${expense.shipment.id}`}
-            className={cn(adminLinkClass, "block text-[12px] font-medium")}
-          >
-            {expense.shipment.transactionNo}
-          </Link>
-          <div className="mt-1 text-[11.5px] text-adm-body [overflow-wrap:anywhere]">
-            {expense.shipment.destination}
-            <span className="text-adm-muted">
-              {" · "}
-              {expense.shipment.truckReg}
-            </span>
-          </div>
-        </AdminCard>
-      ) : null}
 
       {isSuperAdmin && editing ? (
         <ExpenseFormDialog

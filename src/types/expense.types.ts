@@ -29,6 +29,9 @@ export interface IExpense {
   };
   /** Human-readable voucher number, e.g. "EXP-2026-00156". */
   transactionNo: string;
+  /** Last edit. A voucher stays editable, so "recorded" alone cannot say
+   * whether what is on screen is what was first filed. */
+  updatedAt: string;
   /**
    * Set when this voucher was voided. Deliberately NOT money, so it survives
    * redaction: a voided cost has to read as voided for every user.
