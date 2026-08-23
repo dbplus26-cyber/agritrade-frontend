@@ -38,7 +38,6 @@ import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import {
   shipmentDocumentUrl,
-  shipmentWaybillPdfUrl,
   useAddShipmentDocumentMutation,
   useCloseShipmentMutation,
   useDispatchShipmentMutation,
@@ -476,36 +475,16 @@ export function ShipmentDetail({ id }: { id: string }) {
           admin sign it, the signed copy is uploaded, THEN dispatch - so the
           buttons live on every non-cancelled shipment, not just loaded ones. */}
       {s.status !== "CANCELLED" ? (
-        <>
-          <HelpWrap
-            className="inline-flex flex-none xl:w-full"
-            text="Opens the waybill for this truck to print, for the driver and an admin to sign before it leaves."
-          >
-            <AdminButton
-              variant="secondary"
-              className="xl:w-full"
-              asChild
-            >
-              <Link href={`${LIST}/${s.id}/waybill`}>Waybill</Link>
-            </AdminButton>
-          </HelpWrap>
-          {/* The same document in another wrapper, so it is the quietest
-              thing in the rail rather than a second Waybill button. */}
-          <HelpWrap
-            className="inline-flex flex-none xl:w-full"
-            text="Opens that same waybill as a PDF in a new tab, ready to print or send to the driver."
-          >
-            <AdminButton variant="ghost" className="xl:w-full" asChild>
-              <a
-                href={shipmentWaybillPdfUrl(s.id)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                PDF
-              </a>
-            </AdminButton>
-          </HelpWrap>
-        </>
+        // One way in to the paper: the waybill page carries the PDF of
+        // itself, so a second button here was the same document twice.
+        <HelpWrap
+          className="inline-flex flex-none xl:w-full"
+          text="Opens the waybill for this truck to print, for the driver and an admin to sign before it leaves. The PDF is on that page."
+        >
+          <AdminButton variant="secondary" className="xl:w-full" asChild>
+            <Link href={`${LIST}/${s.id}/waybill`}>Waybill</Link>
+          </AdminButton>
+        </HelpWrap>
       ) : null}
     </div>
   );
@@ -565,8 +544,12 @@ export function ShipmentDetail({ id }: { id: string }) {
         >
           Sales on this trip
         </SectionHeading>
+        {/* Two columns, with an odd last card taking the whole row. A lone
+            sale in a two-column grid sits in the left half with the right
+            half empty, and so does the third of three - the gap reads as a
+            card that failed to load rather than as a layout. */}
         <div className="grid gap-2.5 pb-2 @3xl/main:grid-cols-2">
-          {s.sales.map((sale) => {
+          {s.sales.map((sale, saleIndex) => {
             // Removal only where nothing would be silently thrown away: a sale
             // carrying allocated lots has costing decisions on it, so those get
             // cleared deliberately in Allocate lots first (the backend refuses
@@ -592,7 +575,12 @@ export function ShipmentDetail({ id }: { id: string }) {
             return (
               <div
                 key={sale.id}
-                className="flex h-full flex-col rounded-none border border-adm-line bg-adm-card p-3.5"
+                className={cn(
+                  "flex h-full flex-col rounded-none border border-adm-line bg-adm-card p-3.5",
+                  s.sales.length % 2 === 1 &&
+                    saleIndex === s.sales.length - 1 &&
+                    "@3xl/main:col-span-2",
+                )}
               >
                 <div className="flex items-start justify-between gap-2.5">
                   <Link
@@ -649,19 +637,19 @@ export function ShipmentDetail({ id }: { id: string }) {
                 <div className="mt-auto border-t border-dotted border-adm-line pt-3">
                   <dl className="grid grid-cols-2 gap-x-3">
                     <div className="min-w-0">
-                      <dt className="min-w-0 text-[10px] font-bold tracking-[0.08em] text-adm-muted uppercase">
+                      <dt className="min-w-0 text-[9.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
                         <HelpWrap text="The weight this whole order is due to move - what decides whether it fits on the truck.">
                           Load needed
                         </HelpWrap>
                       </dt>
                       <dd className="mt-0.5">
-                        <Mono className="text-[17px] leading-none font-semibold tabular-nums text-adm-ink">
+                        <Mono className="text-[13.5px] leading-none font-semibold tabular-nums text-adm-ink">
                           {formatKg(saleNeedsKg)}
                         </Mono>
                       </dd>
                     </div>
                     <div className="min-w-0">
-                      <dt className="min-w-0 text-[10px] font-bold tracking-[0.08em] text-adm-muted uppercase">
+                      <dt className="min-w-0 text-[9.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
                         <HelpWrap text="What has been allocated onto this truck for the order so far. Green once the order is fully covered.">
                           Loaded now
                         </HelpWrap>
@@ -669,7 +657,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                       <dd className="mt-0.5">
                         <Mono
                           className={cn(
-                            "text-[17px] leading-none font-semibold tabular-nums",
+                            "text-[13.5px] leading-none font-semibold tabular-nums",
                             saleLoadedKg >= saleNeedsKg && saleNeedsKg > 0
                               ? "text-console"
                               : "text-adm-ink",
