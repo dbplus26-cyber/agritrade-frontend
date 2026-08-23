@@ -19,7 +19,7 @@ import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { extractApiError } from "@/lib/extract-api-error";
-import { formatDateTime } from "@/lib/format-date";
+import { formatDateTime, formatTableDate } from "@/lib/format-date";
 import { formatKg } from "@/lib/format-money";
 import {
   repaymentDocumentUrl,
@@ -29,10 +29,98 @@ import {
 } from "@/redux/farm/repayments-api";
 import { ViewablePhoto } from "@/components/admin/photo-view";
 import { FarmDocumentsSection } from "./farm-bits";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useGetGrantsQuery } from "@/redux/farm/grants-api";
+import type { IGrant } from "@/types/farm.types";
 
 const LIST = "/admin/repayments";
 
 const NotRecorded = () => <span className="text-adm-muted">Not recorded</span>;
+
+/**
+ * The grants this repayment is set against.
+ *
+ * The advance and the repayment are joined by the farmer and the season, not
+ * by a foreign key, so this states the join rather than implying a precision
+ * the record does not have: these are the season's advances to this farmer,
+ * and the repayment comes off their total.
+ */
+function SettlingAgainst({
+  farmerId,
+  farmerName,
+  seasonId,
+  seasonName,
+}: {
+  farmerId: string;
+  farmerName: string;
+  seasonId: string;
+  seasonName: string;
+}) {
+  const { data, isError, isLoading } = useGetGrantsQuery({
+    farmerId,
+    limit: 50,
+    seasonId,
+  });
+  const grants = data?.data ?? [];
+
+  return (
+    <AdminCard className="px-5 py-4">
+      <SectionHeading
+        className="mb-1"
+        hint="A repayment comes off what the farmer owes for the season as a whole, so it answers every advance below rather than any one of them."
+      >
+        Settling against
+      </SectionHeading>
+      <p className="mb-2.5 text-[11px] text-adm-muted [overflow-wrap:anywhere]">
+        What {farmerName} was advanced in {seasonName}.
+      </p>
+      {isLoading ? (
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-9 w-full" />
+          <Skeleton className="h-9 w-2/3" />
+        </div>
+      ) : isError ? (
+        <p className="text-[11.5px] text-console-red">
+          Couldn&apos;t load this season&apos;s advances. Reload to try again.
+        </p>
+      ) : grants.length === 0 ? (
+        <p className="text-[11.5px] text-adm-muted">
+          Nothing was advanced to this farmer in {seasonName}, so this
+          repayment stands on its own.
+        </p>
+      ) : (
+        <ul className="flex flex-col gap-2">
+          {grants.map((g: IGrant) => (
+            <li key={g.id}>
+              <Link
+                className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 rounded-none border border-adm-line bg-adm-card px-3.5 py-2.5 transition-colors hover:bg-adm-sunken"
+                href={`/admin/grants/${g.id}`}
+              >
+                <span className="flex min-w-0 flex-col gap-0.5">
+                  <Mono className="text-[11px] font-semibold text-console">
+                    {g.transactionNo}
+                  </Mono>
+                  <span className="min-w-0 text-[11.5px] text-adm-ink [overflow-wrap:anywhere]">
+                    {g.item.name}
+                    <span className="text-adm-muted">
+                      {" · "}
+                      {g.quantity} {g.item.unitLabel}
+                      {" · "}
+                      {formatTableDate(g.grantedAt)}
+                    </span>
+                  </span>
+                </span>
+                <Mono className="flex-none text-[12px] font-semibold text-adm-ink">
+                  <Money value={g.valueGhs} />
+                </Mono>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </AdminCard>
+  );
+}
 
 export function RepaymentDetail({ id }: { id: string }) {
   const { data, isLoading, isError, error, refetch } = useGetRepaymentQuery(id);
@@ -223,6 +311,19 @@ export function RepaymentDetail({ id }: { id: string }) {
                 ) : null}
               </DetailGrid>
             </AdminCard>
+
+            {/* WHAT THIS IS PAYING OFF. A repayment carries no grant id -
+                it settles the farmer's balance for a season, not one advance
+                - so the honest link is every grant that season put out to
+                this farmer. Without it the page is a receipt for money with
+                nothing on it saying what the money was for, and the grant it
+                answers is two searches away. */}
+            <SettlingAgainst
+              farmerId={r.farmer.id}
+              farmerName={r.farmer.name}
+              seasonId={r.season.id}
+              seasonName={r.season.name}
+            />
 
             {/* Evidence */}
             <AdminCard className="px-5 py-4">

@@ -73,6 +73,13 @@ vi.mock("@/redux/warehouses/warehouses-api", () => ({
 }));
 vi.mock("@/redux/farm/grants-api", () => ({
   useCreateGrantMutation: () => [createGrant, { isLoading: false }],
+  // The repayment page lists the season's advances to this farmer, since a
+  // repayment answers the season's balance rather than any one grant.
+  useGetGrantsQuery: () => ({
+    data: { data: [] },
+    isError: false,
+    isLoading: false,
+  }),
 }));
 vi.mock("@/redux/farm/repayments-api", () => ({
   repaymentDocumentUrl: () => "https://example.test/doc",
