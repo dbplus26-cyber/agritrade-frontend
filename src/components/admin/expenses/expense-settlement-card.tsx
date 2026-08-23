@@ -493,15 +493,18 @@ export function ExpenseSettlementCard({
                       value={p.amountGhs}
                     />
                     {isSuperAdmin && !p.isReversal && !reversed ? (
-                      <button
-                        className="cursor-pointer text-[11px] text-adm-muted transition-colors hover:text-console-red"
+                      <AdminButton
+                        aria-label={`Reverse ${p.transactionNo}`}
+                        className="text-console-red hover:text-console-red"
                         onClick={() => {
                           setReversing(p);
                         }}
+                        size="sm"
                         type="button"
+                        variant="outline"
                       >
                         Reverse
-                      </button>
+                      </AdminButton>
                     ) : null}
                   </div>
                 </li>

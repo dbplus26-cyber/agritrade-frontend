@@ -938,8 +938,10 @@ export function PdfLink({
       target="_blank"
       rel="noopener noreferrer"
       className={cn(
-        adminLinkClass,
-        "inline-flex h-9 flex-none items-center px-3 text-[11.5px] whitespace-nowrap",
+        // A bordered plate, not an underlined word: it stands in an action
+        // row beside real buttons, and a link among them reads as the one
+        // control that is not a control.
+        "inline-flex h-[34px] flex-none cursor-pointer items-center gap-1.5 rounded-none border border-adm-line bg-transparent px-3.5 text-[11.5px] font-semibold whitespace-nowrap text-adm-body transition-colors hover:bg-adm-sunken hover:text-adm-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-console",
         className,
       )}
     >
