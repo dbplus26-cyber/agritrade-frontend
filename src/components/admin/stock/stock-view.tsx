@@ -452,6 +452,15 @@ function WarehouseSections({
         const rows = commodities
           .filter((c) => w.byCommodity.has(c.id))
           .map((c) => ({ ...c, kg: w.byCommodity.get(c.id) ?? 0 }));
+        // A commodity is named in two or three words against a six-character
+        // weight, so one full-page row leaves a hand's width of nothing
+        // between them. Past a point the list runs in two columns instead:
+        // each name sits near its own figure, the width is spent on rows
+        // rather than on gap, and a long name still has room to wrap.
+        const half = Math.ceil(rows.length / 2);
+        const groups =
+          rows.length >= 4 ? [rows.slice(0, half), rows.slice(half)] : [rows];
+        const split = groups.length > 1;
         return (
           <section key={w.id} aria-labelledby={`warehouse-${w.id}`}>
             <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b border-adm-hairline bg-adm-sunken px-4 py-3">
@@ -484,77 +493,106 @@ function WarehouseSections({
               </div>
             </div>
 
-            <table className="w-full table-fixed">
-              <colgroup>
-                <col />
-                <col className="w-32 sm:w-40" />
-                <col className="hidden w-44 sm:table-column lg:w-56" />
-              </colgroup>
-              <thead>
-                <tr className="border-b border-adm-hairline">
-                  <th scope="col" className={cn(headCell, "text-left")}>
-                    Commodity
-                  </th>
-                  <th scope="col" className={cn(headCell, "text-right")}>
-                    On hand
-                  </th>
-                  <th
-                    scope="col"
-                    className={cn(headCell, "hidden text-right sm:table-cell")}
+            <div
+              className={cn("grid", split && "@5xl/main:grid-cols-2")}
+            >
+              {groups.map((group, gi) => (
+                <table
+                  className={cn(
+                    "w-full table-fixed",
+                    gi > 0 && "@5xl/main:border-l @5xl/main:border-adm-hairline",
+                  )}
+                  key={gi}
+                >
+                  <colgroup>
+                    <col />
+                    <col className={split ? "w-28 sm:w-32" : "w-32 sm:w-40"} />
+                    <col
+                      className={cn(
+                        "hidden sm:table-column",
+                        split ? "w-32 lg:w-40" : "w-44 lg:w-56",
+                      )}
+                    />
+                  </colgroup>
+                  {/* The second column repeats the headings only once it is
+                      actually beside the first. Stacked, it is the same list
+                      continuing, and a second set of headings mid-list reads
+                      as a second table. */}
+                  <thead
+                    className={cn(gi > 0 && "hidden @5xl/main:table-header-group")}
                   >
-                    Share of store
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((r) => {
-                  const share =
-                    w.subtotalKg > 0
-                      ? Math.min(100, Math.max(0, (r.kg / w.subtotalKg) * 100))
-                      : 0;
-                  const shareLabel =
-                    share > 0 && share < 1 ? "<1%" : `${Math.round(share)}%`;
-                  return (
-                    <tr
-                      key={r.id}
-                      className="border-b border-adm-hairline transition-colors last:border-b-0 hover:bg-adm-hover"
-                    >
-                      <td
-                        className="px-4 py-2.5 text-[11.5px] text-adm-body [overflow-wrap:anywhere]"
-                        title={r.name}
+                    <tr className="border-b border-adm-hairline">
+                      <th scope="col" className={cn(headCell, "text-left")}>
+                        Commodity
+                      </th>
+                      <th scope="col" className={cn(headCell, "text-right")}>
+                        On hand
+                      </th>
+                      <th
+                        scope="col"
+                        className={cn(headCell, "hidden text-right sm:table-cell")}
                       >
-                        {r.name}
-                      </td>
-                      <td className="px-4 py-2.5 text-right">
-                        <Kg
-                          kg={r.kg}
-                          className={cn(
-                            "text-[11.5px] font-semibold",
-                            r.kg === 0 ? "text-adm-faint" : "text-adm-ink",
-                          )}
-                        />
-                      </td>
-                      <td className="hidden px-4 py-2.5 sm:table-cell">
-                        <div className="flex items-center justify-end gap-2.5">
-                          <span
-                            aria-hidden="true"
-                            className="block h-1 w-20 overflow-hidden bg-adm-sunken lg:w-28"
-                          >
-                            <span
-                              className="block h-full bg-console-gold transition-[width] duration-500 ease-out"
-                              style={{ width: `${String(share)}%` }}
-                            />
-                          </span>
-                          <span className="font-adminmono w-9 text-right text-[10.5px] tabular-nums text-adm-muted">
-                            {shareLabel}
-                          </span>
-                        </div>
-                      </td>
+                        Share of store
+                      </th>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                  </thead>
+                  <tbody>
+                    {group.map((r) => {
+                      const share =
+                        w.subtotalKg > 0
+                          ? Math.min(100, Math.max(0, (r.kg / w.subtotalKg) * 100))
+                          : 0;
+                      const shareLabel =
+                        share > 0 && share < 1 ? "<1%" : `${Math.round(share)}%`;
+                      return (
+                        <tr
+                          key={r.id}
+                          className={cn(
+                            "border-b border-adm-hairline transition-colors hover:bg-adm-hover",
+                            gi === groups.length - 1 && "last:border-b-0",
+                          )}
+                        >
+                          <td
+                            className="px-4 py-2.5 text-[11.5px] text-adm-body [overflow-wrap:anywhere]"
+                            title={r.name}
+                          >
+                            {r.name}
+                          </td>
+                          <td className="px-4 py-2.5 text-right">
+                            <Kg
+                              kg={r.kg}
+                              className={cn(
+                                "text-[11.5px] font-semibold",
+                                r.kg === 0 ? "text-adm-faint" : "text-adm-ink",
+                              )}
+                            />
+                          </td>
+                          <td className="hidden px-4 py-2.5 sm:table-cell">
+                            <div className="flex items-center justify-end gap-2.5">
+                              <span
+                                aria-hidden="true"
+                                className={cn(
+                                  "block h-1 overflow-hidden bg-adm-sunken",
+                                  split ? "w-12 lg:w-16" : "w-20 lg:w-28",
+                                )}
+                              >
+                                <span
+                                  className="block h-full bg-console-gold transition-[width] duration-500 ease-out"
+                                  style={{ width: `${String(share)}%` }}
+                                />
+                              </span>
+                              <span className="font-adminmono w-9 text-right text-[10.5px] tabular-nums text-adm-muted">
+                                {shareLabel}
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              ))}
+            </div>
           </section>
         );
       })}
