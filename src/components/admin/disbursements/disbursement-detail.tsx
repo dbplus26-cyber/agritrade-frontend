@@ -7,15 +7,18 @@ import { DateTimeCell } from "@/components/admin/date-cell";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import {
   AdminButton,
+  AdminCard,
   AdminField,
   DetailHeader,
-  DetailRow,
-  DetailShell,
   Mono,
+  SectionHeading,
   adminInputClass,
   adminSelectClass,
 } from "@/components/admin/ui";
-import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
+import { HelpTip } from "@/components/admin/help-tip";
+import { RailCard, RecordShell } from "@/components/admin/record-shell";
+import { RecordFacts, type RecordFact } from "@/components/admin/record-facts";
+import { DASHBOARD_CRUMB } from "@/components/admin/detail-nav";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
 import { SimpleSelect } from "@/components/ui/simple-select";
@@ -45,11 +48,31 @@ import {
   DisbursementStatusBadge,
   Money,
   RAIL_LABEL,
-  TitledCard,
   recipientLine,
 } from "./disbursement-bits";
 
 const LIST = "/admin/disbursements";
+
+/** One money fact beside the headline figure. */
+function CostFact({
+  hint,
+  label,
+  value,
+}: {
+  hint: string;
+  label: string;
+  value: number;
+}) {
+  return (
+    <div className="min-w-0">
+      <div className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
+        <span className="min-w-0">{label}</span>
+        <HelpTip label={`What is ${label}?`} text={hint} />
+      </div>
+      <Money className="mt-0.5 block text-[12.5px] text-adm-ink" value={value} />
+    </div>
+  );
+}
 
 /**
  * One payout, and the two things the owner can do about a stuck one: ask
@@ -83,170 +106,189 @@ export function DisbursementDetail({ id }: { id: string }) {
     }
   };
 
-  return (
-    <div className="space-y-5">
-      <DetailNav
-        crumbs={[DASHBOARD_CRUMB, { label: "Money sent", href: LIST }]}
-        current="Payout details"
-      />
-      <DetailHeader
-        title="Payout details"
-        hint="One transfer sent out: where it went and whether it arrived."
-        sub={
-          <>
-            <span>{RAIL_LABEL[d.rail]}</span>
-            <Mono>{d.transactionNo}</Mono>
-          </>
-        }
-        actions={
-          settled ? null : (
-            <>
-              <AdminButton
-                disabled={checkState.isLoading}
-                loading={checkState.isLoading}
-                onClick={() => void onCheck()}
-                type="button"
-                variant="ghost"
-              >
-                {checkState.isLoading ? "Checking…" : "Check with Hubtel"}
-              </AdminButton>
-              <AdminButton onClick={() => setResolving(true)} type="button">
-                Resolve manually
-              </AdminButton>
-            </>
-          )
-        }
-      />
+  const facts: RecordFact[] = [
+    {
+      hint: "The code this console put on the payment, for tracing it back here.",
+      label: "Our reference",
+      mono: true,
+      value: d.clientReference,
+    },
+    {
+      hint: "The payment provider's own code for this payout: quote it when you call them.",
+      label: "Hubtel transaction",
+      mono: true,
+      value: d.hubtelTransactionId,
+    },
+    {
+      hint: "The mobile network or bank's own code for the transfer, deeper than the provider's.",
+      label: "Network reference",
+      mono: true,
+      value: d.externalTransactionId,
+    },
+    {
+      hint: "The provider's short answer for what happened, useful when a payment is queried.",
+      label: "Response code",
+      mono: true,
+      value: d.responseCode,
+    },
+  ];
 
+  return (
+    <RecordShell
+      backHref={LIST}
+      backLabel="Money sent"
+      crumbs={[DASHBOARD_CRUMB, { label: "Money sent", href: LIST }]}
+      current="Payout details"
+      header={
+        <DetailHeader
+          title="Payout details"
+          hint="One transfer sent out: where it went and whether it arrived."
+          sub={
+            <>
+              <span>{RAIL_LABEL[d.rail]}</span>
+              <Mono>{d.transactionNo}</Mono>
+            </>
+          }
+          badges={
+            <DisbursementStatusBadge
+              needsAttention={d.needsAttention}
+              status={d.status}
+            />
+          }
+          actions={
+            settled ? null : (
+              <>
+                <AdminButton
+                  disabled={checkState.isLoading}
+                  loading={checkState.isLoading}
+                  onClick={() => void onCheck()}
+                  type="button"
+                  variant="secondary"
+                >
+                  {checkState.isLoading ? "Checking…" : "Check with Hubtel"}
+                </AdminButton>
+                <AdminButton onClick={() => setResolving(true)} type="button">
+                  Resolve manually
+                </AdminButton>
+              </>
+            )
+          }
+        />
+      }
+      aside={
+        <>
+          <RailCard title="Paid from">
+            <p className="text-[11.5px] text-adm-ink">
+              {d.holder
+                ? `${d.holder.name}'s float`
+                : "The company account directly"}
+            </p>
+            <p className="mt-1 text-[10.5px] text-adm-muted">
+              Requested by {d.requestedByName ?? "an unknown user"}
+            </p>
+          </RailCard>
+          <RailCard title="Trail">
+            <div className="flex flex-col gap-2.5">
+              <div>
+                <div className="text-[10.5px] text-adm-muted">Recorded</div>
+                <div className="mt-0.5 text-[11.5px] text-adm-ink">
+                  <DateTimeCell value={d.createdAt} />
+                </div>
+              </div>
+              <div>
+                <div className="text-[10.5px] text-adm-muted">
+                  Sent to Hubtel
+                </div>
+                <div className="mt-0.5 text-[11.5px] text-adm-ink">
+                  {d.submittedAt ? (
+                    <DateTimeCell value={d.submittedAt} />
+                  ) : (
+                    <span className="text-adm-faint">Not yet</span>
+                  )}
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center gap-1 text-[10.5px] text-adm-muted">
+                  <span>Settled</span>
+                  <HelpTip
+                    label="What is settled?"
+                    text="When the provider gave a final answer on this payment, one way or the other."
+                  />
+                </div>
+                <div className="mt-0.5 text-[11.5px] text-adm-ink">
+                  {d.settledAt ? (
+                    <DateTimeCell value={d.settledAt} />
+                  ) : (
+                    <span className="text-adm-faint">Not yet</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </RailCard>
+        </>
+      }
+    >
       {d.needsAttention ? (
-        <div className="rounded-none border border-console-red/40 bg-console-red/5 px-4 py-3 text-[11.5px] text-console-red">
+        <AdminCard className="border-console-red/40 bg-console-red/[0.04] px-5 py-3.5 text-[11.5px] leading-[1.55] text-console-red">
           Hubtel has not given a final answer for this payout after several
           checks. It has NOT been marked failed, because the money may well
           have gone out - confirm on the Hubtel dashboard, then record the real
           outcome with &ldquo;Resolve manually&rdquo;.
-        </div>
+        </AdminCard>
       ) : null}
 
-      <DetailShell
-        main={
-          <div className="space-y-5">
-            <TitledCard title="The payout">
-              <DetailRow label="Amount">
-                <Money className="text-[12.5px] font-bold" value={d.amountGhs} />
-              </DetailRow>
-              <DetailRow label="Status">
-                <DisbursementStatusBadge
-                  needsAttention={d.needsAttention}
-                  status={d.status}
-                />
-              </DetailRow>
-              <DetailRow label="Recipient">{d.recipientName}</DetailRow>
-              <DetailRow label="Sent to">
-                <Mono>{recipientLine(d)}</Mono>
-              </DetailRow>
-              <DetailRow label="Description">{d.description}</DetailRow>
-              {/* Charges and the true debit only exist once Hubtel has told
-                  us what it actually took - before that they are honestly
-                  absent rather than shown as zero. */}
-              {d.chargesGhs !== null ? (
-                <DetailRow
-                  hint="What the payment provider took on top of the amount, for moving the money."
-                  label="Hubtel charges"
-                >
-                  <Money value={d.chargesGhs} />
-                </DetailRow>
-              ) : null}
-              {d.amountDebitedGhs !== null ? (
-                <DetailRow
-                  hint="What actually left your account: the amount sent plus the provider\u2019s charges."
-                  label="Total debited"
-                >
-                  <Money value={d.amountDebitedGhs} />
-                </DetailRow>
-              ) : null}
-              {d.failureReason ? (
-                <DetailRow label="Why it failed">
-                  <span className="text-console-red">{d.failureReason}</span>
-                </DetailRow>
-              ) : null}
-            </TitledCard>
+      {/* The figure and where it went, together and alone. The four short
+          facts underneath are the provider's codes, which nobody reads until
+          a payment is queried. */}
+      <AdminCard className="p-5">
+        <Money
+          className="block text-[30px] leading-[1.1] font-semibold text-adm-ink"
+          value={d.amountGhs}
+        />
+        <p className="mt-2 text-[12px] text-adm-body">
+          To <span className="font-semibold text-adm-ink">{d.recipientName}</span>{" "}
+          <span className="text-adm-faint">·</span>{" "}
+          <Mono className="text-[11.5px]">{recipientLine(d)}</Mono>
+        </p>
+        <p className="mt-1 text-[11.5px] text-adm-muted [overflow-wrap:anywhere]">
+          {d.description}
+        </p>
 
-            <TitledCard title="What Hubtel said">
-              <DetailRow
-                hint="The code this console put on the payment, for tracing it back here."
-                label="Our reference"
-              >
-                <Mono>{d.clientReference}</Mono>
-              </DetailRow>
-              <DetailRow
-                hint="The payment provider\u2019s own code for this payout: quote it when you call them."
-                label="Hubtel transaction"
-              >
-                {d.hubtelTransactionId ? (
-                  <Mono>{d.hubtelTransactionId}</Mono>
-                ) : (
-                  <span className="text-adm-faint">Not given</span>
-                )}
-              </DetailRow>
-              <DetailRow
-                hint="The mobile network or bank\u2019s own code for the transfer, deeper than the provider\u2019s."
-                label="Network reference"
-              >
-                {d.externalTransactionId ? (
-                  <Mono>{d.externalTransactionId}</Mono>
-                ) : (
-                  <span className="text-adm-faint">Not given</span>
-                )}
-              </DetailRow>
-              <DetailRow
-                hint="The provider\u2019s short answer for what happened, useful when a payment is queried."
-                label="Response code"
-              >
-                {d.responseCode ? (
-                  <Mono>{d.responseCode}</Mono>
-                ) : (
-                  <span className="text-adm-faint">None yet</span>
-                )}
-              </DetailRow>
-            </TitledCard>
+        {d.failureReason ? (
+          <p className="mt-3 border-t border-adm-hairline pt-3 text-[11.5px] text-console-red">
+            {d.failureReason}
+          </p>
+        ) : null}
+
+        {/* Charges and the true debit only exist once Hubtel has said what it
+            actually took - before that they are honestly absent rather than
+            shown as zero. */}
+        {d.chargesGhs !== null || d.amountDebitedGhs !== null ? (
+          <div className="mt-4 flex flex-wrap gap-x-10 gap-y-3 border-t border-adm-hairline pt-3.5">
+            {d.chargesGhs !== null ? (
+              <CostFact
+                hint="What the payment provider took on top of the amount, for moving the money."
+                label="Hubtel charges"
+                value={d.chargesGhs}
+              />
+            ) : null}
+            {d.amountDebitedGhs !== null ? (
+              <CostFact
+                hint="What actually left your account: the amount sent plus the provider's charges."
+                label="Total debited"
+                value={d.amountDebitedGhs}
+              />
+            ) : null}
           </div>
-        }
-        aside={
-          <TitledCard title="Trail">
-            <DetailRow
-              hint="Whose money this came out of: one person\u2019s float, or the company account directly."
-              label="Paid from"
-            >
-              {d.holder
-                ? `${d.holder.name}'s float`
-                : "The company account directly"}
-            </DetailRow>
-            <DetailRow label="Requested by">
-              {d.requestedByName ?? "Unknown"}
-            </DetailRow>
-            <DetailRow label="Recorded">
-              <DateTimeCell value={d.createdAt} />
-            </DetailRow>
-            <DetailRow label="Sent to Hubtel">
-              {d.submittedAt ? (
-                <DateTimeCell value={d.submittedAt} />
-              ) : (
-                <span className="text-adm-faint">Not yet</span>
-              )}
-            </DetailRow>
-            <DetailRow
-              hint="When the provider gave a final answer on this payment, one way or the other."
-              label="Settled"
-            >
-              {d.settledAt ? (
-                <DateTimeCell value={d.settledAt} />
-              ) : (
-                <span className="text-adm-faint">Not yet</span>
-              )}
-            </DetailRow>
-          </TitledCard>
-        }
-      />
+        ) : null}
+      </AdminCard>
+
+      <AdminCard className="p-5">
+        <SectionHeading hint="The codes the provider and the network put on this transfer. They are what a query to Hubtel is traced by.">
+          What Hubtel said
+        </SectionHeading>
+        <RecordFacts facts={facts} />
+      </AdminCard>
 
       <ResolveDialog
         amountGhs={d.amountGhs}
@@ -254,7 +296,7 @@ export function DisbursementDetail({ id }: { id: string }) {
         onClose={() => setResolving(false)}
         open={resolving}
       />
-    </div>
+    </RecordShell>
   );
 }
 
