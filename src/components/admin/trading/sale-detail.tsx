@@ -239,8 +239,13 @@ export function SaleDetail({
   const paidInFull = saleIsPaidInFull(sale);
   const canManage = has("SALES_MANAGE");
   const isDraft = canManage && sale.status === "DRAFT";
+  // Nothing left to collect, nothing to record. `paidInFull` is false on a
+  // redacted sale, so a user without financial visibility still gets the
+  // button: an unknown balance is unknown, and the server refuses an
+  // overpayment either way.
   const canPay =
     has("PAYMENTS_RECORD") &&
+    !paidInFull &&
     (sale.status === "CONFIRMED" || sale.status === "FULFILLED");
   const canCancel =
     canManage && (sale.status === "DRAFT" || sale.status === "CONFIRMED");
