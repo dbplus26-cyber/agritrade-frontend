@@ -71,7 +71,7 @@ const data: Row[] = [
 ];
 
 describe("the phone card of a console table", () => {
-  it("puts a display-column badge on the same row as the figure", () => {
+  it("keeps a display-column badge on the card rather than filing it as an action", () => {
     render(
       <ConsoleDataTable<Row>
         columns={columns}
@@ -88,10 +88,11 @@ describe("the phone card of a console table", () => {
     expect(badge).not.toBeNull();
     expect(count).not.toBeNull();
 
-    // The badges/figures row is the card's first child; both belong to it.
-    const row = card?.firstElementChild;
-    expect(row?.contains(badge!)).toBe(true);
-    expect(row?.contains(count!)).toBe(true);
+    // The badges open the card and the figures close it, so the two are not
+    // in the same row - what matters is that both are on the card and the
+    // figure sits in its closing row alongside anything actionable.
+    expect(card?.firstElementChild?.contains(badge!)).toBe(true);
+    expect(card?.lastElementChild?.contains(count!)).toBe(true);
   });
 
   /**

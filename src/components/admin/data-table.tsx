@@ -333,49 +333,13 @@ function summaryCard<TData>(
   const title = slotted.find((c) => slotOf(c) === "title");
   const meta = slotted.filter((c) => slotOf(c) === "meta" && filled(c));
 
-  // The actions ride the figures row rather than a row of their own. Alone at
-  // the foot they left a card with its amount pinned top right and its
-  // buttons bottom right, an empty band between them and nothing in it.
-  const topRow =
-    badges.length > 0 || trailing.length > 0 || actionCells.length > 0;
-
   return (
     <>
-      {topRow ? (
-        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
-          <span className="flex min-w-0 flex-wrap items-center gap-1.5">
-            {badges.map((cell) => (
-              <span key={cell.id}>{render(cell)}</span>
-            ))}
-          </span>
-          <span className="flex flex-none flex-wrap items-center justify-end gap-x-3 gap-y-1.5">
-            {trailing.length > 0 ? (
-              // Stacked, not spread: a second figure beside the first reads as
-              // one number split in two.
-              <span className="flex flex-col items-end gap-1 text-[11px] font-semibold text-adm-ink">
-                {trailing.map((cell) => (
-                  <span className="flex flex-col items-end" key={cell.id}>
-                    {/* Named only where there are two of them. One figure in
-                        the corner of a card is the card's amount and needs no
-                        caption; two stacked bare are a pair of numbers with
-                        nothing saying which is the balance and which the
-                        allowance. */}
-                    {trailing.length > 1 ? (
-                      <span className="text-[9px] font-bold tracking-[0.09em] text-adm-faint uppercase">
-                        {headerLabel.get(cell.column.id)}
-                      </span>
-                    ) : null}
-                    {render(cell)}
-                  </span>
-                ))}
-              </span>
-            ) : null}
-            {/* Wraps under the figure when a long amount leaves no room for
-                them, which is the only time the two cannot share the line. */}
-            {actionCells.map((cell) => (
-              <span key={cell.id}>{render(cell)}</span>
-            ))}
-          </span>
+      {badges.length > 0 ? (
+        <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+          {badges.map((cell) => (
+            <span key={cell.id}>{render(cell)}</span>
+          ))}
         </div>
       ) : null}
       {title ? (
@@ -396,6 +360,33 @@ function summaryCard<TData>(
               ) : null}
               <span className="min-w-0 truncate">{render(cell)}</span>
             </span>
+          ))}
+        </div>
+      ) : null}
+      {/* The figures and what can be done about them CLOSE the card, on one
+          row, reading from the left like everything above them. Pinned to the
+          top right they sat away from the name they belong to, and a card
+          reads top to bottom: what this is, then what it comes to. */}
+      {trailing.length > 0 || actionCells.length > 0 ? (
+        <div className="flex min-w-0 flex-wrap items-end gap-x-4 gap-y-2 pt-0.5">
+          {trailing.map((cell) => (
+            <span className="flex min-w-0 flex-col" key={cell.id}>
+              {/* Named only where there are two of them. One figure closing a
+                  card is that card's amount and needs no caption; two side by
+                  side are a pair of numbers with nothing saying which is the
+                  balance and which the allowance. */}
+              {trailing.length > 1 ? (
+                <span className="text-[9px] font-bold tracking-[0.09em] text-adm-faint uppercase">
+                  {headerLabel.get(cell.column.id)}
+                </span>
+              ) : null}
+              <span className="text-[11px] font-semibold text-adm-ink">
+                {render(cell)}
+              </span>
+            </span>
+          ))}
+          {actionCells.map((cell) => (
+            <span key={cell.id}>{render(cell)}</span>
           ))}
         </div>
       ) : null}
