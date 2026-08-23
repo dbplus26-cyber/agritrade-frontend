@@ -115,7 +115,7 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
       name: "",
     },
   });
-  const { fields, append, remove } = useFieldArray({
+  const { fields, prepend, remove } = useFieldArray({
     control,
     name: "milestones",
   });
@@ -168,14 +168,29 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
           </AdminField>
 
           <div>
-            <div className="mb-2 flex items-center gap-1.5">
-              <span className="text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
-                Milestones
+            {/* Add sits with the heading, and a new row lands directly
+                under it: the control and what it produces in one place, so
+                nothing has to be hunted for after the press. */}
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <span className="flex items-center gap-1.5">
+                <span className="text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
+                  Milestones
+                </span>
+                <HelpTip
+                  label="What is a milestone?"
+                  text="One slice of the fee and when it falls due. The slices must add up to 100."
+                />
               </span>
-              <HelpTip
-                label="What is a milestone?"
-                text="One slice of the fee and when it falls due. The slices must add up to 100."
-              />
+              <AdminButton
+                onClick={() => {
+                  prepend({ label: "", percent: "", trigger: "ON_DELIVERY" });
+                }}
+                size="sm"
+                type="button"
+                variant="outline"
+              >
+                Add milestone
+              </AdminButton>
             </div>
 
             <ul className="flex flex-col gap-2">
@@ -244,17 +259,6 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
               </p>
             ) : null}
 
-            <AdminButton
-              className="mt-2.5 w-fit"
-              onClick={() => {
-                append({ label: "", percent: "", trigger: "ON_DELIVERY" });
-              }}
-              size="sm"
-              type="button"
-              variant="outline"
-            >
-              Add milestone
-            </AdminButton>
           </div>
 
           <label className="flex cursor-pointer items-center gap-2 text-[11.5px] text-adm-body">
