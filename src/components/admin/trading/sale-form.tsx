@@ -189,7 +189,9 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
         className="@container flex flex-col gap-5"
       >
         <AdminCard className="flex flex-col gap-5 px-5 py-4">
-          <section className="flex flex-col gap-5">
+          {/* Who is buying and on what terms are one decision taken together,
+              and neither control needs a whole row to hold a single line. */}
+          <section className="grid gap-5 @min-[560px]:grid-cols-2">
             <AdminField label="Buyer" error={errors.buyerId?.message}>
               <Controller
                 control={control}
