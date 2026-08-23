@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Trash2 } from "lucide-react";
 import {
   AdminButton,
   AdminCard,
@@ -345,7 +346,10 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
                   : "Nothing on the sale yet. Type the first line above and add it."}
               </p>
             ) : (
-              <ul className="divide-y divide-adm-hairline">
+              // Each filed line is its own bordered card. As rows separated
+              // by a hairline they read as one block of text, and the line a
+              // Remove press was aimed at was never obvious.
+              <ul className="flex flex-col gap-2">
                 {fields.map((field, index) => {
                   const line = watchedLines?.[index];
                   const weight = Number(line?.weightKg) || 0;
@@ -356,7 +360,7 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
                   return (
                     <li
                       key={field.id}
-                      className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2.5"
+                      className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-none border border-adm-line bg-adm-card px-3 py-2.5"
                     >
                       <div className="min-w-0 flex-1">
                         <p className="text-[11.5px] font-semibold text-adm-ink [overflow-wrap:anywhere]">
@@ -373,15 +377,19 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
                         <Mono className="text-[12px] font-semibold tabular-nums text-adm-ink">
                           {formatCedis(weight * price)}
                         </Mono>
-                        <button
-                          type="button"
+                        <AdminButton
+                          aria-label={`Remove ${name}`}
+                          className="text-console-red hover:text-console-red"
                           onClick={() => {
                             remove(index);
                           }}
-                          className="cursor-pointer text-[11px] font-semibold text-console-red underline-offset-2 hover:underline"
+                          size="sm"
+                          type="button"
+                          variant="outline"
                         >
+                          <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                           Remove
-                        </button>
+                        </AdminButton>
                       </div>
                     </li>
                   );

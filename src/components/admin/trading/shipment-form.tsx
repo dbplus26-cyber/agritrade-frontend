@@ -48,6 +48,7 @@ import {
   FIELD_NAMES,
   NO_SALES,
   NO_SHEDS,
+  PickedCard,
   StepHead,
   opt,
 } from "./shipment-form-bits";
@@ -634,19 +635,26 @@ export function ShipmentForm({
                               {formatKg(s.totalRemainingKg)}
                             </Mono>
                           </span>
+                          {/* The buyer and what they are taking on one line.
+                              A single-commodity sale gets its name only: the
+                              weight is already on the right of the row above,
+                              and printing it twice bought a third line on
+                              every sale in the list. A sale carrying more
+                              than one commodity keeps the split, which the
+                              total on the right cannot say. */}
                           <span className="block min-w-0 text-[11.5px] text-adm-ink [overflow-wrap:anywhere]">
                             {s.buyer.name}
-                          </span>
-                          <span className="mt-0.5 block text-[11px] text-adm-muted">
-                            {s.lines.map((l) => (
-                              <span
-                                key={l.commodityId}
-                                className="mr-2 inline-block whitespace-nowrap"
-                              >
-                                {l.commodityName}{" "}
-                                <Mono>{formatKg(l.remainingKg)}</Mono>
-                              </span>
-                            ))}
+                            <span className="text-adm-muted">
+                              {" · "}
+                              {s.lines.length === 1
+                                ? s.lines[0].commodityName
+                                : s.lines
+                                    .map(
+                                      (l) =>
+                                        `${l.commodityName} ${formatKg(l.remainingKg)}`,
+                                    )
+                                    .join(" · ")}
+                            </span>
                           </span>
                         </span>
                       </label>
@@ -944,42 +952,37 @@ export function ShipmentForm({
               )}
             </AdminField>
             {pickedAddress ? (
-              <div className="rounded-none border border-[#155744]/45 bg-[#F1F6EE] px-3 py-2 text-[11px] text-adm-muted">
-                <p className="mb-0.5 flex items-center gap-1 text-[10.5px] font-bold uppercase tracking-[0.09em] text-console">
-                  <Check className="h-3 w-3 flex-none" /> Delivering to
-                </p>
-                <p className="min-w-0 font-medium text-adm-ink [overflow-wrap:anywhere]">
-                  {pickedAddress.label} · {pickedAddress.city}
-                  {pickedAddress.area ? `, ${pickedAddress.area}` : ""}
-                </p>
-                {pickedAddress.shopName ? (
-                  <p className="min-w-0 [overflow-wrap:anywhere]">
-                    {pickedAddress.shopName}
-                  </p>
-                ) : null}
-                {pickedAddress.digitalAddress || pickedAddress.landmark ? (
-                  <p className="min-w-0 [overflow-wrap:anywhere]">
-                    {pickedAddress.digitalAddress ? (
+              <PickedCard
+                title="Delivering to"
+                heading={`${pickedAddress.label} · ${pickedAddress.city}${
+                  pickedAddress.area ? `, ${pickedAddress.area}` : ""
+                }`}
+                facts={[
+                  { label: "Shop", value: pickedAddress.shopName },
+                  {
+                    label: "Digital address",
+                    value: pickedAddress.digitalAddress ? (
                       <Mono>{pickedAddress.digitalAddress}</Mono>
-                    ) : null}
-                    {pickedAddress.digitalAddress && pickedAddress.landmark
-                      ? " · "
-                      : ""}
-                    {pickedAddress.landmark ?? ""}
-                  </p>
-                ) : null}
-                {pickedAddress.contactName || pickedAddress.contactPhone ? (
-                  <p className="min-w-0 [overflow-wrap:anywhere]">
-                    Receives: {pickedAddress.contactName ?? ""}
-                    {pickedAddress.contactName && pickedAddress.contactPhone
-                      ? " · "
-                      : ""}
-                    {pickedAddress.contactPhone ? (
-                      <Mono>{pickedAddress.contactPhone}</Mono>
-                    ) : null}
-                  </p>
-                ) : null}
-              </div>
+                    ) : null,
+                  },
+                  { label: "Landmark", value: pickedAddress.landmark },
+                  {
+                    label: "Receives",
+                    value:
+                      pickedAddress.contactName || pickedAddress.contactPhone ? (
+                        <>
+                          {pickedAddress.contactName}
+                          {pickedAddress.contactName && pickedAddress.contactPhone
+                            ? " · "
+                            : ""}
+                          {pickedAddress.contactPhone ? (
+                            <Mono>{pickedAddress.contactPhone}</Mono>
+                          ) : null}
+                        </>
+                      ) : null,
+                  },
+                ]}
+              />
             ) : (
               <AdminField label="Destination" error={errors.destination?.message}>
                 <Input
@@ -1089,30 +1092,29 @@ export function ShipmentForm({
               )}
             </AdminField>
             {pickedDriver && !showDriverOverrides ? (
-              <div className="flex flex-wrap items-center justify-between gap-2 rounded-none border border-[#155744]/45 bg-[#F1F6EE] px-3 py-2">
-                <div className="min-w-0 text-[11px] text-adm-muted">
-                  <p className="mb-0.5 flex items-center gap-1 text-[10.5px] font-bold uppercase tracking-[0.09em] text-console">
-                    <Check className="h-3 w-3 flex-none" /> Driving this trip
-                  </p>
-                  <p className="min-w-0 font-medium text-adm-ink [overflow-wrap:anywhere]">
-                    {ovName || pickedDriver.name}
-                  </p>
-                  <p className="min-w-0 [overflow-wrap:anywhere]">
-                    <Mono>{ovPhone || pickedDriver.phone}</Mono>
-                    {ovCompany ? ` · ${ovCompany}` : ""}
-                    {ovCity ? ` · ${ovCity}` : ""}
-                  </p>
-                </div>
-                <AdminButton
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="flex-none"
-                  onClick={() => setShowDriverOverrides(true)}
-                >
-                  Edit details
-                </AdminButton>
-              </div>
+              <PickedCard
+                title="Driving this trip"
+                heading={ovName || pickedDriver.name}
+                action={
+                  <AdminButton
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="flex-none"
+                    onClick={() => setShowDriverOverrides(true)}
+                  >
+                    Edit details
+                  </AdminButton>
+                }
+                facts={[
+                  {
+                    label: "Phone",
+                    value: <Mono>{ovPhone || pickedDriver.phone}</Mono>,
+                  },
+                  { label: "Company", value: ovCompany || pickedDriver.company },
+                  { label: "City", value: ovCity || pickedDriver.city },
+                ]}
+              />
             ) : (
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <AdminField label="Name" error={errors.driverName?.message}>

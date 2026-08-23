@@ -1,5 +1,6 @@
 "use client";
 
+import { Check } from "lucide-react";
 import { SectionHeading } from "@/components/admin/ui";
 
 /** Stable fallbacks so a transient undefined watch can't churn memo deps. */
@@ -56,6 +57,67 @@ export interface PickedAddress {
   landmark: string | null;
   contactName: string | null;
   contactPhone: string | null;
+}
+
+/** One labelled fact on a picked card. Absent values are never rendered. */
+export interface PickedFact {
+  label: string;
+  value: React.ReactNode;
+}
+
+/**
+ * What the form picked out of a register, shown back as a record rather than
+ * as a paragraph.
+ *
+ * A destination carries a shop, a digital address, a landmark and whoever
+ * receives the truck; run together into dot-joined sentences none of them is
+ * findable, and on a desktop the whole card sits in the left third of the row
+ * with the rest of the width empty. Labelled facts in a grid put each one
+ * where the eye can go straight to it and spend the width on columns.
+ */
+export function PickedCard({
+  action,
+  facts,
+  heading,
+  title,
+}: {
+  /** Anything that changes the pick - an Edit button, usually. */
+  action?: React.ReactNode;
+  facts: PickedFact[];
+  heading: React.ReactNode;
+  title: string;
+}) {
+  const shown = facts.filter((f) => f.value);
+  return (
+    <div className="@container rounded-none border border-[#155744]/45 bg-[#F1F6EE]">
+      <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 px-3.5 py-2.5">
+        <div className="min-w-0">
+          <p className="mb-0.5 flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-console uppercase">
+            <Check className="h-3 w-3 flex-none" aria-hidden="true" />
+            {title}
+          </p>
+          <p className="min-w-0 text-[12px] font-semibold text-adm-ink [overflow-wrap:anywhere]">
+            {heading}
+          </p>
+        </div>
+        {action}
+      </div>
+      {shown.length > 0 ? (
+        <dl className="grid grid-cols-2 gap-x-6 gap-y-2.5 border-t border-[#155744]/20 px-3.5 py-2.5 @md:grid-cols-3 @2xl:grid-cols-4">
+          {shown.map((f) => (
+            <div className="min-w-0" key={f.label}>
+              <dt className="text-[10px] font-bold tracking-[0.1em] text-console/70 uppercase">
+                {f.label}
+              </dt>
+              <dd className="mt-0.5 min-w-0 text-[11.5px] text-adm-ink [overflow-wrap:anywhere]">
+                {f.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
+    </div>
+  );
 }
 
 /** A trimmed value, or nothing - empty optional fields are omitted entirely. */
