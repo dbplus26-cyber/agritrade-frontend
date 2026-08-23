@@ -327,16 +327,14 @@ export function FarmerDetail({ id }: { id: string }) {
                 <SectionHeading
                   className="mb-0"
                   actions={
-                    <button
-                      type="button"
+                    <AdminButton
                       onClick={() => setGuarantorDialog("new")}
-                      className={cn(
-                        adminLinkClass,
-                        "cursor-pointer text-[11px] font-semibold whitespace-nowrap",
-                      )}
+                      size="sm"
+                      type="button"
+                      variant="outline"
                     >
-                      + Add guarantor
-                    </button>
+                      Add guarantor
+                    </AdminButton>
                   }
                 >
                   Guarantors
@@ -348,9 +346,15 @@ export function FarmerDetail({ id }: { id: string }) {
               {f.guarantors.length === 0 ? (
                 <p className="px-5 py-4 text-[11.5px] text-adm-muted">No guarantors yet.</p>
               ) : (
-                <ul className="divide-y divide-adm-hairline">
+                // A card each rather than rows behind one hairline: a
+                // guarantor carries five or six facts of its own, and stacked
+                // against a single rule two of them read as one person.
+                <ul className="flex flex-col gap-2.5 p-4">
                   {f.guarantors.map((g) => (
-                    <li key={g.id} className="px-5 py-4">
+                    <li
+                      key={g.id}
+                      className="rounded-none border border-adm-line bg-adm-card p-3.5"
+                    >
                       {/* Name row first, actions on the same line only from sm
                           - free text and controls never compete for width on a
                           phone. The details go into a LABELLED grid rather
@@ -371,21 +375,26 @@ export function FarmerDetail({ id }: { id: string }) {
                             </p>
                           ) : null}
                         </div>
-                        <div className="flex flex-none items-center gap-3 sm:justify-end">
-                          <button
-                            type="button"
+                        <div className="flex flex-none items-center gap-2 sm:justify-end">
+                          <AdminButton
+                            aria-label={`Edit ${g.name}`}
                             onClick={() => setGuarantorDialog(g)}
-                            className={cn(adminLinkClass, "cursor-pointer text-[11px] font-semibold")}
+                            size="sm"
+                            type="button"
+                            variant="outline"
                           >
                             Edit
-                          </button>
-                          <button
-                            type="button"
+                          </AdminButton>
+                          <AdminButton
+                            aria-label={`Remove ${g.name}`}
+                            className="text-console-red hover:text-console-red"
                             onClick={() => void onRemoveGuarantor(g)}
-                            className="cursor-pointer rounded-[2px] text-[11px] font-semibold text-console-red underline-offset-2 hover:underline"
+                            size="sm"
+                            type="button"
+                            variant="outline"
                           >
                             Remove
-                          </button>
+                          </AdminButton>
                         </div>
                       </div>
                       {g.phone || g.idType || g.idNumber || g.address || g.notes ? (
