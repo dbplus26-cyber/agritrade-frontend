@@ -132,7 +132,9 @@ function LogoCard({ settings }: { settings: ISystemSettings }) {
             </p>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        {/* items-start so Remove sits level with the trigger rather than with
+            the middle of the picker's stacked hint. */}
+        <div className="flex flex-wrap items-start gap-2">
           <FilePicker
             accept="image/png,image/jpeg"
             busy={uploadState.isLoading}

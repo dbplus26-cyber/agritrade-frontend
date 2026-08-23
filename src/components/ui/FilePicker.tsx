@@ -185,7 +185,11 @@ export function FilePicker({
           </div>
         </div>
       ) : (
-        <div className="flex flex-wrap items-center gap-2">
+        // The hint goes UNDER the trigger on a phone. Beside it, a line like
+        // "PNG or JPEG, up to 2MB" either wraps mid-phrase or pushes whatever
+        // sits next to the picker onto a row of its own - and the thing next
+        // to it is usually the button that undoes what this one did.
+        <div className="flex flex-col items-start gap-1.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
           <AdminButton
             type="button"
             variant="ghost"
