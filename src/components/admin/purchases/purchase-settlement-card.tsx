@@ -501,7 +501,12 @@ export function PurchaseSettlementCard({
 
       {canPay ? (
         <div className="mt-5">
-          <AdminButton onClick={() => setPayOpen(true)}>
+          {/* The one action this card offers, and on a phone the thumb should
+              not have to find a 140px plate at the left of it. */}
+          <AdminButton
+            className="w-full sm:w-auto"
+            onClick={() => setPayOpen(true)}
+          >
             Record a payment
           </AdminButton>
         </div>
