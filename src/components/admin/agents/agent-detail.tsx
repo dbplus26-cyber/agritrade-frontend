@@ -288,8 +288,14 @@ function LedgerRow({
           <DateOnlyCell value={tx.occurredAt} muted />
           {/* WHICH pot moved. Cash in a pocket and money in a wallet are
               different money, and a line that does not say which is the same
-              conflation the single float balance made. */}
-          <span className="text-[10.5px] text-adm-faint">{tx.account.label}</span>
+              conflation the single float balance made.
+              Its own line until the ledger is wide: the label carries the
+              holder's name AND the tender ("Kofi Anane - cash in hand"), so
+              wrapped in beside a document number and a date it broke across
+              two lines mid-phrase. */}
+          <span className="w-full text-[10.5px] text-adm-faint [overflow-wrap:anywhere] @2xl/ledger:w-auto">
+            {tx.account.label}
+          </span>
         </div>
         {/* Narrow cards have no room for a fourth track, so the balance rides
             under the entry rather than being dropped from the page. */}
@@ -872,7 +878,7 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
               </p>
               <p
                 className={cn(
-                  "font-adminmono mt-1 text-[26px] font-bold tabular-nums",
+                  "font-adminmono mt-1 text-[19px] font-bold tabular-nums sm:text-[26px]",
                   balance === null
                     ? "text-adm-faint"
                     : balance < 0
