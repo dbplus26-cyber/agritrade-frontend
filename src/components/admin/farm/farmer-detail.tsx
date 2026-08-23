@@ -351,54 +351,57 @@ export function FarmerDetail({ id }: { id: string }) {
                 // against a single rule two of them read as one person.
                 <ul className="flex flex-col gap-2.5 p-4">
                   {f.guarantors.map((g) => (
+                    // The card lays itself out rather than nesting a header
+                    // row: on a phone it is a column - who they are, then
+                    // their details, then the two actions across the foot -
+                    // and from sm it becomes a grid with the actions beside
+                    // the name, where a wide row has space for them.
+                    //
+                    // The details go into a LABELLED grid rather than a stack
+                    // of look-alike grey lines: five kinds of fact (phone, ID,
+                    // address, occupation, notes) in the same 12px muted grey
+                    // leaves nothing saying which line is which.
                     <li
                       key={g.id}
-                      className="rounded-none border border-adm-line bg-adm-card p-3.5"
+                      className="flex flex-col gap-2.5 rounded-none border border-adm-line bg-adm-card p-3.5 sm:grid sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start sm:gap-x-3"
                     >
-                      {/* Name row first, actions on the same line only from sm
-                          - free text and controls never compete for width on a
-                          phone. The details go into a LABELLED grid rather
-                          than a stack of look-alike grey lines: five kinds of
-                          fact (phone, ID, address, occupation, notes) in the
-                          same 12px muted grey leaves nothing saying which line
-                          is which. */}
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
-                        <div className="min-w-0">
-                          <p className="text-[12px] font-semibold text-adm-ink [overflow-wrap:anywhere]">
-                            {g.name}
+                      <div className="min-w-0 sm:col-start-1 sm:row-start-1">
+                        <p className="text-[12px] font-semibold text-adm-ink [overflow-wrap:anywhere]">
+                          {g.name}
+                        </p>
+                        {g.relationship || g.occupation ? (
+                          <p className="mt-0.5 text-[11px] text-adm-muted [overflow-wrap:anywhere]">
+                            {[g.relationship, g.occupation]
+                              .filter(Boolean)
+                              .join(" · ")}
                           </p>
-                          {g.relationship || g.occupation ? (
-                            <p className="mt-0.5 text-[11px] text-adm-muted [overflow-wrap:anywhere]">
-                              {[g.relationship, g.occupation]
-                                .filter(Boolean)
-                                .join(" · ")}
-                            </p>
-                          ) : null}
-                        </div>
-                        <div className="flex flex-none items-center gap-2 sm:justify-end">
-                          <AdminButton
-                            aria-label={`Edit ${g.name}`}
-                            onClick={() => setGuarantorDialog(g)}
-                            size="sm"
-                            type="button"
-                            variant="outline"
-                          >
-                            Edit
-                          </AdminButton>
-                          <AdminButton
-                            aria-label={`Remove ${g.name}`}
-                            className="text-console-red hover:text-console-red"
-                            onClick={() => void onRemoveGuarantor(g)}
-                            size="sm"
-                            type="button"
-                            variant="outline"
-                          >
-                            Remove
-                          </AdminButton>
-                        </div>
+                        ) : null}
+                      </div>
+                      {/* Last on a phone, where the two share the full width
+                          in halves under everything they act on; back beside
+                          the name from sm. */}
+                      <div className="order-last grid grid-cols-2 gap-2 border-t border-adm-hairline pt-2.5 sm:order-none sm:col-start-2 sm:row-start-1 sm:flex sm:border-0 sm:pt-0">
+                        <AdminButton
+                          aria-label={`Edit ${g.name}`}
+                          className="w-full sm:w-auto"
+                          onClick={() => setGuarantorDialog(g)}
+                          type="button"
+                          variant="outline"
+                        >
+                          Edit
+                        </AdminButton>
+                        <AdminButton
+                          aria-label={`Remove ${g.name}`}
+                          className="w-full text-console-red hover:text-console-red sm:w-auto"
+                          onClick={() => void onRemoveGuarantor(g)}
+                          type="button"
+                          variant="outline"
+                        >
+                          Remove
+                        </AdminButton>
                       </div>
                       {g.phone || g.idType || g.idNumber || g.address || g.notes ? (
-                        <dl className="mt-2.5 grid grid-cols-[repeat(auto-fit,minmax(min(100%,170px),1fr))] gap-x-6 gap-y-2">
+                        <dl className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,170px),1fr))] gap-x-6 gap-y-2 sm:col-span-2 sm:row-start-2">
                           {g.phone ? (
                             <GuarantorFact label="Phone">
                               <Mono>{g.phone}</Mono>
