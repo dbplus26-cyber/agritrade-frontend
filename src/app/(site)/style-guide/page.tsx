@@ -69,7 +69,7 @@ function Sheet({
 export default function StyleGuidePage() {
   return (
     <div className="texture-grain bg-surface pb-20">
-      <div className="mx-auto max-w-[1312px] px-5 pt-10 lg:px-8 lg:pt-14">
+      <div className="mx-auto max-w-328 px-5 pt-10 lg:px-8 lg:pt-14">
         <SectionHeading
           eyebrow="INTERNAL · COMPONENT SHEET"
           title="The DB Plus design system."
