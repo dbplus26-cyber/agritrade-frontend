@@ -1,8 +1,6 @@
-import type { Metadata } from "next";
-import { WarehouseCreate } from "@/components/admin/registry/warehouse-screens";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Add warehouse" };
-
+/** Adding a warehouse is a dialog on the register now. */
 export default function NewWarehousePage() {
-  return <WarehouseCreate />;
+  redirect("/admin/warehouses");
 }

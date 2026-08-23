@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
-import { Plus } from "lucide-react";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
@@ -25,7 +24,6 @@ import {
   adminInputClass,
   adminLinkClass,
 } from "@/components/admin/ui";
-import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { RecordFacts } from "@/components/admin/record-facts";
 import { TitleCell } from "@/components/admin/table-cells";
 import { ConsoleTableSkeleton, DetailSkeleton } from "@/components/admin/skeletons";
@@ -34,6 +32,14 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogDescription,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+} from "@/components/ui/responsive-dialog";
 import { useGetStockBalancesQuery } from "@/redux/stock/stock-api";
 import {
   useActivateWarehouseMutation,
@@ -76,9 +82,148 @@ import {
 const LIST = "/admin/warehouses";
 const FILTER_DEFAULTS = { status: "all", size: "10" };
 
+/**
+ * Adding a warehouse: three fields, so it asks for them where the register is
+ * rather than on a page of its own. A dialog on a desktop, a sheet from the
+ * bottom edge on a phone.
+ */
+function CreateWarehouseDialog({
+  onClose,
+  open,
+}: {
+  onClose: () => void;
+  open: boolean;
+}) {
+  const router = useRouter();
+  const [createWarehouse, { isLoading }] = useCreateWarehouseMutation();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setError,
+    formState: { errors },
+  } = useForm<WarehouseValues>({
+    resolver: zodResolver(warehouseSchema),
+    defaultValues: toWarehouseValues(),
+  });
+
+  const close = () => {
+    reset();
+    onClose();
+  };
+
+  const onSubmit = async (values: WarehouseValues) => {
+    const location = values.location?.trim() ?? "";
+    const description = values.description?.trim() ?? "";
+    try {
+      const res = await createWarehouse({
+        name: values.name,
+        ...(location ? { location } : {}),
+        ...(description ? { description } : {}),
+      }).unwrap();
+      notify.success("Warehouse created");
+      close();
+      // Straight to the record: a new shed is opened in order to put
+      // something in it, and its page is where that starts.
+      router.push(`${LIST}/${res.data.warehouse.id}`);
+    } catch (err) {
+      const { message, fieldErrors, hasFieldErrors } = extractApiError(err);
+      if (hasFieldErrors && fieldErrors) {
+        for (const field of ["name", "location", "description"] as const) {
+          if (fieldErrors[field])
+            setError(field, { message: fieldErrors[field] });
+        }
+      }
+      notify.error("Couldn't create the warehouse", { description: message });
+    }
+  };
+
+  return (
+    <ResponsiveDialog open={open} onOpenChange={(o) => !o && close()}>
+      <ResponsiveDialogContent className="sm:max-w-[520px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>Add warehouse</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
+            A storage location goods are received into and loaded out of. Stock
+            is counted separately per warehouse.
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
+        <form
+          noValidate
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col gap-5"
+        >
+          <div className="grid gap-5 sm:grid-cols-2">
+            <AdminField label="Name" error={errors.name?.message}>
+              <Input
+                autoFocus
+                placeholder="e.g. Main Warehouse - Tamale"
+                className={cn(
+                  adminInputClass,
+                  errors.name && "border-console-red",
+                )}
+                {...register("name")}
+              />
+            </AdminField>
+            <AdminField
+              label="Location"
+              optional
+              error={errors.location?.message}
+            >
+              <Input
+                placeholder="e.g. Tamale, Northern Region"
+                className={cn(
+                  adminInputClass,
+                  errors.location && "border-console-red",
+                )}
+                {...register("location")}
+              />
+            </AdminField>
+          </div>
+          <AdminField
+            label="Description"
+            optional
+            hint="What this warehouse holds and anything staff need to know."
+            error={errors.description?.message}
+          >
+            <textarea
+              rows={3}
+              placeholder="e.g. Maize and soya, 400 tonnes, fumigated monthly"
+              className={cn(
+                adminInputClass,
+                "h-auto min-h-[62px] w-full resize-y py-2",
+                errors.description && "border-console-red",
+              )}
+              {...register("description")}
+            />
+          </AdminField>
+          <ResponsiveDialogFooter className="gap-2">
+            <AdminButton
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={close}
+            >
+              Cancel
+            </AdminButton>
+            <AdminButton
+              type="submit"
+              disabled={isLoading}
+              loading={isLoading}
+              size="lg"
+            >
+              {isLoading ? "Saving…" : "Create warehouse"}
+            </AdminButton>
+          </ResponsiveDialogFooter>
+        </form>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
+  );
+}
+
 /** The live Warehouses register. */
 export function WarehouseTable() {
-  const router = useRouter();
+  const [createOpen, setCreateOpen] = useState(false);
   const {
     page,
     search: searchInput,
@@ -185,11 +330,8 @@ export function WarehouseTable() {
           noun="warehouses"
           action={
             canManage ? (
-              <AdminButton asChild aria-label="Add warehouse">
-                <Link href={`${LIST}/new`}>
-                  <Plus className="h-4 w-4" aria-hidden="true" />
-                  <span className="hidden sm:inline">Add warehouse</span>
-                </Link>
+              <AdminButton onClick={() => setCreateOpen(true)} type="button">
+                Add warehouse
               </AdminButton>
             ) : null
           }
@@ -227,9 +369,7 @@ export function WarehouseTable() {
           noun="warehouses"
           description="Add the first storage location goods are received into."
           actionLabel={canManage ? "Add your first warehouse" : undefined}
-          onAction={
-            canManage ? () => router.push(`${LIST}/new`) : undefined
-          }
+          onAction={canManage ? () => setCreateOpen(true) : undefined}
           onClear={() => {
             setSearch("");
             resetFilters();
@@ -254,6 +394,11 @@ export function WarehouseTable() {
           />
         </AdminCard>
       )}
+
+      <CreateWarehouseDialog
+        onClose={() => setCreateOpen(false)}
+        open={createOpen}
+      />
     </div>
   );
 }
@@ -265,16 +410,11 @@ const toWarehouseValues = (warehouse?: IWarehouse): WarehouseValues => ({
   location: warehouse?.location ?? "",
 });
 
-function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
-  const router = useRouter();
-  const isEdit = warehouse !== undefined;
-  const [createWarehouse, createState] = useCreateWarehouseMutation();
-  const [updateWarehouse, updateState] = useUpdateWarehouseMutation();
-  const saving = createState.isLoading || updateState.isLoading;
+function WarehouseFormFields({ warehouse }: { warehouse: IWarehouse }) {
+  const [updateWarehouse, { isLoading: saving }] = useUpdateWarehouseMutation();
 
-  // Detail screens open READ-ONLY; the Edit button unlocks the inputs. Create
-  // is always editable.
-  const [isEditing, setIsEditing] = useState(!isEdit);
+  // The record opens READ-ONLY; the Edit button unlocks the inputs.
+  const [isEditing, setIsEditing] = useState(false);
   const readOnly = !isEditing;
   // Keep disabled inputs legible as a read view rather than a greyed-out form.
   const roCls = readOnly ? "disabled:cursor-default disabled:opacity-100" : "";
@@ -302,26 +442,16 @@ function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
     const location = values.location?.trim() ?? "";
     const description = values.description?.trim() ?? "";
     try {
-      if (isEdit) {
-        await updateWarehouse({
-          id: warehouse.id,
-          body: {
-            description: description || null,
-            location: location || null,
-            name: values.name,
-          },
-        }).unwrap();
-        notify.success("Warehouse updated");
-        setIsEditing(false);
-      } else {
-        const res = await createWarehouse({
+      await updateWarehouse({
+        id: warehouse.id,
+        body: {
+          description: description || null,
+          location: location || null,
           name: values.name,
-          ...(location ? { location } : {}),
-          ...(description ? { description } : {}),
-        }).unwrap();
-        notify.success("Warehouse created");
-        router.replace(`${LIST}/${res.data.warehouse.id}`);
-      }
+        },
+      }).unwrap();
+      notify.success("Warehouse updated");
+      setIsEditing(false);
     } catch (err) {
       const { message, fieldErrors, hasFieldErrors } = extractApiError(err);
       if (hasFieldErrors && fieldErrors) {
@@ -330,16 +460,13 @@ function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
             setError(field, { message: fieldErrors[field] });
         }
       }
-      notify.error(
-        isEdit ? "Couldn't update the warehouse" : "Couldn't create the warehouse",
-        { description: message },
-      );
+      notify.error("Couldn't update the warehouse", { description: message });
     }
   };
 
   // At rest an existing record READS. The form appears after Edit is pressed,
   // rather than as a greyed-out copy of the record already on screen.
-  if (isEdit && !isEditing && warehouse) {
+  if (!isEditing) {
     return (
       <AdminCard className="px-5 py-[18px]">
         <RecordFacts
@@ -419,16 +546,12 @@ function WarehouseFormFields({ warehouse }: { warehouse?: IWarehouse }) {
         </section>
 
         <EditableFormActions
-          mode={!isEdit ? "create" : isEditing ? "editing" : "locked"}
+          mode="editing"
           saving={saving}
           createLabel="Create warehouse"
           editLabel="Edit warehouse"
           onEdit={() => setIsEditing(true)}
           onCancel={() => {
-            if (!isEdit) {
-              router.push(LIST);
-              return;
-            }
             reset();
             setIsEditing(false);
           }}
@@ -555,23 +678,6 @@ function WarehouseStockSection({ warehouseId }: { warehouseId: string }) {
         </>
       )}
     </AdminCard>
-  );
-}
-
-export function WarehouseCreate() {
-  return (
-    <div className="max-w-[640px]">
-      <DetailNav
-        crumbs={[DASHBOARD_CRUMB, { label: "Warehouses", href: LIST }]}
-        current="Add warehouse"
-      />
-      <DetailHeader
-        title="Add warehouse"
-        hint="A storage location. Stock is counted separately per warehouse."
-        sub="A storage location goods are received into and loaded out of"
-      />
-      <WarehouseFormFields />
-    </div>
   );
 }
 
