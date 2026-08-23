@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Warehouse as WarehouseIcon } from "lucide-react";
+import { Tractor, Warehouse as WarehouseIcon } from "lucide-react";
 import {
   ActionRow,
   AdminButton,
@@ -30,6 +30,7 @@ import {
 } from "@/redux/shipments/shipments-api";
 import type {
   IAvailableLot,
+  ILotSource,
   IShipment,
   IShipmentSale,
 } from "@/types/admin-shipment.types";
@@ -40,6 +41,7 @@ import {
 } from "./auto-allocate";
 import { LoadMeter } from "./load-meter";
 import { Money } from "./sale-bits";
+import { loadingFrom } from "./shipment-bits";
 
 const LIST = "/admin/shipments";
 
@@ -309,35 +311,45 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
     return lots.filter(
       (l) =>
         l.commodity.name.toLowerCase().includes(q) ||
-        l.warehouse.name.toLowerCase().includes(q),
+        l.source.name.toLowerCase().includes(q) ||
+        (l.purchaseNo?.toLowerCase().includes(q) ?? false),
     );
   }, [lots, search]);
   const filtering = search.trim().length > 0;
 
-  // The lots grouped under the shed holding them: the trip's planned sheds
-  // first, in route order, then any other warehouse with a usable lot - the
-  // backend deliberately offers those too, for when the plan falls short.
+  // The lots grouped under the place holding them - the sheds the truck calls
+  // at, then the sellers it collects from. Goods bought for a straight run to
+  // the buyer never enter a warehouse, so the second kind of group is where
+  // they appear, headed by the seller rather than by a shed they never saw.
   const lotGroups = useMemo(() => {
     const groups = new Map<
       string,
-      { lots: IAvailableLot[]; name: string; planned: boolean }
+      {
+        kind: ILotSource["kind"];
+        lots: IAvailableLot[];
+        name: string;
+        planned: boolean;
+      }
     >();
     for (const w of shipment.loadingWarehouses)
-      groups.set(w.id, { lots: [], name: w.name, planned: true });
+      groups.set(w.id, { kind: "WAREHOUSE", lots: [], name: w.name, planned: true });
+    for (const p of shipment.pickupSuppliers)
+      groups.set(p.id, { kind: "SUPPLIER", lots: [], name: p.name, planned: true });
     for (const l of visibleLots) {
-      const existing = groups.get(l.warehouse.id);
+      const existing = groups.get(l.source.id);
       if (existing) existing.lots.push(l);
       else
-        groups.set(l.warehouse.id, {
+        groups.set(l.source.id, {
+          kind: l.source.kind,
           lots: [l],
-          name: l.warehouse.name,
+          name: l.source.name,
           planned: false,
         });
     }
     return [...groups.entries()]
       .filter(([, g]) => g.lots.length > 0)
       .map(([id, g]) => ({ id, ...g }));
-  }, [visibleLots, shipment.loadingWarehouses]);
+  }, [visibleLots, shipment.loadingWarehouses, shipment.pickupSuppliers]);
 
   const activeRows = rows[activeSaleId];
   const activeSale = shipment.sales.find((s) => s.id === activeSaleId);
@@ -540,7 +552,7 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
       <DetailHeader
         title="Allocate lots"
         hint="Choose which stock goes on this truck. Cost is taken from the lots you pick."
-        sub={`Which warehouse lots fill each sale on ${shipment.truckReg} · ${shipment.originWarehouse.name} → ${shipment.destination}`}
+        sub={`Which lots fill each sale on ${shipment.truckReg} · ${loadingFrom(shipment)} → ${shipment.destination}`}
       />
 
       {!beforeDispatch ? (
@@ -552,8 +564,9 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
         <LotRowsSkeleton />
       ) : lots.length === 0 ? (
         <AdminCard className="px-5 py-4 text-[13px] text-adm-muted">
-          No stock is available in {shipment.originWarehouse.name} for these
-          sales&apos; commodities. Receive a purchase into this warehouse, or
+          No goods are available at {loadingFrom(shipment)} for these sales&apos;
+          commodities. Receive a purchase into one of this trip&apos;s
+          warehouses, receive one straight from a supplier it collects from, or
           dispatch and let the oldest-stock fallback fill the truck (it will be
           flagged estimated).
         </AdminCard>
@@ -795,10 +808,19 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                   section divider rather than another row. */}
               <div className="-mx-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-0.5 border-y border-adm-line bg-[#EFF3E7] px-4 py-2">
                 <span className="flex min-w-0 items-center gap-1.5 text-[11.5px] font-bold uppercase tracking-[0.09em] text-console">
-                  <WarehouseIcon className="h-3.5 w-3.5 flex-none" />
+                  {g.kind === "SUPPLIER" ? (
+                    <Tractor className="h-3.5 w-3.5 flex-none" />
+                  ) : (
+                    <WarehouseIcon className="h-3.5 w-3.5 flex-none" />
+                  )}
                   <span className="min-w-0 [overflow-wrap:anywhere]">
                     {g.name}
                   </span>
+                  {g.kind === "SUPPLIER" ? (
+                    <span className="flex-none rounded-none border border-console/30 px-1 py-px text-[9.5px] font-bold tracking-[0.06em]">
+                      collect
+                    </span>
+                  ) : null}
                 </span>
                 <span className="flex-none text-[11px] font-medium text-adm-muted">
                   {g.planned
@@ -837,6 +859,17 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                           {formatKg(l.remainingKg)} available ·{" "}
                           <Money value={l.unitCostGhs} />
                           /kg
+                          {/* Which consignment this is. Two loads standing at
+                              the same seller look identical without it, and
+                              the loader is picking one of them. */}
+                          {l.source.kind === "SUPPLIER" && l.purchaseNo ? (
+                            <>
+                              {" · "}
+                              <Mono className="text-[11.5px]">
+                                {l.purchaseNo}
+                              </Mono>
+                            </>
+                          ) : null}
                         </div>
                         {otherSalesKg > 0 ? (
                           <div className="text-[11.5px] text-adm-muted/80">

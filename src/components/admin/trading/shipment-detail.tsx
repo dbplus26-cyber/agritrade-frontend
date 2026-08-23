@@ -54,7 +54,11 @@ import { LoadMeter } from "./load-meter";
 import { Money, SaleStatusBadge } from "./sale-bits";
 import { hasSettledTotal, saleSettlementDeltaGhs } from "./sale-payable";
 import { ArrivalDialog } from "./shipment-arrival-dialog";
-import { CostBasisBadge, ShipmentStatusBadge } from "./shipment-bits";
+import {
+  CostBasisBadge,
+  loadingFrom,
+  ShipmentStatusBadge,
+} from "./shipment-bits";
 import { ShipmentSignatures } from "./shipment-signatures";
 import {
   AddSalesDialog,
@@ -84,15 +88,47 @@ const Absent = () => <span className="text-adm-faint">Not provided</span>;
  * argument for keeping two columns.
  */
 function SaleSettlement({ sale }: { sale: IShipmentSale }) {
-  if (!hasSettledTotal(sale)) return null;
+  const settled = hasSettledTotal(sale);
+  if (!settled && sale.arrivalLines.length === 0) return null;
   const delta = saleSettlementDeltaGhs(sale);
   return (
     <div className="mt-2 border-t border-dotted border-adm-line pt-2">
       <div className="text-[10px] font-bold tracking-[0.08em] text-adm-muted uppercase">
-        <HelpWrap text="What was agreed when the sale was struck, and what the buyer will pay now the load has been weighed in.">
+        <HelpWrap text="What went on the truck against what came off it, and what the buyer will pay now the load has been weighed in.">
           Weighed in
         </HelpWrap>
       </div>
+      {/* The weights first, and never behind financial visibility: what left
+          and what arrived is the loading record, and the person who has to
+          answer for a short load is often the one whose money fields are
+          hidden. */}
+      {sale.arrivalLines.length > 0 ? (
+        <ul className="mt-1 flex flex-col gap-0.5 text-[11.5px]">
+          {sale.arrivalLines.map((line) => {
+            const shortKg = line.dispatchedKg - line.receivedKg;
+            return (
+              <li
+                key={line.commodityId}
+                className="flex items-baseline justify-between gap-2"
+              >
+                <span className="min-w-0 text-adm-muted [overflow-wrap:anywhere]">
+                  {line.commodityName}
+                </span>
+                <Mono
+                  className={cn(
+                    "flex-none tabular-nums",
+                    shortKg > 0 ? "text-console-red" : "text-adm-ink",
+                  )}
+                >
+                  {formatKg(line.receivedKg)} of {formatKg(line.dispatchedKg)}
+                  {shortKg > 0 ? ` · ${formatKg(shortKg)} short` : ""}
+                </Mono>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+      {!settled ? null : (
       <dl className="mt-1 flex flex-col gap-0.5 text-[12px]">
         <div className="flex items-baseline justify-between gap-2">
           <dt className="text-adm-muted">Agreed</dt>
@@ -128,6 +164,7 @@ function SaleSettlement({ sale }: { sale: IShipmentSale }) {
           </div>
         ) : null}
       </dl>
+      )}
     </div>
   );
 }
@@ -184,18 +221,15 @@ export function ShipmentDetail({ id }: { id: string }) {
     s.plannedWeightKg !== null &&
     roomLeftKg > s.truckCapacityKg * UNDER_FILL_SHARE;
 
-  // Every shed this truck takes a load from, origin first. A trip that calls
-  // at two sheds moves stock out of both, and a dialog naming only the origin
-  // would be describing half the movement.
-  const loadingFrom =
-    s.loadingWarehouses.length > 0
-      ? s.loadingWarehouses.map((w) => w.name).join(" and ")
-      : s.originWarehouse.name;
+  // Everywhere this truck takes a load from: the sheds it calls at and the
+  // sellers it collects from. A trip that stops at two places moves goods out
+  // of both, and a dialog naming only the origin describes half the movement.
+  const loadsFrom = loadingFrom(s);
 
   const onDispatch = async () => {
     const ok = await confirm({
       title: "Dispatch this shipment?",
-      description: `${formatKg(s.totalWeightKg)} comes off stock at ${loadingFrom} now, and what these goods cost is frozen for this trip - a later purchase at a different price will not move this trip's profit. It cannot be undone. The server refuses this if the load is under a payment milestone the owner has not approved.`,
+      description: `${formatKg(s.totalWeightKg)} comes off stock at ${loadsFrom} now, and what these goods cost is frozen for this trip - a later purchase at a different price will not move this trip's profit. It cannot be undone. The server refuses this if the load is under a payment milestone the owner has not approved.`,
       confirmText: "Dispatch",
     });
     if (!ok) return;
@@ -684,8 +718,11 @@ export function ShipmentDetail({ id }: { id: string }) {
             {s.truckReg}
           </DetailItem>
           <DetailItem full label="Route">
-            {/* Every shed the truck calls at, in loading order, then the
-                drop. One stop is the common case and reads as before. */}
+            {/* Everywhere the truck loads, in stop order, then the drop: the
+                sheds it calls at and the sellers it collects from. One stop is
+                the common case and reads as before. A trip that only collects
+                at the farm gate starts at a seller, because there is no shed
+                it ever visits. */}
             {s.loadingWarehouses.map((w, i) => (
               <span key={w.id}>
                 {i > 0 ? " → " : ""}
@@ -695,6 +732,18 @@ export function ShipmentDetail({ id }: { id: string }) {
                 >
                   {w.name}
                 </Link>
+              </span>
+            ))}
+            {s.pickupSuppliers.map((sup, i) => (
+              <span key={sup.id}>
+                {i > 0 || s.loadingWarehouses.length > 0 ? " → " : ""}
+                <Link
+                  className={adminLinkClass}
+                  href={`/admin/suppliers/${sup.id}`}
+                >
+                  {sup.name}
+                </Link>
+                <span className="text-adm-muted"> (collect)</span>
               </span>
             ))}{" "}
             → {s.destination}
@@ -826,6 +875,26 @@ export function ShipmentDetail({ id }: { id: string }) {
                 >
                   {a.sale.transactionNo}
                 </Link>
+                {/* Where this slice was picked up. A trip that loads at two
+                    sheds, or collects half its load at a farm gate, otherwise
+                    reads as one undifferentiated pile. */}
+                <span className="ml-2 text-[11.5px] text-adm-muted">
+                  {a.source.kind === "SUPPLIER" ? "collected at " : "from "}
+                  {a.source.id ? (
+                    <Link
+                      className={adminLinkClass}
+                      href={
+                        a.source.kind === "SUPPLIER"
+                          ? `/admin/suppliers/${a.source.id}`
+                          : `/admin/warehouses/${a.source.id}`
+                      }
+                    >
+                      {a.source.name}
+                    </Link>
+                  ) : (
+                    a.source.name
+                  )}
+                </span>
               </div>
               <Mono className="whitespace-nowrap text-[13px] text-adm-ink">
                 <Money value={a.lineCostGhs} />
@@ -1026,6 +1095,13 @@ export function ShipmentDetail({ id }: { id: string }) {
   // flat grid profit carries the same weight as the three figures it is
   // derived from, leaving the one number the owner opened the page for to be
   // found among its own inputs.
+  //
+  // Once the load has been weighed in, revenue is the ARRIVAL weight at the
+  // agreed price and the cost stays whole - every kilo that left was bought
+  // and paid for. The shortfall is its own line rather than a quiet
+  // subtraction, because it is what the road cost, and it is the figure that
+  // tells an owner whether to change hauliers.
+  const weighed = s.profit.transitLossKg !== null;
   const aside = (
     <AdminCard className="p-5">
       <div className="flex items-center gap-2 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
@@ -1035,16 +1111,35 @@ export function ShipmentDetail({ id }: { id: string }) {
         <Money value={s.profit.profitGhs} />
       </Mono>
       <div className="mt-3 border-t border-adm-hairline pt-1">
-        <DetailRow label="Revenue" mono>
+        <DetailRow label={weighed ? "Revenue (arrived)" : "Revenue"} mono>
           <Money value={s.profit.revenueGhs} />
         </DetailRow>
+        {weighed ? (
+          <DetailRow label="Revenue (loaded)" mono>
+            <Money value={s.profit.revenueAgreedGhs} />
+          </DetailRow>
+        ) : null}
         <DetailRow label="Lot cost" mono>
           <Money value={s.profit.costGhs} />
         </DetailRow>
         <DetailRow label="Expenses" mono>
           <Money value={s.profit.expensesGhs} />
         </DetailRow>
+        {weighed ? (
+          <DetailRow
+            label={`Lost on the road (${formatKg(s.profit.transitLossKg ?? 0)})`}
+            mono
+          >
+            <Money value={s.profit.transitLossGhs} />
+          </DetailRow>
+        ) : null}
       </div>
+      {weighed ? (
+        <p className="mt-2 text-[11.5px] leading-[1.45] text-adm-muted">
+          The buyer pays for what arrived. What was bought and never delivered
+          stays in the cost, because it was already paid for at the farm gate.
+        </p>
+      ) : null}
       <div className="mt-3 border-t border-adm-hairline pt-3.5">{actions}</div>
     </AdminCard>
   );

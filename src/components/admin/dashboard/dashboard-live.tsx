@@ -4,7 +4,10 @@ import Link from "next/link";
 import { useState } from "react";
 import { CountUp } from "@/components/admin/count-up";
 import { HelpWrap } from "@/components/admin/help-tip";
-import { ShipmentStatusBadge } from "@/components/admin/trading/shipment-bits";
+import {
+  loadingFrom,
+  ShipmentStatusBadge,
+} from "@/components/admin/trading/shipment-bits";
 import { Money } from "@/components/admin/trading/sale-bits";
 import {
   adminLinkClass,
@@ -212,7 +215,7 @@ function TrucksCard() {
                 {t.truckReg}
               </Mono>
               <div className="truncate text-[12px] text-adm-muted">
-                {t.originWarehouse.name} → {t.destination}
+                {loadingFrom(t)} → {t.destination}
               </div>
             </div>
             <ShipmentStatusBadge status={t.status} />

@@ -95,11 +95,14 @@ export const purchasesApi = apiSlice.injectEndpoints({
       // Receiving is the STOCK event: the backend mints the lot and writes a
       // PURCHASE_RECEIPT movement in the same transaction. Without these two
       // the stock register and the movement log keep serving pre-receipt
-      // figures until something else happens to invalidate them.
+      // figures until something else happens to invalidate them. A receipt
+      // straight onto a truck writes no movement but does add to what a
+      // supplier is holding, which the planning screens read.
       invalidatesTags: (_r, _e, { id }) => [
         { type: "Purchases", id },
         { type: "Purchases", id: "LIST" },
         { type: "Stock", id: "LIST" },
+        { type: "Stock", id: "AT_SUPPLIERS" },
         { type: "StockMovements", id: "LIST" },
       ],
     }),
@@ -122,6 +125,7 @@ export const purchasesApi = apiSlice.injectEndpoints({
         { type: "Agents", id: "LIST" },
         { type: "FloatLedger", id: "LIST" },
         { type: "Stock", id: "LIST" },
+        { type: "Stock", id: "AT_SUPPLIERS" },
         { type: "StockMovements", id: "LIST" },
         // Voiding reverses every standing payment - movements come back.
         { type: "PaymentAccounts", id: "HISTORY" },

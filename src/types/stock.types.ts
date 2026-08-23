@@ -32,6 +32,29 @@ export interface IStockCommodityTotal {
   totalKg: number;
 }
 
+/**
+ * One commodity a supplier is holding for the business: goods bought at the
+ * farm gate that never entered a shed and wait there for a truck.
+ *
+ * Deliberately not part of the warehouse balances - those count what is on a
+ * floor, and this grain is not - but it is owned and paid for, and a trip can
+ * be planned around it.
+ */
+export interface ISupplierHolding {
+  commodityId: string;
+  commodityName: string;
+  /** How many separate consignments make it up. */
+  lots: number;
+  remainingKg: number;
+  supplierId: string;
+  supplierName: string;
+}
+
+export interface ISupplierHoldingsResponse {
+  message: string;
+  data: ISupplierHolding[];
+}
+
 export interface IStockBalancesResponse {
   message: string;
   data: IStockBalance[];

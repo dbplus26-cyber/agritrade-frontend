@@ -69,11 +69,30 @@ export const agentPurchaseSchema = z.object({
 });
 export type AgentPurchaseValues = z.infer<typeof agentPurchaseSchema>;
 
-export const receivePurchaseSchema = z.object({
-  receivedKg: requiredNumber("received weight in kg", 1_000_000),
-  warehouseId: z.string().min(1, "Choose the receiving warehouse"),
-  receivedAt: z.string().optional(),
-});
+/**
+ * Taking delivery, the two ways it actually happens: into a shed, or straight
+ * onto the truck that will carry the goods to the buyer.
+ *
+ * Most farm-gate loads go the second way and never see a warehouse, so the
+ * destination is a choice rather than a required warehouse - and the warehouse
+ * is required only when a shed is what was chosen.
+ */
+export const receivePurchaseSchema = z
+  .object({
+    receivedKg: requiredNumber("received weight in kg", 1_000_000),
+    destination: z.enum(["WAREHOUSE", "DIRECT"]),
+    warehouseId: z.string().optional(),
+    receivedAt: z.string().optional(),
+  })
+  .superRefine((values, ctx) => {
+    if (values.destination === "WAREHOUSE" && !values.warehouseId?.trim()) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["warehouseId"],
+        message: "Choose the receiving warehouse",
+      });
+    }
+  });
 export type ReceivePurchaseValues = z.infer<typeof receivePurchaseSchema>;
 
 /**

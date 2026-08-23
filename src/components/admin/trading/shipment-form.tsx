@@ -28,7 +28,10 @@ import {
 } from "@/redux/shipments/shipments-api";
 import { useGetDriversQuery } from "@/redux/drivers/drivers-api";
 import { useGetDeliveryAddressesQuery } from "@/redux/delivery-addresses/delivery-addresses-api";
-import { useGetStockBalancesQuery } from "@/redux/stock/stock-api";
+import {
+  useGetStockBalancesQuery,
+  useGetSupplierHoldingsQuery,
+} from "@/redux/stock/stock-api";
 import { useGetWarehousesQuery } from "@/redux/warehouses/warehouses-api";
 import { useRemoteSearch } from "@/hooks/use-remote-search";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -80,8 +83,13 @@ export function ShipmentForm({
   const eligible = useGetEligibleSalesQuery(undefined, { skip: editing });
   const warehouses = useGetWarehousesQuery({ limit: 100, isActive: true });
   // Live shed balances feed the per-warehouse figures on the shed list and
-  // the "is there enough in the selected sheds" advisory below it.
+  // the "is there enough at the chosen stops" advisory below it.
   const stock = useGetStockBalancesQuery();
+  // What sellers are holding for us: goods bought at the farm gate that never
+  // entered a shed. They are in no warehouse balance, so a trip planned to
+  // collect them has to read them from here or the cover check would call a
+  // perfectly loadable plan short.
+  const supplierHoldings = useGetSupplierHoldingsQuery();
   // Both directories are open registers: a haulier keeps adding drivers and
   // depots and never removes the old ones. Fetching a page and filtering it
   // in the browser leaves everything past the limit invisible AND
@@ -124,10 +132,11 @@ export function ShipmentForm({
           driverPhone: shipment.driverPhone ?? "",
           expectedArrivalAt: shipment.expectedArrivalAt?.slice(0, 10) ?? "",
           loadingWarehouseIds: shipment.loadingWarehouses
-            .filter((w) => w.id !== shipment.originWarehouse.id)
+            .filter((w) => w.id !== shipment.originWarehouse?.id)
             .map((w) => w.id),
           notes: shipment.notes ?? "",
-          originWarehouseId: shipment.originWarehouse.id,
+          originWarehouseId: shipment.originWarehouse?.id ?? "",
+          pickupSupplierIds: shipment.pickupSuppliers.map((p) => p.id),
           saleIds: shipment.sales.map((s) => s.id),
           truckCapacityKg:
             shipment.truckCapacityKg != null
@@ -150,6 +159,7 @@ export function ShipmentForm({
           loadingWarehouseIds: [],
           notes: "",
           originWarehouseId: "",
+          pickupSupplierIds: [],
           saleIds: saleId ? [saleId] : [],
           truckCapacityKg: "",
           truckReg: "",
@@ -161,6 +171,7 @@ export function ShipmentForm({
     useWatch({ control, name: "originWarehouseId" }) ?? "";
   const extraShedIds =
     useWatch({ control, name: "loadingWarehouseIds" }) ?? NO_SHEDS;
+  const pickupIds = useWatch({ control, name: "pickupSupplierIds" }) ?? NO_SHEDS;
   const driverId = useWatch({ control, name: "driverId" }) ?? "";
   const deliveryAddressId =
     useWatch({ control, name: "deliveryAddressId" }) ?? "";
@@ -207,7 +218,15 @@ export function ShipmentForm({
       ? extraShedIds.filter((s) => s !== id)
       : [...extraShedIds, id];
     setValue("loadingWarehouseIds", next, { shouldValidate: false });
-    clearErrors("loadingWarehouseIds");
+    clearErrors(["loadingWarehouseIds", "originWarehouseId"]);
+  };
+
+  const togglePickup = (id: string) => {
+    const next = pickupIds.includes(id)
+      ? pickupIds.filter((s) => s !== id)
+      : [...pickupIds, id];
+    setValue("pickupSupplierIds", next, { shouldValidate: false });
+    clearErrors(["pickupSupplierIds", "originWarehouseId"]);
   };
 
   const allSales = useMemo(() => eligible.data?.data.sales ?? [], [eligible.data]);
@@ -255,6 +274,10 @@ export function ShipmentForm({
     [originWarehouseId, extraShedIds],
   );
   const balances = useMemo(() => stock.data?.data ?? [], [stock.data]);
+  const holdings = useMemo(
+    () => supplierHoldings.data?.data ?? [],
+    [supplierHoldings.data],
+  );
 
   /** kg of the commodities this load needs that a shed holds - its row figure. */
   const relevantStockIn = (warehouseId: string) =>
@@ -262,25 +285,41 @@ export function ShipmentForm({
       .filter((b) => b.warehouseId === warehouseId && needed.has(b.commodityId))
       .reduce((sum, b) => sum + b.balanceKg, 0);
 
-  // Needed vs on hand across the selected sheds, per commodity. Advisory
-  // only - the backend re-checks against actual lot remainders and refuses
-  // with INSUFFICIENT_WAREHOUSE_STOCK if the ledger disagrees.
+  /** The same figure for a seller still holding goods for us. */
+  const relevantHeldBy = (supplierId: string) =>
+    holdings
+      .filter((h) => h.supplierId === supplierId && needed.has(h.commodityId))
+      .reduce((sum, h) => sum + h.remainingKg, 0);
+
+  // Needed vs available across every stop the truck makes - the sheds it
+  // calls at and the sellers it collects from. Advisory only: the backend
+  // re-checks against actual lot remainders and refuses with
+  // INSUFFICIENT_WAREHOUSE_STOCK if the ledger disagrees.
+  const stopsChosen = shedIds.length > 0 || pickupIds.length > 0;
+  const coverReady = Boolean(stock.data) && Boolean(supplierHoldings.data);
   const shortfalls = useMemo(() => {
-    if (needed.size === 0 || shedIds.length === 0 || !stock.data) return [];
+    if (needed.size === 0 || !stopsChosen || !coverReady) return [];
     const rows: { availableKg: number; name: string; neededKg: number }[] = [];
     for (const [commodityId, row] of needed) {
       if (row.kg <= 0) continue;
-      const availableKg = balances
+      const inSheds = balances
         .filter(
           (b) =>
             b.commodityId === commodityId && shedIds.includes(b.warehouseId),
         )
         .reduce((sum, b) => sum + b.balanceKg, 0);
+      const atGates = holdings
+        .filter(
+          (h) =>
+            h.commodityId === commodityId && pickupIds.includes(h.supplierId),
+        )
+        .reduce((sum, h) => sum + h.remainingKg, 0);
+      const availableKg = inSheds + atGates;
       if (availableKg < row.kg)
         rows.push({ availableKg, name: row.name, neededKg: row.kg });
     }
     return rows;
-  }, [needed, shedIds, stock.data, balances]);
+  }, [needed, shedIds, pickupIds, coverReady, balances, holdings, stopsChosen]);
 
   const capacityKg = Number(capacityRaw);
   const hasCapacity = capacityRaw.trim() !== "" && capacityKg > 0;
@@ -294,6 +333,26 @@ export function ShipmentForm({
       (warehouses.data?.data ?? []).filter((w) => w.id !== originWarehouseId),
     [warehouses.data, originWarehouseId],
   );
+
+  // Only sellers actually holding goods are offered. The whole supplier
+  // directory here would be a list of hundreds of places with nothing to
+  // collect, and ticking one of them buys the plan no cover at all.
+  const pickupOptions = useMemo(() => {
+    const bySupplier = new Map<string, { id: string; name: string; kg: number }>();
+    for (const h of holdings) {
+      const entry = bySupplier.get(h.supplierId) ?? {
+        id: h.supplierId,
+        kg: 0,
+        name: h.supplierName,
+      };
+      // The row figure counts only what THIS load needs, exactly as the shed
+      // rows do; the seller still appears when they hold something else, so a
+      // planner can see the trip would collect nothing useful there.
+      if (needed.has(h.commodityId)) entry.kg += h.remainingKg;
+      bySupplier.set(h.supplierId, entry);
+    }
+    return [...bySupplier.values()].sort((a, b) => a.name.localeCompare(b.name));
+  }, [holdings, needed]);
 
   // "The register is empty" and "this search found nothing" are different
   // answers. Only the unfiltered first page can say the book is empty, so a
@@ -350,6 +409,7 @@ export function ShipmentForm({
         await updateShipment({
           id: shipment.id,
           loadingWarehouseIds: extraSheds,
+          pickupSupplierIds: values.pickupSupplierIds ?? [],
           truckReg: values.truckReg,
           // A saved address carries the destination; free text otherwise
           // (null detaches an address picked earlier).
@@ -379,10 +439,15 @@ export function ShipmentForm({
         return;
       }
       const res = await createShipment({
-        originWarehouseId: values.originWarehouseId,
+        ...(values.originWarehouseId
+          ? { originWarehouseId: values.originWarehouseId }
+          : {}),
         saleIds: values.saleIds,
         truckReg: values.truckReg,
         ...(extraSheds.length ? { loadingWarehouseIds: extraSheds } : {}),
+        ...(values.pickupSupplierIds?.length
+          ? { pickupSupplierIds: values.pickupSupplierIds }
+          : {}),
         // A saved address carries the destination; free text otherwise.
         ...(values.deliveryAddressId
           ? { deliveryAddressId: values.deliveryAddressId }
@@ -613,21 +678,23 @@ export function ShipmentForm({
           <section className="flex flex-col gap-5 pt-3 sm:pt-6">
             <StepHead
               step={2}
-              title="Loading warehouses"
-              hint="Where the truck takes its loads. Start at the origin, then tick every other shed it will call at."
+              title="Where the truck loads"
+              hint="Start at the shed it sets off from, tick any other shed it calls at, and add the sellers it collects from on the way."
             />
             {editing && shipment ? (
               <AdminField
                 label="Origin warehouse"
-                hint="Fixed once planned - tick more sheds below instead."
+                hint="Fixed once planned - tick more stops below instead."
               >
                 <p className="rounded-none border border-adm-line bg-adm-sunken px-3 py-2 text-[13.5px] font-medium text-adm-ink">
-                  {shipment.originWarehouse.name}
+                  {shipment.originWarehouse?.name ??
+                    "None - this truck collects from suppliers"}
                 </p>
               </AdminField>
             ) : (
               <AdminField
                 label="Origin warehouse"
+                hint="Leave blank when the goods are collected straight from the supplier and never enter a shed."
                 error={errors.originWarehouseId?.message}
               >
                 <Controller
@@ -640,9 +707,12 @@ export function ShipmentForm({
                         "w-full",
                         errors.originWarehouseId && "border-console-red",
                       )}
-                      value={field.value}
-                      onChange={field.onChange}
-                      placeholder="Choose the warehouse"
+                      value={field.value ?? ""}
+                      onChange={(value) => {
+                        field.onChange(value);
+                        clearErrors("originWarehouseId");
+                      }}
+                      placeholder="No warehouse - collecting from suppliers"
                       options={(warehouses.data?.data ?? []).map((w) => ({
                         value: w.id,
                         label: w.name,
@@ -662,9 +732,7 @@ export function ShipmentForm({
               </span>
               {otherWarehouses.length === 0 ? (
                 <p className="text-[12.5px] text-adm-muted">
-                  {originWarehouseId
-                    ? "There are no other active warehouses to take loads from."
-                    : "Choose the origin warehouse first."}
+                  There are no other active warehouses to take loads from.
                 </p>
               ) : (
                 <div
@@ -718,17 +786,85 @@ export function ShipmentForm({
                 </span>
               ) : null}
             </div>
+
+            {/* The sellers this truck collects from. Goods bought at the farm
+                gate for a straight run to the buyer never enter a shed, so
+                they are picked up here rather than found in a warehouse. Only
+                sellers actually holding something appear. */}
+            <div>
+              <span className="mb-[7px] block text-[11px] uppercase tracking-[0.14em] text-adm-muted">
+                Collects from{" "}
+                <span className="normal-case tracking-normal">(optional)</span>
+              </span>
+              {pickupOptions.length === 0 ? (
+                <p className="text-[12.5px] text-adm-muted">
+                  No supplier is holding goods for collection. Goods appear here
+                  when a purchase is received straight onto a truck instead of
+                  into a warehouse.
+                </p>
+              ) : (
+                <div
+                  className={cn(
+                    "rounded-none border border-adm-line bg-[#FBFCF7]",
+                    errors.pickupSupplierIds && "border-console-red",
+                  )}
+                >
+                  {pickupOptions.map((sup) => {
+                    const ticked = pickupIds.includes(sup.id);
+                    return (
+                      <label
+                        key={sup.id}
+                        className={cn(
+                          "flex cursor-pointer items-center gap-2.5 border-b border-adm-hairline border-l-2 border-l-transparent px-3 py-2 last:border-b-0 hover:bg-adm-sunken",
+                          ticked &&
+                            "border-l-[#155744] bg-[#F1F6EE] hover:bg-[#EBF2E7]",
+                        )}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={ticked}
+                          onChange={() => togglePickup(sup.id)}
+                          className="h-4 w-4 flex-none accent-[#155744]"
+                        />
+                        <span
+                          className={cn(
+                            "min-w-0 flex-1 text-[13px] text-adm-ink [overflow-wrap:anywhere]",
+                            ticked && "font-medium",
+                          )}
+                        >
+                          {sup.name}
+                        </span>
+                        {needed.size > 0 && supplierHoldings.data ? (
+                          <Mono className="flex-none text-[12px] text-adm-muted">
+                            {formatKg(relevantHeldBy(sup.id))} of this
+                            load&apos;s goods
+                          </Mono>
+                        ) : null}
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+              {errors.pickupSupplierIds ? (
+                <span
+                  role="alert"
+                  className="mt-1 block text-[12px] font-medium text-console-red"
+                >
+                  {errors.pickupSupplierIds.message}
+                </span>
+              ) : null}
+            </div>
             {/* Live sufficiency check: needed vs on hand across every selected
                 shed. The backend re-checks against actual lot remainders. */}
-            {needed.size > 0 && shedIds.length > 0 && stock.data ? (
+            {needed.size > 0 && stopsChosen && coverReady ? (
               shortfalls.length > 0 ? (
                 <div
                   role="alert"
                   className="rounded-none border border-[#B45309]/40 bg-[#FFFBEB] px-3 py-2.5 text-[12.5px] text-[#92400E]"
                 >
                   <p className="font-semibold">
-                    There isn&apos;t enough goods in the selected warehouses to
-                    load these sales.
+                    There aren&apos;t enough goods at this trip&apos;s loading
+                    points to load these sales.
                   </p>
                   <ul className="mt-1 flex flex-col gap-0.5">
                     {shortfalls.map((s) => (
@@ -739,15 +875,15 @@ export function ShipmentForm({
                     ))}
                   </ul>
                   <p className="mt-1">
-                    Select more warehouses to take loads from, or plan a smaller
-                    load.
+                    Add another warehouse or supplier to collect from, or plan a
+                    smaller load.
                   </p>
                 </div>
               ) : (
                 <p className="flex items-center gap-1.5 text-[12.5px] font-medium text-console">
                   <Check className="h-3.5 w-3.5 flex-none" />
-                  The selected warehouse{shedIds.length === 1 ? " holds" : "s hold"}{" "}
-                  enough of every commodity for this load.
+                  This trip&apos;s loading points hold enough of every commodity
+                  for the load.
                 </p>
               )
             ) : null}

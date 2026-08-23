@@ -74,8 +74,23 @@ import {
 
 const LIST = "/admin/purchases";
 
-/** Receive dialog: actual kg into which warehouse, with live variance. */
-function ReceiveDialog({
+/**
+ * True when this purchase was taken on without a shed: received, but standing
+ * at the seller's until a truck collects it. Read off the two facts that say
+ * so rather than a flag, which is exactly what the receipt writes.
+ */
+const heldAtSupplier = (purchase: IPurchase): boolean =>
+  purchase.status === PurchaseStatus.RECEIVED && purchase.warehouse === null;
+
+/**
+ * Receive dialog: actual kg, where the goods went, with live variance.
+ *
+ * "Where they went" is a real fork, not a formality. Most of what is bought at
+ * the farm gate is driven straight to the buyer, and booking it into a shed it
+ * never entered puts two movements against that warehouse and leaves its
+ * register claiming stock that was never on the floor.
+ */
+export function ReceiveDialog({
   purchase,
   open,
   onClose,
@@ -98,6 +113,9 @@ function ReceiveDialog({
     resolver: zodResolver(receivePurchaseSchema),
     defaultValues: {
       receivedKg: String(purchase.weightKg),
+      // The purchase's own warehouse, when one was named when it was recorded,
+      // is the plan for these goods - so the shed route starts selected.
+      destination: "WAREHOUSE",
       warehouseId: purchase.warehouse?.id ?? "",
       receivedAt: todayInputValue(),
     },
@@ -105,6 +123,8 @@ function ReceiveDialog({
 
   const receivedKg = Number(watch("receivedKg")) || 0;
   const variance = purchase.weightKg - receivedKg;
+  const destination = watch("destination");
+  const direct = destination === "DIRECT";
 
   const submitReceipt = (
     values: ReceivePurchaseValues,
@@ -114,7 +134,9 @@ function ReceiveDialog({
       id: purchase.id,
       body: {
         receivedKg: Number(values.receivedKg),
-        warehouseId: values.warehouseId,
+        ...(values.destination === "DIRECT"
+          ? { direct: true }
+          : { warehouseId: values.warehouseId }),
         ...(values.receivedAt ? { receivedAt: values.receivedAt } : {}),
         ...(confirmVariance ? { confirmVariance: true } : {}),
       },
@@ -129,10 +151,14 @@ function ReceiveDialog({
     const shed =
       (warehouses.data?.data ?? []).find((w) => w.id === values.warehouseId)
         ?.name ?? "the warehouse you chose";
+    const seller = purchase.supplier?.name ?? "the supplier";
     const ok = await confirm({
-      title: "Book this stock in?",
-      description: `${formatKg(Number(values.receivedKg))} of ${purchase.commodity.name} goes into ${shed} and can be sold and shipped from there. Only a stock adjustment moves it afterwards.`,
-      confirmText: "Receive stock",
+      title: values.destination === "DIRECT" ? "Take these goods on?" : "Book this stock in?",
+      description:
+        values.destination === "DIRECT"
+          ? `${formatKg(Number(values.receivedKg))} of ${purchase.commodity.name} becomes yours where it stands at ${seller}. It joins no warehouse and shows in no shed's stock; a truck that lists ${seller} as a collection point can load it straight to the buyer.`
+          : `${formatKg(Number(values.receivedKg))} of ${purchase.commodity.name} goes into ${shed} and can be sold and shipped from there. Only a stock adjustment moves it afterwards.`,
+      confirmText: values.destination === "DIRECT" ? "Take them on" : "Receive stock",
     });
     if (!ok) return;
 
@@ -171,7 +197,11 @@ function ReceiveDialog({
       onClose();
       return;
     }
-    notify.success("Purchase received - stock is now on hand");
+    notify.success(
+      direct
+        ? "Purchase received - held at the supplier for collection"
+        : "Purchase received - stock is now on hand",
+    );
     onClose();
   };
 
@@ -180,11 +210,11 @@ function ReceiveDialog({
       <ResponsiveDialog open={open} onOpenChange={(o) => !o && onClose()}>
         <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[440px]">
           <ResponsiveDialogHeader>
-            <ResponsiveDialogTitle>Receive into warehouse</ResponsiveDialogTitle>
+            <ResponsiveDialogTitle>Receive purchase</ResponsiveDialogTitle>
             <ResponsiveDialogDescription>
               The recorded weight was {formatKg(purchase.weightKg)}. Enter what
-              the warehouse scale actually says - the difference is kept as
-              variance, never silently absorbed.
+              the scale actually says - the difference is kept as variance,
+              never silently absorbed.
             </ResponsiveDialogDescription>
           </ResponsiveDialogHeader>
           <form
@@ -215,27 +245,105 @@ function ReceiveDialog({
                   : `${formatKg(Math.abs(variance))} more than recorded.`}
               </p>
             ) : null}
-            <AdminField
-              label="Warehouse"
-              error={errors.warehouseId?.message}
-            >
+            {/* Where the goods actually went. Two radios rather than a
+                "no warehouse" option inside the shed picker: this is a
+                decision about the physical world - a shed took them in, or
+                they never left the seller's yard - and the choice changes
+                which stock ledger, if any, moves. */}
+            {/* A fieldset, not an AdminField: that wraps its content in a
+                <label>, and a label around two radios hands the first one the
+                whole group's text as its name - the two choices then announce
+                as each other. A group needs a legend. */}
+            <fieldset className="flex flex-col">
+              <legend className="mb-1 text-[13px] font-semibold text-adm-ink">
+                Where the goods went
+              </legend>
               <Controller
                 control={control}
-                name="warehouseId"
+                name="destination"
                 render={({ field }) => (
-                  <SearchableSelect
-                    value={field.value}
-                    onChange={field.onChange}
-                    options={(warehouses.data?.data ?? []).map((w) => ({
-                      value: w.id,
-                      label: w.name,
-                    }))}
-                    placeholder="Choose the warehouse"
-                    className={cn(errors.warehouseId && "border-console-red")}
-                  />
+                  <div className="flex flex-col gap-2">
+                    {[
+                      {
+                        hint: "They go onto a shed's floor and are sold and shipped from there.",
+                        label: "Into a warehouse",
+                        value: "WAREHOUSE" as const,
+                      },
+                      {
+                        hint: "They stay where they were bought until a truck collects them for the buyer. No shed holds them.",
+                        label: "Straight to a buyer, no warehouse",
+                        value: "DIRECT" as const,
+                      },
+                    ].map((choice) => (
+                      // Explicit id/for, not a wrapping label alone: the
+                      // second line is a sentence, and without the
+                      // association the two choices announce as each other's
+                      // text run together.
+                      <label
+                        key={choice.value}
+                        htmlFor={`receive-destination-${choice.value}`}
+                        className={cn(
+                          "flex cursor-pointer items-start gap-2.5 rounded-none border border-adm-line px-3 py-2.5 hover:bg-adm-sunken",
+                          field.value === choice.value &&
+                            "border-[#155744] bg-[#F1F6EE] hover:bg-[#EBF2E7]",
+                        )}
+                      >
+                        <input
+                          type="radio"
+                          id={`receive-destination-${choice.value}`}
+                          className="mt-0.5 h-4 w-4 flex-none accent-[#155744]"
+                          checked={field.value === choice.value}
+                          onChange={() => field.onChange(choice.value)}
+                          name={field.name}
+                          value={choice.value}
+                          aria-describedby={`receive-destination-${choice.value}-hint`}
+                        />
+                        <span className="min-w-0">
+                          <span className="block text-[13px] font-medium text-adm-ink">
+                            {choice.label}
+                          </span>
+                          <span
+                            id={`receive-destination-${choice.value}-hint`}
+                            className="mt-0.5 block text-[11.5px] leading-[1.4] text-adm-muted"
+                          >
+                            {choice.hint}
+                          </span>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
                 )}
               />
-            </AdminField>
+            </fieldset>
+            {direct ? (
+              <p className="text-[12.5px] leading-[1.45] text-adm-muted">
+                {purchase.supplier
+                  ? `These goods stay at ${purchase.supplier.name} and appear on a shipment when the truck lists them as a collection point.`
+                  : "Name the supplier on this purchase first - a load kept at the farm gate is found by whose yard it is standing in."}
+              </p>
+            ) : (
+              <AdminField
+                label="Warehouse"
+                error={errors.warehouseId?.message}
+              >
+                <Controller
+                  control={control}
+                  name="warehouseId"
+                  render={({ field }) => (
+                    <SearchableSelect
+                      value={field.value ?? ""}
+                      onChange={field.onChange}
+                      options={(warehouses.data?.data ?? []).map((w) => ({
+                        value: w.id,
+                        label: w.name,
+                      }))}
+                      placeholder="Choose the warehouse"
+                      className={cn(errors.warehouseId && "border-console-red")}
+                    />
+                  )}
+                />
+              </AdminField>
+            )}
             <AdminField label="Received date" optional>
               <DateInput
                 className={adminInputClass}
@@ -258,7 +366,11 @@ function ReceiveDialog({
                 loading={isLoading}
                 size="lg"
               >
-                {isLoading ? "Receiving…" : "Receive stock"}
+                {isLoading
+                  ? "Receiving…"
+                  : direct
+                    ? "Take them on"
+                    : "Receive stock"}
               </AdminButton>
             </ResponsiveDialogFooter>
           </form>
@@ -423,7 +535,7 @@ export function PurchaseDetail({ id }: { id: string }) {
         ) : null}
         {canReceive ? (
           <AdminButton onClick={() => setReceiveOpen(true)}>
-            Receive into warehouse
+            Receive purchase
           </AdminButton>
         ) : null}
         {canVoid ? (
@@ -581,7 +693,12 @@ export function PurchaseDetail({ id }: { id: string }) {
               <SectionHeading className="mb-1">Parties & logistics</SectionHeading>
               <DetailGrid>
                 <DetailItem label="Source">{SOURCE_LABEL[p.source]}</DetailItem>
-                <DetailItem label="Warehouse">
+                {/* Where the goods are. A purchase received without a shed
+                    was taken on where it stood: it is owned and costed, it is
+                    in no warehouse balance, and it waits at the seller's for a
+                    truck. Saying "not yet assigned" for those would read as an
+                    unfinished receipt rather than a deliberate one. */}
+                <DetailItem label={heldAtSupplier(p) ? "Held at" : "Warehouse"}>
                   {p.warehouse ? (
                     <Link
                       className={adminLinkClass}
@@ -589,6 +706,19 @@ export function PurchaseDetail({ id }: { id: string }) {
                     >
                       {p.warehouse.name}
                     </Link>
+                  ) : heldAtSupplier(p) && p.supplier ? (
+                    <span>
+                      <Link
+                        className={adminLinkClass}
+                        href={`/admin/suppliers/${p.supplier.id}`}
+                      >
+                        {p.supplier.name}
+                      </Link>
+                      <span className="text-adm-muted">
+                        {" "}
+                        - no warehouse, for collection
+                      </span>
+                    </span>
                   ) : (
                     "Not yet assigned"
                   )}

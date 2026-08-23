@@ -49,11 +49,13 @@ import {
 } from "@/validations/stock-schema";
 import { Kg } from "./stock-bits";
 import { StockMovements } from "./stock-movements";
+import { SupplierHoldings } from "./supplier-holdings";
 
-type Section = "balances" | "movements";
+type Section = "at-suppliers" | "balances" | "movements";
 
 const SECTION_TABS: readonly ConsoleTab<Section>[] = [
   { value: "balances", label: "Balances" },
+  { value: "at-suppliers", label: "At suppliers" },
   { value: "movements", label: "Movements" },
 ];
 
@@ -253,6 +255,8 @@ export function StockView() {
           action={adjustButton}
           leading={sectionTabs}
         />
+      ) : section === "at-suppliers" ? (
+        <SupplierHoldings action={adjustButton} leading={sectionTabs} />
       ) : (
         <>
           {/* Per-commodity grand totals with each commodity's share of the

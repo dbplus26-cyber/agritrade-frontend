@@ -75,6 +75,7 @@ export const FIELD_NAMES = [
   "saleIds",
   "originWarehouseId",
   "loadingWarehouseIds",
+  "pickupSupplierIds",
   "deliveryAddressId",
   "destination",
   "truckReg",

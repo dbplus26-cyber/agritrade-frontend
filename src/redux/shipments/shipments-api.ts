@@ -161,11 +161,13 @@ export const shipmentsApi = apiSlice.injectEndpoints({
         },
       }),
       // Dispatch deducts stock, may fulfil the sales, and moves each sale's
-      // remaining (shippable) weight.
+      // remaining (shippable) weight. A farm-gate slice moves no shed balance
+      // but does empty what its supplier was holding.
       invalidatesTags: (_r, _e, { id }) => [
         { type: "Shipments", id },
         { type: "Shipments", id: "LIST" },
         { type: "Stock", id: "LIST" },
+        { type: "Stock", id: "AT_SUPPLIERS" },
         { type: "StockMovements", id: "LIST" },
         { type: "Sales", id: "LIST" },
         { type: "EligibleSales", id: "LIST" },

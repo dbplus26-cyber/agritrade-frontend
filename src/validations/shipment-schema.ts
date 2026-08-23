@@ -17,11 +17,20 @@ const optionalWeight = z
 export const shipmentSchema = z
   .object({
     saleIds: z.array(z.string()).min(1, "Choose at least one sale"),
-    originWarehouseId: z.string().min(1, "Choose the origin warehouse"),
+    /**
+     * Optional: a trip that only collects at the farm gate starts at no shed.
+     * The refinement below still requires SOME loading point.
+     */
+    originWarehouseId: z.string().optional(),
     /** Further sheds the truck also calls at; the origin is always included. */
     loadingWarehouseIds: z
       .array(z.string())
       .max(10, "A trip can call at 10 warehouses at most")
+      .optional(),
+    /** Suppliers the truck collects from, for goods that skip the warehouse. */
+    pickupSupplierIds: z
+      .array(z.string())
+      .max(10, "A trip can collect from 10 suppliers at most")
       .optional(),
     /** A saved delivery address; "" means "enter the destination manually". */
     deliveryAddressId: z.string().optional(),
@@ -53,8 +62,21 @@ export const shipmentSchema = z
     notes: z.string().trim().max(1000).or(z.literal("")).optional(),
   })
   .superRefine((values, ctx) => {
-    // Mirrors the backend: destination is optional only with a saved address;
-    // driverName/driverPhone are required unless a directory driver is given.
+    // Mirrors the backend: the truck has to load somewhere, destination is
+    // optional only with a saved address, and driverName/driverPhone are
+    // required unless a directory driver backfills them.
+    if (
+      !values.originWarehouseId &&
+      !values.loadingWarehouseIds?.length &&
+      !values.pickupSupplierIds?.length
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["originWarehouseId"],
+        message:
+          "Say where this truck loads - a warehouse, a supplier to collect from, or both",
+      });
+    }
     if (!values.deliveryAddressId && !values.destination?.trim()) {
       ctx.addIssue({
         code: "custom",

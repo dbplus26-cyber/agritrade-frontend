@@ -30,6 +30,7 @@ import {
   SHIPMENT_STATUS_FILTER_OPTIONS,
   ShipmentStatusBadge,
   formatShipmentDate,
+  loadingFrom,
 } from "./shipment-bits";
 
 const LIST = "/admin/shipments";
@@ -193,7 +194,7 @@ export function ShipmentsRegister() {
                 </div>
 
                 <div className="mt-2 line-clamp-2 text-[15px] leading-[1.35] font-semibold text-adm-ink [overflow-wrap:anywhere]">
-                  {sh.originWarehouse.name} → {sh.destination}
+                  {loadingFrom(sh)} → {sh.destination}
                 </div>
 
                 {buyers ? (

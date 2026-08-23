@@ -15,6 +15,18 @@ export type ShipmentStatus =
   | "LOADING"
   | "PLANNED";
 
+/**
+ * Where a lot is held. Most goods sit in a shed; a load bought for a straight
+ * run to the buyer never enters one and stands with the seller until a truck
+ * collects it, so the picker, the waybill and every refusal that names a place
+ * have to be able to say either.
+ */
+export interface ILotSource {
+  id: string;
+  kind: "SUPPLIER" | "WAREHOUSE";
+  name: string;
+}
+
 export interface IShipmentAllocation {
   id: string;
   lotId: string;
@@ -24,6 +36,8 @@ export interface IShipmentAllocation {
   lineCostGhs: number | null;
   /** The sale this slice fulfils (null on legacy rows). */
   sale: { id: string; transactionNo: string };
+  /** Where these goods were picked up. */
+  source: ILotSource;
 }
 
 export interface IShipmentExpense {
@@ -53,10 +67,24 @@ export interface IShipmentSaleLine {
   outstandingKg: number;
 }
 
+/** What one commodity on one sale weighed in at, against what left. */
+export interface IShipmentArrivalLine {
+  commodityId: string;
+  commodityName: string;
+  /** What went on the truck for this sale. */
+  dispatchedKg: number;
+  /** What came off it at the other end. */
+  receivedKg: number;
+  /** The shortfall valued at what those goods cost us. Redacted money. */
+  lossValueGhs: number | null;
+}
+
 export interface IShipmentSale {
   id: string;
   transactionNo: string;
   lines: IShipmentSaleLine[];
+  /** What came off the truck for this sale. Empty until it is weighed in. */
+  arrivalLines: IShipmentArrivalLine[];
   status: SaleStatus;
   buyer: { id: string; name: string; phone: string | null };
   agreedTotalGhs: number | null;
@@ -135,12 +163,18 @@ export interface IShipment {
   /** One or more sales this truck fulfils. */
   sales: IShipmentSale[];
   salesCount: number;
-  originWarehouse: { id: string; name: string };
+  /** Null on a trip that only collects at the farm gate. */
+  originWarehouse: { id: string; name: string } | null;
   /**
-   * Every shed this truck calls at to take loads, origin first. Always has
-   * at least one entry (the origin, for plans made before multi-shed).
+   * Every shed this truck calls at to take loads, origin first. Empty on a
+   * trip that loads nothing out of a warehouse.
    */
   loadingWarehouses: { id: string; name: string }[];
+  /**
+   * Suppliers the truck collects from. Goods bought for a straight run to the
+   * buyer never enter a shed, and this is where they are picked up.
+   */
+  pickupSuppliers: { id: string; name: string }[];
   destination: string;
   /** The saved delivery address the destination came from, if any. */
   deliveryAddress: IShipmentDeliveryAddress | null;
@@ -175,12 +209,28 @@ export interface IShipment {
   manifest: IManifestLine[];
   allocations: IShipmentAllocation[];
   expenses: IShipmentExpense[];
+  /**
+   * The trip's money, on the same basis the profit report uses. Revenue is
+   * stated twice because the business bought what LEFT and is paid for what
+   * ARRIVED: cost stays whole either way, and the gap between the two is what
+   * the road cost, not a discount.
+   */
   profit: {
     costBasis: string;
+    /** Revenue on the arrival weight, falling back to the loaded one. */
     revenueGhs: number | null;
+    /** Revenue on the loaded weight: what the sales were struck at. */
+    revenueAgreedGhs: number | null;
     costGhs: number | null;
+    /** Inside costGhs and stated apart: what the goods brought with them. */
+    acquisitionGhs: number | null;
     expensesGhs: number | null;
     profitGhs: number | null;
+    /** What the trip was expected to make when it was loaded. */
+    profitAgreedGhs: number | null;
+    /** Null until something on this trip has been re-weighed. */
+    transitLossGhs: number | null;
+    transitLossKg: number | null;
   };
   notes: string | null;
   cancelReason: string | null;
@@ -194,12 +244,14 @@ export interface IShipment {
 }
 
 export interface IAvailableLot {
-  /** The shed the lot sits in - the picker groups by it. */
-  warehouse: { id: string; name: string };
+  /** Where the goods stand - the picker groups by it. */
+  source: ILotSource;
   id: string;
   commodity: { id: string; name: string };
   remainingKg: number;
   unitCostGhs: number | null;
+  /** The consignment a farm-gate lot came off, so two are tellable apart. */
+  purchaseNo: string | null;
 }
 
 /** One commodity line on an eligible (shippable) sale. */
@@ -262,7 +314,8 @@ export interface IShipmentListQuery {
 export interface ICreateShipmentInput {
   /** The confirmed sales this truck fulfils (1-20). */
   saleIds: string[];
-  originWarehouseId: string;
+  /** Optional: a trip that only collects at the farm gate starts at no shed. */
+  originWarehouseId?: string;
   /** Free-text destination; optional when `deliveryAddressId` is given. */
   destination?: string;
   /** A saved delivery address to ship to (snapshots onto the shipment). */
@@ -281,6 +334,8 @@ export interface ICreateShipmentInput {
   truckCapacityKg?: number;
   /** Further sheds the truck also loads at, beyond the origin (max 10). */
   loadingWarehouseIds?: string[];
+  /** Suppliers the truck collects from on the way (max 10). */
+  pickupSupplierIds?: string[];
   expectedArrivalAt?: string;
   notes?: string;
 }
@@ -306,6 +361,7 @@ export interface IUpdateShipmentInput {
   driverIdNumber?: string;
   truckCapacityKg?: number | null;
   loadingWarehouseIds?: string[];
+  pickupSupplierIds?: string[];
   expectedArrivalAt?: string | null;
   notes?: string | null;
 }

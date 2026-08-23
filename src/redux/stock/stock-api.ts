@@ -7,6 +7,7 @@ import type {
   IStockBalancesResponse,
   IStockMovementsQuery,
   IStockMovementsResponse,
+  ISupplierHoldingsResponse,
 } from "@/types/stock.types";
 
 /** The stock ledger, mirroring the backend `/admin/stock` surface. */
@@ -18,6 +19,12 @@ export const stockApi = apiSlice.injectEndpoints({
     >({
       query: (params) => `admin/stock/balances${toQueryString(params ?? {})}`,
       providesTags: [{ type: "Stock", id: "LIST" }],
+    }),
+
+    /** Goods owned but standing at a supplier's, waiting to be collected. */
+    getSupplierHoldings: builder.query<ISupplierHoldingsResponse, void>({
+      query: () => "admin/stock/at-suppliers",
+      providesTags: [{ type: "Stock", id: "AT_SUPPLIERS" }],
     }),
 
     getStockMovements: builder.query<
@@ -50,5 +57,6 @@ export const stockApi = apiSlice.injectEndpoints({
 export const {
   useGetStockBalancesQuery,
   useGetStockMovementsQuery,
+  useGetSupplierHoldingsQuery,
   useRequestStockAdjustmentMutation,
 } = stockApi;

@@ -292,6 +292,12 @@ export interface IAgentCreatePurchaseInput {
 export interface IReceivePurchaseInput {
   receivedKg: number;
   warehouseId?: string;
+  /**
+   * The goods never enter a shed: they stay with the supplier until a truck
+   * collects them for the buyer. Exclusive with `warehouseId` - a receipt that
+   * named both would be describing two different events.
+   */
+  direct?: boolean;
   receivedAt?: string;
   /**
    * Acknowledges a warehouse weight that differs from the recorded village

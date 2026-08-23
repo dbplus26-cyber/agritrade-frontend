@@ -3,7 +3,42 @@
 import { HelpWrap } from "@/components/admin/help-tip";
 import { ToneBadge, type Tone } from "@/components/admin/ui";
 import { formatDateTime } from "@/lib/format-date";
-import type { ShipmentStatus } from "@/types/admin-shipment.types";
+import type { IShipment, ShipmentStatus } from "@/types/admin-shipment.types";
+
+/**
+ * Everywhere this truck loads, in the words a person would use: the sheds it
+ * calls at, then the sellers it collects from.
+ *
+ * One helper rather than a line of its own on each screen, because the answer
+ * has three shapes - sheds only, farm gates only, or both - and a screen that
+ * still reaches for the origin warehouse alone names half the movement, or
+ * nothing at all on a trip that never visits a shed.
+ */
+export function loadingPointsOf(
+  shipment: Pick<
+    IShipment,
+    "loadingWarehouses" | "originWarehouse" | "pickupSuppliers"
+  >,
+): string[] {
+  const sheds =
+    shipment.loadingWarehouses.length > 0
+      ? shipment.loadingWarehouses.map((w) => w.name)
+      : shipment.originWarehouse
+        ? [shipment.originWarehouse.name]
+        : [];
+  return [...sheds, ...shipment.pickupSuppliers.map((p) => p.name)];
+}
+
+/** The same list as one phrase, for a sentence or a header line. */
+export function loadingFrom(
+  shipment: Pick<
+    IShipment,
+    "loadingWarehouses" | "originWarehouse" | "pickupSuppliers"
+  >,
+): string {
+  const points = loadingPointsOf(shipment);
+  return points.length > 0 ? points.join(" and ") : "no loading point yet";
+}
 
 const SHIPMENT_STATUS: Record<ShipmentStatus, { label: string; tone: Tone }> = {
   ARRIVED: { label: "Arrived", tone: "leaf" },
