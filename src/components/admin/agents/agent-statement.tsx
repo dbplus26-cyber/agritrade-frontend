@@ -6,7 +6,10 @@ import {
   AdminPageHeader,
   Mono,
 } from "@/components/admin/ui";
-import { ConsoleDateRange } from "@/components/admin/filter-bar";
+import {
+  ConsoleDateRange,
+  ConsoleFieldHeight,
+} from "@/components/admin/filter-bar";
 import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { HelpWrap } from "@/components/admin/help-tip";
 import { DocumentSkeleton } from "@/components/admin/skeletons";
@@ -147,47 +150,52 @@ export function AgentStatement({ id }: { id: string }) {
         backLabel="Back to agent"
       />
       <AdminPageHeader
-        className="print:hidden"
+        className="mb-4 print:hidden"
         title="Agent float statement"
         hint="Every movement in and out of this agent's money, in order."
         sub="Every top-up, purchase and expense against the cash this agent holds, ready to print and sign"
-        actions={
-          <>
-            {/* The window belongs to the DOCUMENT, not to a list, so it is a
-                page-level control beside the heading rather than a toolbar
-                filter. */}
-            <ConsoleDateRange
-              from={from}
-              to={to}
-              onFromChange={setFrom}
-              onToChange={setTo}
-            />
-            {windowed ? (
-              <AdminButton
-                variant="outline"
-                onClick={() => {
-                  setFrom("");
-                  setTo("");
-                }}
-              >
-                All history
-              </AdminButton>
-            ) : null}
-            {/* The server renders this ledger as a paginated A4 PDF, window
-                and all - printing happens from the viewer, which previews the
-                sheet true to size instead of the browser dialog's guesswork. */}
-            <AdminButton asChild>
-              <a
-                href={receiptPdfUrl("agent-statement", id, { from, to })}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View PDF
-              </a>
-            </AdminButton>
-          </>
-        }
       />
+
+      {/* The window belongs to the DOCUMENT, not to a list, so it is a
+          page-level control rather than a toolbar filter - and it sits under
+          the heading on the same edge as the sheet it acts on, instead of
+          across the page from it. Every control on the row is one height and
+          they share a baseline: the dates carry labels and the buttons do
+          not, so aligning their tops would hang the buttons in the air. */}
+      <div className="mb-6 flex flex-wrap items-end gap-2 print:hidden">
+        <ConsoleFieldHeight>
+          <ConsoleDateRange
+            className="w-auto"
+            from={from}
+            to={to}
+            onFromChange={setFrom}
+            onToChange={setTo}
+          />
+        </ConsoleFieldHeight>
+        {windowed ? (
+          <AdminButton
+            variant="outline"
+            onClick={() => {
+              setFrom("");
+              setTo("");
+            }}
+          >
+            All history
+          </AdminButton>
+        ) : null}
+        {/* The server renders this ledger as a paginated A4 PDF, window and
+            all - printing happens from the viewer, which previews the sheet
+            true to size instead of the browser dialog's guesswork. */}
+        <AdminButton asChild>
+          <a
+            href={receiptPdfUrl("agent-statement", id, { from, to })}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View PDF
+          </a>
+        </AdminButton>
+      </div>
 
       {/* Left-aligned like every other console page - the sheet keeps its own
           720px measure so it still reads as a piece of paper. */}

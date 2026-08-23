@@ -15,6 +15,7 @@ import {
   DetailShell,
   Mono,
   SectionHeading,
+  ToneBadge,
   TONES,
   type Tone,
 } from "@/components/admin/ui";
@@ -202,9 +203,27 @@ function FigureLine({
 }
 
 /** Column headings for the ledger, so the two figure columns are named. */
+/** One labelled fact on the identity band. */
+function IdentityFact({
+  children,
+  label,
+}: {
+  children: React.ReactNode;
+  label: string;
+}) {
+  return (
+    <div className="min-w-0">
+      <dt className="text-[10px] font-bold tracking-[0.1em] text-adm-faint uppercase">
+        {label}
+      </dt>
+      <dd className="mt-0.5 min-w-0 text-[11.5px] text-adm-ink">{children}</dd>
+    </div>
+  );
+}
+
 function LedgerHead({ withBalance }: { withBalance: boolean }) {
   return (
-    <div className="grid grid-cols-[24px_minmax(0,1fr)_minmax(124px,max-content)] items-baseline gap-x-3 border-b-[1.5px] border-adm-line pb-1.5 text-[10px] font-bold tracking-[0.12em] text-adm-faint uppercase @md/ledger:grid-cols-[24px_minmax(0,1fr)_minmax(124px,max-content)_minmax(124px,max-content)]">
+    <div className="grid grid-cols-[24px_minmax(0,1fr)_minmax(124px,max-content)] items-baseline gap-x-3 border-b-[1.5px] border-adm-line pb-1.5 text-[10px] font-bold tracking-[0.12em] text-adm-faint uppercase @2xl/ledger:grid-cols-[24px_minmax(0,1fr)_minmax(124px,max-content)_minmax(124px,max-content)]">
       <span aria-hidden="true" />
       <span className="inline-flex min-w-0 items-center gap-1">
         <span className="min-w-0">Entry</span>
@@ -215,7 +234,7 @@ function LedgerHead({ withBalance }: { withBalance: boolean }) {
       </span>
       <span className="text-right">Amount</span>
       {withBalance ? (
-        <span className="hidden text-right @md/ledger:block">
+        <span className="hidden text-right @2xl/ledger:block">
           <span className="inline-flex items-center gap-1">
             <span className="min-w-0">Balance after</span>
             <HelpTip
@@ -258,7 +277,7 @@ function LedgerRow({
   withBalanceColumn: boolean;
 }) {
   return (
-    <div className="grid grid-cols-[24px_minmax(0,1fr)_minmax(124px,max-content)] items-start gap-x-3 border-b border-adm-hairline py-2.5 last:border-b-0 @md/ledger:grid-cols-[24px_minmax(0,1fr)_minmax(124px,max-content)_minmax(124px,max-content)]">
+    <div className="grid grid-cols-[24px_minmax(0,1fr)_minmax(124px,max-content)] items-start gap-x-3 border-b border-adm-hairline py-2.5 last:border-b-0 @2xl/ledger:grid-cols-[24px_minmax(0,1fr)_minmax(124px,max-content)_minmax(124px,max-content)]">
       <TxMarker type={tx.type} />
       <div className="min-w-0">
         <p className="min-w-0 text-[11.5px] leading-snug text-adm-ink [overflow-wrap:anywhere]">
@@ -275,14 +294,14 @@ function LedgerRow({
         {/* Narrow cards have no room for a fourth track, so the balance rides
             under the entry rather than being dropped from the page. */}
         {balanceAfter !== undefined ? (
-          <Mono className="mt-1 block text-[10.5px] text-adm-faint @md/ledger:hidden">
+          <Mono className="mt-1 block text-[10.5px] text-adm-faint @2xl/ledger:hidden">
             Balance after {formatCedis(balanceAfter)}
           </Mono>
         ) : null}
       </div>
       <SignedAmount amount={tx.amountGhs} />
       {withBalanceColumn ? (
-        <Mono className="hidden text-right text-[11.5px] whitespace-nowrap text-adm-ink @md/ledger:block">
+        <Mono className="hidden text-right text-[11.5px] whitespace-nowrap text-adm-ink @2xl/ledger:block">
           {balanceAfter === undefined ? (
             <span className="text-adm-faint">-</span>
           ) : (
@@ -735,6 +754,43 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
           spending authority debits the company's wallet without touching one.
           A reader who saw only the ledger read an agent who had moved thousands
           of the company's money as having spent nothing. */}
+      {/* Who this is, before anything about their money. A band rather than a
+          stack: an avatar beside a name and four short facts is a row, and
+          spending a column of the page on it puts the ledger below the fold. */}
+      <AdminCard className="mb-4 flex flex-wrap items-center gap-x-6 gap-y-3 px-5 py-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <ViewablePhoto name={name} size={52} src={agent.profilePicture} />
+          <div className="min-w-0">
+            <p className="min-w-0 text-[13.5px] font-bold text-adm-ink [overflow-wrap:anywhere]">
+              {name}
+            </p>
+            <p className="text-[11px] text-adm-muted">
+              Joined {formatDateTime(agent.createdAt)}
+            </p>
+          </div>
+        </div>
+        <dl className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-8 gap-y-2">
+          <IdentityFact label="Status">
+            <ToneBadge tone={agent.isActive ? "leaf" : "slate"}>
+              {agent.isActive ? "Active" : "Suspended"}
+            </ToneBadge>
+          </IdentityFact>
+          <IdentityFact label="Region">
+            {agent.region ?? <span className="text-adm-faint">Not set</span>}
+          </IdentityFact>
+          <IdentityFact label="Phone">
+            {agent.phone ? (
+              <Mono className="text-[11.5px]">{agent.phone}</Mono>
+            ) : (
+              <span className="text-adm-faint">Not set</span>
+            )}
+          </IdentityFact>
+          <IdentityFact label="Email">
+            <span className="[overflow-wrap:anywhere]">{agent.email}</span>
+          </IdentityFact>
+        </dl>
+      </AdminCard>
+
       <AgentMoneySummaryCard agentUserId={agentUserId} />
 
       {/* The ledger card names its own container: the fourth (balance) track
@@ -800,21 +856,6 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
                   "border-console-red/40 bg-console-red/[0.04]",
               )}
             >
-              <div className="mb-3 flex items-center gap-3 border-b border-adm-hairline pb-3">
-                <ViewablePhoto
-                  name={name}
-                  size={56}
-                  src={agent.profilePicture}
-                />
-                <div className="min-w-0">
-                  <p className="min-w-0 text-[12px] font-bold text-adm-ink line-clamp-1 [overflow-wrap:anywhere]">
-                    {name}
-                  </p>
-                  <p className="text-[11px] text-adm-muted">
-                    Joined {formatDateTime(agent.createdAt)}
-                  </p>
-                </div>
-              </div>
               {/* The figures as ONE block: the headline float, then the
                   supporting numbers as ruled label/value lines sharing a right
                   edge. As three loose sentences the eye has to hunt for the

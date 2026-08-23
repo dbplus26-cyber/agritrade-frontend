@@ -1,7 +1,17 @@
 "use client";
 
-import { Controller, type Control, type FieldErrors, type Path, type UseFormRegister } from "react-hook-form";
-import { AdminField, adminInputClass, adminSelectClass } from "@/components/admin/ui";
+import {
+  Controller,
+  type Control,
+  type FieldErrors,
+  type Path,
+  type UseFormRegister,
+} from "react-hook-form";
+import {
+  AdminField,
+  adminInputClass,
+  adminSelectClass,
+} from "@/components/admin/ui";
 import { PaymentAccountField } from "@/components/admin/payment-account-field";
 import { SimpleSelect } from "@/components/ui/simple-select";
 import { PAYMENT_METHOD_OPTIONS } from "@/components/admin/trading/sale-bits";
@@ -45,7 +55,9 @@ export function ExpensePaymentFields<T extends ExpensePaymentValues>({
   paidNow: boolean;
   register: UseFormRegister<T>;
 }) {
-  const fieldError = (name: "paymentAccountId" | "reference"): string | undefined =>
+  const fieldError = (
+    name: "paymentAccountId" | "reference",
+  ): string | undefined =>
     (errors[name as keyof FieldErrors<T>] as { message?: string } | undefined)
       ?.message;
 
@@ -92,39 +104,43 @@ export function ExpensePaymentFields<T extends ExpensePaymentValues>({
 
       {paidNow ? (
         <>
-          <AdminField label="How it was paid">
+          {/* The tender and the account it left are one answer in two parts,
+              and neither needs a row of its own to hold a single line. */}
+          <div className="grid gap-5 sm:grid-cols-2">
+            <AdminField label="How it was paid">
+              <Controller
+                control={control}
+                name={"method" as Path<T>}
+                render={({ field }) => (
+                  <SimpleSelect
+                    className={adminSelectClass}
+                    id={`${idPrefix}-method`}
+                    onChange={field.onChange}
+                    placeholder="Choose how it was paid"
+                    options={PAYMENT_METHOD_OPTIONS}
+                    value={field.value as string}
+                  />
+                )}
+              />
+            </AdminField>
+
+            {/* Offered for cash too: somebody who pays for a repair out of the
+              money they are holding is where that money went, and booking it
+              to the office till says the cash is in a box it left. */}
             <Controller
               control={control}
-              name={"method" as Path<T>}
+              name={"paymentAccountId" as Path<T>}
               render={({ field }) => (
-                <SimpleSelect
-                  className={adminSelectClass}
-                  id={`${idPrefix}-method`}
+                <PaymentAccountField
+                  direction="out"
+                  error={fieldError("paymentAccountId")}
+                  method={method}
                   onChange={field.onChange}
-                  placeholder="Choose how it was paid"
-                  options={PAYMENT_METHOD_OPTIONS}
                   value={field.value as string}
                 />
               )}
             />
-          </AdminField>
-
-          {/* Offered for cash too: somebody who pays for a repair out of the
-              money they are holding is where that money went, and booking it
-              to the office till says the cash is in a box it left. */}
-          <Controller
-            control={control}
-            name={"paymentAccountId" as Path<T>}
-            render={({ field }) => (
-              <PaymentAccountField
-                direction="out"
-                error={fieldError("paymentAccountId")}
-                method={method}
-                onChange={field.onChange}
-                value={field.value as string}
-              />
-            )}
-          />
+          </div>
 
           <AdminField
             error={fieldError("reference")}
