@@ -1,18 +1,23 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   AdminButton,
-  AdminCard,
   AdminField,
   adminInputClass,
-  CommitRow,
-  DetailHeader,
 } from "@/components/admin/ui";
 import { SearchableSelect } from "@/components/admin/searchable-select";
-import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
+import {
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogDescription,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+} from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
@@ -25,8 +30,22 @@ import { landSaleSchema, type LandSaleValues } from "@/validations/land-schema";
 
 const LIST = "/admin/land-sales";
 
-/** Draft a land sale. `plotId` may be pre-filled from a plot's "Sell" action. */
-export function LandSaleForm({ plotId }: { plotId?: string }) {
+/**
+ * Draft a land sale: which plot, to whom, at what price.
+ *
+ * Four fields, so it asks for them where the selling decision is taken -
+ * the land-sales register, or the plot itself - rather than on a page of its
+ * own. `plotId` pre-fills the plot when a plot's "Sell" action opened it.
+ */
+export function LandSaleDialog({
+  onClose,
+  open,
+  plotId,
+}: {
+  onClose: () => void;
+  open: boolean;
+  plotId?: string;
+}) {
   const router = useRouter();
   const [createSale, { isLoading: saving }] = useCreateLandSaleMutation();
   // Only AVAILABLE plots can be sold.
@@ -47,6 +66,7 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
     register,
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<LandSaleValues>({
     resolver: zodResolver(landSaleSchema),
@@ -58,6 +78,17 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
     },
   });
 
+  // Opened from a plot, the plot is already decided. It arrives after the
+  // form is built when the page is still fetching, so seed it on open too.
+  useEffect(() => {
+    if (open) reset({ agreedPriceGhs: "", buyerId: "", notes: "", plotId: plotId ?? "" });
+  }, [open, plotId, reset]);
+
+  const close = () => {
+    reset();
+    onClose();
+  };
+
   const onSubmit = async (values: LandSaleValues) => {
     try {
       const res = await createSale({
@@ -67,6 +98,7 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
         ...(values.notes?.trim() ? { notes: values.notes.trim() } : {}),
       }).unwrap();
       notify.success("Land sale drafted");
+      close();
       router.push(`${LIST}/${res.data.sale.id}`);
     } catch (err) {
       notify.error("Couldn't draft the land sale", {
@@ -76,20 +108,24 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
   };
 
   return (
-    <div className="max-w-[640px]">
-      <DetailNav
-        crumbs={[DASHBOARD_CRUMB, { label: "Land sales", href: LIST }]}
-        current="New land sale"
-      />
-      <DetailHeader
-        title="New land sale"
-        hint="Sell a plot to a buyer and set what they owe."
-        sub="Agree a plot and price with a buyer - the plot is only reserved once you confirm the sale"
-      />
+    <ResponsiveDialog open={open} onOpenChange={(o) => !o && close()}>
+      <ResponsiveDialogContent className="sm:max-w-[560px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>Sell a plot</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
+            Agree a plot and price with a buyer. The plot is only reserved once
+            you confirm the sale.
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
 
-      <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
-        <AdminCard className="flex flex-col gap-5 px-5 py-4">
-          <section className="flex flex-col gap-5">
+        <form
+          noValidate
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col gap-5"
+        >
+          {/* What is being sold and who is buying it are one decision, and
+              neither picker needs a row of its own to hold a single line. */}
+          <div className="grid gap-5 sm:grid-cols-2">
             <AdminField label="Plot" error={errors.plotId?.message}>
               <Controller
                 control={control}
@@ -131,45 +167,53 @@ export function LandSaleForm({ plotId }: { plotId?: string }) {
                 )}
               />
             </AdminField>
-          </section>
+          </div>
 
-          <section className="flex flex-col gap-5">
-            <AdminField
-              error={errors.agreedPriceGhs?.message}
-              hint="The whole price the buyer is taking the plot at, before any deposit."
-              label="Agreed price (GHS)"
-            >
-              <Input
-                inputMode="decimal"
-                placeholder="e.g. 60000"
-                className={cn(adminInputClass, errors.agreedPriceGhs && "border-console-red")}
-                {...register("agreedPriceGhs")}
-              />
-            </AdminField>
-            <AdminField label="Notes" optional>
-              <Input
-                placeholder="e.g. Buyer paying in three instalments"
-                className={adminInputClass}
-                {...register("notes")}
-              />
-            </AdminField>
-          </section>
-        </AdminCard>
-
-        <CommitRow>
-          <AdminButton
-            type="button"
-            variant="outline"
-            size="lg"
-            onClick={() => router.push(LIST)}
+          <AdminField
+            error={errors.agreedPriceGhs?.message}
+            hint="The whole price the buyer is taking the plot at, before any deposit."
+            label="Agreed price (GHS)"
           >
-            Cancel
-          </AdminButton>
-          <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
-            {saving ? "Saving…" : "Draft sale"}
-          </AdminButton>
-        </CommitRow>
-      </form>
-    </div>
+            <Input
+              inputMode="decimal"
+              placeholder="e.g. 60000"
+              className={cn(
+                adminInputClass,
+                "font-adminmono",
+                errors.agreedPriceGhs && "border-console-red",
+              )}
+              {...register("agreedPriceGhs")}
+            />
+          </AdminField>
+
+          <AdminField label="Notes" optional>
+            <Input
+              placeholder="e.g. Buyer paying in three instalments"
+              className={adminInputClass}
+              {...register("notes")}
+            />
+          </AdminField>
+
+          <ResponsiveDialogFooter className="gap-2">
+            <AdminButton
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={close}
+            >
+              Cancel
+            </AdminButton>
+            <AdminButton
+              type="submit"
+              disabled={saving}
+              loading={saving}
+              size="lg"
+            >
+              {saving ? "Saving…" : "Draft sale"}
+            </AdminButton>
+          </ResponsiveDialogFooter>
+        </form>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   );
 }

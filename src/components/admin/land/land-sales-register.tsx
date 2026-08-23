@@ -2,10 +2,9 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
-import { Plus } from "lucide-react";
 import {
   ConsoleDateRange,
   ConsoleFilterBar,
@@ -35,12 +34,13 @@ import {
   LAND_SALE_STATUS_FILTER_OPTIONS,
   LandSaleStatusBadge,
 } from "./land-bits";
+import { LandSaleDialog } from "./land-sale-form";
 
 const LIST = "/admin/land-sales";
 const FILTER_DEFAULTS = { status: "all", from: "", to: "", size: "10" };
 
 export function LandSalesRegister() {
-  const router = useRouter();
+  const [sellOpen, setSellOpen] = useState(false);
   const {
     page,
     search: searchInput,
@@ -190,11 +190,8 @@ export function LandSalesRegister() {
           totalCount={total}
           noun="land sales"
           action={
-            <AdminButton asChild aria-label="New land sale">
-              <Link href={`${LIST}/new`}>
-                <Plus className="h-4 w-4" aria-hidden="true" />
-                <span className="hidden sm:inline">New land sale</span>
-              </Link>
+            <AdminButton onClick={() => setSellOpen(true)} type="button">
+              Sell a plot
             </AdminButton>
           }
           chips={
@@ -245,8 +242,8 @@ export function LandSalesRegister() {
           filtered={filtered}
           noun="land sales"
           description="Draft a land sale from an available plot to start tracking it."
-          actionLabel="New land sale"
-          onAction={() => router.push(`${LIST}/new`)}
+          actionLabel="Sell a plot"
+          onAction={() => setSellOpen(true)}
           onClear={() => {
             setSearch("");
             resetFilters();
@@ -270,6 +267,8 @@ export function LandSalesRegister() {
           />
         </AdminCard>
       )}
+
+      <LandSaleDialog onClose={() => setSellOpen(false)} open={sellOpen} />
     </div>
   );
 }

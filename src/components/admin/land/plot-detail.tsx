@@ -40,6 +40,7 @@ import {
 } from "@/redux/land/land-plots-api";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { PlotStatusBadge } from "./land-bits";
+import { LandSaleDialog } from "./land-sale-form";
 
 const LIST = "/admin/plots";
 
@@ -54,6 +55,7 @@ export function PlotDetail({ id }: { id: string }) {
   const [removeDoc] = useRemovePlotDocumentMutation();
   const { confirm, confirmationDialog } = useConfirm();
   const [docName, setDocName] = useState("");
+  const [sellOpen, setSellOpen] = useState(false);
 
   if (isLoading) return <DetailSkeleton main="media" cards={2} />;
   if (isError || !data)
@@ -242,10 +244,8 @@ export function PlotDetail({ id }: { id: string }) {
       <div className="mt-3 border-t border-adm-hairline pt-3.5">
         <ActionRow className="xl:flex-col">
           {p.status === "AVAILABLE" ? (
-            <AdminButton asChild>
-              <Link href={`/admin/land-sales/new?plotId=${p.id}`}>
-                Sell plot
-              </Link>
+            <AdminButton onClick={() => setSellOpen(true)} type="button">
+              Sell plot
             </AdminButton>
           ) : null}
           {canPublish ? (
@@ -395,6 +395,13 @@ export function PlotDetail({ id }: { id: string }) {
             </AdminCard>
           </div>
         }
+      />
+
+      {/* The plot is already decided here, so the dialog opens with it filled. */}
+      <LandSaleDialog
+        onClose={() => setSellOpen(false)}
+        open={sellOpen}
+        plotId={p.id}
       />
 
       {confirmationDialog}
