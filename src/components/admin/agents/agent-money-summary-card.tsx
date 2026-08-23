@@ -45,6 +45,17 @@ function Figure({
   );
 }
 
+/**
+ * The measure a label/figure pair reads at.
+ *
+ * These are fixed labels against short numbers - nothing here grows - so the
+ * pair has a natural width, and past it the two ends stop belonging to each
+ * other: the eye leaves "Given to them" and travels an inch of nothing before
+ * it finds the figure. The pot is capped rather than the card, so the card
+ * still fills the page and the lists inside it stay readable.
+ */
+const POT = "max-w-[22rem]";
+
 /** One labelled figure in a pot. */
 function Line({
   emphasis,
@@ -82,11 +93,21 @@ export function AgentMoneySummaryCard({ agentUserId }: { agentUserId: string }) 
 
   if (isLoading) {
     return (
-      <AdminCard className="px-5 py-4">
+      <AdminCard className="@container/summary px-5 py-4">
         <Skeleton className="mb-3 h-4 w-40" />
-        <Skeleton className="mb-2 h-3 w-full" />
-        <Skeleton className="mb-2 h-3 w-full" />
-        <Skeleton className="h-3 w-2/3" />
+        <div className="grid gap-x-10 gap-y-5 @2xl/summary:grid-cols-2">
+          {[0, 1].map((pot) => (
+            <div className={cn(POT, "space-y-2.5")} key={pot}>
+              <Skeleton className="h-2.5 w-32" />
+              {[0, 1, 2, 3].map((line) => (
+                <div className="flex items-center justify-between gap-3" key={line}>
+                  <Skeleton className="h-3 w-28" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </AdminCard>
     );
   }
@@ -95,7 +116,12 @@ export function AgentMoneySummaryCard({ agentUserId }: { agentUserId: string }) 
   const { held, sent }: IAgentMoneySummary = data.data.summary;
 
   return (
-    <AdminCard className="px-5 py-4">
+    // Its own container. The two-pot split used to be queried against a
+    // container named `detail` that nothing declares, so it never fired: the
+    // card stayed one column the full width of the page and every figure sat
+    // an inch from its label. A container query is only as good as the
+    // container it names.
+    <AdminCard className="@container/summary px-5 py-4">
       <SectionHeading
         className="mb-1"
         hint="Two different kinds of money, kept apart on purpose. What they hold is theirs to produce; what they may send is permission to move the company's money, and none of it passes through their hands."
@@ -103,8 +129,8 @@ export function AgentMoneySummaryCard({ agentUserId }: { agentUserId: string }) 
         Given and spent
       </SectionHeading>
 
-      <div className="grid gap-5 @lg/detail:grid-cols-2">
-        <div>
+      <div className="grid gap-x-10 gap-y-5 @2xl/summary:grid-cols-2">
+        <div className={POT}>
           <p className="mb-1 text-[10.5px] tracking-wide text-adm-faint uppercase">
             Money they are holding
           </p>
@@ -137,7 +163,7 @@ export function AgentMoneySummaryCard({ agentUserId }: { agentUserId: string }) 
           ) : null}
         </div>
 
-        <div>
+        <div className={POT}>
           <p className="mb-1 text-[10.5px] tracking-wide text-adm-faint uppercase">
             Company money they may send
           </p>
