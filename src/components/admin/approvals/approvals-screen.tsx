@@ -495,7 +495,10 @@ export function ApprovalsScreen() {
       <div
         role="tablist"
         aria-label="Approval status"
-        className="mb-6 flex gap-[3px] rounded-none bg-[var(--ap-tabs)] p-[3px]"
+        // w-fit: the tabs are sized by their labels, so a full-width strip
+        // paints a tray of background running past the last tab to the edge
+        // of the page. The tray ends where the tabs do.
+        className="mb-6 flex w-fit max-w-full gap-[3px] overflow-x-auto rounded-none bg-[var(--ap-tabs)] p-[3px]"
       >
         {TABS.map(([value, label]) => (
           <StatusTab
