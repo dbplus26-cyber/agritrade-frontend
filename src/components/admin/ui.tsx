@@ -173,7 +173,8 @@ export function DetailGrid({
  * Two-column detail shell: main content left, a narrower side rail (summary,
  * actions, meta) right from `xl`; below that everything stacks, aside first
  * so status and actions stay above the fold on phones. The rail is sticky
- * under the 54px console topbar so actions stay in reach on long pages.
+ * under the console topbar (its height plus a gap) so actions stay in reach
+ * on long pages.
  */
 export function DetailShell({
   main,
@@ -203,7 +204,7 @@ export function DetailShell({
           // @container so DetailRow (and anything else inside) sizes against
           // the RAIL rather than the viewport - the rail is 340px however wide
           // the screen is.
-          "@container min-w-0 self-start xl:sticky xl:top-[70px] xl:order-2",
+          "@container min-w-0 self-start xl:sticky xl:top-[calc(var(--adm-topbar-h)+16px)] xl:order-2",
           asideFirstOnStack && "order-1",
         )}
       >

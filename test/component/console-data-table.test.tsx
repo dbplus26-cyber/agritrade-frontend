@@ -13,8 +13,8 @@
 //     aria-busy containers are the accessible face of that dimming;
 //   * in server mode the footer must drive the caller's callbacks with
 //     1-based page numbers, not TanStack's internal 0-based index.
-import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEventBase from "@testing-library/user-event";
 import type { ColumnDef } from "@tanstack/react-table";
 
@@ -382,5 +382,120 @@ describe("ConsoleDataTable - the phone card", () => {
     // an empty card.
     expect(cardText()).toContain("Maize, Tolon");
     expect(cardText()).toContain("Name");
+  });
+});
+
+/**
+ * Selecting on a phone.
+ *
+ * A checkbox on a card is the wrong control twice over: a 16px target on the
+ * smallest screen, and a second thing to aim at on a row whose whole surface
+ * is already a link. So the card carries no box - a press and hold selects it,
+ * a tap adds to a selection already under way, and being selected shows as
+ * highlight. What is pinned here is that the box is GONE (it stays in the
+ * table beside it), that a hold does not also follow the row's link, and that
+ * a keyboard has the same reach as a thumb.
+ */
+describe("ConsoleDataTable - selecting on a card", () => {
+  const SELECTABLE: ColumnDef<Row, unknown>[] = [
+    {
+      id: "name",
+      accessorFn: (r) => r.name,
+      header: "Name",
+      meta: { card: "title" },
+      enableSorting: false,
+    },
+  ];
+
+  const renderList = () =>
+    render(
+      <ConsoleDataTable<Row>
+        columns={SELECTABLE}
+        data={ROWS}
+        enableSelection
+        itemNoun="lots"
+        renderBulkActions={() => <button type="button">Delete selected</button>}
+        rowHref={(r) => `/admin/lots/${r.name}`}
+      />,
+    );
+
+  const cards = () => [...document.querySelectorAll("[data-slot-card]")];
+
+  /** A press and hold on a touch screen, and its release. */
+  const hold = async (el: Element) => {
+    fireEvent.pointerDown(el, { clientX: 10, clientY: 10, pointerType: "touch" });
+    await act(async () => {
+      vi.advanceTimersByTime(600);
+    });
+    fireEvent.pointerUp(el, { clientX: 10, clientY: 10, pointerType: "touch" });
+    fireEvent.click(el);
+  };
+
+  beforeEach(() => {
+    pushMock.mockReset();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("puts no checkbox on the card", () => {
+    renderList();
+
+    // The table beside it keeps its select column; the card does not.
+    expect(
+      cards().some((c) => c.querySelector('[role="checkbox"], input[type="checkbox"]')),
+    ).toBe(false);
+    expect(screen.getAllByRole("checkbox").length).toBeGreaterThan(0);
+  });
+
+  it("selects on a press and hold, and does not follow the row", async () => {
+    renderList();
+
+    await hold(cards()[0]);
+
+    expect(cards()[0]).toHaveAttribute("data-state", "selected");
+    // The click that ends a hold belongs to the hold.
+    expect(pushMock).not.toHaveBeenCalled();
+    // And the count appears, which is the only place a number is shown.
+    expect(await screen.findByText("1 selected")).toBeInTheDocument();
+  });
+
+  it("adds with a tap once a selection is under way, and opens the row when none is", async () => {
+    renderList();
+
+    // Nothing selected: a tap is navigation.
+    fireEvent.click(cards()[0]);
+    expect(pushMock).toHaveBeenCalledWith("/admin/lots/Maize, Tolon");
+
+    pushMock.mockReset();
+    await hold(cards()[0]);
+    fireEvent.click(cards()[1]);
+
+    expect(cards()[1]).toHaveAttribute("data-state", "selected");
+    expect(pushMock).not.toHaveBeenCalled();
+  });
+
+  it("cancels the hold when the press turns into a scroll", async () => {
+    renderList();
+
+    const card = cards()[0];
+    fireEvent.pointerDown(card, { clientX: 10, clientY: 10, pointerType: "touch" });
+    fireEvent.pointerMove(card, { clientX: 10, clientY: 60, pointerType: "touch" });
+    await act(async () => {
+      vi.advanceTimersByTime(600);
+    });
+
+    expect(cards()[0]).not.toHaveAttribute("data-state", "selected");
+  });
+
+  it("gives the keyboard the same reach: Space selects, Enter opens", () => {
+    renderList();
+
+    fireEvent.keyDown(cards()[0], { key: " " });
+    expect(cards()[0]).toHaveAttribute("data-state", "selected");
+
+    fireEvent.keyDown(cards()[1], { key: "Enter" });
+    expect(pushMock).toHaveBeenCalledWith("/admin/lots/Soya, Savelugu");
   });
 });

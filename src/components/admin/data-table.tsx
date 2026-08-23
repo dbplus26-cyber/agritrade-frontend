@@ -13,6 +13,7 @@ import {
   type Cell,
   type ColumnDef,
   flexRender,
+  type Row,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
@@ -149,6 +150,112 @@ const slotOf = <TData,>(cell: Cell<TData, unknown>): CardSlot | undefined =>
   cell.column.columnDef.meta?.card;
 
 /**
+ * One row of the card view: the summary, and the ways it can be acted on.
+ *
+ * Its own component because a hold needs state per card, and hooks cannot live
+ * inside the map that renders them.
+ *
+ * Selection shows as HIGHLIGHT and nothing else. A checkbox drawn on every
+ * card is a control the reader has to aim at on the smallest screen they own,
+ * and it earns its room only while somebody is selecting - which is a fraction
+ * of the time a list is open. The rows that are chosen look chosen, the bar
+ * above says how many, and the box stays in the table view where there is
+ * space for a column.
+ */
+function SummaryCard<TData>({
+  actionCells,
+  cells,
+  headerLabel,
+  href,
+  index,
+  onNavigate,
+  reducedMotion,
+  row,
+  selectable,
+  selectionActive,
+}: {
+  actionCells: Cell<TData, unknown>[];
+  cells: Cell<TData, unknown>[];
+  headerLabel: Map<string, React.ReactNode>;
+  href: string | undefined;
+  index: number;
+  onNavigate: (href: string) => void;
+  reducedMotion: boolean | null;
+  row: Row<TData>;
+  selectable: boolean;
+  /** True while anything on the page is selected. */
+  selectionActive: boolean;
+}) {
+  const selected = row.getIsSelected();
+  const toggle = selectable ? () => { row.toggleSelected(); } : undefined;
+  const { consumedHold, holdProps } = useHoldToSelect(toggle);
+
+  // While a selection is being built, a tap adds to it rather than leaving the
+  // list - the thing every phone does once the first item is held. With
+  // nothing selected the card is simply a link to the record.
+  const openOnTap = href !== undefined && !(selectionActive && selectable);
+
+  return (
+    <motion.li
+      // Position only: a card whose content changes size snaps to it rather
+      // than stretching its text through a scale.
+      layout="position"
+      {...rowMotion(index, Boolean(reducedMotion), true)}
+      transition={{
+        layout: reducedMotion
+          ? { duration: 0 }
+          : { type: "spring", stiffness: 500, damping: 40 },
+      }}
+      data-slot-card=""
+      data-state={selected ? "selected" : undefined}
+      {...holdProps}
+      onClick={() => {
+        // The click that ends a hold is the hold's own, not a tap.
+        if (consumedHold()) return;
+        if (openOnTap && href) {
+          navigationStarted();
+          onNavigate(href);
+          return;
+        }
+        toggle?.();
+      }}
+      onKeyDown={(e: React.KeyboardEvent) => {
+        if (e.target !== e.currentTarget) return;
+        if (e.key === " " && toggle) {
+          // Space is the checkbox key, and it is free here: a link answers to
+          // Enter. Prevented so the page does not scroll under the selection.
+          e.preventDefault();
+          toggle();
+          return;
+        }
+        if (e.key === "Enter" && href) {
+          e.preventDefault();
+          navigationStarted();
+          onNavigate(href);
+        }
+      }}
+      role={href ? "link" : undefined}
+      tabIndex={href ?? toggle ? 0 : undefined}
+      className={cn(
+        // Squared with a 1.5px border to match AdminCard, the surface every
+        // other console screen is filed on.
+        "rounded-none border border-adm-line bg-adm-card px-3.5 py-2.5 shadow-[0_1px_2px_rgba(16,24,40,0.05)]",
+        // The selected state has to carry on its own now that no box does: a
+        // filled tint, a full-strength border, and a bar down the leading edge
+        // that survives being read in sunlight.
+        "data-[state=selected]:border-console data-[state=selected]:bg-console/[0.07] data-[state=selected]:shadow-[inset_3px_0_0_0_var(--color-console)]",
+        (href ?? toggle) &&
+          "cursor-pointer hover:border-adm-strong focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-console",
+        // No platform callout over a card being held.
+        selectable && "select-none [-webkit-touch-callout:none]",
+      )}
+    >
+      {summaryCard(cells, headerLabel, actionCells)}
+    </motion.li>
+  );
+}
+
+/**
  * A row as a card: the summary a person scans, not the row transposed.
  *
  * Shape, top to bottom: the state chip and its one figure on a line together,
@@ -166,7 +273,6 @@ const slotOf = <TData,>(cell: Cell<TData, unknown>): CardSlot | undefined =>
 function summaryCard<TData>(
   cells: Cell<TData, unknown>[],
   headerLabel: Map<string, React.ReactNode>,
-  selectCell: Cell<TData, unknown> | undefined,
   actionCells: Cell<TData, unknown>[],
 ) {
   const render = (cell: Cell<TData, unknown>) =>
@@ -182,9 +288,6 @@ function summaryCard<TData>(
   if (slotted.length === 0) {
     return (
       <>
-        {selectCell ? (
-          <div className="mb-1.5 flex justify-end">{render(selectCell)}</div>
-        ) : null}
         {cells.filter(filled).map((cell) => (
           <CardField key={cell.id} label={headerLabel.get(cell.column.id)}>
             {render(cell)}
@@ -208,10 +311,9 @@ function summaryCard<TData>(
 
   return (
     <>
-      {badges.length > 0 || trailing || selectCell ? (
+      {badges.length > 0 || trailing ? (
         <div className="flex items-center justify-between gap-2">
           <span className="flex min-w-0 flex-wrap items-center gap-1.5">
-            {selectCell ? render(selectCell) : null}
             {badges.map((cell) => (
               <span key={cell.id}>{render(cell)}</span>
             ))}
@@ -388,6 +490,88 @@ const rowNavProps = (
         tabIndex: 0,
       }
     : {};
+
+/**
+ * Press and hold to select, on the card view.
+ *
+ * A checkbox on a phone card is the wrong control twice over: it is a 16px
+ * target on the only screen where targets have to be thumb-sized, and it puts
+ * a second thing to aim at on a row whose whole surface is already a link. So
+ * the card carries no box at all. Holding a card for half a second selects it,
+ * which is what a phone user already does to select a message or a photo, and
+ * once anything is selected a plain tap toggles the next one rather than
+ * navigating - otherwise selecting five rows means five long presses.
+ *
+ * The hold is cancelled by movement: a press that turns into a scroll is a
+ * scroll, and a list that selects a row every time somebody flicks past it is
+ * worse than no selection at all.
+ *
+ * Keyboard users get the same thing on Space, the key a checkbox answers to,
+ * with Enter still following the row's link. A gesture with no keyboard path
+ * is a feature half the people using it cannot reach.
+ */
+const HOLD_MS = 500;
+/** How far a finger may drift before the press counts as a scroll. */
+const HOLD_SLOP_PX = 10;
+
+function useHoldToSelect(onSelect: (() => void) | undefined) {
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const origin = useRef<{ x: number; y: number } | null>(null);
+  // Set the moment a hold fires, so the click that follows the release does
+  // not also navigate. Cleared on the next press.
+  const held = useRef(false);
+
+  const clear = () => {
+    if (timer.current !== null) clearTimeout(timer.current);
+    timer.current = null;
+    origin.current = null;
+  };
+
+  useEffect(() => clear, []);
+
+  if (!onSelect) {
+    return { consumedHold: () => false, holdProps: {} };
+  }
+
+  return {
+    /** True when the click being handled is the tail of a hold. */
+    consumedHold: () => {
+      const wasHeld = held.current;
+      held.current = false;
+      return wasHeld;
+    },
+    holdProps: {
+      // A held card must not also raise the platform's own long-press menu
+      // (the iOS link callout, the Android context menu) over the top of it.
+      onContextMenu: (e: React.MouseEvent) => {
+        if (held.current) e.preventDefault();
+      },
+      onPointerCancel: clear,
+      onPointerDown: (e: React.PointerEvent) => {
+        // Mouse users have the checkbox column in the table view; a hold here
+        // would only be a way to select something by accident.
+        if (e.pointerType === "mouse") return;
+        held.current = false;
+        origin.current = { x: e.clientX, y: e.clientY };
+        timer.current = setTimeout(() => {
+          held.current = true;
+          onSelect();
+        }, HOLD_MS);
+      },
+      onPointerMove: (e: React.PointerEvent) => {
+        const from = origin.current;
+        if (!from) return;
+        if (
+          Math.abs(e.clientX - from.x) > HOLD_SLOP_PX ||
+          Math.abs(e.clientY - from.y) > HOLD_SLOP_PX
+        ) {
+          clear();
+        }
+      },
+      onPointerUp: clear,
+    },
+  };
+}
 
 /**
  * How a row or card arrives and leaves.
@@ -670,9 +854,9 @@ export function ConsoleDataTable<TData>({
           <AnimatePresence initial={false} mode="popLayout">
             {rows.map((row, index) => {
               const href = rowHref?.(row.original);
-              const selectCell = row
-                .getVisibleCells()
-                .find((c) => c.column.id === "select");
+              // The select column is a table affordance and is dropped here:
+              // on a card, selecting is a press and hold, and the state shows
+              // as highlight.
               const visible = row
                 .getVisibleCells()
                 .filter((c) => c.column.id !== "select");
@@ -693,30 +877,20 @@ export function ConsoleDataTable<TData>({
               const cells = visible.filter(isData);
               const actionCells = visible.filter((c) => !isData(c));
               return (
-                <motion.li
+                <SummaryCard
                   key={row.id}
-                  // Position only: a card whose content changes size snaps to
-                  // it rather than stretching its text through a scale.
-                  layout="position"
-                  {...rowMotion(index, reducedMotion, true)}
-                  transition={{
-                    layout: reducedMotion
-                      ? { duration: 0 }
-                      : { type: "spring", stiffness: 500, damping: 40 },
-                  }}
-                  data-slot-card=""
-                  data-state={row.getIsSelected() ? "selected" : undefined}
-                  {...rowNavProps(href, (h) => router.push(h))}
-                  className={cn(
-                    // Squared with a 1.5px border to match AdminCard, the
-                    // surface every other console screen is filed on.
-                    "rounded-none border border-adm-line bg-adm-card px-3.5 py-2.5 shadow-[0_1px_2px_rgba(16,24,40,0.05)] data-[state=selected]:border-console/40 data-[state=selected]:bg-console/5",
-                    href &&
-                      "cursor-pointer hover:border-adm-strong focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-console",
-                  )}
-                >
-                  {summaryCard(cells, headerLabel, selectCell, actionCells)}
-                </motion.li>
+                  actionCells={actionCells}
+                  cells={cells}
+                  headerLabel={headerLabel}
+                  href={href}
+                  index={index}
+                  onNavigate={(h) => router.push(h)}
+                  reducedMotion={reducedMotion}
+                  row={row}
+                  // Selecting is only offered where the table offers it at all.
+                  selectable={enableSelection && row.getCanSelect()}
+                  selectionActive={selectedRows.length > 0}
+                />
               );
             })}
           </AnimatePresence>

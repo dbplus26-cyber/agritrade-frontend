@@ -328,7 +328,9 @@ function ConsoleSidebar({ activeKey }: { activeKey: string }) {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="gap-0 border-b border-adm-hairline pb-4 pt-5 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-0 px-5">
+      {/* The same height as the topbar beside it, so the two bottom borders
+          meet as one line across the screen instead of stepping. */}
+      <SidebarHeader className="h-[var(--adm-topbar-h)] justify-center gap-0 border-b border-adm-hairline px-5 py-0 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-0">
         {/* Collapsed to the icon rail the mark carries the brand alone, which
             is exactly what it is for; expanded it sits beside the wordmark. */}
         {collapsed ? (
@@ -348,11 +350,14 @@ function ConsoleSidebar({ activeKey }: { activeKey: string }) {
               height={72}
               className="h-9 w-9 shrink-0"
             />
+            {/* Leading pulled in on both lines: the block has to sit inside
+                the bar's height without the wordmark and its strapline
+                drifting apart to fill it. */}
             <div className="min-w-0">
-              <div className="text-[16px] font-extrabold tracking-[0.14em] text-console">
+              <div className="text-[16px] leading-[1.15] font-extrabold tracking-[0.14em] text-console">
                 DB PLUS
               </div>
-              <div className="mt-0.5 text-[11px] uppercase tracking-[0.06em] text-adm-faint">
+              <div className="mt-0.5 text-[11px] leading-[1.2] uppercase tracking-[0.06em] text-adm-faint">
                 Trading · Tamale
               </div>
             </div>
@@ -486,7 +491,7 @@ function MobileMenuButton() {
 
 /**
  * The console chrome, built on the shadcn Sidebar: 224px white rail with
- * collapsible grouped nav + a sign-out footer, a 54px breadcrumb topbar with
+ * collapsible grouped nav + a sign-out footer, a breadcrumb topbar with
  * the account menu (top right); on a phone a hamburger on the topbar opens the
  * same rail as a sheet.
  */
@@ -619,7 +624,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
       <SidebarInset className="min-w-0 bg-transparent">
         <NavigationProgress />
-        <header className="sticky top-0 z-40 flex h-[54px] flex-none items-center gap-3 border-b border-adm-line bg-adm-card px-4 lg:px-[26px] print:hidden">
+        <header className="sticky top-0 z-40 flex h-[var(--adm-topbar-h)] flex-none items-center gap-3 border-b border-adm-line bg-adm-card px-4 lg:px-[26px] print:hidden">
           {/* Collapse/expand the rail from md up; on a phone the hamburger
               opens it as a sheet. Both live on the topbar's left edge. */}
           <SidebarTrigger className="h-[30px] w-[30px] flex-none cursor-pointer rounded-none border border-adm-line bg-adm-card text-adm-muted hover:bg-adm-sunken hover:text-adm-ink max-md:hidden" />

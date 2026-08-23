@@ -128,6 +128,18 @@
 }
 
 :root {
+  /* The console's one bar height: the topbar and the sidebar's brand block are
+     two halves of the same band across the top of the screen, and their bottom
+     borders have to meet as one line. Held as a token because they live in
+     different components - two literals drift the first time either is
+     touched, and the drift reads as a broken layout rather than a wrong
+     number. The detail rail's sticky offset measures from it too.
+
+     Declared here rather than in @theme: nothing generates a utility from it,
+     it is only read through var() in arbitrary values, and a theme variable
+     with no utility behind it is not guaranteed to be emitted at all. */
+  --adm-topbar-h: 54px;
+
   --background: #eff1e8; /* surface - pale husk, ink text 14.2:1 */
   --foreground: #1f211c; /* ink */
   --card: #fbfcf7; /* paper */
