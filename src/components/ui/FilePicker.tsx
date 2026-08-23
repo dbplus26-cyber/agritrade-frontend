@@ -153,8 +153,18 @@ export function FilePicker({
             </span>
           )}
 
-          <div className="min-w-0 flex-1">
-            <p className="text-[13px] font-medium text-ink [overflow-wrap:anywhere]">
+          {/* basis, not just flex-1: with only a min-w-0 the name gave ALL of
+              its width to the thumbnail and the buttons beside it and was
+              left a couple of characters wide, which `anywhere` then broke
+              into a column of two-letter rows running down the card. A basis
+              makes the row WRAP when there is no room for the name instead of
+              crushing it, and the clamp bounds a pathological name to two
+              lines with the whole of it on the title. */}
+          <div className="min-w-0 flex-1 basis-[12rem]">
+            <p
+              className="line-clamp-2 text-[13px] font-medium text-ink [overflow-wrap:anywhere]"
+              title={staged.file.name}
+            >
               {staged.file.name}
             </p>
             <p className="text-[11.5px] text-soil">
