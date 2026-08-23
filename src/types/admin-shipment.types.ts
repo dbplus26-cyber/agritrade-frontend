@@ -4,6 +4,7 @@
 // costs, expenses, profit) are `number | null` - redacted for callers without
 // financial visibility; weights and the goods manifest are operational and
 // always present.
+import type { ExpensePaymentBody } from "@/validations/expense-payment-fields";
 import type { IPaginationMeta } from "./api";
 import type { SaleStatus } from "./admin-sale.types";
 
@@ -46,6 +47,16 @@ export interface IShipmentExpense {
   amountGhs: number | null;
   description: string | null;
   incurredAt: string;
+  /**
+   * Whether the money has actually gone. The STATUS survives redaction while
+   * the figures do not: somebody without money access still has to be able to
+   * see that a trip cost is outstanding.
+   */
+  settlement: {
+    outstandingGhs: number | null;
+    paidGhs: number | null;
+    status: "PAID" | "PART_PAID" | "UNPAID";
+  };
 }
 
 export interface IManifestLine {
@@ -437,6 +448,11 @@ export interface IShipmentExpenseInput {
   amountGhs: number;
   description?: string;
   incurredAt?: string;
+  /**
+   * Settling it in the same act. Absent means the cost is recorded as owed and
+   * nothing leaves an account; it is then paid from its own voucher.
+   */
+  payment?: ExpensePaymentBody;
 }
 
 /**

@@ -2,6 +2,7 @@ import type { IPaginationMeta } from "./api";
 import type { SalePaymentMethod } from "./admin-sale.types";
 import type { ApprovalStatus } from "./approval.types";
 import type { IExpense, ICreateExpenseResponse } from "./expense.types";
+import type { ExpensePaymentBody } from "@/validations/expense-payment-fields";
 import type { PurchaseSource } from "./registry.types";
 
 /**
@@ -245,6 +246,12 @@ export interface IAddPurchaseCostInput {
   categoryId: string;
   description?: string;
   incurredAt?: string;
+  /**
+   * Settling it in the same act. Absent means the cost is recorded as owed and
+   * nothing leaves an account; the server then settles it from its own voucher
+   * when the money moves.
+   */
+  payment?: ExpensePaymentBody;
 }
 
 /**

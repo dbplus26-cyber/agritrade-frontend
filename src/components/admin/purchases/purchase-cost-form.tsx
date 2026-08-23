@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useIdempotencyKey } from "@/components/admin/disbursements/disbursement-bits";
+import { ExpensePaymentFields } from "@/components/admin/expenses/expense-payment-fields";
 import {
   AdminButton,
   AdminField,
@@ -30,11 +31,16 @@ import {
 } from "@/lib/cost-treatment";
 import { extractApiError } from "@/lib/extract-api-error";
 import { notify } from "@/lib/notify";
+import { useGetSettlementAccountsQuery } from "@/redux/payment-accounts/payment-accounts-api";
 import { useAddPurchaseCostMutation } from "@/redux/purchases/purchases-api";
 import { PURCHASE_VOIDED_CODE } from "@/types/purchase.types";
 import type { IExpenseCategory } from "@/types/registry.types";
 import {
-  purchaseCostSchema,
+  expensePaymentBody,
+  PAYMENT_FIELD_FOR_CODE,
+} from "@/validations/expense-payment-fields";
+import {
+  makePurchaseCostSchema,
   type PurchaseCostValues,
 } from "@/validations/purchase-schema";
 
@@ -59,10 +65,11 @@ const FIELD_FOR_CODE: Record<string, "categoryId"> = {
  *
  *   * it asks where the cost belongs, because that is the fact only a person
  *     can supply and it cannot be revised afterwards;
- *   * it does NOT offer to pay the cost in the same act. The purchase-cost
- *     endpoint takes no payment, so offering the field would collect a
- *     payment the server drops on the floor and tell somebody their money had
- *     moved. The cost lands owed and is settled from its own voucher.
+ *   * it asks whether the cost has been PAID, and settles it in the same
+ *     request when it has. Paying the loading boys at the farm gate is the
+ *     ordinary case here, and making somebody find the voucher on another
+ *     screen to say so is how a cost stays owed on the books while the money
+ *     has demonstrably gone.
  */
 export function PurchaseCostDialog({
   categories,
@@ -85,6 +92,22 @@ export function PurchaseCostDialog({
   purchaseId: string;
 }) {
   const [addCost, { isLoading }] = useAddPurchaseCostMutation();
+  // The reference rule depends on WHICH account was picked - no statement
+  // arrives for somebody's own pocket - so the schema is built from the list
+  // the picker offers. Memoised on the accounts themselves: a resolver rebuilt
+  // every render resets the form's validation state under the user.
+  const { data: accounts } = useGetSettlementAccountsQuery();
+  const schema = useMemo(
+    () =>
+      makePurchaseCostSchema({
+        heldAccountIds: new Set(
+          (accounts?.data.accounts ?? [])
+            .filter((a) => a.holder !== null)
+            .map((a) => a.id),
+        ),
+      }),
+    [accounts],
+  );
   // One key per OPENING of the dialog, reused by every attempt at submitting
   // it. A cost that lands twice is charged into the goods twice, and there is
   // no correction for that short of voiding one of the vouchers.
@@ -97,16 +120,25 @@ export function PurchaseCostDialog({
     register,
     reset,
     setError,
+    setValue,
+    watch,
   } = useForm<PurchaseCostValues>({
-    resolver: zodResolver(purchaseCostSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       amountGhs: "",
       capitalise: true,
       categoryId: "",
       description: "",
       incurredAt: todayInputValue(),
+      method: "CASH",
+      paidNow: true,
+      paymentAccountId: "",
+      reference: "",
     },
   });
+
+  const method = watch("method");
+  const paidNow = watch("paidNow");
 
   // Cleared each time the dialog opens, so reopening after a cancel never
   // shows the last attempt's half-typed figures under a fresh key.
@@ -118,18 +150,33 @@ export function PurchaseCostDialog({
       categoryId: "",
       description: "",
       incurredAt: todayInputValue(),
+      method: "CASH",
+      paidNow: true,
+      paymentAccountId: "",
+      reference: "",
     });
   }, [open, reset]);
 
+  // An account offered under one method is not offered under another, so
+  // switching the method clears the pick rather than leaving a bank account
+  // attached to a cash payment - which the server refuses after the trigger
+  // has already stopped showing it.
+  useEffect(() => {
+    setValue("paymentAccountId", "");
+  }, [method, setValue]);
+
   const onSubmit = async (values: PurchaseCostValues) => {
+    const payment = expensePaymentBody(values);
     try {
-      await addCost({
+      const res = await addCost({
         body: {
           amountGhs: Number(values.amountGhs),
           capitalise: values.capitalise,
           categoryId: values.categoryId,
           ...(values.description ? { description: values.description } : {}),
           incurredAt: values.incurredAt,
+          // No amount in it: the server settles the whole cost.
+          ...(payment ? { payment } : {}),
         },
         idempotencyKey: idempotencyKey(),
         purchaseId,
@@ -140,13 +187,17 @@ export function PurchaseCostDialog({
           : "Cost recorded against this purchase",
         {
           description:
-            "Nothing has gone out yet. Pay it from its voucher in Expenses.",
+            res.data.settlement.status === "UNPAID"
+              ? "Nothing has gone out yet. Pay it from its voucher in Expenses."
+              : "Paid, and taken off the account it came from.",
         },
       );
       onOpenChange(false);
     } catch (error) {
       const { code, message } = extractApiError(error);
-      const field = code ? FIELD_FOR_CODE[code] : undefined;
+      const field = code
+        ? (FIELD_FOR_CODE[code] ?? PAYMENT_FIELD_FOR_CODE[code])
+        : undefined;
       if (field) setError(field, { message });
       notify.error(
         code === PURCHASE_VOIDED_CODE
@@ -271,10 +322,15 @@ export function PurchaseCostDialog({
             </p>
           </section>
 
-          <p className="text-[12.5px] leading-[1.45] text-adm-muted">
-            Nothing goes out yet. The cost is recorded as owed, and is paid from
-            its own voucher once the money moves.
-          </p>
+          <ExpensePaymentFields
+            control={control}
+            errors={errors}
+            idPrefix="purchase-cost"
+            method={method}
+            owedNote="Nothing goes out yet. The cost is recorded as owed, and is paid from its own voucher once the money moves."
+            paidNow={paidNow}
+            register={register}
+          />
 
           <ResponsiveDialogFooter className="mt-2 gap-2">
             <AdminButton

@@ -60,7 +60,7 @@ import {
  * shape sales and driver fees use, and the outstanding balance is derived from
  * it rather than stored, so no two screens can disagree about it.
  */
-const SETTLEMENT_TONE = {
+export const SETTLEMENT_TONE = {
   PAID: { hint: "This cost has been settled in full.", label: "Paid", tone: "forest" },
   PART_PAID: {
     hint: "Some of this cost has been paid; the rest is still owed.",
@@ -73,6 +73,24 @@ const SETTLEMENT_TONE = {
     tone: "alert",
   },
 } as const;
+
+/**
+ * The settlement badge, wherever a cost is listed rather than opened: the trip
+ * page, the purchase page, the register. A list that shows what a cost was and
+ * not whether it has been paid is how one sits owed while the money has gone.
+ */
+export function SettlementBadge({
+  status,
+}: {
+  status: keyof typeof SETTLEMENT_TONE;
+}) {
+  const tone = SETTLEMENT_TONE[status];
+  return (
+    <HelpWrap text={tone.hint}>
+      <ToneBadge tone={tone.tone}>{tone.label}</ToneBadge>
+    </HelpWrap>
+  );
+}
 
 function Figure({
   className,

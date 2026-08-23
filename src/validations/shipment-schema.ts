@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+import {
+  expensePaymentFields,
+  refineExpensePayment,
+} from "./expense-payment-fields";
+
 /**
  * Shipment form schemas, mirroring the backend
  * `src/validations/shipment-validation.ts`. Numbers stay strings in the form
@@ -102,17 +107,38 @@ export const shipmentSchema = z
     }
   });
 
-export const shipmentExpenseSchema = z.object({
-  categoryId: z.string().min(1, "Choose a category"),
-  amountGhs: z
-    .string()
-    .trim()
-    .min(1, "Enter the amount")
-    .refine((v) => Number(v) > 0 && Number(v) <= 100_000_000, {
-      message: "Enter a valid amount",
-    }),
-  description: z.string().trim().max(500).or(z.literal("")).optional(),
-});
+/**
+ * A cost run up on a trip: transport, loading, a checkpoint fee.
+ *
+ * It carries the same payment half as the expenses register and the purchase
+ * cost form, because the money usually goes at the tailgate and making
+ * somebody find the voucher on another screen to say so is how a trip cost
+ * stays owed on the books while the cash has gone.
+ */
+export const makeShipmentExpenseSchema = (options?: {
+  /** Accounts a named person is holding, from the settlement list. */
+  heldAccountIds?: ReadonlySet<string>;
+}) =>
+  z
+    .object({
+      categoryId: z.string().min(1, "Choose a category"),
+      amountGhs: z
+        .string()
+        .trim()
+        .min(1, "Enter the amount")
+        .refine((v) => Number(v) > 0 && Number(v) <= 100_000_000, {
+          message: "Enter a valid amount",
+        }),
+      description: z.string().trim().max(500).or(z.literal("")).optional(),
+      /** The day it was run up, which is also the day it was paid. */
+      incurredAt: z.string(),
+      ...expensePaymentFields,
+    })
+    .superRefine((values, ctx) => {
+      refineExpensePayment(values, ctx, options?.heldAccountIds);
+    });
+
+export const shipmentExpenseSchema = makeShipmentExpenseSchema();
 
 export const cancelShipmentSchema = z.object({
   reason: z.string().trim().min(3, "Give a reason").max(500),
@@ -193,5 +219,7 @@ export const arriveShipmentSchema = z.object({
 
 export type ArriveShipmentValues = z.infer<typeof arriveShipmentSchema>;
 export type CancelShipmentValues = z.infer<typeof cancelShipmentSchema>;
-export type ShipmentExpenseValues = z.infer<typeof shipmentExpenseSchema>;
+export type ShipmentExpenseValues = z.infer<
+  ReturnType<typeof makeShipmentExpenseSchema>
+>;
 export type ShipmentValues = z.infer<typeof shipmentSchema>;

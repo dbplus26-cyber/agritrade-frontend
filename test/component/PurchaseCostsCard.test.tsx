@@ -51,6 +51,7 @@ const cost = (over: Partial<IPurchaseCost>): IPurchaseCost =>
     description: null,
     id: "exp-1",
     incurredAt: "2026-07-11T00:00:00.000Z",
+    settlement: { outstandingGhs: 0, paidGhs: 400, status: "PAID" },
     shipment: null,
     transactionNo: "EXP-2026-00156",
     voidedAt: null,

@@ -14,6 +14,12 @@ export interface IExpense {
   description: null | string;
   id: string;
   incurredAt: string;
+  /**
+   * Whether the money has actually gone, and what is left on it. The STATUS
+   * survives redaction while the figures do not: somebody without money access
+   * still has to be able to see that a cost is outstanding.
+   */
+  settlement: IExpenseSettlement;
   /** Present when the cost belongs to a specific trip. */
   shipment: null | {
     destination: string;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -42,12 +42,15 @@ import {
   voidExpenseSchema,
   type VoidExpenseValues,
 } from "@/validations/expense-schema";
+import { expensePaymentBody } from "@/validations/expense-payment-fields";
 import {
   cancelShipmentSchema,
-  shipmentExpenseSchema,
+  makeShipmentExpenseSchema,
   type CancelShipmentValues,
   type ShipmentExpenseValues,
 } from "@/validations/shipment-schema";
+import { ExpensePaymentFields } from "@/components/admin/expenses/expense-payment-fields";
+import { useGetSettlementAccountsQuery } from "@/redux/payment-accounts/payment-accounts-api";
 import { LoadMeter } from "./load-meter";
 import { Money } from "./sale-bits";
 import { saleBalanceGhs } from "./sale-payable";
@@ -78,18 +81,55 @@ export function ExpenseDialog({
     limit: 100,
   });
   const [add, { isLoading }] = useAddShipmentExpenseMutation();
+  // The reference rule depends on WHICH account was picked - no statement
+  // arrives for somebody's own pocket - so the schema is built from the list
+  // the picker offers.
+  const { data: accounts } = useGetSettlementAccountsQuery();
+  const schema = useMemo(
+    () =>
+      makeShipmentExpenseSchema({
+        heldAccountIds: new Set(
+          (accounts?.data.accounts ?? [])
+            .filter((a) => a.holder !== null)
+            .map((a) => a.id),
+        ),
+      }),
+    [accounts],
+  );
   const {
     register,
     control,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<ShipmentExpenseValues>({
-    resolver: zodResolver(shipmentExpenseSchema),
-    defaultValues: { amountGhs: "", categoryId: "", description: "" },
+    resolver: zodResolver(schema),
+    defaultValues: {
+      amountGhs: "",
+      categoryId: "",
+      description: "",
+      incurredAt: new Date().toISOString().slice(0, 10),
+      method: "CASH",
+      paidNow: true,
+      paymentAccountId: "",
+      reference: "",
+    },
   });
+
+  const method = watch("method");
+  const paidNow = watch("paidNow");
+
+  // An account offered under one method is not offered under another, so
+  // switching the method clears the pick rather than leaving a bank account
+  // attached to a cash payment.
+  useEffect(() => {
+    setValue("paymentAccountId", "");
+  }, [method, setValue]);
 
   const onSubmit = async (values: ShipmentExpenseValues) => {
     try {
+      const payment = expensePaymentBody(values);
       await add({
         body: {
           amountGhs: Number(values.amountGhs),
@@ -97,10 +137,15 @@ export function ExpenseDialog({
           ...(values.description?.trim()
             ? { description: values.description.trim() }
             : {}),
+          incurredAt: values.incurredAt,
+          // No amount in it: the server settles the whole cost.
+          ...(payment ? { payment } : {}),
         },
         id: shipment.id,
       }).unwrap();
-      notify.success("Expense added");
+      notify.success(
+        payment ? "Expense added and paid" : "Expense added - this is owed",
+      );
       onClose();
     } catch (err) {
       notify.error("Couldn't add the expense", {
@@ -157,6 +202,15 @@ export function ExpenseDialog({
               {...register("description")}
             />
           </AdminField>
+          <ExpensePaymentFields
+            control={control}
+            errors={errors}
+            idPrefix="trip-expense"
+            method={method}
+            owedNote="Nothing goes out yet. The cost is on this trip from today and is paid from its own voucher in Expenses once the money moves."
+            paidNow={paidNow}
+            register={register}
+          />
           <ResponsiveDialogFooter className="gap-2">
             <AdminButton
               type="button"

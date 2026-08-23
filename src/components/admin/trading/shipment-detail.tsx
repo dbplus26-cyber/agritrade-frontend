@@ -54,6 +54,7 @@ import { LoadMeter } from "./load-meter";
 import { Money, SaleStatusBadge } from "./sale-bits";
 import { hasSettledTotal, saleSettlementDeltaGhs } from "./sale-payable";
 import { ArrivalDialog } from "./shipment-arrival-dialog";
+import { SettlementBadge } from "@/components/admin/expenses/expense-settlement-card";
 import {
   CostBasisBadge,
   loadingFrom,
@@ -1088,6 +1089,11 @@ export function ShipmentDetail({ id }: { id: string }) {
                 ) : null}
               </div>
               <div className="flex items-center gap-3">
+                {/* Whether the money has actually gone. A trip cost recorded
+                    and never settled is money the books say has left and the
+                    cash book has never seen, and this list is where somebody
+                    would notice. */}
+                <SettlementBadge status={e.settlement.status} />
                 <Mono className="whitespace-nowrap text-[13px] text-adm-ink">
                   <Money value={e.amountGhs} />
                 </Mono>

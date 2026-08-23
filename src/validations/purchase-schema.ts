@@ -1,4 +1,9 @@
 import { z } from "zod";
+
+import {
+  expensePaymentFields,
+  refineExpensePayment,
+} from "./expense-payment-fields";
 import { PurchaseSource } from "@/types/registry.types";
 
 /**
@@ -104,32 +109,46 @@ export type ReceivePurchaseValues = z.infer<typeof receivePurchaseSchema>;
  * month's costs, it cannot be changed afterwards, and a form that submits
  * without an answer has made that call for whoever filled it in.
  */
-export const purchaseCostSchema = z.object({
-  amountGhs: z
-    .string()
-    .trim()
-    .min(1, "Enter the amount")
-    .refine((v) => Number(v) > 0, "The amount must be more than zero")
-    .refine(
-      (v) => Number(v) <= 10_000_000,
-      "That is larger than any single cost the system takes - check the figure",
-    )
-    .refine(
-      (v) => /^\d+(\.\d{1,2})?$/.test(v),
-      "Amounts are recorded to 2 decimal places (pesewas)",
-    ),
-  capitalise: z.boolean(),
-  categoryId: z.string().min(1, "Choose a category"),
-  description: optionalText(500),
-  incurredAt: z
-    .string()
-    .min(1, "Enter the date")
-    .refine(
-      (v) => new Date(v) <= new Date(),
-      "That date is in the future - check the year",
-    ),
-});
-export type PurchaseCostValues = z.infer<typeof purchaseCostSchema>;
+export const makePurchaseCostSchema = (options?: {
+  /** Accounts a named person is holding, from the settlement list. */
+  heldAccountIds?: ReadonlySet<string>;
+}) =>
+  z
+    .object({
+      amountGhs: z
+        .string()
+        .trim()
+        .min(1, "Enter the amount")
+        .refine((v) => Number(v) > 0, "The amount must be more than zero")
+        .refine(
+          (v) => Number(v) <= 10_000_000,
+          "That is larger than any single cost the system takes - check the figure",
+        )
+        .refine(
+          (v) => /^\d+(\.\d{1,2})?$/.test(v),
+          "Amounts are recorded to 2 decimal places (pesewas)",
+        ),
+      capitalise: z.boolean(),
+      categoryId: z.string().min(1, "Choose a category"),
+      description: optionalText(500),
+      incurredAt: z
+        .string()
+        .min(1, "Enter the date")
+        .refine(
+          (v) => new Date(v) <= new Date(),
+          "That date is in the future - check the year",
+        ),
+      ...expensePaymentFields,
+    })
+    .superRefine((values, ctx) => {
+      refineExpensePayment(values, ctx, options?.heldAccountIds);
+    });
+
+/** The rules with no account list to hand: every transfer quotes a reference. */
+export const purchaseCostSchema = makePurchaseCostSchema();
+export type PurchaseCostValues = z.infer<
+  ReturnType<typeof makePurchaseCostSchema>
+>;
 
 export const voidPurchaseSchema = z.object({
   reason: z

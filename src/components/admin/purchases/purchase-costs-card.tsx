@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 
+import { SettlementBadge } from "@/components/admin/expenses/expense-settlement-card";
 import { HelpTip, HelpWrap } from "@/components/admin/help-tip";
 import {
   AdminButton,
@@ -58,8 +59,7 @@ function CostRow({ cost }: { cost: IPurchaseCost }) {
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
           {/* The voucher number is the handle a paper receipt is matched to,
-              and the link is how the cost gets PAID - this screen records it
-              as owed and settles nothing. */}
+              and the link is where a cost left owed is settled or corrected. */}
           <Link
             className={cn(adminLinkClass, "font-adminmono text-[11.5px]")}
             href={`/admin/expenses/${cost.id}`}
@@ -74,7 +74,13 @@ function CostRow({ cost }: { cost: IPurchaseCost }) {
               <ToneBadge tone="slate">Voided</ToneBadge>
             </HelpWrap>
           ) : (
-            <TreatmentBadge capitalised={cost.capitalisedAt !== null} />
+            <>
+              <TreatmentBadge capitalised={cost.capitalisedAt !== null} />
+              {/* Whether the money has actually gone. Two different questions
+                  live on one row here: what the cost DID to the goods, and
+                  whether it has been paid. */}
+              <SettlementBadge status={cost.settlement.status} />
+            </>
           )}
         </div>
         {/* A category can be named anything the office types, so it wraps

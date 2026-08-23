@@ -10,7 +10,10 @@
 //   * `capitalise` has no default here even though the server defaults it to
 //     true. The whole point of the field is that a person chose, and a form
 //     that can submit without one has decided something unchangeable on their
-//     behalf.
+//     behalf;
+//   * the payment half rides along, sharing its rules with the expenses
+//     register and the trip form - a transfer names the account it came from
+//     and quotes a reference, and cash needs neither.
 import { describe, expect, it } from "vitest";
 
 import { purchaseCostSchema } from "@/validations/purchase-schema";
@@ -21,6 +24,11 @@ const valid = {
   categoryId: "cat-haulage",
   description: "Haulage, Kpandai to Tamale",
   incurredAt: "2026-07-11",
+  // Paid out of the till, which needs neither an account nor a reference.
+  method: "CASH" as "BANK" | "CASH" | "MOMO",
+  paidNow: true,
+  paymentAccountId: "",
+  reference: "",
 };
 
 const parse = (over: Partial<typeof valid> = {}) =>
@@ -36,6 +44,25 @@ describe("purchaseCostSchema", () => {
 
   it("takes the not-into-the-goods treatment too", () => {
     expect(parse({ capitalise: false }).success).toBe(true);
+  });
+
+  it("takes a cost left owed, with nothing said about the money", () => {
+    expect(parse({ paidNow: false }).success).toBe(true);
+  });
+
+  it("makes a transfer name its account and its reference", () => {
+    expect(messages(parse({ method: "BANK" }))).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining("Say where this money came from"),
+        expect.stringContaining("Enter the transfer reference"),
+      ]),
+    );
+  });
+
+  it("asks nothing about the money when the cost is owed", () => {
+    // The account and reference rules belong to a payment. A cost recorded as
+    // owed has none, so demanding them would refuse a perfectly good entry.
+    expect(parse({ method: "BANK", paidNow: false }).success).toBe(true);
   });
 
   it("refuses a third decimal place", () => {
