@@ -79,7 +79,7 @@ export function DataTablePagination({
         <span className="flex items-baseline gap-1.5 whitespace-nowrap">
           {isSelected ? (
             <>
-              <span className="font-adminmono text-[12.5px] font-bold text-console">
+              <span className="font-adminmono text-[11px] font-bold text-console">
                 {selectedCount.toLocaleString()}
               </span>
               <span className={microLabel}>selected of</span>
@@ -89,13 +89,13 @@ export function DataTablePagination({
               <span className={cn(microLabel, "hidden min-[400px]:inline")}>
                 Showing
               </span>
-              <span className="font-adminmono text-[12.5px] font-semibold text-soil">
+              <span className="font-adminmono text-[11px] font-semibold text-soil">
                 {startItem.toLocaleString()}–{endItem.toLocaleString()}
               </span>
               <span className={microLabel}>of</span>
             </>
           )}
-          <span className="font-adminmono text-[12.5px] font-semibold text-soil">
+          <span className="font-adminmono text-[11px] font-semibold text-soil">
             {totalCount.toLocaleString()}
           </span>
           <span className={cn(microLabel, "hidden sm:inline")}>{itemNoun}</span>
@@ -109,7 +109,7 @@ export function DataTablePagination({
           >
             <SelectTrigger
               aria-label="Rows per page"
-              className="font-adminmono relative h-7 w-auto min-w-0 cursor-pointer gap-1 before:absolute before:top-1/2 before:left-1/2 before:h-11 before:w-[calc(100%+1.5rem)] before:-translate-x-1/2 before:-translate-y-1/2 before:content-[''] rounded-none border-0 border-b border-dashed border-soil/35 bg-transparent px-0.5 text-[12.5px] font-bold whitespace-nowrap text-soil shadow-none transition-colors hover:border-console hover:text-console focus:ring-0 focus-visible:ring-0 [&>span]:whitespace-nowrap"
+              className="font-adminmono relative h-7 w-auto min-w-0 cursor-pointer gap-1 before:absolute before:top-1/2 before:left-1/2 before:h-11 before:w-[calc(100%+1.5rem)] before:-translate-x-1/2 before:-translate-y-1/2 before:content-[''] rounded-none border-0 border-b border-dashed border-soil/35 bg-transparent px-0.5 text-[11px] font-bold whitespace-nowrap text-soil shadow-none transition-colors hover:border-console hover:text-console focus:ring-0 focus-visible:ring-0 [&>span]:whitespace-nowrap"
             >
               <SelectValue />
             </SelectTrigger>
@@ -148,7 +148,7 @@ export function DataTablePagination({
             <ChevronLeft className="h-4 w-4" aria-hidden="true" />
           </button>
           <span className="mx-1.5 flex flex-col items-center gap-[5px]">
-            <span className="font-adminmono whitespace-nowrap text-[11.5px] font-bold leading-none tracking-[0.08em]">
+            <span className="font-adminmono whitespace-nowrap text-[10.5px] font-bold leading-none tracking-[0.08em]">
               <span className="text-console">{pad(page, padWidth)}</span>
               <span className="text-soil/45"> ∕ </span>
               <span className="text-soil">{pad(totalPages, padWidth)}</span>

@@ -60,7 +60,7 @@ function ResponsiveDialogContent({
         // clear the sheet.
         overlayClassName={cn("z-[70]", overlayClassName)}
         className={cn(
-          "shadow-doc gap-4 rounded-t-none border-t-[1.5px] border-soil/40 bg-paper p-4 pt-2.5 text-sm text-ink",
+          "shadow-doc gap-4 rounded-t-none border-t-[1.5px] border-soil/40 bg-paper p-4 pt-2.5 text-[12px] text-ink",
           // `overscroll-contain`: a sheet scrolled to its end must not hand
           // the gesture to the page behind it, which on a phone reads as the
           // sheet dragging the whole console around under itself.

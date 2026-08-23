@@ -231,6 +231,18 @@
   letter-spacing: 0.06em;
 }
 
+/* ErrorMessage renders on both sides, and its type belongs to the side it is
+   standing on: the site's failed-document plate is set at the site's scale,
+   while inside the console it has to read as console text like everything
+   around it. Scoped rather than forked, and safe to scope because these
+   render inline in the page - nothing portals them out of the console. */
+.admin-scope .state-title {
+  font-size: 15px;
+}
+.admin-scope .state-body {
+  font-size: 11.5px;
+}
+
 /* The state components' action button (EmptyState / ErrorMessage). On the
    public site it keeps the document-button look; inside the console it is
    re-pointed to the AdminButton outline spec - same reason as the frame

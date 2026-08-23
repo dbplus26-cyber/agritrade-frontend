@@ -43,10 +43,10 @@ export function ErrorMessage({
             Not processed
           </Stamp>
         </div>
-        <h3 className="break-words mb-2 font-display text-[20px] font-bold [color:var(--state-title)]">
+        <h3 className="state-title break-words mb-2 font-display text-[20px] font-bold [color:var(--state-title)]">
           {title}
         </h3>
-        <p className="break-words mx-auto max-w-[40ch] text-[13.5px] leading-[1.65] [color:var(--state-body)]">
+        <p className="state-body break-words mx-auto max-w-[40ch] text-[13.5px] leading-[1.65] [color:var(--state-body)]">
           {description}
         </p>
         {onRetry ? (

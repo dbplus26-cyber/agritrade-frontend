@@ -61,17 +61,17 @@ export function EmptyState({
     return (
       <div className={cn("w-full min-w-0 px-6 py-14 text-center", className)}>
         <EmptyFolder className="mx-auto mb-3.5" />
-        <div className="mb-1 break-words text-[15px] font-bold [color:var(--state-title)]">
+        <div className="mb-1 break-words text-[12.5px] font-bold [color:var(--state-title)]">
           {title}
         </div>
-        <p className="mx-auto mb-0 max-w-[42ch] break-words text-[13.5px] leading-[1.6] [color:var(--state-body)]">
+        <p className="mx-auto mb-0 max-w-[42ch] break-words text-[11.5px] leading-[1.6] [color:var(--state-body)]">
           {description}
         </p>
         {actionLabel && onAction ? (
           <Button
             onClick={onAction}
             variant="outline"
-            className="state-action mt-5 h-9 px-4 text-[13px]"
+            className="state-action mt-5 h-9 px-4 text-[11.5px]"
           >
             {actionLabel}
           </Button>
