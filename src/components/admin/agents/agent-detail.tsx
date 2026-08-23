@@ -757,7 +757,7 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
       {/* Who this is, before anything about their money. A band rather than a
           stack: an avatar beside a name and four short facts is a row, and
           spending a column of the page on it puts the ledger below the fold. */}
-      <AdminCard className="mb-4 flex flex-wrap items-center gap-x-6 gap-y-3 px-5 py-4">
+      <AdminCard className="mb-4 flex flex-col gap-3 px-5 py-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6">
         <div className="flex min-w-0 items-center gap-3">
           <ViewablePhoto name={name} size={52} src={agent.profilePicture} />
           <div className="min-w-0">
@@ -769,7 +769,10 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
             </p>
           </div>
         </div>
-        <dl className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-8 gap-y-2">
+        {/* Two tidy columns on a phone, sharing the card's own left edge.
+            Wrapped inline they set their own ragged edges, none of which
+            lined up with the name above them. */}
+        <dl className="grid min-w-0 flex-1 grid-cols-2 gap-x-6 gap-y-2.5 sm:flex sm:flex-wrap sm:items-baseline sm:gap-x-8 sm:gap-y-2">
           <IdentityFact label="Status">
             <ToneBadge tone={agent.isActive ? "leaf" : "slate"}>
               {agent.isActive ? "Active" : "Suspended"}
