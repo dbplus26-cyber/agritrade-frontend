@@ -107,7 +107,7 @@ export function GrantAging() {
               {row.original.farmer.name}
             </Link>
             {row.original.farmer.phone ? (
-              <div className="[overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-muted">
+              <div className="[overflow-wrap:anywhere] @2xl/table:truncate text-[11px] text-adm-muted">
                 {row.original.farmer.phone}
               </div>
             ) : null}
@@ -232,7 +232,7 @@ export function GrantAging() {
                 </div>
                 <div
                   className={cn(
-                    "font-adminmono mt-0.5 text-[16px] font-bold tabular-nums",
+                    "font-adminmono mt-0.5 text-[13px] font-bold tabular-nums",
                     b.valueClass,
                   )}
                 >

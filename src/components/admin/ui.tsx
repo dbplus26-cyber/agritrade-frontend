@@ -50,15 +50,15 @@ export function DetailRow({
 }) {
   return (
     <div className="flex flex-col gap-0.5 py-2 @min-[420px]:flex-row @min-[420px]:items-baseline @min-[420px]:justify-between @min-[420px]:gap-3">
-      <span className="flex flex-none items-center gap-1 text-[11px] font-bold tracking-[0.08em] text-adm-muted uppercase">
+      <span className="flex flex-none items-center gap-1 text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
         <span className="min-w-0">{label}</span>
         {hint ? <HelpTip label={`What is ${label}?`} text={hint} /> : null}
       </span>
       <span
         className={cn(
-          "min-w-0 text-[13.5px] text-adm-ink [overflow-wrap:anywhere] @min-[420px]:text-right",
+          "min-w-0 text-[11.5px] text-adm-ink [overflow-wrap:anywhere] @min-[420px]:text-right",
           mono && "font-adminmono tabular-nums",
-          strong && "text-[16.5px] font-bold",
+          strong && "text-[13px] font-bold",
         )}
       >
         {children}
@@ -109,15 +109,15 @@ export function DetailItem({
         className,
       )}
     >
-      <p className="flex items-center gap-1 text-[11px] font-bold tracking-[0.08em] text-adm-muted uppercase">
+      <p className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
         <span className="min-w-0">{label}</span>
         {hint ? <HelpTip label={`What is ${label}?`} text={hint} /> : null}
       </p>
       <div
         className={cn(
-          "mt-1 min-w-0 text-[14.5px] font-medium text-adm-ink [overflow-wrap:anywhere]",
+          "mt-1 min-w-0 text-[12px] font-medium text-adm-ink [overflow-wrap:anywhere]",
           mono && "font-adminmono tabular-nums",
-          strong && "text-[16.5px] font-bold",
+          strong && "text-[13px] font-bold",
         )}
       >
         {children}
@@ -316,7 +316,7 @@ export function SectionHeading({
         className,
       )}
     >
-      <h2 className="flex min-w-0 items-center gap-1.5 text-base font-semibold tracking-tight text-adm-ink">
+      <h2 className="flex min-w-0 items-center gap-1.5 text-[13px] font-semibold tracking-tight text-adm-ink">
         <span className="min-w-0 [overflow-wrap:anywhere]">{children}</span>
         {hint ? <HelpTip label={`About this section`} text={hint} /> : null}
       </h2>
@@ -366,7 +366,7 @@ export function AdminPageHeader({
             />
           ) : null}
         </h1>
-        {sub ? <p className="mt-1 text-sm text-adm-muted">{sub}</p> : null}
+        {sub ? <p className="mt-1 text-[12px] text-adm-muted">{sub}</p> : null}
       </div>
       {actions ? (
         <div className="flex flex-wrap items-center gap-2">{actions}</div>
@@ -439,7 +439,7 @@ export function DetailHeader({
         {sub ? (
           <div
             className={cn(
-              "flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-adm-muted md:order-3 md:mt-2",
+              "flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-adm-muted md:order-3 md:mt-2",
               !subBesideBadges && "col-span-2 row-start-3 mt-2",
             )}
           >
@@ -546,15 +546,15 @@ export function AdminButton({
         // button that shifts on hover like a stamped plate is charming once
         // and tiring on the fortieth click of a working day.
         "gap-1.5 rounded-none font-semibold shadow-none transition-[color,background-color,border-color,opacity,transform] duration-150 ease-out hover:translate-x-0 hover:translate-y-0 hover:shadow-none active:scale-[0.98]",
-        size === "md" && "h-[34px] px-3.5 text-[13.5px]",
-        size === "lg" && "h-[38px] px-[18px] text-[13.5px]",
+        size === "md" && "h-[34px] px-3.5 text-[11.5px]",
+        size === "lg" && "h-[38px] px-[18px] text-[11.5px]",
         // 28px is a deliberate visual density for row and card actions, but a
         // 28px TARGET is a miss on a phone - and these are the buttons that
         // void a purchase or reverse a payment. The plate stays small; the
         // touch area is padded out to 44px underneath it, which costs no
         // layout because it is drawn as a pseudo-element.
         size === "sm" &&
-          "relative h-7 px-2.5 text-[12.5px] before:absolute before:top-1/2 before:left-1/2 before:h-11 before:w-full before:min-w-11 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']",
+          "relative h-7 px-2.5 text-[11px] before:absolute before:top-1/2 before:left-1/2 before:h-11 before:w-full before:min-w-11 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']",
         variant === "primary" &&
           "bg-console text-white hover:bg-console-hover",
         (variant === "secondary" || variant === "outline") &&
@@ -686,7 +686,7 @@ export function AdminField({
           from the commentary. The label is ink and sentence case: it is the
           question being asked. "Optional" stays faint, because it qualifies
           the label rather than competing with it. */}
-      <span className="mb-1 flex items-center gap-1 text-[13px] font-semibold text-adm-ink">
+      <span className="mb-1 flex items-center gap-1 text-[11.5px] font-semibold text-adm-ink">
         <span className="min-w-0">
           {label}
           {optional ? (
@@ -704,7 +704,7 @@ export function AdminField({
       {error ? (
         <span
           id={errorId}
-          className="mt-1.5 block text-[12.5px] font-medium text-console-red"
+          className="mt-1.5 block text-[11px] font-medium text-console-red"
           role="alert"
         >
           {error}
@@ -739,7 +739,7 @@ export function ChoiceCards<T extends string>({
 }) {
   return (
     <fieldset className="min-w-0">
-      <legend className="mb-1 text-[13px] font-semibold text-adm-ink">
+      <legend className="mb-1 text-[11.5px] font-semibold text-adm-ink">
         {legend}
       </legend>
       {/* Stacked at every width, never two-up: both answers are sentences, and
@@ -767,11 +767,11 @@ export function ChoiceCards<T extends string>({
               className="mt-[3px] flex-none accent-console"
             />
             <span className="min-w-0">
-              <span className="block text-[13.5px] font-semibold text-adm-ink">
+              <span className="block text-[11.5px] font-semibold text-adm-ink">
                 {option.label}
               </span>
               {option.hint ? (
-                <span className="mt-0.5 block text-[12px] leading-[1.45] text-adm-muted">
+                <span className="mt-0.5 block text-[11px] leading-[1.45] text-adm-muted">
                   {option.hint}
                 </span>
               ) : null}
@@ -792,7 +792,7 @@ export function ChoiceCards<T extends string>({
  * is a public-site form control, not one for a working tool.
  */
 export const adminInputClass =
-  "h-[38px] w-full rounded-none border border-adm-line bg-adm-card px-3 text-[14.5px] font-medium text-adm-ink shadow-none outline-none transition-[border-color,box-shadow] placeholder:text-adm-faint focus:border-console focus:shadow-[0_0_0_3px_rgba(30,61,43,0.12)] focus-visible:border-console focus-visible:ring-0 aria-invalid:border-console-red";
+  "h-[38px] w-full rounded-none border border-adm-line bg-adm-card px-3 text-[12px] font-medium text-adm-ink shadow-none outline-none transition-[border-color,box-shadow] placeholder:text-adm-faint focus:border-console focus:shadow-[0_0_0_3px_rgba(30,61,43,0.12)] focus-visible:border-console focus-visible:ring-0 aria-invalid:border-console-red";
 
 export const adminSelectClass = cn(adminInputClass, "cursor-pointer");
 
@@ -966,7 +966,7 @@ export function PdfLink({
       rel="noopener noreferrer"
       className={cn(
         adminLinkClass,
-        "inline-flex h-9 flex-none items-center px-3 text-[13px] whitespace-nowrap",
+        "inline-flex h-9 flex-none items-center px-3 text-[11.5px] whitespace-nowrap",
         className,
       )}
     >

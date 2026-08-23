@@ -44,7 +44,7 @@ export default function AdminLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <div
-      className={`${geist.variable} ${geistMono.variable} admin-scope font-admin min-h-screen bg-adm-page text-[14px] leading-[1.5] text-adm-body antialiased`}
+      className={`${geist.variable} ${geistMono.variable} admin-scope font-admin min-h-screen bg-adm-page text-[12px] leading-[1.5] text-adm-body antialiased`}
     >
       <RequireAuth>
         {/* Field agents have their own surface - the console is not it. */}

@@ -237,9 +237,22 @@ describe("recording a drawing", () => {
 });
 
 describe("disposing of an asset", () => {
-  const openDispose = async () => {
+  /**
+   * A row's actions live behind one icon rather than spelled out across the
+   * row, so reaching one is: open the row's menu, then choose.
+   */
+  const openRowMenu = async () => {
     render(<FixedAssetsScreen />);
-    await userEvent.click(screen.getAllByRole("button", { name: "Dispose" })[0]);
+    await userEvent.click(
+      screen.getAllByRole("button", { name: /Actions for/i })[0],
+    );
+  };
+
+  const openDispose = async () => {
+    await openRowMenu();
+    await userEvent.click(
+      await screen.findByRole("menuitem", { name: "Dispose" }),
+    );
     return screen.findByRole("dialog");
   };
 
@@ -287,7 +300,12 @@ describe("disposing of an asset", () => {
 describe("editing an asset", () => {
   const openEdit = async () => {
     render(<FixedAssetsScreen />);
-    await userEvent.click(screen.getAllByRole("button", { name: "Edit" })[0]);
+    await userEvent.click(
+      screen.getAllByRole("button", { name: /Actions for/i })[0],
+    );
+    await userEvent.click(
+      await screen.findByRole("menuitem", { name: "Edit asset" }),
+    );
     return screen.findByRole("dialog");
   };
 

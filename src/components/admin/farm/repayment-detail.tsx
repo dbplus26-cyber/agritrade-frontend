@@ -102,12 +102,12 @@ export function RepaymentDetail({ id }: { id: string }) {
                     "group min-w-0 hover:no-underline",
                   )}
                 >
-                  <div className="truncate text-[14px] font-semibold underline-offset-2 group-hover:underline">
+                  <div className="truncate text-[12px] font-semibold underline-offset-2 group-hover:underline">
                     {r.farmer.name}
                   </div>
                   {[r.farmer.phone, r.farmer.community].filter(Boolean).length >
                   0 ? (
-                    <div className="truncate text-[12px] text-adm-muted">
+                    <div className="truncate text-[11px] text-adm-muted">
                       {[r.farmer.phone, r.farmer.community]
                         .filter(Boolean)
                         .join(" · ")}
@@ -227,7 +227,7 @@ export function RepaymentDetail({ id }: { id: string }) {
             {/* Evidence */}
             <AdminCard className="px-5 py-4">
               <SectionHeading className="mb-1">Evidence</SectionHeading>
-              <p className="mb-1 text-[12px] text-adm-muted">
+              <p className="mb-1 text-[11px] text-adm-muted">
                 The signed receipt or weigh slip is what settles &quot;I already
                 paid&quot; disputes. Never shown publicly; downloads are logged.
               </p>
@@ -259,7 +259,7 @@ export function RepaymentDetail({ id }: { id: string }) {
             {/* How the figure above was arrived at. On a cash repayment there
                 is no weight and no rate to work it from, so the line says
                 where the money went instead of printing two blanks. */}
-            <p className="mt-1 text-[12.5px] text-adm-muted [overflow-wrap:anywhere]">
+            <p className="mt-1 text-[11px] text-adm-muted [overflow-wrap:anywhere]">
               {isCash ? (
                 r.paymentAccount ? (
                   <>Paid into {r.paymentAccount.label}</>

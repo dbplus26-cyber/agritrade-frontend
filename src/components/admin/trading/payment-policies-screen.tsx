@@ -219,7 +219,7 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
                       type="button"
                       aria-label={`Remove milestone ${String(i + 1)}`}
                       onClick={() => remove(i)}
-                      className="cursor-pointer px-1 text-[12px] text-console-red"
+                      className="cursor-pointer px-1 text-[11px] text-console-red"
                     >
                       <X className="h-3 w-3" aria-hidden="true" />
                     </button>
@@ -230,7 +230,7 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
               </div>
             ))}
             {errors.milestones?.message ? (
-              <p className="text-[12px] text-console-red">
+              <p className="text-[11px] text-console-red">
                 {errors.milestones.message}
               </p>
             ) : null}
@@ -246,7 +246,7 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
             </AdminButton>
           </div>
 
-          <label className="flex items-center gap-2 text-[13px] text-adm-ink">
+          <label className="flex items-center gap-2 text-[11.5px] text-adm-ink">
             <input type="checkbox" {...register("isDefault")} />
             Make this the default policy
           </label>
@@ -356,7 +356,7 @@ function PolicyCard({ policy }: { policy: IPaymentPolicy }) {
             looking for, and half of it is no use. It wraps. Two lines are
             reserved so most cards still start their bar at the same height,
             and a longer name simply takes the room it needs. */}
-        <h2 className="min-h-[2.6em] text-[15px] leading-[1.3] font-semibold text-adm-ink [overflow-wrap:anywhere]">
+        <h2 className="min-h-[2.6em] text-[12.5px] leading-[1.3] font-semibold text-adm-ink [overflow-wrap:anywhere]">
           {policy.name}
         </h2>
         <span className="flex-none">
@@ -394,7 +394,7 @@ function PolicyCard({ policy }: { policy: IPaymentPolicy }) {
         {policy.milestones.map((m, i) => (
           <li
             key={`${m.label}-${String(i)}`}
-            className="flex gap-3 text-[13px] leading-[1.4]"
+            className="flex gap-3 text-[11.5px] leading-[1.4]"
           >
             <span className="font-adminmono w-9 flex-none tabular-nums text-adm-ink">
               {m.percent}%
@@ -465,7 +465,7 @@ export function PaymentPoliciesScreen() {
 
       {/* Policies are immutable by design: sales freeze a snapshot of their
           terms, so there is deliberately no edit action here. */}
-      <p className="mb-4 text-[12.5px] leading-[1.5] text-adm-muted">
+      <p className="mb-4 text-[11px] leading-[1.5] text-adm-muted">
         A policy can&apos;t be edited once created. Sales freeze their terms at
         confirmation, so create a new policy when the terms change.
       </p>

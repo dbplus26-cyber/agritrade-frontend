@@ -315,7 +315,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
                 would misroute label clicks. Same label/error markup as
                 AdminField so it reads as one of the fields above it. */}
             <div>
-              <span className="mb-1 block text-[13px] font-semibold text-adm-ink">
+              <span className="mb-1 block text-[11.5px] font-semibold text-adm-ink">
                 Agreement file
               </span>
               <FilePicker
@@ -332,7 +332,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
               {agreementError ? (
                 <span
                   role="alert"
-                  className="mt-1.5 block text-[12.5px] font-medium text-console-red"
+                  className="mt-1.5 block text-[11px] font-medium text-console-red"
                 >
                   {agreementError}
                 </span>
@@ -341,7 +341,7 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
           </section>
         </AdminCard>
 
-        <p className="text-[12px] text-adm-muted">
+        <p className="text-[11px] text-adm-muted">
           A grant at or above the owner-set threshold records immediately but is
           flagged for approval.
         </p>

@@ -336,11 +336,11 @@ export function ApprovalsScreen() {
         ),
         cell: ({ row }) => (
           <>
-            <span className="block font-adminmono text-[15px] leading-[1.3] font-semibold tracking-[-0.01em] tabular-nums text-[var(--ap-ink)] [overflow-wrap:anywhere]">
+            <span className="block font-adminmono text-[12.5px] leading-[1.3] font-semibold tracking-[-0.01em] tabular-nums text-[var(--ap-ink)] [overflow-wrap:anywhere]">
               {headlineFigure(row.original)}
             </span>
             {headlineSublabel(row.original) ? (
-              <span className="mt-px block text-[11px] leading-[1.4] font-medium text-[var(--ap-muted)]">
+              <span className="mt-px block text-[10.5px] leading-[1.4] font-medium text-[var(--ap-muted)]">
                 {headlineSublabel(row.original)}
               </span>
             ) : null}
@@ -360,11 +360,11 @@ export function ApprovalsScreen() {
         header: () => "What changed",
         cell: ({ row }) => (
           <>
-            <span className="block text-[13.5px] leading-[1.4] font-[550] text-[var(--ap-ink)] [overflow-wrap:anywhere]">
+            <span className="block text-[11.5px] leading-[1.4] font-[550] text-[var(--ap-ink)] [overflow-wrap:anywhere]">
               {row.original.subject}
             </span>
             {subjectDetailLine(row.original) ? (
-              <span className="mt-0.5 block text-[12px] leading-[1.4] text-[var(--ap-muted)] [overflow-wrap:anywhere]">
+              <span className="mt-0.5 block text-[11px] leading-[1.4] text-[var(--ap-muted)] [overflow-wrap:anywhere]">
                 {subjectDetailLine(row.original)}
               </span>
             ) : null}
@@ -394,16 +394,16 @@ export function ApprovalsScreen() {
           // line - "Kwame Mensah · 3 days ago" - rather than two thirds of an
           // inch of vertical space between the subject and the buttons.
           <span className="flex flex-wrap items-baseline gap-x-1.5 @min-[900px]/main:block">
-            <span className="text-[12.5px] leading-[1.4] text-[var(--ap-ink-2)] [overflow-wrap:anywhere]">
+            <span className="text-[11px] leading-[1.4] text-[var(--ap-ink-2)] [overflow-wrap:anywhere]">
               {shortName(row.original.requestedBy?.name)}
             </span>
             <span
               aria-hidden="true"
-              className="text-[11px] text-[var(--ap-muted)] @min-[900px]/main:hidden"
+              className="text-[10.5px] text-[var(--ap-muted)] @min-[900px]/main:hidden"
             >
               ·
             </span>
-            <span className="font-adminmono text-[11.5px] leading-[1.4] tabular-nums text-[var(--ap-muted)]">
+            <span className="font-adminmono text-[10.5px] leading-[1.4] tabular-nums text-[var(--ap-muted)]">
               {ageLabel(row.original)}
             </span>
           </span>
@@ -481,7 +481,7 @@ export function ApprovalsScreen() {
     // and above 80px of dead space.
     <div
       style={APPROVAL_TOKENS}
-      className="font-admin text-[14px] leading-[1.5] text-[var(--ap-ink)] antialiased"
+      className="font-admin text-[12px] leading-[1.5] text-[var(--ap-ink)] antialiased"
     >
       {/* The shared header, at the shared size. A bespoke 26px h1 here would
           be the largest heading in the console; every other page titles at
@@ -565,7 +565,7 @@ export function ApprovalsScreen() {
       )}
 
       {selected.length > 0 ? (
-        <div className="mb-3 flex flex-wrap items-center gap-3.5 rounded-none bg-[var(--ap-forest)] px-3.5 py-2.5 text-[13px] text-white">
+        <div className="mb-3 flex flex-wrap items-center gap-3.5 rounded-none bg-[var(--ap-forest)] px-3.5 py-2.5 text-[11.5px] text-white">
           <span className="font-adminmono font-semibold tabular-nums">
             {selected.length} selected
           </span>
@@ -593,7 +593,7 @@ export function ApprovalsScreen() {
         <QueueSkeleton />
       ) : isError ? (
         <div className="overflow-hidden rounded-none border border-[var(--ap-hair)] bg-[var(--ap-surface)]">
-          <div className="flex flex-wrap items-center gap-3 bg-[var(--ap-clay-soft)] px-4 py-3.5 text-[13px] text-[var(--ap-ink)]">
+          <div className="flex flex-wrap items-center gap-3 bg-[var(--ap-clay-soft)] px-4 py-3.5 text-[11.5px] text-[var(--ap-ink)]">
             <span className="min-w-0 flex-1">
               The approvals list did not load. {extractApiError(error).message}
             </span>
@@ -642,7 +642,7 @@ export function ApprovalsScreen() {
 }
 
 const ghostBarButton =
-  "cursor-pointer rounded-none border border-white/35 bg-transparent px-3 py-[5px] text-[12.5px] leading-[1.4] font-[550] text-white " +
+  "cursor-pointer rounded-none border border-white/35 bg-transparent px-3 py-[5px] text-[11px] leading-[1.4] font-[550] text-white " +
   "hover:bg-white/12 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white " +
   "disabled:cursor-not-allowed disabled:opacity-50";
 
@@ -696,7 +696,7 @@ function StatusTab({
       aria-selected={active}
       onClick={onSelect}
       className={cn(
-        "flex cursor-pointer items-center gap-[7px] rounded-none px-3.5 py-[7px] text-[13px] leading-[1.4] font-[550]",
+        "flex cursor-pointer items-center gap-[7px] rounded-none px-3.5 py-[7px] text-[11.5px] leading-[1.4] font-[550]",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ap-forest)]",
         active
           ? "bg-[var(--ap-surface)] text-[var(--ap-ink)] shadow-[0_1px_2px_rgba(0,0,0,.08)]"
@@ -706,7 +706,7 @@ function StatusTab({
       {label}
       <span
         className={cn(
-          "rounded-none px-1.5 py-px font-adminmono text-[11px] leading-[1.4] tabular-nums",
+          "rounded-none px-1.5 py-px font-adminmono text-[10.5px] leading-[1.4] tabular-nums",
           active
             ? "bg-[var(--ap-forest)] text-white"
             : "bg-[var(--ap-pill)] text-[var(--ap-ink-2)]",
@@ -778,13 +778,13 @@ function DecisionCell({
   return (
     <span className="block min-w-0 text-left @min-[900px]/main:text-right">
       <span
-        className="block text-[12.5px] leading-[1.4] font-semibold"
+        className="block text-[11px] leading-[1.4] font-semibold"
         style={{ color: OUTCOME[settled].colour }}
       >
         {OUTCOME[settled].word}
       </span>
       {approval.note ? (
-        <span className="block truncate text-[11.5px] leading-[1.4] text-[var(--ap-muted)] italic">
+        <span className="block truncate text-[10.5px] leading-[1.4] text-[var(--ap-muted)] italic">
           {approval.note}
         </span>
       ) : null}

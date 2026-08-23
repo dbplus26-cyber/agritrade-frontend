@@ -208,7 +208,7 @@ export function SalesRegister() {
               <Money value={row.original.agreedTotalGhs} />
             </Mono>
             {hasSettledTotal(row.original) ? (
-              <Mono className="block whitespace-nowrap text-[11.5px] text-adm-muted">
+              <Mono className="block whitespace-nowrap text-[10.5px] text-adm-muted">
                 settled <Money value={row.original.settledTotalGhs} />
               </Mono>
             ) : null}
@@ -399,7 +399,7 @@ export function SalesRegister() {
                     className="shadow-[0_1px_2px_rgba(16,24,40,0.05)] rounded-none border border-adm-line bg-adm-card px-3.5 py-[13px] text-left"
                   >
                     <div className="mb-1.5 flex items-center justify-between gap-2">
-                      <span className="block @2xl/table:max-w-[22rem] [overflow-wrap:anywhere] @2xl/table:truncate text-[14px] font-semibold text-adm-ink">
+                      <span className="block @2xl/table:max-w-[22rem] [overflow-wrap:anywhere] @2xl/table:truncate text-[12px] font-semibold text-adm-ink">
                         {s.buyer.name}
                       </span>
                       <SaleStatusBadge status={s.status} />
@@ -408,7 +408,7 @@ export function SalesRegister() {
                       <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">Balance</span>
                       <Mono
                         className={cn(
-                          "text-[14px] font-bold",
+                          "text-[12px] font-bold",
                           saleIsPaidInFull(s) ? "text-console" : "text-console-red",
                         )}
                       >

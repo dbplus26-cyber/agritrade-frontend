@@ -11,7 +11,8 @@ import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
+import { RowAction, RowActions } from "@/components/admin/row-actions";
 import { ConsoleDataTable } from "@/components/admin/data-table";
 import { ConsoleFilterBar } from "@/components/admin/filter-bar";
 import {
@@ -275,18 +276,19 @@ export function DrawingsScreen() {
       },
       {
         id: "actions",
-        header: "",
+        header: "Actions",
         enableSorting: false,
-        meta: columnMeta(),
+        meta: columnMeta({ className: "w-[64px] text-right" }),
         cell: ({ row }) => (
           <span className="flex justify-end">
-            <button
-              type="button"
-              onClick={() => void onRemove(row.original)}
-              className="cursor-pointer text-[12.5px] font-semibold text-console-red underline-offset-2 hover:underline"
-            >
-              Remove
-            </button>
+            <RowActions label={row.original.transactionNo}>
+              <RowAction
+                danger
+                icon={Trash2}
+                label="Remove"
+                onSelect={() => void onRemove(row.original)}
+              />
+            </RowActions>
           </span>
         ),
       },

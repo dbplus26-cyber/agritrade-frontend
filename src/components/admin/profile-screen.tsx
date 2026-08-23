@@ -101,7 +101,7 @@ function IdentityCard() {
         />
         <span
           aria-hidden="true"
-          className="absolute right-4 top-1/2 hidden -translate-y-1/2 text-[13px] font-extrabold uppercase tracking-[0.3em] text-white/25 sm:block"
+          className="absolute right-4 top-1/2 hidden -translate-y-1/2 text-[11.5px] font-extrabold uppercase tracking-[0.3em] text-white/25 sm:block"
         >
           DB Plus
         </span>
@@ -126,13 +126,13 @@ function IdentityCard() {
               </ToneBadge>
             </div>
             <p
-              className="mt-0.5 truncate text-[13px] text-adm-muted"
+              className="mt-0.5 truncate text-[11.5px] text-adm-muted"
               title={user.email}
             >
               {user.email}
             </p>
             {user.pendingEmail ? (
-              <p className="mt-1 text-[12px] font-medium text-console-gold">
+              <p className="mt-1 text-[11px] font-medium text-console-gold">
                 Email change to {user.pendingEmail} awaiting confirmation -
                 check that inbox.
               </p>
@@ -417,10 +417,10 @@ function PasswordCard() {
       ) : (
         <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
-            <div className="font-adminmono text-[15px] tracking-[0.2em] text-adm-faint">
+            <div className="font-adminmono text-[12.5px] tracking-[0.2em] text-adm-faint">
               ••••••••••
             </div>
-            <div className="mt-0.5 text-[12.5px] text-adm-muted">
+            <div className="mt-0.5 text-[11px] text-adm-muted">
               Changing your password signs out every other device.
             </div>
           </div>
@@ -457,14 +457,14 @@ function RecoveryCodesPanel({
   };
   return (
     <div className="mt-3 rounded-none border border-console-gold/40 bg-[#FBF6EA] p-3.5">
-      <div className="text-[12.5px] font-semibold text-adm-ink">
+      <div className="text-[11px] font-semibold text-adm-ink">
         Save these recovery codes now - they are shown only once.
       </div>
-      <p className="mt-1 text-[12px] leading-[1.5] text-adm-muted">
+      <p className="mt-1 text-[11px] leading-[1.5] text-adm-muted">
         Each code signs you in once if you can&apos;t receive the email code.
         Keep them somewhere safe (not in this browser).
       </p>
-      <div className="font-adminmono mt-2.5 grid grid-cols-2 gap-x-6 gap-y-1.5 text-[13px] text-adm-ink">
+      <div className="font-adminmono mt-2.5 grid grid-cols-2 gap-x-6 gap-y-1.5 text-[11.5px] text-adm-ink">
         {codes.map((code) => (
           <span key={code}>{code}</span>
         ))}
@@ -579,10 +579,10 @@ function TwoFactorCard() {
       <SectionHeading>Two-factor authentication</SectionHeading>
       <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <div className="text-[13.5px] font-semibold text-adm-ink">
+          <div className="text-[11.5px] font-semibold text-adm-ink">
             {enabled ? "Email codes - enabled" : "Email codes - off"}
           </div>
-          <div className="mt-0.5 text-[12.5px] text-adm-muted">
+          <div className="mt-0.5 text-[11px] text-adm-muted">
             {enabled
               ? `A 6-digit code is emailed to ${user?.email ?? "you"} at every sign-in.`
               : "Add a second step to sign-in: a 6-digit code emailed to you."}
@@ -703,7 +703,7 @@ function TwoFactorCard() {
       ) : null}
 
       {enabled && freshCodes === null && step === "idle" ? (
-        <div className="mt-3 flex items-center gap-2 rounded-none bg-[#E6F0E9] px-3 py-[9px] text-[12.5px] text-[#2F5E3D]">
+        <div className="mt-3 flex items-center gap-2 rounded-none bg-[#E6F0E9] px-3 py-[9px] text-[11px] text-[#2F5E3D]">
           <Check className="h-3.5 w-3.5 flex-none" aria-hidden="true" />
           <span>
             Two-factor authentication is on. Lost your recovery codes? Generate

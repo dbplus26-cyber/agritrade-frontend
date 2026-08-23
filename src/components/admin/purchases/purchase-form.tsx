@@ -308,14 +308,14 @@ export function PurchaseCreate() {
             </div>
 
             <div className="flex items-baseline justify-between px-0.5 py-1.5">
-              <span className="flex items-center gap-1 text-[11px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+              <span className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 <span className="min-w-0">Total</span>
                 <HelpTip
                   label="What is the Total?"
                   text="The weight times the price per kg: what this whole purchase will cost you."
                 />
               </span>
-              <Mono className="text-[15px] font-semibold text-adm-ink">
+              <Mono className="text-[12.5px] font-semibold text-adm-ink">
                 {formatCedis(totalPreview)}
               </Mono>
             </div>

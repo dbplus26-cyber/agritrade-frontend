@@ -122,7 +122,7 @@ function LogoCard({ settings }: { settings: ISystemSettings }) {
             </div>
           )}
           <div className="min-w-0 flex-1">
-            <p className="text-[12.5px] leading-[1.5] text-adm-muted">
+            <p className="text-[11px] leading-[1.5] text-adm-muted">
               {hasLogo
                 ? "This logo prints on the cover of every generated book."
                 : settings.statementLogoFallbackToSite
@@ -153,7 +153,7 @@ function LogoCard({ settings }: { settings: ISystemSettings }) {
             </AdminButton>
           ) : null}
         </div>
-        <label className="flex cursor-pointer items-start gap-2.5 pt-3 text-[13px] text-adm-body">
+        <label className="flex cursor-pointer items-start gap-2.5 pt-3 text-[11.5px] text-adm-body">
           <input
             type="checkbox"
             checked={settings.statementLogoFallbackToSite}
@@ -163,7 +163,7 @@ function LogoCard({ settings }: { settings: ISystemSettings }) {
           />
           <span className="min-w-0">
             Fall back to the website logo
-            <span className="block text-[12px] text-adm-muted">
+            <span className="block text-[11px] text-adm-muted">
               When no logo is uploaded here, print the site&rsquo;s own logo on
               the cover instead of leaving it bare.
             </span>

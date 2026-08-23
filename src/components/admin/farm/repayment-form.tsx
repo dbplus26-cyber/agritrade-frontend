@@ -348,11 +348,11 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
                 </div>
                 {/* The running total sits with the two figures it is worked out
                     from, not at the foot of the form where it reads as a stray. */}
-                <div className="flex items-center justify-between gap-3 rounded-none border border-adm-hairline bg-adm-sunken px-4 py-3 text-[13px]">
+                <div className="flex items-center justify-between gap-3 rounded-none border border-adm-hairline bg-adm-sunken px-4 py-3 text-[11.5px]">
                   <span className="font-semibold text-adm-muted">
                     Value credited
                   </span>
-                  <span className="text-[16px] font-bold text-console">
+                  <span className="text-[13px] font-bold text-console">
                     {value === null ? "-" : formatCedis(value)}
                   </span>
                 </div>
@@ -428,7 +428,7 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
                 would misroute label clicks. Same label/error markup as
                 AdminField so it reads as one of the fields above it. */}
             <div>
-              <span className="mb-1 block text-[13px] font-semibold text-adm-ink">
+              <span className="mb-1 block text-[11.5px] font-semibold text-adm-ink">
                 Receipt file
               </span>
               <FilePicker
@@ -449,7 +449,7 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
               {receiptError ? (
                 <span
                   role="alert"
-                  className="mt-1.5 block text-[12.5px] font-medium text-console-red"
+                  className="mt-1.5 block text-[11px] font-medium text-console-red"
                 >
                   {receiptError}
                 </span>

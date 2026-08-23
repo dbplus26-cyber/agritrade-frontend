@@ -65,12 +65,12 @@ function Headline({
 }) {
   return (
     <div className="min-w-0 border-b border-adm-hairline py-2">
-      <p className="text-[11px] font-bold tracking-[0.08em] text-adm-muted uppercase">
+      <p className="text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
         {label}
       </p>
       <Mono
         className={cn(
-          "mt-0.5 block text-[15px] text-adm-ink tabular-nums",
+          "mt-0.5 block text-[12.5px] text-adm-ink tabular-nums",
           strong && "text-[17px] font-bold",
           pair.current < 0 && "text-console-red",
         )}
@@ -78,7 +78,7 @@ function Headline({
         {formatCedis(pair.current)}
       </Mono>
       {pair.prior !== null ? (
-        <p className="mt-0.5 text-[11.5px] text-adm-faint">
+        <p className="mt-0.5 text-[10.5px] text-adm-faint">
           prior year <Mono>{formatCedis(pair.prior)}</Mono>
         </p>
       ) : null}
@@ -144,7 +144,7 @@ function OpeningBalanceCard() {
               onClick={() => {
                 setEditing(true);
               }}
-              className={cn(adminLinkClass, "cursor-pointer text-[12.5px] font-semibold")}
+              className={cn(adminLinkClass, "cursor-pointer text-[11px] font-semibold")}
             >
               {opening ? "Edit" : "Enter it"}
             </button>
@@ -166,14 +166,14 @@ function OpeningBalanceCard() {
                 <dt className="text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
                   {label}
                 </dt>
-                <dd className="mt-0.5 text-[13px] text-adm-ink [overflow-wrap:anywhere]">
+                <dd className="mt-0.5 text-[11.5px] text-adm-ink [overflow-wrap:anywhere]">
                   <Mono>{value}</Mono>
                 </dd>
               </div>
             ))}
           </dl>
         ) : (
-          <p className="pt-1 text-[13px] text-adm-muted">
+          <p className="pt-1 text-[11.5px] text-adm-muted">
             Not entered yet. The book needs its starting point - the balances
             as at 31 December of the year before the first statements.
           </p>
@@ -223,7 +223,7 @@ function OpeningBalanceCard() {
               />
             </AdminField>
           </div>
-          <p className="text-[12px] text-adm-muted">
+          <p className="text-[11px] text-adm-muted">
             The opening cash and bank position is not entered here - it is worked
             out from the cash book. Post each account&rsquo;s opening balance to
             the cash book instead.
@@ -310,7 +310,7 @@ export function StatementsScreen() {
         sub="Generate the bindable statement book for a year, ready to print, sign and stamp"
         actions={
           hasOpening ? (
-            <label className="flex items-center gap-2 text-[12.5px] text-adm-muted">
+            <label className="flex items-center gap-2 text-[11px] text-adm-muted">
               Year
               <SimpleSelect
                 value={String(year)}
@@ -318,7 +318,7 @@ export function StatementsScreen() {
                   setYear(Number(v));
                 }}
                 placeholder="Choose a year"
-                className="h-[34px] cursor-pointer rounded-none border border-adm-line bg-adm-card px-2.5 text-[13.5px] font-semibold text-adm-ink outline-none focus:border-console"
+                className="h-[34px] cursor-pointer rounded-none border border-adm-line bg-adm-card px-2.5 text-[11.5px] font-semibold text-adm-ink outline-none focus:border-console"
                 options={years.map((y) => ({
                   value: String(y),
                   label: String(y),
@@ -336,7 +336,7 @@ export function StatementsScreen() {
             {!hasOpening ? (
               <AdminCard className="px-5 py-5">
                 <SectionHeading className="mb-1">Start here</SectionHeading>
-                <p className="text-[13.5px] leading-[1.6] text-adm-body">
+                <p className="text-[11.5px] leading-[1.6] text-adm-body">
                   The statements roll forward from a one-time opening position.
                   Enter it in the panel on the right, add your fixed assets to
                   the{" "}
@@ -348,7 +348,7 @@ export function StatementsScreen() {
               </AdminCard>
             ) : preview.isLoading ? (
               <AdminCard className="px-5 py-5">
-                <p className="text-[13px] text-adm-muted">
+                <p className="text-[11.5px] text-adm-muted">
                   Composing {year}
                   &hellip;
                 </p>
@@ -371,7 +371,7 @@ export function StatementsScreen() {
                         <li
                           key={check.code}
                           className={cn(
-                            "rounded-none border px-3 py-2 text-[12.5px] leading-[1.55]",
+                            "rounded-none border px-3 py-2 text-[11px] leading-[1.55]",
                             check.level === "error"
                               ? "border-console-red/40 bg-console-red/5 text-console-red-deep"
                               : "border-console-gold/40 bg-console-gold/5 text-adm-body",
@@ -429,7 +429,7 @@ export function StatementsScreen() {
                   >
                     Generate the book
                   </SectionHeading>
-                  <p className="mb-3 text-[12.5px] leading-[1.55] text-adm-muted">
+                  <p className="mb-3 text-[11px] leading-[1.55] text-adm-muted">
                     {isFinal
                       ? "This year is final - the book prints clean, with no watermark."
                       : "The year is still draft: every page carries a DRAFT watermark until you mark it final."}
@@ -461,7 +461,7 @@ export function StatementsScreen() {
             <OpeningBalanceCard />
             <AdminCard className="px-5 py-4">
               <SectionHeading className="mb-1">The inputs</SectionHeading>
-              <ul className="flex flex-col gap-2 text-[13px]">
+              <ul className="flex flex-col gap-2 text-[11.5px]">
                 <li>
                   <Link href="/admin/fixed-assets" className={adminLinkClass}>
                     Fixed-asset register

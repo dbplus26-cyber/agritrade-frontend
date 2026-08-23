@@ -290,7 +290,7 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
                 </AdminField>
               </div>
               <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-                <span className="text-[12.5px] text-adm-muted">
+                <span className="text-[11px] text-adm-muted">
                   {entryTotal > 0 ? (
                     <>
                       This line:{" "}
@@ -322,7 +322,7 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
                 </div>
               </div>
               {entryError ? (
-                <p className="mt-1.5 text-[12.5px] font-medium text-console-red" role="alert">
+                <p className="mt-1.5 text-[11px] font-medium text-console-red" role="alert">
                   {entryError}
                 </p>
               ) : null}
@@ -332,7 +332,7 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
             {fields.length === 0 ? (
               <p
                 className={cn(
-                  "rounded-none border border-dashed px-3 py-3 text-[12.5px]",
+                  "rounded-none border border-dashed px-3 py-3 text-[11px]",
                   errors.lines
                     ? "border-console-red/60 text-console-red"
                     : "border-adm-strong/60 text-adm-muted",
@@ -357,10 +357,10 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
                       className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2.5"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="text-[13.5px] font-semibold text-adm-ink [overflow-wrap:anywhere]">
+                        <p className="text-[11.5px] font-semibold text-adm-ink [overflow-wrap:anywhere]">
                           {name}
                         </p>
-                        <p className="text-[12.5px] text-adm-muted">
+                        <p className="text-[11px] text-adm-muted">
                           <Mono>
                             {weight.toLocaleString("en-GH")} kg × {formatCedis(price)}
                             /kg
@@ -368,7 +368,7 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
                         </p>
                       </div>
                       <div className="flex flex-none items-center gap-3">
-                        <Mono className="text-[14px] font-semibold tabular-nums text-adm-ink">
+                        <Mono className="text-[12px] font-semibold tabular-nums text-adm-ink">
                           {formatCedis(weight * price)}
                         </Mono>
                         <button
@@ -376,7 +376,7 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
                           onClick={() => {
                             remove(index);
                           }}
-                          className="cursor-pointer text-[12.5px] font-semibold text-console-red underline-offset-2 hover:underline"
+                          className="cursor-pointer text-[11px] font-semibold text-console-red underline-offset-2 hover:underline"
                         >
                           Remove
                         </button>
@@ -388,7 +388,7 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
             )}
 
             <div className="flex items-baseline justify-between pt-2.5">
-              <span className="flex items-center gap-1 text-[12px] text-adm-muted">
+              <span className="flex items-center gap-1 text-[11px] text-adm-muted">
                 <span className="min-w-0">
                   Agreed total
                   {fields.length > 0

@@ -149,7 +149,7 @@ function AccountSelect({
           rather than push the field sideways. */}
       {note ? (
         <p
-          className="mt-1 text-[12px] text-adm-muted [overflow-wrap:anywhere]"
+          className="mt-1 text-[11px] text-adm-muted [overflow-wrap:anywhere]"
           id={noteId}
         >
           {note}

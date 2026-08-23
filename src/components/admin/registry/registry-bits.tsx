@@ -77,7 +77,7 @@ export const columnMeta = (opts?: {
 }) => ({
   className: cn(
     // No font size here. The shared table body is 14px (data-table.tsx td);
-    // a `text-[13px]` in this meta silently overrides it on every register
+    // a `text-[11.5px]` in this meta silently overrides it on every register
     // that uses columnMeta while screens without it stay at 14px - and the
     // phone card view (which ignores meta) stays at 14px everywhere. One
     // table, two sizes, depending on the width of the screen.

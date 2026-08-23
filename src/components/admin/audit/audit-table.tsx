@@ -147,7 +147,7 @@ export function AuditTable() {
                 {actor.name}
               </div>
               <div
-                className="@2xl/table:max-w-[90%] text-[12.5px] text-adm-faint [overflow-wrap:anywhere] @2xl/table:truncate"
+                className="@2xl/table:max-w-[90%] text-[11px] text-adm-faint [overflow-wrap:anywhere] @2xl/table:truncate"
                 title={actor.email}
               >
                 {actor.email}
@@ -182,7 +182,7 @@ export function AuditTable() {
             <span className="text-adm-muted">{row.original.entity}</span>
             {row.original.entityId ? (
               <Mono
-                className="ml-1.5 text-[11px] text-adm-faint"
+                className="ml-1.5 text-[10.5px] text-adm-faint"
                 // Full id on hover; the cell shows a short handle.
               >
                 <span title={row.original.entityId}>

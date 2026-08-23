@@ -152,7 +152,7 @@ export function EntryDialog({
             />
           </AdminField>
           {chosen ? (
-            <p className="-mt-3 text-[12.5px] text-adm-muted">
+            <p className="-mt-3 text-[11px] text-adm-muted">
               {chosen.description}
             </p>
           ) : null}
@@ -195,7 +195,7 @@ export function EntryDialog({
               {...form.register("reason")}
             />
           </AdminField>
-          <p className="text-[12.5px] text-adm-muted">
+          <p className="text-[11px] text-adm-muted">
             This is the only money path with no document behind it, so what you
             write here is the whole explanation anyone reading the books later
             will have.
@@ -323,7 +323,7 @@ export function TransferDialog({
             />
           </AdminField>
           {from ? (
-            <p className="-mt-3 text-[12.5px] text-adm-muted">
+            <p className="-mt-3 text-[11px] text-adm-muted">
               {from.label} holds {formatCedis(from.balanceGhs)}.
             </p>
           ) : null}
@@ -528,13 +528,13 @@ export function ReconcileDialog({
           </div>
 
           <div className="border border-adm-hairline bg-adm-sunken p-3">
-            <p className="text-[12.5px] text-adm-muted">
+            <p className="text-[11px] text-adm-muted">
               The books say {formatCedis(bookBalanceGhs)}.
             </p>
             {variance !== null ? (
               <p
                 className={cn(
-                  "font-adminmono mt-1 text-[15px] font-bold tabular-nums",
+                  "font-adminmono mt-1 text-[12.5px] font-bold tabular-nums",
                   variance === 0 ? "text-adm-ink" : "text-console-red",
                 )}
               >
@@ -557,7 +557,7 @@ export function ReconcileDialog({
             />
           </AdminField>
 
-          <label className="flex items-start gap-2.5 text-[13px] text-adm-body">
+          <label className="flex items-start gap-2.5 text-[11.5px] text-adm-body">
             <input
               className="mt-0.5 size-4 flex-none accent-[var(--console)]"
               type="checkbox"
@@ -565,7 +565,7 @@ export function ReconcileDialog({
             />
             <span>
               Correct the books to match what I counted.
-              <span className="mt-0.5 block text-[12.5px] text-adm-muted">
+              <span className="mt-0.5 block text-[11px] text-adm-muted">
                 Only tick this when the difference is a real error, not a
                 payment that has yet to clear. It writes a correction that moves
                 the balance - it does not quietly rewrite anything.

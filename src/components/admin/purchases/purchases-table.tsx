@@ -162,11 +162,11 @@ export function PurchasesTable() {
               <span className="block min-w-0 @2xl/table:max-w-[90%]">
                 <span className="block [overflow-wrap:anywhere] @2xl/table:truncate font-medium text-adm-ink">
                   {p.commodity.name}
-                  <Mono className="ml-1.5 text-[12.5px] text-adm-muted">
+                  <Mono className="ml-1.5 text-[11px] text-adm-muted">
                     {formatKg(p.weightKg)}
                   </Mono>
                 </span>
-                <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-faint">
+                <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[11px] text-adm-faint">
                   {purchaseCounterparty(p)}
                 </span>
               </span>

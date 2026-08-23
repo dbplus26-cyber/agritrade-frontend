@@ -159,7 +159,7 @@ export function FarmDocumentsSection({
           value={docName}
           onChange={(e) => setDocName(e.target.value)}
           placeholder={`Document name (default: ${defaultName})`}
-          className="h-8 min-w-0 flex-1 rounded-none border border-adm-line bg-adm-card px-2.5 text-[13px] outline-none transition-colors placeholder:text-adm-faint focus:border-console"
+          className="h-8 min-w-0 flex-1 rounded-none border border-adm-line bg-adm-card px-2.5 text-[11.5px] outline-none transition-colors placeholder:text-adm-faint focus:border-console"
         />
         <FilePicker
           accept="image/*,application/pdf,.doc,.docx"
@@ -175,7 +175,7 @@ export function FarmDocumentsSection({
         <button
           type="button"
           onClick={() => setSigning((v) => !v)}
-          className={cn(adminLinkClass, "cursor-pointer text-[12px] font-semibold")}
+          className={cn(adminLinkClass, "cursor-pointer text-[11px] font-semibold")}
           aria-expanded={signing}
         >
           {signing ? "Hide signature pad" : "Or sign on this screen"}
@@ -191,7 +191,7 @@ export function FarmDocumentsSection({
                 void onDocConfirm(file).catch(() => undefined);
               }}
             />
-            <p className="mt-1 text-[11.5px] text-adm-faint">
+            <p className="mt-1 text-[10.5px] text-adm-faint">
               Saves as &quot;{docName.trim() || defaultName}&quot; - hand the
               phone over to sign right here.
             </p>

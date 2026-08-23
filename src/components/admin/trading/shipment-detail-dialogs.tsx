@@ -293,13 +293,13 @@ export function AddSalesDialog({
         />
 
         {eligible.isLoading ? (
-          <p className="py-3 text-[13px] text-adm-muted">Loading shippable sales…</p>
+          <p className="py-3 text-[11.5px] text-adm-muted">Loading shippable sales…</p>
         ) : eligible.isError ? (
-          <p className="py-3 text-[13px] text-console-red">
+          <p className="py-3 text-[11.5px] text-console-red">
             Couldn&apos;t load the shippable sales. Reload and try again.
           </p>
         ) : sales.length === 0 ? (
-          <p className="py-3 text-[13px] text-adm-muted">
+          <p className="py-3 text-[11.5px] text-adm-muted">
             No other sale is ready to ship right now.
           </p>
         ) : (
@@ -317,17 +317,17 @@ export function AddSalesDialog({
                 />
                 <span className="min-w-0 flex-1">
                   <span className="flex items-baseline justify-between gap-2">
-                    <Mono className="block text-[12.5px] text-console">
+                    <Mono className="block text-[11px] text-console">
                       {s.transactionNo}
                     </Mono>
-                    <Mono className="flex-none text-[12.5px] font-bold text-adm-ink">
+                    <Mono className="flex-none text-[11px] font-bold text-adm-ink">
                       {formatKg(s.totalRemainingKg)}
                     </Mono>
                   </span>
-                  <span className="block min-w-0 text-[13px] text-adm-ink [overflow-wrap:anywhere]">
+                  <span className="block min-w-0 text-[11.5px] text-adm-ink [overflow-wrap:anywhere]">
                     {s.buyer.name}
                   </span>
-                  <span className="mt-0.5 block text-[12px] text-adm-muted">
+                  <span className="mt-0.5 block text-[11px] text-adm-muted">
                     {s.lines.map((l) => (
                       <span
                         key={l.commodityId}
@@ -346,7 +346,7 @@ export function AddSalesDialog({
         {serverError ? (
           <p
             role="alert"
-            className="rounded-none border border-console-red/50 bg-console-red/[0.06] px-3 py-2 text-[12.5px] font-medium text-console-red"
+            className="rounded-none border border-console-red/50 bg-console-red/[0.06] px-3 py-2 text-[11px] font-medium text-console-red"
           >
             {serverError}
           </p>
@@ -425,16 +425,16 @@ export function SalesUnpaidDialog({
               >
                 <Link
                   href={`/admin/sales/${s.id}`}
-                  className={cn(adminLinkClass, "min-w-0 text-[13px]")}
+                  className={cn(adminLinkClass, "min-w-0 text-[11.5px]")}
                 >
-                  <Mono className="text-[12.5px] font-semibold">
+                  <Mono className="text-[11px] font-semibold">
                     {s.transactionNo}
                   </Mono>
                   <span className="ml-2 [overflow-wrap:anywhere]">
                     {s.buyer.name}
                   </span>
                 </Link>
-                <Mono className="flex-none text-[13.5px] font-bold text-console-red">
+                <Mono className="flex-none text-[11.5px] font-bold text-console-red">
                   <Money value={saleBalanceGhs(s)} />
                 </Mono>
               </li>
@@ -442,7 +442,7 @@ export function SalesUnpaidDialog({
           </ul>
         ) : null}
 
-        <p className="text-[12.5px] text-adm-muted">
+        <p className="text-[11px] text-adm-muted">
           Open each sale and record what the buyer has paid, then close the
           trip.
         </p>

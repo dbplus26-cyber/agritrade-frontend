@@ -166,7 +166,7 @@ export function SearchableSelect({
             {/* "Searching" and "nothing found" are different answers, and
                 saying "No matches" while the request is still out tells the
                 user their record does not exist when it may well. */}
-            <CommandEmpty className="py-5 text-center text-[13px] text-adm-muted">
+            <CommandEmpty className="py-5 text-center text-[11.5px] text-adm-muted">
               {loading ? "Searching…" : emptyText}
             </CommandEmpty>
             {options.map((o) => (
@@ -180,7 +180,7 @@ export function SearchableSelect({
                   onChange(o.value);
                   setOpen(false);
                 }}
-                className="rounded-none text-[13.5px]"
+                className="rounded-none text-[11.5px]"
               >
                 <span className="min-w-0 flex-1 text-adm-ink [overflow-wrap:break-word]">
                   {o.label}
@@ -195,7 +195,7 @@ export function SearchableSelect({
                     keeps the greater share. */}
                 {o.hint ? (
                   <span
-                    className="ml-auto max-w-[40%] flex-none truncate pl-2 text-right text-[12px] text-adm-muted/80"
+                    className="ml-auto max-w-[40%] flex-none truncate pl-2 text-right text-[11px] text-adm-muted/80"
                     title={o.hint}
                   >
                     {o.hint}

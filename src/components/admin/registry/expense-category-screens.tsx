@@ -609,15 +609,15 @@ function ExpenseLine({ expense }: { expense: IExpense }) {
   return (
     <li className="flex items-start justify-between gap-4 px-4 py-3">
       <div className="min-w-0 flex-1">
-        <p className="text-[13.5px] leading-[1.45] text-adm-ink [overflow-wrap:anywhere]">
+        <p className="text-[11.5px] leading-[1.45] text-adm-ink [overflow-wrap:anywhere]">
           {expense.description ?? <Absent />}
         </p>
-        <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[12px] text-adm-muted">
+        <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-adm-muted">
           {/* The voucher number is the line's handle: the description can be
               empty, the number never is, so it carries the link to the cost's
               own page. */}
           <Link
-            className={cn(adminLinkClass, "font-adminmono text-[12px] tabular-nums")}
+            className={cn(adminLinkClass, "font-adminmono text-[11px] tabular-nums")}
             href={`/admin/expenses/${expense.id}`}
           >
             {expense.transactionNo}
@@ -629,7 +629,7 @@ function ExpenseLine({ expense }: { expense: IExpense }) {
         </p>
       </div>
       {showMoney ? (
-        <Mono className="flex-none text-[13.5px] font-semibold tabular-nums text-adm-ink">
+        <Mono className="flex-none text-[11.5px] font-semibold tabular-nums text-adm-ink">
           {formatCedis(expense.amountGhs)}
         </Mono>
       ) : null}
@@ -712,10 +712,10 @@ function CategoryExpensesCard({ categoryId }: { categoryId: string }) {
               {/* The server sums the WHOLE filtered set, not the page on
                   screen, so narrowing the window answers "what did we spend
                   on this in July?" rather than "what is on page 1?". */}
-              <span className="text-[11px] font-bold tracking-[0.08em] text-adm-muted uppercase">
+              <span className="text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
                 {filtered ? "Matched" : "Total"}
               </span>
-              <Mono className="text-[16px] font-bold text-adm-ink">
+              <Mono className="text-[13px] font-bold text-adm-ink">
                 {formatCedis(windowTotal)}
               </Mono>
             </span>

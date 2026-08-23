@@ -49,12 +49,12 @@ function GhsInput({
         error ? "border-console-red" : "border-adm-line",
       )}
     >
-      <span className="flex h-full items-center border-r border-adm-line bg-adm-sunken px-2.5 text-[13px] text-adm-muted">
+      <span className="flex h-full items-center border-r border-adm-line bg-adm-sunken px-2.5 text-[11.5px] text-adm-muted">
         GH₵
       </span>
       <Input
         inputMode="decimal"
-        className="font-adminmono h-full min-w-0 flex-1 rounded-none border-0 bg-transparent px-2.5 py-0 text-right text-[14px] tabular-nums text-adm-ink outline-none placeholder:text-adm-faint focus-visible:ring-0 disabled:cursor-default disabled:opacity-100"
+        className="font-adminmono h-full min-w-0 flex-1 rounded-none border-0 bg-transparent px-2.5 py-0 text-right text-[12px] tabular-nums text-adm-ink outline-none placeholder:text-adm-faint focus-visible:ring-0 disabled:cursor-default disabled:opacity-100"
         {...props}
       />
     </div>
@@ -371,7 +371,7 @@ function SignatureCard({ settings }: { settings: ISystemSettings }) {
               No signature
             </div>
           )}
-          <p className="min-w-0 flex-1 text-[12.5px] leading-[1.5] text-adm-muted">
+          <p className="min-w-0 flex-1 text-[11px] leading-[1.5] text-adm-muted">
             {uploadState.isLoading
               ? "Saving the signature…"
               : hasSignature

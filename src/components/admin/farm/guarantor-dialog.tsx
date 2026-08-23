@@ -125,10 +125,10 @@ export function GuarantorDialog({
     <ResponsiveDialog open onOpenChange={(o) => !o && onClose()}>
       <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto border-adm-line p-5 sm:max-w-[640px]">
         <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle className="text-[15px] font-bold text-adm-ink">
+          <ResponsiveDialogTitle className="text-[12.5px] font-bold text-adm-ink">
             {guarantor ? "Edit guarantor" : "Add guarantor"}
           </ResponsiveDialogTitle>
-          <ResponsiveDialogDescription className="text-[12.5px] leading-[1.55] text-adm-muted">
+          <ResponsiveDialogDescription className="text-[11px] leading-[1.55] text-adm-muted">
             Someone who vouches for the farmer and can be reached if repayment
             stalls.
           </ResponsiveDialogDescription>

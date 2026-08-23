@@ -316,7 +316,7 @@ export function PurchaseCostDialog({
                 written into the books on the day the cost was incurred, and
                 moving it later would take the cost out of a month somebody has
                 already read and closed. */}
-            <p className="text-[12px] leading-[1.45] text-adm-muted">
+            <p className="text-[11px] leading-[1.45] text-adm-muted">
               This is decided once. It cannot be changed after the cost is
               saved.
             </p>

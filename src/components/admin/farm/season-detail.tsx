@@ -213,7 +213,7 @@ export function SeasonDetail({ id }: { id: string }) {
               <SectionHeading className="mb-1">
                 Expected vs actual
               </SectionHeading>
-              <p className="mb-2 text-[12px] text-adm-muted">
+              <p className="mb-2 text-[11px] text-adm-muted">
                 The season plans against what actually came back - the read
                 that makes next season&apos;s grant decisions better informed.
               </p>
@@ -279,7 +279,7 @@ export function SeasonDetail({ id }: { id: string }) {
                 description="Grants and repayments booked to this season appear here."
               />
             ) : (
-              <table className="w-full border-collapse text-[14px]">
+              <table className="w-full border-collapse text-[12px]">
                 <thead>
                   <tr className="border-b border-adm-hairline text-left text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted">
                     <th className="px-5 py-2">Farmer</th>

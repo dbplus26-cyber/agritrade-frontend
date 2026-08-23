@@ -61,10 +61,10 @@ function PayToCard({
 
   return (
     <div className="break-inside-avoid border border-adm-line p-3">
-      <div className="text-[11px] font-bold tracking-[0.06em] text-console uppercase">
+      <div className="text-[10.5px] font-bold tracking-[0.06em] text-console uppercase">
         {heading}
       </div>
-      <dl className="mt-1.5 text-[12px]">
+      <dl className="mt-1.5 text-[11px]">
         {rows.map(([label, value]) => (
           <div key={label} className="flex justify-between gap-3 py-[1px]">
             <dt className="text-adm-muted">{label}</dt>
@@ -164,42 +164,42 @@ export function SaleInvoice({ id }: { id: string }) {
             <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">
               DB PLUS
             </div>
-            <div className="text-[11px] tracking-[0.06em] text-adm-muted uppercase">
+            <div className="text-[10.5px] tracking-[0.06em] text-adm-muted uppercase">
               Trading
             </div>
             {/* From the owner's settings, never hardcoded: an invoice that
                 names a stale address is a document the buyer cannot act on. */}
             {company?.companyContactAddress ? (
-              <div className="mt-1 text-[11px] text-adm-muted">
+              <div className="mt-1 text-[10.5px] text-adm-muted">
                 {company.companyContactAddress}
               </div>
             ) : null}
             {company?.companyContactPhone ? (
-              <div className="text-[11px] text-adm-muted">
+              <div className="text-[10.5px] text-adm-muted">
                 {company.companyContactPhone}
               </div>
             ) : null}
             {company?.companyContactEmail ? (
-              <div className="text-[11px] text-adm-muted">
+              <div className="text-[10.5px] text-adm-muted">
                 {company.companyContactEmail}
               </div>
             ) : null}
             </div>
           </div>
           <div className="text-right">
-            <div className="text-[16px] font-bold">
+            <div className="text-[13px] font-bold">
               {isReceipt ? "RECEIPT" : "INVOICE"}
             </div>
-            <div className="text-[12px] text-adm-muted">
+            <div className="text-[11px] text-adm-muted">
               Ref {s.transactionNo}
             </div>
-            <div className="text-[12px] text-adm-muted">
+            <div className="text-[11px] text-adm-muted">
               {formatSaleDate(s.confirmedAt ?? s.createdAt)}
             </div>
           </div>
         </div>
 
-        <div className="mt-4 text-[13px]">
+        <div className="mt-4 text-[11.5px]">
           <div className="mb-1 text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
             Billed to
           </div>
@@ -207,7 +207,7 @@ export function SaleInvoice({ id }: { id: string }) {
           {s.buyer.phone ? <div>{s.buyer.phone}</div> : null}
         </div>
 
-        <table className="mt-6 w-full border-collapse text-[13px]">
+        <table className="mt-6 w-full border-collapse text-[11.5px]">
           <thead>
             <tr className="border-y border-adm-strong text-left">
               <th className="py-2">Commodity</th>
@@ -232,7 +232,7 @@ export function SaleInvoice({ id }: { id: string }) {
           </tbody>
         </table>
 
-        <div className="mt-4 ml-auto w-full max-w-[280px] text-[13px]">
+        <div className="mt-4 ml-auto w-full max-w-[280px] text-[11.5px]">
           <div className="flex justify-between py-1">
             <span className="text-adm-muted">Agreed total</span>
             <span className="font-semibold">
@@ -257,14 +257,14 @@ export function SaleInvoice({ id }: { id: string }) {
               <Money value={s.paidGhs} />
             </span>
           </div>
-          <div className="flex justify-between border-t border-adm-strong py-1.5 text-[15px] font-bold">
+          <div className="flex justify-between border-t border-adm-strong py-1.5 text-[12.5px] font-bold">
             <span>{isReceipt ? "Settled" : "Balance due"}</span>
             <span>{isReceipt ? "Paid in full" : <Money value={balance} />}</span>
           </div>
         </div>
 
         {s.payments.length > 0 ? (
-          <div className="mt-6 text-[12px]">
+          <div className="mt-6 text-[11px]">
             <div className="mb-1 text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
               Payments received
             </div>
@@ -304,7 +304,7 @@ export function SaleInvoice({ id }: { id: string }) {
         ) : !isReceipt ? (
           // Silence here would read as "no payment needed". Say plainly that
           // the details are missing so staff notice before the buyer does.
-          <p className="mt-6 border border-dashed border-adm-line p-3 text-[11.5px] text-adm-muted print:hidden">
+          <p className="mt-6 border border-dashed border-adm-line p-3 text-[10.5px] text-adm-muted print:hidden">
             No payment accounts are published yet, so this invoice cannot tell
             the buyer where to send the money. Add one under Directory →
             Payment Accounts.
@@ -316,7 +316,7 @@ export function SaleInvoice({ id }: { id: string }) {
           <AuthorisedSignature />
         </div>
 
-        <p className="mt-6 text-[11px] text-adm-muted">
+        <p className="mt-6 text-[10.5px] text-adm-muted">
           Thank you for trading with DB Plus.
         </p>
       </div>

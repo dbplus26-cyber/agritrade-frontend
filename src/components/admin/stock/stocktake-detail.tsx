@@ -59,7 +59,7 @@ function LinesCard({ lines }: { lines: IStocktakeLine[] }) {
       <div className="@container/lines">
         {/* Wide: the real four-column table. */}
         <div className="hidden overflow-x-auto @xl/lines:block">
-          <table className="w-full text-[14px]">
+          <table className="w-full text-[12px]">
             <thead>
               <tr className="bg-adm-sunken text-left text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted">
                 {/* The named column takes the slack; Counted, Book and Difference
@@ -140,7 +140,7 @@ function LinesCard({ lines }: { lines: IStocktakeLine[] }) {
                 <Link
                   className={cn(
                     adminLinkClass,
-                    "min-w-0 text-[13.5px] font-medium line-clamp-1 whitespace-normal [overflow-wrap:anywhere]",
+                    "min-w-0 text-[11.5px] font-medium line-clamp-1 whitespace-normal [overflow-wrap:anywhere]",
                   )}
                   href={`/admin/commodities/${l.commodity.id}`}
                   title={l.commodity.name}
@@ -149,11 +149,11 @@ function LinesCard({ lines }: { lines: IStocktakeLine[] }) {
                 </Link>
                 <Kg
                   kg={l.countedKg}
-                  className="flex-none text-[13px] font-semibold text-adm-ink"
+                  className="flex-none text-[11.5px] font-semibold text-adm-ink"
                 />
               </div>
               {l.derivedKg !== null ? (
-                <div className="mt-0.5 flex items-baseline justify-between gap-3 text-[12.5px]">
+                <div className="mt-0.5 flex items-baseline justify-between gap-3 text-[11px]">
                   <span className="text-adm-muted">
                     Book <Kg kg={l.derivedKg} className="text-adm-muted" />
                   </span>
@@ -357,7 +357,7 @@ export function StocktakeDetail({ id }: { id: string }) {
             ) : st.status === StocktakeStatus.SUBMITTED ? (
               <div className="mt-4 border-t border-adm-hairline pt-4">
                 {!isSuperAdmin ? (
-                  <p className="mb-3 text-[12.5px] text-adm-muted">
+                  <p className="mb-3 text-[11px] text-adm-muted">
                     Waiting for the owner to approve or cancel this sheet.
                   </p>
                 ) : null}
@@ -379,7 +379,7 @@ export function StocktakeDetail({ id }: { id: string }) {
                 </ActionRow>
               </div>
             ) : (
-              <p className="mt-4 border-t border-adm-hairline pt-4 text-[12.5px] text-adm-muted">
+              <p className="mt-4 border-t border-adm-hairline pt-4 text-[11px] text-adm-muted">
                 {st.status === StocktakeStatus.APPROVED
                   ? `Approved ${st.decidedAt ? formatDateTime(st.decidedAt) : ""} - every difference posted as a stock adjustment.`
                   : `Cancelled ${st.decidedAt ? formatDateTime(st.decidedAt) : ""} - nothing posted from this sheet.`}

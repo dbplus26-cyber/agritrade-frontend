@@ -99,7 +99,7 @@ export function CashSourceField({
           reader then reads every option on every option. The legend names the
           group; each option's own label names itself. */}
       <fieldset className="min-w-0">
-        <legend className="mb-1 text-[13px] font-semibold text-adm-ink">
+        <legend className="mb-1 text-[11.5px] font-semibold text-adm-ink">
           {copy.question}
         </legend>
         {/* Stacked at every width, never two-up: both answers are sentences,
@@ -127,11 +127,11 @@ export function CashSourceField({
                 className="mt-[3px] flex-none accent-console"
               />
               <span className="min-w-0">
-                <span className="block text-[13.5px] font-semibold text-adm-ink">
+                <span className="block text-[11.5px] font-semibold text-adm-ink">
                   {option.label}
                 </span>
                 {option.hint ? (
-                  <span className="mt-0.5 block text-[12px] leading-[1.45] text-adm-muted">
+                  <span className="mt-0.5 block text-[11px] leading-[1.45] text-adm-muted">
                     {option.hint}
                   </span>
                 ) : null}
@@ -184,7 +184,7 @@ export function CashSourceField({
                 onClick={() => {
                   onReasonChange(example);
                 }}
-                className="cursor-pointer rounded-[3px] border border-adm-line px-2 py-1 text-left text-[12px] text-adm-body hover:bg-adm-sunken"
+                className="cursor-pointer rounded-[3px] border border-adm-line px-2 py-1 text-left text-[11px] text-adm-body hover:bg-adm-sunken"
               >
                 {example}
               </button>
@@ -242,7 +242,7 @@ export function CashSourceNote({
       <span className="block min-w-0">
         <ToneBadge tone="slate">No cash moved</ToneBadge>
         <span
-          className="mt-1 block text-[12.5px] text-adm-muted [overflow-wrap:anywhere] @2xl/table:truncate"
+          className="mt-1 block text-[11px] text-adm-muted [overflow-wrap:anywhere] @2xl/table:truncate"
           title={reason}
         >
           {reason}

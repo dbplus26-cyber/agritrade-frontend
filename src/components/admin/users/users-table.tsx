@@ -194,7 +194,7 @@ export function UsersTable() {
                     className="h-6 w-6 flex-none rounded-full object-cover"
                   />
                 ) : (
-                  <span className="font-adminmono inline-flex h-6 w-6 flex-none items-center justify-center rounded-full bg-console/10 text-[11px] font-bold text-console">
+                  <span className="font-adminmono inline-flex h-6 w-6 flex-none items-center justify-center rounded-full bg-console/10 text-[10.5px] font-bold text-console">
                     {initialsOf(u)}
                   </span>
                 )}
@@ -202,7 +202,7 @@ export function UsersTable() {
                   <span className="block [overflow-wrap:anywhere] @2xl/table:truncate font-medium text-adm-ink">
                     {u.firstName} {u.lastName}
                   </span>
-                  <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-faint">
+                  <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[11px] text-adm-faint">
                     {u.email}
                   </span>
                 </span>

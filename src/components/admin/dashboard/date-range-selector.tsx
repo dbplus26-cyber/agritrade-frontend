@@ -100,7 +100,7 @@ export function DateRangeSelector({
   return (
     <div className="flex flex-wrap items-center gap-2">
       <Select value={preset} onValueChange={(v) => choosePreset(v as RangePreset)}>
-        <SelectTrigger className="h-9 w-full cursor-pointer text-[13px] sm:w-[164px]">
+        <SelectTrigger className="h-9 w-full cursor-pointer text-[11.5px] sm:w-[164px]">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

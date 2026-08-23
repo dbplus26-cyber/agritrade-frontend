@@ -97,21 +97,21 @@ export function ExpenseDetail({ id }: { id: string }) {
       aside={
         <>
           <RailCard title="Voucher">
-            <Mono className="text-[13px] text-adm-ink">
+            <Mono className="text-[11.5px] text-adm-ink">
               {expense.transactionNo}
             </Mono>
           </RailCard>
           <RailCard title="Dates">
             <div className="flex flex-col gap-2.5">
               <div>
-                <div className="text-[11.5px] text-adm-muted">Incurred</div>
-                <div className="mt-0.5 text-[13px] text-adm-ink">
+                <div className="text-[10.5px] text-adm-muted">Incurred</div>
+                <div className="mt-0.5 text-[11.5px] text-adm-ink">
                   <DateOnlyCell value={expense.incurredAt} />
                 </div>
               </div>
               <div>
-                <div className="text-[11.5px] text-adm-muted">Recorded</div>
-                <div className="mt-0.5 text-[13px] text-adm-ink">
+                <div className="text-[10.5px] text-adm-muted">Recorded</div>
+                <div className="mt-0.5 text-[11.5px] text-adm-ink">
                   <DateTimeCell value={expense.createdAt} muted />
                 </div>
               </div>
@@ -130,7 +130,7 @@ export function ExpenseDetail({ id }: { id: string }) {
             {formatCedis(expense.amountGhs)}
           </Mono>
         ) : (
-          <span className="block text-[15px] text-adm-faint">
+          <span className="block text-[12.5px] text-adm-faint">
             Amount hidden
           </span>
         )}
@@ -139,7 +139,7 @@ export function ExpenseDetail({ id }: { id: string }) {
             "what else did we spend on fuel" is the next question after "how
             much was this". */}
         <Link
-          className={cn(adminLinkClass, "mt-1.5 inline-block text-[13px]")}
+          className={cn(adminLinkClass, "mt-1.5 inline-block text-[11.5px]")}
           href={`/admin/expense-categories/${expense.category.id}`}
         >
           {expense.category.name}
@@ -150,11 +150,11 @@ export function ExpenseDetail({ id }: { id: string }) {
         <div className="mt-4 border-t border-adm-hairline pt-4">
           <SectionHeading>What it was for</SectionHeading>
           {expense.description ? (
-            <p className="text-[13.5px] leading-[1.55] text-adm-body [overflow-wrap:anywhere]">
+            <p className="text-[11.5px] leading-[1.55] text-adm-body [overflow-wrap:anywhere]">
               {expense.description}
             </p>
           ) : (
-            <p className="text-[13.5px] text-adm-faint">Not recorded</p>
+            <p className="text-[11.5px] text-adm-faint">Not recorded</p>
           )}
         </div>
       </AdminCard>
@@ -179,11 +179,11 @@ export function ExpenseDetail({ id }: { id: string }) {
           </SectionHeading>
           <Link
             href={`/admin/shipments/${expense.shipment.id}`}
-            className={cn(adminLinkClass, "block text-[14px] font-medium")}
+            className={cn(adminLinkClass, "block text-[12px] font-medium")}
           >
             {expense.shipment.transactionNo}
           </Link>
-          <div className="mt-1 text-[13px] text-adm-body [overflow-wrap:anywhere]">
+          <div className="mt-1 text-[11.5px] text-adm-body [overflow-wrap:anywhere]">
             {expense.shipment.destination}
             <span className="text-adm-muted">
               {" · "}

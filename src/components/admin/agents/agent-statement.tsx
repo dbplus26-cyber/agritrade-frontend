@@ -199,20 +199,20 @@ export function AgentStatement({ id }: { id: string }) {
               <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">
                 DB PLUS
               </div>
-              <div className="text-[11px] tracking-[0.06em] text-adm-muted uppercase">
+              <div className="text-[10.5px] tracking-[0.06em] text-adm-muted uppercase">
                 Trading · Tamale
               </div>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-[16px] font-bold">FLOAT STATEMENT</div>
-            <div className="text-[12px] text-adm-muted">
+            <div className="text-[13px] font-bold">FLOAT STATEMENT</div>
+            <div className="text-[11px] text-adm-muted">
               {a.firstName} {a.lastName}
             </div>
-            <div className="text-[12px] text-adm-muted">
+            <div className="text-[11px] text-adm-muted">
               Printed {formatDate(new Date().toISOString())}
             </div>
-            <div className="text-[12px] text-adm-muted">
+            <div className="text-[11px] text-adm-muted">
               {windowed
                 ? `Period ${from ? formatDateOnly(from) : "start"} to ${to ? formatDateOnly(to) : "today"}`
                 : "All history"}
@@ -223,7 +223,7 @@ export function AgentStatement({ id }: { id: string }) {
         {/* Fixed money columns so every figure lands on the same right edge
             whatever the description beside it does. */}
         <div className="mt-6 overflow-x-auto">
-          <table className="w-full min-w-[520px] table-fixed border-collapse text-[13px]">
+          <table className="w-full min-w-[520px] table-fixed border-collapse text-[11.5px]">
             <colgroup>
               <col className="w-[92px]" />
               <col />
@@ -325,7 +325,7 @@ export function AgentStatement({ id }: { id: string }) {
 
         {/* Never let a truncated ledger pass as the whole story. */}
         {(float.data.meta.total ?? 0) > rows.length ? (
-          <p className="mt-3 text-[11.5px] text-adm-muted">
+          <p className="mt-3 text-[10.5px] text-adm-muted">
             Showing the {PAGE_LIMIT} most recent entries of{" "}
             {float.data.meta.total}. Narrow the period above to print the rest.
           </p>
@@ -335,7 +335,7 @@ export function AgentStatement({ id }: { id: string }) {
         <div className="mt-5 ml-auto w-full max-w-[340px]">
           {windowed ? (
             <>
-              <div className="flex items-baseline justify-between gap-4 border-t border-adm-line py-1.5 text-[12.5px]">
+              <div className="flex items-baseline justify-between gap-4 border-t border-adm-line py-1.5 text-[11px]">
                 <span className="text-adm-muted">
                   Opening{from ? ` on ${formatDateOnly(from)}` : ""}
                 </span>
@@ -344,7 +344,7 @@ export function AgentStatement({ id }: { id: string }) {
               {/* The rows' own movement: the closing figure minus what was
                   carried in, so it stays a period total even though the
                   balance column starts from the opening balance. */}
-              <div className="flex items-baseline justify-between gap-4 border-t border-adm-line py-1.5 text-[12.5px]">
+              <div className="flex items-baseline justify-between gap-4 border-t border-adm-line py-1.5 text-[11px]">
                 <span className="text-adm-muted">
                   <HelpWrap text="Everything handed to the agent in these dates, less everything they spent or sent.">
                     Net over period
@@ -362,7 +362,7 @@ export function AgentStatement({ id }: { id: string }) {
                   )}
                 />
               </div>
-              <div className="flex items-baseline justify-between gap-4 border-t border-adm-line py-1.5 text-[12.5px]">
+              <div className="flex items-baseline justify-between gap-4 border-t border-adm-line py-1.5 text-[11px]">
                 <span className="text-adm-muted">
                   Closing on {to ? formatDateOnly(to) : "today"}
                 </span>
@@ -370,7 +370,7 @@ export function AgentStatement({ id }: { id: string }) {
               </div>
             </>
           ) : null}
-          <div className="flex items-baseline justify-between gap-4 border-t-2 border-adm-strong py-2 text-[12px] font-bold tracking-[0.08em] uppercase">
+          <div className="flex items-baseline justify-between gap-4 border-t-2 border-adm-strong py-2 text-[11px] font-bold tracking-[0.08em] uppercase">
             <span>
               <HelpWrap
                 text={
@@ -382,13 +382,13 @@ export function AgentStatement({ id }: { id: string }) {
                 {windowed ? "Current float" : "Closing balance"}
               </HelpWrap>
             </span>
-            <Figure value={balance} className="text-[16px] font-bold normal-case" />
+            <Figure value={balance} className="text-[13px] font-bold normal-case" />
           </div>
         </div>
 
         {/* The counterparty signs in ink; the owner's saved signature is
             already on their line, same as the PDF. */}
-        <div className="mt-12 flex flex-wrap items-end gap-x-8 gap-y-6 text-[12px]">
+        <div className="mt-12 flex flex-wrap items-end gap-x-8 gap-y-6 text-[11px]">
           <InkSignatureLine
             label="Agent's signature"
             className="flex-1 basis-[160px]"

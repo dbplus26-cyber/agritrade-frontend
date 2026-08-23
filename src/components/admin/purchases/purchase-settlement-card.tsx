@@ -386,7 +386,7 @@ export function PurchaseSettlementCard({
 
       {/* Still owed leads, because that is what anyone opens this to find. */}
       {isVoided ? (
-        <p className="text-[13px] text-adm-muted">
+        <p className="text-[11.5px] text-adm-muted">
           This purchase was voided, so nothing is owed on it. Anything already
           paid was given back.
         </p>
@@ -407,7 +407,7 @@ export function PurchaseSettlementCard({
             <dt className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
               Paid
             </dt>
-            <dd className="mt-0.5 text-[14px] text-adm-ink">
+            <dd className="mt-0.5 text-[12px] text-adm-ink">
               <Figure value={settlement.paidGhs} />
             </dd>
           </div>
@@ -415,7 +415,7 @@ export function PurchaseSettlementCard({
             <dt className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
               Cost
             </dt>
-            <dd className="mt-0.5 text-[14px] text-adm-ink">
+            <dd className="mt-0.5 text-[12px] text-adm-ink">
               <Figure value={totalGhs} />
             </dd>
           </div>
@@ -440,17 +440,17 @@ export function PurchaseSettlementCard({
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                      <Mono className="text-[11.5px] text-adm-faint">
+                      <Mono className="text-[10.5px] text-adm-faint">
                         {p.transactionNo}
                       </Mono>
-                      <span className="text-[11.5px] text-adm-faint">
+                      <span className="text-[10.5px] text-adm-faint">
                         {new Date(p.paidAt).toLocaleDateString("en-GB", {
                           day: "2-digit",
                           month: "short",
                           year: "numeric",
                         })}
                       </span>
-                      <span className="text-[11.5px] text-adm-faint">
+                      <span className="text-[10.5px] text-adm-faint">
                         {p.method}
                       </span>
                       {/* Which money paid this matters: an agent's float and a
@@ -466,7 +466,7 @@ export function PurchaseSettlementCard({
                       ) : null}
                     </div>
                     {p.reversalReason ? (
-                      <p className="mt-0.5 text-[12px] text-adm-muted [overflow-wrap:anywhere]">
+                      <p className="mt-0.5 text-[11px] text-adm-muted [overflow-wrap:anywhere]">
                         {p.reversalReason}
                       </p>
                     ) : null}
@@ -475,14 +475,14 @@ export function PurchaseSettlementCard({
                   <div className="flex flex-none items-baseline justify-between gap-3 @min-[520px]/settle:justify-end">
                     <Figure
                       className={cn(
-                        "text-[14px] font-semibold",
+                        "text-[12px] font-semibold",
                         p.isReversal ? "text-console-red" : "text-adm-ink",
                       )}
                       value={p.amountGhs}
                     />
                     {isSuperAdmin && !p.isReversal && !reversed ? (
                       <button
-                        className="cursor-pointer text-[12px] text-adm-muted transition-colors hover:text-console-red"
+                        className="cursor-pointer text-[11px] text-adm-muted transition-colors hover:text-console-red"
                         onClick={() => {
                           setReversing(p);
                         }}

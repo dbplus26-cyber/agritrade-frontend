@@ -117,7 +117,7 @@ export function RuleBadge({ action }: { action: ApprovalAction }) {
   const rule = RULE[action];
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-none px-[9px] py-[3px] text-[11.5px] leading-[1.4] font-[550] whitespace-nowrap"
+      className="inline-flex items-center gap-1.5 rounded-none px-[9px] py-[3px] text-[10.5px] leading-[1.4] font-[550] whitespace-nowrap"
       style={{ backgroundColor: rule.bg, color: rule.fg }}
     >
       <span
@@ -309,7 +309,7 @@ export function auditTrail(a: IApproval): string {
 
 /** Button styling: base, primary and danger share one shape. */
 export const apButton =
-  "inline-flex items-center justify-center rounded-none border px-[13px] py-1.5 text-[12.5px] leading-[1.4] font-[550] whitespace-nowrap cursor-pointer " +
+  "inline-flex items-center justify-center rounded-none border px-[13px] py-1.5 text-[11px] leading-[1.4] font-[550] whitespace-nowrap cursor-pointer " +
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ap-forest)] " +
   "disabled:cursor-not-allowed disabled:opacity-50";
 
@@ -339,7 +339,7 @@ export function NoteBlock({ note }: { note: string }) {
   return (
     <div className="mt-3.5 max-w-[70ch] border-l-2 border-[var(--ap-hair)] py-0.5 pl-3">
       <div className={cn(apFieldKey, "mb-[3px]")}>Decider&apos;s note</div>
-      <div className="text-[13px] leading-[1.5] text-[var(--ap-ink-2)] [overflow-wrap:anywhere]">
+      <div className="text-[11.5px] leading-[1.5] text-[var(--ap-ink-2)] [overflow-wrap:anywhere]">
         {note}
       </div>
     </div>
@@ -349,7 +349,7 @@ export function NoteBlock({ note }: { note: string }) {
 /** Shown when one account both raised and signed off the same request. */
 export function SelfDecidedChip() {
   return (
-    <span className="rounded-none bg-[var(--ap-chip)] px-[7px] py-0.5 text-[11px] leading-[1.4] font-semibold text-[var(--ap-muted)]">
+    <span className="rounded-none bg-[var(--ap-chip)] px-[7px] py-0.5 text-[10.5px] leading-[1.4] font-semibold text-[var(--ap-muted)]">
       Self approved
     </span>
   );

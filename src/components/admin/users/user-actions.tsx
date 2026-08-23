@@ -150,12 +150,12 @@ export function UserActionsDropdown({ user }: { user: IUser }) {
         >
           <DropdownMenuLabel
             title={name}
-            className="max-w-full truncate text-[11px] font-semibold uppercase tracking-[0.08em] text-adm-faint"
+            className="max-w-full truncate text-[10.5px] font-semibold uppercase tracking-[0.08em] text-adm-faint"
           >
             {name}
           </DropdownMenuLabel>
           <DropdownMenuItem
-            className="cursor-pointer gap-2 text-[13px]"
+            className="cursor-pointer gap-2 text-[11.5px]"
             onClick={() => router.push(`/admin/users/${user.id}`)}
           >
             <Eye className="h-3.5 w-3.5" aria-hidden="true" />
@@ -163,7 +163,7 @@ export function UserActionsDropdown({ user }: { user: IUser }) {
           </DropdownMenuItem>
           {!isSelf ? (
             <DropdownMenuItem
-              className="cursor-pointer gap-2 text-[13px]"
+              className="cursor-pointer gap-2 text-[11.5px]"
               onClick={() => setRoleDialogOpen(true)}
             >
               <UserCog className="h-3.5 w-3.5" aria-hidden="true" />
@@ -172,7 +172,7 @@ export function UserActionsDropdown({ user }: { user: IUser }) {
           ) : null}
           {!isSelf ? (
             <DropdownMenuItem
-              className="cursor-pointer gap-2 text-[13px]"
+              className="cursor-pointer gap-2 text-[11.5px]"
               onClick={() =>
                 void onSendReset().catch(fail("Couldn't send the link"))
               }
@@ -183,7 +183,7 @@ export function UserActionsDropdown({ user }: { user: IUser }) {
           ) : null}
           {user.blockedAt ? (
             <DropdownMenuItem
-              className="cursor-pointer gap-2 text-[13px]"
+              className="cursor-pointer gap-2 text-[11.5px]"
               onClick={() => void onUnblock().catch(fail("Couldn't unblock"))}
             >
               <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
@@ -194,7 +194,7 @@ export function UserActionsDropdown({ user }: { user: IUser }) {
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                className="cursor-pointer gap-2 text-[13px]"
+                className="cursor-pointer gap-2 text-[11.5px]"
                 onClick={() =>
                   void onToggleActive().catch(fail("Couldn't update the account"))
                 }
@@ -203,7 +203,7 @@ export function UserActionsDropdown({ user }: { user: IUser }) {
                 {user.isActive ? "Deactivate account" : "Activate account"}
               </DropdownMenuItem>
               <DropdownMenuItem
-                className="cursor-pointer gap-2 text-[13px] text-console-red focus:text-console-red"
+                className="cursor-pointer gap-2 text-[11.5px] text-console-red focus:text-console-red"
                 onClick={() => void onDelete().catch(fail("Couldn't delete"))}
               >
                 <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />

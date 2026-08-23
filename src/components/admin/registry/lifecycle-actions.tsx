@@ -106,7 +106,7 @@ export function LifecycleActions({
       </ActionRow>
       {/* What the ungated button does, standing where it is read before the
           tap rather than inside a dialog after it. */}
-      <p className="mt-2 text-[12.5px] text-adm-muted">
+      <p className="mt-2 text-[11px] text-adm-muted">
         {isActive
           ? `Deactivating stops new transactions offering this ${noun}; history and reports keep it, and you can activate it again from here.`
           : `Activating makes this ${noun} selectable in new transactions again.`}

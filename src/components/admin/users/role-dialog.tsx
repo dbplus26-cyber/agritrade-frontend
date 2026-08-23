@@ -76,10 +76,10 @@ export function RoleChangeDialog({
     <ResponsiveDialog open={open} onOpenChange={close}>
       <ResponsiveDialogContent className="border-adm-line p-5 sm:max-w-[400px]">
         <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle className="text-[15px] font-bold text-adm-ink">
+          <ResponsiveDialogTitle className="text-[12.5px] font-bold text-adm-ink">
             Change role - {user.firstName} {user.lastName}
           </ResponsiveDialogTitle>
-          <ResponsiveDialogDescription className="text-[12.5px] leading-[1.55] text-adm-muted">
+          <ResponsiveDialogDescription className="text-[11px] leading-[1.55] text-adm-muted">
             The user is signed out everywhere and their access changes the
             moment they sign back in.
           </ResponsiveDialogDescription>

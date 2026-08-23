@@ -116,7 +116,7 @@ export function AccountLedgerScreen({ accountId }: { accountId: string }) {
               >
                 {r.counterparty || sourceLabel(r.source)}
               </span>
-              <span className="block text-[12px] text-adm-muted">
+              <span className="block text-[11px] text-adm-muted">
                 {sourceLabel(r.source)}
                 {r.isReversal ? " · reversed" : ""}
               </span>
@@ -217,20 +217,20 @@ export function AccountLedgerScreen({ accountId }: { accountId: string }) {
       />
 
       <AdminCard className="p-4 sm:p-5">
-        <p className="flex items-center text-[12.5px] font-semibold tracking-wide text-adm-muted uppercase">
+        <p className="flex items-center text-[11px] font-semibold tracking-wide text-adm-muted uppercase">
           Balance now
         </p>
         <p className="mt-1.5">
           <Balance className="text-[26px] font-bold" value={balance} />
         </p>
         {balance !== null && balance < 0 ? (
-          <p className="mt-1.5 text-[12.5px] text-console-red">
+          <p className="mt-1.5 text-[11px] text-console-red">
             This account is in the red. Either money left that the books do not
             know about, or its opening balance has not been entered yet.
           </p>
         ) : null}
         {latestCheck ? (
-          <p className="mt-2 text-[12.5px] text-adm-muted">
+          <p className="mt-2 text-[11px] text-adm-muted">
             Last checked{" "}
             {new Date(latestCheck.performedAt).toLocaleDateString()} -{" "}
             {latestCheck.varianceGhs === 0
@@ -282,21 +282,21 @@ export function AccountLedgerScreen({ accountId }: { accountId: string }) {
                   className="flex flex-col gap-1 px-4 py-3 min-[480px]:flex-row min-[480px]:items-center min-[480px]:justify-between min-[480px]:gap-4"
                   key={check.id}
                 >
-                  <span className="min-w-0 text-[13px] text-adm-body">
+                  <span className="min-w-0 text-[11.5px] text-adm-body">
                     <span className="block text-adm-ink">
                       {new Date(check.asOf).toLocaleDateString()} - counted{" "}
                       {formatCedis(check.countedBalanceGhs)} against{" "}
                       {formatCedis(check.bookBalanceGhs)}
                     </span>
                     {check.notes ? (
-                      <span className="block text-[12.5px] text-adm-muted [overflow-wrap:anywhere]">
+                      <span className="block text-[11px] text-adm-muted [overflow-wrap:anywhere]">
                         {check.notes}
                       </span>
                     ) : null}
                   </span>
                   <span
                     className={cn(
-                      "font-adminmono flex-none text-[13px] tabular-nums",
+                      "font-adminmono flex-none text-[11.5px] tabular-nums",
                       check.varianceGhs === 0
                         ? "text-adm-muted"
                         : "text-console-red",

@@ -205,15 +205,15 @@ export function PaymentDialog({
           <div className="border border-adm-line bg-adm-sunken">
             <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2 px-3.5 py-3">
               <div className="min-w-0">
-                <Mono className="block text-[13px] font-semibold text-console">
+                <Mono className="block text-[11.5px] font-semibold text-console">
                   {detail.transactionNo}
                 </Mono>
-                <span className="block truncate text-[12.5px] text-adm-muted">
+                <span className="block truncate text-[11px] text-adm-muted">
                   {detail.buyer.name}
                 </span>
               </div>
               <div className="text-right">
-                <span className="block text-[9.5px] tracking-[0.14em] text-adm-muted uppercase">
+                <span className="block text-[10px] tracking-[0.14em] text-adm-muted uppercase">
                   {paidInFull ? "Settled" : "Balance"}
                 </span>
                 <Mono
@@ -229,7 +229,7 @@ export function PaymentDialog({
 
             {/* The schedule and the dispatch gate: supporting detail, so it
                 sits under a rule rather than competing with the balance. */}
-            <div className="flex flex-col gap-1 px-3.5 py-2.5 text-[12.5px]">
+            <div className="flex flex-col gap-1 px-3.5 py-2.5 text-[11px]">
               {/* Why the balance is not the agreed price. Without this the
                   admin reads a figure that does not match the sale they are
                   holding and assumes the console is wrong. */}
@@ -297,7 +297,7 @@ export function PaymentDialog({
             </div>
           </div>
         ) : detailQuery.isError ? (
-          <p className="text-[12.5px] text-adm-muted">
+          <p className="text-[11px] text-adm-muted">
             Couldn&apos;t load the payment schedule - you can still record the
             payment.
           </p>
@@ -319,7 +319,7 @@ export function PaymentDialog({
               <div className="relative">
                 <span
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-[15px] font-semibold text-adm-faint"
+                  className="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-[12.5px] font-semibold text-adm-faint"
                 >
                   GH₵
                 </span>
@@ -356,7 +356,7 @@ export function PaymentDialog({
                     <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                       {f.label}
                     </span>
-                    <Mono className="text-[15px] font-bold text-adm-ink">
+                    <Mono className="text-[12.5px] font-bold text-adm-ink">
                       {formatCedis(f.amount)}
                     </Mono>
                   </button>

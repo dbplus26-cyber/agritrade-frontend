@@ -257,11 +257,11 @@ function FarmApplicationDetailBody({
             <AdminCard className="px-5 py-4">
               <SectionHeading>Message</SectionHeading>
               {application.message ? (
-                <p className="text-[13.5px] leading-[1.75] whitespace-pre-wrap text-adm-ink [overflow-wrap:anywhere]">
+                <p className="text-[11.5px] leading-[1.75] whitespace-pre-wrap text-adm-ink [overflow-wrap:anywhere]">
                   {application.message}
                 </p>
               ) : (
-                <p className="text-[13px] text-adm-faint">
+                <p className="text-[11.5px] text-adm-faint">
                   No message included with the application.
                 </p>
               )}
@@ -333,7 +333,7 @@ function FarmApplicationDetailBody({
             <AdminCard className="px-5 py-4">
               {isConverted && application.convertedFarmerId ? (
                 <>
-                  <p className="text-[12.5px] text-adm-muted">
+                  <p className="text-[11px] text-adm-muted">
                     This application became a farmer record.
                   </p>
                   <AdminButton
@@ -350,7 +350,7 @@ function FarmApplicationDetailBody({
                 </>
               ) : (
                 <>
-                  <p className="text-[12.5px] text-adm-muted">
+                  <p className="text-[11px] text-adm-muted">
                     Converting creates a farmer record on the register from
                     these details.
                   </p>
@@ -388,7 +388,7 @@ function FarmApplicationDetailBody({
             </AdminCard>
 
             <AdminCard className="px-5 py-4">
-              <p className="text-[12.5px] text-adm-muted">
+              <p className="text-[11px] text-adm-muted">
                 Deleting removes the application permanently.
               </p>
               <AdminButton

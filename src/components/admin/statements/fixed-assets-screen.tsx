@@ -12,8 +12,9 @@ import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Plus } from "lucide-react";
+import { PackageX, Pencil, Plus, Trash2 } from "lucide-react";
 import { ConsoleDataTable } from "@/components/admin/data-table";
+import { RowAction, RowActions } from "@/components/admin/row-actions";
 import { ConsoleFilterBar } from "@/components/admin/filter-bar";
 import {
   AdminButton,
@@ -49,7 +50,6 @@ import {
   CashSourceNote,
   cashSourceBody,
 } from "@/components/admin/statements/cash-source";
-import { HelpWrap } from "@/components/admin/help-tip";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
 import { formatTableDate } from "@/lib/format-date";
@@ -211,7 +211,7 @@ function AddAssetDialog({ onClose }: { onClose: () => void }) {
                 onClick={() => {
                   setAddingClass(true);
                 }}
-                className="mt-1.5 cursor-pointer text-[12px] font-semibold text-console underline-offset-2 hover:underline"
+                className="mt-1.5 cursor-pointer text-[11px] font-semibold text-console underline-offset-2 hover:underline"
               >
                 + New class
               </button>
@@ -453,7 +453,7 @@ function DisposeDialog({
               value={watch("disposalAccountId") ?? ""}
             />
           ) : (
-            <p className="text-[12.5px] leading-[1.5] text-adm-muted">
+            <p className="text-[11px] leading-[1.5] text-adm-muted">
               Nothing came in, so no account is named. Type what the sale
               fetched above if it did raise money.
             </p>
@@ -605,20 +605,20 @@ function EditAssetDialog({
             // lost them.
             <div className="rounded-[3px] border border-adm-line bg-adm-sunken px-3 py-2.5">
               <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                <span className="text-[13px] text-adm-body">
+                <span className="text-[11.5px] text-adm-body">
                   Cost{" "}
                   <Mono className="font-semibold tabular-nums text-adm-ink">
                     {formatCedis(asset.costGhs)}
                   </Mono>
                 </span>
-                <span className="text-[13px] text-adm-body">
+                <span className="text-[11.5px] text-adm-body">
                   Acquired{" "}
                   <span className="font-semibold text-adm-ink">
                     {formatTableDate(asset.acquiredAt)}
                   </span>
                 </span>
               </div>
-              <p className="mt-2 text-[12px] leading-[1.5] text-adm-muted [overflow-wrap:anywhere]">
+              <p className="mt-2 text-[11px] leading-[1.5] text-adm-muted [overflow-wrap:anywhere]">
                 {asset.paymentAccount?.label} already paid for this, so neither
                 figure can move: the cash book is append-only, and a movement
                 cannot follow a cost that changes or a date that shifts the year
@@ -796,7 +796,7 @@ export function FixedAssetsScreen() {
               <ToneBadge tone="slate">Disposed</ToneBadge>
               {/* What the sale brought in and where it landed - the other half
                   of the same question the acquisition answers. */}
-              <span className="mt-1 block text-[12.5px] text-adm-muted [overflow-wrap:anywhere] @2xl/table:truncate">
+              <span className="mt-1 block text-[11px] text-adm-muted [overflow-wrap:anywhere] @2xl/table:truncate">
                 {proceeds > 0
                   ? `${formatCedis(proceeds)} into ${asset.disposalAccount?.label ?? "an account never recorded"}`
                   : "Raised nothing"}
@@ -807,53 +807,49 @@ export function FixedAssetsScreen() {
       },
       {
         id: "actions",
-        header: "",
+        header: "Actions",
         enableSorting: false,
-        meta: columnMeta(),
+        // Behind one icon: listed out, three actions took a couple of hundred
+        // pixels from the column carrying the asset's name, on every row.
+        meta: columnMeta({ className: "w-[64px] text-right" }),
         cell: ({ row }) => {
           const asset = row.original;
           return (
-            <span className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1">
-              {asset.disposedAt ? null : (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEditing(asset);
-                    }}
-                    className="cursor-pointer text-[12.5px] font-semibold text-console underline-offset-2 hover:underline"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setDisposing(asset);
-                    }}
-                    className="cursor-pointer text-[12.5px] font-semibold text-console underline-offset-2 hover:underline"
-                  >
-                    Dispose
-                  </button>
-                </>
-              )}
-              {removalLocked(asset) ? (
-                // Said plainly rather than offered and then refused: there is
-                // no account to give the proceeds back to, so this record has
-                // to stay on the books.
-                <HelpWrap text="This disposal was recorded before the register named the account its proceeds landed in, so removing it would leave that money unaccounted for.">
-                  <span className="text-[12.5px] font-semibold text-adm-faint">
-                    Can&apos;t be removed
-                  </span>
-                </HelpWrap>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => void onRemove(asset)}
-                  className="cursor-pointer text-[12.5px] font-semibold text-console-red underline-offset-2 hover:underline"
-                >
-                  Remove
-                </button>
-              )}
+            <span className="flex justify-end">
+              <RowActions label={asset.name}>
+                {asset.disposedAt ? null : (
+                  <>
+                    <RowAction
+                      icon={Pencil}
+                      label="Edit asset"
+                      onSelect={() => {
+                        setEditing(asset);
+                      }}
+                    />
+                    <RowAction
+                      icon={PackageX}
+                      label="Dispose"
+                      onSelect={() => {
+                        setDisposing(asset);
+                      }}
+                    />
+                  </>
+                )}
+                <RowAction
+                  danger
+                  icon={Trash2}
+                  label="Remove"
+                  onSelect={() => void onRemove(asset)}
+                  // Said plainly rather than offered and then refused: there
+                  // is no account to give the proceeds back to, so this record
+                  // has to stay on the books.
+                  unavailable={
+                    removalLocked(asset)
+                      ? "This disposal was recorded before the register named the account its proceeds landed in, so removing it would leave that money unaccounted for."
+                      : undefined
+                  }
+                />
+              </RowActions>
             </span>
           );
         },
@@ -932,12 +928,12 @@ export function FixedAssetsScreen() {
             {classes.data.data.assetClasses.map((c) => (
               <li
                 key={c.id}
-                className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-2 text-[13px]"
+                className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-2 text-[11.5px]"
               >
                 <span className="min-w-0 font-semibold text-adm-ink [overflow-wrap:anywhere]">
                   {c.name}
                 </span>
-                <span className="flex-none text-[12.5px] text-adm-muted">
+                <span className="flex-none text-[11px] text-adm-muted">
                   {c.depreciationRatePct}% straight line · {c.capitalAllowancePool}{" "}
                   @ {c.capitalAllowanceRatePct}%
                 </span>

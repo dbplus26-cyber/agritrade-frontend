@@ -25,7 +25,7 @@ export function TrendBadge({
     return (
       <span
         className={cn(
-          "inline-flex items-center gap-0.5 text-[11.5px] font-semibold text-adm-faint",
+          "inline-flex items-center gap-0.5 text-[10.5px] font-semibold text-adm-faint",
           className,
         )}
       >
@@ -43,7 +43,7 @@ export function TrendBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-0.5 text-[11.5px] font-semibold",
+        "inline-flex items-center gap-0.5 text-[10.5px] font-semibold",
         good ? "text-console" : "text-console-red",
         className,
       )}

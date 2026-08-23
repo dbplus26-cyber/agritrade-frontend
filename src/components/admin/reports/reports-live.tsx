@@ -105,7 +105,7 @@ function PlStatement({ window }: { window: IReportWindow }) {
   const cats = expenses.data?.data.byCategory ?? [];
 
   const rowClass =
-    "flex items-baseline justify-between gap-3 py-1.5 text-[13.5px] [&>span:first-child]:min-w-0 [&>span:first-child]:line-clamp-2 [&>*:last-child]:flex-none [&>*:last-child]:whitespace-nowrap";
+    "flex items-baseline justify-between gap-3 py-1.5 text-[11.5px] [&>span:first-child]:min-w-0 [&>span:first-child]:line-clamp-2 [&>*:last-child]:flex-none [&>*:last-child]:whitespace-nowrap";
   return (
     <AdminCard className="px-5 py-4">
       <div className="mb-2 flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
@@ -156,7 +156,7 @@ function PlStatement({ window }: { window: IReportWindow }) {
       <div
         className={cn(
           rowClass,
-          "border-t border-adm-hairline text-[15px] font-bold text-console",
+          "border-t border-adm-hairline text-[12.5px] font-bold text-console",
         )}
       >
         <span>Net profit</span>
@@ -188,7 +188,7 @@ function AgentPerformance({
             text="What each field agent bought for you in the period you picked, and what they paid per kilo."
           />
         </span>
-        <a href={exportHref} className={cn(adminLinkClass, "text-[12px]")}>
+        <a href={exportHref} className={cn(adminLinkClass, "text-[11px]")}>
           Export CSV
         </a>
       </div>
@@ -209,7 +209,7 @@ function AgentPerformance({
           {/* Declared widths so the figures are never the columns that give
               way: an agent name has no natural limit and, left to size
               itself, took the whole row and wrapped every number beside it. */}
-          <table className="w-full min-w-[560px] table-fixed text-[14px]">
+          <table className="w-full min-w-[560px] table-fixed text-[12px]">
             <colgroup>
               <col className="w-[38%]" />
               <col className="w-[4.5rem]" />
@@ -298,7 +298,7 @@ function CashComingIn() {
 
   const moreLine = (hidden: number) =>
     hidden > 0 ? (
-      <p className="pt-1.5 text-[12px] text-adm-faint">
+      <p className="pt-1.5 text-[11px] text-adm-faint">
         + {hidden} more in this window
       </p>
     ) : null;
@@ -321,7 +321,7 @@ function CashComingIn() {
               onClick={() => setDays(d)}
               aria-pressed={days === d}
               className={cn(
-                "cursor-pointer rounded-none border px-2.5 py-1 text-[12px] font-semibold transition-colors",
+                "cursor-pointer rounded-none border px-2.5 py-1 text-[11px] font-semibold transition-colors",
                 days === d
                   ? "border-console bg-console text-white"
                   : "border-adm-line bg-adm-card text-adm-muted hover:border-console/60",
@@ -354,7 +354,7 @@ function CashComingIn() {
 
           <div className="grid grid-cols-1 gap-x-8 gap-y-4 xl:grid-cols-2">
             <div>
-              <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.06em] text-adm-faint">
+              <div className="mb-1 text-[10.5px] font-semibold uppercase tracking-[0.06em] text-adm-faint">
                 Sale balances
               </div>
               {saleRows.length === 0 ? (
@@ -367,7 +367,7 @@ function CashComingIn() {
                   {saleRows.slice(0, LIST_CAP).map((r) => (
                     <div
                       key={r.id}
-                      className="flex items-baseline justify-between gap-3 border-t border-adm-hairline py-1.5 text-[13px] first:border-t-0"
+                      className="flex items-baseline justify-between gap-3 border-t border-adm-hairline py-1.5 text-[11.5px] first:border-t-0"
                     >
                       <div className="min-w-0">
                         <Link
@@ -384,7 +384,7 @@ function CashComingIn() {
                           href={`/admin/sales/${r.id}`}
                           className={cn(
                             adminLinkClass,
-                            "font-adminmono text-[11.5px] tabular-nums",
+                            "font-adminmono text-[10.5px] tabular-nums",
                           )}
                         >
                           {r.transactionNo}
@@ -401,7 +401,7 @@ function CashComingIn() {
             </div>
 
             <div>
-              <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.06em] text-adm-faint">
+              <div className="mb-1 text-[10.5px] font-semibold uppercase tracking-[0.06em] text-adm-faint">
                 Farm dues
               </div>
               {farmRows.length === 0 ? (
@@ -414,7 +414,7 @@ function CashComingIn() {
                   {farmRows.slice(0, LIST_CAP).map((r, i) => (
                     <div
                       key={`${r.farmer.id}-${r.season.id}-${i}`}
-                      className="flex items-baseline justify-between gap-3 border-t border-adm-hairline py-1.5 text-[13px] first:border-t-0"
+                      className="flex items-baseline justify-between gap-3 border-t border-adm-hairline py-1.5 text-[11.5px] first:border-t-0"
                     >
                       <div className="min-w-0">
                         <span className="flex min-w-0 flex-wrap items-baseline gap-x-1.5">
@@ -429,13 +429,13 @@ function CashComingIn() {
                             {r.farmer.name}
                           </Link>
                           <Link
-                            className={cn(adminLinkClass, "text-[11.5px]")}
+                            className={cn(adminLinkClass, "text-[10.5px]")}
                             href={`/admin/seasons/${r.season.id}`}
                           >
                             {r.season.name}
                           </Link>
                         </span>
-                        <span className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[11.5px] text-adm-muted">
+                        <span className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[10.5px] text-adm-muted">
                           Due {formatDateTime(r.dueDate)}
                           {r.daysOverdue > 0 ? (
                             <ToneBadge tone="alert">

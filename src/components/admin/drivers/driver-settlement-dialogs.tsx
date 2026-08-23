@@ -368,7 +368,7 @@ export function DriverPaymentDialog({
                 amount field the pills stacked one per line at every size. */}
             {quickAmounts.length > 0 ? (
               <div className="mt-2 flex flex-wrap items-center gap-2">
-                <span className="text-[11.5px] text-adm-muted">Fill:</span>
+                <span className="text-[10.5px] text-adm-muted">Fill:</span>
                 {quickAmounts.map((q) => (
                   <AdminButton
                     key={q.label}

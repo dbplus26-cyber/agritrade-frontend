@@ -125,7 +125,7 @@ function RecipientNameHint({
 
   const lookup = data?.data.lookup;
   return (
-    <div className="border border-adm-line bg-adm-sunken px-3 py-2 text-[12.5px] leading-[1.55] text-adm-body">
+    <div className="border border-adm-line bg-adm-sunken px-3 py-2 text-[11px] leading-[1.55] text-adm-body">
       {isFetching || !data ? (
         "Checking the name on this number…"
       ) : lookup?.name ? (
@@ -143,7 +143,7 @@ function RecipientNameHint({
             <button
               type="button"
               onClick={() => onUse(lookup.name ?? "")}
-              className="flex-none cursor-pointer border border-adm-line bg-adm-card px-2 py-0.5 text-[12px] font-semibold text-console hover:bg-adm-hover"
+              className="flex-none cursor-pointer border border-adm-line bg-adm-card px-2 py-0.5 text-[11px] font-semibold text-console hover:bg-adm-hover"
             >
               Use this name
             </button>

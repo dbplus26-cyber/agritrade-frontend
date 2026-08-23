@@ -68,7 +68,7 @@ export function InkSignatureLine({
   return (
     <div className={cn("w-[190px] max-w-full", className)}>
       <div className="h-[44px]" aria-hidden="true" />
-      <div className="border-t border-adm-strong pt-1 text-center text-[12px]">
+      <div className="border-t border-adm-strong pt-1 text-center text-[11px]">
         {label}
       </div>
     </div>
@@ -94,7 +94,7 @@ export function AuthorisedSignature({ className }: { className?: string }) {
           />
         ) : null}
       </div>
-      <div className="border-t border-adm-strong pt-1 text-center text-[12px]">
+      <div className="border-t border-adm-strong pt-1 text-center text-[11px]">
         Authorised signature
       </div>
     </div>

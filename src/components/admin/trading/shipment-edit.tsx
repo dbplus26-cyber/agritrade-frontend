@@ -35,7 +35,7 @@ export function ShipmentEdit({ id }: { id: string }) {
           crumbs={[DASHBOARD_CRUMB, { label: "Shipments", href: LIST }]}
           current="Edit shipment plan"
         />
-        <AdminCard className="px-5 py-4 text-[13px] text-console-red">
+        <AdminCard className="px-5 py-4 text-[11.5px] text-console-red">
           Couldn&apos;t load this shipment. Reload and try again.
         </AdminCard>
       </div>

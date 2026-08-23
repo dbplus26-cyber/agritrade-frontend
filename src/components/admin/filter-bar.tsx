@@ -33,9 +33,9 @@ import { cn } from "@/lib/utils";
  * Every filter control wears the SAME box so a panel of them lines up.
  */
 const fieldBox =
-  "flex h-11 w-full min-w-0 items-center rounded-none border bg-adm-card text-sm text-adm-ink transition-colors focus-within:border-console";
+  "flex h-11 w-full min-w-0 items-center rounded-none border bg-adm-card text-[12px] text-adm-ink transition-colors focus-within:border-console";
 
-const fieldLabel = "text-xs font-medium text-adm-ink sm:text-sm";
+const fieldLabel = "text-[11px] font-medium text-adm-ink sm:text-[12px]";
 
 /**
  * Set by ConsoleFilterBar around a filter that sits BESIDE the search box,
@@ -126,7 +126,7 @@ export function ConsoleLabeledSelect({
             <SelectItem
               key={o.value || EMPTY_VALUE}
               value={toSelect(o.value)}
-              className="text-sm"
+              className="text-[12px]"
             >
               {o.label}
             </SelectItem>
@@ -185,7 +185,7 @@ export function ConsoleDateField({
             onChange={(e) => onChange(e.target.value)}
             aria-label={label}
             className={cn(
-              "peer h-full w-full min-w-0 cursor-pointer appearance-none bg-transparent pr-2 text-sm font-normal outline-none",
+              "peer h-full w-full min-w-0 cursor-pointer appearance-none bg-transparent pr-2 text-[12px] font-normal outline-none",
               // The picker glyph is laid out INSIDE the input as an
               // unshrinkable item; taken out of flow it cannot be pushed past
               // the border, and stretched over the field a tap anywhere opens
@@ -197,7 +197,7 @@ export function ConsoleDateField({
           {!value && (
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute inset-y-0 right-0 left-0 flex items-center truncate text-sm text-adm-faint peer-focus:hidden"
+              className="pointer-events-none absolute inset-y-0 right-0 left-0 flex items-center truncate text-[12px] text-adm-faint peer-focus:hidden"
             >
               {placeholder}
             </span>
@@ -274,7 +274,7 @@ export function FilterChip({
   onRemove: () => void;
 }) {
   return (
-    <span className="inline-flex items-center gap-1 border border-console/30 bg-console/15 py-1 pl-2 pr-1.5 text-xs font-medium text-adm-ink sm:py-1.5 sm:pl-3 sm:pr-2">
+    <span className="inline-flex items-center gap-1 border border-console/30 bg-console/15 py-1 pl-2 pr-1.5 text-[11px] font-medium text-adm-ink sm:py-1.5 sm:pl-3 sm:pr-2">
       {Icon ? <Icon strokeWidth={1.5} className="h-3 w-3" aria-hidden="true" /> : null}
       <span className="max-w-30 truncate sm:max-w-50">{children}</span>
       <button
@@ -413,7 +413,7 @@ export function ConsoleFilterBar({
           placeholder={searchPlaceholder}
           aria-label={labelledSearch ? undefined : searchPlaceholder}
           className={cn(
-            "w-full min-w-0 rounded-none border border-adm-line bg-adm-card pr-10 pl-10 text-sm text-adm-ink shadow-none outline-none transition-colors placeholder:text-adm-faint focus:border-console focus-visible:ring-0 [&::-webkit-search-cancel-button]:hidden",
+            "w-full min-w-0 rounded-none border border-adm-line bg-adm-card pr-10 pl-10 text-[12px] text-adm-ink shadow-none outline-none transition-colors placeholder:text-adm-faint focus:border-console focus-visible:ring-0 [&::-webkit-search-cancel-button]:hidden",
             controlHeight,
           )}
         />
@@ -460,7 +460,7 @@ export function ConsoleFilterBar({
         />
         <span
           className={cn(
-            "text-sm",
+            "text-[12px]",
             inlineFilter && !hasFields ? "hidden" : "hidden sm:inline",
           )}
         >
@@ -470,7 +470,7 @@ export function ConsoleFilterBar({
           <span
             key={activeCount}
             className={cn(
-              "animate-console-pop ml-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-semibold",
+              "animate-console-pop ml-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[11px] font-semibold",
               hasApplied ? "bg-white/20 text-white" : "bg-adm-sunken text-adm-ink",
             )}
           >
@@ -512,7 +512,7 @@ export function ConsoleFilterBar({
             <div className="flex min-w-0 items-center gap-3">{leading}</div>
           ) : null}
           {countText ? (
-            <div className="text-xs font-medium text-adm-muted sm:text-sm">
+            <div className="text-[11px] font-medium text-adm-muted sm:text-[12px]">
               {countText}
             </div>
           ) : null}
@@ -533,7 +533,7 @@ export function ConsoleFilterBar({
         <div className="order-1 flex min-w-0 items-center gap-3">
           {leading}
           {countText ? (
-            <span className="hidden text-sm font-medium text-adm-muted xl:inline">
+            <span className="hidden text-[12px] font-medium text-adm-muted xl:inline">
               {countText}
             </span>
           ) : null}
@@ -554,7 +554,7 @@ export function ConsoleFilterBar({
       <>
         {countText || actionSlot ? (
           <div className="flex items-center justify-between gap-2">
-            <div className="text-xs font-medium text-adm-muted sm:text-sm">
+            <div className="text-[11px] font-medium text-adm-muted sm:text-[12px]">
               {countText}
             </div>
             {actionSlot}
@@ -627,7 +627,7 @@ export function ConsoleFilterBar({
 
       {hasChips ? (
         <div className="animate-in fade-in flex flex-wrap items-center gap-2 duration-150">
-          <span className="text-xs font-medium text-adm-muted sm:text-sm">
+          <span className="text-[11px] font-medium text-adm-muted sm:text-[12px]">
             Active:
           </span>
           {chips}

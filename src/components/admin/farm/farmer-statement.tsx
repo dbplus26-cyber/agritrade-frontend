@@ -124,20 +124,20 @@ export function FarmerStatement({
               <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">
                 DB PLUS
               </div>
-              <div className="text-[11px] tracking-[0.06em] text-adm-muted uppercase">
+              <div className="text-[10.5px] tracking-[0.06em] text-adm-muted uppercase">
                 Trading · Tamale
               </div>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-[16px] font-bold">FARMER STATEMENT</div>
-            <div className="text-[12px] text-adm-muted">{st.farmer.name}</div>
-            <div className="text-[12px] text-adm-muted">
+            <div className="text-[13px] font-bold">FARMER STATEMENT</div>
+            <div className="text-[11px] text-adm-muted">{st.farmer.name}</div>
+            <div className="text-[11px] text-adm-muted">
               Printed {formatFarmDate(new Date().toISOString())}
             </div>
             {/* The period is part of the document: a statement someone keeps
                 has to say what it covers, or it cannot be reconciled later. */}
-            <div className="text-[12px] text-adm-muted">
+            <div className="text-[11px] text-adm-muted">
               {st.window.from || st.window.to
                 ? `Period ${st.window.from ? formatFarmDate(st.window.from) : "start"} to ${st.window.to ? formatFarmDate(st.window.to) : "date"}`
                 : "All history"}
@@ -145,7 +145,7 @@ export function FarmerStatement({
           </div>
         </div>
 
-        <table className="mt-6 w-full border-collapse text-[13px]">
+        <table className="mt-6 w-full border-collapse text-[11.5px]">
           <thead>
             <tr className="border-y border-adm-strong text-left">
               <th className="py-2">Date</th>
@@ -206,14 +206,14 @@ export function FarmerStatement({
           </tbody>
         </table>
 
-        <div className="mt-4 ml-auto flex w-full max-w-[280px] justify-between border-t border-adm-strong py-1.5 text-[15px] font-bold">
+        <div className="mt-4 ml-auto flex w-full max-w-[280px] justify-between border-t border-adm-strong py-1.5 text-[12.5px] font-bold">
           <span>Outstanding balance</span>
           <Money value={st.balanceGhs} />
         </div>
 
         {/* The counterparty signs in ink; the owner's saved signature is
             already on their line, same as the PDF. */}
-        <div className="mt-12 flex flex-wrap items-end gap-x-8 gap-y-6 text-[12px]">
+        <div className="mt-12 flex flex-wrap items-end gap-x-8 gap-y-6 text-[11px]">
           <InkSignatureLine
             label="Farmer's signature"
             className="flex-1 basis-[160px]"

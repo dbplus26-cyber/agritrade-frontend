@@ -97,12 +97,12 @@ export function GrantDetail({ id }: { id: string }) {
                     "group min-w-0 hover:no-underline",
                   )}
                 >
-                  <div className="truncate text-[14px] font-semibold underline-offset-2 group-hover:underline">
+                  <div className="truncate text-[12px] font-semibold underline-offset-2 group-hover:underline">
                     {g.farmer.name}
                   </div>
                   {[g.farmer.phone, g.farmer.community].filter(Boolean).length >
                   0 ? (
-                    <div className="truncate text-[12px] text-adm-muted">
+                    <div className="truncate text-[11px] text-adm-muted">
                       {[g.farmer.phone, g.farmer.community]
                         .filter(Boolean)
                         .join(" · ")}
@@ -168,7 +168,7 @@ export function GrantDetail({ id }: { id: string }) {
             {/* Agreement */}
             <AdminCard className="px-5 py-4">
               <SectionHeading className="mb-1">Agreement</SectionHeading>
-              <p className="mb-1 text-[12px] text-adm-muted">
+              <p className="mb-1 text-[11px] text-adm-muted">
                 The signed agreement is the binding record behind this grant.
                 Never shown publicly; downloads are logged.
               </p>
@@ -214,7 +214,7 @@ export function GrantDetail({ id }: { id: string }) {
               <p className="font-adminmono mt-1 text-[26px] font-bold text-adm-ink tabular-nums">
                 <Money value={g.valueGhs} />
               </p>
-              <p className="mt-1 text-[12.5px] text-adm-muted">
+              <p className="mt-1 text-[11px] text-adm-muted">
                 Granted {formatDateTime(g.grantedAt)}
               </p>
             </AdminCard>
@@ -222,7 +222,7 @@ export function GrantDetail({ id }: { id: string }) {
             {/* Season position */}
             <AdminCard className="px-5 py-4">
               <SectionHeading className="mb-1">Season position</SectionHeading>
-              <p className="mb-1 text-[12px] text-adm-muted">
+              <p className="mb-1 text-[11px] text-adm-muted">
                 {g.farmer.name}&apos;s running balance for {g.season.name}.
               </p>
               <DetailGrid columns={2}>

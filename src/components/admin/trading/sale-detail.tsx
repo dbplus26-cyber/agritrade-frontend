@@ -86,7 +86,7 @@ function SummaryRow({
       <span
         className={cn(
           "font-adminmono text-right tabular-nums",
-          strong ? "text-[15px] font-bold text-adm-ink" : "text-[13.5px] text-adm-ink",
+          strong ? "text-[12.5px] font-bold text-adm-ink" : "text-[11.5px] text-adm-ink",
         )}
       >
         {children}
@@ -378,7 +378,7 @@ export function SaleDetail({
           </SummaryRow>
         </div>
         {sale.paymentPolicy ? (
-          <div className="border-t border-adm-hairline pt-2 text-[12px] text-adm-muted">
+          <div className="border-t border-adm-hairline pt-2 text-[11px] text-adm-muted">
             Payment terms: {sale.paymentPolicy.name}
           </div>
         ) : null}
@@ -399,11 +399,11 @@ export function SaleDetail({
           >
             <div className="min-w-0">
               <span className="font-medium text-adm-ink">{l.commodity.name}</span>
-              <Mono className="ml-2 text-[12px] text-adm-muted">
+              <Mono className="ml-2 text-[11px] text-adm-muted">
                 {formatKg(l.weightKg)} @ <Money value={l.unitPriceGhs} />
               </Mono>
             </div>
-            <Mono className="whitespace-nowrap text-[13px] text-adm-ink">
+            <Mono className="whitespace-nowrap text-[11.5px] text-adm-ink">
               <Money value={l.totalGhs} />
             </Mono>
           </div>
@@ -426,11 +426,11 @@ export function SaleDetail({
             >
               <div className="min-w-0">
                 <span className="text-adm-ink">{m.label}</span>
-                <span className="ml-2 text-[12px] text-adm-muted">
+                <span className="ml-2 text-[11px] text-adm-muted">
                   {m.percent}% · {milestoneTriggerLabel(m.trigger)}
                 </span>
               </div>
-              <Mono className="whitespace-nowrap text-[13px] text-adm-ink">
+              <Mono className="whitespace-nowrap text-[11.5px] text-adm-ink">
                 <Money value={m.amountGhs} />
               </Mono>
             </div>
@@ -438,7 +438,7 @@ export function SaleDetail({
           {/* The gate that decides whether this sale may board a truck - the
               computed figure, so nobody works it out in their head. */}
           <div className="mt-2 flex flex-wrap items-baseline justify-between gap-2 border-t-[1.5px] border-adm-line pt-2">
-            <span className="flex items-center gap-1 text-[12px] font-semibold text-adm-ink">
+            <span className="flex items-center gap-1 text-[11px] font-semibold text-adm-ink">
               <span className="min-w-0">Required before loading</span>
               <HelpTip
                 label="What is required before loading?"
@@ -446,7 +446,7 @@ export function SaleDetail({
               />
             </span>
             <span className="flex items-baseline gap-2">
-              <Mono className="text-[13px] text-adm-ink">
+              <Mono className="text-[11.5px] text-adm-ink">
                 <Money value={sale.requiredBeforeLoadingGhs} />
               </Mono>
               <ToneBadge tone={sale.beforeLoadingMet ? "leaf" : "alert"}>
@@ -461,7 +461,7 @@ export function SaleDetail({
       <AdminCard className="px-5 py-3">
         <SectionHeading className="mb-1">Payments</SectionHeading>
         {sale.payments.length === 0 ? (
-          <p className="py-2 text-[13px] text-adm-muted">No payments recorded yet.</p>
+          <p className="py-2 text-[11.5px] text-adm-muted">No payments recorded yet.</p>
         ) : (
           sale.payments.map((p) => (
             <div
@@ -472,7 +472,7 @@ export function SaleDetail({
                 <span className="text-adm-ink">{p.method}</span>
                 {/* Date only: `paidAt` comes from a date picker, so its time
                     is a midnight stamp nobody chose. */}
-                <span className="ml-2 text-[12px] text-adm-muted">
+                <span className="ml-2 text-[11px] text-adm-muted">
                   <DateOnlyCell value={p.paidAt} muted />
                   {p.reference ? ` · ${p.reference}` : ""}
                 </span>
@@ -480,7 +480,7 @@ export function SaleDetail({
               <div className="flex flex-none items-center gap-2">
                 <Mono
                   className={cn(
-                    "whitespace-nowrap text-[13px] font-semibold",
+                    "whitespace-nowrap text-[11.5px] font-semibold",
                     p.amountGhs !== null && p.amountGhs < 0
                       ? "text-console-red"
                       : "text-console",
@@ -512,7 +512,7 @@ export function SaleDetail({
       <AdminCard className="px-5 py-3">
         <SectionHeading className="mb-1">Shipments</SectionHeading>
         {sale.shipments.length === 0 ? (
-          <p className="py-2 text-[13px] text-adm-muted">Nothing shipped yet.</p>
+          <p className="py-2 text-[11.5px] text-adm-muted">Nothing shipped yet.</p>
         ) : (
           sale.shipments.map((sh) => (
             <div
@@ -522,13 +522,13 @@ export function SaleDetail({
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                 <Link
                   href={`/admin/shipments/${sh.id}`}
-                  className="font-adminmono text-[13px] text-console tabular-nums hover:underline"
+                  className="font-adminmono text-[11.5px] text-console tabular-nums hover:underline"
                 >
                   {sh.transactionNo}
                 </Link>
                 <ShipmentStatusBadge status={sh.status} />
               </div>
-              <div className="mt-0.5 min-w-0 text-[12.5px] text-adm-muted [overflow-wrap:anywhere]">
+              <div className="mt-0.5 min-w-0 text-[11px] text-adm-muted [overflow-wrap:anywhere]">
                 <Mono>{sh.truckReg}</Mono> · {sh.destination} ·{" "}
                 {sh.departedAt
                   ? `Departed ${formatSaleDate(sh.departedAt)}`
@@ -555,7 +555,7 @@ export function SaleDetail({
       />
 
       {sale.status === "CANCELLED" && sale.cancelReason ? (
-        <AdminCard className="mb-4 border-console-red/40 bg-console-red/[0.04] px-4 py-3 text-[13px] text-adm-ink">
+        <AdminCard className="mb-4 border-console-red/40 bg-console-red/[0.04] px-4 py-3 text-[11.5px] text-adm-ink">
           Cancelled: {sale.cancelReason}
         </AdminCard>
       ) : null}

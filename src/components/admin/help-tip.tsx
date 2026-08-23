@@ -97,7 +97,7 @@ export function HelpTip({
           )}
         </TooltipTrigger>
         <TooltipContent
-          className="max-w-[16rem] text-[12px] leading-[1.45]"
+          className="max-w-[16rem] text-[11px] leading-[1.45]"
           side={side}
         >
           {text}
@@ -138,7 +138,7 @@ export function HelpWrap({
           </span>
         </TooltipTrigger>
         <TooltipContent
-          className="max-w-[16rem] text-[12px] leading-[1.45]"
+          className="max-w-[16rem] text-[11px] leading-[1.45]"
           side={side}
         >
           {text}

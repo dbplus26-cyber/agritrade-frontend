@@ -123,7 +123,7 @@ export function CommodityTable() {
                     className="h-7 w-7 flex-none rounded-none object-cover"
                   />
                 ) : (
-                  <span className="font-adminmono inline-flex h-7 w-7 flex-none items-center justify-center rounded-none bg-console/10 text-[11px] font-bold text-console">
+                  <span className="font-adminmono inline-flex h-7 w-7 flex-none items-center justify-center rounded-none bg-console/10 text-[10.5px] font-bold text-console">
                     {c.name.charAt(0).toUpperCase()}
                   </span>
                 )}
@@ -131,7 +131,7 @@ export function CommodityTable() {
                   <span className="block [overflow-wrap:anywhere] @2xl/table:truncate font-medium text-adm-ink">
                     {c.name}
                   </span>
-                  <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-faint">
+                  <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[11px] text-adm-faint">
                     {c.variety ?? "No variety"}
                   </span>
                 </span>

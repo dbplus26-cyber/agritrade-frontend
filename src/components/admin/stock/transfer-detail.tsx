@@ -125,7 +125,7 @@ export function TransferDetail({ id }: { id: string }) {
         >
           On the ledger
         </SectionHeading>
-        <p className="text-[13px] text-adm-muted">
+        <p className="text-[11.5px] text-adm-muted">
           This move wrote a transfer-out against{" "}
           <Link
             className={adminLinkClass}

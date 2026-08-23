@@ -152,7 +152,7 @@ function ReviewModCard({
 
       <blockquote
         className={cn(
-          "mt-3 min-w-0 text-[13.5px] leading-[1.7] text-adm-ink [overflow-wrap:anywhere]",
+          "mt-3 min-w-0 text-[11.5px] leading-[1.7] text-adm-ink [overflow-wrap:anywhere]",
           clampable && !expanded && "line-clamp-4",
         )}
       >
@@ -164,7 +164,7 @@ function ReviewModCard({
           onClick={() => {
             setExpanded((e) => !e);
           }}
-          className={cn(adminLinkClass, "mt-1 self-start cursor-pointer text-[12.5px] font-semibold")}
+          className={cn(adminLinkClass, "mt-1 self-start cursor-pointer text-[11px] font-semibold")}
         >
           {expanded ? "Show less" : "Show more"}
         </button>
@@ -172,16 +172,16 @@ function ReviewModCard({
 
       <div className="mt-auto pt-3">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 border-t border-dotted border-adm-line pt-3">
-          <span className="min-w-0 text-[13.5px] font-bold text-adm-ink [overflow-wrap:anywhere]">
+          <span className="min-w-0 text-[11.5px] font-bold text-adm-ink [overflow-wrap:anywhere]">
             {review.authorName}
           </span>
           <ToneBadge tone="sky">{REVIEW_ROLE_LABELS[review.role]}</ToneBadge>
-          <span className="ml-auto text-[12px] whitespace-nowrap text-adm-muted">
+          <span className="ml-auto text-[11px] whitespace-nowrap text-adm-muted">
             {formatDateTime(review.createdAt)}
           </span>
         </div>
         {review.transactionNo ? (
-          <Mono className="mt-1.5 block text-[11.5px] text-adm-muted/80">
+          <Mono className="mt-1.5 block text-[10.5px] text-adm-muted/80">
             {review.transactionNo}
           </Mono>
         ) : null}

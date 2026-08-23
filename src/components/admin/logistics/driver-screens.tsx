@@ -144,7 +144,7 @@ export function DriverTable() {
                 <span className="block [overflow-wrap:anywhere] @2xl/table:truncate font-medium text-adm-ink">
                   {d.name}
                 </span>
-                <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-faint">
+                <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[11px] text-adm-faint">
                   {d.company ?? "Independent"}
                 </span>
               </span>
@@ -445,10 +445,10 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
             src={driver.photoUrl}
           />
           <div className="min-w-0">
-            <div className="text-[15px] font-semibold text-adm-ink [overflow-wrap:anywhere]">
+            <div className="text-[12.5px] font-semibold text-adm-ink [overflow-wrap:anywhere]">
               {driver.name}
             </div>
-            <div className="text-[12px] text-adm-muted">
+            <div className="text-[11px] text-adm-muted">
               {driver.photoUrl ? "Tap the photo to see it in full" : "No photo on file"}
             </div>
           </div>
@@ -488,7 +488,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
               a button misroutes its clicks. Same label markup as AdminField so
               it stays in step with the fields under it. */}
           <div>
-            <span className="mb-1 block text-[13px] font-semibold text-adm-ink">
+            <span className="mb-1 block text-[11.5px] font-semibold text-adm-ink">
               Photo <span className="font-normal text-adm-faint">(optional)</span>
             </span>
             <div className="flex flex-wrap items-center gap-3.5">

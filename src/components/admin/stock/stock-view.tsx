@@ -289,7 +289,7 @@ export function StockView() {
                     <Kg
                       countUp
                       kg={t.totalKg}
-                      className="mt-0.5 block text-[16px] font-bold text-adm-ink"
+                      className="mt-0.5 block text-[13px] font-bold text-adm-ink"
                     />
                     <div
                       aria-hidden="true"
@@ -459,12 +459,12 @@ function WarehouseSections({
                 <Link
                   id={`warehouse-${w.id}`}
                   href={`/admin/warehouses/${w.id}`}
-                  className="block truncate text-[14px] font-semibold text-adm-ink underline-offset-2 hover:text-console hover:underline"
+                  className="block truncate text-[12px] font-semibold text-adm-ink underline-offset-2 hover:text-console hover:underline"
                   title={w.name}
                 >
                   {w.name}
                 </Link>
-                <span className="text-[11.5px] text-adm-muted">
+                <span className="text-[10.5px] text-adm-muted">
                   {rows.length} {rows.length === 1 ? "commodity" : "commodities"}
                 </span>
               </div>
@@ -472,7 +472,7 @@ function WarehouseSections({
                 <Kg
                   countUp
                   kg={w.subtotalKg}
-                  className="block text-[15px] font-semibold text-adm-ink"
+                  className="block text-[12.5px] font-semibold text-adm-ink"
                 />
                 <span className="flex items-center justify-end gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                   <span className="min-w-0">On hand</span>
@@ -520,7 +520,7 @@ function WarehouseSections({
                       className="border-b border-adm-hairline transition-colors last:border-b-0 hover:bg-adm-hover"
                     >
                       <td
-                        className="px-4 py-2.5 text-[13px] text-adm-body [overflow-wrap:anywhere]"
+                        className="px-4 py-2.5 text-[11.5px] text-adm-body [overflow-wrap:anywhere]"
                         title={r.name}
                       >
                         {r.name}
@@ -529,7 +529,7 @@ function WarehouseSections({
                         <Kg
                           kg={r.kg}
                           className={cn(
-                            "text-[13px] font-semibold",
+                            "text-[11.5px] font-semibold",
                             r.kg === 0 ? "text-adm-faint" : "text-adm-ink",
                           )}
                         />
@@ -545,7 +545,7 @@ function WarehouseSections({
                               style={{ width: `${String(share)}%` }}
                             />
                           </span>
-                          <span className="font-adminmono w-9 text-right text-[11.5px] tabular-nums text-adm-muted">
+                          <span className="font-adminmono w-9 text-right text-[10.5px] tabular-nums text-adm-muted">
                             {shareLabel}
                           </span>
                         </div>
@@ -670,7 +670,7 @@ function AdjustmentDialog({
 
           <div className="grid grid-cols-[auto_1fr] items-end gap-2.5">
             <div>
-              <span className="mb-1 block text-[11.5px] font-semibold uppercase tracking-[0.08em] text-adm-muted">
+              <span className="mb-1 block text-[10.5px] font-semibold uppercase tracking-[0.08em] text-adm-muted">
                 Direction
               </span>
               <div className="flex gap-1">
@@ -688,7 +688,7 @@ function AdjustmentDialog({
                       setValue("direction", value, { shouldValidate: true })
                     }
                     className={cn(
-                      "cursor-pointer rounded-none border px-3.5 py-[7px] text-[13px] font-semibold transition-colors",
+                      "cursor-pointer rounded-none border px-3.5 py-[7px] text-[11.5px] font-semibold transition-colors",
                       direction === value
                         ? value === "REMOVE"
                           ? "border-console-red bg-console-red text-white"

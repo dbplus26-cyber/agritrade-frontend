@@ -156,7 +156,7 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
               <SectionHeading className="mb-3">
                 {enquiry.subject}
               </SectionHeading>
-              <p className="text-[14px] leading-[1.75] whitespace-pre-wrap text-adm-ink [overflow-wrap:anywhere]">
+              <p className="text-[12px] leading-[1.75] whitespace-pre-wrap text-adm-ink [overflow-wrap:anywhere]">
                 {enquiry.message}
               </p>
               {/* The thread, then the composer. Anyone opening this needs to
@@ -176,19 +176,19 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
                         key={r.id}
                       >
                         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                          <span className="text-[11.5px] text-adm-faint">
+                          <span className="text-[10.5px] text-adm-faint">
                             {formatDateTime(r.sentAt)}
                           </span>
-                          <span className="min-w-0 text-[11.5px] text-adm-faint [overflow-wrap:anywhere]">
+                          <span className="min-w-0 text-[10.5px] text-adm-faint [overflow-wrap:anywhere]">
                             to {r.sentToEmail}
                           </span>
                           {!r.delivered ? (
-                            <span className="text-[11px] font-bold tracking-[0.06em] text-console-red uppercase">
+                            <span className="text-[10.5px] font-bold tracking-[0.06em] text-console-red uppercase">
                               Not delivered
                             </span>
                           ) : null}
                         </div>
-                        <p className="mt-1.5 text-[13.5px] leading-[1.7] whitespace-pre-wrap text-adm-ink [overflow-wrap:anywhere]">
+                        <p className="mt-1.5 text-[11.5px] leading-[1.7] whitespace-pre-wrap text-adm-ink [overflow-wrap:anywhere]">
                           {r.body}
                         </p>
                       </li>
@@ -222,7 +222,7 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
                       >
                         {replying ? "Sending…" : "Send reply"}
                       </AdminButton>
-                      <span className="min-w-0 text-[12px] text-adm-muted [overflow-wrap:anywhere]">
+                      <span className="min-w-0 text-[11px] text-adm-muted [overflow-wrap:anywhere]">
                         Goes to {enquiry.email}
                       </span>
                     </div>
@@ -231,7 +231,7 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
                   // Many enquiries arrive phone-only, and the server refuses a
                   // reply with nowhere to send it. Saying so here is better
                   // than a button that can only fail.
-                  <p className="text-[13px] text-adm-muted">
+                  <p className="text-[11.5px] text-adm-muted">
                     No email address on file, so there is nowhere to send a
                     reply. Call or message the number on the record instead.
                   </p>
@@ -341,7 +341,7 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
 
             {isSuperAdmin ? (
               <AdminCard className="px-5 py-4">
-                <p className="text-[12.5px] text-adm-muted">
+                <p className="text-[11px] text-adm-muted">
                   Deleting removes the enquiry permanently.
                 </p>
                 <AdminButton

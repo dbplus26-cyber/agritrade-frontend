@@ -103,9 +103,17 @@ export interface ConsoleColumnMeta {
    * `max-w-0` on the td is what makes the percentage authoritative. Without it
    * the cell's min-content width wins over `w-2/5` and the column grows again.
    *
-   * NEVER put a `min-w-[…]` on anything inside a stretch cell. A minimum and a
-   * share are contradictory instructions, and CSS resolves the contradiction in
-   * the minimum's favour: `min-width` beats `max-width`, so the content keeps
+   * The COLUMN carries a floor (15rem) so it can never be squeezed to nothing
+   * by the columns beside it: a share is only a share of a table that fits,
+   * and when the rest want more than the remaining 60% the browser has none to
+   * give. Below the floor the table grows past its container and the wrapper
+   * scrolls, which is the right trade on a desktop - a name clipped to five
+   * letters is not.
+   *
+   * NEVER put a `min-w-[…]` on anything INSIDE a stretch cell, though. A
+   * minimum on the content and a share on the column are contradictory
+   * instructions, and CSS resolves the contradiction in the minimum's favour:
+   * `min-width` beats `max-width`, so the content keeps
    * the floor's width however narrow the column gets, `truncate` then clips
    * against the FLOOR rather than the cell, and the text runs out over the
    * next column. `min-w-0` is right; a floor never is.
@@ -319,21 +327,21 @@ function summaryCard<TData>(
             ))}
           </span>
           {trailing && filled(trailing) ? (
-            <span className="flex-none text-[12.5px] font-semibold text-adm-ink">
+            <span className="flex-none text-[11px] font-semibold text-adm-ink">
               {render(trailing)}
             </span>
           ) : null}
         </div>
       ) : null}
       {title ? (
-        <div className="min-w-0 text-[14px] leading-[1.35] font-medium text-adm-ink">
+        <div className="min-w-0 text-[12px] leading-[1.35] font-medium text-adm-ink">
           {render(title)}
         </div>
       ) : null}
       {meta.length > 0 ? (
         // Separated by a middle dot rather than stacked: three short facts on
         // one quiet line is one glance, and three lines is three.
-        <div className="flex min-w-0 flex-wrap items-baseline gap-x-1.5 text-[12px] text-adm-muted">
+        <div className="flex min-w-0 flex-wrap items-baseline gap-x-1.5 text-[11px] text-adm-muted">
           {meta.map((cell, index) => (
             <span key={cell.id} className="flex min-w-0 items-baseline gap-1.5">
               {index > 0 ? (
@@ -418,7 +426,7 @@ function CardField({
 
   if (!label) {
     return (
-      <div className="border-b border-adm-hairline py-1.5 text-[14px] last:border-b-0">
+      <div className="border-b border-adm-hairline py-1.5 text-[12px] last:border-b-0">
         <span className="block min-w-0 [overflow-wrap:anywhere] text-adm-body">
           {children}
         </span>
@@ -427,7 +435,7 @@ function CardField({
   }
 
   return (
-    <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-0.5 border-b border-adm-hairline py-1.5 text-[14px] last:border-b-0">
+    <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-0.5 border-b border-adm-hairline py-1.5 text-[12px] last:border-b-0">
       <span
         ref={labelRef}
         className="flex-none pt-px text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase"
@@ -790,7 +798,7 @@ export function ConsoleDataTable<TData>({
     return (
       <div className={cn("@container/table min-w-0", className)}>
         {emptyState ?? (
-          <div className="px-4 py-12 text-center text-[14px] text-adm-muted">
+          <div className="px-4 py-12 text-center text-[12px] text-adm-muted">
             Nothing here yet.
           </div>
         )}
@@ -804,7 +812,7 @@ export function ConsoleDataTable<TData>({
     >
       {enableSelection && selectedRows.length > 0 && renderBulkActions ? (
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-adm-line bg-adm-sunken px-4 py-2">
-          <span className="text-[13.5px] font-semibold text-adm-body">
+          <span className="text-[11.5px] font-semibold text-adm-body">
             {selectedRows.length} selected
           </span>
           <div className="flex items-center gap-2">
@@ -843,7 +851,7 @@ export function ConsoleDataTable<TData>({
         {rows.length === 0 ? (
           <li>
             {emptyState ?? (
-              <div className="px-4 py-12 text-center text-[14px] text-adm-muted">
+              <div className="px-4 py-12 text-center text-[12px] text-adm-muted">
                 Nothing here yet.
               </div>
             )}
@@ -938,7 +946,9 @@ export function ConsoleDataTable<TData>({
                       meta?.className,
                       meta?.headerClassName,
                       // Last, so the share wins over any width in the meta.
-                      meta?.stretch && "w-2/5",
+                      // Header and body carry the same floor, or the two
+                      // disagree about the column's width.
+                      meta?.stretch && "w-2/5 min-w-[15rem]",
                     )}
                   >
                     {sortable ? (
@@ -977,7 +987,7 @@ export function ConsoleDataTable<TData>({
             <TableRow className="hover:bg-transparent">
               <TableCell colSpan={allColumns.length} className="p-0">
                 {emptyState ?? (
-                  <div className="px-4 py-12 text-center text-[14px] text-adm-muted">
+                  <div className="px-4 py-12 text-center text-[12px] text-adm-muted">
                     Nothing here yet.
                   </div>
                 )}
@@ -1017,12 +1027,22 @@ export function ConsoleDataTable<TData>({
                           // height, and the table stops being scannable. Cells
                           // that want a single line clamp themselves; this is
                           // the backstop for the ones that do not.
-                          "px-3 py-2.5 text-[14px] text-adm-body [&_p]:line-clamp-2",
+                          "px-3 py-2.5 text-[12px] text-adm-body [&_p]:line-clamp-2",
                           cell.column.columnDef.meta?.className,
                           // max-w-0 is not cosmetic: without it the cell's
                           // min-content width beats w-2/5 and the column grows
                           // back to whatever the longest value wants.
-                          cell.column.columnDef.meta?.stretch && "w-2/5 max-w-0",
+                          // The floor is what stops the column collapsing.
+                          // `w-2/5` is a SHARE of a table that fits; when the
+                          // other columns want more than the remaining 60%
+                          // there is no share to be had, and `max-w-0` leaves
+                          // this cell with no min-content of its own to hold
+                          // it open - so the name a person is scanning for was
+                          // clipped after four or five letters. A floor lets
+                          // the table grow past its container instead, which
+                          // the wrapper already scrolls.
+                          cell.column.columnDef.meta?.stretch &&
+                            "w-2/5 max-w-0 min-w-[15rem]",
                         )}
                       >
                         {flexRender(
@@ -1059,7 +1079,7 @@ export function ConsoleDataTable<TData>({
           }
         />
       ) : total > 0 ? (
-        <div className="border-t border-adm-line px-4 py-2.5 text-[13.5px] text-adm-muted">
+        <div className="border-t border-adm-line px-4 py-2.5 text-[11.5px] text-adm-muted">
           {total} {itemNoun}
         </div>
       ) : null}

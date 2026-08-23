@@ -102,7 +102,7 @@ export function CashBookScreen() {
         ) : null}
 
         {isFetching ? (
-          <p className="text-[12.5px] text-adm-muted">Refreshing…</p>
+          <p className="text-[11px] text-adm-muted">Refreshing…</p>
         ) : null}
       </div>
 
@@ -129,7 +129,7 @@ function PositionCard({
 }) {
   return (
     <AdminCard className="p-4 sm:p-5">
-      <p className="flex items-center text-[12.5px] font-semibold tracking-wide text-adm-muted uppercase">
+      <p className="flex items-center text-[11px] font-semibold tracking-wide text-adm-muted uppercase">
         {title}
         <HelpTip className="ml-1.5" label={`What is ${title}?`} text={hint} />
       </p>
@@ -166,12 +166,12 @@ function AccountList({
 }) {
   return (
     <section>
-      <h2 className="mb-2 text-[13px] font-semibold tracking-wide text-adm-muted uppercase">
+      <h2 className="mb-2 text-[11.5px] font-semibold tracking-wide text-adm-muted uppercase">
         {title}
       </h2>
       <AdminCard>
         {accounts.length === 0 ? (
-          <p className="p-4 text-[13px] text-adm-muted">{emptyText}</p>
+          <p className="p-4 text-[11.5px] text-adm-muted">{emptyText}</p>
         ) : (
           <ul className="divide-y divide-adm-hairline">
             {accounts.map((account) => (
@@ -195,7 +195,7 @@ function AccountRow({ account }: { account: IAccountBalance }) {
         <span className="flex min-w-0 items-center gap-1.5">
           <span
             className={cn(
-              "min-w-0 text-[14px] font-medium [overflow-wrap:anywhere]",
+              "min-w-0 text-[12px] font-medium [overflow-wrap:anywhere]",
               account.isActive ? "text-adm-ink" : "text-adm-muted",
             )}
           >
@@ -209,13 +209,13 @@ function AccountRow({ account }: { account: IAccountBalance }) {
             />
           ) : null}
           {!account.isActive ? (
-            <span className="flex-none text-[11.5px] text-adm-muted">
+            <span className="flex-none text-[10.5px] text-adm-muted">
               (retired)
             </span>
           ) : null}
         </span>
         {/* flex-none: the figure is the point of the row and never truncates. */}
-        <Balance className="flex-none text-[15px]" value={account.balanceGhs} />
+        <Balance className="flex-none text-[12.5px]" value={account.balanceGhs} />
       </Link>
     </li>
   );

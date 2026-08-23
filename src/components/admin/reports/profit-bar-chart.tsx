@@ -42,7 +42,7 @@ function ProfitTooltip({
 }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-none border border-adm-line bg-adm-card px-3 py-2 text-[12px] shadow-[0_1px_2px_rgba(16,24,40,0.05)]">
+    <div className="rounded-none border border-adm-line bg-adm-card px-3 py-2 text-[11px] shadow-[0_1px_2px_rgba(16,24,40,0.05)]">
       <div className="mb-1 font-semibold text-adm-ink">{label}</div>
       {payload.map((p) => (
         <div key={p.name} className="flex items-center justify-between gap-4">

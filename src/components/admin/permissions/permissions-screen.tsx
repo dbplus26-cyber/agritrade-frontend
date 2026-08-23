@@ -88,10 +88,10 @@ function PermissionGroups({
         return (
           <div key={group.group}>
             <div className="flex items-baseline justify-between gap-3 border-t border-adm-line bg-adm-sunken px-4 py-[7px] sm:px-5">
-              <span className="text-[11px] font-bold tracking-[0.08em] text-adm-muted uppercase">
+              <span className="text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
                 {group.group}
               </span>
-              <span className="font-adminmono text-[11px] tabular-nums text-adm-faint">
+              <span className="font-adminmono text-[10.5px] tabular-nums text-adm-faint">
                 {on} of {group.permissions.length} on
               </span>
             </div>
@@ -107,13 +107,13 @@ function PermissionGroups({
                   )}
                 >
                   <span className="min-w-0">
-                    <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[13.5px] font-semibold text-adm-ink">
+                    <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11.5px] font-semibold text-adm-ink">
                       {meta.label}
                       {fromRole ? (
                         <ToneBadge tone="forest">Via role</ToneBadge>
                       ) : null}
                     </span>
-                    <span className="mt-0.5 block text-[12.5px] leading-[1.5] text-adm-muted">
+                    <span className="mt-0.5 block text-[11px] leading-[1.5] text-adm-muted">
                       {meta.description}
                     </span>
                   </span>
@@ -150,7 +150,7 @@ function SaveRow({
   return (
     <CommitRow className="border-t border-adm-line px-4 py-3.5 sm:px-5">
       {dirty ? (
-        <span className="order-last text-[12px] font-medium text-console-gold sm:order-first sm:mr-auto">
+        <span className="order-last text-[11px] font-medium text-console-gold sm:order-first sm:mr-auto">
           Unsaved changes
         </span>
       ) : null}
@@ -290,14 +290,14 @@ function RoleDefaults({
           <SectionHeading
             className="mb-0"
             actions={
-              <span className="font-adminmono text-[12px] font-semibold tabular-nums text-adm-body">
+              <span className="font-adminmono text-[11px] font-semibold tabular-nums text-adm-body">
                 {current.size} of {total} allowed
               </span>
             }
           >
             {ROLE_TITLE[role]}
           </SectionHeading>
-          <p className="mt-0.5 max-w-[600px] text-[12.5px] leading-[1.55] text-adm-muted">
+          <p className="mt-0.5 max-w-[600px] text-[11px] leading-[1.55] text-adm-muted">
             {ROLE_BLURB[role]}
           </p>
         </div>
@@ -345,17 +345,17 @@ function PersonRow({
       <span
         aria-hidden="true"
         className={cn(
-          "flex h-[30px] w-[30px] flex-none items-center justify-center rounded-full text-[12px] font-bold",
+          "flex h-[30px] w-[30px] flex-none items-center justify-center rounded-full text-[11px] font-bold",
           active ? "bg-console text-white" : "bg-adm-sunken text-adm-body",
         )}
       >
         {initialsOf(user)}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[13px] font-semibold text-adm-ink">
+        <span className="block truncate text-[11.5px] font-semibold text-adm-ink">
           {user.firstName} {user.lastName}
         </span>
-        <span className="block truncate text-[11.5px] text-adm-muted">
+        <span className="block truncate text-[10.5px] text-adm-muted">
           {ROLE_LABEL[user.role]}
         </span>
       </span>
@@ -462,7 +462,7 @@ function PersonEditor({
         <SectionHeading
           className="mb-0"
           actions={
-            <span className="font-adminmono text-[12px] font-semibold tabular-nums text-adm-body">
+            <span className="font-adminmono text-[11px] font-semibold tabular-nums text-adm-body">
               {effectiveCount} of {total} allowed
             </span>
           }
@@ -472,7 +472,7 @@ function PersonEditor({
             {ROLE_LABEL[user.role]}
           </ToneBadge>
         </SectionHeading>
-        <p className="mt-0.5 max-w-[600px] text-[12.5px] leading-[1.55] text-adm-muted">
+        <p className="mt-0.5 max-w-[600px] text-[11px] leading-[1.55] text-adm-muted">
           Switches here are personal grants on top of the{" "}
           {ROLE_LABEL[user.role].toLowerCase()} defaults. Anything marked via
           role is already allowed to the whole role - a personal grant keeps
@@ -571,13 +571,13 @@ function People({
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search people…"
               aria-label="Search people"
-              className={cn(adminInputClass, "h-[34px] pl-8 text-[13px]")}
+              className={cn(adminInputClass, "h-[34px] pl-8 text-[11.5px]")}
             />
           </div>
         </div>
         <div className="max-h-[300px] overflow-y-auto lg:max-h-[calc(100vh-240px)]">
           {shown.length === 0 ? (
-            <p className="px-3.5 py-5 text-center text-[12.5px] text-adm-muted">
+            <p className="px-3.5 py-5 text-center text-[11px] text-adm-muted">
               Nobody matches this search.
             </p>
           ) : (
@@ -602,10 +602,10 @@ function People({
               aria-hidden="true"
               className="mx-auto h-6 w-6 text-adm-faint"
             />
-            <p className="mt-2.5 text-[13.5px] font-semibold text-adm-ink">
+            <p className="mt-2.5 text-[11.5px] font-semibold text-adm-ink">
               Pick a person
             </p>
-            <p className="mx-auto mt-1 max-w-[340px] text-[12.5px] leading-[1.55] text-adm-muted">
+            <p className="mx-auto mt-1 max-w-[340px] text-[11px] leading-[1.55] text-adm-muted">
               Choose a staff member or agent to see what they may do and grant
               them extra access.
             </p>

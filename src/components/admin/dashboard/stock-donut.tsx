@@ -59,7 +59,7 @@ export function StockDonut({ rows }: { rows: StockRow[] }) {
               <span className="text-[17px] font-bold text-adm-ink">
                 {formatWeight(total)}
               </span>
-              <span className="text-[9.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+              <span className="text-[10px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 On hand
               </span>
             </div>
@@ -68,7 +68,7 @@ export function StockDonut({ rows }: { rows: StockRow[] }) {
             {slices.map((s) => (
               <div key={s.name} className="flex items-center justify-between gap-2">
                 <LegendItem color={s.color} label={s.name} />
-                <span className="flex-none text-[11.5px] text-adm-muted">
+                <span className="flex-none text-[10.5px] text-adm-muted">
                   <span className="font-semibold text-adm-ink">
                     {formatWeight(s.value)}
                   </span>{" "}

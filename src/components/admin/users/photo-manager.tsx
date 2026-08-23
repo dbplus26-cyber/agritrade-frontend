@@ -138,7 +138,7 @@ export function PhotoManager({
       {previewing ? (
         // Preview mode: commit or walk away - nothing has uploaded yet.
         <div className="flex flex-col items-center gap-1.5">
-          <span className="text-[11px] font-semibold text-console-gold">
+          <span className="text-[10.5px] font-semibold text-console-gold">
             Preview - not saved yet
           </span>
           <div className="flex items-center gap-1.5">
@@ -183,7 +183,7 @@ export function PhotoManager({
               </AdminButton>
             ) : null}
           </div>
-          <span className="text-[11px] text-adm-faint">JPG or PNG</span>
+          <span className="text-[10.5px] text-adm-faint">JPG or PNG</span>
         </>
       )}
 

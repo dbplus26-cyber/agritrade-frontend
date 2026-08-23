@@ -110,7 +110,7 @@ export function LandAcquisitionsRegister() {
             <Mono className="font-semibold text-console">
               {row.original.reference}
             </Mono>
-            <div className="[overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-muted">
+            <div className="[overflow-wrap:anywhere] @2xl/table:truncate text-[11px] text-adm-muted">
               {/* The row navigates to the acquisition, so the seller has to
                   stop the click reaching it. */}
               <Link

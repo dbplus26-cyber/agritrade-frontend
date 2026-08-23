@@ -96,7 +96,7 @@ export function LandSalesRegister() {
             <Mono className="font-semibold text-console">
               {row.original.plot.reference}
             </Mono>
-            <div className="[overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-muted">
+            <div className="[overflow-wrap:anywhere] @2xl/table:truncate text-[11px] text-adm-muted">
               {row.original.plot.locationText}
             </div>
           </Link>

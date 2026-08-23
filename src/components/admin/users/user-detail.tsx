@@ -102,7 +102,7 @@ function IdentityCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
         />
         <span
           aria-hidden="true"
-          className="absolute right-4 top-1/2 hidden -translate-y-1/2 text-[13px] font-extrabold uppercase tracking-[0.3em] text-white/25 sm:block"
+          className="absolute right-4 top-1/2 hidden -translate-y-1/2 text-[11.5px] font-extrabold uppercase tracking-[0.3em] text-white/25 sm:block"
         >
           DB Plus
         </span>
@@ -127,19 +127,19 @@ function IdentityCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
               </ToneBadge>
               <StatusBadge user={user} />
               {isSelf ? (
-                <span className="text-[11px] font-semibold text-adm-faint">
+                <span className="text-[10.5px] font-semibold text-adm-faint">
                   (you)
                 </span>
               ) : null}
             </div>
             <p
-              className="mt-0.5 truncate text-[13px] text-adm-muted"
+              className="mt-0.5 truncate text-[11.5px] text-adm-muted"
               title={user.email}
             >
               {user.email}
             </p>
             {user.pendingEmail ? (
-              <p className="mt-1 text-[12px] font-medium text-console-gold">
+              <p className="mt-1 text-[11px] font-medium text-console-gold">
                 Email change to {user.pendingEmail} awaiting confirmation.
               </p>
             ) : null}
@@ -299,21 +299,21 @@ function PermissionsCard({ user }: { user: IUser }) {
     <AdminCard className="px-4 py-[18px] sm:px-6">
       <SectionHeading className="mb-3.5">Permissions</SectionHeading>
       {isOwner ? (
-        <p className="text-[12.5px] leading-[1.55] text-adm-muted">
+        <p className="text-[11px] leading-[1.55] text-adm-muted">
           Full access - the owner role holds every permission and cannot be
           narrowed.
         </p>
       ) : (
         <div className="flex flex-col items-start gap-2.5 @min-[300px]:flex-row @min-[300px]:items-center @min-[300px]:gap-3">
           <div className="min-w-0 flex-1">
-            <div className="text-[13.5px] font-semibold text-adm-ink">
+            <div className="text-[11.5px] font-semibold text-adm-ink">
               {state
                 ? `${String(state.effective.length)} permission${
                     state.effective.length === 1 ? "" : "s"
                   } in effect`
                 : "Loading their access…"}
             </div>
-            <div className="mt-0.5 text-[12.5px] text-adm-muted">
+            <div className="mt-0.5 text-[11px] text-adm-muted">
               {state
                 ? `${String(state.fromRole.length)} from the role, ${String(
                     state.granted.length,
@@ -348,10 +348,10 @@ function RoleCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
         <SectionHeading className="mb-3.5">Role</SectionHeading>
         <div className="flex flex-col items-start gap-2.5 @min-[300px]:flex-row @min-[300px]:items-center @min-[300px]:gap-3">
           <div className="min-w-0 flex-1">
-            <div className="text-[13.5px] font-semibold text-adm-ink">
+            <div className="text-[11.5px] font-semibold text-adm-ink">
               {ROLE_TITLE[user.role] ?? user.role}
             </div>
-            <div className="mt-0.5 text-[12.5px] text-adm-muted">
+            <div className="mt-0.5 text-[11px] text-adm-muted">
               {isSelf
                 ? "You cannot change your own role."
                 : "Changing the role signs the user out everywhere."}
@@ -547,10 +547,10 @@ function ActionsCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
           className="flex items-start gap-3 border-t border-adm-hairline px-4 py-3 first:border-t-0 sm:items-center sm:px-6"
         >
           <div className="min-w-0 flex-1">
-            <div className="text-[13.5px] font-semibold text-adm-ink">
+            <div className="text-[11.5px] font-semibold text-adm-ink">
               {row.title}
             </div>
-            <div className="mt-px text-[12.5px] text-adm-muted">{row.sub}</div>
+            <div className="mt-px text-[11px] text-adm-muted">{row.sub}</div>
           </div>
           <AdminButton
             variant={row.destructive ? "danger" : "secondary"}

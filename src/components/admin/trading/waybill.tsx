@@ -47,7 +47,7 @@ function WaybillSignature({
           className="max-h-[40px] max-w-[150px] object-contain"
         />
       </div>
-      <div className="border-t border-adm-strong pt-1 text-center text-[12px]">
+      <div className="border-t border-adm-strong pt-1 text-center text-[11px]">
         {label}
       </div>
       <div className="mt-0.5 text-center text-[10px] leading-[1.35] text-adm-muted [overflow-wrap:anywhere]">
@@ -126,18 +126,18 @@ export function Waybill({ id }: { id: string }) {
               <div className="text-[20px] font-extrabold tracking-[0.12em] text-console">
                 DB PLUS
               </div>
-              <div className="text-[11px] tracking-[0.06em] text-adm-muted uppercase">
+              <div className="text-[10.5px] tracking-[0.06em] text-adm-muted uppercase">
                 Trading · Tamale
               </div>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-[16px] font-bold">WAYBILL</div>
-            <div className="text-[12px] text-adm-muted">Ref {s.transactionNo}</div>
-            <div className="max-w-[260px] text-[12px] text-adm-muted [overflow-wrap:anywhere]">
+            <div className="text-[13px] font-bold">WAYBILL</div>
+            <div className="text-[11px] text-adm-muted">Ref {s.transactionNo}</div>
+            <div className="max-w-[260px] text-[11px] text-adm-muted [overflow-wrap:anywhere]">
               Sales: {s.sales.map((sale) => sale.transactionNo).join(", ")}
             </div>
-            <div className="text-[12px] text-adm-muted">
+            <div className="text-[11px] text-adm-muted">
               {s.departedAt
                 ? formatShipmentDate(s.departedAt)
                 : formatShipmentDate(s.createdAt)}
@@ -145,7 +145,7 @@ export function Waybill({ id }: { id: string }) {
           </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-4 text-[13px]">
+        <div className="mt-4 grid grid-cols-2 gap-4 text-[11.5px]">
           <div>
             <div className="mb-1 text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
               {s.sales.length === 1 ? "Buyer" : "Buyers"}
@@ -187,7 +187,7 @@ export function Waybill({ id }: { id: string }) {
           </div>
         </div>
 
-        <table className="mt-6 w-full border-collapse text-[13px]">
+        <table className="mt-6 w-full border-collapse text-[11.5px]">
           <thead>
             <tr className="border-y border-adm-strong text-left">
               <th className="py-2">Commodity</th>
@@ -222,7 +222,7 @@ export function Waybill({ id }: { id: string }) {
             The receiver keeps an ink line either way: nobody at the far end
             has a login, and a mark taken on our device at our shed would not
             be their acknowledgement of anything. */}
-        <div className="mt-12 flex flex-wrap items-end gap-x-8 gap-y-6 text-[12px]">
+        <div className="mt-12 flex flex-wrap items-end gap-x-8 gap-y-6 text-[11px]">
           <WaybillSignature
             label="Driver's signature"
             signature={s.signatures.driver}

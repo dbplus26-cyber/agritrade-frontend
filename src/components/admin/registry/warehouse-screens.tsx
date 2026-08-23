@@ -465,7 +465,7 @@ function WarehouseStockSection({ warehouseId }: { warehouseId: string }) {
               href="/admin/stock"
               className={cn(
                 adminLinkClass,
-                "whitespace-nowrap text-[12.5px] font-semibold",
+                "whitespace-nowrap text-[11px] font-semibold",
               )}
             >
               Full stock view
@@ -474,7 +474,7 @@ function WarehouseStockSection({ warehouseId }: { warehouseId: string }) {
         >
           Commodities in this warehouse
         </SectionHeading>
-        <p className="mt-0.5 text-[12px] text-adm-muted">
+        <p className="mt-0.5 text-[11px] text-adm-muted">
           {isLoading
             ? "Loading current balances…"
             : rows.length === 0
@@ -512,14 +512,14 @@ function WarehouseStockSection({ warehouseId }: { warehouseId: string }) {
                   <Link
                     className={cn(
                       adminLinkClass,
-                      "min-w-0 [overflow-wrap:anywhere] text-[13.5px] font-medium",
+                      "min-w-0 [overflow-wrap:anywhere] text-[11.5px] font-medium",
                     )}
                     href={`/admin/commodities/${row.commodityId}`}
                   >
                     {row.commodityName}
                   </Link>
                   <span
-                    className="font-adminmono flex-none text-[13.5px] font-semibold tabular-nums text-adm-ink"
+                    className="font-adminmono flex-none text-[11.5px] font-semibold tabular-nums text-adm-ink"
                     title={`${row.balanceKg.toLocaleString("en-GH")} kg`}
                   >
                     {formatKg(row.balanceKg)}
@@ -542,11 +542,11 @@ function WarehouseStockSection({ warehouseId }: { warehouseId: string }) {
             ))}
           </ul>
           <div className="flex items-center justify-between gap-3 border-t border-adm-hairline bg-adm-sunken px-5 py-2.5">
-            <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-adm-muted">
+            <span className="text-[10.5px] font-bold uppercase tracking-[0.1em] text-adm-muted">
               Total on hand
             </span>
             <span
-              className="font-adminmono flex-none text-[14px] font-bold tabular-nums text-adm-ink"
+              className="font-adminmono flex-none text-[12px] font-bold tabular-nums text-adm-ink"
               title={`${totalKg.toLocaleString("en-GH")} kg`}
             >
               {formatKg(totalKg)}

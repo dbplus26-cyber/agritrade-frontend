@@ -52,7 +52,7 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
         right={
           <a
             href={exportHref}
-            className={cn(adminLinkClass, "text-[12px]")}
+            className={cn(adminLinkClass, "text-[11px]")}
           >
             Export CSV
           </a>
@@ -68,7 +68,7 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
           onChange={(e) => onSearch(e.target.value)}
           placeholder="Search buyer name…"
           aria-label="Search debtors by buyer name"
-          className="h-9 pr-8 text-[13px]"
+          className="h-9 pr-8 text-[11.5px]"
         />
         {search ? (
           <button
@@ -97,7 +97,7 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
         />
       ) : rows.length === 0 ? (
         isFetching ? (
-          <p className="py-4 text-[13px] text-adm-muted">Loading…</p>
+          <p className="py-4 text-[11.5px] text-adm-muted">Loading…</p>
         ) : (
           <WidgetEmpty
             title={
@@ -128,17 +128,17 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
                 <Link
                   className={cn(
                     adminLinkClass,
-                    "min-w-0 text-[13.5px] font-semibold whitespace-normal [overflow-wrap:anywhere]",
+                    "min-w-0 text-[11.5px] font-semibold whitespace-normal [overflow-wrap:anywhere]",
                   )}
                   href={`/admin/buyers/${r.buyer.id}`}
                 >
                   {r.buyer.name}
                 </Link>
-                <Mono className="flex-none text-[13.5px] font-semibold text-console-red">
+                <Mono className="flex-none text-[11.5px] font-semibold text-console-red">
                   <Money compact value={r.balanceGhs} />
                 </Mono>
               </div>
-              <div className="mt-0.5 flex items-baseline justify-between gap-3 text-[12px] text-adm-muted">
+              <div className="mt-0.5 flex items-baseline justify-between gap-3 text-[11px] text-adm-muted">
                 <span className="min-w-0 [overflow-wrap:anywhere]">
                   {r.kind === "LAND" ? "Land" : "Commodity"} ·{" "}
                   <Mono>{r.subject}</Mono>
@@ -159,7 +159,7 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
               "GHS 59,377.38" wraps. The figures are why this table exists;
               they get the room they need first, and the name takes what is
               left and wraps to at most two lines. */}
-          <table className="w-full min-w-[720px] table-fixed text-[14px]">
+          <table className="w-full min-w-[720px] table-fixed text-[12px]">
             <colgroup>
               <col className="w-[30%]" />
               <col className="w-[9rem]" />
@@ -212,7 +212,7 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
                       {r.buyer.name}
                     </Link>
                     {r.buyer.phone ? (
-                      <div className="font-adminmono truncate text-[12.5px] text-adm-muted">
+                      <div className="font-adminmono truncate text-[11px] text-adm-muted">
                         {r.buyer.phone}
                       </div>
                     ) : null}

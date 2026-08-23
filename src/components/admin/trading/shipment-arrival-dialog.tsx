@@ -157,11 +157,11 @@ function SaleArrival({
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
         <Link
           href={`/admin/sales/${sale.id}`}
-          className={cn(adminLinkClass, "font-adminmono text-[12.5px] font-semibold tabular-nums")}
+          className={cn(adminLinkClass, "font-adminmono text-[11px] font-semibold tabular-nums")}
         >
           {sale.transactionNo}
         </Link>
-        <span className="min-w-0 text-[13px] font-semibold text-adm-ink [overflow-wrap:anywhere]">
+        <span className="min-w-0 text-[11.5px] font-semibold text-adm-ink [overflow-wrap:anywhere]">
           {sale.buyer.name}
         </span>
       </div>
@@ -175,12 +175,12 @@ function SaleArrival({
           <div key={line.commodityId} className="flex flex-col gap-1">
             <div className="flex flex-wrap items-baseline justify-between gap-x-2">
               <label
-                className="min-w-0 text-[13px] font-medium text-adm-ink [overflow-wrap:anywhere]"
+                className="min-w-0 text-[11.5px] font-medium text-adm-ink [overflow-wrap:anywhere]"
                 htmlFor={`received-${sale.id}-${line.commodityId}`}
               >
                 {line.commodityName}
               </label>
-              <Mono className="flex-none text-[11.5px] text-adm-muted">
+              <Mono className="flex-none text-[10.5px] text-adm-muted">
                 loaded {formatKg(line.loadedKg)}
               </Mono>
             </div>
@@ -193,14 +193,14 @@ function SaleArrival({
                 aria-label={`Received ${line.commodityName} for ${sale.transactionNo}`}
                 className={cn(
                   adminInputClass,
-                  "font-adminmono pr-10 text-[15px] tabular-nums",
+                  "font-adminmono pr-10 text-[12.5px] tabular-nums",
                 )}
                 placeholder="e.g. 1200"
                 {...register(`sales.${index}.lines.${i}.receivedKg`)}
               />
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[12.5px] font-semibold text-adm-faint"
+                className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[11px] font-semibold text-adm-faint"
               >
                 kg
               </span>
@@ -213,14 +213,14 @@ function SaleArrival({
           overwritten, the suggestion under it as an offer, and the box the
           admin actually commits to last. */}
       <div className="mt-3 border-t border-dotted border-adm-line pt-2.5">
-        <div className="flex items-baseline justify-between gap-3 text-[12.5px]">
+        <div className="flex items-baseline justify-between gap-3 text-[11px]">
           <span className="text-adm-muted">Agreed total</span>
           <Mono className="flex-none text-adm-ink">
             <Money value={sale.agreedTotalGhs} />
           </Mono>
         </div>
         {suggestedGhs !== null ? (
-          <div className="mt-0.5 flex items-baseline justify-between gap-3 text-[12.5px]">
+          <div className="mt-0.5 flex items-baseline justify-between gap-3 text-[11px]">
             <span className="text-adm-muted">Suggested</span>
             <span className="flex flex-none items-baseline gap-2">
               <Mono className="text-adm-ink">{formatCedis(suggestedGhs)}</Mono>
@@ -235,7 +235,7 @@ function SaleArrival({
                       { shouldValidate: true },
                     );
                   }}
-                  className={cn(adminLinkClass, "cursor-pointer text-[12px] font-semibold")}
+                  className={cn(adminLinkClass, "cursor-pointer text-[11px] font-semibold")}
                 >
                   Use
                 </button>
@@ -253,7 +253,7 @@ function SaleArrival({
         <div className="relative mt-1">
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-[13px] font-semibold text-adm-faint"
+            className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-[11.5px] font-semibold text-adm-faint"
           >
             GH₵
           </span>
@@ -276,7 +276,7 @@ function SaleArrival({
         {belowPaid ? (
           <p
             role="alert"
-            className="mt-1.5 text-[12px] font-medium text-console-red"
+            className="mt-1.5 text-[11px] font-medium text-console-red"
           >
             {sale.buyer.name} has already paid{" "}
             <Mono>{formatCedis(sale.paidGhs)}</Mono> on this sale. Reverse a
@@ -490,7 +490,7 @@ export function ArrivalDialog({
         </ResponsiveDialogHeader>
 
         {loaded.length === 0 ? (
-          <p className="text-[13px] text-adm-muted">
+          <p className="text-[11.5px] text-adm-muted">
             No lots were allocated on this trip, so there is nothing to weigh
             in.
             {secondPass
@@ -520,7 +520,7 @@ export function ArrivalDialog({
                 individually - a blank weight is one message, and it belongs
                 where the eye lands after the last box. */}
             {errors.sales ? (
-              <p role="alert" className="text-[12.5px] font-medium text-console-red">
+              <p role="alert" className="text-[11px] font-medium text-console-red">
                 Every weight and every payment needs a figure. Enter 0 where
                 nothing arrived.
               </p>
@@ -531,7 +531,7 @@ export function ArrivalDialog({
         {serverError ? (
           <p
             role="alert"
-            className="rounded-none border border-console-red/50 bg-console-red/[0.06] px-3 py-2 text-[12.5px] font-medium text-console-red"
+            className="rounded-none border border-console-red/50 bg-console-red/[0.06] px-3 py-2 text-[11px] font-medium text-console-red"
           >
             {serverError}
           </p>
@@ -550,7 +550,7 @@ export function ArrivalDialog({
               onClick={() => void onArriveWithoutFigures()}
               className={cn(
                 adminLinkClass,
-                "cursor-pointer text-[12.5px] font-semibold disabled:opacity-60",
+                "cursor-pointer text-[11px] font-semibold disabled:opacity-60",
               )}
             >
               Nobody has weighed it - mark arrived and record this later

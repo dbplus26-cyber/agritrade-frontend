@@ -456,7 +456,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
       />
 
       {a.status === "COMPLETED" && a.plot ? (
-        <AdminCard className="mb-4 border-console/40 bg-console/[0.05] px-4 py-3 text-[13px] text-adm-ink">
+        <AdminCard className="mb-4 border-console/40 bg-console/[0.05] px-4 py-3 text-[11.5px] text-adm-ink">
           This acquisition produced plot{" "}
           <Link
             href={`/admin/plots/${a.plot.id}`}
@@ -469,7 +469,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
       ) : null}
 
       {a.status === "CANCELLED" && a.cancelReason ? (
-        <AdminCard className="mb-4 border-console-red/40 bg-console-red/[0.04] px-4 py-3 text-[13px] text-adm-ink">
+        <AdminCard className="mb-4 border-console-red/40 bg-console-red/[0.04] px-4 py-3 text-[11.5px] text-adm-ink">
           Cancelled: {a.cancelReason}
         </AdminCard>
       ) : null}
@@ -536,7 +536,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
               Payments to seller
             </SectionHeading>
             {a.payments.length === 0 ? (
-              <p className="py-2 text-[13px] text-adm-muted">
+              <p className="py-2 text-[11.5px] text-adm-muted">
                 No payments recorded yet.
               </p>
             ) : (
@@ -549,7 +549,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
                     <span className="text-adm-ink">{p.method}</span>
                     {/* Date only: `paidAt` comes from a date picker, so its
                         time is a midnight stamp nobody chose. */}
-                    <span className="ml-2 text-[12px] text-adm-muted">
+                    <span className="ml-2 text-[11px] text-adm-muted">
                       <DateOnlyCell value={p.paidAt} muted />
                       {p.reference ? ` · ${p.reference}` : ""}
                     </span>
@@ -559,7 +559,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
                         a negative row, shown red like the land-sale ledger. */}
                     <Mono
                       className={cn(
-                        "whitespace-nowrap text-[13px] font-semibold",
+                        "whitespace-nowrap text-[11.5px] font-semibold",
                         p.amountGhs !== null && p.amountGhs < 0
                           ? "text-console-red"
                           : "text-console",

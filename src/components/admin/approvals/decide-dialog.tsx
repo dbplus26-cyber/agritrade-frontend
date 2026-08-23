@@ -123,11 +123,11 @@ export function DecideDialog({
         {approval && summary && link ? (
           <div className="rounded-none border border-adm-hairline bg-adm-sunken px-3 py-2.5">
             {/* The inbox card's title block + meta strip, in miniature. */}
-            <div className="font-adminmono text-[15px] leading-tight font-bold text-adm-ink [overflow-wrap:anywhere]">
+            <div className="font-adminmono text-[12.5px] leading-tight font-bold text-adm-ink [overflow-wrap:anywhere]">
               {summary.headline}
             </div>
             {summary.detail ? (
-              <div className="mt-0.5 text-[12.5px] text-adm-muted [overflow-wrap:anywhere]">
+              <div className="mt-0.5 text-[11px] text-adm-muted [overflow-wrap:anywhere]">
                 {summary.detail}
               </div>
             ) : null}

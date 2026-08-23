@@ -104,7 +104,7 @@ function SaleSettlement({ sale }: { sale: IShipmentSale }) {
           answer for a short load is often the one whose money fields are
           hidden. */}
       {sale.arrivalLines.length > 0 ? (
-        <ul className="mt-1 flex flex-col gap-0.5 text-[11.5px]">
+        <ul className="mt-1 flex flex-col gap-0.5 text-[10.5px]">
           {sale.arrivalLines.map((line) => {
             const shortKg = line.dispatchedKg - line.receivedKg;
             return (
@@ -130,7 +130,7 @@ function SaleSettlement({ sale }: { sale: IShipmentSale }) {
         </ul>
       ) : null}
       {!settled ? null : (
-      <dl className="mt-1 flex flex-col gap-0.5 text-[12px]">
+      <dl className="mt-1 flex flex-col gap-0.5 text-[11px]">
         <div className="flex items-baseline justify-between gap-2">
           <dt className="text-adm-muted">Agreed</dt>
           <dd className="flex-none">
@@ -526,7 +526,7 @@ export function ShipmentDetail({ id }: { id: string }) {
             loadedLabel={beforeDispatch ? "Planned" : "Loaded"}
           />
           {beforeDispatch && underFilled ? (
-            <p className="mt-1.5 text-[12.5px] text-adm-muted">
+            <p className="mt-1.5 text-[11px] text-adm-muted">
               This truck has {formatKg(roomLeftKg)} of room left. Add another
               sale before it rolls, or send it part-loaded if that is the plan.
             </p>
@@ -542,7 +542,7 @@ export function ShipmentDetail({ id }: { id: string }) {
         <SectionHeading
           actions={
             <span className="flex items-center gap-2">
-              <Mono className="text-[11px] text-adm-faint">
+              <Mono className="text-[10.5px] text-adm-faint">
                 {s.salesCount} {s.salesCount === 1 ? "sale" : "sales"}
               </Mono>
               {beforeDispatch ? (
@@ -599,7 +599,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                     href={`/admin/sales/${sale.id}`}
                     className={cn(
                       adminLinkClass,
-                      "font-adminmono min-w-0 text-[12.5px] font-semibold tabular-nums",
+                      "font-adminmono min-w-0 text-[11px] font-semibold tabular-nums",
                     )}
                   >
                     {sale.transactionNo}
@@ -616,7 +616,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                           onClick={() =>
                             void onRemoveSale(sale.id, sale.transactionNo)
                           }
-                          className="cursor-pointer text-[12px] text-console-red hover:opacity-70"
+                          className="cursor-pointer text-[11px] text-console-red hover:opacity-70"
                           aria-label={`Remove ${sale.transactionNo} from this shipment`}
                         >
                           <X className="h-3 w-3" aria-hidden="true" />
@@ -629,14 +629,14 @@ export function ShipmentDetail({ id }: { id: string }) {
                 <Link
                   className={cn(
                     adminLinkClass,
-                    "mt-2 block min-w-0 text-[14px] leading-[1.35] font-semibold [overflow-wrap:anywhere]",
+                    "mt-2 block min-w-0 text-[12px] leading-[1.35] font-semibold [overflow-wrap:anywhere]",
                   )}
                   href={`/admin/buyers/${sale.buyer.id}`}
                 >
                   {sale.buyer.name}
                 </Link>
                 {sale.buyer.phone ? (
-                  <Mono className="mt-0.5 block text-[12px] text-adm-muted">
+                  <Mono className="mt-0.5 block text-[11px] text-adm-muted">
                     {sale.buyer.phone}
                   </Mono>
                 ) : null}
@@ -699,7 +699,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                         return (
                           <li
                             key={l.commodityId}
-                            className="flex items-baseline justify-between gap-2 text-[11.5px]"
+                            className="flex items-baseline justify-between gap-2 text-[10.5px]"
                           >
                             <span className="min-w-0 text-adm-muted [overflow-wrap:anywhere]">
                               {l.commodityName}
@@ -873,7 +873,7 @@ export function ShipmentDetail({ id }: { id: string }) {
           Loaded lots
         </SectionHeading>
         {s.allocations.length === 0 ? (
-          <p className="py-2 text-[13px] text-adm-muted">
+          <p className="py-2 text-[11.5px] text-adm-muted">
             No lots allocated yet. Dispatching without allocations auto-fills
             from the oldest stock (flagged estimated).
           </p>
@@ -890,14 +890,14 @@ export function ShipmentDetail({ id }: { id: string }) {
                 >
                   {a.commodity.name}
                 </Link>
-                <Mono className="ml-2 text-[12px] text-adm-muted">
+                <Mono className="ml-2 text-[11px] text-adm-muted">
                   {formatKg(a.weightKg)} @{" "}
                   <Money value={a.unitCostSnapshotGhs} />
                 </Mono>
                 <Link
                   className={cn(
                     adminLinkClass,
-                    "font-adminmono ml-2 text-[11.5px] tabular-nums",
+                    "font-adminmono ml-2 text-[10.5px] tabular-nums",
                   )}
                   href={`/admin/sales/${a.sale.id}`}
                 >
@@ -906,7 +906,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                 {/* Where this slice was picked up. A trip that loads at two
                     sheds, or collects half its load at a farm gate, otherwise
                     reads as one undifferentiated pile. */}
-                <span className="ml-2 text-[11.5px] text-adm-muted">
+                <span className="ml-2 text-[10.5px] text-adm-muted">
                   {a.source.kind === "SUPPLIER" ? "collected at " : "from "}
                   {a.source.id ? (
                     <Link
@@ -924,7 +924,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                   )}
                 </span>
               </div>
-              <Mono className="whitespace-nowrap text-[13px] text-adm-ink">
+              <Mono className="whitespace-nowrap text-[11.5px] text-adm-ink">
                 <Money value={a.lineCostGhs} />
               </Mono>
             </div>
@@ -949,7 +949,7 @@ export function ShipmentDetail({ id }: { id: string }) {
         >
           Other paperwork (private)
         </SectionHeading>
-        <p className="mb-2 text-[12px] text-adm-muted">
+        <p className="mb-2 text-[11px] text-adm-muted">
           Weighbridge tickets, checkpoint and toll receipts, a buyer&rsquo;s
           signed delivery note - anything this trip collected that is not a
           signature. The driver and owner sign above; nothing here needs
@@ -982,7 +982,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                 onChange={(e) => setDocName(e.target.value)}
                 placeholder="Document name"
                 aria-label="Document name"
-                className="h-8 min-w-[160px] flex-1 rounded-none border border-adm-line bg-adm-card px-2.5 text-[13px] outline-none transition-colors placeholder:text-adm-faint focus:border-console"
+                className="h-8 min-w-[160px] flex-1 rounded-none border border-adm-line bg-adm-card px-2.5 text-[11.5px] outline-none transition-colors placeholder:text-adm-faint focus:border-console"
               />
               <FilePicker
                 accept="image/*,application/pdf"
@@ -1009,7 +1009,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                 <button
                   type="button"
                   onClick={() => setSigning((v) => !v)}
-                  className={cn(adminLinkClass, "cursor-pointer text-[12.5px] font-semibold")}
+                  className={cn(adminLinkClass, "cursor-pointer text-[11px] font-semibold")}
                   aria-expanded={signing}
                 >
                   {signing ? "Hide signature pad" : "Or sign on this screen"}
@@ -1026,7 +1026,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                       void onUploadDocument(file).catch(() => undefined);
                     }}
                   />
-                  <p className="mt-1 text-[11.5px] text-adm-faint">
+                  <p className="mt-1 text-[10.5px] text-adm-faint">
                     Saves as &quot;{docName.trim() || "Signed waybill"}&quot; -
                     hand the phone to the driver to sign right here.
                   </p>
@@ -1060,7 +1060,7 @@ export function ShipmentDetail({ id }: { id: string }) {
           Expenses
         </SectionHeading>
         {s.expenses.length === 0 ? (
-          <p className="py-2 text-[13px] text-adm-muted">No expenses recorded.</p>
+          <p className="py-2 text-[11.5px] text-adm-muted">No expenses recorded.</p>
         ) : (
           s.expenses.map((e) => (
             <div
@@ -1081,7 +1081,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                 </Link>
                 {e.description ? (
                   <span
-                    className="mt-0.5 line-clamp-2 text-[12px] text-adm-muted"
+                    className="mt-0.5 line-clamp-2 text-[11px] text-adm-muted"
                     title={e.description}
                   >
                     {e.description}
@@ -1094,7 +1094,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                     cash book has never seen, and this list is where somebody
                     would notice. */}
                 <SettlementBadge status={e.settlement.status} />
-                <Mono className="whitespace-nowrap text-[13px] text-adm-ink">
+                <Mono className="whitespace-nowrap text-[11.5px] text-adm-ink">
                   <Money value={e.amountGhs} />
                 </Mono>
                 {/* Voiding is owner-only (like the general expense void):
@@ -1168,7 +1168,7 @@ export function ShipmentDetail({ id }: { id: string }) {
         ) : null}
       </div>
       {weighed ? (
-        <p className="mt-2 text-[11.5px] leading-[1.45] text-adm-muted">
+        <p className="mt-2 text-[10.5px] leading-[1.45] text-adm-muted">
           The buyer pays for what arrived. What was bought and never delivered
           stays in the cost, because it was already paid for at the farm gate.
         </p>
@@ -1195,7 +1195,7 @@ export function ShipmentDetail({ id }: { id: string }) {
       />
 
       {s.status === "CANCELLED" && s.cancelReason ? (
-        <AdminCard className="mb-4 border-console-red/40 bg-console-red/[0.04] px-4 py-3 text-[13px] text-adm-ink">
+        <AdminCard className="mb-4 border-console-red/40 bg-console-red/[0.04] px-4 py-3 text-[11.5px] text-adm-ink">
           Cancelled: {s.cancelReason}
         </AdminCard>
       ) : null}

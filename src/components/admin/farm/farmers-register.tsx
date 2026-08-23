@@ -43,7 +43,7 @@ function FarmerCell({ farmer }: { farmer: IFarmer }) {
       onClick={(e) => { e.stopPropagation(); }}
     >
       <span
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[12px] font-bold"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold"
         style={{ background: a.bg, color: a.fg }}
       >
         {a.init}
@@ -53,7 +53,7 @@ function FarmerCell({ farmer }: { farmer: IFarmer }) {
           {farmer.name}
         </div>
         {farmer.phone ? (
-          <div className="text-[12.5px] text-adm-muted">{farmer.phone}</div>
+          <div className="text-[11px] text-adm-muted">{farmer.phone}</div>
         ) : null}
       </div>
     </Link>

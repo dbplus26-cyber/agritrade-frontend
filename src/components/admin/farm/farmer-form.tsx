@@ -156,7 +156,7 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
                 button in a <label> misroutes its clicks. Same label markup as
                 AdminField so it stays in step with the fields under it. */}
             <div>
-              <span className="mb-1 block text-[13px] font-semibold text-adm-ink">
+              <span className="mb-1 block text-[11.5px] font-semibold text-adm-ink">
                 Photo <span className="font-normal text-adm-faint">(optional)</span>
               </span>
               <div className="flex flex-wrap items-center gap-4">
@@ -168,7 +168,7 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
                     className="h-16 w-16 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-adm-sunken text-[11px] text-adm-faint">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-adm-sunken text-[10.5px] text-adm-faint">
                     No photo
                   </div>
                 )}

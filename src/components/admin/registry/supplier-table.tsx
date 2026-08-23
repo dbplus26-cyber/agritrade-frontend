@@ -52,7 +52,7 @@ export function RecordTimestamps({
   updatedAt: string;
 }) {
   return (
-    <p className="mt-3 text-[12px] text-adm-muted/80">
+    <p className="mt-3 text-[11px] text-adm-muted/80">
       Added {formatDateTime(createdAt)}
       {updatedAt && updatedAt !== createdAt ? (
         <> · Updated {formatDateTime(updatedAt)}</>
@@ -191,7 +191,7 @@ export function SupplierTable() {
                 <span className="block [overflow-wrap:anywhere] @2xl/table:truncate font-medium text-adm-ink">
                   {s.name}
                 </span>
-                <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-faint">
+                <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[11px] text-adm-faint">
                   {s.community ?? "No community"}
                 </span>
               </span>

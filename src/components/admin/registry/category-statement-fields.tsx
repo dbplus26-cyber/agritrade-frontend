@@ -51,7 +51,7 @@ export function CategoryStatementFields({
               value={field.value}
             />
             {errors.statementSection?.message ? (
-              <p role="alert" className="mt-1 text-[12px] text-console-red">
+              <p role="alert" className="mt-1 text-[11px] text-console-red">
                 {errors.statementSection.message}
               </p>
             ) : null}

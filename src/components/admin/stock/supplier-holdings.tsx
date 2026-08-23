@@ -82,7 +82,7 @@ export function SupplierHoldings({
         enableSorting: false,
         meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => (
-          <span className="text-[13px] text-adm-body">{row.original.lots}</span>
+          <span className="text-[11.5px] text-adm-body">{row.original.lots}</span>
         ),
       },
       {
@@ -144,9 +144,9 @@ export function SupplierHoldings({
               <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Waiting for collection
               </span>
-              <Kg kg={totalKg} className="text-[16px] font-bold text-adm-ink" />
+              <Kg kg={totalKg} className="text-[13px] font-bold text-adm-ink" />
             </div>
-            <p className="mt-1 text-[12px] leading-[1.45] text-adm-muted">
+            <p className="mt-1 text-[11px] leading-[1.45] text-adm-muted">
               Owned and paid for, in no warehouse. Put a trip&apos;s{" "}
               <Link className={adminLinkClass} href="/admin/shipments/new">
                 collection points

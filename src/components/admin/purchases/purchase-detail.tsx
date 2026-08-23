@@ -236,7 +236,7 @@ export function ReceiveDialog({
             {receivedKg > 0 && variance !== 0 ? (
               <p
                 className={cn(
-                  "text-[12.5px]",
+                  "text-[11px]",
                   variance > 0 ? "text-console-red" : "text-console",
                 )}
               >
@@ -255,7 +255,7 @@ export function ReceiveDialog({
                 whole group's text as its name - the two choices then announce
                 as each other. A group needs a legend. */}
             <fieldset className="flex flex-col">
-              <legend className="mb-1 text-[13px] font-semibold text-adm-ink">
+              <legend className="mb-1 text-[11.5px] font-semibold text-adm-ink">
                 Where the goods went
               </legend>
               <Controller
@@ -299,12 +299,12 @@ export function ReceiveDialog({
                           aria-describedby={`receive-destination-${choice.value}-hint`}
                         />
                         <span className="min-w-0">
-                          <span className="block text-[13px] font-medium text-adm-ink">
+                          <span className="block text-[11.5px] font-medium text-adm-ink">
                             {choice.label}
                           </span>
                           <span
                             id={`receive-destination-${choice.value}-hint`}
-                            className="mt-0.5 block text-[11.5px] leading-[1.4] text-adm-muted"
+                            className="mt-0.5 block text-[10.5px] leading-[1.4] text-adm-muted"
                           >
                             {choice.hint}
                           </span>
@@ -316,7 +316,7 @@ export function ReceiveDialog({
               />
             </fieldset>
             {direct ? (
-              <p className="text-[12.5px] leading-[1.45] text-adm-muted">
+              <p className="text-[11px] leading-[1.45] text-adm-muted">
                 {purchase.supplier
                   ? `These goods stay at ${purchase.supplier.name} and appear on a shipment when the truck lists them as a collection point.`
                   : "Name the supplier on this purchase first - a load kept at the farm gate is found by whose yard it is standing in."}
@@ -579,7 +579,7 @@ export function PurchaseDetail({ id }: { id: string }) {
       />
 
       {p.approval && p.approval.status !== "APPROVED" ? (
-        <AdminCard className="mb-4 border-console-gold/50 bg-console-gold/8 px-4 py-3 text-[13px] leading-[1.55] text-adm-ink">
+        <AdminCard className="mb-4 border-console-gold/50 bg-console-gold/8 px-4 py-3 text-[11.5px] leading-[1.55] text-adm-ink">
           {p.approval.status === "PENDING" ? (
             <>
               This purchase is at or above the approval threshold and is

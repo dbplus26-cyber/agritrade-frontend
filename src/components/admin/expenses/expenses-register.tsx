@@ -151,7 +151,7 @@ export function ExpensesRegister() {
             <Link
               className={cn(
                 adminLinkClass,
-                "font-adminmono block @2xl/table:max-w-[12rem] [overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px]",
+                "font-adminmono block @2xl/table:max-w-[12rem] [overflow-wrap:anywhere] @2xl/table:truncate text-[11px]",
               )}
               href={`/admin/shipments/${row.original.shipment.id}`}
               onClick={(e) => e.stopPropagation()}
@@ -189,7 +189,7 @@ export function ExpensesRegister() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => { e.stopPropagation(); }}
-              className={cn(adminLinkClass, "inline-flex h-7 items-center px-2 text-[12px]")}
+              className={cn(adminLinkClass, "inline-flex h-7 items-center px-2 text-[11px]")}
             >
               Voucher
             </a>
@@ -344,7 +344,7 @@ export function ExpensesRegister() {
               <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 Total for this view
               </span>
-              <Mono className="text-[16px] font-bold text-adm-ink">
+              <Mono className="text-[13px] font-bold text-adm-ink">
                 {formatCedis(windowTotal)}
               </Mono>
             </div>

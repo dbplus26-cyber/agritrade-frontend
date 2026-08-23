@@ -71,13 +71,13 @@ function PaymentRow({ payment }: { payment: IDriverPaymentLedgerRow }) {
     >
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-          <Mono className="text-[11.5px] text-adm-faint">
+          <Mono className="text-[10.5px] text-adm-faint">
             {payment.transactionNo}
           </Mono>
-          <span className="text-[11.5px] text-adm-faint">
+          <span className="text-[10.5px] text-adm-faint">
             {shortDate(payment.paidAt)}
           </span>
-          <span className="text-[11.5px] text-adm-faint">{payment.method}</span>
+          <span className="text-[10.5px] text-adm-faint">{payment.method}</span>
           {payment.isReversal ? (
             <HelpWrap text="This row cancels an earlier payment. Nothing is deleted, so the history still shows what happened.">
               <ToneBadge tone="slate">Reversal</ToneBadge>
@@ -91,7 +91,7 @@ function PaymentRow({ payment }: { payment: IDriverPaymentLedgerRow }) {
         </div>
         {/* The trip. A driver does not know their shipment numbers, so the
             destination leads and the document number follows it. */}
-        <p className="mt-0.5 min-w-0 text-[13px] text-adm-body [overflow-wrap:anywhere]">
+        <p className="mt-0.5 min-w-0 text-[11.5px] text-adm-body [overflow-wrap:anywhere]">
           {payment.shipment.destination}
           <span className="text-adm-faint">
             {" "}
@@ -99,7 +99,7 @@ function PaymentRow({ payment }: { payment: IDriverPaymentLedgerRow }) {
           </span>
         </p>
         {payment.reversalReason ? (
-          <p className="mt-0.5 text-[12px] text-adm-muted [overflow-wrap:anywhere]">
+          <p className="mt-0.5 text-[11px] text-adm-muted [overflow-wrap:anywhere]">
             {payment.reversalReason}
           </p>
         ) : null}
@@ -110,7 +110,7 @@ function PaymentRow({ payment }: { payment: IDriverPaymentLedgerRow }) {
       <div className="flex flex-none items-baseline justify-between gap-2 @min-[520px]/driverpay:justify-end">
         <Figure
           className={cn(
-            "text-[14px] font-semibold",
+            "text-[12px] font-semibold",
             payment.isReversal ? "text-console-red" : "text-adm-ink",
           )}
           value={payment.amountGhs}
@@ -163,7 +163,7 @@ export function DriverPaymentsCard({ driverId }: { driverId: string }) {
         className="mb-4"
         hint="Every payment made to this driver, across every trip, with the receipt for each one."
         actions={
-          <p className="text-[12.5px] text-adm-muted">
+          <p className="text-[11px] text-adm-muted">
             {meta.total === 1 ? "1 payment" : `${String(meta.total)} payments`}
           </p>
         }
@@ -191,7 +191,7 @@ export function DriverPaymentsCard({ driverId }: { driverId: string }) {
 
       {/* Where the receipts went. Counter staff should never have to guess
           whether the driver already has a copy in their inbox. */}
-      <p className="mt-3 min-w-0 text-[12.5px] leading-[1.5] text-adm-muted [overflow-wrap:anywhere]">
+      <p className="mt-3 min-w-0 text-[11px] leading-[1.5] text-adm-muted [overflow-wrap:anywhere]">
         {summary.driverEmail ? (
           <>
             Each receipt is emailed to{" "}

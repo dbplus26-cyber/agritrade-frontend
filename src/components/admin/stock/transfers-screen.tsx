@@ -615,7 +615,7 @@ function TransferDialog({
           {serverError ? (
             <p
               role="alert"
-              className="min-w-0 rounded-none border border-console-red/40 bg-console-red/5 px-3 py-2 text-[12.5px] font-medium text-console-red [overflow-wrap:anywhere]"
+              className="min-w-0 rounded-none border border-console-red/40 bg-console-red/5 px-3 py-2 text-[11px] font-medium text-console-red [overflow-wrap:anywhere]"
             >
               {serverError}
             </p>

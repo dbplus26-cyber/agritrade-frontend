@@ -155,7 +155,7 @@ export function PaymentAccountTable() {
               <span className="block [overflow-wrap:anywhere] @2xl/table:truncate font-medium text-adm-ink">
                 {a.label}
               </span>
-              <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-faint">
+              <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[11px] text-adm-faint">
                 {a.accountName}
               </span>
             </Link>
@@ -189,7 +189,7 @@ export function PaymentAccountTable() {
               <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-adm-ink">
                 {where}
               </span>
-              <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-faint">
+              <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[11px] text-adm-faint">
                 {KIND_LABEL[a.kind]}
                 {a.branch ? ` · ${a.branch}` : ""}
               </span>
@@ -648,11 +648,11 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
             />
           </AdminField>
 
-          <label className="flex items-center gap-2 text-[13px] text-adm-ink">
+          <label className="flex items-center gap-2 text-[11.5px] text-adm-ink">
             <input type="checkbox" {...register("showOnInvoice")} />
             Print this account on invoices and statements
           </label>
-          <label className="flex items-center gap-2 text-[13px] text-adm-ink">
+          <label className="flex items-center gap-2 text-[11.5px] text-adm-ink">
             <input type="checkbox" {...register("isActive")} />
             Active
           </label>

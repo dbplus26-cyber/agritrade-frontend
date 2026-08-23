@@ -655,10 +655,10 @@ function GiveMoneyDialog({
                         value={option.value}
                       />
                       <span className="min-w-0">
-                        <span className="block text-[13px] text-adm-ink">
+                        <span className="block text-[11.5px] text-adm-ink">
                           {option.label}
                         </span>
-                        <span className="block text-[12px] text-adm-muted">
+                        <span className="block text-[11px] text-adm-muted">
                           {option.blurb}
                         </span>
                       </span>
@@ -700,7 +700,7 @@ function GiveMoneyDialog({
                 // Named, not chosen. Notes handed over always leave the office
                 // box, and the account in their name is opened on demand - so
                 // there is nothing here for the owner to get wrong.
-                <p className="border border-adm-line bg-adm-sunken p-3 text-[12px] text-adm-muted">
+                <p className="border border-adm-line bg-adm-sunken p-3 text-[11px] text-adm-muted">
                   Out of{" "}
                   <span className="text-adm-ink">
                     {till ? till.label : "the company cash till"}

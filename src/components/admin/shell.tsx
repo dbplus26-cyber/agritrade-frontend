@@ -151,10 +151,10 @@ function NavbarUser() {
         >
           {user ? (
             <span className="hidden text-right sm:block">
-              <span className="block max-w-[160px] truncate text-[13px] font-semibold leading-tight text-adm-ink">
+              <span className="block max-w-[160px] truncate text-[11.5px] font-semibold leading-tight text-adm-ink">
                 {user.firstName} {user.lastName}
               </span>
-              <span className="block text-[11px] leading-tight text-adm-muted">
+              <span className="block text-[10.5px] leading-tight text-adm-muted">
                 {ROLE_LABEL[user.role] ?? ""}
               </span>
             </span>
@@ -165,20 +165,20 @@ function NavbarUser() {
           <div className="flex items-center gap-2.5 border-b border-adm-hairline px-3.5 py-3">
             <UserAvatar size={38} />
             <div className="min-w-0 flex-1">
-              <div className="truncate text-[13px] font-semibold text-adm-ink">
+              <div className="truncate text-[11.5px] font-semibold text-adm-ink">
                 {user ? `${user.firstName} ${user.lastName}` : "Signed in"}
               </div>
-              <div className="truncate text-[11.5px] text-adm-muted">
+              <div className="truncate text-[10.5px] text-adm-muted">
                 {user?.email ?? ""}
               </div>
-              <div className="text-[11px] text-adm-faint">
+              <div className="text-[10.5px] text-adm-faint">
                 {(user && ROLE_LABEL[user.role]) ?? ""}
               </div>
             </div>
           </div>
           <div>
             <DropdownMenuItem
-              className="cursor-pointer gap-2 text-[13px]"
+              className="cursor-pointer gap-2 text-[11.5px]"
               onClick={() => router.push(`${ADMIN_HOME}/profile`)}
             >
               <UserIcon className="h-3.5 w-3.5" aria-hidden="true" />
@@ -186,7 +186,7 @@ function NavbarUser() {
             </DropdownMenuItem>
             {isSuperAdmin ? (
               <DropdownMenuItem
-                className="cursor-pointer gap-2 text-[13px]"
+                className="cursor-pointer gap-2 text-[11.5px]"
                 onClick={() => router.push(`${ADMIN_HOME}/settings`)}
               >
                 <Settings className="h-3.5 w-3.5" aria-hidden="true" />
@@ -196,7 +196,7 @@ function NavbarUser() {
             <DropdownMenuSeparator />
             <DropdownMenuItem
               disabled={isLoading}
-              className="cursor-pointer gap-2 text-[13px] text-console-red focus:text-console-red"
+              className="cursor-pointer gap-2 text-[11.5px] text-console-red focus:text-console-red"
               onClick={() => void signOut()}
             >
               <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
@@ -233,7 +233,7 @@ function SidebarSignOut() {
         disabled={isLoading}
         title={collapsed ? "Sign out" : undefined}
         className={cn(
-          "flex w-full cursor-pointer items-center gap-2.5 py-3.5 text-left text-[13px] font-semibold text-adm-body hover:bg-adm-sunken hover:text-console-red disabled:opacity-50",
+          "flex w-full cursor-pointer items-center gap-2.5 py-3.5 text-left text-[11.5px] font-semibold text-adm-body hover:bg-adm-sunken hover:text-console-red disabled:opacity-50",
           collapsed ? "justify-center px-0" : "px-5",
         )}
       >
@@ -354,10 +354,10 @@ function ConsoleSidebar({ activeKey }: { activeKey: string }) {
                 the bar's height without the wordmark and its strapline
                 drifting apart to fill it. */}
             <div className="min-w-0">
-              <div className="text-[16px] leading-[1.15] font-extrabold tracking-[0.14em] text-console">
+              <div className="text-[13px] leading-[1.15] font-extrabold tracking-[0.14em] text-console">
                 DB PLUS
               </div>
-              <div className="mt-0.5 text-[11px] leading-[1.2] uppercase tracking-[0.06em] text-adm-faint">
+              <div className="mt-0.5 text-[10.5px] leading-[1.2] uppercase tracking-[0.06em] text-adm-faint">
                 Trading · Tamale
               </div>
             </div>
@@ -390,7 +390,7 @@ function ConsoleSidebar({ activeKey }: { activeKey: string }) {
                     }
                   }}
                   className={cn(
-                    "h-auto cursor-pointer justify-between gap-2 rounded-none px-2.5 py-[7px] text-[13.5px] font-medium text-adm-body hover:bg-adm-sunken hover:text-adm-ink",
+                    "h-auto cursor-pointer justify-between gap-2 rounded-none px-2.5 py-[7px] text-[11.5px] font-medium text-adm-body hover:bg-adm-sunken hover:text-adm-ink",
                     hasActive && (!isOpen || collapsed) && "text-console",
                   )}
                 >
@@ -435,7 +435,7 @@ function ConsoleSidebar({ activeKey }: { activeKey: string }) {
                         key={item.key}
                         asChild
                         isActive={activeKey === item.key}
-                        className="h-auto justify-between gap-2 rounded-none px-2.5 py-[6px] text-[13px] font-normal text-adm-body hover:bg-adm-sunken hover:text-adm-ink data-[active=true]:bg-console data-[active=true]:font-semibold data-[active=true]:text-white"
+                        className="h-auto justify-between gap-2 rounded-none px-2.5 py-[6px] text-[11.5px] font-normal text-adm-body hover:bg-adm-sunken hover:text-adm-ink data-[active=true]:bg-console data-[active=true]:font-semibold data-[active=true]:text-white"
                       >
                         <Link
                           href={item.href}
@@ -515,7 +515,7 @@ function Crumbs() {
       // Desktop only: on a phone the page already says its own name in its
       // h1, and repeating it an inch above wasted the bar - the topbar
       // carries the brand there instead (see the header).
-      className="flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-[13px] text-adm-muted max-md:hidden"
+      className="flex min-w-0 items-center gap-1.5 overflow-hidden whitespace-nowrap text-[11.5px] text-adm-muted max-md:hidden"
     >
       <span className="text-adm-faint">DB Plus</span>
       <span className="text-adm-strong">/</span>
@@ -570,12 +570,12 @@ function ConsoleFooter() {
             height={56}
             className="h-7 w-7 shrink-0"
           />
-          <span className="text-[11.5px] leading-tight text-adm-muted">
+          <span className="text-[10.5px] leading-tight text-adm-muted">
             <span className="block font-semibold text-adm-ink">DB Plus</span>
             Trading · Tamale
           </span>
         </div>
-        <p className="text-[11px] text-adm-muted/80">
+        <p className="text-[10.5px] text-adm-muted/80">
           © {new Date().getFullYear()} DB Plus. All rights reserved.
           <span className="ml-1">
             Developed by{" "}
@@ -614,7 +614,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           off paper. */}
       <a
         href="#console-main"
-        className="sr-only z-50 focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:rounded-none focus:border focus:border-console focus:bg-adm-card focus:px-3 focus:py-2 focus:text-[13px] focus:font-semibold focus:text-console print:hidden"
+        className="sr-only z-50 focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:rounded-none focus:border focus:border-console focus:bg-adm-card focus:px-3 focus:py-2 focus:text-[11.5px] focus:font-semibold focus:text-console print:hidden"
       >
         Skip to main content
       </a>
@@ -640,7 +640,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               height={44}
               className="h-[22px] w-[22px] shrink-0"
             />
-            <span className="text-[13px] font-bold tracking-[0.14em] text-adm-ink">
+            <span className="text-[11.5px] font-bold tracking-[0.14em] text-adm-ink">
               DB PLUS
             </span>
           </span>

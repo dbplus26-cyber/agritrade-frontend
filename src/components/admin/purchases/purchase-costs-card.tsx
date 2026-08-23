@@ -61,12 +61,12 @@ function CostRow({ cost }: { cost: IPurchaseCost }) {
           {/* The voucher number is the handle a paper receipt is matched to,
               and the link is where a cost left owed is settled or corrected. */}
           <Link
-            className={cn(adminLinkClass, "font-adminmono text-[11.5px]")}
+            className={cn(adminLinkClass, "font-adminmono text-[10.5px]")}
             href={`/admin/expenses/${cost.id}`}
           >
             {cost.transactionNo}
           </Link>
-          <span className="text-[11.5px] text-adm-faint">
+          <span className="text-[10.5px] text-adm-faint">
             {formatDateOnly(cost.incurredAt)}
           </span>
           {voided ? (
@@ -85,21 +85,21 @@ function CostRow({ cost }: { cost: IPurchaseCost }) {
         </div>
         {/* A category can be named anything the office types, so it wraps
             inside the word rather than pushing the amount off a 360px row. */}
-        <p className="mt-0.5 text-[13px] text-adm-ink [overflow-wrap:anywhere]">
+        <p className="mt-0.5 text-[11.5px] text-adm-ink [overflow-wrap:anywhere]">
           {cost.category.name}
           {cost.description ? (
             <span className="text-adm-muted"> - {cost.description}</span>
           ) : null}
         </p>
         {cost.voidReason ? (
-          <p className="mt-0.5 text-[12px] text-adm-muted [overflow-wrap:anywhere]">
+          <p className="mt-0.5 text-[11px] text-adm-muted [overflow-wrap:anywhere]">
             {cost.voidReason}
           </p>
         ) : null}
       </div>
       <Mono
         className={cn(
-          "flex-none text-[14px] font-semibold tabular-nums",
+          "flex-none text-[12px] font-semibold tabular-nums",
           voided ? "text-adm-faint line-through" : "text-adm-ink",
         )}
       >
@@ -142,7 +142,7 @@ export function PurchaseGoodsCostSummary({
     : null;
 
   const rate = (
-    <p className="mt-1 text-[12.5px] text-adm-muted">
+    <p className="mt-1 text-[11px] text-adm-muted">
       <Mono>{formatKg(weightKg)}</Mono> at{" "}
       <Mono>{formatCedis(unitPriceGhs)}</Mono> per kg
     </p>
@@ -169,7 +169,7 @@ export function PurchaseGoodsCostSummary({
         {rate}
         {isLoading ? <Skeleton className="mt-2 h-3 w-40" /> : null}
         {isError ? (
-          <p className="mt-2 text-[12px] text-console-red">
+          <p className="mt-2 text-[11px] text-console-red">
             The costs recorded on this load could not be loaded, so this is the
             purchase price only.
           </p>
@@ -195,7 +195,7 @@ export function PurchaseGoodsCostSummary({
       >
         {formatCedis(summary.goodsCostGhs)}
       </p>
-      <p className="mt-1 text-[12.5px] leading-[1.5] text-adm-muted">
+      <p className="mt-1 text-[11px] leading-[1.5] text-adm-muted">
         Grain <Mono className="text-adm-ink">{formatCedis(totalGhs)}</Mono>
         {summary.capitalisedGhs === null || summary.capitalisedGhs > 0 ? (
           <>
@@ -304,7 +304,7 @@ export function PurchaseCostsCard({
           recorded against it - the vouchers are real and were really paid -
           but nothing here is a live cost of anything. */}
       {isVoided ? (
-        <p className="mb-3 text-[13px] leading-[1.55] text-adm-muted">
+        <p className="mb-3 text-[11.5px] leading-[1.55] text-adm-muted">
           This purchase was voided, so these goods are no longer on the books.
           What was recorded against it is kept here as a record.
         </p>
@@ -321,7 +321,7 @@ export function PurchaseCostsCard({
       >
         {formatCedis(goodsCostGhs)}
       </p>
-      <p className="mt-1 text-[12.5px] leading-[1.5] text-adm-muted">
+      <p className="mt-1 text-[11px] leading-[1.5] text-adm-muted">
         Grain <Mono className="text-adm-ink">{formatCedis(totalGhs)}</Mono>
         {capitalisedGhs === null || capitalisedGhs > 0 ? (
           <>
@@ -338,7 +338,7 @@ export function PurchaseCostsCard({
           system that lost them - but adding them to the headline would charge
           the month's books and the goods for the same cedi. */}
       {monthlyGhs === null || monthlyGhs > 0 ? (
-        <p className="mt-2 border-t border-adm-hairline pt-2 text-[12.5px] leading-[1.5] text-adm-muted">
+        <p className="mt-2 border-t border-adm-hairline pt-2 text-[11px] leading-[1.5] text-adm-muted">
           A further <Mono className="text-adm-ink">{formatCedis(monthlyGhs)}</Mono>{" "}
           is charged to this purchase but not to the goods - it sits in the
           costs of the month it was incurred.
@@ -357,7 +357,7 @@ export function PurchaseCostsCard({
           </ul>
         </div>
       ) : (
-        <p className="mt-5 border-t border-adm-hairline pt-4 text-[13px] leading-[1.55] text-adm-muted">
+        <p className="mt-5 border-t border-adm-hairline pt-4 text-[11.5px] leading-[1.55] text-adm-muted">
           Nothing has been recorded against this load yet. Haulage from the farm
           gate, loading, porters and bagging all belong here, so the profit on
           the load can be worked out when the grain sells.

@@ -64,13 +64,13 @@ function Line({
         emphasis && "border-t border-adm-line pt-2 font-semibold",
       )}
     >
-      <span className="flex min-w-0 items-center gap-1 text-[12.5px] text-adm-muted">
+      <span className="flex min-w-0 items-center gap-1 text-[11px] text-adm-muted">
         <span className="[overflow-wrap:anywhere]">{label}</span>
         {hint ? <HelpTip label={label} text={hint} /> : null}
       </span>
       <Figure
         animate
-        className={emphasis ? "text-[15px] text-adm-ink" : undefined}
+        className={emphasis ? "text-[12.5px] text-adm-ink" : undefined}
         value={value}
       />
     </div>
@@ -105,7 +105,7 @@ export function AgentMoneySummaryCard({ agentUserId }: { agentUserId: string }) 
 
       <div className="grid gap-5 @lg/detail:grid-cols-2">
         <div>
-          <p className="mb-1 text-[11.5px] tracking-wide text-adm-faint uppercase">
+          <p className="mb-1 text-[10.5px] tracking-wide text-adm-faint uppercase">
             Money they are holding
           </p>
           <Line label="Held before this" value={held.openingGhs} />
@@ -127,10 +127,10 @@ export function AgentMoneySummaryCard({ agentUserId }: { agentUserId: string }) 
                   className="flex items-baseline justify-between gap-3"
                   key={account.id}
                 >
-                  <span className="min-w-0 truncate text-[12px] text-adm-muted">
+                  <span className="min-w-0 truncate text-[11px] text-adm-muted">
                     {account.label}
                   </span>
-                  <Figure className="text-[12px]" value={account.netGhs} />
+                  <Figure className="text-[11px]" value={account.netGhs} />
                 </div>
               ))}
             </div>
@@ -138,13 +138,13 @@ export function AgentMoneySummaryCard({ agentUserId }: { agentUserId: string }) 
         </div>
 
         <div>
-          <p className="mb-1 text-[11.5px] tracking-wide text-adm-faint uppercase">
+          <p className="mb-1 text-[10.5px] tracking-wide text-adm-faint uppercase">
             Company money they may send
           </p>
           {sent.hasAuthority ? (
             <>
               <div className="flex items-baseline justify-between gap-3 py-1.5">
-                <span className="text-[12.5px] text-adm-muted">Limit</span>
+                <span className="text-[11px] text-adm-muted">Limit</span>
                 {sent.capGhs === null ? (
                   // "No limit" is not a large number, and printing one would
                   // invite somebody to subtract against it.
@@ -171,14 +171,14 @@ export function AgentMoneySummaryCard({ agentUserId }: { agentUserId: string }) 
                 />
               ) : null}
               {!sent.isActive ? (
-                <p className="mt-2 text-[12px] text-adm-muted">
+                <p className="mt-2 text-[11px] text-adm-muted">
                   <ToneBadge tone="alert">Suspended</ToneBadge> They cannot send
                   while this is suspended. The history above is untouched.
                 </p>
               ) : null}
             </>
           ) : (
-            <p className="py-1.5 text-[13px] text-adm-muted">
+            <p className="py-1.5 text-[11.5px] text-adm-muted">
               They may not send company money. Nothing here is a balance - use
               Give money to allow it.
             </p>
@@ -188,7 +188,7 @@ export function AgentMoneySummaryCard({ agentUserId }: { agentUserId: string }) 
 
       {/* Said outright, because the whole reason this card exists is to keep
           the two figures apart. */}
-      <p className="mt-3 border-t border-adm-line pt-2 text-[11.5px] text-adm-faint">
+      <p className="mt-3 border-t border-adm-line pt-2 text-[10.5px] text-adm-faint">
         These two are never added. What they hold is cash they must produce;
         what they may send is permission that leaves nothing in their hands.
       </p>

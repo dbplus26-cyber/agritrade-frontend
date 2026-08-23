@@ -185,7 +185,7 @@ export function ShipmentsRegister() {
                 className="flex h-full flex-col rounded-none border border-adm-line bg-adm-card p-4 shadow-[0_1px_2px_rgba(16,24,40,0.05)] transition-colors hover:border-adm-strong"
               >
                 <div className="flex items-start justify-between gap-2.5">
-                  <Mono className="text-[12.5px] text-adm-muted">
+                  <Mono className="text-[11px] text-adm-muted">
                     {sh.truckReg}
                   </Mono>
                   <span className="flex-none">
@@ -193,12 +193,12 @@ export function ShipmentsRegister() {
                   </span>
                 </div>
 
-                <div className="mt-2 line-clamp-2 text-[15px] leading-[1.35] font-semibold text-adm-ink [overflow-wrap:anywhere]">
+                <div className="mt-2 line-clamp-2 text-[12.5px] leading-[1.35] font-semibold text-adm-ink [overflow-wrap:anywhere]">
                   {loadingFrom(sh)} → {sh.destination}
                 </div>
 
                 {buyers ? (
-                  <div className="mt-1.5 line-clamp-2 min-w-0 text-[13px] leading-[1.5] text-adm-body [overflow-wrap:anywhere]">
+                  <div className="mt-1.5 line-clamp-2 min-w-0 text-[11.5px] leading-[1.5] text-adm-body [overflow-wrap:anywhere]">
                     {buyers}
                   </div>
                 ) : null}
@@ -208,10 +208,10 @@ export function ShipmentsRegister() {
                     <Mono className="font-semibold text-adm-ink">
                       {sh.totalWeightKg > 0 ? formatKg(sh.totalWeightKg) : "-"}
                     </Mono>
-                    <span className="text-[12.5px] text-adm-muted">
+                    <span className="text-[11px] text-adm-muted">
                       {sh.salesCount} sale{sh.salesCount === 1 ? "" : "s"}
                     </span>
-                    <span className="ml-auto text-[12.5px] whitespace-nowrap text-adm-faint">
+                    <span className="ml-auto text-[11px] whitespace-nowrap text-adm-faint">
                       {sh.departedAt
                         ? `Departed ${formatShipmentDate(sh.departedAt)}`
                         : `Planned ${formatShipmentDate(sh.createdAt)}`}

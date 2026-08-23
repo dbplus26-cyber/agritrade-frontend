@@ -55,7 +55,7 @@ export function ExpensePaymentFields<T extends ExpensePaymentValues>({
           the question the whole screen turns on, and it is answered far more
           often than it is read. */}
       <div>
-        <span className="mb-1 flex text-[13px] font-semibold text-adm-ink">
+        <span className="mb-1 flex text-[11.5px] font-semibold text-adm-ink">
           Has this been paid?
         </span>
         <Controller
@@ -71,7 +71,7 @@ export function ExpensePaymentFields<T extends ExpensePaymentValues>({
                 <button
                   aria-pressed={field.value === choice.value}
                   className={cn(
-                    "min-h-[44px] cursor-pointer rounded-none border px-3 text-[13.5px] font-semibold transition-colors",
+                    "min-h-[44px] cursor-pointer rounded-none border px-3 text-[11.5px] font-semibold transition-colors",
                     field.value === choice.value
                       ? "border-console bg-console text-white"
                       : "border-adm-line bg-adm-card text-adm-body hover:bg-adm-sunken",
@@ -141,7 +141,7 @@ export function ExpensePaymentFields<T extends ExpensePaymentValues>({
           </AdminField>
         </>
       ) : (
-        <p className="text-[12.5px] text-adm-muted">{owedNote}</p>
+        <p className="text-[11px] text-adm-muted">{owedNote}</p>
       )}
     </section>
   );

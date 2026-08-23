@@ -118,7 +118,7 @@ export function NotificationsScreen() {
               {EVENT_LABEL[row.original.event] ?? row.original.event}
             </div>
             {row.original.preview ? (
-              <div className="text-[12.5px] text-adm-muted [overflow-wrap:anywhere] @2xl/table:truncate">
+              <div className="text-[11px] text-adm-muted [overflow-wrap:anywhere] @2xl/table:truncate">
                 {row.original.preview}
               </div>
             ) : null}

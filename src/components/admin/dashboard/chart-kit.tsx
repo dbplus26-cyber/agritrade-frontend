@@ -122,7 +122,7 @@ export function LegendItem({
     // `min-width: auto`, meaning it refuses to shrink below its content - so
     // without it `truncate` on the label has nothing to clamp against and a
     // long commodity name runs straight out past the card's edge.
-    <span className={cn("flex min-w-0 items-center gap-1.5 text-[11.5px] text-adm-muted", className)}>
+    <span className={cn("flex min-w-0 items-center gap-1.5 text-[10.5px] text-adm-muted", className)}>
       <span
         aria-hidden="true"
         className="h-2 w-2 flex-none rounded-full"
@@ -141,7 +141,7 @@ export function LegendItem({
 /** Small centred empty/hidden note inside a chart card. */
 export function ChartNote({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-[180px] items-center justify-center text-center text-[13px] text-adm-muted">
+    <div className="flex h-[180px] items-center justify-center text-center text-[11.5px] text-adm-muted">
       {children}
     </div>
   );
@@ -179,9 +179,9 @@ export function WidgetEmpty({
       )}
     >
       <EmptyFolder className="mb-1 h-9 w-auto" />
-      <p className="text-[13px] font-semibold text-adm-ink">{title}</p>
+      <p className="text-[11.5px] font-semibold text-adm-ink">{title}</p>
       {hint ? (
-        <p className="max-w-[36ch] text-[12.5px] leading-[1.55] text-adm-muted">
+        <p className="max-w-[36ch] text-[11px] leading-[1.55] text-adm-muted">
           {hint}
         </p>
       ) : null}
@@ -212,11 +212,11 @@ export function WidgetError({
       role="alert"
       className="flex min-h-[86px] flex-col items-center justify-center gap-1.5 rounded-none border border-dashed border-console-red/35 bg-console-red/[0.03] px-4 py-4 text-center"
     >
-      <p className="text-[12.5px] text-adm-muted">Couldn&apos;t load {what}.</p>
+      <p className="text-[11px] text-adm-muted">Couldn&apos;t load {what}.</p>
       <button
         type="button"
         onClick={onRetry}
-        className="cursor-pointer text-[12.5px] font-semibold text-console-red underline underline-offset-2 hover:no-underline"
+        className="cursor-pointer text-[11px] font-semibold text-console-red underline underline-offset-2 hover:no-underline"
       >
         Try again
       </button>

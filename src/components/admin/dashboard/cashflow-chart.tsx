@@ -51,7 +51,7 @@ function CashflowTooltip({
   if (!active || !payload?.length) return null;
   const get = (k: string) => payload.find((p) => p.dataKey === k)?.value ?? 0;
   return (
-    <div className="rounded-none border border-adm-line bg-adm-card px-3 py-2 text-[12px] shadow-[0_1px_2px_rgba(16,24,40,0.05)]">
+    <div className="rounded-none border border-adm-line bg-adm-card px-3 py-2 text-[11px] shadow-[0_1px_2px_rgba(16,24,40,0.05)]">
       <div className="mb-1 font-semibold text-adm-ink">{label}</div>
       <div className="flex items-center justify-between gap-4">
         <LegendItem color={SALES} label="Sales in" />

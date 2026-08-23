@@ -149,7 +149,7 @@ export function waitingFor(createdAtIso: string): string {
 
 /** The anatomy's micro-label - meta rows and the note heading. */
 export const stencilCls =
-  "text-[11px] font-bold uppercase tracking-[0.08em] text-adm-muted/80";
+  "text-[10.5px] font-bold uppercase tracking-[0.08em] text-adm-muted/80";
 
 /**
  * Compact card timestamp, "12 Jul, 14:30". The year appears only when it is
@@ -199,7 +199,7 @@ export function MetaRow({
   return (
     <div className="flex items-baseline justify-between gap-3 py-[3px]">
       <span className={cn("flex-none", stencilCls)}>{label}</span>
-      <span className="min-w-0 text-right text-[12px] text-adm-ink [overflow-wrap:anywhere]">
+      <span className="min-w-0 text-right text-[11px] text-adm-ink [overflow-wrap:anywhere]">
         {children}
       </span>
     </div>

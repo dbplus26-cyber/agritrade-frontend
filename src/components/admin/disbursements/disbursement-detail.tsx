@@ -119,7 +119,7 @@ export function DisbursementDetail({ id }: { id: string }) {
       />
 
       {d.needsAttention ? (
-        <div className="rounded-none border border-console-red/40 bg-console-red/5 px-4 py-3 text-[13px] text-console-red">
+        <div className="rounded-none border border-console-red/40 bg-console-red/5 px-4 py-3 text-[11.5px] text-console-red">
           Hubtel has not given a final answer for this payout after several
           checks. It has NOT been marked failed, because the money may well
           have gone out - confirm on the Hubtel dashboard, then record the real
@@ -132,7 +132,7 @@ export function DisbursementDetail({ id }: { id: string }) {
           <div className="space-y-5">
             <TitledCard title="The payout">
               <DetailRow label="Amount">
-                <Money className="text-[15px] font-bold" value={d.amountGhs} />
+                <Money className="text-[12.5px] font-bold" value={d.amountGhs} />
               </DetailRow>
               <DetailRow label="Status">
                 <DisbursementStatusBadge

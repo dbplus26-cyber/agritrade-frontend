@@ -125,7 +125,7 @@ export function DisbursementsScreen() {
             >
               {row.original.recipientName}
             </span>
-            <span className="font-adminmono block [overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-faint">
+            <span className="font-adminmono block [overflow-wrap:anywhere] @2xl/table:truncate text-[11px] text-adm-faint">
               {recipientLine(row.original)}
             </span>
           </span>

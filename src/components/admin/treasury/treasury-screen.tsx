@@ -285,7 +285,7 @@ function BalanceCard({
     <TitledCard title={title}>
       <div className="py-2">
         {amount === null ? (
-          <p className="text-[15px] font-medium text-console-red">
+          <p className="text-[12.5px] font-medium text-console-red">
             Could not be checked just now
           </p>
         ) : (
@@ -298,7 +298,7 @@ function BalanceCard({
             <CountUp value={amount} format={formatCedis} />
           </p>
         )}
-        <p className="mt-1 text-[12.5px] text-adm-muted">{hint}</p>
+        <p className="mt-1 text-[11px] text-adm-muted">{hint}</p>
       </div>
       {account?.accountNumber ? (
         <div className="border-t border-adm-hairline">
@@ -396,7 +396,7 @@ function TransferDialog({
               {...form.register("description")}
             />
           </AdminField>
-          <p className="text-[12.5px] text-adm-muted">
+          <p className="text-[11px] text-adm-muted">
             Hubtel usually settles this in under a minute. Until it confirms,
             the transfer shows as &ldquo;with Hubtel&rdquo; rather than done -
             the money is not counted before it has actually moved.

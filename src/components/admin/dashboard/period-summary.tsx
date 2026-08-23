@@ -68,7 +68,7 @@ function Tile({
           </span>
         ) : null}
       </div>
-      {sub ? <div className="mt-0.5 text-[12px] text-adm-muted">{sub}</div> : null}
+      {sub ? <div className="mt-0.5 text-[11px] text-adm-muted">{sub}</div> : null}
     </AdminCard>
   );
 }
@@ -85,7 +85,7 @@ export function PeriodSummary({ window }: { window: IReportWindow }) {
 
   return (
     <div>
-      <div className="mb-2 text-[11px] font-semibold tracking-[0.04em] text-adm-muted/80 uppercase">
+      <div className="mb-2 text-[10.5px] font-semibold tracking-[0.04em] text-adm-muted/80 uppercase">
         In selected period
       </div>
       {isError ? (

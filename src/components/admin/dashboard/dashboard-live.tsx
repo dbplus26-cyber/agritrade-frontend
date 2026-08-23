@@ -102,7 +102,7 @@ function Kpi({
             <Money compact animate value={figure} />
           )}
         </div>
-        {sub ? <div className="mt-0.5 text-[12px] text-adm-muted">{sub}</div> : null}
+        {sub ? <div className="mt-0.5 text-[11px] text-adm-muted">{sub}</div> : null}
       </AdminCard>
     </Link>
   );
@@ -119,7 +119,7 @@ function AgentFloatsCard() {
       title="Cash with agents"
       hint="What each field agent still holds of the money you gave them to buy with."
       right={
-        <Link href="/admin/agents" className={cn(adminLinkClass, "text-[12px]")}>
+        <Link href="/admin/agents" className={cn(adminLinkClass, "text-[11px]")}>
           All agents
         </Link>
       }
@@ -145,7 +145,7 @@ function AgentFloatsCard() {
           // symbol onto a line of its own.
           <div
             key={a.userId}
-            className="flex items-baseline justify-between gap-3 border-b border-adm-hairline py-1.5 text-[13px] last:border-b-0"
+            className="flex items-baseline justify-between gap-3 border-b border-adm-hairline py-1.5 text-[11.5px] last:border-b-0"
           >
             <span
               className="min-w-0 truncate text-adm-ink"
@@ -183,7 +183,7 @@ function TrucksCard() {
       title="Trucks on the road"
       hint="Loads that have been started or dispatched and have not been signed off yet."
       right={
-        <Link href="/admin/shipments" className={cn(adminLinkClass, "text-[12px]")}>
+        <Link href="/admin/shipments" className={cn(adminLinkClass, "text-[11px]")}>
           All shipments
         </Link>
       }
@@ -211,10 +211,10 @@ function TrucksCard() {
             className="flex items-center justify-between gap-2 border-b border-adm-hairline py-2 last:border-b-0"
           >
             <div className="min-w-0">
-              <Mono className="text-[12.5px] font-semibold text-console">
+              <Mono className="text-[11px] font-semibold text-console">
                 {t.truckReg}
               </Mono>
-              <div className="truncate text-[12px] text-adm-muted">
+              <div className="truncate text-[11px] text-adm-muted">
                 {loadingFrom(t)} → {t.destination}
               </div>
             </div>

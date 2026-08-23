@@ -114,7 +114,7 @@ export function AgentsTable() {
                 <span className="block [overflow-wrap:anywhere] @2xl/table:truncate font-medium text-adm-ink">
                   {a.firstName} {a.lastName}
                 </span>
-                <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[12.5px] text-adm-faint">
+                <span className="block [overflow-wrap:anywhere] @2xl/table:truncate text-[11px] text-adm-faint">
                   {a.region ?? a.email}
                 </span>
               </span>

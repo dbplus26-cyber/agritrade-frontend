@@ -193,7 +193,7 @@ export function TitleCell({
       {meta ? (
         <span
           className={cn(
-            "block text-[12.5px] text-adm-faint [overflow-wrap:anywhere] @2xl/table:truncate",
+            "block text-[11px] text-adm-faint [overflow-wrap:anywhere] @2xl/table:truncate",
             // A little more than the title, preserving the hierarchy above.
             stretch && "@2xl/table:max-w-[96%]",
           )}

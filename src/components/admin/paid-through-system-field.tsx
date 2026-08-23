@@ -63,19 +63,19 @@ function SendRow({
       </span>
       <span className="min-w-0 flex-1">
         <span className="flex flex-wrap items-baseline gap-x-2">
-          <Mono className="text-[12px] text-adm-ink">{send.transactionNo}</Mono>
-          <span className="text-[13px] text-adm-ink [overflow-wrap:anywhere]">
+          <Mono className="text-[11px] text-adm-ink">{send.transactionNo}</Mono>
+          <span className="text-[11.5px] text-adm-ink [overflow-wrap:anywhere]">
             {send.recipientName}
           </span>
           <ToneBadge tone={send.rail === "BANK" ? "sky" : "leaf"}>
             {send.rail === "BANK" ? (send.bankName ?? "Bank") : "MoMo"}
           </ToneBadge>
         </span>
-        <span className="mt-0.5 block text-[11.5px] text-adm-muted [overflow-wrap:anywhere]">
+        <span className="mt-0.5 block text-[10.5px] text-adm-muted [overflow-wrap:anywhere]">
           {shortDate(send.settledAt)} · {send.description}
         </span>
       </span>
-      <Mono className="flex-none pt-0.5 text-[12.5px] tabular-nums text-adm-ink">
+      <Mono className="flex-none pt-0.5 text-[11px] tabular-nums text-adm-ink">
         {formatCedis(send.amountGhs)}
       </Mono>
     </button>
@@ -126,10 +126,10 @@ export function PaidThroughSystemField({
           type="checkbox"
         />
         <span className="min-w-0">
-          <span className="block text-[13px] text-adm-ink">
+          <span className="block text-[11.5px] text-adm-ink">
             Already paid through the system
           </span>
-          <span className="block text-[12px] text-adm-muted">
+          <span className="block text-[11px] text-adm-muted">
             Match this to a send the system already made. The money has left the
             payout wallet, so nothing is deducted a second time.
           </span>
@@ -159,7 +159,7 @@ export function PaidThroughSystemField({
             ) : sends.length === 0 ? (
               // Says WHY it is empty. "No results" over a list that filters on
               // two conditions invites the reader to assume the search is broken.
-              <p className="p-2.5 text-[12px] text-adm-muted">
+              <p className="p-2.5 text-[11px] text-adm-muted">
                 {debounced
                   ? "No settled send matches that, or the ones that do are already matched to another payment."
                   : "No settled sends are waiting to be matched. A send appears here once it has landed and until something is booked against it."}

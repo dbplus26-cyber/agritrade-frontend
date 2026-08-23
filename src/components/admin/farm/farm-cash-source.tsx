@@ -126,7 +126,7 @@ export function GrantCashSourceField({
                 onClick={() => {
                   onReasonChange(example);
                 }}
-                className="cursor-pointer rounded-[3px] border border-adm-line px-2 py-1 text-left text-[12px] text-adm-body hover:bg-adm-sunken"
+                className="cursor-pointer rounded-[3px] border border-adm-line px-2 py-1 text-left text-[11px] text-adm-body hover:bg-adm-sunken"
               >
                 {example}
               </button>
@@ -203,7 +203,7 @@ export function RepaymentSettlement({
         <ToneBadge tone="leaf">Cash</ToneBadge>
         {paymentAccount ? (
           <span
-            className="mt-1 block text-[12.5px] text-adm-muted [overflow-wrap:anywhere] @2xl/table:truncate"
+            className="mt-1 block text-[11px] text-adm-muted [overflow-wrap:anywhere] @2xl/table:truncate"
             title={paymentAccount.label}
           >
             {paymentAccount.label}

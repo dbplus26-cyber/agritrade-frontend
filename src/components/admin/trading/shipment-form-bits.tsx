@@ -25,14 +25,14 @@ export function StepHead({
     <div className="border-b border-adm-hairline pb-3">
       <SectionHeading className="mb-0">
         <span className="flex items-center gap-2.5">
-          <span className="flex h-[22px] w-[22px] flex-none items-center justify-center rounded-full bg-[#155744] text-[11px] font-bold text-white">
+          <span className="flex h-[22px] w-[22px] flex-none items-center justify-center rounded-full bg-[#155744] text-[10.5px] font-bold text-white">
             {step}
           </span>
           <span className="min-w-0">{title}</span>
         </span>
       </SectionHeading>
       {hint ? (
-        <p className="mt-1.5 text-[12.5px] leading-[1.55] text-adm-muted">
+        <p className="mt-1.5 text-[11px] leading-[1.55] text-adm-muted">
           {hint}
         </p>
       ) : null}

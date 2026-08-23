@@ -267,7 +267,7 @@ export function ApprovalDetailPanel({
 
       {approval.note ? <NoteBlock note={approval.note} /> : null}
 
-      <p className="mt-4 font-adminmono text-[12px] leading-[1.5] text-[var(--ap-muted)] [overflow-wrap:anywhere]">
+      <p className="mt-4 font-adminmono text-[11px] leading-[1.5] text-[var(--ap-muted)] [overflow-wrap:anywhere]">
         {auditTrail(approval)}
       </p>
     </div>
@@ -290,7 +290,7 @@ function Field({
         <span className="min-w-0">{label}</span>
         {hint ? <HelpTip label={`What is ${label}?`} text={hint} /> : null}
       </dt>
-      <dd className="text-[13px] leading-[1.5] text-[var(--ap-ink)] [overflow-wrap:anywhere]">
+      <dd className="text-[11.5px] leading-[1.5] text-[var(--ap-ink)] [overflow-wrap:anywhere]">
         {children}
       </dd>
     </div>

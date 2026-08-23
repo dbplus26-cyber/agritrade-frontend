@@ -192,7 +192,7 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
                 hint: "What the plot cost you to get hold of, used to work out what you make on a sale.",
               })}
             </div>
-            <label className="flex items-center gap-2 text-[13px] text-adm-ink">
+            <label className="flex items-center gap-2 text-[11.5px] text-adm-ink">
               <input type="checkbox" {...register("showPriceOnWebsite")} />
               Show the asking price on the public listing
             </label>

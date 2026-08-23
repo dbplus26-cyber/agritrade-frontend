@@ -153,7 +153,7 @@ export function PlotsRegister() {
                   className="h-[130px] w-full object-cover"
                 />
               ) : (
-                <div className="flex h-[130px] w-full items-center justify-center bg-adm-sunken text-[12px] text-adm-faint">
+                <div className="flex h-[130px] w-full items-center justify-center bg-adm-sunken text-[11px] text-adm-faint">
                   No photo
                 </div>
               )}
@@ -169,10 +169,10 @@ export function PlotsRegister() {
                     <PlotStatusBadge status={p.status} />
                   </span>
                 </div>
-                <div className="@2xl/table:max-w-[22rem] [overflow-wrap:anywhere] @2xl/table:truncate text-[14px] font-semibold text-adm-ink">
+                <div className="@2xl/table:max-w-[22rem] [overflow-wrap:anywhere] @2xl/table:truncate text-[12px] font-semibold text-adm-ink">
                   {p.locationText}
                 </div>
-                <div className="mt-0.5 flex items-center justify-between text-[12.5px] text-adm-muted">
+                <div className="mt-0.5 flex items-center justify-between text-[11px] text-adm-muted">
                   <span>
                     {p.sizeText}
                     {p.use ? ` · ${p.use}` : ""}

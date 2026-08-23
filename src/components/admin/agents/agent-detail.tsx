@@ -147,7 +147,7 @@ function SignedAmount({ amount }: { amount: number | null }) {
   if (amount === null) {
     return (
       <div className="text-right">
-        <Mono className="block text-[13px] whitespace-nowrap text-adm-faint">
+        <Mono className="block text-[11.5px] whitespace-nowrap text-adm-faint">
           {MONEY_HIDDEN}
         </Mono>
       </div>
@@ -158,7 +158,7 @@ function SignedAmount({ amount }: { amount: number | null }) {
     <div className="text-right">
       <Mono
         className={cn(
-          "block text-[13.5px] font-semibold whitespace-nowrap",
+          "block text-[11.5px] font-semibold whitespace-nowrap",
           isDebit ? "text-console-red" : "text-console",
         )}
       >
@@ -167,7 +167,7 @@ function SignedAmount({ amount }: { amount: number | null }) {
       </Mono>
       <span
         className={cn(
-          "block text-[9.5px] font-bold tracking-[0.12em] uppercase",
+          "block text-[10px] font-bold tracking-[0.12em] uppercase",
           isDebit ? "text-console-red/70" : "text-console/70",
         )}
       >
@@ -194,7 +194,7 @@ function FigureLine({
         <span className="min-w-0">{label}</span>
         {hint ? <HelpTip label={`What is ${label}?`} text={hint} /> : null}
       </dt>
-      <dd className="font-adminmono text-[12.5px] whitespace-nowrap text-adm-ink tabular-nums">
+      <dd className="font-adminmono text-[11px] whitespace-nowrap text-adm-ink tabular-nums">
         {children}
       </dd>
     </div>
@@ -204,7 +204,7 @@ function FigureLine({
 /** Column headings for the ledger, so the two figure columns are named. */
 function LedgerHead({ withBalance }: { withBalance: boolean }) {
   return (
-    <div className="grid grid-cols-[24px_minmax(0,1fr)_minmax(124px,max-content)] items-baseline gap-x-3 border-b-[1.5px] border-adm-line pb-1.5 text-[9.5px] font-bold tracking-[0.12em] text-adm-faint uppercase @md/ledger:grid-cols-[24px_minmax(0,1fr)_minmax(124px,max-content)_minmax(124px,max-content)]">
+    <div className="grid grid-cols-[24px_minmax(0,1fr)_minmax(124px,max-content)] items-baseline gap-x-3 border-b-[1.5px] border-adm-line pb-1.5 text-[10px] font-bold tracking-[0.12em] text-adm-faint uppercase @md/ledger:grid-cols-[24px_minmax(0,1fr)_minmax(124px,max-content)_minmax(124px,max-content)]">
       <span aria-hidden="true" />
       <span className="inline-flex min-w-0 items-center gap-1">
         <span className="min-w-0">Entry</span>
@@ -261,28 +261,28 @@ function LedgerRow({
     <div className="grid grid-cols-[24px_minmax(0,1fr)_minmax(124px,max-content)] items-start gap-x-3 border-b border-adm-hairline py-2.5 last:border-b-0 @md/ledger:grid-cols-[24px_minmax(0,1fr)_minmax(124px,max-content)_minmax(124px,max-content)]">
       <TxMarker type={tx.type} />
       <div className="min-w-0">
-        <p className="min-w-0 text-[13px] leading-snug text-adm-ink [overflow-wrap:anywhere]">
+        <p className="min-w-0 text-[11.5px] leading-snug text-adm-ink [overflow-wrap:anywhere]">
           {tx.reason ?? txLabel(tx.type)}
         </p>
         <div className="mt-0.5 flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
-          <Mono className="text-[11px] text-adm-faint">{tx.transactionNo}</Mono>
+          <Mono className="text-[10.5px] text-adm-faint">{tx.transactionNo}</Mono>
           <DateTimeCell value={tx.occurredAt} muted />
           {/* WHICH pot moved. Cash in a pocket and money in a wallet are
               different money, and a line that does not say which is the same
               conflation the single float balance made. */}
-          <span className="text-[11px] text-adm-faint">{tx.account.label}</span>
+          <span className="text-[10.5px] text-adm-faint">{tx.account.label}</span>
         </div>
         {/* Narrow cards have no room for a fourth track, so the balance rides
             under the entry rather than being dropped from the page. */}
         {balanceAfter !== undefined ? (
-          <Mono className="mt-1 block text-[11px] text-adm-faint @md/ledger:hidden">
+          <Mono className="mt-1 block text-[10.5px] text-adm-faint @md/ledger:hidden">
             Balance after {formatCedis(balanceAfter)}
           </Mono>
         ) : null}
       </div>
       <SignedAmount amount={tx.amountGhs} />
       {withBalanceColumn ? (
-        <Mono className="hidden text-right text-[13px] whitespace-nowrap text-adm-ink @md/ledger:block">
+        <Mono className="hidden text-right text-[11.5px] whitespace-nowrap text-adm-ink @md/ledger:block">
           {balanceAfter === undefined ? (
             <span className="text-adm-faint">-</span>
           ) : (
@@ -500,10 +500,10 @@ function ReconcileDialog({
 
   const line = (label: string, amount: number, sign?: "+" | "-") => (
     <div className="flex items-baseline justify-between gap-4 border-b border-adm-hairline py-2 last:border-b-0">
-      <span className="min-w-0 text-[12.5px] text-adm-body [overflow-wrap:anywhere]">
+      <span className="min-w-0 text-[11px] text-adm-body [overflow-wrap:anywhere]">
         {label}
       </span>
-      <Mono className="flex-none text-[13px] text-adm-ink">
+      <Mono className="flex-none text-[11.5px] text-adm-ink">
         {sign ?? ""}
         {formatCedis(Math.abs(amount))}
       </Mono>
@@ -525,7 +525,7 @@ function ReconcileDialog({
         </ResponsiveDialogHeader>
 
         {preview.isLoading ? (
-          <p className="py-2 text-[13px] text-adm-muted">Computing…</p>
+          <p className="py-2 text-[11.5px] text-adm-muted">Computing…</p>
         ) : preview.isError || !p ? (
           <ErrorMessage
             description={extractApiError(preview.error).message}
@@ -586,7 +586,7 @@ function ReconcileDialog({
               {variance !== null && !Number.isNaN(variance) ? (
                 <p
                   className={cn(
-                    "text-[12.5px] font-medium",
+                    "text-[11px] font-medium",
                     variance === 0
                       ? "text-console"
                       : variance > 0
@@ -746,7 +746,7 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
             <SectionHeading
               actions={
                 totalTx > 0 ? (
-                  <Mono className="text-[11px] text-adm-faint">
+                  <Mono className="text-[10.5px] text-adm-faint">
                     {totalTx} {totalTx === 1 ? "entry" : "entries"}
                   </Mono>
                 ) : null
@@ -758,7 +758,7 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
             {ledger.isLoading ? (
               <LedgerSkeleton rows={5} />
             ) : transactions.length === 0 ? (
-              <p className="py-2 text-[13px] text-adm-muted">
+              <p className="py-2 text-[11.5px] text-adm-muted">
                 Nothing in the ledger yet - the first top-up opens it.
               </p>
             ) : (
@@ -775,7 +775,7 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
                 {/* Say why the column is missing rather than leaving a reader
                     to wonder whether the balances simply stopped existing. */}
                 {!withBalanceAfter && ledgerPage > 1 ? (
-                  <p className="mt-2 text-[11.5px] text-adm-faint">
+                  <p className="mt-2 text-[10.5px] text-adm-faint">
                     Running balances are shown on the first page only - they are
                     walked back from the live float.
                   </p>
@@ -807,10 +807,10 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
                   src={agent.profilePicture}
                 />
                 <div className="min-w-0">
-                  <p className="min-w-0 text-[14px] font-bold text-adm-ink line-clamp-1 [overflow-wrap:anywhere]">
+                  <p className="min-w-0 text-[12px] font-bold text-adm-ink line-clamp-1 [overflow-wrap:anywhere]">
                     {name}
                   </p>
-                  <p className="text-[12px] text-adm-muted">
+                  <p className="text-[11px] text-adm-muted">
                     Joined {formatDateTime(agent.createdAt)}
                   </p>
                 </div>
@@ -839,7 +839,7 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
                 {formatCedis(balance)}
               </p>
               {balance !== null && balance < 0 ? (
-                <p className="mt-0.5 text-[12px] text-console-red">
+                <p className="mt-0.5 text-[11px] text-console-red">
                   Negative float - {agent.firstName} is fronting their own cash.
                 </p>
               ) : null}
@@ -881,10 +881,10 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
                     className="flex items-baseline justify-between gap-3 border-b border-adm-hairline py-2 last:border-b-0"
                   >
                     <div className="min-w-0">
-                      <p className="text-[13px] text-adm-ink">
+                      <p className="text-[11.5px] text-adm-ink">
                         {formatConsoleDate(r.performedAt)}
                       </p>
-                      <p className="truncate text-[11.5px] text-adm-faint">
+                      <p className="truncate text-[10.5px] text-adm-faint">
                         Expected {formatCedis(r.expectedGhs)} · counted{" "}
                         {formatCedis(r.countedGhs)}
                         {r.notes ? ` · ${r.notes}` : ""}
@@ -892,7 +892,7 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
                     </div>
                     <Mono
                       className={cn(
-                        "text-[12.5px] font-semibold whitespace-nowrap",
+                        "text-[11px] font-semibold whitespace-nowrap",
                         r.varianceGhs === null
                           ? "text-adm-faint"
                           : r.varianceGhs === 0

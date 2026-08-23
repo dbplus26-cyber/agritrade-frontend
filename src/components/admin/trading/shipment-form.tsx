@@ -555,16 +555,16 @@ export function ShipmentForm({
                       className="border-b border-adm-hairline px-3 py-2 last:border-b-0"
                     >
                       <div className="flex items-baseline justify-between gap-2">
-                        <Mono className="text-[12.5px] text-console">
+                        <Mono className="text-[11px] text-console">
                           {s.transactionNo}
                         </Mono>
-                        <Mono className="flex-none text-[12.5px] font-bold text-adm-ink">
+                        <Mono className="flex-none text-[11px] font-bold text-adm-ink">
                           {formatKg(
                             s.lines.reduce((kg, l) => kg + l.outstandingKg, 0),
                           )}
                         </Mono>
                       </div>
-                      <p className="min-w-0 text-[13px] text-adm-ink [overflow-wrap:anywhere]">
+                      <p className="min-w-0 text-[11.5px] text-adm-ink [overflow-wrap:anywhere]">
                         {s.buyer.name}
                       </p>
                     </div>
@@ -589,15 +589,15 @@ export function ShipmentForm({
                   />
                 </div>
                 {eligible.isLoading ? (
-                  <p className="px-3 py-3 text-[13px] text-adm-muted">
+                  <p className="px-3 py-3 text-[11.5px] text-adm-muted">
                     Loading shippable sales…
                   </p>
                 ) : eligible.isError ? (
-                  <p className="px-3 py-3 text-[13px] text-console-red">
+                  <p className="px-3 py-3 text-[11.5px] text-console-red">
                     Couldn&apos;t load the shippable sales. Reload and try again.
                   </p>
                 ) : visibleSales.length === 0 ? (
-                  <p className="px-3 py-3 text-[13px] text-adm-muted">
+                  <p className="px-3 py-3 text-[11.5px] text-adm-muted">
                     {allSales.length === 0
                       ? "No sales are ready to ship - a sale appears here once it is confirmed, its payment terms are met and it isn't already on a truck."
                       : "No sales match this search."}
@@ -625,20 +625,20 @@ export function ShipmentForm({
                           <span className="flex items-baseline justify-between gap-2">
                             <Mono
                               className={cn(
-                                "block text-[12.5px] text-console",
+                                "block text-[11px] text-console",
                                 selected.includes(s.id) && "font-bold",
                               )}
                             >
                               {s.transactionNo}
                             </Mono>
-                            <Mono className="flex-none text-[12.5px] font-bold text-adm-ink">
+                            <Mono className="flex-none text-[11px] font-bold text-adm-ink">
                               {formatKg(s.totalRemainingKg)}
                             </Mono>
                           </span>
-                          <span className="block min-w-0 text-[13px] text-adm-ink [overflow-wrap:anywhere]">
+                          <span className="block min-w-0 text-[11.5px] text-adm-ink [overflow-wrap:anywhere]">
                             {s.buyer.name}
                           </span>
-                          <span className="mt-0.5 block text-[12px] text-adm-muted">
+                          <span className="mt-0.5 block text-[11px] text-adm-muted">
                             {s.lines.map((l) => (
                               <span
                                 key={l.commodityId}
@@ -654,7 +654,7 @@ export function ShipmentForm({
                     ))}
                   </div>
                 )}
-                <div className="border-t border-adm-hairline px-3 py-1.5 text-[12px] text-adm-muted">
+                <div className="border-t border-adm-hairline px-3 py-1.5 text-[11px] text-adm-muted">
                   {selected.length} sale{selected.length === 1 ? "" : "s"} selected
                   {selectedKg > 0 ? (
                     <>
@@ -667,7 +667,7 @@ export function ShipmentForm({
               {errors.saleIds ? (
                 <span
                   role="alert"
-                  className="mt-1 block text-[12px] font-medium text-console-red"
+                  className="mt-1 block text-[11px] font-medium text-console-red"
                 >
                   {errors.saleIds.message}
                 </span>
@@ -687,7 +687,7 @@ export function ShipmentForm({
                 label="Origin warehouse"
                 hint="Fixed once planned - tick more stops below instead."
               >
-                <p className="rounded-none border border-adm-line bg-adm-sunken px-3 py-2 text-[13.5px] font-medium text-adm-ink">
+                <p className="rounded-none border border-adm-line bg-adm-sunken px-3 py-2 text-[11.5px] font-medium text-adm-ink">
                   {shipment.originWarehouse?.name ??
                     "None - this truck collects from suppliers"}
                 </p>
@@ -727,12 +727,12 @@ export function ShipmentForm({
                 much of THIS load's commodities the shed holds, so picking the
                 next stop is a glance, not a stock-report expedition. */}
             <div>
-              <span className="mb-[7px] block text-[11px] uppercase tracking-[0.14em] text-adm-muted">
+              <span className="mb-[7px] block text-[10.5px] uppercase tracking-[0.14em] text-adm-muted">
                 Also loads at{" "}
                 <span className="normal-case tracking-normal">(optional)</span>
               </span>
               {otherWarehouses.length === 0 ? (
-                <p className="text-[12.5px] text-adm-muted">
+                <p className="text-[11px] text-adm-muted">
                   There are no other active warehouses to take loads from.
                 </p>
               ) : (
@@ -762,14 +762,14 @@ export function ShipmentForm({
                         />
                         <span
                           className={cn(
-                            "min-w-0 flex-1 text-[13px] text-adm-ink [overflow-wrap:anywhere]",
+                            "min-w-0 flex-1 text-[11.5px] text-adm-ink [overflow-wrap:anywhere]",
                             ticked && "font-medium",
                           )}
                         >
                           {w.name}
                         </span>
                         {needed.size > 0 && stock.data ? (
-                          <Mono className="flex-none text-[12px] text-adm-muted">
+                          <Mono className="flex-none text-[11px] text-adm-muted">
                             {formatKg(heldKg)} of this load&apos;s goods
                           </Mono>
                         ) : null}
@@ -781,7 +781,7 @@ export function ShipmentForm({
               {errors.loadingWarehouseIds ? (
                 <span
                   role="alert"
-                  className="mt-1 block text-[12px] font-medium text-console-red"
+                  className="mt-1 block text-[11px] font-medium text-console-red"
                 >
                   {errors.loadingWarehouseIds.message}
                 </span>
@@ -793,12 +793,12 @@ export function ShipmentForm({
                 they are picked up here rather than found in a warehouse. Only
                 sellers actually holding something appear. */}
             <div>
-              <span className="mb-[7px] block text-[11px] uppercase tracking-[0.14em] text-adm-muted">
+              <span className="mb-[7px] block text-[10.5px] uppercase tracking-[0.14em] text-adm-muted">
                 Collects from{" "}
                 <span className="normal-case tracking-normal">(optional)</span>
               </span>
               {pickupOptions.length === 0 ? (
-                <p className="text-[12.5px] text-adm-muted">
+                <p className="text-[11px] text-adm-muted">
                   No supplier is holding goods for collection. Goods appear here
                   when a purchase is received straight onto a truck instead of
                   into a warehouse.
@@ -829,14 +829,14 @@ export function ShipmentForm({
                         />
                         <span
                           className={cn(
-                            "min-w-0 flex-1 text-[13px] text-adm-ink [overflow-wrap:anywhere]",
+                            "min-w-0 flex-1 text-[11.5px] text-adm-ink [overflow-wrap:anywhere]",
                             ticked && "font-medium",
                           )}
                         >
                           {sup.name}
                         </span>
                         {needed.size > 0 && supplierHoldings.data ? (
-                          <Mono className="flex-none text-[12px] text-adm-muted">
+                          <Mono className="flex-none text-[11px] text-adm-muted">
                             {formatKg(relevantHeldBy(sup.id))} of this
                             load&apos;s goods
                           </Mono>
@@ -849,7 +849,7 @@ export function ShipmentForm({
               {errors.pickupSupplierIds ? (
                 <span
                   role="alert"
-                  className="mt-1 block text-[12px] font-medium text-console-red"
+                  className="mt-1 block text-[11px] font-medium text-console-red"
                 >
                   {errors.pickupSupplierIds.message}
                 </span>
@@ -861,7 +861,7 @@ export function ShipmentForm({
               shortfalls.length > 0 ? (
                 <div
                   role="alert"
-                  className="rounded-none border border-[#B45309]/40 bg-[#FFFBEB] px-3 py-2.5 text-[12.5px] text-[#92400E]"
+                  className="rounded-none border border-[#B45309]/40 bg-[#FFFBEB] px-3 py-2.5 text-[11px] text-[#92400E]"
                 >
                   <p className="font-semibold">
                     There aren&apos;t enough goods at this trip&apos;s loading
@@ -881,7 +881,7 @@ export function ShipmentForm({
                   </p>
                 </div>
               ) : (
-                <p className="flex items-center gap-1.5 text-[12.5px] font-medium text-console">
+                <p className="flex items-center gap-1.5 text-[11px] font-medium text-console">
                   <Check className="h-3.5 w-3.5 flex-none" />
                   This trip&apos;s loading points hold enough of every commodity
                   for the load.
@@ -934,7 +934,7 @@ export function ShipmentForm({
                   emptyText="No saved destination matches that."
                 />
               ) : (
-                <p className="text-[12.5px] text-adm-muted">
+                <p className="text-[11px] text-adm-muted">
                   No saved destinations yet - enter this one below, or{" "}
                   <Link
                     href="/admin/delivery-addresses/new"
@@ -947,7 +947,7 @@ export function ShipmentForm({
               )}
             </AdminField>
             {pickedAddress ? (
-              <div className="rounded-none border border-[#155744]/45 bg-[#F1F6EE] px-3 py-2 text-[12.5px] text-adm-muted">
+              <div className="rounded-none border border-[#155744]/45 bg-[#F1F6EE] px-3 py-2 text-[11px] text-adm-muted">
                 <p className="mb-0.5 flex items-center gap-1 text-[10.5px] font-bold uppercase tracking-[0.09em] text-console">
                   <Check className="h-3 w-3 flex-none" /> Delivering to
                 </p>
@@ -1080,7 +1080,7 @@ export function ShipmentForm({
                   emptyText="No driver matches that."
                 />
               ) : (
-                <p className="text-[12.5px] text-adm-muted">
+                <p className="text-[11px] text-adm-muted">
                   No drivers saved yet - enter this trip&apos;s driver below, or{" "}
                   <Link
                     href="/admin/drivers/new"
@@ -1094,7 +1094,7 @@ export function ShipmentForm({
             </AdminField>
             {pickedDriver && !showDriverOverrides ? (
               <div className="flex flex-wrap items-center justify-between gap-2 rounded-none border border-[#155744]/45 bg-[#F1F6EE] px-3 py-2">
-                <div className="min-w-0 text-[12.5px] text-adm-muted">
+                <div className="min-w-0 text-[11px] text-adm-muted">
                   <p className="mb-0.5 flex items-center gap-1 text-[10.5px] font-bold uppercase tracking-[0.09em] text-console">
                     <Check className="h-3 w-3 flex-none" /> Driving this trip
                   </p>

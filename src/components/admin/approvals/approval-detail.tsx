@@ -75,11 +75,11 @@ export function ApprovalDetail({ id }: { id: string }) {
             <ApprovalStatusBadge status={approval.status} />
           </div>
           <div className="ml-auto flex-none text-right">
-            <div className="font-adminmono text-[11.5px] tabular-nums text-adm-muted">
+            <div className="font-adminmono text-[10.5px] tabular-nums text-adm-muted">
               {approvalStamp(approval.createdAt)}
             </div>
             {pending ? (
-              <div className="text-[11px] italic text-adm-faint">
+              <div className="text-[10.5px] italic text-adm-faint">
                 {waitingFor(approval.createdAt)}
               </div>
             ) : null}
@@ -92,7 +92,7 @@ export function ApprovalDetail({ id }: { id: string }) {
             {headline}
           </div>
           {detail ? (
-            <div className="mt-0.5 text-[13px] leading-[1.5] text-adm-muted [overflow-wrap:anywhere]">
+            <div className="mt-0.5 text-[11.5px] leading-[1.5] text-adm-muted [overflow-wrap:anywhere]">
               {detail}
             </div>
           ) : null}
@@ -146,7 +146,7 @@ export function ApprovalDetail({ id }: { id: string }) {
             <div className={stencilCls}>
               {pending ? "Note" : "Decider's note"}
             </div>
-            <div className="text-[13px] italic text-adm-muted [overflow-wrap:anywhere]">
+            <div className="text-[11.5px] italic text-adm-muted [overflow-wrap:anywhere]">
               {approval.note}
             </div>
           </div>

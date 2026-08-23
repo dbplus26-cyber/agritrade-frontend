@@ -78,7 +78,7 @@ function GuarantorFact({
       <dt className="text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
         {label}
       </dt>
-      <dd className="mt-0.5 min-w-0 text-[13px] text-adm-ink [overflow-wrap:anywhere]">
+      <dd className="mt-0.5 min-w-0 text-[11.5px] text-adm-ink [overflow-wrap:anywhere]">
         {children}
       </dd>
     </div>
@@ -114,7 +114,7 @@ function RailPager({
   const last = Math.min(page * pageSize, total);
   return (
     <div className="border-t border-adm-hairline px-5 py-2.5">
-      <p className="text-center text-[11.5px] text-adm-faint">
+      <p className="text-center text-[10.5px] text-adm-faint">
         {first}-{last} of {total} {noun}
       </p>
       <ListPagination
@@ -332,7 +332,7 @@ export function FarmerDetail({ id }: { id: string }) {
                       onClick={() => setGuarantorDialog("new")}
                       className={cn(
                         adminLinkClass,
-                        "cursor-pointer text-[12.5px] font-semibold whitespace-nowrap",
+                        "cursor-pointer text-[11px] font-semibold whitespace-nowrap",
                       )}
                     >
                       + Add guarantor
@@ -341,12 +341,12 @@ export function FarmerDetail({ id }: { id: string }) {
                 >
                   Guarantors
                 </SectionHeading>
-                <p className="mt-0.5 text-[12px] text-adm-muted">
+                <p className="mt-0.5 text-[11px] text-adm-muted">
                   Who vouches for this farmer before grants are released.
                 </p>
               </div>
               {f.guarantors.length === 0 ? (
-                <p className="px-5 py-4 text-[13px] text-adm-muted">No guarantors yet.</p>
+                <p className="px-5 py-4 text-[11.5px] text-adm-muted">No guarantors yet.</p>
               ) : (
                 <ul className="divide-y divide-adm-hairline">
                   {f.guarantors.map((g) => (
@@ -360,11 +360,11 @@ export function FarmerDetail({ id }: { id: string }) {
                           is which. */}
                       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
                         <div className="min-w-0">
-                          <p className="text-[14px] font-semibold text-adm-ink [overflow-wrap:anywhere]">
+                          <p className="text-[12px] font-semibold text-adm-ink [overflow-wrap:anywhere]">
                             {g.name}
                           </p>
                           {g.relationship || g.occupation ? (
-                            <p className="mt-0.5 text-[12.5px] text-adm-muted [overflow-wrap:anywhere]">
+                            <p className="mt-0.5 text-[11px] text-adm-muted [overflow-wrap:anywhere]">
                               {[g.relationship, g.occupation]
                                 .filter(Boolean)
                                 .join(" · ")}
@@ -375,14 +375,14 @@ export function FarmerDetail({ id }: { id: string }) {
                           <button
                             type="button"
                             onClick={() => setGuarantorDialog(g)}
-                            className={cn(adminLinkClass, "cursor-pointer text-[12.5px] font-semibold")}
+                            className={cn(adminLinkClass, "cursor-pointer text-[11px] font-semibold")}
                           >
                             Edit
                           </button>
                           <button
                             type="button"
                             onClick={() => void onRemoveGuarantor(g)}
-                            className="cursor-pointer rounded-[2px] text-[12.5px] font-semibold text-console-red underline-offset-2 hover:underline"
+                            className="cursor-pointer rounded-[2px] text-[11px] font-semibold text-console-red underline-offset-2 hover:underline"
                           >
                             Remove
                           </button>
@@ -423,7 +423,7 @@ export function FarmerDetail({ id }: { id: string }) {
               <SectionHeading className="mb-1">
                 Agreement documents (private)
               </SectionHeading>
-              <p className="mb-2 text-[12px] text-adm-muted">
+              <p className="mb-2 text-[11px] text-adm-muted">
                 Never shown publicly. Downloads are logged.
               </p>
               {f.documents.length === 0 ? (
@@ -447,7 +447,7 @@ export function FarmerDetail({ id }: { id: string }) {
                   value={docName}
                   onChange={(e) => setDocName(e.target.value)}
                   placeholder="Document name (e.g. Grant agreement)"
-                  className="h-8 min-w-0 flex-1 rounded-none border border-adm-line bg-adm-card px-2.5 text-[13px] outline-none transition-colors placeholder:text-adm-faint focus:border-console"
+                  className="h-8 min-w-0 flex-1 rounded-none border border-adm-line bg-adm-card px-2.5 text-[11.5px] outline-none transition-colors placeholder:text-adm-faint focus:border-console"
                 />
                 <FilePicker
                   accept="image/*,application/pdf,.doc,.docx"
@@ -470,7 +470,7 @@ export function FarmerDetail({ id }: { id: string }) {
                     actions={
                       <Link
                         href={`/admin/grants/new?farmerId=${f.id}`}
-                        className={cn(adminLinkClass, "text-[12.5px]")}
+                        className={cn(adminLinkClass, "text-[11px]")}
                       >
                         + New
                       </Link>
@@ -480,11 +480,11 @@ export function FarmerDetail({ id }: { id: string }) {
                   </SectionHeading>
                 </div>
                 {(grants.data?.data ?? []).length === 0 ? (
-                  <p className="px-5 py-4 text-[13px] text-adm-muted">No grants yet.</p>
+                  <p className="px-5 py-4 text-[11.5px] text-adm-muted">No grants yet.</p>
                 ) : (
                   <ul className="divide-y divide-adm-hairline">
                     {(grants.data?.data ?? []).map((g) => (
-                      <li key={g.id} className="px-5 py-2.5 text-[13px]">
+                      <li key={g.id} className="px-5 py-2.5 text-[11.5px]">
                         <div className="flex items-center justify-between gap-2">
                           {/* The input item stays plain: the register has no
                               read page, only an edit form, and a fact on a
@@ -495,7 +495,7 @@ export function FarmerDetail({ id }: { id: string }) {
                             <Money value={g.valueGhs} />
                           </Mono>
                         </div>
-                        <div className="mt-0.5 flex items-center justify-between text-[12px] text-adm-muted">
+                        <div className="mt-0.5 flex items-center justify-between text-[11px] text-adm-muted">
                           <span>
                             <Link
                               className={adminLinkClass}
@@ -527,7 +527,7 @@ export function FarmerDetail({ id }: { id: string }) {
                     actions={
                       <Link
                         href={`/admin/repayments/new?farmerId=${f.id}`}
-                        className={cn(adminLinkClass, "text-[12.5px]")}
+                        className={cn(adminLinkClass, "text-[11px]")}
                       >
                         + New
                       </Link>
@@ -537,11 +537,11 @@ export function FarmerDetail({ id }: { id: string }) {
                   </SectionHeading>
                 </div>
                 {(repayments.data?.data ?? []).length === 0 ? (
-                  <p className="px-5 py-4 text-[13px] text-adm-muted">No repayments yet.</p>
+                  <p className="px-5 py-4 text-[11.5px] text-adm-muted">No repayments yet.</p>
                 ) : (
                   <ul className="divide-y divide-adm-hairline">
                     {(repayments.data?.data ?? []).map((r) => (
-                      <li key={r.id} className="px-5 py-2.5 text-[13px]">
+                      <li key={r.id} className="px-5 py-2.5 text-[11.5px]">
                         <div className="flex items-center justify-between gap-2">
                           {/* A cash repayment names no crop and carries no
                               weight. Printing them anyway would put "0 kg" on
@@ -566,7 +566,7 @@ export function FarmerDetail({ id }: { id: string }) {
                             <Money value={r.valueGhs} />
                           </Mono>
                         </div>
-                        <div className="mt-0.5 flex items-center justify-between gap-2 text-[12px] text-adm-muted">
+                        <div className="mt-0.5 flex items-center justify-between gap-2 text-[11px] text-adm-muted">
                           <span className="min-w-0 truncate">
                             {r.kind === "CASH"
                               ? (r.paymentAccount?.label ?? "Paid in cash")

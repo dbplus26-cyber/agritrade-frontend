@@ -206,7 +206,7 @@ export function StocktakeCountSheet({
       className="flex items-center gap-3 border-b border-adm-hairline py-2 last:border-b-0"
     >
       <span
-        className="min-w-0 flex-1 text-[13.5px] font-medium text-adm-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere]"
+        className="min-w-0 flex-1 text-[11.5px] font-medium text-adm-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere]"
         title={name}
       >
         {name}
@@ -216,7 +216,7 @@ export function StocktakeCountSheet({
           type="button"
           onClick={() => removeExtra(commodityId)}
           aria-label={`Remove ${name} from the sheet`}
-          className="flex-none cursor-pointer text-[12px] text-console-red"
+          className="flex-none cursor-pointer text-[11px] text-console-red"
         >
           <X className="h-3 w-3" aria-hidden="true" />
         </button>
@@ -232,7 +232,7 @@ export function StocktakeCountSheet({
           "h-9 w-[110px] flex-none px-2.5 text-right font-adminmono tabular-nums min-[400px]:w-[130px]",
         )}
       />
-      <span className="w-6 flex-none text-[12px] text-adm-muted">kg</span>
+      <span className="w-6 flex-none text-[11px] text-adm-muted">kg</span>
     </div>
   );
 
@@ -240,12 +240,12 @@ export function StocktakeCountSheet({
     <div className="flex flex-col gap-4">
       <AdminCard className="px-4 py-3 sm:px-5 sm:py-4">
         <SectionHeading className="mb-1">Count sheet</SectionHeading>
-        <p className="mb-2 text-[12px] text-adm-muted">
+        <p className="mb-2 text-[11px] text-adm-muted">
           Enter what was physically counted. Leave a line blank to skip it -
           book balances are compared only when the sheet is submitted.
         </p>
         {balanceRows.length === 0 && extraIds.length === 0 ? (
-          <p className="py-2 text-[13px] text-adm-muted">
+          <p className="py-2 text-[11.5px] text-adm-muted">
             This warehouse has no ledger lines yet - add the commodities found
             below.
           </p>
@@ -291,7 +291,7 @@ export function StocktakeCountSheet({
       {formError ? (
         <p
           role="alert"
-          className="rounded-none border border-console-red/40 bg-console-red/5 px-3 py-2 text-[12.5px] font-medium text-console-red"
+          className="rounded-none border border-console-red/40 bg-console-red/5 px-3 py-2 text-[11px] font-medium text-console-red"
         >
           {formError}
         </p>

@@ -103,7 +103,7 @@ export function StarRow({ rating }: { rating: number }) {
     <span
       role="img"
       aria-label={`${String(clamped)} out of 5`}
-      className="flex items-center gap-[3px] text-[15px] leading-none"
+      className="flex items-center gap-[3px] text-[12.5px] leading-none"
     >
       {[1, 2, 3, 4, 5].map((star) => (
         <span

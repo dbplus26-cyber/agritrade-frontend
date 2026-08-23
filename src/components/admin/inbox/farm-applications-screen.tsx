@@ -149,7 +149,7 @@ export function FarmApplicationsScreen() {
             <span className="block [overflow-wrap:anywhere] @2xl/table:truncate font-medium text-adm-ink">
               {row.original.name}
             </span>
-            <Mono className="block text-[12.5px] text-adm-faint">
+            <Mono className="block text-[11px] text-adm-faint">
               {row.original.reference}
             </Mono>
           </Link>

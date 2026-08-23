@@ -215,7 +215,7 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
                   {fields.length > 1 ? (
                     <button
                       aria-label={`Remove milestone ${String(i + 1)}`}
-                      className="cursor-pointer justify-self-start text-[12.5px] text-adm-muted transition-colors hover:text-console-red @min-[520px]:justify-self-auto"
+                      className="cursor-pointer justify-self-start text-[11px] text-adm-muted transition-colors hover:text-console-red @min-[520px]:justify-self-auto"
                       onClick={() => {
                         remove(i);
                       }}
@@ -229,13 +229,13 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
             </ul>
 
             {errors.milestones?.message ? (
-              <p className="mt-2 text-[12px] font-medium text-console-red">
+              <p className="mt-2 text-[11px] font-medium text-console-red">
                 {errors.milestones.message}
               </p>
             ) : null}
 
             <button
-              className={cn(adminLinkClass, "mt-2.5 cursor-pointer text-[12.5px] font-semibold")}
+              className={cn(adminLinkClass, "mt-2.5 cursor-pointer text-[11px] font-semibold")}
               onClick={() => {
                 append({ label: "", percent: "", trigger: "ON_DELIVERY" });
               }}
@@ -245,7 +245,7 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
             </button>
           </div>
 
-          <label className="flex cursor-pointer items-center gap-2 text-[13px] text-adm-body">
+          <label className="flex cursor-pointer items-center gap-2 text-[11.5px] text-adm-body">
             <input
               className="size-4 cursor-pointer accent-[#1E3D2B]"
               type="checkbox"
@@ -326,7 +326,7 @@ function PolicyCard({ policy }: { policy: IDriverPaymentPolicy }) {
         {/* No clamp and no truncation: the name is what the reader is looking
             for, and half of it is no use. Two lines are reserved so most cards
             start their bar at the same height. */}
-        <h2 className="min-h-[2.6em] text-[15px] leading-[1.3] font-semibold text-adm-ink [overflow-wrap:anywhere]">
+        <h2 className="min-h-[2.6em] text-[12.5px] leading-[1.3] font-semibold text-adm-ink [overflow-wrap:anywhere]">
           {policy.name}
         </h2>
         <span className="flex-none">
@@ -357,7 +357,7 @@ function PolicyCard({ policy }: { policy: IDriverPaymentPolicy }) {
       <ul className="mt-3.5 flex flex-col gap-2">
         {policy.milestones.map((m, i) => (
           <li
-            className="flex gap-3 text-[13px] leading-[1.4]"
+            className="flex gap-3 text-[11.5px] leading-[1.4]"
             key={`${m.label}-${String(i)}`}
           >
             <span className="font-adminmono w-9 flex-none tabular-nums text-adm-ink">
@@ -430,7 +430,7 @@ export function DriverPoliciesScreen() {
         title="Driver Payment Policies"
       />
 
-      <p className="mb-4 text-[12.5px] leading-[1.5] text-adm-muted">
+      <p className="mb-4 text-[11px] leading-[1.5] text-adm-muted">
         A policy can&apos;t be edited once created. Trips freeze their terms
         when the fee is agreed, so create a new policy when the terms change.
       </p>

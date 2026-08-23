@@ -69,7 +69,7 @@ function CapturedSignature({
           className="max-h-[52px] max-w-full object-contain"
         />
       </div>
-      <dl className="mt-2 space-y-0.5 text-[12px] text-adm-muted">
+      <dl className="mt-2 space-y-0.5 text-[11px] text-adm-muted">
         <div className="[overflow-wrap:anywhere]">
           <dt className="sr-only">Signed by</dt>
           <dd className="font-semibold text-adm-ink">{signature.signedName}</dd>
@@ -91,7 +91,7 @@ function CapturedSignature({
         </div>
       </dl>
       {signature.manifestChanged ? (
-        <p className="mt-2 border-l-2 border-console-red/60 bg-console-red/5 px-2 py-1.5 text-[11.5px] text-adm-ink">
+        <p className="mt-2 border-l-2 border-console-red/60 bg-console-red/5 px-2 py-1.5 text-[10.5px] text-adm-ink">
           The load has changed since this was signed. The mark still stands for
           what it was given for, not for what is on the truck now.
         </p>
@@ -105,7 +105,7 @@ function EmptySlot({ children }: { children?: React.ReactNode }) {
   return (
     <div>
       <div className="flex h-[56px] items-center justify-center border-b border-dashed border-adm-strong/60">
-        <span className="text-[11.5px] text-adm-faint">Not signed</span>
+        <span className="text-[10.5px] text-adm-faint">Not signed</span>
       </div>
       {children}
     </div>
@@ -187,10 +187,10 @@ export function ShipmentSignatures({ shipment }: { shipment: IShipment }) {
 
     return (
       <div className="min-w-0 border border-adm-line bg-adm-sunken/40 p-3">
-        <h3 className="text-[12px] font-bold tracking-[0.06em] text-adm-muted uppercase">
+        <h3 className="text-[11px] font-bold tracking-[0.06em] text-adm-muted uppercase">
           {which === "driver" ? "Driver's signature" : "Owner's signature"}
         </h3>
-        <p className="mt-0.5 mb-2 text-[11.5px] text-adm-muted">
+        <p className="mt-0.5 mb-2 text-[10.5px] text-adm-muted">
           {SLOT_HELP[which]}
         </p>
 
@@ -270,7 +270,7 @@ export function ShipmentSignatures({ shipment }: { shipment: IShipment }) {
             {withdrawing === which ? (
               <div className="flex flex-col gap-2">
                 <label
-                  className="text-[11.5px] font-semibold text-adm-ink"
+                  className="text-[10.5px] font-semibold text-adm-ink"
                   htmlFor={`withdraw-reason-${which}`}
                 >
                   Why is this being withdrawn?
@@ -281,7 +281,7 @@ export function ShipmentSignatures({ shipment }: { shipment: IShipment }) {
                   onChange={(e) => setReason(e.target.value)}
                   rows={2}
                   maxLength={300}
-                  className="w-full rounded-none border border-adm-line bg-adm-card px-2.5 py-1.5 text-[13px] outline-none transition-colors placeholder:text-adm-faint focus:border-console"
+                  className="w-full rounded-none border border-adm-line bg-adm-card px-2.5 py-1.5 text-[11.5px] outline-none transition-colors placeholder:text-adm-faint focus:border-console"
                   placeholder="Signed by the wrong driver at the gate"
                 />
                 <ActionRow>
@@ -315,7 +315,7 @@ export function ShipmentSignatures({ shipment }: { shipment: IShipment }) {
                 }}
                 className={cn(
                   adminLinkClass,
-                  "cursor-pointer text-[12.5px] font-semibold",
+                  "cursor-pointer text-[11px] font-semibold",
                 )}
               >
                 Withdraw this signature
@@ -335,7 +335,7 @@ export function ShipmentSignatures({ shipment }: { shipment: IShipment }) {
       >
         Signatures
       </SectionHeading>
-      <p className="mb-3 text-[12px] text-adm-muted">
+      <p className="mb-3 text-[11px] text-adm-muted">
         {open
           ? "Signed before the truck leaves. A signature can't be replaced once it is on - it is withdrawn, with a reason."
           : "The truck has left. What was signed is part of this trip's record now."}

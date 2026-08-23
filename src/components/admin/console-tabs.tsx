@@ -55,7 +55,7 @@ export function ConsoleTabs<T extends string>({
             aria-selected={active}
             onClick={() => onChange(tab.value)}
             className={cn(
-              "relative flex cursor-pointer items-center gap-1.5 whitespace-nowrap px-3.5 text-[13px] font-semibold transition-colors",
+              "relative flex cursor-pointer items-center gap-1.5 whitespace-nowrap px-3.5 text-[11.5px] font-semibold transition-colors",
               variant === "segmented" ? "h-[30px]" : "h-[34px] border",
               variant === "solid" &&
                 (active

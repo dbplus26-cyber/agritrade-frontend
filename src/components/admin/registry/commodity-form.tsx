@@ -332,10 +332,10 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
               button misroutes its clicks. Same label/hint markup as AdminField
               so it stays in step with the fields above it. */}
           <div>
-            <span className="mb-1 block text-[13px] font-semibold text-adm-ink">
+            <span className="mb-1 block text-[11.5px] font-semibold text-adm-ink">
               Photo <span className="font-normal text-adm-faint">(optional)</span>
             </span>
-            <span className="mb-1.5 block text-[12px] leading-[1.5] font-normal text-adm-muted">
+            <span className="mb-1.5 block text-[11px] leading-[1.5] font-normal text-adm-muted">
               Used on the website&apos;s commodity card. JPG or PNG.
             </span>
             <div className="flex flex-wrap items-center gap-3">
@@ -489,10 +489,10 @@ export function CommodityEdit({ id }: { id: string }) {
       <AdminCard className="mt-4 px-5 py-4">
         <label className="flex cursor-pointer items-center justify-between gap-3">
           <span>
-            <span className="block text-[13px] font-semibold text-adm-ink">
+            <span className="block text-[11.5px] font-semibold text-adm-ink">
               Show on website
             </span>
-            <span className="block text-[12px] text-adm-muted">
+            <span className="block text-[11px] text-adm-muted">
               The site lists it as available while stock is on hand - never
               quantities. Inactive commodities cannot be published.
             </span>

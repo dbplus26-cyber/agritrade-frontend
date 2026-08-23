@@ -305,7 +305,7 @@ export function PlotDetail({ id }: { id: string }) {
         main={
           <div className="flex flex-col gap-4">
             {p.description ? (
-              <AdminCard className="px-5 py-3 text-[13.5px] text-adm-ink [overflow-wrap:anywhere]">
+              <AdminCard className="px-5 py-3 text-[11.5px] text-adm-ink [overflow-wrap:anywhere]">
                 <SectionHeading className="mb-1">Description</SectionHeading>
                 {p.description}
               </AdminCard>
@@ -320,7 +320,7 @@ export function PlotDetail({ id }: { id: string }) {
                 className="mb-2"
                 actions={
                   p.photos.length >= 3 ? (
-                    <span className="text-[11.5px] text-adm-faint">
+                    <span className="text-[10.5px] text-adm-faint">
                       3 of 3 photos
                     </span>
                   ) : (
@@ -338,7 +338,7 @@ export function PlotDetail({ id }: { id: string }) {
                 Photos (public)
               </SectionHeading>
               {p.photos.length === 0 ? (
-                <p className="text-[13px] text-adm-muted">No photos yet.</p>
+                <p className="text-[11.5px] text-adm-muted">No photos yet.</p>
               ) : (
                 <div className="flex flex-col gap-2">
                   {photoTile(p.photos[0], true)}
@@ -356,7 +356,7 @@ export function PlotDetail({ id }: { id: string }) {
               <SectionHeading className="mb-1">
                 Ownership documents (private)
               </SectionHeading>
-              <p className="mb-2 text-[12px] text-adm-muted">
+              <p className="mb-2 text-[11px] text-adm-muted">
                 Never shown on the website. Downloads are logged.
               </p>
               {p.documents.length === 0 ? (
@@ -380,7 +380,7 @@ export function PlotDetail({ id }: { id: string }) {
                   value={docName}
                   onChange={(e) => setDocName(e.target.value)}
                   placeholder="Document name (e.g. Indenture)"
-                  className="h-8 min-w-0 flex-1 rounded-none border border-adm-line bg-adm-card px-2.5 text-[13px] outline-none transition-colors placeholder:text-adm-faint focus:border-console"
+                  className="h-8 min-w-0 flex-1 rounded-none border border-adm-line bg-adm-card px-2.5 text-[11.5px] outline-none transition-colors placeholder:text-adm-faint focus:border-console"
                 />
                 <FilePicker
                   accept="image/*,application/pdf,.doc,.docx"

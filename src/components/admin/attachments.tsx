@@ -113,10 +113,10 @@ export function AttachmentTile({
         title={`Open ${name}`}
         className="min-w-0 flex-1 outline-none after:absolute after:inset-0 after:rounded-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-console"
       >
-        <span className="block min-w-0 text-[13.5px] leading-[1.35] font-semibold text-adm-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere]">
+        <span className="block min-w-0 text-[11.5px] leading-[1.35] font-semibold text-adm-ink line-clamp-1 whitespace-normal [overflow-wrap:anywhere]">
           {name}
         </span>
-        <span className="mt-0.5 block min-w-0 text-[11.5px] text-adm-muted line-clamp-1 whitespace-normal [overflow-wrap:anywhere]">
+        <span className="mt-0.5 block min-w-0 text-[10.5px] text-adm-muted line-clamp-1 whitespace-normal [overflow-wrap:anywhere]">
           {metaLine}
         </span>
       </a>
@@ -141,7 +141,7 @@ export function AttachmentEmpty({ text }: { text: string }) {
   return (
     <div className="flex items-center justify-center gap-2 rounded-none border border-dashed border-adm-strong/60 px-4 py-5">
       <Paperclip aria-hidden="true" className="size-3.5 flex-none text-adm-faint" />
-      <p className="text-[12.5px] text-adm-muted">{text}</p>
+      <p className="text-[11px] text-adm-muted">{text}</p>
     </div>
   );
 }
