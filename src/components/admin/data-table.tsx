@@ -290,7 +290,13 @@ function summaryCard<TData>(
     flexRender(cell.column.columnDef.cell, cell.getContext());
   // A slot with nothing in it is not a slot: an empty badge would hold a line
   // open, and an empty meta entry would leave a stray separator behind.
+  //
+  // A DISPLAY column has nothing to inspect - it carries no accessor, so
+  // getValue() is undefined however much its cell renders. Judging those by
+  // their value dropped the status badge from every card on the registers
+  // that declare status as a display column, which is most of them.
   const filled = (cell: Cell<TData, unknown>) => {
+    if (!cell.column.accessorFn) return true;
     const raw = cell.getValue();
     return raw !== null && raw !== undefined && raw !== "";
   };
