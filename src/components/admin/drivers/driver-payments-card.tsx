@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 import { HelpTip, HelpWrap } from "@/components/admin/help-tip";
 import {
   AdminCard,
+  adminLinkClass,
   Mono,
   PdfLink,
   SectionHeading,
@@ -89,15 +91,24 @@ function PaymentRow({ payment }: { payment: IDriverPaymentLedgerRow }) {
             </HelpWrap>
           ) : null}
         </div>
-        {/* The trip. A driver does not know their shipment numbers, so the
-            destination leads and the document number follows it. */}
-        <p className="mt-0.5 min-w-0 text-[11.5px] text-adm-body [overflow-wrap:anywhere]">
+        {/* The trip, and a way into it. A payment is only ever queried
+            alongside the trip that earned it - what the fee was, what else
+            has been paid against it - and the row already knows which
+            shipment that is. A driver does not know their shipment numbers,
+            so the destination leads and the document number follows it. */}
+        <Link
+          className={cn(
+            adminLinkClass,
+            "mt-0.5 block min-w-0 text-[11.5px] [overflow-wrap:anywhere]",
+          )}
+          href={`/admin/shipments/${payment.shipment.id}`}
+        >
           {payment.shipment.destination}
           <span className="text-adm-faint">
             {" "}
             · {payment.shipment.transactionNo}
           </span>
-        </p>
+        </Link>
         {payment.reversalReason ? (
           <p className="mt-0.5 text-[11px] text-adm-muted [overflow-wrap:anywhere]">
             {payment.reversalReason}
