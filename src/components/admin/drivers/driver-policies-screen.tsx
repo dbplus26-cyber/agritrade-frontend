@@ -7,6 +7,10 @@ import { z } from "zod";
 import { Plus } from "lucide-react";
 
 import { HelpTip } from "@/components/admin/help-tip";
+import {
+  LegendField,
+  legendControlClass,
+} from "@/components/admin/legend-field";
 import { CardGridSkeleton } from "@/components/admin/skeletons";
 import {
   ActionRow,
@@ -14,9 +18,7 @@ import {
   AdminCard,
   AdminField,
   adminInputClass,
-  adminLinkClass,
   AdminPageHeader,
-  adminSelectClass,
   ToneBadge,
 } from "@/components/admin/ui";
 import {
@@ -185,44 +187,52 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
                   // which is not enough for any of them.
                   className="grid grid-cols-1 gap-2 @min-[520px]:grid-cols-[minmax(0,1fr)_5rem_9rem_auto] @min-[520px]:items-center"
                 >
-                  <Input
-                    aria-label={`Milestone ${String(i + 1)} label`}
-                    className={adminInputClass}
-                    placeholder="What this covers"
-                    {...register(`milestones.${i}.label` as const)}
-                  />
-                  <Input
-                    aria-label={`Milestone ${String(i + 1)} percent`}
-                    className={cn(adminInputClass, "text-right")}
-                    inputMode="decimal"
-                    placeholder="%"
-                    {...register(`milestones.${i}.percent` as const)}
-                  />
-                  <Controller
-                    control={control}
-                    name={`milestones.${i}.trigger` as const}
-                    render={({ field }) => (
-                      <SimpleSelect
-                        ariaLabel={`Milestone ${String(i + 1)} trigger`}
-                        className={adminSelectClass}
-                        value={field.value}
-                        onChange={field.onChange}
-                        placeholder="Choose when it falls due"
-                        options={DRIVER_TRIGGER_OPTIONS}
-                      />
-                    )}
-                  />
+                  <LegendField label="Covers">
+                    <Input
+                      aria-label={`Milestone ${String(i + 1)} label`}
+                      className={legendControlClass}
+                      placeholder="What this covers"
+                      {...register(`milestones.${i}.label` as const)}
+                    />
+                  </LegendField>
+                  <LegendField label="Share">
+                    <Input
+                      aria-label={`Milestone ${String(i + 1)} percent`}
+                      className={cn(legendControlClass, "text-right")}
+                      inputMode="decimal"
+                      placeholder="%"
+                      {...register(`milestones.${i}.percent` as const)}
+                    />
+                  </LegendField>
+                  <LegendField label="Due">
+                    <Controller
+                      control={control}
+                      name={`milestones.${i}.trigger` as const}
+                      render={({ field }) => (
+                        <SimpleSelect
+                          ariaLabel={`Milestone ${String(i + 1)} trigger`}
+                          className={legendControlClass}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="When it falls due"
+                          options={DRIVER_TRIGGER_OPTIONS}
+                        />
+                      )}
+                    />
+                  </LegendField>
                   {fields.length > 1 ? (
-                    <button
+                    <AdminButton
                       aria-label={`Remove milestone ${String(i + 1)}`}
-                      className="cursor-pointer justify-self-start text-[11px] text-adm-muted transition-colors hover:text-console-red @min-[520px]:justify-self-auto"
+                      className="justify-self-start text-console-red hover:text-console-red @min-[520px]:justify-self-auto"
                       onClick={() => {
                         remove(i);
                       }}
+                      size="sm"
                       type="button"
+                      variant="outline"
                     >
                       Remove
-                    </button>
+                    </AdminButton>
                   ) : null}
                 </li>
               ))}
@@ -234,15 +244,17 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
               </p>
             ) : null}
 
-            <button
-              className={cn(adminLinkClass, "mt-2.5 cursor-pointer text-[11px] font-semibold")}
+            <AdminButton
+              className="mt-2.5 w-fit"
               onClick={() => {
                 append({ label: "", percent: "", trigger: "ON_DELIVERY" });
               }}
+              size="sm"
               type="button"
+              variant="outline"
             >
-              + Add milestone
-            </button>
+              Add milestone
+            </AdminButton>
           </div>
 
           <label className="flex cursor-pointer items-center gap-2 text-[11.5px] text-adm-body">
@@ -354,12 +366,22 @@ function PolicyCard({ policy }: { policy: IDriverPaymentPolicy }) {
         ))}
       </div>
 
+      {/* Each row carries the colour of its own segment above. Without the
+          key the bar is four shades of nothing: a reader can see that one
+          share is larger, but not which milestone it belongs to. */}
       <ul className="mt-3.5 flex flex-col gap-2">
         {policy.milestones.map((m, i) => (
           <li
-            className="flex gap-3 text-[11.5px] leading-[1.4]"
+            className="flex items-baseline gap-2.5 text-[11.5px] leading-[1.4]"
             key={`${m.label}-${String(i)}`}
           >
+            <span
+              aria-hidden="true"
+              className={cn(
+                "mt-[1px] h-2 w-2 flex-none rounded-full",
+                SEGMENT_TONES[i % SEGMENT_TONES.length],
+              )}
+            />
             <span className="font-adminmono w-9 flex-none tabular-nums text-adm-ink">
               {m.percent}%
             </span>

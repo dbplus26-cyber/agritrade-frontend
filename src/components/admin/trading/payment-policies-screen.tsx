@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Plus, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import {
   ActionRow,
   AdminButton,
@@ -12,10 +12,13 @@ import {
   AdminField,
   adminInputClass,
   AdminPageHeader,
-  adminSelectClass,
   ToneBadge,
 } from "@/components/admin/ui";
 import { HelpTip } from "@/components/admin/help-tip";
+import {
+  LegendField,
+  legendControlClass,
+} from "@/components/admin/legend-field";
 import { CardGridSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -149,17 +152,21 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
 
   return (
     <ResponsiveDialog open onOpenChange={(o) => !o && onClose()}>
-      <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[480px]">
+      <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[560px]">
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>New payment policy</ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
-            Milestone percentages must add up to 100.
+            When a buyer has to pay for a sale. The shares must add up to 100.
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
         <form
+          // The milestone rows query this element's width, not the viewport's
+          // - the dialog is portaled out of the console's `@container/main`,
+          // so without a container here the `@min-` rules never resolve and
+          // the row stays stacked even on a wide screen.
+          className="@container flex flex-col gap-5"
           noValidate
           onSubmit={handleSubmit(onSubmit)}
-          className="@container flex flex-col gap-5"
         >
           <AdminField label="Name" error={errors.name?.message}>
             <Input
@@ -169,98 +176,114 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
             />
           </AdminField>
 
-          <div className="flex flex-col gap-2">
-            <span className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
-              <span className="min-w-0">Milestones</span>
+          <div>
+            <div className="mb-2 flex items-center gap-1.5">
+              <span className="text-[10.5px] font-bold tracking-[0.08em] text-adm-muted uppercase">
+                Milestones
+              </span>
               <HelpTip
                 label="What is a milestone?"
-                text="One stage of paying: a share of the price, and the moment the buyer has to hand it over."
+                text="One stage of paying: a share of the price, and the moment the buyer has to hand it over. The shares must add up to 100."
               />
-            </span>
-            {fields.map((field, i) => (
-              <div
-                key={field.id}
-                // Stacked until the form itself is 520px wide, which on a
-                // phone drawer it never is: label, percent and trigger on one
-                // row would leave each about 70px at 375px and overflow at
-                // 280px. The label takes its own line, the rest share the next.
-                className="grid grid-cols-1 gap-2 @min-[520px]:grid-cols-[minmax(0,1fr)_70px_130px_auto] @min-[520px]:items-center"
-              >
-                <Input
-                  aria-label={`Milestone ${String(i + 1)} label`}
-                  className={cn(adminInputClass, "min-w-0")}
-                  placeholder="Label"
-                  {...register(`milestones.${i}.label`)}
-                />
-                <div className="grid grid-cols-[70px_minmax(0,1fr)_auto] items-center gap-2 @min-[520px]:contents">
-                  <Input
-                    aria-label={`Milestone ${String(i + 1)} percent`}
-                    className={cn(adminInputClass, "min-w-0")}
-                    inputMode="decimal"
-                    placeholder="%"
-                    {...register(`milestones.${i}.percent`)}
-                  />
-                  <Controller
-                    control={control}
-                    name={`milestones.${i}.trigger` as const}
-                    render={({ field: triggerField }) => (
-                      <SimpleSelect
-                        ariaLabel={`Milestone ${String(i + 1)} trigger`}
-                        className={cn(adminSelectClass, "w-full min-w-0")}
-                        value={triggerField.value}
-                        onChange={triggerField.onChange}
-                        placeholder="Choose when it is due"
-                        options={TRIGGER_OPTIONS}
-                      />
-                    )}
-                  />
+            </div>
+
+            <ul className="flex flex-col gap-2">
+              {fields.map((field, i) => (
+                <li
+                  key={field.id}
+                  // Stacked below 520px: a label, a percent and a trigger on
+                  // one row inside a dialog leaves each about 90px on a phone,
+                  // which is not enough for any of them.
+                  className="grid grid-cols-1 gap-2 @min-[520px]:grid-cols-[minmax(0,1fr)_5rem_9rem_auto] @min-[520px]:items-center"
+                >
+                  <LegendField label="Covers">
+                    <Input
+                      aria-label={`Milestone ${String(i + 1)} label`}
+                      className={legendControlClass}
+                      placeholder="What this covers"
+                      {...register(`milestones.${i}.label`)}
+                    />
+                  </LegendField>
+                  <LegendField label="Share">
+                    <Input
+                      aria-label={`Milestone ${String(i + 1)} percent`}
+                      className={cn(legendControlClass, "text-right")}
+                      inputMode="decimal"
+                      placeholder="%"
+                      {...register(`milestones.${i}.percent`)}
+                    />
+                  </LegendField>
+                  <LegendField label="Due">
+                    <Controller
+                      control={control}
+                      name={`milestones.${i}.trigger` as const}
+                      render={({ field: triggerField }) => (
+                        <SimpleSelect
+                          ariaLabel={`Milestone ${String(i + 1)} trigger`}
+                          className={legendControlClass}
+                          value={triggerField.value}
+                          onChange={triggerField.onChange}
+                          placeholder="When it is due"
+                          options={TRIGGER_OPTIONS}
+                        />
+                      )}
+                    />
+                  </LegendField>
                   {fields.length > 1 ? (
-                    <button
-                      type="button"
+                    <AdminButton
                       aria-label={`Remove milestone ${String(i + 1)}`}
-                      onClick={() => remove(i)}
-                      className="cursor-pointer px-1 text-[11px] text-console-red"
+                      className="justify-self-start text-console-red hover:text-console-red @min-[520px]:justify-self-auto"
+                      onClick={() => {
+                        remove(i);
+                      }}
+                      size="sm"
+                      type="button"
+                      variant="outline"
                     >
-                      <X className="h-3 w-3" aria-hidden="true" />
-                    </button>
-                  ) : (
-                    <span />
-                  )}
-                </div>
-              </div>
-            ))}
+                      Remove
+                    </AdminButton>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+
             {errors.milestones?.message ? (
-              <p className="text-[11px] text-console-red">
+              <p className="mt-2 text-[11px] font-medium text-console-red">
                 {errors.milestones.message}
               </p>
             ) : null}
+
             <AdminButton
+              className="mt-2.5 w-fit"
+              onClick={() => {
+                append({ label: "", percent: "", trigger: "ON_ARRIVAL" });
+              }}
+              size="sm"
               type="button"
               variant="outline"
-              className="w-fit"
-              onClick={() =>
-                append({ label: "", percent: "", trigger: "ON_ARRIVAL" })
-              }
             >
-              + Add milestone
+              Add milestone
             </AdminButton>
           </div>
 
-          <label className="flex items-center gap-2 text-[11.5px] text-adm-ink">
-            <input type="checkbox" {...register("isDefault")} />
-            Make this the default policy
+          <label className="flex cursor-pointer items-center gap-2 text-[11.5px] text-adm-body">
+            <input
+              className="size-4 cursor-pointer accent-[#1E3D2B]"
+              type="checkbox"
+              {...register("isDefault")}
+            />
+            Make this the default
+            <HelpTip
+              label="What does default mean?"
+              text="The terms used when a sale and its buyer have none of their own."
+            />
           </label>
 
           <ResponsiveDialogFooter className="gap-2">
-            <AdminButton
-              type="button"
-              variant="outline"
-              size="lg"
-              onClick={onClose}
-            >
+            <AdminButton onClick={onClose} type="button" variant="ghost">
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={isLoading} loading={isLoading} size="lg">
+            <AdminButton disabled={isLoading} loading={isLoading} type="submit">
               {isLoading ? "Creating…" : "Create policy"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -390,12 +413,22 @@ function PolicyCard({ policy }: { policy: IPaymentPolicy }) {
       {/* One line per milestone, not two, and no rules between them. The bar
           above already separates the shares, so dividers would draw the same
           boundary twice. */}
+      {/* Each row carries the colour of its own segment above. Without the
+          key the bar is four shades of nothing: a reader can see that one
+          share is larger, but not which milestone it belongs to. */}
       <ul className="mt-3.5 flex flex-col gap-2">
         {policy.milestones.map((m, i) => (
           <li
             key={`${m.label}-${String(i)}`}
-            className="flex gap-3 text-[11.5px] leading-[1.4]"
+            className="flex items-baseline gap-2.5 text-[11.5px] leading-[1.4]"
           >
+            <span
+              aria-hidden="true"
+              className={cn(
+                "mt-[1px] h-2 w-2 flex-none rounded-full",
+                SEGMENT_TONES[i % SEGMENT_TONES.length],
+              )}
+            />
             <span className="font-adminmono w-9 flex-none tabular-nums text-adm-ink">
               {m.percent}%
             </span>
