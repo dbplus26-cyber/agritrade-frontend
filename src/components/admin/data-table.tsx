@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/DataTablePagination";
 import { navigationStarted } from "@/components/admin/navigation-progress";
 import { HelpTip } from "@/components/admin/help-tip";
+import { CompactDates } from "@/components/admin/date-cell";
 import { cn } from "@/lib/utils";
 
 /**
@@ -351,9 +352,21 @@ function summaryCard<TData>(
             {trailing.length > 0 ? (
               // Stacked, not spread: a second figure beside the first reads as
               // one number split in two.
-              <span className="flex flex-col items-end gap-0.5 text-[11px] font-semibold text-adm-ink">
+              <span className="flex flex-col items-end gap-1 text-[11px] font-semibold text-adm-ink">
                 {trailing.map((cell) => (
-                  <span key={cell.id}>{render(cell)}</span>
+                  <span className="flex flex-col items-end" key={cell.id}>
+                    {/* Named only where there are two of them. One figure in
+                        the corner of a card is the card's amount and needs no
+                        caption; two stacked bare are a pair of numbers with
+                        nothing saying which is the balance and which the
+                        allowance. */}
+                    {trailing.length > 1 ? (
+                      <span className="text-[9px] font-bold tracking-[0.09em] text-adm-faint uppercase">
+                        {headerLabel.get(cell.column.id)}
+                      </span>
+                    ) : null}
+                    {render(cell)}
+                  </span>
                 ))}
               </span>
             ) : null}
@@ -870,6 +883,7 @@ export function ConsoleDataTable<TData>({
         )}
         aria-busy={isFetching || undefined}
       >
+        <CompactDates.Provider value>
         {rows.length === 0 ? (
           <li>
             {emptyState ?? (
@@ -933,6 +947,7 @@ export function ConsoleDataTable<TData>({
             })}
           </AnimatePresence>
         )}
+        </CompactDates.Provider>
       </ul>
 
       {/* Wide container: the real table, horizontally scrollable only as a

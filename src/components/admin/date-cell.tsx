@@ -1,3 +1,7 @@
+"use client";
+
+import { createContext, useContext } from "react";
+
 import { Absent } from "@/components/admin/registry/registry-bits";
 import { formatTableDate, formatTableTime } from "@/lib/format-date";
 import { cn } from "@/lib/utils";
@@ -12,6 +16,16 @@ import { cn } from "@/lib/utils";
  * numbers into a truncation nobody wants. Business dates drop the time.
  */
 
+/**
+ * Set by the phone card view.
+ *
+ * The card/table switch is a CONTAINER query and a viewport breakpoint cannot
+ * follow it: a narrow console column on a wide screen renders cards while the
+ * viewport still says desktop, and the clock came back on rows that had no
+ * room for it. The card says so itself instead.
+ */
+export const CompactDates = createContext(false);
+
 interface IDateCellProps {
   value: string | null | undefined;
   /** Mutes the whole stamp (for secondary columns). */
@@ -23,6 +37,7 @@ const isInvalid = (value: string | null | undefined): value is null | undefined 
 
 /** Stacked date over time for timestamp columns (createdAt etc.). */
 export function DateTimeCell({ value, muted }: IDateCellProps) {
+  const compact = useContext(CompactDates);
   if (isInvalid(value)) return <Absent />;
   return (
     <span className="block leading-[1.35]">
@@ -34,12 +49,15 @@ export function DateTimeCell({ value, muted }: IDateCellProps) {
       >
         {formatTableDate(value)}
       </span>
-      {/* Phones lose the clock. A minute past the hour decides nothing an
-          admin does from a list - the day does - and the second line cost
-          every row of every register its height on the smallest screen. */}
-      <span className="hidden whitespace-nowrap text-[10.5px] text-adm-faint sm:block">
-        {formatTableTime(value)}
-      </span>
+      {/* A card loses the clock outright; elsewhere a phone loses it. A
+          minute past the hour decides nothing an admin does from a list -
+          the day does - and the second line cost every row of every register
+          its height on the smallest screen. */}
+      {compact ? null : (
+        <span className="hidden whitespace-nowrap text-[10.5px] text-adm-faint sm:block">
+          {formatTableTime(value)}
+        </span>
+      )}
     </span>
   );
 }

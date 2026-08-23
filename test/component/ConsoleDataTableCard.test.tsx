@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { render } from "@testing-library/react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
+import { DateTimeCell } from "@/components/admin/date-cell";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 
 vi.mock("next/navigation", () => ({
@@ -12,6 +13,7 @@ vi.mock("next/navigation", () => ({
 
 interface Row {
   active: boolean;
+  added: string;
   count: number;
   id: string;
   name: string;
@@ -49,9 +51,24 @@ const columns: ColumnDef<Row, unknown>[] = [
     id: "status",
     meta: columnMeta({ card: "badge" }),
   },
+  {
+    accessorFn: (r) => r.added,
+    cell: ({ row }) => <DateTimeCell value={row.original.added} />,
+    header: "Added",
+    id: "added",
+    meta: columnMeta({ card: "meta" }),
+  },
 ];
 
-const data: Row[] = [{ active: true, count: 4, id: "1", name: "Transport" }];
+const data: Row[] = [
+  {
+    active: true,
+    added: "2026-07-12T14:30:00.000Z",
+    count: 4,
+    id: "1",
+    name: "Transport",
+  },
+];
 
 describe("the phone card of a console table", () => {
   it("puts a display-column badge on the same row as the figure", () => {
@@ -75,5 +92,26 @@ describe("the phone card of a console table", () => {
     const row = card?.firstElementChild;
     expect(row?.contains(badge!)).toBe(true);
     expect(row?.contains(count!)).toBe(true);
+  });
+
+  /**
+   * The card/table switch is a container query, so a viewport breakpoint
+   * cannot follow it: a narrow console column on a wide screen renders cards
+   * while the viewport still reads as desktop, and the clock came back on
+   * rows with no room for it. The card declares itself compact instead.
+   */
+  it("drops the clock from a date inside a card", () => {
+    render(
+      <ConsoleDataTable<Row>
+        columns={columns}
+        data={data}
+        itemNoun="categories"
+      />,
+    );
+
+    const card = document.querySelector("[data-slot-card]");
+    expect(card?.textContent).toContain("Jul 12, 2026");
+    // The table beside it keeps the time; the card must not carry one.
+    expect(card?.textContent).not.toMatch(/\d{1,2}:\d{2}/);
   });
 });
