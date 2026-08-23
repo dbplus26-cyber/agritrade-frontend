@@ -885,7 +885,15 @@ export function ConsoleDataTable<TData>({
               // accessorFn or accessorKey. Checking only accessorFn mistakes an
               // accessorKey column for a row action and drops it to the card
               // foot. An ACTION column is a display column with neither.
+              //
+              // A column that NAMES a card slot is content by declaration,
+              // accessor or not. Status is usually a display column - the
+              // badge is computed in the cell, so there is nothing to accessor
+              // - and reading it as a row action put it on a line of its own
+              // at the foot of the card, away from the figure it belongs
+              // beside, on every register that declares status that way.
               const isData = (c: (typeof visible)[number]) => {
+                if (c.column.columnDef.meta?.card) return true;
                 const def = c.column.columnDef as {
                   accessorFn?: unknown;
                   accessorKey?: unknown;
