@@ -536,7 +536,6 @@ export function ShipmentForm({
         <AdminCard className="flex flex-col gap-5 p-5">
           <section className="flex flex-col gap-5">
             <StepHead
-              step={1}
               title="Sales on this trip"
               hint={
                 editing
@@ -678,7 +677,6 @@ export function ShipmentForm({
 
           <section className="flex flex-col gap-5 pt-3 sm:pt-6">
             <StepHead
-              step={2}
               title="Where the truck loads"
               hint="Start at the shed it sets off from, tick any other shed it calls at, and add the sellers it collects from on the way."
             />
@@ -892,7 +890,6 @@ export function ShipmentForm({
 
           <section className="flex flex-col gap-5 pt-3 sm:pt-6">
             <StepHead
-              step={3}
               title="Truck & destination"
               hint="What carries the goods and where they are going."
             />
@@ -1044,7 +1041,6 @@ export function ShipmentForm({
 
           <section className="flex flex-col gap-5 pt-3 sm:pt-6">
             <StepHead
-              step={4}
               title="Driver"
               hint="Who has the truck. Pick from the directory or enter the trip's driver by hand."
             />

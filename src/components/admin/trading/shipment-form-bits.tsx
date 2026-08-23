@@ -7,30 +7,22 @@ export const NO_SALES: string[] = [];
 export const NO_SHEDS: string[] = [];
 
 /**
- * A card's heading: a numbered step, a title, one quiet line of guidance.
- * Planning really is a sequence - what goes, from where, on what truck,
- * with whom - so the numbering carries information, and every per-field
- * hint the number replaces is one less line crowding the controls.
+ * A card's heading: a title and one quiet line of guidance.
+ *
+ * The rule under it is what separates one part of the form from the next.
+ * A numbered badge said the same thing louder, and a form laid out in
+ * sequence already reads in sequence without being counted at.
  */
 export function StepHead({
   hint,
-  step,
   title,
 }: {
   hint?: string;
-  step: number;
   title: string;
 }) {
   return (
     <div className="border-b border-adm-hairline pb-3">
-      <SectionHeading className="mb-0">
-        <span className="flex items-center gap-2.5">
-          <span className="flex h-[22px] w-[22px] flex-none items-center justify-center rounded-full bg-[#155744] text-[10.5px] font-bold text-white">
-            {step}
-          </span>
-          <span className="min-w-0">{title}</span>
-        </span>
-      </SectionHeading>
+      <SectionHeading className="mb-0">{title}</SectionHeading>
       {hint ? (
         <p className="mt-1.5 text-[11px] leading-[1.55] text-adm-muted">
           {hint}
