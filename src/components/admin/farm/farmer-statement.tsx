@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { ConsoleDateRange } from "@/components/admin/filter-bar";
+import {
+  ConsoleDateRange,
+  ConsoleFieldHeight,
+} from "@/components/admin/filter-bar";
 import { AdminButton, AdminPageHeader, Mono } from "@/components/admin/ui";
 import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { Money } from "@/components/admin/trading/sale-bits";
@@ -67,51 +70,57 @@ export function FarmerStatement({
           backLabel="Farmer"
         />
         <AdminPageHeader
+          className="mb-4"
           title="Farmer statement"
           hint="Everything advanced to this farmer and everything repaid, in order."
           sub="Every grant and repayment with a running balance, ready to print and sign"
-          actions={
-            <>
-              {/* The window belongs to the DOCUMENT, not to a list, so it is
-                  a page-level control beside the heading rather than a
-                  toolbar filter. */}
-              <ConsoleDateRange
-                from={from}
-                to={to}
-                onFromChange={setFrom}
-                onToChange={setTo}
-              />
-              {from || to ? (
-                <AdminButton
-                  variant="outline"
-                  onClick={() => {
-                    setFrom("");
-                    setTo("");
-                  }}
-                >
-                  All history
-                </AdminButton>
-              ) : null}
-              {/* The server renders this ledger as a paginated A4 PDF, window
-                  and all - printing happens from the viewer, which previews
-                  the sheet true to size instead of the browser dialog's
-                  guesswork. */}
-              <AdminButton asChild>
-                <a
-                  href={receiptPdfUrl("farmer-statement", id, {
-                    from,
-                    seasonId,
-                    to,
-                  })}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  View PDF
-                </a>
-              </AdminButton>
-            </>
-          }
         />
+
+        {/* The window belongs to the DOCUMENT, not to a list, so it is a
+            page-level control rather than a toolbar filter - and it sits
+            under the heading on the same edge as the sheet it acts on,
+            instead of across the page from it. Every control on the row is
+            one height and they share a baseline: the dates carry labels and
+            the buttons do not, so aligning their tops would hang the buttons
+            in the air. */}
+        <div className="mb-6 flex flex-wrap items-end gap-2">
+          <ConsoleFieldHeight>
+            <ConsoleDateRange
+              className="w-auto"
+              from={from}
+              to={to}
+              onFromChange={setFrom}
+              onToChange={setTo}
+            />
+          </ConsoleFieldHeight>
+          {from || to ? (
+            <AdminButton
+              variant="outline"
+              onClick={() => {
+                setFrom("");
+                setTo("");
+              }}
+            >
+              All history
+            </AdminButton>
+          ) : null}
+          {/* The server renders this ledger as a paginated A4 PDF, window and
+              all - printing happens from the viewer, which previews the sheet
+              true to size instead of the browser dialog's guesswork. */}
+          <AdminButton asChild>
+            <a
+              href={receiptPdfUrl("farmer-statement", id, {
+                from,
+                seasonId,
+                to,
+              })}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View PDF
+            </a>
+          </AdminButton>
+        </div>
       </div>
 
       {/* Left-aligned like every other console page - the sheet keeps its own
