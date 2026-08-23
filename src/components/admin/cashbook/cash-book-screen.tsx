@@ -154,6 +154,16 @@ function PositionCard({
  * The label takes its own line above the figure below `sm` - a long label and
  * a right-aligned amount competing for a 280px row squeezes the label into a
  * sliver.
+ *
+ * The rows run in columns rather than one full-page stack. An account is
+ * named in two or three words and holds a six-character figure; across a
+ * 1100px row those two ends sit a hand apart with nothing between them, and
+ * the eye has to travel to pair them up. Two or three shorter columns keep
+ * each name beside its own figure and put the width to work.
+ *
+ * The dividers are borders on every cell, with the outermost ones pulled
+ * under the card's own border - which is what makes the grid work for any
+ * number of accounts, where a rule per row cannot say where the last row is.
  */
 function AccountList({
   accounts,
@@ -169,11 +179,11 @@ function AccountList({
       <h2 className="mb-2 text-[11.5px] font-semibold tracking-wide text-adm-muted uppercase">
         {title}
       </h2>
-      <AdminCard>
+      <AdminCard className="overflow-hidden">
         {accounts.length === 0 ? (
           <p className="p-4 text-[11.5px] text-adm-muted">{emptyText}</p>
         ) : (
-          <ul className="divide-y divide-adm-hairline">
+          <ul className="-mr-px -mb-px grid @2xl/cashbook:grid-cols-2 @5xl/cashbook:grid-cols-3">
             {accounts.map((account) => (
               <AccountRow account={account} key={account.id} />
             ))}
@@ -187,9 +197,9 @@ function AccountList({
 function AccountRow({ account }: { account: IAccountBalance }) {
   const hint = accountHint(account);
   return (
-    <li>
+    <li className="border-r border-b border-adm-hairline">
       <Link
-        className="flex flex-col gap-1 px-4 py-3 outline-none hover:bg-adm-sunken focus-visible:bg-adm-sunken min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between min-[420px]:gap-4"
+        className="flex h-full flex-col gap-1 px-4 py-3 outline-none hover:bg-adm-sunken focus-visible:bg-adm-sunken min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between min-[420px]:gap-4"
         href={`${CASH_BOOK}/${account.id}`}
       >
         <span className="flex min-w-0 items-center gap-1.5">
