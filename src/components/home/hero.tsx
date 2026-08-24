@@ -1,5 +1,4 @@
 import { Photo } from "@/components/ui/Photo";
-import { StencilLabel } from "@/components/ui/StencilLabel";
 import { getSiteContact } from "@/lib/public-contact";
 
 // Our own photograph, served from /public. Sized for the optimizer (see
@@ -7,9 +6,9 @@ import { getSiteContact } from "@/lib/public-contact";
 const HERO_PHOTO = "/images/home-hero.webp";
 
 /**
- * Home hero - asymmetric 7/5: dispatch eyebrow, the two-line drop-in
- * headline with the gold underline on "south.", CTAs, and the treated truck
- * photo that crosses down into the plank board below (negative margin pair).
+ * Home hero - asymmetric 7/5: the two-line drop-in headline with the gold
+ * underline on "south.", CTAs, and the treated truck photo that crosses down
+ * into the plank board below (negative margin pair).
  */
 export async function Hero() {
   const contact = await getSiteContact();
@@ -23,14 +22,6 @@ export async function Hero() {
         {/* Bottom padding clears the board's 70px pull; kept slightly shorter
             than the photo column so the photo always governs the crossing. */}
         <div className="relative z-[2] pb-4 lg:pb-24 lg:pr-10 lg:pt-6">
-          <div
-            className="mb-6 lg:mb-8"
-            style={{ animation: "sack-drop .55s cubic-bezier(.2,.9,.3,1) .05s backwards" }}
-          >
-            <StencilLabel className="text-[11px] tracking-[0.32em] lg:text-[12px]">
-              DISPATCH · TAMALE, NORTHERN REGION
-            </StencilLabel>
-          </div>
           <p
             className="mb-1.5 font-display text-[19px] font-semibold leading-[1.25] text-soil lg:text-[30px]"
             style={{ animation: "sack-drop .6s cubic-bezier(.2,.9,.3,1) .18s backwards" }}
