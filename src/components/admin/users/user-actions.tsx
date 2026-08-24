@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   Eye,
   KeyRound,
-  MoreHorizontal,
+  MoreVertical,
   Power,
   ShieldCheck,
   Trash2,
@@ -141,7 +141,7 @@ export function UserActionsDropdown({ user }: { user: IUser }) {
           onClick={(e) => e.stopPropagation()}
           className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-none text-adm-faint outline-none hover:bg-adm-sunken hover:text-adm-muted focus-visible:ring-2 focus-visible:ring-console/40"
         >
-          <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
+          <MoreVertical className="h-4 w-4" aria-hidden="true" />
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="end"

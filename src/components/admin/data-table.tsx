@@ -148,8 +148,12 @@ export interface ConsoleColumnMeta {
  *   title     which row this is. Exactly one, and it reads first.
  *   meta      the supporting facts, joined into one quiet line under the
  *             title. Two or three; past that the line stops being scannable.
+ *   action    an actions menu that belongs beside the title rather than at the
+ *             foot of the card. For a register whose card carries no figure to
+ *             close on, the foot row holds one lone icon under whitespace; on
+ *             the title line the menu sits against the name it acts on.
  */
-export type CardSlot = "badge" | "meta" | "title" | "trailing";
+export type CardSlot = "action" | "badge" | "meta" | "title" | "trailing";
 
 declare module "@tanstack/react-table" {
   // The standard TanStack meta-augmentation shape - params/emptiness required.
@@ -332,6 +336,7 @@ function summaryCard<TData>(
   const trailing = slotted.filter((c) => slotOf(c) === "trailing" && filled(c));
   const title = slotted.find((c) => slotOf(c) === "title");
   const meta = slotted.filter((c) => slotOf(c) === "meta" && filled(c));
+  const titleAction = slotted.find((c) => slotOf(c) === "action");
 
   return (
     <>
@@ -342,9 +347,18 @@ function summaryCard<TData>(
           ))}
         </div>
       ) : null}
-      {title ? (
-        <div className="min-w-0 text-[12px] leading-[1.35] font-medium text-adm-ink">
-          {render(title)}
+      {(title ?? titleAction) ? (
+        <div className="flex items-start gap-2">
+          {title ? (
+            <div className="min-w-0 flex-1 text-[12px] leading-[1.35] font-medium text-adm-ink">
+              {render(title)}
+            </div>
+          ) : null}
+          {titleAction ? (
+            // Pulled out to the card's own padding: the menu reads as the
+            // right edge of the line, not as something floating short of it.
+            <span className="-mr-1 ml-auto flex-none">{render(titleAction)}</span>
+          ) : null}
         </div>
       ) : null}
       {meta.length > 0 ? (

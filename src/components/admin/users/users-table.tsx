@@ -36,6 +36,7 @@ import { UserActionsDropdown } from "./user-actions";
 import {
   initialsOf,
   lastActiveLabel,
+  RoleCell,
   ROLE_LABEL,
   StatusBadge,
 } from "./user-bits";
@@ -219,12 +220,8 @@ export function UsersTable() {
           "What this person is allowed to do: agents only ever see their own float and purchases.",
         ),
         enableSorting: false,
-        meta: columnMeta({ card: "meta", at: "lg" }),
-        cell: ({ row }) => (
-          <span className="whitespace-nowrap text-adm-muted">
-            {ROLE_LABEL[row.original.role]}
-          </span>
-        ),
+        meta: columnMeta({ card: "badge", at: "lg" }),
+        cell: ({ row }) => <RoleCell user={row.original} />,
       },
       {
         id: "phone",
@@ -246,7 +243,7 @@ export function UsersTable() {
           "The last time this person signed in, so you can spot accounts nobody uses.",
         ),
         enableSorting: false,
-        meta: columnMeta({ card: "meta", at: "xl" }),
+        meta: columnMeta({ at: "xl" }),
         cell: ({ row }) => (
           <span className="whitespace-nowrap text-adm-muted">
             {lastActiveLabel(row.original)}
@@ -273,6 +270,7 @@ export function UsersTable() {
         header: "Actions",
         enableSorting: false,
         meta: {
+          card: "action" as const,
           className: "w-16 pl-0 text-right",
         },
         cell: ({ row }) => (

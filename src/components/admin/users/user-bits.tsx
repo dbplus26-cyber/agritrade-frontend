@@ -37,6 +37,28 @@ export function StatusBadge({ user }: { user: IUser }) {
   return help ? <HelpWrap text={help}>{badge}</HelpWrap> : badge;
 }
 
+/**
+ * What this person is allowed to do.
+ *
+ * Two renderings of the same fact: the table column is a quiet line of text
+ * among other columns, while the phone card has no Role column to sit in - the
+ * role rides beside the status chip at the top of the card, and a chip is what
+ * reads as belonging on that line.
+ */
+export function RoleCell({ user }: { user: IUser }) {
+  const label = ROLE_LABEL[user.role];
+  return (
+    <>
+      <span className="hidden whitespace-nowrap text-adm-muted @2xl/table:inline">
+        {label}
+      </span>
+      <ToneBadge tone="slate" className="@2xl/table:hidden">
+        {label}
+      </ToneBadge>
+    </>
+  );
+}
+
 export function lastActiveLabel(user: IUser): string {
   if (!user.lastLoginAt) return "Never";
   const d = new Date(user.lastLoginAt);
