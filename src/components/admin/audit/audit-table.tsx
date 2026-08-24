@@ -118,7 +118,7 @@ export function AuditTable() {
         accessorFn: (log) => log.createdAt,
         header: "Time",
         enableSorting: false,
-        meta: columnMeta({ card: "meta" }),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
       },
       {
@@ -129,7 +129,7 @@ export function AuditTable() {
           "Who did it: the person signed in at the time, or the system itself.",
         ),
         enableSorting: false,
-        meta: columnMeta({ card: "meta", stretch: true }),
+        meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) => {
           const actor = row.original.actor;
           if (!actor) {
@@ -161,7 +161,7 @@ export function AuditTable() {
         accessorFn: (log) => log.action,
         header: columnHelp("Action", "What they did, in plain words."),
         enableSorting: false,
-        meta: columnMeta({ card: "title" }),
+        meta: columnMeta({ card: "badge" }),
         cell: ({ row }) => (
           <ToneBadge tone={actionTone(row.original.action)}>
             {actionLabel(row.original.action)}
