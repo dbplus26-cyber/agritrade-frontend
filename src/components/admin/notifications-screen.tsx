@@ -3,7 +3,6 @@
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
-import { DateTimeCell } from "@/components/admin/date-cell";
 import {
   ConsoleFilterBar,
   ConsoleLabeledSelect,
@@ -24,6 +23,7 @@ import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
+import { cn } from "@/lib/utils";
 import { useGetNotificationsQuery } from "@/redux/notifications/notifications-api";
 import type {
   INotification,
@@ -50,6 +50,74 @@ const EVENT_LABEL: Record<string, string> = {
   "float.low": "Agent float low",
   "payment.confirmed": "Payment received",
   "sale.balance_due": "Balance due",
+};
+
+/**
+ * How loudly an event should read.
+ *
+ * A log where every line looks the same is a log nobody scans: an agent
+ * running out of money in the field and a receipt going out are not the same
+ * news. `alert` is money that has run short somewhere - the thing an owner
+ * would want to see from across the room; `warn` is money owed and unpaid;
+ * everything else is a record of routine traffic and stays quiet.
+ *
+ * Delivery FAILURE is a separate axis and keeps its own badge: a routine
+ * receipt that never arrived still matters, and an urgent warning that was
+ * delivered is not a problem with the system.
+ */
+type Severity = "alert" | "info" | "warn";
+
+const EVENT_SEVERITY: Record<string, Severity> = {
+  "float.low": "alert",
+  "sale.balance_due": "warn",
+};
+
+const severityOf = (event: string): Severity => EVENT_SEVERITY[event] ?? "info";
+
+/** One line, one typeface, and the CLOCK - this is a delivery log, and two
+ *  rows stamped "23 Aug" say nothing about which went out first. */
+const stamp = (iso: string): string =>
+  new Date(iso).toLocaleString("en-GB", {
+    day: "2-digit",
+    hour: "2-digit",
+    hour12: false,
+    minute: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+
+/**
+ * A run of identical messages, counted rather than repeated.
+ *
+ * The same event to the same person with the same outcome is one fact however
+ * many times the system tried it, and printed one row per attempt it buries
+ * everything else on the page. The STATUS is part of the key on purpose: three
+ * sent and one failed is not four of anything, and folding the failure into
+ * the run would hide the only row worth acting on.
+ */
+export interface NotificationGroup extends INotification {
+  count: number;
+  /** The oldest in the run, for the range on a grouped row. */
+  firstAt: string;
+}
+
+export const groupRuns = (list: INotification[]): NotificationGroup[] => {
+  const order: string[] = [];
+  const byKey = new Map<string, NotificationGroup>();
+  for (const n of list) {
+    const key = `${n.event}|${n.recipient}|${n.status}`;
+    const seen = byKey.get(key);
+    if (!seen) {
+      order.push(key);
+      byKey.set(key, { ...n, count: 1, firstAt: n.createdAt });
+      continue;
+    }
+    seen.count += 1;
+    // The rows arrive newest first, so the representative keeps the newest
+    // stamp and the run's foot walks backwards.
+    if (n.createdAt < seen.firstAt) seen.firstAt = n.createdAt;
+  }
+  return order.map((key) => byKey.get(key)!);
 };
 
 const STATUS_OPTIONS = [
@@ -96,7 +164,9 @@ export function NotificationsScreen() {
 
   const { data, isLoading, isError, error, refetch } =
     useGetNotificationsQuery(queryArgs);
-  const rows = data?.data ?? [];
+  // Grouped for DISPLAY only: the counts still sum to the server's total, so
+  // the "N notifications" beside the filters keeps counting messages.
+  const rows = useMemo(() => groupRuns(data?.data ?? []), [data]);
   const total = data?.meta.total ?? 0;
   const activeFilterCount =
     (status !== "all" ? 1 : 0) + (channel !== "all" ? 1 : 0);
@@ -105,25 +175,65 @@ export function NotificationsScreen() {
   // the empty state - a filter bar filters nothing.
   const pristine = !isLoading && !isError && rows.length === 0 && !filtered;
 
-  const columns = useMemo<ColumnDef<INotification, unknown>[]>(
+  const columns = useMemo<ColumnDef<NotificationGroup, unknown>[]>(
     () => [
       {
         id: "event",
         header: "Notification",
         enableSorting: false,
         meta: columnMeta({ card: "title", stretch: true }),
-        cell: ({ row }) => (
-          <div className="min-w-0 @2xl/table:max-w-[90%]">
-            <div className="font-medium text-adm-ink">
-              {EVENT_LABEL[row.original.event] ?? row.original.event}
-            </div>
-            {row.original.preview ? (
-              <div className="text-[11px] text-adm-muted [overflow-wrap:anywhere] @2xl/table:truncate">
-                {row.original.preview}
+        cell: ({ row }) => {
+          const n = row.original;
+          const severity = severityOf(n.event);
+          return (
+            <div className="min-w-0 @2xl/table:max-w-[90%]">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <span
+                  className={cn(
+                    "font-medium",
+                    severity === "alert"
+                      ? "font-semibold text-console-red"
+                      : severity === "warn"
+                        ? "text-console-gold-deep"
+                        : "text-adm-ink",
+                  )}
+                >
+                  {EVENT_LABEL[n.event] ?? n.event}
+                </span>
+                {severity !== "info" ? (
+                  <HelpWrap
+                    text={
+                      severity === "alert"
+                        ? "Money has run short somewhere. Worth acting on before the next one of these arrives."
+                        : "Money owed and not yet paid."
+                    }
+                  >
+                    <ToneBadge tone={severity === "alert" ? "alert" : "harvest"}>
+                      {severity === "alert" ? "Needs attention" : "Money owed"}
+                    </ToneBadge>
+                  </HelpWrap>
+                ) : null}
+                {/* The run, counted. Three of the same warning to the same
+                    person is one thing that keeps happening, not three
+                    things. */}
+                {n.count > 1 ? (
+                  <HelpWrap
+                    text={`Sent ${String(n.count)} times, ${stamp(n.firstAt)} to ${stamp(n.createdAt)}. Identical messages to the same recipient with the same outcome are counted rather than repeated.`}
+                  >
+                    <Mono className="rounded-none border border-adm-line bg-adm-sunken px-1.5 py-px text-[10.5px] font-semibold text-adm-body">
+                      &times;{n.count}
+                    </Mono>
+                  </HelpWrap>
+                ) : null}
               </div>
-            ) : null}
-          </div>
-        ),
+              {n.preview ? (
+                <div className="mt-0.5 text-[11px] text-adm-muted [overflow-wrap:anywhere] @2xl/table:truncate">
+                  {n.preview}
+                </div>
+              ) : null}
+            </div>
+          );
+        },
       },
       {
         id: "recipient",
@@ -170,7 +280,14 @@ export function NotificationsScreen() {
         header: "When",
         enableSorting: false,
         meta: columnMeta({ card: "meta", wide: true }),
-        cell: ({ row }) => <DateTimeCell value={row.original.createdAt} />,
+        // Mono, like the recipient beside it: the meta line ran a
+        // proportional date against a monospaced address, and the two set
+        // their own rhythms either side of the separator.
+        cell: ({ row }) => (
+          <Mono className="whitespace-nowrap text-adm-muted">
+            {stamp(row.original.createdAt)}
+          </Mono>
+        ),
       },
     ],
     [],
@@ -243,7 +360,7 @@ export function NotificationsScreen() {
         />
       ) : (
         <AdminCard className="overflow-hidden">
-          <ConsoleDataTable<INotification>
+          <ConsoleDataTable<NotificationGroup>
             columns={columns}
             data={rows}
             itemNoun="notifications"
