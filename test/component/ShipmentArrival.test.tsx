@@ -20,7 +20,7 @@
 //     one-way: the trip cannot be put back on the road, and the settled totals
 //     become what every buyer on it owes.
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEventBase from "@testing-library/user-event";
 
 import { ArrivalDialog } from "@/components/admin/trading/shipment-arrival-dialog";
@@ -48,6 +48,18 @@ vi.mock("@/lib/notify", () => ({
 const userEvent = userEventBase.setup({ delay: null });
 
 /**
+ * Clicks a control that lives inside a modal layer once the layer takes
+ * pointer events.
+ *
+ * A Radix modal switches pointer events off on the body in an effect and back
+ * on for its own content in the render that follows, so a query that resolves
+ * between the two finds a button still inheriting pointer-events: none, which
+ * user-event refuses to click. Retrying until the click lands closes that gap.
+ */
+const clickWhenInteractive = (element: HTMLElement) =>
+  waitFor(() => userEvent.click(element));
+
+/**
  * Clears the confirmation raised before either write.
  *
  * Found by the gate's own title and scoped to it: both commit buttons carry
@@ -58,14 +70,14 @@ const clearGate = async (title: RegExp, commit: string) => {
   const heading = await screen.findByText(title);
   const gate = heading.closest('[role="dialog"]');
   if (!gate) throw new Error("the gate's title is not inside a dialog");
-  await userEvent.click(
+  await clickWhenInteractive(
     within(gate as HTMLElement).getByRole("button", { name: commit }),
   );
 };
 
 /** Submit the figures and clear the gate: what actually reaches the API. */
 const recordArrival = async () => {
-  await userEvent.click(
+  await clickWhenInteractive(
     screen.getAllByRole("button", { name: "Record arrival" })[0],
   );
   await clearGate(/Bill these figures/i, "Record arrival");
@@ -73,7 +85,7 @@ const recordArrival = async () => {
 
 /** Take the "weigh it later" path all the way through. */
 const arriveWithoutFigures = async () => {
-  await userEvent.click(
+  await clickWhenInteractive(
     screen.getByRole("button", { name: /mark arrived and record this later/i }),
   );
   await clearGate(/Mark this trip arrived/i, "Mark arrived");
@@ -245,7 +257,7 @@ describe("ArrivalDialog", () => {
     render(<ArrivalDialog onClose={vi.fn()} shipment={shipment()} />);
     await screen.findByDisplayValue("12000.00");
 
-    await userEvent.click(
+    await clickWhenInteractive(
       screen.getAllByRole("button", { name: "Record arrival" })[0],
     );
 
@@ -262,7 +274,7 @@ describe("ArrivalDialog", () => {
     render(<ArrivalDialog onClose={vi.fn()} shipment={shipment()} />);
     await screen.findByDisplayValue("12000.00");
 
-    await userEvent.click(
+    await clickWhenInteractive(
       screen.getAllByRole("button", { name: "Record arrival" })[0],
     );
     const heading = await screen.findByText(/Bill these figures/i);
