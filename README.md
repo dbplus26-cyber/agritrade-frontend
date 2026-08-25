@@ -35,8 +35,12 @@ stub-API fallback: run `agritrade-backend` alongside this app.
 | `npm run dev` | Dev server (Turbopack) |
 | `npm run build` / `start` | Production build / serve |
 | `npm test` / `test:watch` | Vitest (unit + component, jsdom) |
+| `npm run test:coverage` | Vitest with v8 coverage; fails below the floors in `vitest.config.ts` |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | `tsc --noEmit` |
+| `npm run audit:ci` | Fails on high/critical advisories in production dependencies (`scripts/audit-gate.mjs`) |
+
+Node is pinned in `.nvmrc`; CI and local `nvm use` read the same file.
 
 ## Design
 
@@ -101,5 +105,30 @@ reading numbers rather than selling.
 | `NEXT_PUBLIC_BASE_URL` | no | Canonical site origin for metadata and sitemap. |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | no | Bot protection on public forms. Unset disables the widget; the backend skips verification without its secret too, so set both or neither. |
 | `REVALIDATE_SECRET` | no | Server-only. Must match the backend. Unset means published pages refresh only on their ISR window. |
+| `NEXT_PUBLIC_SENTRY_DSN` | no | Sentry error reporting. Unset disables the SDK. |
+| `NEXT_PUBLIC_SENTRY_ENVIRONMENT` | no | Sentry environment tag. Defaults to `VERCEL_ENV`, then `NODE_ENV`. |
+| `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` | no | Build-time only. All three present: source maps upload. Otherwise the build skips the upload. |
+| `NEXT_PUBLIC_POSTHOG_KEY` | no | PostHog product analytics (EU). Unset disables it. |
+
+## Observability
+
+- **Sentry**: `src/lib/sentry-options.ts` holds the shared init options
+  (`enabled` only with a DSN, `sendDefaultPii: false`, 10% tracing in
+  production, release from `VERCEL_GIT_COMMIT_SHA`). `sentry.server.config.ts`
+  and `sentry.edge.config.ts` load through `src/instrumentation.ts`;
+  `src/instrumentation-client.ts` covers the browser. Browser events go through
+  the `/monitoring` tunnel, so the CSP stays same-origin.
+- **PostHog**: `src/components/providers/analytics-provider.tsx` initialises
+  `posthog-js` when the key is set, captures one `$pageview` per App Router
+  navigation, and identifies the signed-in user by opaque id only (the same
+  id goes to `Sentry.setUser`; both are cleared on sign-out). Requests go
+  through the `/ingest` rewrite to the EU ingest host.
+
+## CI
+
+`.github/workflows/ci.yml` runs lint, typecheck, tests with coverage floors,
+and a build with no Sentry or PostHog vars set, plus a separate `security-audit`
+job over production dependencies. Dependabot opens weekly grouped minor/patch
+PRs for npm and GitHub Actions. Vercel deploys from the Git integration.
 
 Photography: Wikimedia Commons contributors (CC BY-SA), credited in the footer.

@@ -28,4 +28,18 @@ export const env = {
    * skips verification too. Set BOTH keys to enforce in production.
    */
   TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "",
+  /**
+   * Sentry DSN. Optional: unset disables the SDK outright, so local dev, CI
+   * and tests never need a Sentry project.
+   */
+  SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN ?? "",
+  /** Overrides the Sentry environment tag (defaults to VERCEL_ENV/NODE_ENV). */
+  SENTRY_ENVIRONMENT: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? "",
+  /**
+   * Deployed git SHA, bridged from VERCEL_GIT_COMMIT_SHA in next.config.ts so
+   * the browser bundle carries the same release as the server.
+   */
+  SENTRY_RELEASE: process.env.NEXT_PUBLIC_SENTRY_RELEASE ?? "",
+  /** PostHog project key. Optional: unset disables product analytics. */
+  POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY ?? "",
 } as const;

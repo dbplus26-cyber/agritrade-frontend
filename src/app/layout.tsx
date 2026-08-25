@@ -4,6 +4,7 @@ import {
   Barlow_Semi_Condensed,
   Stardos_Stencil,
 } from "next/font/google";
+import { AnalyticsProvider } from "@/components/providers/analytics-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { StoreProvider } from "@/redux/store-provider";
 import { siteConfig, siteUrl } from "@/lib/site";
@@ -74,7 +75,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col font-sans">
         <StoreProvider>
-          {children}
+          <AnalyticsProvider>{children}</AnalyticsProvider>
           <Toaster
             position="top-right"
             toastOptions={{
