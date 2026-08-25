@@ -9,7 +9,7 @@ on:
 
 # A newer push to the same branch supersedes the run in progress.
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version-file: .nvmrc
           cache: "npm"
 
       - run: npm ci
@@ -32,8 +32,9 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit
 
+      # Coverage floors live in vitest.config.ts; a drop below them fails here.
       - name: Test
-        run: npm test
+        run: npm run test:coverage
 
       - name: Build
         # Placeholder values, deliberately. The env module fails fast on a
@@ -41,8 +42,26 @@ jobs:
         # quietly calling undefined/api/v1), and CI has no .env. This build
         # verifies the code compiles and every page renders - it is never
         # deployed, so the API origin baked into it does not matter. The real
-        # values live in the hosting platform's environment.
+        # values live in the hosting platform's environment. No Sentry or
+        # PostHog vars are set, so both SDKs stay disabled and no source maps
+        # are uploaded.
         env:
           NEXT_PUBLIC_SERVER_URI: http://ci-placeholder.local/api/v1
           NEXT_PUBLIC_BASE_URL: http://ci-placeholder.local
         run: npm run build
+
+  # Fails on a known HIGH/CRITICAL advisory in a production dependency (see
+  # scripts/audit-gate.mjs). Dev-only and moderate advisories do not block,
+  # and the wrapper carries an allowlist for advisories that provably cannot
+  # apply here - currently empty, which is the goal state.
+  security-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: "npm"
+      - run: npm ci
+      - name: Audit production dependencies
+        run: npm run audit:ci

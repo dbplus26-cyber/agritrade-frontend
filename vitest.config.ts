@@ -20,5 +20,18 @@ export default defineConfig({
     // files in parallel, and CI runners are slower again. A real hang still
     // fails, just later.
     testTimeout: 20000,
+    coverage: {
+      provider: "v8",
+      reporter: ["text-summary", "lcov"],
+      // Floors hold the level the suite reaches today (rounded down to the
+      // nearest five); raise them as coverage grows, never lower them to get
+      // a run green.
+      thresholds: {
+        lines: 65,
+        statements: 65,
+        functions: 55,
+        branches: 55,
+      },
+    },
   },
 });
