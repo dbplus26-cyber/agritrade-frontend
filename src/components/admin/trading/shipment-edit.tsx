@@ -53,11 +53,12 @@ export function ShipmentEdit({ id }: { id: string }) {
           ]}
           current="This plan is locked"
           backLabel="Back to shipment"
-        />
-        <DetailHeader
-          title="This plan is locked"
-          sub={`${shipment.transactionNo} has already dispatched - the plan can no longer be edited.`}
-        />
+        >
+          <DetailHeader
+            title="This plan is locked"
+            sub={`${shipment.transactionNo} has already dispatched - the plan can no longer be edited.`}
+          />
+        </DetailNav>
         <AdminButton asChild>
           <Link href={`${LIST}/${shipment.id}`}>View the shipment</Link>
         </AdminButton>

@@ -262,12 +262,13 @@ export function FarmerDetail({ id }: { id: string }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Farmers", href: LIST }]}
         current="Farmer details"
-      />
-      <DetailHeader
-        title="Farmer details"
-        hint="One outgrower: what they were advanced and what they have brought back."
-        badges={<ActiveBadge active={f.isActive} />}
-      />
+      >
+        <DetailHeader
+          title="Farmer details"
+          hint="One outgrower: what they were advanced and what they have brought back."
+          badges={<ActiveBadge active={f.isActive} />}
+        />
+      </DetailNav>
 
       <DetailShell
         aside={aside}

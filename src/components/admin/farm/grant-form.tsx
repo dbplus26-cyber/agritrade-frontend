@@ -142,12 +142,13 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Grants", href: LIST }]}
         current="New input grant"
-      />
-      <DetailHeader
-        title="New input grant"
-        hint="Advance seed, fertiliser or tools to a farmer against this season."
-        sub="Inputs handed to a farmer, valued in cedis and owed back at harvest"
-      />
+      >
+        <DetailHeader
+          title="New input grant"
+          hint="Advance seed, fertiliser or tools to a farmer against this season."
+          sub="Inputs handed to a farmer, valued in cedis and owed back at harvest"
+        />
+      </DetailNav>
 
       {/* Field pairs measure against this form, not the viewport: the console
           shell keeps a ~225px rail beside it, so `sm:` would pair fields up

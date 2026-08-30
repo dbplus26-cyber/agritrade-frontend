@@ -127,31 +127,32 @@ export function SaleInvoice({ id }: { id: string }) {
         ]}
         current={title}
         backLabel="Back to sale"
-      />
-      <DetailHeader
-        className="print:hidden"
-        title={title}
-        sub={
-          isReceipt
-            ? `Proof that ${s.buyer.name} settled this sale in full`
-            : `What ${s.buyer.name} still owes on this sale, and where to pay it`
-        }
-        actions={
-          // The server renders this same document as a real A4 PDF, so the
-          // one action opens that - the viewer previews it true to size and
-          // printing happens from there. The browser's own print dialog
-          // places the sheet top-left with dead space around it.
-          <AdminButton asChild>
-            <a
-              href={saleInvoicePdfUrl(s.id)}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              View PDF
-            </a>
-          </AdminButton>
-        }
-      />
+      >
+        <DetailHeader
+          className="print:hidden"
+          title={title}
+          sub={
+            isReceipt
+              ? `Proof that ${s.buyer.name} settled this sale in full`
+              : `What ${s.buyer.name} still owes on this sale, and where to pay it`
+          }
+          actions={
+            // The server renders this same document as a real A4 PDF, so the
+            // one action opens that - the viewer previews it true to size and
+            // printing happens from there. The browser's own print dialog
+            // places the sheet top-left with dead space around it.
+            <AdminButton asChild>
+              <a
+                href={saleInvoicePdfUrl(s.id)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View PDF
+              </a>
+            </AdminButton>
+          }
+        />
+      </DetailNav>
 
       {/* Left-aligned like every other console page - the sheet keeps its own
           720px measure so it still reads as a piece of paper. Squared and

@@ -683,12 +683,13 @@ export function PaymentAccountCreate() {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Accounts", href: LIST }]}
         current="Add payment account"
-      />
-      <DetailHeader
-        title="Add payment account"
-        hint="A bank or mobile money account your customers pay into."
-        sub="A destination customers send money to"
-      />
+      >
+        <DetailHeader
+          title="Add payment account"
+          hint="A bank or mobile money account your customers pay into."
+          sub="A destination customers send money to"
+        />
+      </DetailNav>
       <PaymentAccountFormFields />
     </div>
   );

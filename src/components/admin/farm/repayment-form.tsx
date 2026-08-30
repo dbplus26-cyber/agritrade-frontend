@@ -189,12 +189,13 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Repayments", href: LIST }]}
         current="Record repayment"
-      />
-      <DetailHeader
-        title="Record repayment"
-        hint="Take back what a farmer owes, in produce or in cash."
-        sub="What a farmer brought back against their grant - grain into the store, or money into an account"
-      />
+      >
+        <DetailHeader
+          title="Record repayment"
+          hint="Take back what a farmer owes, in produce or in cash."
+          sub="What a farmer brought back against their grant - grain into the store, or money into an account"
+        />
+      </DetailNav>
 
       {/* Field pairs measure against this form, not the viewport: the console
           shell keeps a ~225px rail beside it, so `sm:` would pair fields up

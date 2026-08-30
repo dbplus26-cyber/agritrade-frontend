@@ -97,11 +97,12 @@ export function SeasonForm({ season }: { season?: ISeason }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Seasons", href: LIST }]}
         current={season ? "Edit season" : "New season"}
-      />
-      <DetailHeader
-        title={season ? "Edit season" : "New season"}
-        sub="The planting season that grants and repayments are booked against"
-      />
+      >
+        <DetailHeader
+          title={season ? "Edit season" : "New season"}
+          sub="The planting season that grants and repayments are booked against"
+        />
+      </DetailNav>
 
       {/* The date pair measures against this form, not the viewport: the
           console shell keeps a ~225px rail beside it, so `sm:` would pair the

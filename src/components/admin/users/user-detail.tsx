@@ -659,11 +659,12 @@ export function UserDetail({ id }: { id: string }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Users", href: "/admin/users" }]}
         current="User details"
-      />
-      <DetailHeader
-        title="User details"
-        hint="One person's access: their role and what they are allowed to do."
-      />
+      >
+        <DetailHeader
+          title="User details"
+          hint="One person's access: their role and what they are allowed to do."
+        />
+      </DetailNav>
 
       <DetailShell
         asideFirstOnStack={false}

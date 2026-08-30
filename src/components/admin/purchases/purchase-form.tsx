@@ -159,12 +159,13 @@ export function PurchaseCreate() {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Purchases", href: LIST }]}
         current="Record purchase"
-      />
-      <DetailHeader
-        title="Record purchase"
-        hint="Buy a load from a supplier or agent and take it into stock."
-        sub="Goods bought and paid for - an agent-paid purchase debits their float immediately"
-      />
+      >
+        <DetailHeader
+          title="Record purchase"
+          hint="Buy a load from a supplier or agent and take it into stock."
+          sub="Goods bought and paid for - an agent-paid purchase debits their float immediately"
+        />
+      </DetailNav>
       <AdminCard className="px-5 py-[18px]">
         {/* The form is the container the field pairs measure themselves
             against, not the viewport: the console shell keeps ~225px of rail

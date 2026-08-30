@@ -428,12 +428,13 @@ export function CommodityCreate() {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Commodities", href: LIST }]}
         current="Add commodity"
-      />
-      <DetailHeader
-        title="Add commodity"
-        hint="A crop you trade in. It then appears wherever a commodity is chosen."
-        sub="Name, variety and grade - how this commodity appears everywhere"
-      />
+      >
+        <DetailHeader
+          title="Add commodity"
+          hint="A crop you trade in. It then appears wherever a commodity is chosen."
+          sub="Name, variety and grade - how this commodity appears everywhere"
+        />
+      </DetailNav>
       <CommodityFormFields />
     </div>
   );
@@ -478,12 +479,13 @@ export function CommodityEdit({ id }: { id: string }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Commodities", href: LIST }]}
         current="Commodity details"
-      />
-      <DetailHeader
-        title="Commodity details"
-        hint="One crop, and whether it is shown on the public website."
-        sub="Edit the commodity, its website visibility and lifecycle"
-      />
+      >
+        <DetailHeader
+          title="Commodity details"
+          hint="One crop, and whether it is shown on the public website."
+          sub="Edit the commodity, its website visibility and lifecycle"
+        />
+      </DetailNav>
       <CommodityFormFields commodity={commodity} />
 
       <AdminCard className="mt-4 px-5 py-4">

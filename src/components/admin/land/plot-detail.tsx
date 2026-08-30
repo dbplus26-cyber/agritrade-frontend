@@ -288,17 +288,18 @@ export function PlotDetail({ id }: { id: string }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Plots", href: LIST }]}
         current="Plot details"
-      />
-      <DetailHeader
-        title="Plot details"
-        hint="One piece of land you own, and whether it is listed publicly."
-        badges={
-          <>
-            {p.publishToWebsite ? <ToneBadge tone="sky">Live</ToneBadge> : null}
-            <PlotStatusBadge status={p.status} />
-          </>
-        }
-      />
+      >
+        <DetailHeader
+          title="Plot details"
+          hint="One piece of land you own, and whether it is listed publicly."
+          badges={
+            <>
+              {p.publishToWebsite ? <ToneBadge tone="sky">Live</ToneBadge> : null}
+              <PlotStatusBadge status={p.status} />
+            </>
+          }
+        />
+      </DetailNav>
 
       <DetailShell
         aside={aside}

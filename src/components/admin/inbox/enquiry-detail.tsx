@@ -135,13 +135,14 @@ function EnquiryDetailBody({ enquiry }: { enquiry: IAdminEnquiry }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Enquiries", href: LIST }]}
         current="Enquiry details"
-      />
-      <DetailHeader
-        title="Enquiry details"
-        hint="One website message and the replies sent back."
-        sub={`Enquiry ${enquiry.reference}`}
-        badges={<EnquiryStatusBadge status={enquiry.status} />}
-      />
+      >
+        <DetailHeader
+          title="Enquiry details"
+          hint="One website message and the replies sent back."
+          sub={`Enquiry ${enquiry.reference}`}
+          badges={<EnquiryStatusBadge status={enquiry.status} />}
+        />
+      </DetailNav>
 
       <DetailShell
         asideFirstOnStack={false}

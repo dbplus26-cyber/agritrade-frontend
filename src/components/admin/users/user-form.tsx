@@ -123,12 +123,13 @@ export function UserForm() {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Users", href: "/admin/users" }]}
         current="Add user"
-      />
-      <DetailHeader
-        title="Add user"
-        hint="Someone who can sign in, and what they are allowed to do."
-        sub="Create a console account and hand over its first password"
-      />
+      >
+        <DetailHeader
+          title="Add user"
+          hint="Someone who can sign in, and what they are allowed to do."
+          sub="Create a console account and hand over its first password"
+        />
+      </DetailNav>
       <AdminCard className="px-5 py-[18px]">
         {/* Field pairs measure against this form, not the viewport: the
             console shell keeps a ~225px rail beside it, so `sm:` would pair the

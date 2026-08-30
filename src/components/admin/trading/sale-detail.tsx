@@ -551,13 +551,14 @@ export function SaleDetail({
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Sales", href: LIST }]}
         current="Sale details"
-      />
-      <DetailHeader
-        title="Sale details"
-        hint="One order: what was agreed, what has shipped and what is still owed."
-        sub={`Drafted ${formatSaleDate(sale.createdAt)}`}
-        badges={<SaleStatusBadge status={sale.status} />}
-      />
+      >
+        <DetailHeader
+          title="Sale details"
+          hint="One order: what was agreed, what has shipped and what is still owed."
+          sub={`Drafted ${formatSaleDate(sale.createdAt)}`}
+          badges={<SaleStatusBadge status={sale.status} />}
+        />
+      </DetailNav>
 
       {sale.status === "CANCELLED" && sale.cancelReason ? (
         <AdminCard className="mb-4 border-console-red/40 bg-console-red/[0.04] px-4 py-3 text-[11.5px] text-adm-ink">

@@ -22,16 +22,22 @@ export interface Crumb {
 export const DASHBOARD_CRUMB: Crumb = { label: "Dashboard", href: "/admin" };
 
 /**
- * Standard detail-page navigation: a back button below `md` (no browser back
+ * Standard detail-page navigation: a back arrow below `md` (no browser back
  * affordance in a standalone PWA) and a breadcrumb at/above `md`. Every
  * record, create and edit page uses it so the back/breadcrumb split is
  * identical everywhere.
+ *
+ * The page heading goes in as `children`: the arrow then takes the left of
+ * the heading's own row and aligns with its first line, so a phone spends no
+ * vertical band on a control that is one glyph wide. Without a heading to sit
+ * beside, the arrow keeps its own row above whatever follows.
  */
 export function DetailNav({
   crumbs,
   current,
   backHref,
   backLabel,
+  children,
   className,
 }: {
   /**
@@ -46,22 +52,24 @@ export function DetailNav({
    * the parent crumb always agree.
    */
   backHref?: string;
-  /** Mobile back-button label; defaults to the last crumb's label. */
+  /** Accessible name for the arrow; defaults to the parent crumb's name. */
   backLabel?: string;
+  /** The page heading, which the arrow shares a row with. */
+  children?: React.ReactNode;
   className?: string;
 }) {
   const parent = crumbs[crumbs.length - 1];
+  const back = (
+    <BackButton
+      className={cn("md:hidden", children ? undefined : "mb-6")}
+      href={backHref ?? parent?.href ?? DASHBOARD_CRUMB.href}
+      label={backLabel ?? `Back to ${parent?.label ?? "the dashboard"}`}
+    />
+  );
 
   return (
-    <div className={cn("mb-6", className)}>
-      <div className="md:hidden">
-        <BackButton
-          href={backHref ?? parent?.href ?? DASHBOARD_CRUMB.href}
-          label={backLabel ?? parent?.label ?? "Back"}
-        />
-      </div>
-
-      <Breadcrumb className="hidden md:flex">
+    <div className={className}>
+      <Breadcrumb className="mb-6 hidden md:flex">
         <BreadcrumbList className="text-adm-muted">
           {crumbs.map((crumb, index) => (
             <Fragment key={crumb.href}>
@@ -87,6 +95,15 @@ export function DetailNav({
           ) : null}
         </BreadcrumbList>
       </Breadcrumb>
+
+      {children ? (
+        <div className="flex items-start gap-1.5">
+          {back}
+          <div className="min-w-0 flex-1">{children}</div>
+        </div>
+      ) : (
+        back
+      )}
     </div>
   );
 }

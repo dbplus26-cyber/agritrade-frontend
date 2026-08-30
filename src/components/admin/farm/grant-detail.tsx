@@ -55,24 +55,25 @@ export function GrantDetail({ id }: { id: string }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Grants", href: LIST }]}
         current="Grant details"
-      />
-      <DetailHeader
-        title="Grant details"
-        hint="Inputs advanced to one farmer, and the terms for getting them back."
-        sub={`Recorded ${formatDateTime(g.createdAt)}`}
-        badges={<GrantApprovalBadge status={g.approval?.status} />}
-        actions={
-          <AdminButton variant="outline" asChild>
-            <a
-              href={receiptPdfUrl("grant", g.id)}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              View PDF
-            </a>
-          </AdminButton>
-        }
-      />
+      >
+        <DetailHeader
+          title="Grant details"
+          hint="Inputs advanced to one farmer, and the terms for getting them back."
+          sub={`Recorded ${formatDateTime(g.createdAt)}`}
+          badges={<GrantApprovalBadge status={g.approval?.status} />}
+          actions={
+            <AdminButton variant="outline" asChild>
+              <a
+                href={receiptPdfUrl("grant", g.id)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View PDF
+              </a>
+            </AdminButton>
+          }
+        />
+      </DetailNav>
 
       <DetailShell
         main={

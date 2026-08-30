@@ -67,14 +67,15 @@ export function FarmerStatement({
             { label: st.farmer.name, href: `/admin/farmers/${id}` },
           ]}
           current="Statement"
-          backLabel="Farmer"
-        />
-        <AdminPageHeader
-          className="mb-4"
-          title="Farmer statement"
-          hint="Everything advanced to this farmer and everything repaid, in order."
-          sub="Every grant and repayment with a running balance, ready to print and sign"
-        />
+          backLabel="Back to the farmer"
+        >
+          <AdminPageHeader
+            className="mb-4"
+            title="Farmer statement"
+            hint="Everything advanced to this farmer and everything repaid, in order."
+            sub="Every grant and repayment with a running balance, ready to print and sign"
+          />
+        </DetailNav>
 
         {/* The window belongs to the DOCUMENT, not to a list, so it is a
             page-level control rather than a toolbar filter - and it sits

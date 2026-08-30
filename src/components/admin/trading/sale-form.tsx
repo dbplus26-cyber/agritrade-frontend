@@ -171,15 +171,16 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Sales", href: LIST }]}
         current={sale ? "Edit sale" : "New sale"}
-      />
-      <DetailHeader
-        title={sale ? "Edit sale" : "New sale"}
-        sub={
-          sale
-            ? "Change the goods and terms while this sale is still a draft"
-            : "Agree goods, weights and a price with a buyer - it stays a draft until you confirm it"
-        }
-      />
+      >
+        <DetailHeader
+          title={sale ? "Edit sale" : "New sale"}
+          sub={
+            sale
+              ? "Change the goods and terms while this sale is still a draft"
+              : "Agree goods, weights and a price with a buyer - it stays a draft until you confirm it"
+          }
+        />
+      </DetailNav>
 
       {/* The goods lines measure against this form, not the viewport: the
           console shell keeps a ~225px rail beside it, so `sm:` put four

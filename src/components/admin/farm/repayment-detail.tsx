@@ -148,22 +148,23 @@ export function RepaymentDetail({ id }: { id: string }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Repayments", href: LIST }]}
         current="Repayment details"
-      />
-      <DetailHeader
-        title="Repayment details"
-        hint="One repayment from a farmer against their advance, in produce or in cash."
-        sub={`Recorded ${formatDateTime(r.createdAt)}`}
-        badges={
-          isCash || r.intoStock ? (
-            <>
-              {isCash ? <ToneBadge tone="leaf">Repaid in cash</ToneBadge> : null}
-              {r.intoStock ? (
-                <ToneBadge tone="sky">Taken into stock</ToneBadge>
-              ) : null}
-            </>
-          ) : null
-        }
-      />
+      >
+        <DetailHeader
+          title="Repayment details"
+          hint="One repayment from a farmer against their advance, in produce or in cash."
+          sub={`Recorded ${formatDateTime(r.createdAt)}`}
+          badges={
+            isCash || r.intoStock ? (
+              <>
+                {isCash ? <ToneBadge tone="leaf">Repaid in cash</ToneBadge> : null}
+                {r.intoStock ? (
+                  <ToneBadge tone="sky">Taken into stock</ToneBadge>
+                ) : null}
+              </>
+            ) : null
+          }
+        />
+      </DetailNav>
 
       <DetailShell
         main={

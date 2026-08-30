@@ -548,12 +548,13 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
         ]}
         current="Allocate lots"
         backLabel="Back to shipment"
-      />
-      <DetailHeader
-        title="Allocate lots"
-        hint="Choose which stock goes on this truck. Cost is taken from the lots you pick."
-        sub={`Which lots fill each sale on ${shipment.truckReg} · ${loadingFrom(shipment)} → ${shipment.destination}`}
-      />
+      >
+        <DetailHeader
+          title="Allocate lots"
+          hint="Choose which stock goes on this truck. Cost is taken from the lots you pick."
+          sub={`Which lots fill each sale on ${shipment.truckReg} · ${loadingFrom(shipment)} → ${shipment.destination}`}
+        />
+      </DetailNav>
 
       {!beforeDispatch ? (
         <AdminCard className="px-5 py-4 text-[11.5px] text-adm-ink">

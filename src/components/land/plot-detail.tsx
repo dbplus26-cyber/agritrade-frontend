@@ -51,7 +51,7 @@ export async function PlotDetail({ plot }: { plot: PublicLandPlot }) {
         {/* Its own row: BackButton is inline-flex, so the file label
             below sat beside it rather than under it. */}
         <div className="mb-4">
-          <BackButton href={routes.land} label="All plots" />
+          <BackButton href={routes.land} label="Back to all plots" />
         </div>
         <StencilLabel className="text-[11px] tracking-[0.3em] lg:text-[12px]">
           PLOT {plot.reference} · PLOT FILE

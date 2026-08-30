@@ -41,7 +41,7 @@ export function LotDetail({ lot }: { lot: PublicLot }) {
         {/* Its own row: BackButton is inline-flex, so the file label
             below sat beside it rather than under it. */}
         <div className="mb-4">
-          <BackButton href={routes.commodities} label="The board" />
+          <BackButton href={routes.commodities} label="Back to the board" />
         </div>
         <StencilLabel className="text-[11px] tracking-[0.3em] lg:text-[12px]">
           {lot.lotNo} · COMMODITY FILE

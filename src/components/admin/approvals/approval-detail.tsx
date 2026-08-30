@@ -60,12 +60,13 @@ export function ApprovalDetail({ id }: { id: string }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Approvals", href: LIST }]}
         current="Approval details"
-      />
-      <DetailHeader
-        title="Approval details"
-        hint="One request waiting on a decision, with what it would change."
-        sub={ACTION_LABEL[approval.action] ?? approval.action}
-      />
+      >
+        <DetailHeader
+          title="Approval details"
+          hint="One request waiting on a decision, with what it would change."
+          sub={ACTION_LABEL[approval.action] ?? approval.action}
+        />
+      </DetailNav>
 
       <AdminCard className="p-4 sm:p-5">
         {/* 1. Header: what kind of request, its outcome, and when it arrived. */}

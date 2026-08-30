@@ -93,27 +93,28 @@ export function Waybill({ id }: { id: string }) {
         ]}
         current="Waybill"
         backLabel="Back to shipment"
-      />
-      <DetailHeader
-        className="print:hidden"
-        title="Waybill"
-        sub="Open the PDF, print it from the viewer and have the driver sign"
-        actions={
-          // The server's own A4 rendering is the ONLY way out to paper.
-          // Screen-printing this page is not: the browser dialog places the
-          // sheet top-left with dead space around it, while the PDF viewer
-          // previews true to size and its own print button does it right.
-          <AdminButton asChild>
-            <a
-              href={shipmentWaybillPdfUrl(s.id)}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              View PDF
-            </a>
-          </AdminButton>
-        }
-      />
+      >
+        <DetailHeader
+          className="print:hidden"
+          title="Waybill"
+          sub="Open the PDF, print it from the viewer and have the driver sign"
+          actions={
+            // The server's own A4 rendering is the ONLY way out to paper.
+            // Screen-printing this page is not: the browser dialog places the
+            // sheet top-left with dead space around it, while the PDF viewer
+            // previews true to size and its own print button does it right.
+            <AdminButton asChild>
+              <a
+                href={shipmentWaybillPdfUrl(s.id)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View PDF
+              </a>
+            </AdminButton>
+          }
+        />
+      </DetailNav>
 
       {/* Left-aligned like every other console page - the sheet keeps its own
           720px measure so it still reads as a piece of paper. Squared and

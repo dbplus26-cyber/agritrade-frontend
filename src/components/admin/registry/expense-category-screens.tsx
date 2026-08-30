@@ -581,12 +581,13 @@ export function ExpenseCategoryCreate() {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Categories", href: LIST }]}
         current="Add expense category"
-      />
-      <DetailHeader
-        title="Add expense category"
-        hint="A heading costs are filed under, so spending can be grouped."
-        sub="A bucket expenses are filed under in reports"
-      />
+      >
+        <DetailHeader
+          title="Add expense category"
+          hint="A heading costs are filed under, so spending can be grouped."
+          sub="A bucket expenses are filed under in reports"
+        />
+      </DetailNav>
       <ExpenseCategoryFormFields />
     </div>
   );
@@ -839,12 +840,13 @@ export function ExpenseCategoryEdit({ id }: { id: string }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Categories", href: LIST }]}
         current="Expense category details"
-      />
-      <DetailHeader
-        title="Expense category details"
-        hint="One heading, and every cost filed under it."
-        sub="What this heading covers, and every cost filed under it"
-      />
+      >
+        <DetailHeader
+          title="Expense category details"
+          hint="One heading, and every cost filed under it."
+          sub="What this heading covers, and every cost filed under it"
+        />
+      </DetailNav>
       {/* The record is two short fields; the spend under it is the page's
           substance, so the record takes the rail and the vouchers take the
           width. On a phone the rail stacks first: editing is what this route

@@ -136,11 +136,12 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Farmers", href: LIST }]}
         current={farmer ? "Edit farmer" : "Add farmer"}
-      />
-      <DetailHeader
-        title={farmer ? "Edit farmer" : "Add farmer"}
-        sub="The outgrower's identity, community and guarantors - every input grant is booked against this record"
-      />
+      >
+        <DetailHeader
+          title={farmer ? "Edit farmer" : "Add farmer"}
+          sub="The outgrower's identity, community and guarantors - every input grant is booked against this record"
+        />
+      </DetailNav>
 
       {/* Field pairs are measured against this form, not the viewport. The
           console shell keeps a ~225px rail beside it, so `sm:` would fire while

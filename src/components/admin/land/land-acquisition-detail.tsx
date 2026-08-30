@@ -435,25 +435,26 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Acquisitions", href: LIST }]}
         current="Acquisition details"
-      />
-      <DetailHeader
-        title="Acquisition details"
-        hint="One piece of land being bought: the seller, the agreed price and what has been paid."
-        badges={<LandAcquisitionStatusBadge status={a.status} />}
-        actions={
-          /* The whole record on paper: seller, plot facts and every
-             payment made so far, PAID-stamped once settled. */
-          <AdminButton variant="outline" asChild>
-            <a
-              href={receiptPdfUrl("land-acquisition", a.id)}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              View PDF
-            </a>
-          </AdminButton>
-        }
-      />
+      >
+        <DetailHeader
+          title="Acquisition details"
+          hint="One piece of land being bought: the seller, the agreed price and what has been paid."
+          badges={<LandAcquisitionStatusBadge status={a.status} />}
+          actions={
+            /* The whole record on paper: seller, plot facts and every
+               payment made so far, PAID-stamped once settled. */
+            <AdminButton variant="outline" asChild>
+              <a
+                href={receiptPdfUrl("land-acquisition", a.id)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View PDF
+              </a>
+            </AdminButton>
+          }
+        />
+      </DetailNav>
 
       {a.status === "COMPLETED" && a.plot ? (
         <AdminCard className="mb-4 border-console/40 bg-console/[0.05] px-4 py-3 text-[11.5px] text-adm-ink">

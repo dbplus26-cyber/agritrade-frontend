@@ -554,29 +554,30 @@ export function PurchaseDetail({ id }: { id: string }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Purchases", href: LIST }]}
         current="Purchase details"
-      />
-      <DetailHeader
-        title="Purchase details"
-        hint="One load bought: the weight, the price and where it was stored."
-        sub={`${SOURCE_LABEL[p.source]} purchase from ${purchaseCounterparty(p)}`}
-        badges={
-          <>
-            <PurchaseStatusBadge status={p.status} />
-            <ApprovalOverlayBadge approval={p.approval} />
-          </>
-        }
-        actions={
-          <AdminButton variant="outline" asChild>
-            <a
-              href={receiptPdfUrl("purchase", p.id)}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              View PDF
-            </a>
-          </AdminButton>
-        }
-      />
+      >
+        <DetailHeader
+          title="Purchase details"
+          hint="One load bought: the weight, the price and where it was stored."
+          sub={`${SOURCE_LABEL[p.source]} purchase from ${purchaseCounterparty(p)}`}
+          badges={
+            <>
+              <PurchaseStatusBadge status={p.status} />
+              <ApprovalOverlayBadge approval={p.approval} />
+            </>
+          }
+          actions={
+            <AdminButton variant="outline" asChild>
+              <a
+                href={receiptPdfUrl("purchase", p.id)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View PDF
+              </a>
+            </AdminButton>
+          }
+        />
+      </DetailNav>
 
       {p.approval && p.approval.status !== "APPROVED" ? (
         <AdminCard className="mb-4 border-console-gold/50 bg-console-gold/8 px-4 py-3 text-[11.5px] leading-[1.55] text-adm-ink">

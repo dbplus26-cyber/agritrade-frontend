@@ -101,12 +101,13 @@ export function LandAcquisitionForm() {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Acquisitions", href: LIST }]}
         current="New land acquisition"
-      />
-      <DetailHeader
-        title="New land acquisition"
-        hint="Record land you are buying, and the price agreed with the seller."
-        sub="Buying a plot from a seller. It enters the plot register once completed."
-      />
+      >
+        <DetailHeader
+          title="New land acquisition"
+          hint="Record land you are buying, and the price agreed with the seller."
+          sub="Buying a plot from a seller. It enters the plot register once completed."
+        />
+      </DetailNav>
 
       {/* Field pairs measure against this form, not the viewport: the console
           shell keeps a ~225px rail beside it, so `sm:` paired fields up while

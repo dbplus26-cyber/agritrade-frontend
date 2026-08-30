@@ -52,12 +52,13 @@ export function StocktakeNew() {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Stocktakes", href: LIST }]}
         current="New stocktake"
-      />
-      <DetailHeader
-        title="New stocktake"
-        hint="Count what is physically in a warehouse. Approving corrects the system to match."
-        sub="Count what is physically on the floor; the book is compared at submit"
-      />
+      >
+        <DetailHeader
+          title="New stocktake"
+          hint="Count what is physically in a warehouse. Approving corrects the system to match."
+          sub="Count what is physically on the floor; the book is compared at submit"
+        />
+      </DetailNav>
 
       <AdminCard className="mb-4 px-4 py-3 sm:px-5 sm:py-4">
         <SectionHeading className="mb-3">Which warehouse</SectionHeading>

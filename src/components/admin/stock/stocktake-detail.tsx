@@ -260,12 +260,13 @@ export function StocktakeDetail({ id }: { id: string }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Stocktakes", href: LIST }]}
         current="Stocktake details"
-      />
-      <DetailHeader
-        title="Stocktake details"
-        hint="One physical count, and the difference from what the system expected."
-        badges={<StocktakeStatusBadge status={st.status} />}
-      />
+      >
+        <DetailHeader
+          title="Stocktake details"
+          hint="One physical count, and the difference from what the system expected."
+          badges={<StocktakeStatusBadge status={st.status} />}
+        />
+      </DetailNav>
 
       {editing && st.status === StocktakeStatus.DRAFT ? (
         <div className="max-w-[640px]">

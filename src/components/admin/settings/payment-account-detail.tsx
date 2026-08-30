@@ -334,17 +334,18 @@ export function PaymentAccountDetail({ id }: { id: string }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Accounts", href: LIST }]}
         current="Payment account details"
-      />
-      <DetailHeader
-        title="Payment account details"
-        hint="One account customers pay into, and everything received through it."
-        badges={<ActiveBadge isActive={account.isActive} />}
-        actions={
-          <AdminButton asChild variant="outline">
-            <Link href={`${LIST}/${id}/edit`}>Edit account</Link>
-          </AdminButton>
-        }
-      />
+      >
+        <DetailHeader
+          title="Payment account details"
+          hint="One account customers pay into, and everything received through it."
+          badges={<ActiveBadge isActive={account.isActive} />}
+          actions={
+            <AdminButton asChild variant="outline">
+              <Link href={`${LIST}/${id}/edit`}>Edit account</Link>
+            </AdminButton>
+          }
+        />
+      </DetailNav>
 
       {/* The account's position: what it has received, what left it, and
           where that nets out - over the WHOLE history, not the page. */}

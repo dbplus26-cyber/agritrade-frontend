@@ -208,11 +208,12 @@ export function GrantAging() {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Grants", href: "/admin/grants" }]}
         current="Grant aging"
-      />
-      <AdminPageHeader
-        title="Grant aging"
-        sub="Outstanding farm investment by how overdue it is - most overdue first"
-      />
+      >
+        <AdminPageHeader
+          title="Grant aging"
+          sub="Outstanding farm investment by how overdue it is - most overdue first"
+        />
+      </DetailNav>
 
       {isLoading ? (
         <ConsoleTableSkeleton columns={5} />

@@ -424,28 +424,29 @@ export function LandSaleDetail({ id }: { id: string }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Land sales", href: LIST }]}
         current="Land sale details"
-      />
-      <DetailHeader
-        title="Land sale details"
-        hint="One plot sold: the buyer, the price and what they still owe."
-        badges={<LandSaleStatusBadge status={s.status} />}
-        actions={
-          /* The server titles it for its state: a sale still owing prints
-             as the agreement (with every payment listed), a settled one
-             as the receipt. */
-          s.status !== "CANCELLED" ? (
-            <AdminButton variant="outline" asChild>
-              <a
-                href={receiptPdfUrl("land-sale", s.id)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {s.balanceGhs === 0 ? "Receipt" : "Agreement"} PDF
-              </a>
-            </AdminButton>
-          ) : null
-        }
-      />
+      >
+        <DetailHeader
+          title="Land sale details"
+          hint="One plot sold: the buyer, the price and what they still owe."
+          badges={<LandSaleStatusBadge status={s.status} />}
+          actions={
+            /* The server titles it for its state: a sale still owing prints
+               as the agreement (with every payment listed), a settled one
+               as the receipt. */
+            s.status !== "CANCELLED" ? (
+              <AdminButton variant="outline" asChild>
+                <a
+                  href={receiptPdfUrl("land-sale", s.id)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {s.balanceGhs === 0 ? "Receipt" : "Agreement"} PDF
+                </a>
+              </AdminButton>
+            ) : null
+          }
+        />
+      </DetailNav>
 
       {s.status === "CANCELLED" && s.cancelReason ? (
         <AdminCard className="mb-4 border-console-red/40 bg-console-red/[0.04] px-4 py-3 text-[11.5px] text-adm-ink">

@@ -186,35 +186,36 @@ export function AccountLedgerScreen({ accountId }: { accountId: string }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Cash book", href: CASH_BOOK }]}
         current={label}
-      />
-      <DetailHeader
-        title={label}
-        hint={hint}
-        sub="Every movement in and out of this account"
-        actions={
-          canPost ? (
-            <>
-              <AdminButton onClick={() => setEntering(true)} type="button">
-                Record entry
-              </AdminButton>
-              <AdminButton
-                onClick={() => setMoving(true)}
-                type="button"
-                variant="ghost"
-              >
-                Move money
-              </AdminButton>
-              <AdminButton
-                onClick={() => setChecking(true)}
-                type="button"
-                variant="ghost"
-              >
-                Check against books
-              </AdminButton>
-            </>
-          ) : null
-        }
-      />
+      >
+        <DetailHeader
+          title={label}
+          hint={hint}
+          sub="Every movement in and out of this account"
+          actions={
+            canPost ? (
+              <>
+                <AdminButton onClick={() => setEntering(true)} type="button">
+                  Record entry
+                </AdminButton>
+                <AdminButton
+                  onClick={() => setMoving(true)}
+                  type="button"
+                  variant="ghost"
+                >
+                  Move money
+                </AdminButton>
+                <AdminButton
+                  onClick={() => setChecking(true)}
+                  type="button"
+                  variant="ghost"
+                >
+                  Check against books
+                </AdminButton>
+              </>
+            ) : null
+          }
+        />
+      </DetailNav>
 
       <AdminCard className="p-4 sm:p-5">
         <p className="flex items-center text-[11px] font-semibold tracking-wide text-adm-muted uppercase">

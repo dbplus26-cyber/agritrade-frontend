@@ -514,20 +514,21 @@ export function ShipmentForm({
         }
         current={editing ? "Edit shipment plan" : "Plan shipment"}
         backLabel={editing ? "Back to shipment" : undefined}
-      />
-      <DetailHeader
-        title={editing ? "Edit shipment plan" : "Plan shipment"}
-        hint={
-          editing
-            ? "Change the truck, driver, destination or the warehouses it loads at - until it dispatches."
-            : "Set up a truck: who drives, what it carries and where it is going."
-        }
-        sub={
-          editing && shipment
-            ? `${shipment.transactionNo} · nothing moves until you dispatch`
-            : "Book a truck and driver against confirmed sales - nothing leaves the warehouse until you dispatch"
-        }
-      />
+      >
+        <DetailHeader
+          title={editing ? "Edit shipment plan" : "Plan shipment"}
+          hint={
+            editing
+              ? "Change the truck, driver, destination or the warehouses it loads at - until it dispatches."
+              : "Set up a truck: who drives, what it carries and where it is going."
+          }
+          sub={
+            editing && shipment
+              ? `${shipment.transactionNo} · nothing moves until you dispatch`
+              : "Book a truck and driver against confirmed sales - nothing leaves the warehouse until you dispatch"
+          }
+        />
+      </DetailNav>
 
       <form
         noValidate

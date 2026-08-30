@@ -112,15 +112,16 @@ export function SeasonDetail({ id }: { id: string }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Seasons", href: LIST }]}
         current="Season details"
-      />
-      <DetailHeader
-        title="Season details"
-        hint="One planting cycle. Grants and repayments are recorded against it."
-        sub={`${formatFarmDate(s.startsOn)}${
-          s.endsOn ? ` - ${formatFarmDate(s.endsOn)}` : ""
-        }`}
-        badges={<ActiveBadge active={s.isActive} />}
-      />
+      >
+        <DetailHeader
+          title="Season details"
+          hint="One planting cycle. Grants and repayments are recorded against it."
+          sub={`${formatFarmDate(s.startsOn)}${
+            s.endsOn ? ` - ${formatFarmDate(s.endsOn)}` : ""
+          }`}
+          badges={<ActiveBadge active={s.isActive} />}
+        />
+      </DetailNav>
 
       {/* KPI strip - full width above the shell */}
       <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">

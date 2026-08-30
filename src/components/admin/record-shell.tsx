@@ -22,7 +22,10 @@ import { cn } from "@/lib/utils";
  * Below xl the rail stacks on top, so status and actions stay above the fold
  * on a phone.
  */
-/** "All buyers" / "Back to buyers" -> "Buyers": the register's name as a crumb. */
+/**
+ * "All buyers" / "Back to buyers" -> "Buyers": the register's name, for the
+ * parent crumb and for the back arrow's accessible name.
+ */
 function crumbLabel(backLabel: string): string {
   const bare = backLabel.replace(/^(all|back to)\s+/i, "").trim();
   return bare ? bare.charAt(0).toUpperCase() + bare.slice(1) : backLabel;
@@ -61,9 +64,10 @@ export function RecordShell({
         }
         current={current}
         backHref={backHref}
-        backLabel={backLabel}
-      />
-      {header}
+        backLabel={`Back to ${crumbLabel(backLabel).toLowerCase()}`}
+      >
+        {header}
+      </DetailNav>
       {/* The MEASURE is the shell's, not the content's.
           A record card that caps itself at 640px inside a column that is 1000px
           wide leaves a band of empty page between it and the rail, and the page

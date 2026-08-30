@@ -1205,17 +1205,18 @@ export function ShipmentDetail({ id }: { id: string }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Shipments", href: LIST }]}
         current="Shipment details"
-      />
-      <DetailHeader
-        title="Shipment details"
-        hint="One truck: its load, its trip, its costs and what the driver is owed."
-        badges={
-          <>
-            <ShipmentStatusBadge status={s.status} />
-            <CostBasisBadge basis={s.costBasis} />
-          </>
-        }
-      />
+      >
+        <DetailHeader
+          title="Shipment details"
+          hint="One truck: its load, its trip, its costs and what the driver is owed."
+          badges={
+            <>
+              <ShipmentStatusBadge status={s.status} />
+              <CostBasisBadge basis={s.costBasis} />
+            </>
+          }
+        />
+      </DetailNav>
 
       {s.status === "CANCELLED" && s.cancelReason ? (
         <AdminCard className="mb-4 border-console-red/40 bg-console-red/[0.04] px-4 py-3 text-[11.5px] text-adm-ink">

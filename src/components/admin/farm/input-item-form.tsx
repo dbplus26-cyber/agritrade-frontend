@@ -125,13 +125,14 @@ export function InputItemForm({ item }: { item: IInputItem }) {
         <DetailNav
           crumbs={[DASHBOARD_CRUMB, { label: "Input items", href: LIST }]}
           current="Input item details"
-        />
-        <DetailHeader
-          title="Input item details"
-          hint="One thing you advance to farmers, such as seed or fertiliser."
-          sub={"An input the programme grants to farmers - what it is, and the unit it is issued in"}
-          badges={<ActiveBadge active={item.isActive} />}
-        />
+        >
+          <DetailHeader
+            title="Input item details"
+            hint="One thing you advance to farmers, such as seed or fertiliser."
+            sub={"An input the programme grants to farmers - what it is, and the unit it is issued in"}
+            badges={<ActiveBadge active={item.isActive} />}
+          />
+        </DetailNav>
         <AdminCard className="px-5 py-4">
           <RecordFacts
             facts={[
@@ -155,12 +156,13 @@ export function InputItemForm({ item }: { item: IInputItem }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Input items", href: LIST }]}
         current={item ? "Edit item" : "New input item"}
-      />
-      <DetailHeader
-        title={item ? "Edit item" : "New input item"}
-        sub="An input the programme grants to farmers - what it is, and the unit it is issued in"
-        badges={item ? <ActiveBadge active={item.isActive} /> : undefined}
-      />
+      >
+        <DetailHeader
+          title={item ? "Edit item" : "New input item"}
+          sub="An input the programme grants to farmers - what it is, and the unit it is issued in"
+          badges={item ? <ActiveBadge active={item.isActive} /> : undefined}
+        />
+      </DetailNav>
 
       {/* The name/unit pair measures against this form, not the viewport: the
           console shell keeps a ~225px rail beside it, so `sm:` paired them up

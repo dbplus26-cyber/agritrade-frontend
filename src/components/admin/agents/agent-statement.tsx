@@ -148,13 +148,14 @@ export function AgentStatement({ id }: { id: string }) {
         current="Statement"
         backHref={`/admin/agents/${id}`}
         backLabel="Back to agent"
-      />
-      <AdminPageHeader
-        className="mb-4 print:hidden"
-        title="Agent float statement"
-        hint="Every movement in and out of this agent's money, in order."
-        sub="Every top-up, purchase and expense against the cash this agent holds, ready to print and sign"
-      />
+      >
+        <AdminPageHeader
+          className="mb-4 print:hidden"
+          title="Agent float statement"
+          hint="Every movement in and out of this agent's money, in order."
+          sub="Every top-up, purchase and expense against the cash this agent holds, ready to print and sign"
+        />
+      </DetailNav>
 
       {/* The window belongs to the DOCUMENT, not to a list, so it is a
           page-level control rather than a toolbar filter - and it sits under

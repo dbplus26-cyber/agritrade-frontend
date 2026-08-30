@@ -721,39 +721,40 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Agents", href: LIST }]}
         current="Agent details"
-      />
-      <DetailHeader
-        title="Agent details"
-        hint="One field buyer: the money they hold, what they spent it on, and the last count."
-        actions={
-          <>
-            {/* Statement is a read - anyone with agent access can print it. */}
-            <AdminButton variant="secondary" asChild>
-              <Link href={`/admin/agents/${agentUserId}/statement`}>
-                Statement
-              </Link>
-            </AdminButton>
-            {/* Float money moves are owner actions; staff only ever view
-                them. The API enforces it; hiding the buttons keeps staff from
-                being offered an action that can only 403. */}
-            {isSuperAdmin ? (
-              <>
-                <AdminButton
-                  variant="secondary"
-                  onClick={() => setReconcileOpen(true)}
-                >
-                  Reconcile
-                </AdminButton>
-                <AdminButton
-                  onClick={() => setTopUpOpen(true)}
-                >
-                  Top up float
-                </AdminButton>
-              </>
-            ) : null}
-          </>
-        }
-      />
+      >
+        <DetailHeader
+          title="Agent details"
+          hint="One field buyer: the money they hold, what they spent it on, and the last count."
+          actions={
+            <>
+              {/* Statement is a read - anyone with agent access can print it. */}
+              <AdminButton variant="secondary" asChild>
+                <Link href={`/admin/agents/${agentUserId}/statement`}>
+                  Statement
+                </Link>
+              </AdminButton>
+              {/* Float money moves are owner actions; staff only ever view
+                  them. The API enforces it; hiding the buttons keeps staff from
+                  being offered an action that can only 403. */}
+              {isSuperAdmin ? (
+                <>
+                  <AdminButton
+                    variant="secondary"
+                    onClick={() => setReconcileOpen(true)}
+                  >
+                    Reconcile
+                  </AdminButton>
+                  <AdminButton
+                    onClick={() => setTopUpOpen(true)}
+                  >
+                    Top up float
+                  </AdminButton>
+                </>
+              ) : null}
+            </>
+          }
+        />
+      </DetailNav>
 
       {/* Above the ledger, because it is the question the ledger cannot answer
           on its own: the rows below walk HELD accounts, and a send made on

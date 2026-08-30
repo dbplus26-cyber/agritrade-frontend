@@ -136,15 +136,16 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Plots", href: LIST }]}
         current={plot ? "Edit plot" : "Add plot"}
-      />
-      <DetailHeader
-        title={plot ? "Edit plot" : "Add plot"}
-        sub={
-          plot
-            ? "Location, size and pricing - photos and title documents live on the plot record"
-            : "Put a plot on the register so it can be priced, published and sold"
-        }
-      />
+      >
+        <DetailHeader
+          title={plot ? "Edit plot" : "Add plot"}
+          sub={
+            plot
+              ? "Location, size and pricing - photos and title documents live on the plot record"
+              : "Put a plot on the register so it can be priced, published and sold"
+          }
+        />
+      </DetailNav>
 
       {/* Field pairs measure against this form, not the viewport: the console
           shell keeps a ~225px rail beside it, so `sm:` would pair fields up

@@ -156,18 +156,19 @@ function FarmApplicationDetailBody({
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Applications", href: LIST }]}
         current="Application details"
-      />
-      <DetailHeader
-        title="Application details"
-        hint="One farmer applying to join the outgrower scheme."
-        sub={
-          <>
-            <span>Application {application.reference}</span>
-            <span>Received {formatDateTime(application.createdAt)}</span>
-          </>
-        }
-        badges={<FarmApplicationStatusBadge status={application.status} />}
-      />
+      >
+        <DetailHeader
+          title="Application details"
+          hint="One farmer applying to join the outgrower scheme."
+          sub={
+            <>
+              <span>Application {application.reference}</span>
+              <span>Received {formatDateTime(application.createdAt)}</span>
+            </>
+          }
+          badges={<FarmApplicationStatusBadge status={application.status} />}
+        />
+      </DetailNav>
 
       <DetailShell
         main={
