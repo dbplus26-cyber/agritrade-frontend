@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment } from "react";
+import { Fragment, createContext, useContext } from "react";
 import Link from "next/link";
 import { BackButton } from "@/components/ui/BackButton";
 import {
@@ -22,15 +22,29 @@ export interface Crumb {
 export const DASHBOARD_CRUMB: Crumb = { label: "Dashboard", href: "/admin" };
 
 /**
+ * The arrow DetailNav renders, handed down so the heading can place it at the
+ * head of its own title row. Null for a heading used outside DetailNav, which
+ * then renders no arrow at all.
+ */
+const BackArrowContext = createContext<React.ReactNode>(null);
+
+/** The arrow belonging at the head of the page title's row, if there is one. */
+export function useBackArrow(): React.ReactNode {
+  return useContext(BackArrowContext);
+}
+
+/**
  * Standard detail-page navigation: a back arrow below `md` (no browser back
  * affordance in a standalone PWA) and a breadcrumb at/above `md`. Every
  * record, create and edit page uses it so the back/breadcrumb split is
  * identical everywhere.
  *
- * The page heading goes in as `children`: the arrow then takes the left of
- * the heading's own row and aligns with its first line, so a phone spends no
- * vertical band on a control that is one glyph wide. Without a heading to sit
- * beside, the arrow keeps its own row above whatever follows.
+ * The page heading goes in as `children` and pulls the arrow into its title
+ * row, so the arrow shares that one line and everything under the title -
+ * description, badges, actions - starts at the arrow's own left edge rather
+ * than in a column beside it. A phone therefore spends no vertical band on a
+ * control that is one glyph wide. Without a heading to sit beside, the arrow
+ * keeps its own row above whatever follows.
  */
 export function DetailNav({
   crumbs,
@@ -54,7 +68,7 @@ export function DetailNav({
   backHref?: string;
   /** Accessible name for the arrow; defaults to the parent crumb's name. */
   backLabel?: string;
-  /** The page heading, which the arrow shares a row with. */
+  /** The page heading, which takes the arrow into its title row. */
   children?: React.ReactNode;
   className?: string;
 }) {
@@ -97,10 +111,9 @@ export function DetailNav({
       </Breadcrumb>
 
       {children ? (
-        <div className="flex items-start gap-1.5">
-          {back}
-          <div className="min-w-0 flex-1">{children}</div>
-        </div>
+        <BackArrowContext.Provider value={back}>
+          {children}
+        </BackArrowContext.Provider>
       ) : (
         back
       )}

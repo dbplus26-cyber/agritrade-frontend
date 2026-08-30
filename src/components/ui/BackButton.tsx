@@ -13,10 +13,9 @@ import { cn } from "@/lib/utils";
  * Uses history when the visitor navigated here in-app; falls back to `href`
  * on a direct/deep link so it never dead-ends.
  *
- * The plate is 28px, the height of the heading's first line, so it aligns
- * with the title rather than floating beside a two-line header. The touch
- * area is padded out to 44px underneath it as a pseudo-element, which costs
- * no layout: on a phone this is the only way back in a standalone PWA.
+ * The plate is 28px and centres on the title's row. The touch area is padded
+ * out to 44px underneath it as a pseudo-element, which costs no layout: on a
+ * phone this is the only way back in a standalone PWA.
  */
 export function BackButton({
   href,

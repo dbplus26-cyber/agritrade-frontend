@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { HelpTip } from "@/components/admin/help-tip";
+import { useBackArrow } from "@/components/admin/detail-nav";
 import { cn } from "@/lib/utils";
 
 /**
@@ -330,6 +331,9 @@ export function SectionHeading({
  * one-line description underneath, and nothing else in the row unless the
  * page has a control that belongs at the top (the dashboard's date range).
  * Register actions ("+ Add") live in the toolbar's count row, not here.
+ *
+ * Under a DetailNav the back arrow joins the title's row; the description
+ * still begins at the heading's left edge, level with the arrow.
  */
 export function AdminPageHeader({
   title,
@@ -348,6 +352,7 @@ export function AdminPageHeader({
    */
   hint?: string;
 }) {
+  const backArrow = useBackArrow();
   return (
     <div
       className={cn(
@@ -356,16 +361,19 @@ export function AdminPageHeader({
       )}
     >
       <div className="min-w-0 flex-1">
-        <h1 className="text-2xl font-bold tracking-tight text-adm-ink">
-          {title}
-          {hint ? (
-            <HelpTip
-              className="ml-1.5 translate-y-[-1px]"
-              label={`What is the ${title} page for?`}
-              text={hint}
-            />
-          ) : null}
-        </h1>
+        <div className="flex min-w-0 items-center gap-1.5">
+          {backArrow}
+          <h1 className="min-w-0 text-2xl font-bold tracking-tight text-adm-ink">
+            {title}
+            {hint ? (
+              <HelpTip
+                className="ml-1.5 translate-y-[-1px]"
+                label={`What is the ${title} page for?`}
+                text={hint}
+              />
+            ) : null}
+          </h1>
+        </div>
         {sub ? <p className="mt-1 text-[12px] text-adm-muted">{sub}</p> : null}
       </div>
       {actions ? (
@@ -379,6 +387,10 @@ export function AdminPageHeader({
  * Heading for a single record's page (detail, create, edit), under the
  * DetailNav: badges that identify the record's state, the title (wrapping,
  * never truncated), a meta line, and the record's actions grouped below.
+ *
+ * The title's row is the only one the back arrow shares. The meta line, the
+ * badges and the actions all start at the heading's left edge, level with the
+ * arrow, so nothing below the title is indented by it.
  *
  * On phones the badges and the actions share one top row (badges left,
  * buttons right) above the title: a status badge and a "View PDF" button are
@@ -404,6 +416,7 @@ export function DetailHeader({
   className?: string;
   hint?: string;
 }) {
+  const backArrow = useBackArrow();
   const hasTopRow = Boolean(badges || actions);
   return (
     // One reading order at every width: what this page is, what this record
@@ -411,16 +424,19 @@ export function DetailHeader({
     // is not the first thing to say about it, and a badge sitting above the
     // title made the title look like a caption on the badge.
     <div className={cn("mb-6", className)}>
-      <h1 className="text-lg font-bold tracking-tight [overflow-wrap:anywhere] text-adm-ink sm:text-xl lg:text-2xl">
-        {title}
-        {hint ? (
-          <HelpTip
-            className="ml-1.5 translate-y-[-1px]"
-            label={`What is the ${title} page for?`}
-            text={hint}
-          />
-        ) : null}
-      </h1>
+      <div className="flex min-w-0 items-center gap-1.5">
+        {backArrow}
+        <h1 className="min-w-0 text-lg font-bold tracking-tight [overflow-wrap:anywhere] text-adm-ink sm:text-xl lg:text-2xl">
+          {title}
+          {hint ? (
+            <HelpTip
+              className="ml-1.5 translate-y-[-1px]"
+              label={`What is the ${title} page for?`}
+              text={hint}
+            />
+          ) : null}
+        </h1>
+      </div>
       {sub ? (
         <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-adm-muted">
           {sub}
