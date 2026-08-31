@@ -2,15 +2,15 @@ import { apiSlice } from "../api-slice";
 import { toQueryString } from "@/lib/to-query-string";
 import type {
   IFarmerPlanResponse,
-  IFarmerStatementResponse,
   ISeasonSummaryResponse,
   IUpsertPlanInput,
 } from "@/types/farm.types";
 
 /**
  * The farm "books": season plans (one per farmer-season, upserted) and the
- * derived reporting reads (season dashboard, farmer statement). Balances are
- * fully derived server-side, so these are read-heavy and tagged FarmStats.
+ * season dashboard. Balances are fully derived server-side, so these are
+ * read-heavy and tagged FarmStats. The farmer's statement is a document, and
+ * documents are fetched whole from `/admin/receipts`.
  */
 export const farmBooksApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -35,19 +35,6 @@ export const farmBooksApi = apiSlice.injectEndpoints({
       query: (seasonId) => `admin/farm/seasons/${seasonId}/summary`,
       providesTags: [{ type: "FarmStats", id: "LIST" }],
     }),
-
-    getFarmerStatement: builder.query<
-      IFarmerStatementResponse,
-      { farmerId: string; from?: string; seasonId?: string; to?: string }
-    >({
-      query: ({ farmerId, from, seasonId, to }) =>
-        `admin/farm/farmers/${farmerId}/statement${toQueryString({
-          ...(seasonId ? { seasonId } : {}),
-          ...(from ? { from } : {}),
-          ...(to ? { to } : {}),
-        })}`,
-      providesTags: [{ type: "FarmStats", id: "LIST" }],
-    }),
   }),
 });
 
@@ -55,5 +42,4 @@ export const {
   useGetFarmerPlanQuery,
   useUpsertPlanMutation,
   useGetSeasonSummaryQuery,
-  useGetFarmerStatementQuery,
 } = farmBooksApi;

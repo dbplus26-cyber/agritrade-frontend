@@ -399,29 +399,3 @@ export interface ISeasonSummaryResponse {
   message: string;
   data: { summary: ISeasonSummary };
 }
-
-export interface IStatementRow {
-  at: string;
-  kind: "grant" | "repayment";
-  detail: string;
-  season: string;
-  deltaGhs: number | null;
-  balanceAfterGhs: number | null;
-}
-export interface IFarmerStatement {
-  farmer: { id: string; name: string };
-  /** Closing balance: the farmer's whole position at the end of the window. */
-  balanceGhs: number | null;
-  /**
-   * Everything before the window opens, summed. A statement that starts
-   * mid-history and runs its total from zero is a lie, so the running balance
-   * starts here.
-   */
-  openingBalanceGhs: number | null;
-  rows: IStatementRow[];
-  window: { from: string | null; to: string | null };
-}
-export interface IFarmerStatementResponse {
-  message: string;
-  data: { statement: IFarmerStatement };
-}

@@ -646,51 +646,61 @@ export function AllocateSkeleton() {
    ──────────────────────────────────────────────────────────────────── */
 
 /**
- * An invoice / receipt / statement: the print toolbar, then the sheet itself
- * - letterhead, ruled line items, and the totals block that hangs off the
- * right edge. Left-aligned and 720px wide, like the real documents.
+ * An invoice / receipt / statement, in the shape of the sheet that replaces
+ * it: the A4 measure and print margins, letterhead, addressed-to block, ruled
+ * line items and the totals block hanging off the right edge. The controls
+ * above the sheet are real on every document page, so nothing here stands in
+ * for them.
  */
 export function DocumentSkeleton({ lines = 6 }: { lines?: number }) {
   return (
-    <div aria-hidden="true">
-      <div className="mb-4 flex items-center justify-between">
-        <Skeleton className="h-3 w-28" />
-        <Skeleton className="h-9 w-24" />
-      </div>
-      <div className="max-w-[720px] border border-adm-line bg-white p-8">
-        <div className="flex items-start justify-between border-b-2 border-adm-line pb-3">
+    <div
+      aria-hidden="true"
+      className="w-full max-w-[794px] border border-adm-line bg-white px-5 py-7 sm:px-9 sm:py-10 lg:px-16 lg:py-14"
+    >
+      <div className="flex items-start justify-between gap-8 border-b border-adm-line pb-4">
+        <div className="flex items-start gap-3">
+          <Skeleton className="size-10 flex-none" />
           <div>
             <Skeleton className="h-5 w-32" />
             <Skeleton className="mt-2 h-2.5 w-40" />
           </div>
-          <div className="flex flex-col items-end gap-1.5">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-2.5 w-24" />
-            <Skeleton className="h-2.5 w-28" />
-          </div>
         </div>
-        <div className="mt-6 flex items-center gap-4 border-y border-adm-line py-2">
-          {Array.from({ length: 4 }, (_, i) => (
-            <Skeleton key={i} className="h-2.5 flex-1" />
+        <div className="flex flex-col items-end gap-1.5">
+          <Skeleton className="h-4 w-28" />
+          <Skeleton className="h-3 w-32" />
+        </div>
+      </div>
+      <div className="mt-6 flex flex-wrap justify-between gap-6">
+        <div>
+          <Skeleton className="h-2.5 w-16" />
+          <Skeleton className="mt-2 h-4 w-40" />
+        </div>
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-2.5 w-36" />
+          <Skeleton className="h-2.5 w-28" />
+        </div>
+      </div>
+      <div className="mt-7 flex items-center gap-4 border-y border-adm-line py-2.5">
+        {Array.from({ length: 3 }, (_, i) => (
+          <Skeleton key={i} className="h-2.5 flex-1" />
+        ))}
+      </div>
+      {Array.from({ length: lines }, (_, row) => (
+        <div
+          key={row}
+          className="flex items-center gap-4 border-b border-adm-line py-3"
+        >
+          {Array.from({ length: 3 }, (_, col) => (
+            <div key={col} className="flex-1">
+              <Skeleton className="h-3" style={{ width: width(row + col) }} />
+            </div>
           ))}
         </div>
-        {Array.from({ length: lines }, (_, row) => (
-          <div
-            key={row}
-            className="flex items-center gap-4 border-b border-adm-line py-2"
-          >
-            {Array.from({ length: 4 }, (_, col) => (
-              <div key={col} className="flex-1">
-                <Skeleton className="h-3" style={{ width: width(row + col) }} />
-              </div>
-            ))}
-          </div>
-        ))}
-        <div className="mt-4 ml-auto flex w-full max-w-[280px] flex-col gap-2">
-          <Skeleton className="h-3 w-full" />
-          <Skeleton className="h-3 w-full" />
-          <Skeleton className="h-4 w-full" />
-        </div>
+      ))}
+      <div className="mt-4 ml-auto flex w-full max-w-[300px] flex-col gap-2">
+        <Skeleton className="h-3 w-full" />
+        <Skeleton className="h-9 w-full" />
       </div>
     </div>
   );

@@ -67,6 +67,19 @@
   --color-console-red-deep: #8e2e24;
   --color-console-blue: #3e6b8c;
 
+  /* Document paper. The receipts, waybills and statements are one artefact
+     printed two ways - a PDF the server draws and a sheet the console shows -
+     so both renderings read from one palette. These are the printed values,
+     not console chrome: a buyer holding the paper and a clerk reading the
+     screen have to be looking at the same document. */
+  --color-doc-ink: #1f211c;
+  --color-doc-forest: #155744;
+  --color-doc-soil: #59523b;
+  --color-doc-rule: #ded9ca;
+  --color-doc-rule-strong: #c1bba7;
+  --color-doc-band: #f2f4ec;
+  --color-doc-stamp: #a33a22;
+
   /* Meridian neutrals. `adm` keeps them clearly console-only, so a public
      component can never reach for a console grey by accident. */
   --color-adm-page: #fafaf8;

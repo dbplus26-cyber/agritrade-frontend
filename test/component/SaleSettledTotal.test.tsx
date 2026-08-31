@@ -14,36 +14,23 @@
 //     still counts against the agreement, so a sale settled down and paid in
 //     full would otherwise read as a debtor on one screen and square on
 //     another.
+//
+// The buyer's own paper answers the same question on the server, which builds
+// the invoice and the sheet that shows it - test/integration/payable-basis
+// pins what that document bills.
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
 import { SaleDetail } from "@/components/admin/trading/sale-detail";
-import { SaleInvoice } from "@/components/admin/trading/sale-invoice";
 
 const { saleQuery } = vi.hoisted(() => ({ saleQuery: vi.fn() }));
 
 vi.mock("@/redux/sales/admin-sales-api", () => ({
-  saleInvoicePdfUrl: () => "/pdf",
   useCancelSaleMutation: () => [vi.fn(), { isLoading: false }],
   useConfirmSaleMutation: () => [vi.fn(), { isLoading: false }],
   useGetSaleQuery: () => saleQuery(),
   useRecordSalePaymentMutation: () => [vi.fn(), { isLoading: false }],
   useReverseSalePaymentMutation: () => [vi.fn(), { isLoading: false }],
-}));
-
-vi.mock("@/redux/settings/settings-api", () => ({
-  useGetSettingsQuery: () => ({ data: undefined }),
-}));
-
-vi.mock("@/redux/payment-accounts/payment-accounts-api", () => ({
-  useGetPayableAccountsQuery: () => ({ data: undefined }),
-}));
-
-// The letterhead runs its own branding query. It is chrome on a document
-// about money; stubbed so this file does not need a live store for it.
-vi.mock("@/components/admin/document-marks", () => ({
-  AuthorisedSignature: () => null,
-  DocumentLogo: () => null,
 }));
 
 vi.mock("@/hooks/use-permissions", () => ({
@@ -151,28 +138,5 @@ describe("SaleDetail, once the load has been weighed in", () => {
 
     expect(screen.getByText("Settled total")).toBeInTheDocument();
     expect(screen.getByText("Paid in full")).toBeInTheDocument();
-  });
-});
-
-describe("SaleInvoice", () => {
-  it("bills against the settled figure and still prints the agreement", () => {
-    showing();
-    render(<SaleInvoice id="sale-1" />);
-
-    expect(screen.getByText("Agreed total")).toBeInTheDocument();
-    expect(screen.getByText("GH₵ 12,000.00")).toBeInTheDocument();
-    expect(screen.getByText(/Settled on arrival/i)).toBeInTheDocument();
-    // Paid to the settled figure, so this is a receipt and not a demand.
-    expect(screen.getAllByText(/RECEIPT|Receipt/).length).toBeGreaterThan(0);
-    expect(screen.getByText("Paid in full")).toBeInTheDocument();
-  });
-
-  it("is still an invoice while the agreed price is unpaid and unweighed", () => {
-    showing({ settledTotalGhs: null });
-    render(<SaleInvoice id="sale-1" />);
-
-    expect(screen.queryByText(/Settled on arrival/i)).not.toBeInTheDocument();
-    expect(screen.getByText("Balance due")).toBeInTheDocument();
-    expect(screen.getByText("GH₵ 240.00")).toBeInTheDocument();
   });
 });

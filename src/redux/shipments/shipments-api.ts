@@ -28,10 +28,6 @@ export const shipmentDocumentUrl = (
 ): string =>
   `${env.SERVER_URI}/api/v1/admin/shipments/${shipmentId}/documents/${documentId}`;
 
-/** The staff-accessible, money-free waybill PDF for a shipment. */
-export const shipmentWaybillPdfUrl = (shipmentId: string): string =>
-  `${env.SERVER_URI}/api/v1/admin/receipts/shipment/${shipmentId}.pdf`;
-
 /**
  * The shipments surface, mirroring `/admin/shipments`. Dispatch writes stock
  * movements and can fulfil the sales, so it invalidates Stock and Sales too.

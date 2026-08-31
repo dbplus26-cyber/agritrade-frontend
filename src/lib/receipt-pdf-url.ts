@@ -1,5 +1,6 @@
 import { env } from "@/lib/env";
 import { toQueryString } from "@/lib/to-query-string";
+import type { IDocumentWindow } from "@/types/document.types";
 
 /**
  * A server-rendered document PDF (`/admin/receipts/<type>/<id>.pdf`) - the
@@ -9,6 +10,6 @@ import { toQueryString } from "@/lib/to-query-string";
 export const receiptPdfUrl = (
   type: string,
   id: string,
-  params: Record<string, string | undefined> = {},
+  params: IDocumentWindow = {},
 ): string =>
   `${env.SERVER_URI}/api/v1/admin/receipts/${type}/${id}.pdf${toQueryString(params)}`;
