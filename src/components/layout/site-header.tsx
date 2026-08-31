@@ -180,7 +180,10 @@ export function SiteHeader() {
         >
           {primaryNav.map((item) =>
             "children" in item ? (
-              <DropdownMenu key={item.label}>
+              // Non-modal: a modal menu locks the body and takes the
+              // scrollbar out of the layout while it is open, which shunts
+              // the whole page sideways on every open and close.
+              <DropdownMenu key={item.label} modal={false}>
                 {onServicePage ? (
                   <DropdownMenuTrigger className="cursor-pointer">
                     <ActiveTag label={item.label} />
