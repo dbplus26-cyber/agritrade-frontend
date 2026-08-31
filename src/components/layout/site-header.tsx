@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, ChevronRight, Menu, Phone, X } from "lucide-react";
+import { ChevronDown, Menu, Phone, X } from "lucide-react";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 import {
   DropdownMenu,
@@ -76,15 +76,14 @@ function ActiveTag({ label }: { label: string }) {
 }
 
 /**
- * One line in the mobile menu. The drawer is a plain list of destinations and
- * nothing else: group captions, left-column numerals, tinted active rows and
- * rules between entries would all be decoration to read past on the way to
- * seven words.
+ * One line in the mobile menu. The panel is a plain list of destinations and
+ * nothing else: cards, group captions, left-column numerals and rules between
+ * entries would all be decoration to read past on the way to seven words.
  *
- * So each row is the word alone, at a size worth tapping, on 56px rows with no
- * dividers. The current page is marked by SHAPE as well as colour - a single
- * gold rail on the leading edge, plus the heavier weight - and carries
- * aria-current for assistive tech.
+ * So each row is the word alone, set at heading size straight on the paper,
+ * on a target worth tapping. The current page is marked by SHAPE as well as
+ * colour - a short gold rule under the word, plus the heavier weight - and
+ * carries aria-current for assistive tech.
  */
 function MobileNavItem({
   active,
@@ -105,50 +104,27 @@ function MobileNavItem({
       href={href}
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
-      // Rows deal themselves in from the drawer's edge, a beat apart. The
+      // Rows drop in behind the panel's leading edge, a beat apart. The
       // global prefers-reduced-motion rule switches every one of these off.
       style={{
         animation: `menu-row-in .34s cubic-bezier(.22,.9,.3,1) ${String(
           0.04 + index * 0.035,
         )}s backwards`,
       }}
-      // Each row is a filed card, the same object the rest of the site is
-      // built from: soil hairline, bright paper, hard offset shadow, squared
-      // corners. The current page is the card that has been pulled forward -
-      // gold edge, gold tint and a heavier shadow.
       className={cn(
-        "group relative mx-4 my-[3px] flex min-h-[54px] items-center justify-between gap-3 rounded-[2px] border pl-4 pr-3 transition-[box-shadow,transform,background-color,border-color] active:translate-x-px active:translate-y-px",
-        active
-          ? "border-harvest-deep/45 bg-harvest/15 shadow-block-sm"
-          : "border-soil/30 bg-paper shadow-doc-sm active:shadow-none",
+        "flex min-h-[52px] items-center px-6 font-display text-[21px] leading-none tracking-[-0.01em] transition-colors active:bg-harvest/12",
+        active ? "font-bold text-forest" : "font-semibold text-forest/80",
       )}
     >
-      {active ? (
-        <span
-          aria-hidden="true"
-          className="absolute inset-y-0 left-0 w-[3px] bg-harvest-deep"
-        />
-      ) : null}
       <span
         className={cn(
-          "font-display text-[18px] transition-colors",
-          active ? "font-bold text-forest" : "font-medium text-soil",
+          "relative",
+          active &&
+            "after:absolute after:-bottom-2 after:left-0 after:h-[3px] after:w-8 after:bg-harvest-deep",
         )}
       >
         {label}
       </span>
-      {/* A quiet chevron gives every row somewhere to go, and leans in on the
-          current page so the marked row is the one that looks live. */}
-      <ChevronRight
-        aria-hidden="true"
-        strokeWidth={2.4}
-        className={cn(
-          "size-4 shrink-0 transition-[transform,color]",
-          active
-            ? "translate-x-0.5 text-harvest-deep"
-            : "text-soil/35 group-active:translate-x-0.5",
-        )}
-      />
     </Link>
   );
 }
@@ -256,23 +232,23 @@ export function SiteHeader() {
             <Menu aria-hidden="true" className="size-[19px]" strokeWidth={2.4} />
           </SheetTrigger>
           <SheetContent
-            side="right"
+            side="top"
             showCloseButton={false}
-            // A hand's width of the page stays visible behind the drawer, so
-            // the reader keeps their place; the full-width slide reads as a
-            // sheet of paper pulled over rather than a panel popping in.
+            // The page stays visible under the panel, so the reader keeps
+            // their place while the menu is down.
             overlayClassName="bg-ink/45"
-            // The width is variant-scoped on purpose: the base SheetContent
-            // sets `data-[side=right]:w-3/4`, which out-specifies a plain
-            // `w-*` and silently wins.
+            // The panel comes down over the bar it was opened from and stops
+            // short of the fold, so a strip of the page still shows below it.
+            // It is only as tall as its own rows; the list takes the scroll if
+            // a short screen cannot hold all seven.
             // No gradient here: `.texture-grain` owns background-image (it is
             // declared after Tailwind's utilities and wins), and tailwind-merge
             // reads the v3-era `bg-gradient-to-b` as a background COLOUR, which
             // would silently drop `bg-surface` and leave the panel see-through.
-            className="texture-grain flex flex-col gap-0 border-l-0 bg-surface p-0 shadow-[-10px_0_34px_-16px_rgb(31_33_28/0.6)] duration-[280ms] ease-[cubic-bezier(.22,.9,.3,1)] data-[side=right]:w-[min(330px,86vw)] data-[state=open]:slide-in-from-right-full data-[state=closed]:slide-out-to-right-full"
+            className="texture-grain flex max-h-[92dvh] flex-col gap-0 border-b-soil/25 bg-surface p-0 shadow-[0_16px_34px_-18px_rgb(31_33_28/0.6)] duration-[280ms] ease-[cubic-bezier(.22,.9,.3,1)] data-[state=open]:slide-in-from-top-full data-[state=closed]:slide-out-to-top-full"
           >
             {/* A gold thread runs under the brand: one warm line is what stops
-                the sheet reading as an empty page, and it ties the drawer to
+                the sheet reading as an empty page, and it ties the panel to
                 the tags and buttons that carry the same colour. */}
             <SheetHeader className="relative gap-0 p-0 after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-gradient-to-r after:from-harvest/70 after:via-soil/20 after:to-transparent">
               <div className="flex items-center justify-between gap-3 px-6 py-3.5">
@@ -292,7 +268,7 @@ export function SiteHeader() {
                 titles already say. */}
             <nav
               aria-label="Primary"
-              className="flex flex-1 flex-col py-3 overflow-y-auto overscroll-contain"
+              className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain py-3"
             >
               {mobileNav.map((item, i) => (
                 <MobileNavItem

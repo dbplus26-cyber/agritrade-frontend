@@ -353,11 +353,11 @@
     transform: none;
   }
 }
-/* The mobile menu rows dealing themselves in from the drawer's edge. */
+/* The mobile menu rows dropping in behind the panel's leading edge. */
 @keyframes menu-row-in {
   from {
     opacity: 0;
-    transform: translateX(16px);
+    transform: translateY(-12px);
   }
   to {
     opacity: 1;
