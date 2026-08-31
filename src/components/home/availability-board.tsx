@@ -24,9 +24,12 @@ export function AvailabilityBoard({
   lines: CommodityLine[];
 }) {
   return (
+    // The hero photo hangs 70px below the hero's bottom edge, and the pull
+    // takes another 70px off the top padding, so the padding has to cover
+    // both before the caption row starts - otherwise the photo lands on it.
     <section
       aria-label="Today at the warehouse - commodity availability"
-      className="texture-grain relative z-[1] bg-surface-alt px-5 pb-12 pt-10 lg:-mt-[70px] lg:px-0 lg:pb-14 lg:pt-[110px]"
+      className="texture-grain relative z-[1] bg-surface-alt px-5 pb-12 pt-10 lg:-mt-[70px] lg:px-0 lg:pb-14 lg:pt-[180px]"
     >
       <div className="mx-auto max-w-[1312px] lg:px-8">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 lg:mb-5">
