@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Menu, Phone, X } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { WhatsAppIcon } from "@/components/ui/WhatsAppIcon";
 import {
   DropdownMenu,
@@ -13,14 +14,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { primaryNav, routes } from "@/lib/routes";
 import { useSiteContact } from "@/components/providers/site-contact-provider";
 import { cn } from "@/lib/utils";
@@ -107,8 +100,8 @@ function MobileNavItem({
       // Rows drop in behind the panel's leading edge, a beat apart. The
       // global prefers-reduced-motion rule switches every one of these off.
       style={{
-        animation: `menu-row-in .34s cubic-bezier(.22,.9,.3,1) ${String(
-          0.04 + index * 0.035,
+        animation: `menu-row-in .3s cubic-bezier(.23,1,.32,1) ${String(
+          0.06 + index * 0.03,
         )}s backwards`,
       }}
       className={cn(
@@ -129,13 +122,42 @@ function MobileNavItem({
   );
 }
 
+/**
+ * The drawer curve: quick off the mark, then a long settle, so the panel
+ * reads as a sheet dropping into place rather than a box sliding on rails.
+ * The exit runs on the same curve but shorter - the menu was asked to go, so
+ * it should be gone before the eye has to wait for it.
+ */
+const sheetEase: [number, number, number, number] = [0.32, 0.72, 0, 1];
+const sheetIn = { duration: 0.42, ease: sheetEase };
+const sheetOut = { duration: 0.26, ease: sheetEase };
+const fadeIn = { duration: 0.28, ease: "easeOut" as const };
+const fadeOut = { duration: 0.18, ease: "easeOut" as const };
+
 export function SiteHeader() {
   const pathname = usePathname();
   const contact = useSiteContact();
+  const reduceMotion = useReducedMotion() === true;
+  const menuId = useId();
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => {
     setMenuOpen(false);
   };
+
+  // Escape closes the menu and hands focus back to the button that opened it.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setMenuOpen(false);
+      triggerRef.current?.focus();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [menuOpen]);
 
   const services = primaryNav.find((item) => "children" in item);
   const serviceLinks = services && "children" in services ? services.children : [];
@@ -219,111 +241,147 @@ export function SiteHeader() {
       </div>
       <div aria-hidden="true" className="ledger-rule mx-auto hidden max-w-[1312px] px-8 lg:block" />
 
-      {/* Mobile: brand + the menu sheet. */}
-      <div className="flex h-16 items-center justify-between border-b border-soil/16 px-5 lg:hidden">
-        <BrandMark />
-        <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-          {/* Icon only, with the label on aria-label so the control still
-              announces itself. */}
-          <SheetTrigger
-            aria-label="Open menu"
-            className="flex size-11 cursor-pointer items-center justify-center rounded-[2px] border-2 border-forest text-forest shadow-doc-sm transition-colors active:bg-harvest/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+      {/* Mobile: the bar stays put and the menu drops from under it, so
+          nothing the reader is looking at moves except the panel itself. It
+          is a disclosure, not a modal: the page stays visible and dimmed
+          beneath, the same button opens and closes it, and Escape or a tap on
+          the dimmed page puts it away. */}
+      <div className="relative lg:hidden">
+        {/* The bar sits above the panel and the scrim on its own opaque
+            ground, so the panel can wait tucked behind it before it drops
+            and the bar is never dimmed. */}
+        <div className="texture-grain relative z-20 flex h-16 items-center justify-between border-b border-soil/16 bg-surface px-5">
+          <BrandMark onNavigate={closeMenu} />
+          <button
+            ref={triggerRef}
+            type="button"
+            aria-label="Menu"
+            aria-expanded={menuOpen}
+            aria-controls={menuId}
+            onClick={() => {
+              setMenuOpen((open) => !open);
+            }}
+            className="group flex size-11 cursor-pointer items-center justify-center rounded-[2px] border-2 border-forest text-forest shadow-doc-sm transition-[background-color,scale] duration-150 active:scale-[0.96] active:bg-harvest/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
           >
-            <Menu aria-hidden="true" className="size-[19px]" strokeWidth={2.4} />
-          </SheetTrigger>
-          <SheetContent
-            side="top"
-            showCloseButton={false}
-            // The page stays visible under the panel, so the reader keeps
-            // their place while the menu is down.
-            overlayClassName="bg-ink/45"
-            // The panel comes down over the bar it was opened from and stops
-            // short of the fold, so a strip of the page still shows below it.
-            // It is only as tall as its own rows; the list takes the scroll if
-            // a short screen cannot hold all seven.
-            // No gradient here: `.texture-grain` owns background-image (it is
-            // declared after Tailwind's utilities and wins), and tailwind-merge
-            // reads the v3-era `bg-gradient-to-b` as a background COLOUR, which
-            // would silently drop `bg-surface` and leave the panel see-through.
-            className="texture-grain flex max-h-[92dvh] flex-col gap-0 border-b-soil/25 bg-surface p-0 shadow-[0_16px_34px_-18px_rgb(31_33_28/0.6)] duration-[280ms] ease-[cubic-bezier(.22,.9,.3,1)] data-[state=open]:slide-in-from-top-full data-[state=closed]:slide-out-to-top-full"
-          >
-            {/* A gold thread runs under the brand: one warm line is what stops
-                the sheet reading as an empty page, and it ties the panel to
-                the tags and buttons that carry the same colour. */}
-            <SheetHeader className="relative gap-0 p-0 after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-gradient-to-r after:from-harvest/70 after:via-soil/20 after:to-transparent">
-              <div className="flex items-center justify-between gap-3 px-6 py-3.5">
-                <BrandMark onNavigate={closeMenu} />
-                <SheetClose
-                  aria-label="Close menu"
-                  className="-mr-2.5 flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-soil transition-colors active:bg-soil/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
-                >
-                  <X aria-hidden="true" className="size-5" strokeWidth={2} />
-                </SheetClose>
-              </div>
-              <SheetTitle className="sr-only">Site menu</SheetTitle>
-            </SheetHeader>
-            {/* One flat list, in the order the site is read. The services sit
-                inline rather than in a captioned branch of their own, which
-                would cost two extra rows of chrome to say something the page
-                titles already say. */}
-            <nav
-              aria-label="Primary"
-              className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain py-3"
+            {/* Both glyphs share one slot: the bars turn out and shrink as
+                the cross turns in, so the button reads as one mark changing
+                state rather than two icons swapping. */}
+            <span className="relative size-[19px]">
+              <Menu
+                aria-hidden="true"
+                className="absolute inset-0 size-full transition-[rotate,scale,opacity] duration-200 ease-out group-aria-expanded:scale-75 group-aria-expanded:-rotate-90 group-aria-expanded:opacity-0"
+                strokeWidth={2.4}
+              />
+              <X
+                aria-hidden="true"
+                className="absolute inset-0 size-full scale-75 rotate-90 opacity-0 transition-[rotate,scale,opacity] duration-200 ease-out group-aria-expanded:scale-100 group-aria-expanded:rotate-0 group-aria-expanded:opacity-100"
+                strokeWidth={2.4}
+              />
+            </span>
+          </button>
+        </div>
+
+        {/* Both layers animate on transform and opacity only, as full
+            transform strings so they run on the compositor, and each can be
+            reversed mid-flight: a tap on the cross while the panel is still
+            dropping sends it back up from wherever it is. Under
+            prefers-reduced-motion the panel fades in place instead of moving. */}
+        <AnimatePresence>
+          {menuOpen ? (
+            <motion.div
+              key="scrim"
+              aria-hidden="true"
+              onClick={closeMenu}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, transition: fadeOut }}
+              transition={fadeIn}
+              // touch-none refuses a scroll gesture that starts on the scrim,
+              // so the page holds still under the open menu.
+              className="fixed inset-0 z-0 touch-none bg-ink/45"
+            />
+          ) : null}
+          {menuOpen ? (
+            <motion.div
+              key="panel"
+              id={menuId}
+              initial={reduceMotion ? { opacity: 0 } : { transform: "translateY(-100%)" }}
+              animate={reduceMotion ? { opacity: 1 } : { transform: "translateY(0%)" }}
+              exit={
+                reduceMotion
+                  ? { opacity: 0, transition: fadeOut }
+                  : { transform: "translateY(-100%)", transition: sheetOut }
+              }
+              transition={reduceMotion ? fadeIn : sheetIn}
+              // The panel hangs from the bar and stops short of the fold, so
+              // a strip of the page still shows below it. It is only as tall
+              // as its own rows; the list takes the scroll if a short screen
+              // cannot hold all seven.
+              className="texture-grain absolute inset-x-0 top-full z-10 flex max-h-[calc(92dvh-4rem)] flex-col border-b border-soil/25 bg-surface shadow-[0_16px_34px_-18px_rgb(31_33_28/0.6)] will-change-transform"
             >
-              {mobileNav.map((item, i) => (
-                <MobileNavItem
-                  key={item.href}
-                  index={i}
-                  active={
-                    item.href === routes.home
-                      ? pathname === routes.home
-                      : pathname.startsWith(item.href)
-                  }
-                  href={item.href}
-                  label={item.label}
-                  onNavigate={closeMenu}
-                />
-              ))}
-            </nav>
-            {/* One action, pinned clear of the home indicator: calling is what
-                a visitor on a phone actually wants, and WhatsApp follows as a
-                quiet second line rather than a second slab. No stencilled
-                caption and no address: that is the contact page repeated at
-                the bottom of a menu. */}
-            <div className="mt-auto border-t border-soil/12 bg-surface-alt/50 px-6 pb-[calc(20px+env(safe-area-inset-bottom,0px))] pt-4">
-              {contact.hasPhone ? (
-                <a
-                  href={contact.phoneHref}
-                  onClick={closeMenu}
-                  className="shadow-block flex min-h-12 items-center justify-center gap-2.5 rounded-[2px] bg-harvest text-[15px] font-bold text-ink transition-[transform,box-shadow] active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_rgb(31_33_28/0.85)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
-                >
-                  <Phone aria-hidden="true" className="size-[17px]" strokeWidth={2.3} />
-                  Call {contact.phone}
-                </a>
-              ) : (
-                <Link
-                  href={routes.contact}
-                  onClick={closeMenu}
-                  className="shadow-block flex min-h-12 items-center justify-center rounded-[2px] bg-harvest text-[15px] font-bold text-ink transition-[transform,box-shadow] active:translate-x-px active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
-                >
-                  Contact us
-                </Link>
-              )}
-              {contact.hasWhatsapp ? (
-                <a
-                  href={contact.whatsappHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={closeMenu}
-                  className="mt-2.5 flex min-h-11 items-center justify-center gap-2 rounded-[2px] border border-forest/45 bg-surface text-[14px] font-bold text-forest shadow-doc-sm transition-[transform,box-shadow] active:translate-x-px active:translate-y-px active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
-                >
-                  <WhatsAppIcon aria-hidden="true" className="size-[16px]" />
-                  WhatsApp us
-                </a>
-              ) : null}
-            </div>
-          </SheetContent>
-        </Sheet>
+              {/* One flat list, in the order the site is read. The services
+                  sit inline rather than in a captioned branch of their own,
+                  which would cost two extra rows of chrome to say something
+                  the page titles already say. */}
+              <nav
+                aria-label="Primary"
+                className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain py-3"
+              >
+                {mobileNav.map((item, i) => (
+                  <MobileNavItem
+                    key={item.href}
+                    index={i}
+                    active={
+                      item.href === routes.home
+                        ? pathname === routes.home
+                        : pathname.startsWith(item.href)
+                    }
+                    href={item.href}
+                    label={item.label}
+                    onNavigate={closeMenu}
+                  />
+                ))}
+              </nav>
+              {/* One action, pinned clear of the home indicator: calling is
+                  what a visitor on a phone actually wants, and WhatsApp
+                  follows as a quiet second line rather than a second slab.
+                  No stencilled caption and no address: that is the contact
+                  page repeated at the bottom of a menu. */}
+              <div className="mt-auto border-t border-soil/12 bg-surface-alt/50 px-6 pb-[calc(20px+env(safe-area-inset-bottom,0px))] pt-4">
+                {contact.hasPhone ? (
+                  <a
+                    href={contact.phoneHref}
+                    onClick={closeMenu}
+                    className="shadow-block flex min-h-12 items-center justify-center gap-2.5 rounded-[2px] bg-harvest text-[15px] font-bold text-ink transition-[transform,box-shadow] active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_rgb(31_33_28/0.85)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+                  >
+                    <Phone aria-hidden="true" className="size-[17px]" strokeWidth={2.3} />
+                    Call {contact.phone}
+                  </a>
+                ) : (
+                  <Link
+                    href={routes.contact}
+                    onClick={closeMenu}
+                    className="shadow-block flex min-h-12 items-center justify-center rounded-[2px] bg-harvest text-[15px] font-bold text-ink transition-[transform,box-shadow] active:translate-x-px active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+                  >
+                    Contact us
+                  </Link>
+                )}
+                {contact.hasWhatsapp ? (
+                  <a
+                    href={contact.whatsappHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={closeMenu}
+                    className="mt-2.5 flex min-h-11 items-center justify-center gap-2 rounded-[2px] border border-forest/45 bg-surface text-[14px] font-bold text-forest shadow-doc-sm transition-[transform,box-shadow] active:translate-x-px active:translate-y-px active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+                  >
+                    <WhatsAppIcon aria-hidden="true" className="size-[16px]" />
+                    WhatsApp us
+                  </a>
+                ) : null}
+              </div>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
       </div>
     </header>
   );
