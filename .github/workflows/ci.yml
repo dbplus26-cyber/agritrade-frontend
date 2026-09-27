@@ -1,10 +1,8 @@
 name: CI
 
+# Automatic CI is paused while Actions minutes are unavailable. Run the same
+# checks locally before pushing; Vercel deployment remains independent.
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 
 # A newer push to the same branch supersedes the run in progress.
