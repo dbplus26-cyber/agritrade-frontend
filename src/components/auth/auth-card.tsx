@@ -32,9 +32,7 @@ export function AuthCard({ title, subtitle, children, footer }: AuthCardProps) {
         </div>
 
         <div className="rounded-none border-[1.5px] border-soil/30 shadow-doc-sm bg-paper p-[clamp(24px,4vw,32px)]">
-          <h1 className="mb-1.5 text-[20px] font-bold text-ink">
-            {title}
-          </h1>
+          <h1 className="mb-1.5 text-[20px] font-bold text-ink">{title}</h1>
           <p className="mb-6 text-[13.5px] leading-[1.6] text-soil">
             {subtitle}
           </p>

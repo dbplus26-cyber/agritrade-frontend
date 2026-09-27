@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { ActionRow, AdminButton, AdminCard, adminLinkClass, SectionHeading } from "@/components/admin/ui";
+import {
+  ActionRow,
+  AdminButton,
+  AdminCard,
+  adminLinkClass,
+  SectionHeading,
+} from "@/components/admin/ui";
 import { SignaturePad } from "@/components/ui/SignaturePad";
 import { FilePicker } from "@/components/ui/FilePicker";
 import { useAuthRole } from "@/hooks/use-auth-role";
@@ -164,7 +170,11 @@ export function ShipmentSignatures({ shipment }: { shipment: IShipment }) {
 
   const submitWithdrawal = async (slot: "driver" | "owner") => {
     try {
-      await revoke({ id: shipment.id, reason: reason.trim(), role: slot }).unwrap();
+      await revoke({
+        id: shipment.id,
+        reason: reason.trim(),
+        role: slot,
+      }).unwrap();
       setWithdrawing(null);
       setReason("");
       notify.success("Signature withdrawn - the reason is on the record");

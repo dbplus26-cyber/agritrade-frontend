@@ -22,7 +22,8 @@ export const adminFarmApplicationsApi = apiSlice.injectEndpoints({
       IFarmApplicationListResponse,
       IFarmApplicationListQuery | void
     >({
-      query: (params) => `admin/farm-applications${toQueryString(params ?? {})}`,
+      query: (params) =>
+        `admin/farm-applications${toQueryString(params ?? {})}`,
       providesTags: (result) =>
         result
           ? [
@@ -35,10 +36,12 @@ export const adminFarmApplicationsApi = apiSlice.injectEndpoints({
           : [{ type: "FarmApplications" as const, id: "LIST" }],
     }),
 
-    getFarmApplicationStats: builder.query<IFarmApplicationStatsResponse, void>({
-      query: () => "admin/farm-applications/stats",
-      providesTags: [{ type: "FarmApplications", id: "STATS" }],
-    }),
+    getFarmApplicationStats: builder.query<IFarmApplicationStatsResponse, void>(
+      {
+        query: () => "admin/farm-applications/stats",
+        providesTags: [{ type: "FarmApplications", id: "STATS" }],
+      },
+    ),
 
     getFarmApplication: builder.query<IFarmApplicationResponse, string>({
       query: (id) => `admin/farm-applications/${id}`,

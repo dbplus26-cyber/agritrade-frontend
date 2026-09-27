@@ -22,17 +22,54 @@ import { pickOption } from "../helpers/pick-option";
 
 import { ExpenseFormDialog } from "@/components/admin/expenses/expense-form";
 
-const { createExpense, errorToast, successToast, updateExpense } = vi.hoisted(
-  () => ({
-    createExpense: vi.fn(),
-    errorToast: vi.fn(),
-    successToast: vi.fn(),
-    updateExpense: vi.fn(),
-  }),
-);
+const {
+  createExpense,
+  errorToast,
+  moneyVisibility,
+  successToast,
+  updateExpense,
+} = vi.hoisted(() => ({
+  createExpense: vi.fn(),
+  errorToast: vi.fn(),
+  moneyVisibility: { enabled: true },
+  successToast: vi.fn(),
+  updateExpense: vi.fn(),
+}));
 
 vi.mock("@/redux/expenses/expenses-api", () => ({
   useCreateExpenseMutation: () => [createExpense, { isLoading: false }],
+  useGetMatchableOutflowsQuery: () => ({
+    data: {
+      data: [
+        {
+          account: { kind: "MOMO", label: "Wallet" },
+          amountGhs: 300,
+          id: "b10e20ef-1111-4111-8111-111111111111",
+          occurredAt: "2026-09-20T10:00:00.000Z",
+          reason: "Driver part 1",
+          transactionNo: "CMV-2026-00001",
+        },
+        {
+          account: { kind: "MOMO", label: "Wallet" },
+          amountGhs: 250,
+          id: "b10e20ef-2222-4222-8222-222222222222",
+          occurredAt: "2026-09-21T10:00:00.000Z",
+          reason: "Driver part 2",
+          transactionNo: "CMV-2026-00002",
+        },
+        {
+          account: { kind: "MOMO", label: "Wallet" },
+          amountGhs: 400,
+          id: "b10e20ef-3333-4333-8333-333333333333",
+          occurredAt: "2026-09-22T10:00:00.000Z",
+          reason: "Driver part 3",
+          transactionNo: "CMV-2026-00003",
+        },
+      ],
+    },
+    isFetching: false,
+    isError: false,
+  }),
   useUpdateExpenseMutation: () => [updateExpense, { isLoading: false }],
 }));
 
@@ -86,6 +123,9 @@ vi.mock("@/redux/payment-accounts/payment-accounts-api", () => ({
 vi.mock("@/lib/notify", () => ({
   notify: { error: errorToast, success: successToast },
 }));
+vi.mock("@/hooks/use-money-visibility", () => ({
+  useMoneyVisibility: () => moneyVisibility.enabled,
+}));
 
 const userEvent = userEventBase.setup({ delay: null });
 
@@ -114,6 +154,7 @@ const submit = () =>
   userEvent.click(screen.getByRole("button", { name: "Record expense" }));
 
 beforeEach(() => {
+  moneyVisibility.enabled = true;
   createExpense.mockReset();
   updateExpense.mockReset();
   errorToast.mockReset();
@@ -127,7 +168,7 @@ beforeEach(() => {
 });
 
 describe("ExpenseFormDialog", () => {
-  it("pays the whole cost in cash by default, and keys the submission", async () => {
+  it("leaves a new cost owed by default, and keys the submission", async () => {
     renderDialog();
 
     await fillCost();
@@ -139,26 +180,52 @@ describe("ExpenseFormDialog", () => {
     // A number, not the typed string: "850.00" reaching a Decimal column as
     // text is the kind of thing that works until it doesn't.
     expect(body.amountGhs).toBe(850);
-    // No amount on the payment: the server settles the WHOLE cost, and
-    // sending the figure twice is how a part payment happens by accident.
-    expect(body.payment).toEqual({ method: "CASH", paidAt: expect.any(String) });
+    expect(body).not.toHaveProperty("payment");
   });
 
-  it("sends no payment at all when the cost is being paid later", async () => {
+  it("only creates a new account debit after an explicit choice", async () => {
     renderDialog();
 
     await fillCost();
-    await userEvent.click(screen.getByRole("button", { name: "Paying later" }));
+    await userEvent.click(screen.getByRole("button", { name: "Already paid" }));
+    expect(
+      screen.getByRole("button", { name: "Match existing debit" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await userEvent.click(
+      screen.getByRole("button", { name: "Record a new debit" }),
+    );
     await submit();
 
-    expect(sent().body).not.toHaveProperty("payment");
+    expect(sent().body.payment).toEqual({
+      method: "CASH",
+      paidAt: expect.any(String),
+    });
+  });
+
+  it("keeps new payment available when existing debits are not visible", async () => {
+    moneyVisibility.enabled = false;
+    renderDialog();
+    await fillCost();
+    await userEvent.click(screen.getByRole("button", { name: "Pay now" }));
+    expect(
+      screen.queryByRole("button", { name: "Match existing debit" }),
+    ).not.toBeInTheDocument();
+    await submit();
+    expect(sent().body.payment).toMatchObject({ method: "CASH" });
   });
 
   it("will not file a transfer without its account and reference", async () => {
     renderDialog();
 
     await fillCost();
-    await pickOption(screen.getByLabelText(/How it was paid/i), "Bank transfer");
+    await userEvent.click(screen.getByRole("button", { name: "Already paid" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Record a new debit" }),
+    );
+    await pickOption(
+      screen.getByLabelText(/How it was paid/i),
+      "Bank transfer",
+    );
     await submit();
 
     expect(
@@ -174,7 +241,14 @@ describe("ExpenseFormDialog", () => {
     renderDialog();
 
     await fillCost();
-    await pickOption(screen.getByLabelText(/How it was paid/i), "Bank transfer");
+    await userEvent.click(screen.getByRole("button", { name: "Already paid" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Record a new debit" }),
+    );
+    await pickOption(
+      screen.getByLabelText(/How it was paid/i),
+      "Bank transfer",
+    );
     await userEvent.type(screen.getByLabelText("Account"), "acc-1");
     await userEvent.type(screen.getByLabelText(/Reference/i), "TRF884512");
     await submit();
@@ -197,6 +271,10 @@ describe("ExpenseFormDialog", () => {
     renderDialog();
 
     await fillCost();
+    await userEvent.click(screen.getByRole("button", { name: "Already paid" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Record a new debit" }),
+    );
     await submit();
     expect(errorToast).toHaveBeenCalled();
 
@@ -206,5 +284,37 @@ describe("ExpenseFormDialog", () => {
     // The retry is the same expense: one key, one payment, whatever the line
     // did in between.
     expect(sent(1).idempotencyKey).toBe(sent(0).idempotencyKey);
+  });
+
+  it("matches two existing debits without requesting a new payment", async () => {
+    renderDialog();
+    await fillCost();
+    await userEvent.click(screen.getByRole("button", { name: "Already paid" }));
+    await pickOption(screen.getByLabelText(/How it was paid/i), "Mobile money");
+    await userEvent.type(screen.getByLabelText("Account"), "acc-1");
+    await userEvent.click(screen.getByLabelText(/CMV-2026-00001/i));
+    await userEvent.click(screen.getByLabelText(/CMV-2026-00002/i));
+    await submit();
+    expect(sent().body).not.toHaveProperty("payment");
+    expect(sent().body.existingMovementIds).toEqual([
+      "b10e20ef-1111-4111-8111-111111111111",
+      "b10e20ef-2222-4222-8222-222222222222",
+    ]);
+  });
+
+  it("refuses existing debits that exceed the cost", async () => {
+    renderDialog();
+    await fillCost();
+    await userEvent.click(screen.getByRole("button", { name: "Already paid" }));
+    await pickOption(screen.getByLabelText(/How it was paid/i), "Mobile money");
+    await userEvent.type(screen.getByLabelText("Account"), "acc-1");
+    await userEvent.click(screen.getByLabelText(/CMV-2026-00001/i));
+    await userEvent.click(screen.getByLabelText(/CMV-2026-00002/i));
+    await userEvent.click(screen.getByLabelText(/CMV-2026-00003/i));
+    await submit();
+    expect(createExpense).not.toHaveBeenCalled();
+    expect(errorToast).toHaveBeenCalledWith(
+      "The selected debits exceed this expense's amount.",
+    );
   });
 });

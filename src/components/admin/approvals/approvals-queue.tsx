@@ -124,7 +124,10 @@ export function ApprovalsQueue({ table }: { table: Table<IApproval> }) {
           {group.headers.map((header) => (
             <div
               key={header.id}
-              className={cn("min-w-0", header.column.columnDef.meta?.headerClassName)}
+              className={cn(
+                "min-w-0",
+                header.column.columnDef.meta?.headerClassName,
+              )}
             >
               {flexRender(header.column.columnDef.header, header.getContext())}
             </div>
@@ -154,7 +157,8 @@ export function ApprovalsQueue({ table }: { table: Table<IApproval> }) {
               }}
               className={cn(
                 "relative",
-                index < rows.length - 1 && "border-b border-[var(--ap-hair-soft)]",
+                index < rows.length - 1 &&
+                  "border-b border-[var(--ap-hair-soft)]",
               )}
             >
               {/* The rail owns the whole record, expanded panel included. */}
@@ -179,7 +183,12 @@ export function ApprovalsQueue({ table }: { table: Table<IApproval> }) {
                   </span>
                 </button>
 
-                <div className={cn(GRID, "pointer-events-none relative z-10 px-4 py-[13px]")}>
+                <div
+                  className={cn(
+                    GRID,
+                    "pointer-events-none relative z-10 px-4 py-[13px]",
+                  )}
+                >
                   {row.getVisibleCells().map((cell, cellIndex) => (
                     <div
                       key={cell.id}
@@ -194,7 +203,10 @@ export function ApprovalsQueue({ table }: { table: Table<IApproval> }) {
                         cell.column.columnDef.meta?.className,
                       )}
                     >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
                     </div>
                   ))}
                 </div>

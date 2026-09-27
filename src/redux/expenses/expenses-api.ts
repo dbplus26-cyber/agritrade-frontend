@@ -6,6 +6,7 @@ import type {
   IExpenseListQuery,
   IExpenseListResponse,
   IExpenseResponse,
+  IMatchableOutflow,
   IUpdateExpenseInput,
 } from "@/types/expense.types";
 
@@ -16,6 +17,14 @@ import type {
  */
 export const expensesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    getMatchableOutflows: builder.query<
+      { data: IMatchableOutflow[]; message: string },
+      { accountId: string; search?: string }
+    >({
+      query: (params) =>
+        `admin/expenses/matchable-outflows${toQueryString(params)}`,
+      providesTags: [{ type: "PaymentAccounts", id: "HISTORY" }],
+    }),
     getExpenses: builder.query<IExpenseListResponse, IExpenseListQuery | void>({
       query: (params) => `admin/expenses${toQueryString(params ?? {})}`,
       providesTags: (result) =>
@@ -80,11 +89,11 @@ export const expensesApi = apiSlice.injectEndpoints({
         { type: "Reports", id: "LIST" },
       ],
     }),
-
   }),
 });
 
 export const {
+  useGetMatchableOutflowsQuery,
   useGetExpensesQuery,
   useGetExpenseQuery,
   useCreateExpenseMutation,

@@ -116,7 +116,10 @@ export function PlTrendChart() {
       ) : (
         <div className="h-[240px] min-w-0">
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={rows} margin={{ top: 6, right: 6, bottom: 0, left: -4 }}>
+            <ComposedChart
+              data={rows}
+              margin={{ top: 6, right: 6, bottom: 0, left: -4 }}
+            >
               <defs>
                 <linearGradient id="salesFill" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#3E7D62" stopOpacity={0.22} />

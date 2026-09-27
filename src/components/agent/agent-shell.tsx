@@ -32,11 +32,13 @@ export function AgentShell({ children }: { children: ReactNode }) {
       confirmText: "Sign out",
     });
     if (!ok) return;
-    await logout()
-      .unwrap()
-      .catch(() => {});
-    notify.success("Signed out");
-    router.replace("/login");
+    try {
+      await logout().unwrap();
+      notify.success("Signed out");
+      router.replace("/login");
+    } catch {
+      notify.error("Couldn't sign out. Check your connection and try again.");
+    }
   };
 
   // Every screen below the home one gets a way back. Browser history first

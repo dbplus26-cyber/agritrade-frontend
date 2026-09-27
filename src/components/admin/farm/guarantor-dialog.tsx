@@ -24,7 +24,10 @@ import {
   useUpdateFarmerGuarantorMutation,
 } from "@/redux/farm/farmers-api";
 import type { IFarmerGuarantor, IGuarantorInput } from "@/types/farm.types";
-import { guarantorSchema, type GuarantorValues } from "@/validations/farm-schema";
+import {
+  guarantorSchema,
+  type GuarantorValues,
+} from "@/validations/farm-schema";
 
 const GUARANTOR_FIELDS = [
   "name",
@@ -90,7 +93,9 @@ export function GuarantorDialog({
         ? { occupation: trimmed(values.occupation) }
         : {}),
       ...(trimmed(values.idType) ? { idType: trimmed(values.idType) } : {}),
-      ...(trimmed(values.idNumber) ? { idNumber: trimmed(values.idNumber) } : {}),
+      ...(trimmed(values.idNumber)
+        ? { idNumber: trimmed(values.idNumber) }
+        : {}),
       ...(trimmed(values.address) ? { address: trimmed(values.address) } : {}),
       ...(trimmed(values.notes) ? { notes: trimmed(values.notes) } : {}),
     };
@@ -111,11 +116,14 @@ export function GuarantorDialog({
       const { message, fieldErrors, hasFieldErrors } = extractApiError(err);
       if (hasFieldErrors && fieldErrors) {
         for (const field of GUARANTOR_FIELDS) {
-          if (fieldErrors[field]) setError(field, { message: fieldErrors[field] });
+          if (fieldErrors[field])
+            setError(field, { message: fieldErrors[field] });
         }
       }
       notify.error(
-        guarantor ? "Couldn't update the guarantor" : "Couldn't add the guarantor",
+        guarantor
+          ? "Couldn't update the guarantor"
+          : "Couldn't add the guarantor",
         { description: message },
       );
     }
@@ -146,7 +154,10 @@ export function GuarantorDialog({
             <AdminField label="Name" error={errors.name?.message}>
               <Input
                 placeholder="e.g. Fuseini Alhassan"
-                className={cn(adminInputClass, errors.name && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  errors.name && "border-console-red",
+                )}
                 {...register("name")}
               />
             </AdminField>
@@ -158,14 +169,24 @@ export function GuarantorDialog({
               >
                 <Input
                   placeholder="e.g. Brother"
-                  className={cn(adminInputClass, errors.relationship && "border-console-red")}
+                  className={cn(
+                    adminInputClass,
+                    errors.relationship && "border-console-red",
+                  )}
                   {...register("relationship")}
                 />
               </AdminField>
-              <AdminField label="Occupation" optional error={errors.occupation?.message}>
+              <AdminField
+                label="Occupation"
+                optional
+                error={errors.occupation?.message}
+              >
                 <Input
                   placeholder="e.g. Teacher"
-                  className={cn(adminInputClass, errors.occupation && "border-console-red")}
+                  className={cn(
+                    adminInputClass,
+                    errors.occupation && "border-console-red",
+                  )}
                   {...register("occupation")}
                 />
               </AdminField>
@@ -174,11 +195,18 @@ export function GuarantorDialog({
 
           <section className="flex flex-col gap-5">
             <div className="grid grid-cols-1 gap-5 @min-[440px]:grid-cols-2">
-              <AdminField label="ID type" optional error={errors.idType?.message}>
+              <AdminField
+                label="ID type"
+                optional
+                error={errors.idType?.message}
+              >
                 <Input
                   list="guarantor-id-types"
                   placeholder="e.g. Ghana Card"
-                  className={cn(adminInputClass, errors.idType && "border-console-red")}
+                  className={cn(
+                    adminInputClass,
+                    errors.idType && "border-console-red",
+                  )}
                   {...register("idType")}
                 />
                 <datalist id="guarantor-id-types">
@@ -187,10 +215,17 @@ export function GuarantorDialog({
                   ))}
                 </datalist>
               </AdminField>
-              <AdminField label="ID number" optional error={errors.idNumber?.message}>
+              <AdminField
+                label="ID number"
+                optional
+                error={errors.idNumber?.message}
+              >
                 <Input
                   placeholder="e.g. GHA-000000000-0"
-                  className={cn(adminInputClass, errors.idNumber && "border-console-red")}
+                  className={cn(
+                    adminInputClass,
+                    errors.idNumber && "border-console-red",
+                  )}
                   {...register("idNumber")}
                 />
               </AdminField>
@@ -202,11 +237,18 @@ export function GuarantorDialog({
               <Input
                 inputMode="tel"
                 placeholder="e.g. 024 000 0000"
-                className={cn(adminInputClass, errors.phone && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  errors.phone && "border-console-red",
+                )}
                 {...register("phone")}
               />
             </AdminField>
-            <AdminField label="Address" optional error={errors.address?.message}>
+            <AdminField
+              label="Address"
+              optional
+              error={errors.address?.message}
+            >
               <textarea
                 rows={4}
                 placeholder="e.g. House 12, Kumbungu"
@@ -221,7 +263,10 @@ export function GuarantorDialog({
             <AdminField label="Notes" optional error={errors.notes?.message}>
               <Input
                 placeholder="e.g. Vouched for two other farmers in 2025"
-                className={cn(adminInputClass, errors.notes && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  errors.notes && "border-console-red",
+                )}
                 {...register("notes")}
               />
             </AdminField>
@@ -237,7 +282,12 @@ export function GuarantorDialog({
             >
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
+            <AdminButton
+              type="submit"
+              disabled={saving}
+              loading={saving}
+              size="lg"
+            >
               {saving
                 ? "Saving…"
                 : guarantor

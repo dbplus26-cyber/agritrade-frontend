@@ -82,11 +82,7 @@ export const columnMeta = (opts?: {
     // phone card view (which ignores meta) stays at 14px everywhere. One
     // table, two sizes, depending on the width of the screen.
     "px-4 py-0",
-    opts?.at
-      ? REVEAL_AT[opts.at]
-      : opts?.wide
-        ? REVEAL_AT.xl
-        : "table-cell",
+    opts?.at ? REVEAL_AT[opts.at] : opts?.wide ? REVEAL_AT.xl : "table-cell",
     opts?.className,
   ),
   headerClassName:
@@ -104,9 +100,7 @@ export const STATUS_FILTER_OPTIONS = [
 export type StatusFilter = (typeof STATUS_FILTER_OPTIONS)[number]["value"];
 
 /** Maps the status facet onto the backend's isActive filter. */
-export const statusToQuery = (
-  status: StatusFilter,
-): { isActive?: boolean } => {
+export const statusToQuery = (status: StatusFilter): { isActive?: boolean } => {
   if (status === "active") return { isActive: true };
   if (status === "inactive") return { isActive: false };
   return {};

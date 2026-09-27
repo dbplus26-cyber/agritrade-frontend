@@ -44,12 +44,16 @@ beforeEach(() => {
 describe("ConfirmEmailChange", () => {
   it("does not spend the token on render - only the button press posts it", async () => {
     confirmMock.mockReturnValue({ unwrap: () => Promise.resolve({}) });
-    render(<ConfirmEmailChange token="tok-abcdefghijklmnopqrstuvwxyz-123456" />);
+    render(
+      <ConfirmEmailChange token="tok-abcdefghijklmnopqrstuvwxyz-123456" />,
+    );
 
     // Rendering (what a scanner's GET triggers) must post nothing.
     expect(confirmMock).not.toHaveBeenCalled();
 
-    await user.click(screen.getByRole("button", { name: /confirm new email/i }));
+    await user.click(
+      screen.getByRole("button", { name: /confirm new email/i }),
+    );
     expect(confirmMock).toHaveBeenCalledTimes(1);
     expect(confirmMock).toHaveBeenCalledWith({
       token: "tok-abcdefghijklmnopqrstuvwxyz-123456",
@@ -68,7 +72,9 @@ describe("ConfirmEmailChange", () => {
     });
     render(<ConfirmEmailChange token="tok-expired-abcdefghijklmnopqrstu" />);
 
-    await user.click(screen.getByRole("button", { name: /confirm new email/i }));
+    await user.click(
+      screen.getByRole("button", { name: /confirm new email/i }),
+    );
 
     const alert = await screen.findByRole("alert");
     expect(alert.textContent).toContain("Invalid or expired");

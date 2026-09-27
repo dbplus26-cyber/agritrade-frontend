@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useIdempotencyKey } from "@/components/admin/disbursements/disbursement-bits";
 import { ExpensePaymentFields } from "@/components/admin/expenses/expense-payment-fields";
+import { ExistingOutflowPicker } from "@/components/admin/expenses/existing-outflow-picker";
+import { useMoneyVisibility } from "@/hooks/use-money-visibility";
 import {
   AdminButton,
   AdminField,
@@ -34,6 +36,7 @@ import { notify } from "@/lib/notify";
 import { useGetSettlementAccountsQuery } from "@/redux/payment-accounts/payment-accounts-api";
 import { useAddPurchaseCostMutation } from "@/redux/purchases/purchases-api";
 import { PURCHASE_VOIDED_CODE } from "@/types/purchase.types";
+import type { IMatchableOutflow } from "@/types/expense.types";
 import type { IExpenseCategory } from "@/types/registry.types";
 import {
   expensePaymentBody,
@@ -92,6 +95,10 @@ export function PurchaseCostDialog({
   purchaseId: string;
 }) {
   const [addCost, { isLoading }] = useAddPurchaseCostMutation();
+  const canSeeMoney = useMoneyVisibility();
+  const [matchedOutflows, setMatchedOutflows] = useState<IMatchableOutflow[]>(
+    [],
+  );
   // The reference rule depends on WHICH account was picked - no statement
   // arrives for somebody's own pocket - so the schema is built from the list
   // the picker offers. Memoised on the accounts themselves: a resolver rebuilt
@@ -131,7 +138,8 @@ export function PurchaseCostDialog({
       description: "",
       incurredAt: todayInputValue(),
       method: "CASH",
-      paidNow: true,
+      paidNow: false,
+      useExistingPayment: canSeeMoney,
       paymentAccountId: "",
       reference: "",
     },
@@ -139,6 +147,8 @@ export function PurchaseCostDialog({
 
   const method = watch("method");
   const paidNow = watch("paidNow");
+  const useExistingPayment = Boolean(watch("useExistingPayment"));
+  const paymentAccountId = watch("paymentAccountId");
 
   // Cleared each time the dialog opens, so reopening after a cancel never
   // shows the last attempt's half-typed figures under a fresh key.
@@ -151,11 +161,13 @@ export function PurchaseCostDialog({
       description: "",
       incurredAt: todayInputValue(),
       method: "CASH",
-      paidNow: true,
+      paidNow: false,
+      useExistingPayment: canSeeMoney,
       paymentAccountId: "",
       reference: "",
     });
-  }, [open, reset]);
+    setMatchedOutflows([]);
+  }, [canSeeMoney, open, reset]);
 
   // An account offered under one method is not offered under another, so
   // switching the method clears the pick rather than leaving a bank account
@@ -164,8 +176,29 @@ export function PurchaseCostDialog({
   useEffect(() => {
     setValue("paymentAccountId", "");
   }, [method, setValue]);
+  useEffect(() => {
+    setMatchedOutflows([]);
+  }, [paymentAccountId]);
 
   const onSubmit = async (values: PurchaseCostValues) => {
+    if (
+      values.paidNow &&
+      values.useExistingPayment &&
+      !matchedOutflows.length
+    ) {
+      notify.error("Select at least one existing account debit.");
+      return;
+    }
+    if (
+      values.paidNow &&
+      values.useExistingPayment &&
+      Math.round(
+        matchedOutflows.reduce((sum, row) => sum + row.amountGhs, 0) * 100,
+      ) > Math.round(Number(values.amountGhs) * 100)
+    ) {
+      notify.error("The selected debits exceed this cost's amount.");
+      return;
+    }
     const payment = expensePaymentBody(values);
     try {
       const res = await addCost({
@@ -175,6 +208,9 @@ export function PurchaseCostDialog({
           categoryId: values.categoryId,
           ...(values.description ? { description: values.description } : {}),
           incurredAt: values.incurredAt,
+          ...(values.paidNow && values.useExistingPayment
+            ? { existingMovementIds: matchedOutflows.map((row) => row.id) }
+            : {}),
           // No amount in it: the server settles the whole cost.
           ...(payment ? { payment } : {}),
         },
@@ -189,7 +225,13 @@ export function PurchaseCostDialog({
           description:
             res.data.settlement.status === "UNPAID"
               ? "Nothing has gone out yet. Pay it from its voucher in Expenses."
-              : "Paid, and taken off the account it came from.",
+              : res.data.settlement.status === "PART_PAID"
+                ? "Part paid. The remaining balance is still owed."
+                : values.paidNow && values.useExistingPayment
+                  ? "Matched to money already taken from the account."
+                  : payment
+                    ? "Paid, and taken off the account it came from."
+                    : "Cost is fully paid.",
         },
       );
       onOpenChange(false);
@@ -329,8 +371,17 @@ export function PurchaseCostDialog({
             method={method}
             owedNote="Nothing goes out yet. The cost is recorded as owed, and is paid from its own voucher once the money moves."
             paidNow={paidNow}
+            allowExisting={canSeeMoney}
+            useExistingPayment={useExistingPayment}
             register={register}
           />
+          {paidNow && useExistingPayment ? (
+            <ExistingOutflowPicker
+              key={paymentAccountId}
+              accountId={paymentAccountId}
+              onChange={setMatchedOutflows}
+            />
+          ) : null}
 
           <ResponsiveDialogFooter className="mt-2 gap-2">
             <AdminButton

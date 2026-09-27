@@ -128,14 +128,20 @@ function AddDrawingDialog({ onClose }: { onClose: () => void }) {
                 autoFocus
                 inputMode="decimal"
                 placeholder="0.00"
-                className={cn(adminInputClass, errors.amountGhs && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  errors.amountGhs && "border-console-red",
+                )}
                 {...register("amountGhs")}
               />
             </AdminField>
             <AdminField label="Date" error={errors.occurredAt?.message}>
               <DateInput
                 placeholder="Pick the date taken"
-                className={cn(adminInputClass, errors.occurredAt && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  errors.occurredAt && "border-console-red",
+                )}
                 {...register("occurredAt")}
               />
             </AdminField>
@@ -166,10 +172,20 @@ function AddDrawingDialog({ onClose }: { onClose: () => void }) {
             />
           </AdminField>
           <ResponsiveDialogFooter className="gap-2">
-            <AdminButton type="button" variant="outline" size="lg" onClick={onClose}>
+            <AdminButton
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={onClose}
+            >
               Cancel
             </AdminButton>
-            <AdminButton type="submit" size="lg" disabled={createState.isLoading} loading={createState.isLoading}>
+            <AdminButton
+              type="submit"
+              size="lg"
+              disabled={createState.isLoading}
+              loading={createState.isLoading}
+            >
               {createState.isLoading ? "Saving…" : "Record drawing"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -234,7 +250,10 @@ export function DrawingsScreen() {
         meta: columnMeta({ card: "title", stretch: true }),
         cell: ({ row }) =>
           row.original.notes ? (
-            <span className="block @2xl/table:max-w-[90%] [overflow-wrap:anywhere] @2xl/table:truncate" title={row.original.notes}>
+            <span
+              className="block @2xl/table:max-w-[90%] [overflow-wrap:anywhere] @2xl/table:truncate"
+              title={row.original.notes}
+            >
               {row.original.notes}
             </span>
           ) : (
@@ -315,7 +334,9 @@ export function DrawingsScreen() {
           action={
             <AdminButton
               aria-label="Record drawing"
-              onClick={() => { setAdding(true); }}
+              onClick={() => {
+                setAdding(true);
+              }}
             >
               <Plus className="h-4 w-4" aria-hidden="true" />
               <span className="hidden sm:inline">Record drawing</span>
@@ -338,7 +359,9 @@ export function DrawingsScreen() {
             title="No drawings recorded"
             description="When the proprietor takes money for personal use, record it here so the capital account stays honest."
             actionLabel="Record the first drawing"
-            onAction={() => { setAdding(true); }}
+            onAction={() => {
+              setAdding(true);
+            }}
           />
         </AdminCard>
       ) : (
@@ -353,7 +376,13 @@ export function DrawingsScreen() {
         </AdminCard>
       )}
 
-      {adding ? <AddDrawingDialog onClose={() => { setAdding(false); }} /> : null}
+      {adding ? (
+        <AddDrawingDialog
+          onClose={() => {
+            setAdding(false);
+          }}
+        />
+      ) : null}
       {confirmationDialog}
     </div>
   );

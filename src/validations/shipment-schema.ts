@@ -132,10 +132,12 @@ export const makeShipmentExpenseSchema = (options?: {
       description: z.string().trim().max(500).or(z.literal("")).optional(),
       /** The day it was run up, which is also the day it was paid. */
       incurredAt: z.string(),
+      linkDriverFee: z.boolean().optional(),
       ...expensePaymentFields,
     })
     .superRefine((values, ctx) => {
-      refineExpensePayment(values, ctx, options?.heldAccountIds);
+      if (!values.linkDriverFee)
+        refineExpensePayment(values, ctx, options?.heldAccountIds);
     });
 
 export const shipmentExpenseSchema = makeShipmentExpenseSchema();

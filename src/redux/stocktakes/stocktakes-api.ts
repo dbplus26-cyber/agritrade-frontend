@@ -38,16 +38,17 @@ export const stocktakesApi = apiSlice.injectEndpoints({
       providesTags: (_r, _e, id) => [{ type: "Stocktakes", id }],
     }),
 
-    createStocktake: builder.mutation<IStocktakeResponse, ICreateStocktakeInput>(
-      {
-        query: (body) => ({
-          url: "admin/stock/stocktakes",
-          method: "POST",
-          body,
-        }),
-        invalidatesTags: [{ type: "Stocktakes", id: "LIST" }],
-      },
-    ),
+    createStocktake: builder.mutation<
+      IStocktakeResponse,
+      ICreateStocktakeInput
+    >({
+      query: (body) => ({
+        url: "admin/stock/stocktakes",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "Stocktakes", id: "LIST" }],
+    }),
 
     updateStocktake: builder.mutation<
       IStocktakeResponse,

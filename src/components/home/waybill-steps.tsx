@@ -39,38 +39,38 @@ export function WaybillSteps() {
         />
       </Reveal>
       <Reveal delay={120}>
-      <DocCard
-        title="WAYBILL - STANDARD PROCESS"
-        fileNo="N° WB-0001"
-        // Extra mobile bottom padding so the overhanging stamp never touches
-        // the last step's text; header stacks on phones (too long for one row).
-        className="mb-6 max-sm:pb-3 lg:mb-0"
-        headerClassName="max-sm:flex-col max-sm:items-start max-sm:gap-1"
-      >
-        {STEPS.map((step, i) => (
-          <div
-            key={step.no}
-            className={
-              i < STEPS.length - 1
-                ? "border-b border-soil/28 px-6 py-5 sm:px-7 lg:flex lg:items-baseline lg:gap-6"
-                : "px-6 py-5 sm:px-7 lg:flex lg:items-baseline lg:gap-6"
-            }
-          >
-            <span className="stencil text-[16px] text-harvest-deep lg:flex-none lg:basis-[34px] lg:text-[20px]">
-              {step.no}
-            </span>
-            <h3 className="mt-1 font-display text-[17px] font-semibold text-forest lg:mt-0 lg:flex-none lg:basis-[240px] lg:text-[19px]">
-              {step.title}
-            </h3>
-            <p className="mt-1.5 text-[14px] leading-[1.6] text-soil lg:mt-0">
-              {step.body}
-            </p>
-          </div>
-        ))}
-        <Stamp className="absolute -bottom-6 right-4 rotate-[-7deg] lg:-bottom-6 lg:-right-7">
-          Every load
-        </Stamp>
-      </DocCard>
+        <DocCard
+          title="WAYBILL - STANDARD PROCESS"
+          fileNo="N° WB-0001"
+          // Extra mobile bottom padding so the overhanging stamp never touches
+          // the last step's text; header stacks on phones (too long for one row).
+          className="mb-6 max-sm:pb-3 lg:mb-0"
+          headerClassName="max-sm:flex-col max-sm:items-start max-sm:gap-1"
+        >
+          {STEPS.map((step, i) => (
+            <div
+              key={step.no}
+              className={
+                i < STEPS.length - 1
+                  ? "border-b border-soil/28 px-6 py-5 sm:px-7 lg:flex lg:items-baseline lg:gap-6"
+                  : "px-6 py-5 sm:px-7 lg:flex lg:items-baseline lg:gap-6"
+              }
+            >
+              <span className="stencil text-[16px] text-harvest-deep lg:flex-none lg:basis-[34px] lg:text-[20px]">
+                {step.no}
+              </span>
+              <h3 className="mt-1 font-display text-[17px] font-semibold text-forest lg:mt-0 lg:flex-none lg:basis-[240px] lg:text-[19px]">
+                {step.title}
+              </h3>
+              <p className="mt-1.5 text-[14px] leading-[1.6] text-soil lg:mt-0">
+                {step.body}
+              </p>
+            </div>
+          ))}
+          <Stamp className="absolute -bottom-6 right-4 rotate-[-7deg] lg:-bottom-6 lg:-right-7">
+            Every load
+          </Stamp>
+        </DocCard>
       </Reveal>
     </section>
   );

@@ -8,6 +8,7 @@ import type {
   IDriverSettlementResponse,
   IExpensePaymentLedgerResponse,
   IRecordDriverPaymentInput,
+  IRecordExpensePaymentInput,
   ISetDriverFeeInput,
   IUnpaidExpenseListResponse,
   IUnsettledTripListResponse,
@@ -31,8 +32,12 @@ export const driverSettlementApi = apiSlice.injectEndpoints({
     // ── Policies (owner config) ─────────────────────────────────
     getDriverPaymentPolicies: builder.query<
       IDriverPaymentPolicyListResponse,
-      | { page?: number; limit?: number; isActive?: boolean; search?: string }
-      | void
+      {
+        page?: number;
+        limit?: number;
+        isActive?: boolean;
+        search?: string;
+      } | void
     >({
       query: (params) =>
         `admin/driver-payment-policies${toQueryString(params ?? {})}`,
@@ -99,6 +104,9 @@ export const driverSettlementApi = apiSlice.injectEndpoints({
       invalidatesTags: (_r, _e, { shipmentId }) => [
         { type: "DriverSettlement", id: shipmentId },
         { type: "Shipments", id: shipmentId },
+        "Expenses",
+        "ExpensePayments",
+        { type: "Reports", id: "LIST" },
         // Pricing a trip is what puts it ON the unsettled list.
         { type: "DriverSettlement", id: "UNSETTLED" },
       ],
@@ -123,6 +131,9 @@ export const driverSettlementApi = apiSlice.injectEndpoints({
       invalidatesTags: (_r, _e, { shipmentId }) => [
         { type: "DriverSettlement", id: shipmentId },
         { type: "Shipments", id: shipmentId },
+        "Expenses",
+        "ExpensePayments",
+        { type: "Reports", id: "LIST" },
         { type: "DriverSettlement", id: "UNSETTLED" },
       ],
     }),
@@ -139,6 +150,8 @@ export const driverSettlementApi = apiSlice.injectEndpoints({
       invalidatesTags: (_r, _e, { shipmentId }) => [
         { type: "DriverSettlement", id: shipmentId },
         { type: "Shipments", id: shipmentId },
+        "Expenses",
+        "ExpensePayments",
         { type: "DriverSettlement", id: "UNSETTLED" },
         // Money left (or came back to) a company account: the account's
         // history and every cash-book view moved with it.
@@ -159,6 +172,8 @@ export const driverSettlementApi = apiSlice.injectEndpoints({
       invalidatesTags: (_r, _e, { shipmentId }) => [
         { type: "DriverSettlement", id: shipmentId },
         { type: "Shipments", id: shipmentId },
+        "Expenses",
+        "ExpensePayments",
         { type: "DriverSettlement", id: "UNSETTLED" },
         // Money left (or came back to) a company account: the account's
         // history and every cash-book view moved with it.
@@ -185,7 +200,7 @@ export const driverSettlementApi = apiSlice.injectEndpoints({
 
     recordExpensePayment: builder.mutation<
       { message: string },
-      { expenseId: string; body: IRecordDriverPaymentInput }
+      { expenseId: string; body: IRecordExpensePaymentInput }
     >({
       query: ({ expenseId, body }) => ({
         url: `admin/expenses/${expenseId}/payments`,
@@ -198,6 +213,24 @@ export const driverSettlementApi = apiSlice.injectEndpoints({
         { type: "ExpensePayments", id: "UNPAID" },
         { type: "PaymentAccounts", id: "HISTORY" },
         "CashBook",
+      ],
+    }),
+
+    matchExpenseOutflows: builder.mutation<
+      { message: string },
+      { expenseId: string; movementIds: string[] }
+    >({
+      query: ({ expenseId, movementIds }) => ({
+        url: `admin/expenses/${expenseId}/match-outflows`,
+        method: "POST",
+        body: { movementIds },
+      }),
+      invalidatesTags: (_r, _e, { expenseId }) => [
+        { type: "ExpensePayments", id: expenseId },
+        { type: "Expenses", id: expenseId },
+        { type: "Expenses", id: "LIST" },
+        { type: "ExpensePayments", id: "UNPAID" },
+        { type: "PaymentAccounts", id: "HISTORY" },
       ],
     }),
 
@@ -222,7 +255,13 @@ export const driverSettlementApi = apiSlice.injectEndpoints({
     /** Costs that still owe money - the send-money picker feed. */
     getUnpaidExpenses: builder.query<
       IUnpaidExpenseListResponse,
-      { page?: number; limit?: number; search?: string; from?: string; to?: string } | void
+      {
+        page?: number;
+        limit?: number;
+        search?: string;
+        from?: string;
+        to?: string;
+      } | void
     >({
       query: (params) => `admin/expenses/unpaid${toQueryString(params ?? {})}`,
       providesTags: [{ type: "ExpensePayments", id: "UNPAID" }],
@@ -231,6 +270,7 @@ export const driverSettlementApi = apiSlice.injectEndpoints({
 });
 
 export const {
+  useMatchExpenseOutflowsMutation,
   useAdjustDriverFeeMutation,
   useCreateDriverPaymentPolicyMutation,
   useDeleteDriverPaymentPolicyMutation,

@@ -33,13 +33,15 @@ export const reportsApi = apiSlice.injectEndpoints({
         { type: "Reports", id: "LIST" },
       ],
     }),
-    getProfitReport: builder.query<IProfitReportResponse, IReportWindow | void>({
-      query: (w) => `admin/reports/profit${toQueryString(w ?? {})}`,
-      providesTags: [
-        { type: "Reports", id: "PROFIT" },
-        { type: "Reports", id: "LIST" },
-      ],
-    }),
+    getProfitReport: builder.query<IProfitReportResponse, IReportWindow | void>(
+      {
+        query: (w) => `admin/reports/profit${toQueryString(w ?? {})}`,
+        providesTags: [
+          { type: "Reports", id: "PROFIT" },
+          { type: "Reports", id: "LIST" },
+        ],
+      },
+    ),
     getExpenseSummary: builder.query<
       IExpenseSummaryResponse,
       IReportWindow | void
@@ -67,15 +69,16 @@ export const reportsApi = apiSlice.injectEndpoints({
         { type: "Reports", id: "LIST" },
       ],
     }),
-    getPeriodSummary: builder.query<IPeriodSummaryResponse, IReportWindow | void>(
-      {
-        query: (w) => `admin/reports/period-summary${toQueryString(w ?? {})}`,
-        providesTags: [
+    getPeriodSummary: builder.query<
+      IPeriodSummaryResponse,
+      IReportWindow | void
+    >({
+      query: (w) => `admin/reports/period-summary${toQueryString(w ?? {})}`,
+      providesTags: [
         { type: "Reports", id: "PERIOD_SUMMARY" },
         { type: "Reports", id: "LIST" },
       ],
-      },
-    ),
+    }),
     getCashflow: builder.query<ICashflowResponse, IReportWindow | void>({
       query: (w) => `admin/reports/cashflow${toQueryString(w ?? {})}`,
       providesTags: [

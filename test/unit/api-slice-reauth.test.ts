@@ -23,6 +23,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { apiSlice } from "@/redux/api-slice";
+import { authApi } from "@/redux/auth/auth-api";
 import { userLoggedIn } from "@/redux/auth/auth-slice";
 import { makeStore } from "@/redux/store";
 import type { IUser } from "@/types/user.types";
@@ -50,7 +51,10 @@ const json = (body: unknown, status = 200) =>
 /** What the fetch stub does per route; tests flip these. */
 let refreshCalls: number;
 let refreshSucceeds: boolean;
+let refreshFailureStatus: number;
 let probeAuthorized: boolean;
+let logoutSucceeds: boolean;
+let meStatus: number;
 
 const urlOf = (input: Request | string | URL) =>
   input instanceof Request ? input.url : String(input);
@@ -58,7 +62,10 @@ const urlOf = (input: Request | string | URL) =>
 beforeEach(() => {
   refreshCalls = 0;
   refreshSucceeds = true;
+  refreshFailureStatus = 401;
   probeAuthorized = false;
+  logoutSucceeds = false;
+  meStatus = 200;
   localStorage.clear();
 
   vi.stubGlobal(
@@ -71,10 +78,20 @@ beforeEach(() => {
           probeAuthorized = true; // the retried requests now carry a session
           return json({ data: { user: USER } });
         }
-        return json({ message: "Refresh token expired" }, 401);
+        return json({ message: "Refresh unavailable" }, refreshFailureStatus);
       }
       if (url.endsWith("/auth/login")) {
         return json({ message: "Invalid credentials" }, 401);
+      }
+      if (url.endsWith("/auth/logout")) {
+        return logoutSucceeds
+          ? json({ message: "Signed out" })
+          : json({ message: "Server unavailable" }, 503);
+      }
+      if (url.endsWith("/auth/me")) {
+        return meStatus === 200
+          ? json({ data: { user: USER } })
+          : json({ message: "Server unavailable" }, meStatus);
       }
       if (url.includes("/probe/")) {
         return probeAuthorized
@@ -98,6 +115,42 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
+});
+
+describe("logout - server revocation", () => {
+  it("keeps the client session when the server cannot revoke it", async () => {
+    const store = makeStore();
+    store.dispatch(userLoggedIn({ user: USER }));
+
+    const result = await store.dispatch(authApi.endpoints.logout.initiate());
+
+    expect(result.error).toMatchObject({ status: 503 });
+    expect(store.getState().auth.user).toEqual(USER);
+  });
+
+  it("clears the client session after server revocation succeeds", async () => {
+    logoutSucceeds = true;
+    const store = makeStore();
+    store.dispatch(userLoggedIn({ user: USER }));
+
+    const result = await store.dispatch(authApi.endpoints.logout.initiate());
+
+    expect(result.error).toBeUndefined();
+    expect(store.getState().auth.user).toBeNull();
+  });
+});
+
+describe("getMe - temporary failures", () => {
+  it("keeps the stored user when the session check returns 503", async () => {
+    meStatus = 503;
+    const store = makeStore();
+    store.dispatch(userLoggedIn({ user: USER }));
+
+    const result = await store.dispatch(authApi.endpoints.getMe.initiate());
+
+    expect(result.error).toMatchObject({ status: 503 });
+    expect(store.getState().auth.user).toEqual(USER);
+  });
 });
 
 describe("baseQueryWithReauth - concurrent 401s", () => {
@@ -134,6 +187,21 @@ describe("baseQueryWithReauth - concurrent 401s", () => {
 });
 
 describe("baseQueryWithReauth - refresh failure", () => {
+  it("preserves the session and reports a temporary refresh outage", async () => {
+    refreshSucceeds = false;
+    refreshFailureStatus = 503;
+    const store = makeStore();
+    store.dispatch(userLoggedIn({ user: USER }));
+
+    const result = await store.dispatch(
+      testApi.endpoints.probe.initiate("outage"),
+    );
+
+    expect(refreshCalls).toBe(1);
+    expect(result.error).toMatchObject({ status: 503 });
+    expect(store.getState().auth.user).toEqual(USER);
+  });
+
   it("ends the session, empties the cache, and cools down further attempts", async () => {
     refreshSucceeds = false;
     const store = makeStore();

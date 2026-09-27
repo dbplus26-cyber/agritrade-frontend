@@ -37,7 +37,10 @@ const COPY: Record<
   asset: {
     accountLabel: "Paid from which account?",
     accountOption: "A company account paid for it",
-    examples: ["Owned before the books started", "Contributed by the proprietor"],
+    examples: [
+      "Owned before the books started",
+      "Contributed by the proprietor",
+    ],
     noCashHint:
       "Nothing is posted to the cash book. Right for an asset the business already had when the books started - its money left before day one, and posting it now would spend it twice.",
     noCashOption: "No company money moved",

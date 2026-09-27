@@ -6,11 +6,7 @@
 import type { IPaginationMeta } from "./api";
 
 export type PlotStatus = "ARCHIVED" | "AVAILABLE" | "RESERVED" | "SOLD";
-export type LandSaleStatus =
-  | "CANCELLED"
-  | "COMPLETED"
-  | "CONFIRMED"
-  | "DRAFT";
+export type LandSaleStatus = "CANCELLED" | "COMPLETED" | "CONFIRMED" | "DRAFT";
 
 export interface ILandPlotPhoto {
   id: string;
@@ -148,6 +144,7 @@ export interface ICreateLandSaleInput {
 
 export interface IRecordLandPaymentInput {
   amountGhs: number;
+  idempotencyKey?: string;
   method: "BANK" | "CASH" | "MOMO";
   reference?: string;
   paidAt?: string;
@@ -285,9 +282,11 @@ export type IUpdateLandAcquisitionInput = Partial<ICreateLandAcquisitionInput>;
 
 export interface IRecordAcquisitionPaymentInput {
   amountGhs: number;
+  idempotencyKey?: string;
   method: "BANK" | "CASH" | "MOMO";
   reference?: string;
   paidAt?: string;
   /** Company account the seller was paid FROM. Required for BANK/MOMO. */
   paymentAccountId?: string;
+  sourceMovementId?: string;
 }

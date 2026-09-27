@@ -83,10 +83,7 @@ export function ExpenseDetail({ id }: { id: string }) {
                 Voucher PDF
               </PdfLink>
               {isSuperAdmin ? (
-                <AdminButton
-                  onClick={() => setEditing(true)}
-                  type="button"
-                >
+                <AdminButton onClick={() => setEditing(true)} type="button">
                   Edit
                 </AdminButton>
               ) : null}
@@ -188,7 +185,10 @@ export function ExpenseDetail({ id }: { id: string }) {
                 </SectionHeading>
                 <Link
                   href={`/admin/shipments/${expense.shipment.id}`}
-                  className={cn(adminLinkClass, "block text-[12px] font-medium")}
+                  className={cn(
+                    adminLinkClass,
+                    "block text-[12px] font-medium",
+                  )}
                 >
                   {expense.shipment.transactionNo}
                 </Link>
@@ -211,6 +211,7 @@ export function ExpenseDetail({ id }: { id: string }) {
       <ExpenseSettlementCard
         amountGhs={showMoney ? expense.amountGhs : null}
         expenseId={expense.id}
+        driverFeeShipmentId={expense.driverFeeShipmentId}
         isVoided={expense.voidedAt !== null}
         subject={`${expense.transactionNo} (${expense.category.name})`}
       />

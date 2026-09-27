@@ -194,9 +194,7 @@ describe("AgentPurchaseForm - the payload", () => {
     expect(
       await screen.findByText(/Choose the commodity/i),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText(/Enter the weight in kg/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Enter the weight in kg/i)).toBeInTheDocument();
     expect(createPurchase).not.toHaveBeenCalled();
   });
 });

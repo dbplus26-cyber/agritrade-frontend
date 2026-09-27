@@ -87,9 +87,7 @@ describe("draft-storage - hostile storage", () => {
         throw new Error("QuotaExceededError");
       });
     try {
-      expect(() =>
-        saveDraft(KEY, { key: "k-1", values: {} }),
-      ).not.toThrow();
+      expect(() => saveDraft(KEY, { key: "k-1", values: {} })).not.toThrow();
     } finally {
       setItem.mockRestore();
     }

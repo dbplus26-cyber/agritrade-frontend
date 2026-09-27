@@ -40,12 +40,18 @@ describe("purchase form money validation", () => {
 
   it("rejects a 3dp price and a 3dp weight", () => {
     expect(
-      purchaseSchema.safeParse({ ...base, unitPriceGhs: "4.205", weightKg: "10" })
-        .success,
+      purchaseSchema.safeParse({
+        ...base,
+        unitPriceGhs: "4.205",
+        weightKg: "10",
+      }).success,
     ).toBe(false);
     expect(
-      purchaseSchema.safeParse({ ...base, unitPriceGhs: "4.20", weightKg: "10.005" })
-        .success,
+      purchaseSchema.safeParse({
+        ...base,
+        unitPriceGhs: "4.20",
+        weightKg: "10.005",
+      }).success,
     ).toBe(false);
   });
 });

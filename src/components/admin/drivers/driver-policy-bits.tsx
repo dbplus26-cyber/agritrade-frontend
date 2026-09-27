@@ -22,7 +22,8 @@ export const driverTriggerLabel = (t: DriverMilestoneTrigger): string =>
 
 /** What each trigger actually means, for the help tooltips. */
 export const DRIVER_TRIGGER_HINT: Record<DriverMilestoneTrigger, string> = {
-  AT_LOADING: "Due once the truck is loaded, usually the driver's fuel advance.",
+  AT_LOADING:
+    "Due once the truck is loaded, usually the driver's fuel advance.",
   ON_DELIVERY: "Due once the goods are signed for at the destination.",
   ON_DEMAND: "No fixed point. Settled whenever, against an invoice.",
 };

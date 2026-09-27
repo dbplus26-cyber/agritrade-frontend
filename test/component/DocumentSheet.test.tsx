@@ -67,9 +67,7 @@ describe("DocumentSheet", () => {
     expect(screen.getByText("White maize")).toBeInTheDocument();
     // The figure arrives formatted; the sheet never recomputes one.
     expect(screen.getByText("GH¢ 600.00")).toBeInTheDocument();
-    expect(
-      screen.getByText(/Please quote SAL-2026-00118/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Please quote SAL-2026-00118/)).toBeInTheDocument();
   });
 
   it("carries the middle column under the description for a phone", () => {
@@ -102,9 +100,7 @@ describe("DocumentSheet", () => {
     );
 
     // The driver's rule is left empty for ink; nothing claims he signed.
-    expect(
-      screen.queryByAltText("Driver's signature"),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByAltText("Driver's signature")).not.toBeInTheDocument();
     expect(screen.getByAltText("Authorised signature")).toHaveAttribute(
       "src",
       "https://cdn.test/signature.png",

@@ -43,11 +43,7 @@ import {
 import { useGetGrantsQuery } from "@/redux/farm/grants-api";
 import { useGetRepaymentsQuery } from "@/redux/farm/repayments-api";
 import type { IFarmerGuarantor } from "@/types/farm.types";
-import {
-  ActiveBadge,
-  GrantApprovalBadge,
-  formatFarmDate,
-} from "./farm-bits";
+import { ActiveBadge, GrantApprovalBadge, formatFarmDate } from "./farm-bits";
 import { GuarantorDialog } from "./guarantor-dialog";
 
 const LIST = "/admin/farmers";
@@ -303,7 +299,11 @@ export function FarmerDetail({ id }: { id: string }) {
                   {f.momoNumber ? <Mono>{f.momoNumber}</Mono> : <Absent />}
                 </DetailItem>
                 <DetailItem label="Farm size">
-                  {f.farmSizeAcres != null ? `${f.farmSizeAcres} acres` : <Absent />}
+                  {f.farmSizeAcres != null ? (
+                    `${f.farmSizeAcres} acres`
+                  ) : (
+                    <Absent />
+                  )}
                 </DetailItem>
                 <DetailItem label="Farm location">
                   {f.farmLocation ? f.farmLocation : <Absent />}
@@ -315,7 +315,11 @@ export function FarmerDetail({ id }: { id: string }) {
                   {f.address ? f.address : <Absent />}
                 </DetailItem>
                 <DetailItem full label="Notes">
-                  {f.notes ? f.notes : <span className="text-adm-muted">No notes.</span>}
+                  {f.notes ? (
+                    f.notes
+                  ) : (
+                    <span className="text-adm-muted">No notes.</span>
+                  )}
                 </DetailItem>
               </DetailGrid>
             </AdminCard>
@@ -345,7 +349,9 @@ export function FarmerDetail({ id }: { id: string }) {
                 </p>
               </div>
               {f.guarantors.length === 0 ? (
-                <p className="px-5 py-4 text-[11.5px] text-adm-muted">No guarantors yet.</p>
+                <p className="px-5 py-4 text-[11.5px] text-adm-muted">
+                  No guarantors yet.
+                </p>
               ) : (
                 // A card each rather than rows behind one hairline: a
                 // guarantor carries five or six facts of its own, and stacked
@@ -401,7 +407,11 @@ export function FarmerDetail({ id }: { id: string }) {
                           Remove
                         </AdminButton>
                       </div>
-                      {g.phone || g.idType || g.idNumber || g.address || g.notes ? (
+                      {g.phone ||
+                      g.idType ||
+                      g.idNumber ||
+                      g.address ||
+                      g.notes ? (
                         <dl className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,170px),1fr))] gap-x-6 gap-y-2 sm:col-span-2 sm:row-start-2">
                           {g.phone ? (
                             <GuarantorFact label="Phone">
@@ -410,7 +420,9 @@ export function FarmerDetail({ id }: { id: string }) {
                           ) : null}
                           {g.idType || g.idNumber ? (
                             <GuarantorFact label="ID">
-                              {[g.idType, g.idNumber].filter(Boolean).join(" · ")}
+                              {[g.idType, g.idNumber]
+                                .filter(Boolean)
+                                .join(" · ")}
                             </GuarantorFact>
                           ) : null}
                           {g.address ? (
@@ -493,7 +505,9 @@ export function FarmerDetail({ id }: { id: string }) {
                   </SectionHeading>
                 </div>
                 {(grants.data?.data ?? []).length === 0 ? (
-                  <p className="px-5 py-4 text-[11.5px] text-adm-muted">No grants yet.</p>
+                  <p className="px-5 py-4 text-[11.5px] text-adm-muted">
+                    No grants yet.
+                  </p>
                 ) : (
                   <ul className="divide-y divide-adm-hairline">
                     {(grants.data?.data ?? []).map((g) => (
@@ -503,7 +517,9 @@ export function FarmerDetail({ id }: { id: string }) {
                               read page, only an edit form, and a fact on a
                               farmer's card should not open an editable
                               field. */}
-                          <span className="font-semibold text-adm-ink">{g.item.name}</span>
+                          <span className="font-semibold text-adm-ink">
+                            {g.item.name}
+                          </span>
                           <Mono className="text-adm-ink">
                             <Money value={g.valueGhs} />
                           </Mono>
@@ -550,7 +566,9 @@ export function FarmerDetail({ id }: { id: string }) {
                   </SectionHeading>
                 </div>
                 {(repayments.data?.data ?? []).length === 0 ? (
-                  <p className="px-5 py-4 text-[11.5px] text-adm-muted">No repayments yet.</p>
+                  <p className="px-5 py-4 text-[11.5px] text-adm-muted">
+                    No repayments yet.
+                  </p>
                 ) : (
                   <ul className="divide-y divide-adm-hairline">
                     {(repayments.data?.data ?? []).map((r) => (

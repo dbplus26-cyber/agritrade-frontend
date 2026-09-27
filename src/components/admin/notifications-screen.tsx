@@ -40,7 +40,8 @@ const STATUS_TONE: Record<NotifStatus, { label: string; tone: Tone }> = {
 
 /** What each state means for whether the person actually got the message. */
 const STATUS_HELP: Record<NotifStatus, string> = {
-  FAILED: "The message could not be delivered, so assume the person never saw it.",
+  FAILED:
+    "The message could not be delivered, so assume the person never saw it.",
   QUEUED: "Written and waiting to go out; it has not been sent yet.",
   SENT: "Handed to the network or email provider for delivery.",
 };
@@ -208,7 +209,9 @@ export function NotificationsScreen() {
                         : "Money owed and not yet paid."
                     }
                   >
-                    <ToneBadge tone={severity === "alert" ? "alert" : "harvest"}>
+                    <ToneBadge
+                      tone={severity === "alert" ? "alert" : "harvest"}
+                    >
                       {severity === "alert" ? "Needs attention" : "Money owed"}
                     </ToneBadge>
                   </HelpWrap>
@@ -241,9 +244,7 @@ export function NotificationsScreen() {
         enableSorting: false,
         meta: columnMeta({ card: "meta", wide: true }),
         cell: ({ row }) => (
-          <Mono className="text-adm-muted">
-            {row.original.recipient}
-          </Mono>
+          <Mono className="text-adm-muted">{row.original.recipient}</Mono>
         ),
       },
       {

@@ -22,7 +22,10 @@ export const landPlotsApi = apiSlice.injectEndpoints({
         result
           ? [
               { type: "LandPlots" as const, id: "LIST" },
-              ...result.data.map((p) => ({ type: "LandPlots" as const, id: p.id })),
+              ...result.data.map((p) => ({
+                type: "LandPlots" as const,
+                id: p.id,
+              })),
             ]
           : [{ type: "LandPlots" as const, id: "LIST" }],
     }),
@@ -67,7 +70,10 @@ export const landPlotsApi = apiSlice.injectEndpoints({
     }),
 
     requestPlotPublish: builder.mutation<ILandPlotResponse, string>({
-      query: (id) => ({ url: `admin/land/plots/${id}/publish`, method: "PATCH" }),
+      query: (id) => ({
+        url: `admin/land/plots/${id}/publish`,
+        method: "PATCH",
+      }),
       invalidatesTags: (_r, _e, id) => [
         { type: "LandPlots", id },
         { type: "ApprovalsCount", id: "COUNT" },
@@ -93,7 +99,11 @@ export const landPlotsApi = apiSlice.injectEndpoints({
         const form = new FormData();
         form.append("photo", file);
         if (alt) form.append("alt", alt);
-        return { url: `admin/land/plots/${id}/photos`, method: "POST", body: form };
+        return {
+          url: `admin/land/plots/${id}/photos`,
+          method: "POST",
+          body: form,
+        };
       },
       invalidatesTags: (_r, _e, { id }) => [{ type: "LandPlots", id }],
     }),

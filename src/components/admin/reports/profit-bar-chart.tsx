@@ -29,7 +29,12 @@ const SERIES = [
   { color: "#1E3D2B", key: "grossProfitGhs", label: "Gross profit" },
 ] as const;
 
-type Row = { costGhs: number; grossProfitGhs: number; name: string; revenueGhs: number };
+type Row = {
+  costGhs: number;
+  grossProfitGhs: number;
+  name: string;
+  revenueGhs: number;
+};
 
 function ProfitTooltip({
   active,
@@ -68,7 +73,8 @@ export function ProfitBarChart({
   hasEstimated?: boolean;
   rows: ICommodityProfit[];
 }) {
-  const redacted = rows.length > 0 && rows.every((r) => r.grossProfitGhs === null);
+  const redacted =
+    rows.length > 0 && rows.every((r) => r.grossProfitGhs === null);
   const data: Row[] = rows.map((r) => ({
     costGhs: r.costGhs ?? 0,
     grossProfitGhs: r.grossProfitGhs ?? 0,
@@ -102,7 +108,10 @@ export function ProfitBarChart({
       ) : (
         <div className="h-[240px] min-w-0">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} margin={{ top: 6, right: 6, bottom: 0, left: -4 }}>
+            <BarChart
+              data={data}
+              margin={{ top: 6, right: 6, bottom: 0, left: -4 }}
+            >
               <CartesianGrid stroke={GRID_STROKE} vertical={false} />
               <XAxis
                 dataKey="name"

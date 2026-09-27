@@ -109,7 +109,16 @@ export function useTableQuery<F extends Record<string, string>>({
     }
     if (mine.toString()) sessionStorage.setItem(storageKey, mine.toString());
     else sessionStorage.removeItem(storageKey);
-  }, [page, debouncedSearch, filters, pathname, key, router, defaults, storageKey]);
+  }, [
+    page,
+    debouncedSearch,
+    filters,
+    pathname,
+    key,
+    router,
+    defaults,
+    storageKey,
+  ]);
 
   // URL → state, for browser back/forward only. The mirror above uses
   // `router.replace` (history.replaceState), which does NOT emit `popstate`, so

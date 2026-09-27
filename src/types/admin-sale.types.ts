@@ -155,6 +155,7 @@ export interface IUpdateSaleInput {
 
 export interface IRecordPaymentInput {
   amountGhs: number;
+  idempotencyKey?: string;
   method: "BANK" | "CASH" | "MOMO";
   reference?: string;
   paidAt?: string;

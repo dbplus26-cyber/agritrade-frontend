@@ -98,6 +98,8 @@ describe("AgentHome", () => {
     withFloat({ balanceGhs: 0, pots: [] });
     withSpending({ capGhs: null, remainingGhs: null, usedGhs: 0 });
     render(<AgentHome />);
-    expect(screen.getByText(/nothing has been handed to you/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/nothing has been handed to you/i),
+    ).toBeInTheDocument();
   });
 });

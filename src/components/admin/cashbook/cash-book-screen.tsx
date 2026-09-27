@@ -10,11 +10,7 @@ import {
 import { TransferDialog } from "@/components/admin/cashbook/cash-book-dialogs";
 import { HelpTip } from "@/components/admin/help-tip";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
-import {
-  AdminButton,
-  AdminCard,
-  AdminPageHeader,
-} from "@/components/admin/ui";
+import { AdminButton, AdminCard, AdminPageHeader } from "@/components/admin/ui";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { usePermissions } from "@/hooks/use-permissions";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -225,7 +221,10 @@ function AccountRow({ account }: { account: IAccountBalance }) {
           ) : null}
         </span>
         {/* flex-none: the figure is the point of the row and never truncates. */}
-        <Balance className="flex-none text-[12.5px]" value={account.balanceGhs} />
+        <Balance
+          className="flex-none text-[12.5px]"
+          value={account.balanceGhs}
+        />
       </Link>
     </li>
   );

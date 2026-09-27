@@ -100,7 +100,9 @@ describe("AgentExpenseForm - attributing a cost to a purchase", () => {
 
     await userEvent.click(screen.getByLabelText(/For a purchase/i));
     expect(
-      await screen.findByRole("option", { name: "PUR-2026-00042 - Maize 1,000 kg" }),
+      await screen.findByRole("option", {
+        name: "PUR-2026-00042 - Maize 1,000 kg",
+      }),
     ).toBeInTheDocument();
     await userEvent.click(
       screen.getByRole("option", { name: "PUR-2026-00042 - Maize 1,000 kg" }),
@@ -129,7 +131,9 @@ describe("AgentExpenseForm - attributing a cost to a purchase", () => {
     });
     expect(body).not.toHaveProperty("purchaseId");
     expect(body).not.toHaveProperty("capitalise");
-    expect(successToast).toHaveBeenCalledWith("Expense recorded off your float");
+    expect(successToast).toHaveBeenCalledWith(
+      "Expense recorded off your float",
+    );
   });
 
   it("sends the purchase and, by default, files the cost into the goods", async () => {

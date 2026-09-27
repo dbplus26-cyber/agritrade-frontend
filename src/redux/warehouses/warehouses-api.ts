@@ -35,12 +35,13 @@ export const warehousesApi = apiSlice.injectEndpoints({
       providesTags: (_r, _e, id) => [{ type: "Warehouses", id }],
     }),
 
-    createWarehouse: builder.mutation<IWarehouseResponse, ICreateWarehouseInput>(
-      {
-        query: (body) => ({ url: "admin/warehouses", method: "POST", body }),
-        invalidatesTags: [{ type: "Warehouses", id: "LIST" }],
-      },
-    ),
+    createWarehouse: builder.mutation<
+      IWarehouseResponse,
+      ICreateWarehouseInput
+    >({
+      query: (body) => ({ url: "admin/warehouses", method: "POST", body }),
+      invalidatesTags: [{ type: "Warehouses", id: "LIST" }],
+    }),
 
     updateWarehouse: builder.mutation<
       IWarehouseResponse,

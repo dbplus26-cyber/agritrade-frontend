@@ -25,10 +25,7 @@ import { extractApiError } from "@/lib/extract-api-error";
 import { useGetPlotsQuery } from "@/redux/land/land-plots-api";
 import type { ILandPlotListQuery, PlotStatus } from "@/types/land.types";
 import { Money } from "@/components/admin/trading/sale-bits";
-import {
-  PLOT_STATUS_FILTER_OPTIONS,
-  PlotStatusBadge,
-} from "./land-bits";
+import { PLOT_STATUS_FILTER_OPTIONS, PlotStatusBadge } from "./land-bits";
 
 const LIST = "/admin/plots";
 const FILTER_DEFAULTS = { status: "all", size: "12" };

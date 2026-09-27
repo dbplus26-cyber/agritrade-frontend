@@ -81,7 +81,13 @@ export function LandSaleDialog({
   // Opened from a plot, the plot is already decided. It arrives after the
   // form is built when the page is still fetching, so seed it on open too.
   useEffect(() => {
-    if (open) reset({ agreedPriceGhs: "", buyerId: "", notes: "", plotId: plotId ?? "" });
+    if (open)
+      reset({
+        agreedPriceGhs: "",
+        buyerId: "",
+        notes: "",
+        plotId: plotId ?? "",
+      });
   }, [open, plotId, reset]);
 
   const close = () => {

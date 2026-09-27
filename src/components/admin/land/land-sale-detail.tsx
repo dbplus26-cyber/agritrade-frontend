@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PaymentAccountField } from "@/components/admin/payment-account-field";
+import { useIdempotencyKey } from "@/components/admin/disbursements/disbursement-bits";
 import {
   ActionRow,
   AdminButton,
@@ -92,6 +93,7 @@ function PaymentDialog({
   onClose: () => void;
 }) {
   const [record, { isLoading }] = useRecordLandPaymentMutation();
+  const idempotencyKey = useIdempotencyKey(true);
   const { confirm, confirmationDialog } = useConfirm();
   const {
     register,
@@ -128,8 +130,11 @@ function PaymentDialog({
         id: sale.id,
         body: {
           amountGhs: Number(values.amountGhs),
+          idempotencyKey: idempotencyKey(),
           method: values.method,
-          ...(values.reference?.trim() ? { reference: values.reference.trim() } : {}),
+          ...(values.reference?.trim()
+            ? { reference: values.reference.trim() }
+            : {}),
           ...(values.paidAt ? { paidAt: values.paidAt } : {}),
           ...(values.paymentAccountId
             ? { paymentAccountId: values.paymentAccountId }
@@ -150,15 +155,22 @@ function PaymentDialog({
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>Record a payment</ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
-            Part-payments are fine. Full payment completes the sale and marks the
-            plot sold.
+            Part-payments are fine. Full payment completes the sale and marks
+            the plot sold.
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
-        <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
+        <form
+          noValidate
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col gap-5"
+        >
           <AdminField label="Amount (GHS)" error={errors.amountGhs?.message}>
             <Input
               inputMode="decimal"
-              className={cn(adminInputClass, errors.amountGhs && "border-console-red")}
+              className={cn(
+                adminInputClass,
+                errors.amountGhs && "border-console-red",
+              )}
               placeholder="0.00"
               {...register("amountGhs")}
             />
@@ -200,10 +212,20 @@ function PaymentDialog({
             />
           </AdminField>
           <ResponsiveDialogFooter className="gap-2">
-            <AdminButton type="button" variant="outline" size="lg" onClick={onClose}>
+            <AdminButton
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={onClose}
+            >
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={isLoading} loading={isLoading} size="lg">
+            <AdminButton
+              type="submit"
+              disabled={isLoading}
+              loading={isLoading}
+              size="lg"
+            >
               {isLoading ? "Recording…" : "Record payment"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -285,7 +307,11 @@ function CancelDialog({
               : ""}
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
-        <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
+        <form
+          noValidate
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col gap-5"
+        >
           {hasMoney ? (
             <AdminField
               label={`Received so far: ${formatCedis(paid)}`}
@@ -303,7 +329,11 @@ function CancelDialog({
                     key={value}
                     className="flex items-center gap-2 text-[11.5px] text-adm-ink"
                   >
-                    <input type="radio" value={value} {...register("settlement")} />
+                    <input
+                      type="radio"
+                      value={value}
+                      {...register("settlement")}
+                    />
                     {label}
                   </label>
                 ))}
@@ -311,10 +341,7 @@ function CancelDialog({
             </AdminField>
           ) : null}
           {hasMoney && settlement === "PARTIAL" ? (
-            <AdminField
-              label="Refund amount"
-              error={errors.refundGhs?.message}
-            >
+            <AdminField label="Refund amount" error={errors.refundGhs?.message}>
               <Input
                 inputMode="decimal"
                 placeholder="0.00"
@@ -329,16 +356,30 @@ function CancelDialog({
           ) : null}
           <AdminField label="Reason" error={errors.reason?.message}>
             <Input
-              className={cn(adminInputClass, errors.reason && "border-console-red")}
+              className={cn(
+                adminInputClass,
+                errors.reason && "border-console-red",
+              )}
               placeholder="e.g. Buyer pulled out of the deal"
               {...register("reason")}
             />
           </AdminField>
           <ResponsiveDialogFooter className="gap-2">
-            <AdminButton type="button" variant="outline" size="lg" onClick={onClose}>
+            <AdminButton
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={onClose}
+            >
               Keep sale
             </AdminButton>
-            <AdminButton type="submit" variant="danger" disabled={isLoading} loading={isLoading} size="lg">
+            <AdminButton
+              type="submit"
+              variant="danger"
+              disabled={isLoading}
+              loading={isLoading}
+              size="lg"
+            >
               {isLoading ? "Cancelling…" : "Cancel sale"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -459,7 +500,10 @@ export function LandSaleDetail({ id }: { id: string }) {
           <AdminCard className="px-5 py-3">
             {/* Which plot, to whom - the two facts the heading cannot hold. */}
             <Row label="Plot">
-              <Link className={adminLinkClass} href={`/admin/plots/${s.plot.id}`}>
+              <Link
+                className={adminLinkClass}
+                href={`/admin/plots/${s.plot.id}`}
+              >
                 {s.plot.reference}
               </Link>
             </Row>
@@ -544,9 +588,7 @@ export function LandSaleDetail({ id }: { id: string }) {
                       record. The deposit comes first, so it leads; confirm
                       follows it. */}
                   {s.status === "DRAFT" || s.status === "CONFIRMED" ? (
-                    <AdminButton
-                      onClick={() => setPayOpen(true)}
-                    >
+                    <AdminButton onClick={() => setPayOpen(true)}>
                       Record payment
                     </AdminButton>
                   ) : null}
@@ -608,9 +650,7 @@ export function LandSaleDetail({ id }: { id: string }) {
                         through releases its plot: cancelling refuses while
                         money sits on the ledger. Owner-only, and never
                         offered on a reversal row itself. */}
-                    {isSuperAdmin &&
-                    p.amountGhs !== null &&
-                    p.amountGhs > 0 ? (
+                    {isSuperAdmin && p.amountGhs !== null && p.amountGhs > 0 ? (
                       <AdminButton
                         type="button"
                         variant="outline"
@@ -629,8 +669,12 @@ export function LandSaleDetail({ id }: { id: string }) {
         }
       />
 
-      {payOpen ? <PaymentDialog sale={s} onClose={() => setPayOpen(false)} /> : null}
-      {cancelOpen ? <CancelDialog sale={s} onClose={() => setCancelOpen(false)} /> : null}
+      {payOpen ? (
+        <PaymentDialog sale={s} onClose={() => setPayOpen(false)} />
+      ) : null}
+      {cancelOpen ? (
+        <CancelDialog sale={s} onClose={() => setCancelOpen(false)} />
+      ) : null}
       {confirmationDialog}
     </div>
   );

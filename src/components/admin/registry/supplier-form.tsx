@@ -32,10 +32,7 @@ import {
   useGetSupplierQuery,
   useUpdateSupplierMutation,
 } from "@/redux/suppliers/suppliers-api";
-import {
-  PhotoViewDialog,
-  ViewablePhoto,
-} from "@/components/admin/photo-view";
+import { PhotoViewDialog, ViewablePhoto } from "@/components/admin/photo-view";
 import { useEditableRecordForm } from "@/hooks/use-editable-record-form";
 import { usePhotoStaging } from "@/hooks/use-photo-staging";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -148,9 +145,7 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
             bankName: opt(values.bankName),
             bankAccountNumber: opt(values.bankAccountNumber),
             momoNumber: opt(values.momoNumber),
-            ...(removePhoto && !photoFile
-              ? { removePhoto: true }
-              : {}),
+            ...(removePhoto && !photoFile ? { removePhoto: true } : {}),
           },
           photo: photoFile ?? undefined,
         }).unwrap();
@@ -215,7 +210,9 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
         }
       }
       notify.error(
-        isEdit ? "Couldn't update the supplier" : "Couldn't create the supplier",
+        isEdit
+          ? "Couldn't update the supplier"
+          : "Couldn't create the supplier",
         { description: message },
       );
     }
@@ -241,7 +238,9 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
               {supplier.name}
             </div>
             <div className="text-[11px] text-adm-muted">
-              {supplier.photoUrl ? "Tap the photo to see it in full" : "No photo on file"}
+              {supplier.photoUrl
+                ? "Tap the photo to see it in full"
+                : "No photo on file"}
             </div>
           </div>
         </div>
@@ -254,8 +253,16 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
             { mono: true, label: "ID number", value: supplier.idNumber },
             { full: true, label: "Address", value: supplier.address },
             { label: "Bank name", value: supplier.bankName },
-            { mono: true, label: "Bank account number", value: supplier.bankAccountNumber },
-            { mono: true, label: "Mobile money number", value: supplier.momoNumber },
+            {
+              mono: true,
+              label: "Bank account number",
+              value: supplier.bankAccountNumber,
+            },
+            {
+              mono: true,
+              label: "Mobile money number",
+              value: supplier.momoNumber,
+            },
             { full: true, label: "Notes", value: supplier.notes },
           ]}
         />
@@ -284,7 +291,8 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
               it stays in step with the fields under it. */}
           <div>
             <span className="mb-1 block text-[11.5px] font-semibold text-adm-ink">
-              Photo <span className="font-normal text-adm-faint">(optional)</span>
+              Photo{" "}
+              <span className="font-normal text-adm-faint">(optional)</span>
             </span>
             <div className="flex flex-wrap items-center gap-3.5">
               {previewUrl && readOnly ? (
@@ -352,7 +360,11 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
             <Input
               placeholder="e.g. Ibrahim Fuseini"
               disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
+              className={cn(
+                adminInputClass,
+                roCls,
+                errors.name && "border-console-red",
+              )}
               {...register("name")}
             />
           </AdminField>
@@ -370,7 +382,9 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
                     onValueChange={field.onChange}
                     disabled={readOnly}
                   >
-                    <SelectTrigger className={cn(adminSelectClass, roCls, "w-full")}>
+                    <SelectTrigger
+                      className={cn(adminSelectClass, roCls, "w-full")}
+                    >
                       <SelectValue placeholder="Choose a source type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -411,7 +425,11 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
                 type="tel"
                 placeholder="e.g. 024 000 0000"
                 disabled={readOnly}
-                className={cn(adminInputClass, roCls, errors.phone && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.phone && "border-console-red",
+                )}
                 {...register("phone")}
               />
             </AdminField>
@@ -440,7 +458,11 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
                 type="email"
                 placeholder="e.g. ibrahim@example.com"
                 disabled={readOnly}
-                className={cn(adminInputClass, roCls, errors.email && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.email && "border-console-red",
+                )}
                 {...register("email")}
               />
             </AdminField>
@@ -477,7 +499,11 @@ function SupplierFormFields({ supplier }: { supplier?: ISupplier }) {
 
         <section className="flex flex-col gap-5">
           <div className="grid gap-5 @min-[440px]:grid-cols-2">
-            <AdminField label="Bank name" optional error={errors.bankName?.message}>
+            <AdminField
+              label="Bank name"
+              optional
+              error={errors.bankName?.message}
+            >
               <Input
                 placeholder="e.g. GCB Bank"
                 disabled={readOnly}

@@ -147,16 +147,15 @@ export function StockRegister({ lines }: { lines: CommodityLine[] }) {
   // gets ONE honest line, never a stand-in list that makes the warehouse look
   // stocked when the records say otherwise.
   const isEmpty = lines.length === 0;
-  const rows: CommodityLine[] =
-    !isEmpty
-      ? lines
-      : [
-          {
-            available: false,
-            meta: "The register is being updated - call for today's position",
-            name: "Nothing on the board",
-          },
-        ];
+  const rows: CommodityLine[] = !isEmpty
+    ? lines
+    : [
+        {
+          available: false,
+          meta: "The register is being updated - call for today's position",
+          name: "Nothing on the board",
+        },
+      ];
 
   return (
     <div className="shadow-doc rounded-[2px] border border-soil/35 bg-paper">

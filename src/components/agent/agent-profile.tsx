@@ -92,13 +92,7 @@ function AgentPhoto({ user }: { user: IUser }) {
   );
 }
 
-function DetailsForm({
-  user,
-  onClose,
-}: {
-  user: IUser;
-  onClose: () => void;
-}) {
+function DetailsForm({ user, onClose }: { user: IUser; onClose: () => void }) {
   const [updateMe, { isLoading }] = useUpdateMeMutation();
   const {
     register,
@@ -411,9 +405,15 @@ function AccessCard() {
                 {label}
               </span>
               {on ? (
-                <Check aria-label="Allowed" className="h-4 w-4 flex-none text-forest" />
+                <Check
+                  aria-label="Allowed"
+                  className="h-4 w-4 flex-none text-forest"
+                />
               ) : (
-                <X aria-label="Switched off" className="h-4 w-4 flex-none text-soil/50" />
+                <X
+                  aria-label="Switched off"
+                  className="h-4 w-4 flex-none text-soil/50"
+                />
               )}
             </li>
           );

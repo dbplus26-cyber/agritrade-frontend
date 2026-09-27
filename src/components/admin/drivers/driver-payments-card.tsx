@@ -136,9 +136,8 @@ function PaymentRow({ payment }: { payment: IDriverPaymentLedgerRow }) {
 
 export function DriverPaymentsCard({ driverId }: { driverId: string }) {
   const [page, setPage] = useState(1);
-  const { data, error, isError, isLoading, refetch } = useGetDriverPaymentsQuery(
-    { driverId, limit: PER_PAGE, page },
-  );
+  const { data, error, isError, isLoading, refetch } =
+    useGetDriverPaymentsQuery({ driverId, limit: PER_PAGE, page });
 
   if (isLoading) {
     return (
@@ -206,13 +205,14 @@ export function DriverPaymentsCard({ driverId }: { driverId: string }) {
         {summary.driverEmail ? (
           <>
             Each receipt is emailed to{" "}
-            <span className="text-adm-body">{summary.driverEmail}</span> when the
-            payment is recorded. Download a copy below if it is needed again.
+            <span className="text-adm-body">{summary.driverEmail}</span> when
+            the payment is recorded. Download a copy below if it is needed
+            again.
           </>
         ) : (
           <>
-            This driver has no email address on file, so nothing has been sent to
-            them. Download or print a receipt below when they ask for one.
+            This driver has no email address on file, so nothing has been sent
+            to them. Download or print a receipt below when they ask for one.
           </>
         )}
       </p>

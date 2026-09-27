@@ -35,8 +35,8 @@ export function SchemeFile() {
           className="mt-2 lg:mt-0"
         >
           <DocRow label="INPUTS OUT">
-            Fertiliser and certified seed, issued before planting and signed
-            for - both copies kept
+            Fertiliser and certified seed, issued before planting and signed for
+            - both copies kept
           </DocRow>
           <DocRow label="IN THE FIELD">
             Field-agent visits through the season, noted on the same file

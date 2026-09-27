@@ -39,7 +39,8 @@ const ASSET = {
 };
 
 /** The `path` of every issue a parse raised, for terse assertions. */
-const issuePaths = (schema: { safeParse: (v: unknown) => unknown }) =>
+const issuePaths =
+  (schema: { safeParse: (v: unknown) => unknown }) =>
   (input: unknown): string[] => {
     const result = schema.safeParse(input) as
       | { error: { issues: { path: PropertyKey[] }[] }; success: false }
@@ -59,9 +60,9 @@ describe("drawingSchema", () => {
   });
 
   it("refuses a drawing that names no account and no reason", () => {
-    expect(
-      drawingIssues({ ...DRAWING, paymentAccountId: "" }),
-    ).toContain("paymentAccountId");
+    expect(drawingIssues({ ...DRAWING, paymentAccountId: "" })).toContain(
+      "paymentAccountId",
+    );
   });
 
   it("takes a reason instead, when no company money moved", () => {

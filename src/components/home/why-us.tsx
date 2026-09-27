@@ -29,31 +29,31 @@ export function WhyUs() {
   return (
     <section className="texture-grain-dark bg-forest px-5 py-14 lg:px-0 lg:py-[88px]">
       <Reveal className="mx-auto max-w-[1312px]">
-      <div className="grid gap-9 lg:grid-cols-[360px_1fr] lg:gap-20 lg:px-8">
-        <SectionHeading
-          tone="dark"
-          eyebrow="WHY BUY FROM US"
-          title="Built on volume, weight and word."
-        />
-        <div className="flex flex-col">
-          {REASONS.map((reason, i) => (
-            <div
-              key={reason.no}
-              className={`grid grid-cols-[32px_1fr] items-baseline gap-x-4 gap-y-1 border-t border-surface/32 py-4 sm:grid-cols-[44px_220px_1fr] sm:gap-x-7 lg:py-[22px] ${i === REASONS.length - 1 ? "pb-0" : ""}`}
-            >
-              <span className="stencil text-[13px] tracking-[0.1em] text-harvest lg:text-[14px]">
-                {reason.no}
-              </span>
-              <span className="font-display text-[14px] font-bold tracking-[0.04em] text-surface lg:text-[16px]">
-                {reason.title}
-              </span>
-              <p className="col-start-2 text-[13.5px] leading-[1.65] text-surface/70 sm:col-start-auto lg:text-[14px]">
-                {reason.body}
-              </p>
-            </div>
-          ))}
+        <div className="grid gap-9 lg:grid-cols-[360px_1fr] lg:gap-20 lg:px-8">
+          <SectionHeading
+            tone="dark"
+            eyebrow="WHY BUY FROM US"
+            title="Built on volume, weight and word."
+          />
+          <div className="flex flex-col">
+            {REASONS.map((reason, i) => (
+              <div
+                key={reason.no}
+                className={`grid grid-cols-[32px_1fr] items-baseline gap-x-4 gap-y-1 border-t border-surface/32 py-4 sm:grid-cols-[44px_220px_1fr] sm:gap-x-7 lg:py-[22px] ${i === REASONS.length - 1 ? "pb-0" : ""}`}
+              >
+                <span className="stencil text-[13px] tracking-[0.1em] text-harvest lg:text-[14px]">
+                  {reason.no}
+                </span>
+                <span className="font-display text-[14px] font-bold tracking-[0.04em] text-surface lg:text-[16px]">
+                  {reason.title}
+                </span>
+                <p className="col-start-2 text-[13.5px] leading-[1.65] text-surface/70 sm:col-start-auto lg:text-[14px]">
+                  {reason.body}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
       </Reveal>
     </section>
   );

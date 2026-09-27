@@ -13,7 +13,9 @@ describe("EmptyState", () => {
     );
     expect(screen.getByText("File empty")).toBeInTheDocument();
     expect(screen.getByText("No plots on the register")).toBeInTheDocument();
-    expect(screen.getByText("Ask the office what's coming.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Ask the office what's coming."),
+    ).toBeInTheDocument();
   });
 
   it("only offers an action when both label and handler are given", async () => {

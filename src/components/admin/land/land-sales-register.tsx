@@ -26,7 +26,11 @@ import { useTableQuery } from "@/hooks/use-table-query";
 import { extractApiError } from "@/lib/extract-api-error";
 import { cn } from "@/lib/utils";
 import { useGetLandSalesQuery } from "@/redux/land/land-sales-api";
-import type { ILandSale, ILandSaleListQuery, LandSaleStatus } from "@/types/land.types";
+import type {
+  ILandSale,
+  ILandSaleListQuery,
+  LandSaleStatus,
+} from "@/types/land.types";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { DateTimeCell } from "@/components/admin/date-cell";
 import { Money } from "@/components/admin/trading/sale-bits";
@@ -91,7 +95,9 @@ export function LandSalesRegister() {
           <Link
             href={`/admin/land-sales/${row.original.id}`}
             className="block min-w-0 @2xl/table:max-w-[90%] outline-none focus-visible:underline"
-            onClick={(e) => { e.stopPropagation(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
           >
             <Mono className="font-semibold text-console">
               {row.original.plot.reference}
@@ -110,7 +116,10 @@ export function LandSalesRegister() {
         // The row navigates to the sale, so the buyer stops the click first.
         cell: ({ row }) => (
           <Link
-            className={cn(adminLinkClass, "block min-w-0 [overflow-wrap:anywhere] @2xl/table:truncate")}
+            className={cn(
+              adminLinkClass,
+              "block min-w-0 [overflow-wrap:anywhere] @2xl/table:truncate",
+            )}
             href={`/admin/buyers/${row.original.buyer.id}`}
             onClick={(e) => e.stopPropagation()}
             title={row.original.buyer.name}

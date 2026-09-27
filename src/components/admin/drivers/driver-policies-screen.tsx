@@ -76,7 +76,10 @@ const policyFormSchema = z
             // haulier after the goods land.
             .refine(
               (v) =>
-                v !== "" && Number(v) >= 0 && Number(v) <= 100 && !Number.isNaN(Number(v)),
+                v !== "" &&
+                Number(v) >= 0 &&
+                Number(v) <= 100 &&
+                !Number.isNaN(Number(v)),
               { message: "0-100" },
             ),
           trigger: z.enum(["AT_LOADING", "ON_DELIVERY", "ON_DEMAND"]),
@@ -144,7 +147,9 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
     <ResponsiveDialog open onOpenChange={onClose}>
       <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[560px]">
         <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle>New driver payment policy</ResponsiveDialogTitle>
+          <ResponsiveDialogTitle>
+            New driver payment policy
+          </ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
             How a haulier gets paid for a trip. The shares must add up to 100.
           </ResponsiveDialogDescription>
@@ -258,7 +263,6 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
                 {errors.milestones.message}
               </p>
             ) : null}
-
           </div>
 
           <label className="flex cursor-pointer items-center gap-2 text-[11.5px] text-adm-body">

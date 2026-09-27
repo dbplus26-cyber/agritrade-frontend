@@ -36,9 +36,9 @@ export async function EmptyLots() {
           </div>
           <p className="mb-6 max-w-[52ch] text-[14px] leading-[1.65] text-soil lg:text-[15px]">
             Nothing is listed at the moment - the register updates as stock
-            arrives at the warehouse. We source against firm orders too: tell
-            us the grain, tonnage and destination and we&rsquo;ll come back
-            with a same-day position.
+            arrives at the warehouse. We source against firm orders too: tell us
+            the grain, tonnage and destination and we&rsquo;ll come back with a
+            same-day position.
           </p>
           <div className="flex flex-wrap gap-4">
             <Link

@@ -163,9 +163,7 @@ export function StocktakesScreen() {
         enableSorting: false,
         meta: columnMeta({ card: "trailing" }),
         cell: ({ row }) => (
-          <Mono className="text-adm-ink">
-            {row.original.lines.length}
-          </Mono>
+          <Mono className="text-adm-ink">{row.original.lines.length}</Mono>
         ),
       },
       {

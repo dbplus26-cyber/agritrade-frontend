@@ -123,7 +123,10 @@ export function SearchableSelect({
           >
             {triggerLabel ?? placeholder}
           </span>
-          <ChevronDownIcon aria-hidden className="size-4 flex-none text-adm-faint" />
+          <ChevronDownIcon
+            aria-hidden
+            className="size-4 flex-none text-adm-faint"
+          />
         </button>
       </PopoverTrigger>
       <PopoverContent

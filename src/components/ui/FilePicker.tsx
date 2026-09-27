@@ -72,9 +72,10 @@ export function FilePicker({
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const objectUrl = useRef<null | string>(null);
-  const [staged, setStaged] = useState<null | { file: File; url: null | string }>(
-    null,
-  );
+  const [staged, setStaged] = useState<null | {
+    file: File;
+    url: null | string;
+  }>(null);
   const [preparing, setPreparing] = useState(false);
 
   const revoke = () => {

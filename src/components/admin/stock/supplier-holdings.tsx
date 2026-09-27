@@ -82,7 +82,9 @@ export function SupplierHoldings({
         enableSorting: false,
         meta: columnMeta({ card: "meta" }),
         cell: ({ row }) => (
-          <span className="text-[11.5px] text-adm-body">{row.original.lots}</span>
+          <span className="text-[11.5px] text-adm-body">
+            {row.original.lots}
+          </span>
         ),
       },
       {

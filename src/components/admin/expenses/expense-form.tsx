@@ -1,7 +1,7 @@
 "use client";
 
 import { DateInput } from "@/components/ui/date-input";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -21,6 +21,8 @@ import {
 } from "@/components/admin/ui";
 import { useIdempotencyKey } from "@/components/admin/disbursements/disbursement-bits";
 import { ExpensePaymentFields } from "@/components/admin/expenses/expense-payment-fields";
+import { ExistingOutflowPicker } from "@/components/admin/expenses/existing-outflow-picker";
+import { useMoneyVisibility } from "@/hooks/use-money-visibility";
 import { extractApiError } from "@/lib/extract-api-error";
 import { useGetSettlementAccountsQuery } from "@/redux/payment-accounts/payment-accounts-api";
 import { notify } from "@/lib/notify";
@@ -28,7 +30,7 @@ import {
   useCreateExpenseMutation,
   useUpdateExpenseMutation,
 } from "@/redux/expenses/expenses-api";
-import type { IExpense } from "@/types/expense.types";
+import type { IExpense, IMatchableOutflow } from "@/types/expense.types";
 import type { IExpenseCategory } from "@/types/registry.types";
 import {
   expensePaymentBody,
@@ -40,7 +42,6 @@ import {
 } from "@/validations/expense-schema";
 
 const today = () => new Date().toISOString().slice(0, 10);
-
 
 /**
  * Record or correct an operating cost. One dialog for both: an `expense` prop
@@ -70,6 +71,10 @@ export function ExpenseFormDialog({
 }) {
   const [create, { isLoading: creating }] = useCreateExpenseMutation();
   const [update, { isLoading: updating }] = useUpdateExpenseMutation();
+  const canSeeMoney = useMoneyVisibility();
+  const [matchedOutflows, setMatchedOutflows] = useState<IMatchableOutflow[]>(
+    [],
+  );
   const isEdit = Boolean(expense);
   // One key per OPENING of the dialog, reused by every attempt at submitting
   // it: this endpoint moves money, so a double tap or a resend after a
@@ -112,13 +117,16 @@ export function ExpenseFormDialog({
       description: "",
       incurredAt: today(),
       method: "CASH",
-      paidNow: true,
+      paidNow: false,
+      useExistingPayment: canSeeMoney,
       paymentAccountId: "",
       reference: "",
     },
   });
 
   const paidNow = watch("paidNow");
+  const useExistingPayment = Boolean(watch("useExistingPayment"));
+  const paymentAccountId = watch("paymentAccountId");
   const method = watch("method");
 
   // Seed from the record each time the dialog opens, so reopening after a
@@ -133,11 +141,13 @@ export function ExpenseFormDialog({
       method: "CASH",
       // A correction never pays anything, and an edit that quietly settled the
       // cost it was correcting would be a second payment nobody asked for.
-      paidNow: !expense,
+      paidNow: false,
+      useExistingPayment: canSeeMoney,
       paymentAccountId: "",
       reference: "",
     });
-  }, [expense, open, reset]);
+    setMatchedOutflows([]);
+  }, [canSeeMoney, expense, open, reset]);
 
   // An account offered under one method is not offered under another - the
   // list narrows to the kinds that method can move on - so switching the
@@ -147,8 +157,29 @@ export function ExpenseFormDialog({
   useEffect(() => {
     setValue("paymentAccountId", "");
   }, [method, setValue]);
+  useEffect(() => {
+    setMatchedOutflows([]);
+  }, [paymentAccountId]);
 
   const onSubmit = async (values: ExpenseValues) => {
+    if (
+      values.paidNow &&
+      values.useExistingPayment &&
+      matchedOutflows.length === 0
+    ) {
+      notify.error("Select at least one existing account debit.");
+      return;
+    }
+    if (
+      values.paidNow &&
+      values.useExistingPayment &&
+      Math.round(
+        matchedOutflows.reduce((sum, row) => sum + row.amountGhs, 0) * 100,
+      ) > Math.round(Number(values.amountGhs) * 100)
+    ) {
+      notify.error("The selected debits exceed this expense's amount.");
+      return;
+    }
     const payment = expensePaymentBody(values);
     const body = {
       amountGhs: Number(values.amountGhs),
@@ -166,13 +197,18 @@ export function ExpenseFormDialog({
             ...body,
             // No amount in it: the server settles the whole cost.
             ...(payment ? { payment } : {}),
+            ...(values.paidNow && values.useExistingPayment
+              ? { existingMovementIds: matchedOutflows.map((row) => row.id) }
+              : {}),
           },
           idempotencyKey: idempotencyKey(),
         }).unwrap();
         notify.success(
-          res.data.settlement.status === "UNPAID"
-            ? "Expense recorded - this is still owed"
-            : "Expense recorded and paid",
+          res.data.settlement.status === "PAID"
+            ? "Expense recorded and paid"
+            : res.data.settlement.status === "PART_PAID"
+              ? "Expense recorded with a remaining balance"
+              : "Expense recorded - this is still owed",
         );
       }
       onOpenChange(false);
@@ -233,7 +269,11 @@ export function ExpenseFormDialog({
               />
             </AdminField>
 
-            <AdminField label="Description" error={errors.description?.message} optional>
+            <AdminField
+              label="Description"
+              error={errors.description?.message}
+              optional
+            >
               <input
                 id="expense-description"
                 placeholder="e.g. Warehouse rent, July"
@@ -245,7 +285,10 @@ export function ExpenseFormDialog({
 
           <section className="grid gap-5">
             <div className="grid gap-5 @min-[380px]:grid-cols-2">
-              <AdminField label="Amount (GH₵)" error={errors.amountGhs?.message}>
+              <AdminField
+                label="Amount (GH₵)"
+                error={errors.amountGhs?.message}
+              >
                 <input
                   id="expense-amount"
                   inputMode="decimal"
@@ -279,7 +322,16 @@ export function ExpenseFormDialog({
               method={method}
               owedNote="Nothing goes out yet. The cost is recorded as owed, and can be paid from the voucher once the money moves."
               paidNow={paidNow}
+              allowExisting={canSeeMoney}
+              useExistingPayment={useExistingPayment}
               register={register}
+            />
+          )}
+          {isEdit || !paidNow || !useExistingPayment ? null : (
+            <ExistingOutflowPicker
+              key={paymentAccountId}
+              accountId={paymentAccountId}
+              onChange={setMatchedOutflows}
             />
           )}
 
@@ -287,7 +339,9 @@ export function ExpenseFormDialog({
             <AdminButton
               type="button"
               variant="ghost"
-              onClick={() => { onOpenChange(false); }}
+              onClick={() => {
+                onOpenChange(false);
+              }}
             >
               Cancel
             </AdminButton>

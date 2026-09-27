@@ -90,8 +90,8 @@ export function InputItemDialog({
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>New input item</ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
-            Something granted to a farmer against the harvest: fertiliser,
-            seed, a sprayer.
+            Something granted to a farmer against the harvest: fertiliser, seed,
+            a sprayer.
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
         <form

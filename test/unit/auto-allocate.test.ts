@@ -107,7 +107,10 @@ describe("autoAllocate - strategy", () => {
   });
 
   it("sorts cost-redacted lots last under both strategies", () => {
-    const lots = [lot("hidden", "maize", 500, null), lot("known", "maize", 500, 9)];
+    const lots = [
+      lot("hidden", "maize", 500, null),
+      lot("known", "maize", 500, 9),
+    ];
     const sales = [sale("s1", [{ agreedKg: 500, commodityId: "maize" }])];
     expect(run(lots, sales, { strategy: "CHEAPEST" }).rows.s1).toEqual({
       known: "500",

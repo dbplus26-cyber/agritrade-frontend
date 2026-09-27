@@ -34,7 +34,10 @@ export const buyersApi = apiSlice.injectEndpoints({
         result
           ? [
               { type: "Buyers" as const, id: "LIST" },
-              ...result.data.map((b) => ({ type: "Buyers" as const, id: b.id })),
+              ...result.data.map((b) => ({
+                type: "Buyers" as const,
+                id: b.id,
+              })),
             ]
           : [{ type: "Buyers" as const, id: "LIST" }],
     }),
@@ -72,7 +75,10 @@ export const buyersApi = apiSlice.injectEndpoints({
     }),
 
     deactivateBuyer: builder.mutation<IBuyerResponse, string>({
-      query: (id) => ({ url: `admin/buyers/${id}/deactivate`, method: "PATCH" }),
+      query: (id) => ({
+        url: `admin/buyers/${id}/deactivate`,
+        method: "PATCH",
+      }),
       invalidatesTags: (_r, _e, id) => [
         { type: "Buyers", id },
         { type: "Buyers", id: "LIST" },

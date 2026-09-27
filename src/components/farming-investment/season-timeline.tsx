@@ -88,7 +88,10 @@ export function SeasonTimeline() {
           {STAGES.map((stage, i) => (
             <div
               key={stage.no}
-              className={cn("relative flex gap-[18px]", i < STAGES.length - 1 && "pb-[26px]")}
+              className={cn(
+                "relative flex gap-[18px]",
+                i < STAGES.length - 1 && "pb-[26px]",
+              )}
             >
               <span
                 className={cn(

@@ -133,7 +133,10 @@ export function ApprovalDetail({ id }: { id: string }) {
                 ) : (
                   "Unknown"
                 )}
-                <span className="text-adm-muted"> · {approvalStamp(decidedAt)}</span>
+                <span className="text-adm-muted">
+                  {" "}
+                  · {approvalStamp(decidedAt)}
+                </span>
               </>
             ) : (
               <Absent />

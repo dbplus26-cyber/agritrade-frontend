@@ -243,7 +243,9 @@ export function PurchaseCreate() {
                       }))}
                       placeholder="e.g. Musah Alhassan"
                       emptyText="No agents with an opened float match."
-                      className={cn(errors.agentProfileId && "border-console-red")}
+                      className={cn(
+                        errors.agentProfileId && "border-console-red",
+                      )}
                     />
                   )}
                 />
@@ -258,28 +260,28 @@ export function PurchaseCreate() {
               optional
               hint={`Who the goods were bought from - only ${SOURCE_LABEL[source].toLowerCase()} suppliers are listed.`}
             >
-                <Controller
-                  control={control}
-                  name="supplierId"
-                  render={({ field }) => (
-                    <SearchableSelect
-                      value={field.value ?? ""}
-                      onChange={field.onChange}
-                      options={[
-                        { value: "", label: "No supplier recorded" },
-                        ...(suppliers.data?.data ?? []).map((s) => ({
-                          value: s.id,
-                          label: s.name,
-                          ...(s.community ? { hint: s.community } : {}),
-                        })),
-                      ]}
-                      placeholder="e.g. Bontanga Farms Ltd"
-                      onSearchChange={supplierSearch.onSearchChange}
-                      loading={suppliers.isFetching}
-                    />
-                  )}
-                />
-              </AdminField>
+              <Controller
+                control={control}
+                name="supplierId"
+                render={({ field }) => (
+                  <SearchableSelect
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    options={[
+                      { value: "", label: "No supplier recorded" },
+                      ...(suppliers.data?.data ?? []).map((s) => ({
+                        value: s.id,
+                        label: s.name,
+                        ...(s.community ? { hint: s.community } : {}),
+                      })),
+                    ]}
+                    placeholder="e.g. Bontanga Farms Ltd"
+                    onSearchChange={supplierSearch.onSearchChange}
+                    loading={suppliers.isFetching}
+                  />
+                )}
+              />
+            </AdminField>
           </section>
 
           <section className="flex flex-col gap-5">
@@ -288,7 +290,10 @@ export function PurchaseCreate() {
                 <Input
                   inputMode="decimal"
                   placeholder="e.g. 1200"
-                  className={cn(adminInputClass, errors.weightKg && "border-console-red")}
+                  className={cn(
+                    adminInputClass,
+                    errors.weightKg && "border-console-red",
+                  )}
                   {...register("weightKg")}
                 />
               </AdminField>

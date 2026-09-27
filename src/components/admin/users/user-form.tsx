@@ -111,7 +111,8 @@ export function UserForm() {
           "password",
           "phone",
         ] as const) {
-          if (fieldErrors[field]) setError(field, { message: fieldErrors[field] });
+          if (fieldErrors[field])
+            setError(field, { message: fieldErrors[field] });
         }
       }
       notify.error("Couldn't create the user", { description: message });
@@ -167,15 +168,14 @@ export function UserForm() {
                 <Input
                   type="email"
                   placeholder="e.g. amina@dbplus.com"
-                  className={cn(adminInputClass, errors.email && "border-console-red")}
+                  className={cn(
+                    adminInputClass,
+                    errors.email && "border-console-red",
+                  )}
                   {...register("email")}
                 />
               </AdminField>
-              <AdminField
-                label="Phone"
-                optional
-                error={errors.phone?.message}
-              >
+              <AdminField label="Phone" optional error={errors.phone?.message}>
                 <Input
                   type="tel"
                   placeholder="e.g. 024 000 0000"
@@ -191,59 +191,59 @@ export function UserForm() {
 
           <section className="flex flex-col gap-5">
             <div className="grid gap-5 @min-[520px]:grid-cols-2">
-            <AdminField
-              label="Role"
-              hint="Agents only ever see their own float and purchases."
-            >
-              <Controller
-                control={control}
-                name="role"
-                render={({ field }) => (
-                  <SimpleSelect
-                    className={cn(adminSelectClass, "w-full")}
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="Choose an access level"
-                    options={ROLE_OPTIONS.map((role) => ({
-                      value: role,
-                      label: ROLE_LABEL[role],
-                    }))}
-                  />
-                )}
-              />
-            </AdminField>
-            <AdminField
-              label="Initial password"
-              hint="Share it with them securely - it is never emailed. They should change it on first sign-in."
-              error={errors.password?.message}
-            >
-              <div className="flex gap-2">
-                <div className="min-w-0 flex-1">
-                  <PasswordInput
-                    autoComplete="new-password"
-                    placeholder="Type one, or press Generate"
-                    className={cn(
-                      adminInputClass,
-                      errors.password && "border-console-red",
-                    )}
-                    {...register("password")}
-                  />
+              <AdminField
+                label="Role"
+                hint="Agents only ever see their own float and purchases."
+              >
+                <Controller
+                  control={control}
+                  name="role"
+                  render={({ field }) => (
+                    <SimpleSelect
+                      className={cn(adminSelectClass, "w-full")}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Choose an access level"
+                      options={ROLE_OPTIONS.map((role) => ({
+                        value: role,
+                        label: ROLE_LABEL[role],
+                      }))}
+                    />
+                  )}
+                />
+              </AdminField>
+              <AdminField
+                label="Initial password"
+                hint="Share it with them securely - it is never emailed. They should change it on first sign-in."
+                error={errors.password?.message}
+              >
+                <div className="flex gap-2">
+                  <div className="min-w-0 flex-1">
+                    <PasswordInput
+                      autoComplete="new-password"
+                      placeholder="Type one, or press Generate"
+                      className={cn(
+                        adminInputClass,
+                        errors.password && "border-console-red",
+                      )}
+                      {...register("password")}
+                    />
+                  </div>
+                  <AdminButton
+                    type="button"
+                    variant="secondary"
+                    size="lg"
+                    className="flex-none"
+                    onClick={() =>
+                      setValue("password", generatePassword(), {
+                        shouldValidate: true,
+                      })
+                    }
+                  >
+                    Generate
+                  </AdminButton>
                 </div>
-                <AdminButton
-                  type="button"
-                  variant="secondary"
-                  size="lg"
-                  className="flex-none"
-                  onClick={() =>
-                    setValue("password", generatePassword(), {
-                      shouldValidate: true,
-                    })
-                  }
-                >
-                  Generate
-                </AdminButton>
-              </div>
-            </AdminField>
+              </AdminField>
             </div>
           </section>
 

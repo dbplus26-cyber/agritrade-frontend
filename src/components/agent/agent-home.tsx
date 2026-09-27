@@ -31,7 +31,9 @@ function LedgerLine({ tx }: { tx: IFloatTransaction }) {
   return (
     <div className="flex items-baseline justify-between gap-3 border-b border-soil/15 py-2 last:border-b-0">
       <div className="min-w-0">
-        <p className="text-[13px] font-medium text-ink">{TX_LABEL[tx.type] ?? tx.type}</p>
+        <p className="text-[13px] font-medium text-ink">
+          {TX_LABEL[tx.type] ?? tx.type}
+        </p>
         <p className="truncate text-[11.5px] text-soil/75">
           {new Date(tx.occurredAt).toLocaleDateString("en-GB", {
             day: "2-digit",
@@ -257,8 +259,7 @@ export function AgentHome() {
         {!canBuy && !canSend && !canExpense ? (
           <div className="rounded-none border border-soil/25 bg-paper px-4 py-3 text-[12.5px] leading-[1.55] text-soil">
             The office has not opened any actions for your account yet. Your
-            float and history stay visible; call the office if this seems
-            wrong.
+            float and history stay visible; call the office if this seems wrong.
           </div>
         ) : null}
       </div>

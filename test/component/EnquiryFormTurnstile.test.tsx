@@ -94,7 +94,9 @@ describe("EnquiryForm with Turnstile enforced", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Send enquiry" }));
 
-    expect(await screen.findByText("Enquiry on file. Thank you.")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Enquiry on file. Thank you."),
+    ).toBeInTheDocument();
     expect(sendTrigger).toHaveBeenCalledTimes(1);
     expect(sendTrigger).toHaveBeenCalledWith(
       expect.objectContaining({ turnstileToken: "solved-token-123" }),

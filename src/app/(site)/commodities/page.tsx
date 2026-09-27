@@ -43,7 +43,10 @@ export default async function CommoditiesPage({
     fetchPublicCommoditiesPage({ limit: LOT_PAGE_SIZE, page }),
   ]);
   const lines = toBoardLines(commodities);
-  const lots = toLots(lotsPage?.commodities ?? null, (page - 1) * LOT_PAGE_SIZE);
+  const lots = toLots(
+    lotsPage?.commodities ?? null,
+    (page - 1) * LOT_PAGE_SIZE,
+  );
   const totalPages = lotsPage?.meta.totalPages ?? 1;
   const updatedOn = new Date().toLocaleDateString("en-GB", {
     day: "numeric",

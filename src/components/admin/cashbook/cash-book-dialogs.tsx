@@ -70,6 +70,7 @@ export function EntryDialog({
     defaultValues: {
       amountGhs: "",
       occurredAt: today(),
+      externalReference: "",
       reason: "",
       type: "DEPOSIT",
     },
@@ -81,6 +82,7 @@ export function EntryDialog({
       form.reset({
         amountGhs: "",
         occurredAt: today(),
+        externalReference: "",
         reason: "",
         type: "DEPOSIT",
       });
@@ -110,6 +112,9 @@ export function EntryDialog({
         body: {
           amountGhs: Number(values.amountGhs),
           occurredAt: values.occurredAt,
+          ...(values.externalReference?.trim()
+            ? { externalReference: values.externalReference.trim() }
+            : {}),
           reason: values.reason,
           type: values.type,
         },
@@ -193,6 +198,19 @@ export function EntryDialog({
               maxLength={500}
               placeholder="e.g. Banked Saturday market takings"
               {...form.register("reason")}
+            />
+          </AdminField>
+          <AdminField
+            label="Provider reference"
+            optional
+            error={form.formState.errors.externalReference?.message}
+            hint="The bank or MoMo transaction reference, if one was issued. It can later be used to match this debit to an expense."
+          >
+            <Input
+              className={adminInputClass}
+              maxLength={120}
+              placeholder="e.g. MOMO884512"
+              {...form.register("externalReference")}
             />
           </AdminField>
           <p className="text-[11px] text-adm-muted">

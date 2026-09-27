@@ -34,10 +34,7 @@ import {
   useGetEligibleSalesQuery,
   useVoidShipmentExpenseMutation,
 } from "@/redux/shipments/shipments-api";
-import type {
-  IShipment,
-  IShipmentExpense,
-} from "@/types/admin-shipment.types";
+import type { IShipment, IShipmentExpense } from "@/types/admin-shipment.types";
 import {
   voidExpenseSchema,
   type VoidExpenseValues,
@@ -50,6 +47,10 @@ import {
   type ShipmentExpenseValues,
 } from "@/validations/shipment-schema";
 import { ExpensePaymentFields } from "@/components/admin/expenses/expense-payment-fields";
+import { ExistingOutflowPicker } from "@/components/admin/expenses/existing-outflow-picker";
+import { useMoneyVisibility } from "@/hooks/use-money-visibility";
+import { useGetDriverSettlementQuery } from "@/redux/driver-settlement/driver-settlement-api";
+import type { IMatchableOutflow } from "@/types/expense.types";
 import { useGetSettlementAccountsQuery } from "@/redux/payment-accounts/payment-accounts-api";
 import { LoadMeter } from "./load-meter";
 import { Money } from "./sale-bits";
@@ -81,6 +82,15 @@ export function ExpenseDialog({
     limit: 100,
   });
   const [add, { isLoading }] = useAddShipmentExpenseMutation();
+  const canSeeMoney = useMoneyVisibility();
+  const { data: driverSettlement } = useGetDriverSettlementQuery(shipment.id);
+  const [matchedOutflows, setMatchedOutflows] = useState<IMatchableOutflow[]>(
+    [],
+  );
+  const feeGhs = driverSettlement?.data.settlement.feeGhs;
+  const hasDriverFeeExpense = shipment.expenses.some(
+    (expense) => expense.driverFeeShipmentId !== null,
+  );
   // The reference rule depends on WHICH account was picked - no statement
   // arrives for somebody's own pocket - so the schema is built from the list
   // the picker offers.
@@ -111,7 +121,9 @@ export function ExpenseDialog({
       description: "",
       incurredAt: new Date().toISOString().slice(0, 10),
       method: "CASH",
-      paidNow: true,
+      paidNow: false,
+      useExistingPayment: canSeeMoney,
+      linkDriverFee: false,
       paymentAccountId: "",
       reference: "",
     },
@@ -119,6 +131,9 @@ export function ExpenseDialog({
 
   const method = watch("method");
   const paidNow = watch("paidNow");
+  const useExistingPayment = Boolean(watch("useExistingPayment"));
+  const paymentAccountId = watch("paymentAccountId");
+  const linkDriverFee = Boolean(watch("linkDriverFee"));
 
   // An account offered under one method is not offered under another, so
   // switching the method clears the pick rather than leaving a bank account
@@ -126,10 +141,35 @@ export function ExpenseDialog({
   useEffect(() => {
     setValue("paymentAccountId", "");
   }, [method, setValue]);
+  useEffect(() => {
+    setMatchedOutflows([]);
+  }, [paymentAccountId]);
 
   const onSubmit = async (values: ShipmentExpenseValues) => {
+    if (
+      !values.linkDriverFee &&
+      values.paidNow &&
+      values.useExistingPayment &&
+      matchedOutflows.length === 0
+    ) {
+      notify.error("Select at least one existing account debit.");
+      return;
+    }
+    if (
+      !values.linkDriverFee &&
+      values.paidNow &&
+      values.useExistingPayment &&
+      Math.round(
+        matchedOutflows.reduce((sum, row) => sum + row.amountGhs, 0) * 100,
+      ) > Math.round(Number(values.amountGhs) * 100)
+    ) {
+      notify.error("The selected debits exceed this expense's amount.");
+      return;
+    }
     try {
-      const payment = expensePaymentBody(values);
+      const payment = values.linkDriverFee
+        ? undefined
+        : expensePaymentBody(values);
       await add({
         body: {
           amountGhs: Number(values.amountGhs),
@@ -138,13 +178,23 @@ export function ExpenseDialog({
             ? { description: values.description.trim() }
             : {}),
           incurredAt: values.incurredAt,
+          ...(values.linkDriverFee ? { linkDriverFee: true } : {}),
+          ...(!values.linkDriverFee &&
+          values.paidNow &&
+          values.useExistingPayment
+            ? { existingMovementIds: matchedOutflows.map((row) => row.id) }
+            : {}),
           // No amount in it: the server settles the whole cost.
           ...(payment ? { payment } : {}),
         },
         id: shipment.id,
       }).unwrap();
       notify.success(
-        payment ? "Expense added and paid" : "Expense added - this is owed",
+        values.linkDriverFee
+          ? "Driver fee added to shipment expenses"
+          : payment || matchedOutflows.length
+            ? "Expense added with payment recorded"
+            : "Expense added - this is owed",
       );
       onClose();
     } catch (err) {
@@ -190,11 +240,43 @@ export function ExpenseDialog({
           <AdminField label="Amount (GHS)" error={errors.amountGhs?.message}>
             <Input
               inputMode="decimal"
-              className={cn(adminInputClass, errors.amountGhs && "border-console-red")}
+              className={cn(
+                adminInputClass,
+                errors.amountGhs && "border-console-red",
+              )}
               placeholder="0.00"
+              readOnly={linkDriverFee}
               {...register("amountGhs")}
             />
           </AdminField>
+          {canSeeMoney &&
+          feeGhs != null &&
+          feeGhs > 0 &&
+          !hasDriverFeeExpense ? (
+            <Controller
+              control={control}
+              name="linkDriverFee"
+              render={({ field }) => (
+                <label className="flex cursor-pointer items-start gap-2 text-[11.5px] text-adm-body">
+                  <input
+                    checked={Boolean(field.value)}
+                    className="mt-0.5"
+                    onChange={(event) => {
+                      field.onChange(event.target.checked);
+                      if (event.target.checked)
+                        setValue("amountGhs", String(feeGhs));
+                    }}
+                    type="checkbox"
+                  />
+                  <span>
+                    Record this trip&apos;s driver fee as the expense. Its
+                    existing and future driver payments will settle it without
+                    another account debit.
+                  </span>
+                </label>
+              )}
+            />
+          ) : null}
           <AdminField label="Description" optional>
             <Input
               className={adminInputClass}
@@ -202,15 +284,26 @@ export function ExpenseDialog({
               {...register("description")}
             />
           </AdminField>
-          <ExpensePaymentFields
-            control={control}
-            errors={errors}
-            idPrefix="trip-expense"
-            method={method}
-            owedNote="Nothing goes out yet. The cost is on this trip from today and is paid from its own voucher in Expenses once the money moves."
-            paidNow={paidNow}
-            register={register}
-          />
+          {!linkDriverFee ? (
+            <ExpensePaymentFields
+              control={control}
+              errors={errors}
+              idPrefix="trip-expense"
+              method={method}
+              owedNote="Nothing goes out yet. The cost is on this trip from today and is paid from its own voucher in Expenses once the money moves."
+              paidNow={paidNow}
+              allowExisting={canSeeMoney}
+              useExistingPayment={useExistingPayment}
+              register={register}
+            />
+          ) : null}
+          {!linkDriverFee && paidNow && useExistingPayment ? (
+            <ExistingOutflowPicker
+              key={paymentAccountId}
+              accountId={paymentAccountId}
+              onChange={setMatchedOutflows}
+            />
+          ) : null}
           <ResponsiveDialogFooter className="gap-2">
             <AdminButton
               type="button"
@@ -220,7 +313,12 @@ export function ExpenseDialog({
             >
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={isLoading} loading={isLoading} size="lg">
+            <AdminButton
+              type="submit"
+              disabled={isLoading}
+              loading={isLoading}
+              size="lg"
+            >
               {isLoading ? "Adding…" : "Add expense"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -265,7 +363,9 @@ export function AddSalesDialog({
     try {
       await addSales({ id: shipment.id, saleIds: picked }).unwrap();
       notify.success(
-        picked.length === 1 ? "Sale added to the truck" : "Sales added to the truck",
+        picked.length === 1
+          ? "Sale added to the truck"
+          : "Sales added to the truck",
       );
       onClose();
     } catch (err) {
@@ -293,7 +393,9 @@ export function AddSalesDialog({
         />
 
         {eligible.isLoading ? (
-          <p className="py-3 text-[11.5px] text-adm-muted">Loading shippable sales…</p>
+          <p className="py-3 text-[11.5px] text-adm-muted">
+            Loading shippable sales…
+          </p>
         ) : eligible.isError ? (
           <p className="py-3 text-[11.5px] text-console-red">
             Couldn&apos;t load the shippable sales. Reload and try again.
@@ -448,7 +550,12 @@ export function SalesUnpaidDialog({
         </p>
 
         <ResponsiveDialogFooter className="gap-2">
-          <AdminButton type="button" variant="outline" size="lg" onClick={onClose}>
+          <AdminButton
+            type="button"
+            variant="outline"
+            size="lg"
+            onClick={onClose}
+          >
             Leave it open
           </AdminButton>
         </ResponsiveDialogFooter>
@@ -500,7 +607,10 @@ export function CancelDialog({
         >
           <AdminField label="Reason" error={errors.reason?.message}>
             <Input
-              className={cn(adminInputClass, errors.reason && "border-console-red")}
+              className={cn(
+                adminInputClass,
+                errors.reason && "border-console-red",
+              )}
               placeholder="e.g. Buyer postponed collection"
               {...register("reason")}
             />
@@ -592,7 +702,10 @@ export function VoidExpenseDialog({
         >
           <AdminField label="Reason" error={errors.reason?.message}>
             <Input
-              className={cn(adminInputClass, errors.reason && "border-console-red")}
+              className={cn(
+                adminInputClass,
+                errors.reason && "border-console-red",
+              )}
               placeholder="e.g. Wrong amount keyed"
               {...register("reason")}
             />

@@ -32,7 +32,9 @@ interface IDateCellProps {
   muted?: boolean;
 }
 
-const isInvalid = (value: string | null | undefined): value is null | undefined =>
+const isInvalid = (
+  value: string | null | undefined,
+): value is null | undefined =>
   !value || Number.isNaN(new Date(value).getTime());
 
 /** Stacked date over time for timestamp columns (createdAt etc.). */
@@ -66,7 +68,12 @@ export function DateTimeCell({ value, muted }: IDateCellProps) {
 export function DateOnlyCell({ value, muted }: IDateCellProps) {
   if (isInvalid(value)) return <Absent />;
   return (
-    <span className={cn("whitespace-nowrap text-[11.5px]", muted && "text-adm-muted")}>
+    <span
+      className={cn(
+        "whitespace-nowrap text-[11.5px]",
+        muted && "text-adm-muted",
+      )}
+    >
       {formatTableDate(value)}
     </span>
   );

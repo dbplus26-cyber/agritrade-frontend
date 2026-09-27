@@ -97,8 +97,16 @@ const SALE_DETAIL = {
     data: {
       sale: {
         lines: [
-          { commodity: { id: "maize", name: "Maize" }, id: "l1", unitPriceGhs: 10 },
-          { commodity: { id: "soya", name: "Soya beans" }, id: "l2", unitPriceGhs: 4 },
+          {
+            commodity: { id: "maize", name: "Maize" },
+            id: "l1",
+            unitPriceGhs: 10,
+          },
+          {
+            commodity: { id: "soya", name: "Soya beans" },
+            id: "l2",
+            unitPriceGhs: 4,
+          },
         ],
       },
     },
@@ -237,7 +245,11 @@ describe("ArrivalDialog", () => {
     await recordArrival();
 
     const [[sent]] = arriveTrigger.mock.calls as [
-      [{ sales: { lines: { receivedKg: number }[]; settledTotalGhs: number }[] }],
+      [
+        {
+          sales: { lines: { receivedKg: number }[]; settledTotalGhs: number }[];
+        },
+      ],
     ];
     expect(sent.sales[0].settledTotalGhs).toBe(0);
     expect(sent.sales[0].lines.map((l) => l.receivedKg)).toEqual([0, 0]);
@@ -290,7 +302,9 @@ describe("ArrivalDialog", () => {
     render(<ArrivalDialog onClose={vi.fn()} shipment={shipment()} />);
 
     await userEvent.click(
-      screen.getByRole("button", { name: /mark arrived and record this later/i }),
+      screen.getByRole("button", {
+        name: /mark arrived and record this later/i,
+      }),
     );
     const heading = await screen.findByText(/Mark this trip arrived/i);
     const gate = heading.closest('[role="dialog"]') as HTMLElement;
@@ -305,7 +319,9 @@ describe("ArrivalDialog", () => {
 
     await userEvent.clear(paymentBox());
     await userEvent.type(paymentBox(), "11000");
-    await userEvent.click(screen.getByRole("button", { name: "Record arrival" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Record arrival" }),
+    );
 
     expect(
       await screen.findByText(/Reverse a payment on SAL-2026-00011 first/i),
@@ -331,7 +347,9 @@ describe("ArrivalDialog", () => {
     await recordArrival();
 
     expect(
-      await screen.findByText(/Reverse a payment first, then record the arrival/i),
+      await screen.findByText(
+        /Reverse a payment first, then record the arrival/i,
+      ),
     ).toBeInTheDocument();
     // Still on screen to be corrected, not lost behind a closed dialog.
     expect(paymentBox()).toBeInTheDocument();
@@ -345,8 +363,16 @@ describe("ArrivalDialog", () => {
         data: {
           sale: {
             lines: [
-              { commodity: { id: "maize", name: "Maize" }, id: "l1", unitPriceGhs: null },
-              { commodity: { id: "soya", name: "Soya beans" }, id: "l2", unitPriceGhs: null },
+              {
+                commodity: { id: "maize", name: "Maize" },
+                id: "l1",
+                unitPriceGhs: null,
+              },
+              {
+                commodity: { id: "soya", name: "Soya beans" },
+                id: "l2",
+                unitPriceGhs: null,
+              },
             ],
           },
         },

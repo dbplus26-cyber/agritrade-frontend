@@ -30,20 +30,31 @@ describe("an expense category says where it files", () => {
       "FINANCE",
       "TAX",
     ]);
-    for (const value of ["ADMINISTRATIVE", "COST_OF_SALES", "FINANCE", "TAX"] as const) {
+    for (const value of [
+      "ADMINISTRATIVE",
+      "COST_OF_SALES",
+      "FINANCE",
+      "TAX",
+    ] as const) {
       expect(
-        expenseCategorySchema.safeParse({ name: "Rent", statementSection: value })
-          .success,
+        expenseCategorySchema.safeParse({
+          name: "Rent",
+          statementSection: value,
+        }).success,
       ).toBe(true);
     }
     expect(
-      expenseCategorySchema.safeParse({ name: "Rent", statementSection: "OTHER" })
-        .success,
+      expenseCategorySchema.safeParse({
+        name: "Rent",
+        statementSection: "OTHER",
+      }).success,
     ).toBe(false);
   });
 
   it("prints a section in the owner's words", () => {
     expect(statementSectionLabel("TAX")).toBe("Tax paid");
-    expect(statementSectionLabel("COST_OF_SALES")).toBe("Cost of the goods sold");
+    expect(statementSectionLabel("COST_OF_SALES")).toBe(
+      "Cost of the goods sold",
+    );
   });
 });

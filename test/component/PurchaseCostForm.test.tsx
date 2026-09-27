@@ -17,21 +17,49 @@
 //     owed sent everybody to a second screen - which is how a cost sat owed on
 //     the books while the cash had demonstrably gone.
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEventBase from "@testing-library/user-event";
 
 import { pickOption } from "../helpers/pick-option";
 
 import { PurchaseCostDialog } from "@/components/admin/purchases/purchase-cost-form";
 
-const { addCost, errorToast, successToast } = vi.hoisted(() => ({
-  addCost: vi.fn(),
-  errorToast: vi.fn(),
-  successToast: vi.fn(),
-}));
+const { addCost, errorToast, moneyVisibility, successToast } = vi.hoisted(
+  () => ({
+    addCost: vi.fn(),
+    errorToast: vi.fn(),
+    moneyVisibility: { enabled: true },
+    successToast: vi.fn(),
+  }),
+);
 
 vi.mock("@/redux/purchases/purchases-api", () => ({
   useAddPurchaseCostMutation: () => [addCost, { isLoading: false }],
+}));
+vi.mock("@/redux/expenses/expenses-api", () => ({
+  useGetMatchableOutflowsQuery: () => ({
+    data: {
+      data: [
+        {
+          amountGhs: 150,
+          id: "b10e20ef-1111-4111-8111-111111111111",
+          occurredAt: "2026-09-20T10:00:00.000Z",
+          transactionNo: "CMV-2026-00001",
+        },
+        {
+          amountGhs: 100,
+          id: "b10e20ef-2222-4222-8222-222222222222",
+          occurredAt: "2026-09-21T10:00:00.000Z",
+          transactionNo: "CMV-2026-00002",
+        },
+      ],
+    },
+    isError: false,
+    isFetching: false,
+  }),
+}));
+vi.mock("@/hooks/use-money-visibility", () => ({
+  useMoneyVisibility: () => moneyVisibility.enabled,
 }));
 
 // The picker is covered on its own (test/component/PaymentAccountField.test.tsx);
@@ -91,8 +119,7 @@ type AddCall = [
   { body: Record<string, unknown>; idempotencyKey: string; purchaseId: string },
 ];
 
-const sent = (call = 0) =>
-  (addCost.mock.calls[call] as unknown as AddCall)[0];
+const sent = (call = 0) => (addCost.mock.calls[call] as unknown as AddCall)[0];
 
 const renderDialog = () =>
   render(
@@ -106,13 +133,16 @@ const renderDialog = () =>
 
 const fillCost = async (amount = "400.00") => {
   await pickOption(screen.getByLabelText(/Category/i), "Haulage");
-  await userEvent.type(screen.getByLabelText(/Amount/i), amount);
+  fireEvent.change(screen.getByLabelText(/Amount/i), {
+    target: { value: amount },
+  });
 };
 
 const submit = () =>
   userEvent.click(screen.getByRole("button", { name: "Record cost" }));
 
 beforeEach(() => {
+  moneyVisibility.enabled = true;
   addCost.mockReset();
   errorToast.mockReset();
   successToast.mockReset();
@@ -153,10 +183,17 @@ describe("PurchaseCostDialog", () => {
     expect(sent().body.capitalise).toBe(false);
   });
 
-  it("settles the cost in the same act, by default", async () => {
+  it("only creates a new debit after an explicit choice", async () => {
     renderDialog();
 
     await fillCost();
+    await userEvent.click(screen.getByRole("button", { name: "Already paid" }));
+    expect(
+      screen.getByRole("button", { name: "Match existing debit" }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await userEvent.click(
+      screen.getByRole("button", { name: "Record a new debit" }),
+    );
     await submit();
 
     // Cash out of the till: no account, no reference, and the server settles
@@ -165,6 +202,47 @@ describe("PurchaseCostDialog", () => {
       method: "CASH",
       paidAt: expect.any(String),
     });
+  });
+
+  it("allows a new payment when existing cash-book debits are not visible", async () => {
+    moneyVisibility.enabled = false;
+    renderDialog();
+    await fillCost();
+    await userEvent.click(screen.getByRole("button", { name: "Pay now" }));
+    expect(
+      screen.queryByRole("button", { name: "Match existing debit" }),
+    ).not.toBeInTheDocument();
+    await submit();
+    expect(sent().body.payment).toMatchObject({ method: "CASH" });
+  });
+
+  it("matches multiple debits without recording another payment", async () => {
+    renderDialog();
+    await fillCost();
+    await userEvent.click(screen.getByRole("button", { name: "Already paid" }));
+    await userEvent.type(screen.getByLabelText("Account"), "acc-1");
+    await userEvent.click(screen.getByLabelText(/CMV-2026-00001/i));
+    await userEvent.click(screen.getByLabelText(/CMV-2026-00002/i));
+    await submit();
+    expect(sent().body).not.toHaveProperty("payment");
+    expect(sent().body.existingMovementIds).toEqual([
+      "b10e20ef-1111-4111-8111-111111111111",
+      "b10e20ef-2222-4222-8222-222222222222",
+    ]);
+  });
+
+  it("refuses matched debits above the cost", async () => {
+    renderDialog();
+    await fillCost("200.00");
+    await userEvent.click(screen.getByRole("button", { name: "Already paid" }));
+    await userEvent.type(screen.getByLabelText("Account"), "acc-1");
+    await userEvent.click(screen.getByLabelText(/CMV-2026-00001/i));
+    await userEvent.click(screen.getByLabelText(/CMV-2026-00002/i));
+    await submit();
+    expect(addCost).not.toHaveBeenCalled();
+    expect(errorToast).toHaveBeenCalledWith(
+      "The selected debits exceed this cost's amount.",
+    );
   });
 
   it("records it as owed when the money has not gone yet", async () => {
@@ -181,12 +259,20 @@ describe("PurchaseCostDialog", () => {
     renderDialog();
 
     await fillCost();
-    await pickOption(screen.getByLabelText(/How it was paid/i), "Bank transfer");
-    await userEvent.type(
-      screen.getByLabelText("Account"),
-      "3d0c9f0e-1a2b-4c5d-8e9f-0a1b2c3d4e5f",
+    await userEvent.click(screen.getByRole("button", { name: "Already paid" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Record a new debit" }),
     );
-    await userEvent.type(screen.getByLabelText(/Reference/i), "TRF884512");
+    await pickOption(
+      screen.getByLabelText(/How it was paid/i),
+      "Bank transfer",
+    );
+    fireEvent.change(screen.getByLabelText("Account"), {
+      target: { value: "3d0c9f0e-1a2b-4c5d-8e9f-0a1b2c3d4e5f" },
+    });
+    fireEvent.change(screen.getByLabelText(/Reference/i), {
+      target: { value: "TRF884512" },
+    });
     await submit();
 
     expect(sent().body.payment).toMatchObject({
@@ -200,7 +286,14 @@ describe("PurchaseCostDialog", () => {
     renderDialog();
 
     await fillCost();
-    await pickOption(screen.getByLabelText(/How it was paid/i), "Bank transfer");
+    await userEvent.click(screen.getByRole("button", { name: "Already paid" }));
+    await userEvent.click(
+      screen.getByRole("button", { name: "Record a new debit" }),
+    );
+    await pickOption(
+      screen.getByLabelText(/How it was paid/i),
+      "Bank transfer",
+    );
     await submit();
 
     expect(addCost).not.toHaveBeenCalled();
@@ -210,9 +303,7 @@ describe("PurchaseCostDialog", () => {
   });
 
   it("reports what the SERVER settled, not what the form asked for", async () => {
-    // The form can ask to pay and still be told the cost stands owed - a
-    // replayed submission answers with the cost that already exists. The
-    // message follows the answer, never the request.
+    // The message follows the server's settlement, never an assumed form default.
     renderDialog();
 
     await fillCost();
@@ -241,7 +332,7 @@ describe("PurchaseCostDialog", () => {
     expect(successToast).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({
-        description: expect.stringContaining("taken off the account"),
+        description: expect.stringContaining("Cost is fully paid"),
       }),
     );
   });

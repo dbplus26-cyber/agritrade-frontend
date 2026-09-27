@@ -339,9 +339,10 @@ export function PurchaseCostsCard({
           the month's books and the goods for the same cedi. */}
       {monthlyGhs === null || monthlyGhs > 0 ? (
         <p className="mt-2 border-t border-adm-hairline pt-2 text-[11px] leading-[1.5] text-adm-muted">
-          A further <Mono className="text-adm-ink">{formatCedis(monthlyGhs)}</Mono>{" "}
-          is charged to this purchase but not to the goods - it sits in the
-          costs of the month it was incurred.
+          A further{" "}
+          <Mono className="text-adm-ink">{formatCedis(monthlyGhs)}</Mono> is
+          charged to this purchase but not to the goods - it sits in the costs
+          of the month it was incurred.
         </p>
       ) : null}
 

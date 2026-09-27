@@ -38,6 +38,7 @@ export const accountEntrySchema = z
   .object({
     amountGhs: amountText,
     occurredAt: z.string().min(1, "Pick the date the money moved"),
+    externalReference: z.string().trim().max(120).optional(),
     reason: z
       .string()
       .trim()

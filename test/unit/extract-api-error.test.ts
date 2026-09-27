@@ -42,8 +42,8 @@ describe("extractApiError", () => {
   });
 
   it("never surfaces a bare Aborted", () => {
-    expect(extractApiError({ name: "AbortError", message: "Aborted" }).message).toMatch(
-      /interrupted/i,
-    );
+    expect(
+      extractApiError({ name: "AbortError", message: "Aborted" }).message,
+    ).toMatch(/interrupted/i);
   });
 });

@@ -26,7 +26,10 @@ import {
   adminSelectClass,
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
-import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons";
+import {
+  ConsoleTableSkeleton,
+  FormSkeleton,
+} from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
@@ -40,10 +43,7 @@ import {
   useGetDriversQuery,
   useUpdateDriverMutation,
 } from "@/redux/drivers/drivers-api";
-import {
-  PhotoViewDialog,
-  ViewablePhoto,
-} from "@/components/admin/photo-view";
+import { PhotoViewDialog, ViewablePhoto } from "@/components/admin/photo-view";
 import { useTableQuery } from "@/hooks/use-table-query";
 import { usePermissions } from "@/hooks/use-permissions";
 import { useEditableRecordForm } from "@/hooks/use-editable-record-form";
@@ -53,7 +53,10 @@ import { DateTimeCell } from "@/components/admin/date-cell";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import type { IDriver, IDriverListQuery } from "@/types/logistics.types";
-import { driverSchema, type DriverValues } from "@/validations/logistics-schema";
+import {
+  driverSchema,
+  type DriverValues,
+} from "@/validations/logistics-schema";
 import {
   RailCard,
   RailStatus,
@@ -172,7 +175,11 @@ export function DriverTable() {
         meta: columnMeta({ card: "meta", at: "xl" }),
         cell: ({ row }) =>
           row.original.city ? (
-            <TextCell className="text-adm-muted" value={row.original.city} width="label" />
+            <TextCell
+              className="text-adm-muted"
+              value={row.original.city}
+              width="label"
+            />
           ) : (
             <Absent />
           ),
@@ -350,7 +357,10 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
   });
   // The owner-maintained policy register is a handful of rows, so one page is
   // the whole register and a native select over it is honest.
-  const policies = useGetDriverPaymentPoliciesQuery({ isActive: true, limit: 100 });
+  const policies = useGetDriverPaymentPoliciesQuery({
+    isActive: true,
+    limit: 100,
+  });
   const watchedName = useWatch({ control, name: "name" });
   const avatarName = watchedName || driver?.name || "";
 
@@ -373,9 +383,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
             licenseNo: opt(values.licenseNo),
             idNumber: opt(values.idNumber),
             notes: opt(values.notes),
-            ...(removePhoto && !photoFile
-              ? { removePhoto: true }
-              : {}),
+            ...(removePhoto && !photoFile ? { removePhoto: true } : {}),
           },
           photo: photoFile ?? undefined,
         }).unwrap();
@@ -439,17 +447,15 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
             - which is how this page is nearly always seen - the record would
             show no picture at all. */}
         <div className="mb-4 flex items-center gap-3.5 border-b border-adm-hairline pb-4">
-          <ViewablePhoto
-            name={driver.name}
-            size={64}
-            src={driver.photoUrl}
-          />
+          <ViewablePhoto name={driver.name} size={64} src={driver.photoUrl} />
           <div className="min-w-0">
             <div className="text-[12.5px] font-semibold text-adm-ink [overflow-wrap:anywhere]">
               {driver.name}
             </div>
             <div className="text-[11px] text-adm-muted">
-              {driver.photoUrl ? "Tap the photo to see it in full" : "No photo on file"}
+              {driver.photoUrl
+                ? "Tap the photo to see it in full"
+                : "No photo on file"}
             </div>
           </div>
         </div>
@@ -489,7 +495,8 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
               it stays in step with the fields under it. */}
           <div>
             <span className="mb-1 block text-[11.5px] font-semibold text-adm-ink">
-              Photo <span className="font-normal text-adm-faint">(optional)</span>
+              Photo{" "}
+              <span className="font-normal text-adm-faint">(optional)</span>
             </span>
             <div className="flex flex-wrap items-center gap-3.5">
               {previewUrl && readOnly ? (
@@ -557,7 +564,11 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
             <Input
               placeholder="e.g. Yakubu Andani"
               disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
+              className={cn(
+                adminInputClass,
+                roCls,
+                errors.name && "border-console-red",
+              )}
               {...register("name")}
             />
           </AdminField>
@@ -567,7 +578,11 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
                 type="tel"
                 placeholder="e.g. 024 000 0000"
                 disabled={readOnly}
-                className={cn(adminInputClass, roCls, errors.phone && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.phone && "border-console-red",
+                )}
                 {...register("phone")}
               />
             </AdminField>
@@ -576,7 +591,11 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
                 type="email"
                 placeholder="e.g. yakubu@example.com"
                 disabled={readOnly}
-                className={cn(adminInputClass, roCls, errors.email && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.email && "border-console-red",
+                )}
                 {...register("email")}
               />
             </AdminField>
@@ -606,7 +625,11 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
               <Input
                 placeholder="e.g. Tamale"
                 disabled={readOnly}
-                className={cn(adminInputClass, roCls, errors.city && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.city && "border-console-red",
+                )}
                 {...register("city")}
               />
             </AdminField>
@@ -669,9 +692,7 @@ function DriverFormFields({ driver }: { driver?: IDriver }) {
                   className={cn(adminSelectClass, roCls)}
                   disabled={readOnly}
                   value={field.value}
-                  onChange={(v) =>
-                    field.onChange(v === "__default__" ? "" : v)
-                  }
+                  onChange={(v) => field.onChange(v === "__default__" ? "" : v)}
                   placeholder="Use the system default"
                   // "Default" is a real choice, not just an unset state - the
                   // sentinel maps back to "" so a picked policy can be

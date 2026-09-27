@@ -21,7 +21,8 @@ const ACQUISITION_HELP: Record<LandAcquisitionStatus, string> = {
   CANCELLED:
     "The purchase was called off; anything already paid stays on the record.",
   COMPLETED: "The seller has been paid in full and the land is yours.",
-  NEGOTIATING: "Still agreeing a price with the seller, so nothing is owed yet.",
+  NEGOTIATING:
+    "Still agreeing a price with the seller, so nothing is owed yet.",
 };
 
 export function LandAcquisitionStatusBadge({

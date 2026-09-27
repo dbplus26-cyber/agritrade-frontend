@@ -53,9 +53,9 @@ export default async function ReviewsPage({
             What people put on record about us.
           </h1>
           <p className="text-[14px] leading-[1.65] text-soil lg:text-[16px] lg:leading-[1.7]">
-            Every review here was written by someone who actually dealt with
-            us - we match each one to a transaction number before it goes up.
-            Been our customer? Add yours below.
+            Every review here was written by someone who actually dealt with us
+            - we match each one to a transaction number before it goes up. Been
+            our customer? Add yours below.
           </p>
         </div>
       </section>
@@ -63,8 +63,8 @@ export default async function ReviewsPage({
       <section className="mx-auto max-w-[1312px] px-5 pb-14 lg:px-8 lg:pb-20">
         {reviews.length === 0 ? (
           <p className="max-w-[52ch] border-t border-dotted border-soil/40 pt-6 text-[14px] leading-[1.65] text-soil lg:text-[15px]">
-            No reviews on file yet. If you have traded with us, yours can be
-            the first - the form below takes a minute.
+            No reviews on file yet. If you have traded with us, yours can be the
+            first - the form below takes a minute.
           </p>
         ) : (
           <Reveal>
@@ -90,22 +90,22 @@ export default async function ReviewsPage({
         className="texture-grain bg-surface-alt py-14 lg:py-20"
       >
         <div className="mx-auto max-w-[1312px] px-5 lg:px-8">
-        <div className="max-w-[860px]">
-          <div className="mb-4 flex items-center gap-2.5">
-            <StencilLabel className="text-[11px] tracking-[0.3em] lg:text-[12px]">
-              LEAVE A REVIEW
-            </StencilLabel>
+          <div className="max-w-[860px]">
+            <div className="mb-4 flex items-center gap-2.5">
+              <StencilLabel className="text-[11px] tracking-[0.3em] lg:text-[12px]">
+                LEAVE A REVIEW
+              </StencilLabel>
+            </div>
+            <h2 className="mb-3 font-display text-[26px] font-bold leading-[1.15] text-forest lg:text-[34px]">
+              Dealt with us? Put it on record.
+            </h2>
+            <p className="mb-7 max-w-[56ch] text-[14px] leading-[1.65] text-soil lg:mb-9 lg:text-[15px]">
+              You&rsquo;ll need the transaction number from your receipt or
+              waybill and the phone number you used - that&rsquo;s how we keep
+              the reviews real. Approved reviews appear on this page.
+            </p>
+            <ReviewForm />
           </div>
-          <h2 className="mb-3 font-display text-[26px] font-bold leading-[1.15] text-forest lg:text-[34px]">
-            Dealt with us? Put it on record.
-          </h2>
-          <p className="mb-7 max-w-[56ch] text-[14px] leading-[1.65] text-soil lg:mb-9 lg:text-[15px]">
-            You&rsquo;ll need the transaction number from your receipt or
-            waybill and the phone number you used - that&rsquo;s how we keep
-            the reviews real. Approved reviews appear on this page.
-          </p>
-          <ReviewForm />
-        </div>
         </div>
       </section>
     </div>

@@ -16,8 +16,18 @@ export default function manifest(): MetadataRoute.Manifest {
       // Real files derived from the company mark. The "any" icons keep their
       // transparent field; the maskable one is padded onto the brand green
       // because Android crops it to a circle and would otherwise clip the mark.
-      { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
-      { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      {
+        src: "/icon-192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/icon-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any",
+      },
       {
         purpose: "maskable",
         sizes: "512x512",

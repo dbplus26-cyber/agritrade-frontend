@@ -154,12 +154,7 @@ describe("repaymentSchema", () => {
         ratePerKgGhs: "4.20",
         weightKg: "900",
       }),
-    ).toEqual([
-      "commodityId",
-      "weightKg",
-      "ratePerKgGhs",
-      "intakeWarehouseId",
-    ]);
+    ).toEqual(["commodityId", "weightKg", "ratePerKgGhs", "intakeWarehouseId"]);
   });
 
   it("refuses a produce repayment that names an account", () => {

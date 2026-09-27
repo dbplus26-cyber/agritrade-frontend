@@ -102,7 +102,9 @@ function Kpi({
             <Money compact animate value={figure} />
           )}
         </div>
-        {sub ? <div className="mt-0.5 text-[11px] text-adm-muted">{sub}</div> : null}
+        {sub ? (
+          <div className="mt-0.5 text-[11px] text-adm-muted">{sub}</div>
+        ) : null}
       </AdminCard>
     </Link>
   );
@@ -119,16 +121,16 @@ function AgentFloatsCard() {
       title="Cash with agents"
       hint="What each field agent still holds of the money you gave them to buy with."
       right={
-        <Link href="/admin/agents" className={cn(adminLinkClass, "text-[11px]")}>
+        <Link
+          href="/admin/agents"
+          className={cn(adminLinkClass, "text-[11px]")}
+        >
           All agents
         </Link>
       }
     >
       {isError ? (
-        <WidgetError
-          what="the agent floats"
-          onRetry={() => void refetch()}
-        />
+        <WidgetError what="the agent floats" onRetry={() => void refetch()} />
       ) : isLoading ? (
         <Skeleton className="h-[120px] w-full rounded-none" />
       ) : agents.length === 0 ? (
@@ -183,7 +185,10 @@ function TrucksCard() {
       title="Trucks on the road"
       hint="Loads that have been started or dispatched and have not been signed off yet."
       right={
-        <Link href="/admin/shipments" className={cn(adminLinkClass, "text-[11px]")}>
+        <Link
+          href="/admin/shipments"
+          className={cn(adminLinkClass, "text-[11px]")}
+        >
           All shipments
         </Link>
       }
@@ -258,7 +263,10 @@ export function DashboardLive() {
           which would leave an empty skeleton pulsing with nothing to act on. */}
       {isError ? (
         <div className="mb-5">
-          <WidgetError what="the snapshot figures" onRetry={() => void refetch()} />
+          <WidgetError
+            what="the snapshot figures"
+            onRetry={() => void refetch()}
+          />
         </div>
       ) : isLoading || !d ? (
         <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-5">
@@ -312,7 +320,11 @@ export function DashboardLive() {
             hint="Orders agreed with buyers that are not yet delivered and paid off."
             figure={d.salesInProgress}
             format={formatCount}
-            sub={canSeeMoney ? <Money compact value={d.salesInProgressAgreedGhs} /> : undefined}
+            sub={
+              canSeeMoney ? (
+                <Money compact value={d.salesInProgressAgreedGhs} />
+              ) : undefined
+            }
             href="/admin/sales"
           />
           {canSeeMoney ? (

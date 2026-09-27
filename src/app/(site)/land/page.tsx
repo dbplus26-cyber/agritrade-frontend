@@ -37,7 +37,10 @@ export default async function LandPage({
   return (
     <div className="texture-grain bg-surface">
       <LandIntro />
-      <div aria-hidden="true" className="ledger-rule mx-auto mb-10 max-w-[1312px] px-5 lg:mb-12 lg:px-8" />
+      <div
+        aria-hidden="true"
+        className="ledger-rule mx-auto mb-10 max-w-[1312px] px-5 lg:mb-12 lg:px-8"
+      />
       <BuyingSteps />
       <PlotFiles
         page={page}

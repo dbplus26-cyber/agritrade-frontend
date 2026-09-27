@@ -52,10 +52,17 @@ function Tile({
           beside the figure it describes anyway. */}
       <div className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         <span className="min-w-0">{label}</span>
-        {hint ? <HelpTip label={`What does ${label} count?`} text={hint} /> : null}
+        {hint ? (
+          <HelpTip label={`What does ${label} count?`} text={hint} />
+        ) : null}
       </div>
       <div className="mt-1 flex items-baseline justify-between gap-1.5">
-        <Mono className={cn("min-w-0 font-bold text-adm-ink", statValueCls(valueText))}>
+        <Mono
+          className={cn(
+            "min-w-0 font-bold text-adm-ink",
+            statValueCls(valueText),
+          )}
+        >
           {figure !== null && format ? (
             <CountUp value={figure} format={format} />
           ) : (
@@ -68,7 +75,9 @@ function Tile({
           </span>
         ) : null}
       </div>
-      {sub ? <div className="mt-0.5 text-[11px] text-adm-muted">{sub}</div> : null}
+      {sub ? (
+        <div className="mt-0.5 text-[11px] text-adm-muted">{sub}</div>
+      ) : null}
     </AdminCard>
   );
 }
@@ -89,10 +98,7 @@ export function PeriodSummary({ window }: { window: IReportWindow }) {
         In selected period
       </div>
       {isError ? (
-        <WidgetError
-          what="the period figures"
-          onRetry={() => void refetch()}
-        />
+        <WidgetError what="the period figures" onRetry={() => void refetch()} />
       ) : isLoading || !s ? (
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (

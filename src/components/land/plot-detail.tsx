@@ -127,7 +127,9 @@ export async function PlotDetail({ plot }: { plot: PublicLandPlot }) {
                     : "border-soil/55 text-soil shadow-[3px_3px_0_rgb(89_82_59/0.3)] hover:text-ink hover:shadow-[2px_2px_0_rgb(89_82_59/0.3)]",
                 )}
               >
-                {available ? "Enquire about this plot" : "Ask about similar plots"}
+                {available
+                  ? "Enquire about this plot"
+                  : "Ask about similar plots"}
               </Link>
               {contact.hasPhone ? (
                 <a

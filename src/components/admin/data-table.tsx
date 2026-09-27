@@ -357,7 +357,9 @@ function summaryCard<TData>(
           {titleAction ? (
             // Pulled out to the card's own padding: the menu reads as the
             // right edge of the line, not as something floating short of it.
-            <span className="-mr-1 ml-auto flex-none">{render(titleAction)}</span>
+            <span className="-mr-1 ml-auto flex-none">
+              {render(titleAction)}
+            </span>
           ) : null}
         </div>
       ) : null}
@@ -889,69 +891,69 @@ export function ConsoleDataTable<TData>({
         aria-busy={isFetching || undefined}
       >
         <CompactDates.Provider value>
-        {rows.length === 0 ? (
-          <li>
-            {emptyState ?? (
-              <div className="px-4 py-12 text-center text-[12px] text-adm-muted">
-                Nothing here yet.
-              </div>
-            )}
-          </li>
-        ) : (
-          // `initial={false}`: the first paint arrives whole; only cards that
-          // appear AFTER mount play the entrance.
-          <AnimatePresence initial={false} mode="popLayout">
-            {rows.map((row, index) => {
-              const href = rowHref?.(row.original);
-              // The select column is a table affordance and is dropped here:
-              // on a card, selecting is a press and hold, and the state shows
-              // as highlight.
-              const visible = row
-                .getVisibleCells()
-                .filter((c) => c.column.id !== "select");
-              // A DATA column carries an accessor - either form TanStack accepts,
-              // accessorFn or accessorKey. Checking only accessorFn mistakes an
-              // accessorKey column for a row action and drops it to the card
-              // foot. An ACTION column is a display column with neither.
-              //
-              // A column that NAMES a card slot is content by declaration,
-              // accessor or not. Status is usually a display column - the
-              // badge is computed in the cell, so there is nothing to accessor
-              // - and reading it as a row action put it on a line of its own
-              // at the foot of the card, away from the figure it belongs
-              // beside, on every register that declares status that way.
-              const isData = (c: (typeof visible)[number]) => {
-                if (c.column.columnDef.meta?.card) return true;
-                const def = c.column.columnDef as {
-                  accessorFn?: unknown;
-                  accessorKey?: unknown;
+          {rows.length === 0 ? (
+            <li>
+              {emptyState ?? (
+                <div className="px-4 py-12 text-center text-[12px] text-adm-muted">
+                  Nothing here yet.
+                </div>
+              )}
+            </li>
+          ) : (
+            // `initial={false}`: the first paint arrives whole; only cards that
+            // appear AFTER mount play the entrance.
+            <AnimatePresence initial={false} mode="popLayout">
+              {rows.map((row, index) => {
+                const href = rowHref?.(row.original);
+                // The select column is a table affordance and is dropped here:
+                // on a card, selecting is a press and hold, and the state shows
+                // as highlight.
+                const visible = row
+                  .getVisibleCells()
+                  .filter((c) => c.column.id !== "select");
+                // A DATA column carries an accessor - either form TanStack accepts,
+                // accessorFn or accessorKey. Checking only accessorFn mistakes an
+                // accessorKey column for a row action and drops it to the card
+                // foot. An ACTION column is a display column with neither.
+                //
+                // A column that NAMES a card slot is content by declaration,
+                // accessor or not. Status is usually a display column - the
+                // badge is computed in the cell, so there is nothing to accessor
+                // - and reading it as a row action put it on a line of its own
+                // at the foot of the card, away from the figure it belongs
+                // beside, on every register that declares status that way.
+                const isData = (c: (typeof visible)[number]) => {
+                  if (c.column.columnDef.meta?.card) return true;
+                  const def = c.column.columnDef as {
+                    accessorFn?: unknown;
+                    accessorKey?: unknown;
+                  };
+                  return Boolean(def.accessorFn ?? def.accessorKey);
                 };
-                return Boolean(def.accessorFn ?? def.accessorKey);
-              };
-              // A table puts row actions wherever the column order says; a CARD
-              // reads top to bottom, so they belong at the foot of it. Split
-              // rather than relying on call sites to declare actions last.
-              const cells = visible.filter(isData);
-              const actionCells = visible.filter((c) => !isData(c));
-              return (
-                <SummaryCard
-                  key={row.id}
-                  actionCells={actionCells}
-                  cells={cells}
-                  headerLabel={headerLabel}
-                  href={href}
-                  index={index}
-                  onNavigate={(h) => router.push(h)}
-                  reducedMotion={reducedMotion}
-                  row={row}
-                  // Selecting is only offered where the table offers it at all.
-                  selectable={enableSelection && row.getCanSelect()}
-                  selectionActive={selectedRows.length > 0}
-                />
-              );
-            })}
-          </AnimatePresence>
-        )}
+                // A table puts row actions wherever the column order says; a CARD
+                // reads top to bottom, so they belong at the foot of it. Split
+                // rather than relying on call sites to declare actions last.
+                const cells = visible.filter(isData);
+                const actionCells = visible.filter((c) => !isData(c));
+                return (
+                  <SummaryCard
+                    key={row.id}
+                    actionCells={actionCells}
+                    cells={cells}
+                    headerLabel={headerLabel}
+                    href={href}
+                    index={index}
+                    onNavigate={(h) => router.push(h)}
+                    reducedMotion={reducedMotion}
+                    row={row}
+                    // Selecting is only offered where the table offers it at all.
+                    selectable={enableSelection && row.getCanSelect()}
+                    selectionActive={selectedRows.length > 0}
+                  />
+                );
+              })}
+            </AnimatePresence>
+          )}
         </CompactDates.Provider>
       </ul>
 

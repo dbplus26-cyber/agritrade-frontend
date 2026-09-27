@@ -64,28 +64,101 @@ export const adminNavGroups: AdminNavGroup[] = [
   {
     label: "Overview",
     items: [
-      item("dashboard", "Dashboard", "Today at a glance: what came in, what went out, and what needs you."),
-      item("approvals", "Approvals", "Requests waiting on your decision. Approving applies the change straight away.", { badge: "approvals", permission: "APPROVALS_DECIDE" }),
-      item("cash-book", "Cash book", "Where the business's money is right now, account by account, and every movement in and out of each.", { permission: "MONEY_VIEW" }),
-      item("reports", "Reports", "Profit, cash and volume over a period you choose.", { permission: "MONEY_VIEW" }),
+      item(
+        "dashboard",
+        "Dashboard",
+        "Today at a glance: what came in, what went out, and what needs you.",
+      ),
+      item(
+        "approvals",
+        "Approvals",
+        "Requests waiting on your decision. Approving applies the change straight away.",
+        { badge: "approvals", permission: "APPROVALS_DECIDE" },
+      ),
+      item(
+        "cash-book",
+        "Cash book",
+        "Where the business's money is right now, account by account, and every movement in and out of each.",
+        { permission: "MONEY_VIEW" },
+      ),
+      item(
+        "reports",
+        "Reports",
+        "Profit, cash and volume over a period you choose.",
+        { permission: "MONEY_VIEW" },
+      ),
     ],
   },
   {
     label: "Trading",
     items: [
-      item("purchases", "Purchases", "Grain you have bought from suppliers and agents, and what it cost."),
-      item("sales", "Sales", "Orders you have agreed with buyers, and what they have paid so far."),
-      item("shipments", "Shipments", "Trucks carrying orders out: who is driving, what is on board, where it is going."),
-      item("stock", "Stock", "How much of each commodity is sitting in each warehouse right now."),
-      item("transfers", "Transfers", "Stock moved from one warehouse to another."),
-      item("stocktakes", "Stocktakes", "Physical counts. Approving one corrects the system to match what was actually there."),
-      item("commodities", "Commodities", "The list of crops you trade in. Used everywhere a commodity is chosen."),
-      item("warehouses", "Warehouses", "Your storage locations. Stock is counted per warehouse."),
-      item("agents", "Agents", "Field buyers who hold your money to buy on your behalf."),
-      item("expenses", "Expenses", "Costs the business has incurred, and whether they have been paid."),
-      item("expense-categories", "Expense Categories", "The headings costs are filed under, so spending can be grouped."),
-      item("payment-policies", "Payment Policies", "When a buyer has to pay you: the deposit and balance split.", { ownerOnly: true }),
-      item("driver-payment-policies", "Driver Terms", "The haulage terms trips are priced on. Record an actual driver payment on the shipment itself.", { ownerOnly: true }),
+      item(
+        "purchases",
+        "Purchases",
+        "Grain you have bought from suppliers and agents, and what it cost.",
+      ),
+      item(
+        "sales",
+        "Sales",
+        "Orders you have agreed with buyers, and what they have paid so far.",
+      ),
+      item(
+        "shipments",
+        "Shipments",
+        "Trucks carrying orders out: who is driving, what is on board, where it is going.",
+      ),
+      item(
+        "stock",
+        "Stock",
+        "How much of each commodity is sitting in each warehouse right now.",
+      ),
+      item(
+        "transfers",
+        "Transfers",
+        "Stock moved from one warehouse to another.",
+      ),
+      item(
+        "stocktakes",
+        "Stocktakes",
+        "Physical counts. Approving one corrects the system to match what was actually there.",
+      ),
+      item(
+        "commodities",
+        "Commodities",
+        "The list of crops you trade in. Used everywhere a commodity is chosen.",
+      ),
+      item(
+        "warehouses",
+        "Warehouses",
+        "Your storage locations. Stock is counted per warehouse.",
+      ),
+      item(
+        "agents",
+        "Agents",
+        "Field buyers who hold your money to buy on your behalf.",
+      ),
+      item(
+        "expenses",
+        "Expenses",
+        "Costs the business has incurred, and whether they have been paid.",
+      ),
+      item(
+        "expense-categories",
+        "Expense Categories",
+        "The headings costs are filed under, so spending can be grouped.",
+      ),
+      item(
+        "payment-policies",
+        "Payment Policies",
+        "When a buyer has to pay you: the deposit and balance split.",
+        { ownerOnly: true },
+      ),
+      item(
+        "driver-payment-policies",
+        "Driver Terms",
+        "The haulage terms trips are priced on. Record an actual driver payment on the shipment itself.",
+        { ownerOnly: true },
+      ),
     ],
   },
   {
@@ -93,38 +166,118 @@ export const adminNavGroups: AdminNavGroup[] = [
     items: [
       // Staff see only their own sends; the whole register and the company's
       // bank position are the owner's business.
-      item("my-sends", "My sends", "Money you personally have sent out, and whether it arrived."),
-      item("disbursements", "Money sent", "Every mobile money and bank transfer sent from the business.", { permission: "PAYOUTS_SEND" }),
-      item("floats", "Floats", "Money handed to agents to buy with, and what each still holds."),
-      item("treasury", "Company account", "The company's own balance, and moving money between its accounts.", { ownerOnly: true }),
+      item(
+        "my-sends",
+        "My sends",
+        "Money you personally have sent out, and whether it arrived.",
+      ),
+      item(
+        "disbursements",
+        "Money sent",
+        "Every mobile money and bank transfer sent from the business.",
+        { permission: "PAYOUTS_SEND" },
+      ),
+      item(
+        "floats",
+        "Floats",
+        "Money handed to agents to buy with, and what each still holds.",
+      ),
+      item(
+        "treasury",
+        "Company account",
+        "The company's own balance, and moving money between its accounts.",
+        { ownerOnly: true },
+      ),
     ],
   },
   {
     label: "Land",
     items: [
-      item("plots", "Land Plots", "Land the business owns and can sell.", { permission: "LAND_MANAGE" }),
-      item("land-acquisitions", "Acquisitions", "Land being bought from a seller, and what has been paid for it.", { permission: "LAND_MANAGE" }),
-      item("land-sellers", "Sellers", "People and families you buy land from.", { permission: "LAND_MANAGE" }),
-      item("land-sales", "Land Sales", "Land sold to a buyer, and what they still owe.", { permission: "LAND_MANAGE" }),
+      item("plots", "Land Plots", "Land the business owns and can sell.", {
+        permission: "LAND_MANAGE",
+      }),
+      item(
+        "land-acquisitions",
+        "Acquisitions",
+        "Land being bought from a seller, and what has been paid for it.",
+        { permission: "LAND_MANAGE" },
+      ),
+      item(
+        "land-sellers",
+        "Sellers",
+        "People and families you buy land from.",
+        { permission: "LAND_MANAGE" },
+      ),
+      item(
+        "land-sales",
+        "Land Sales",
+        "Land sold to a buyer, and what they still owe.",
+        { permission: "LAND_MANAGE" },
+      ),
     ],
   },
   {
     label: "Farm",
     items: [
-      item("seasons", "Seasons", "Planting cycles. Grants and repayments are recorded against one.", { permission: "FARM_MANAGE" }),
-      item("farmers", "Farmers", "Outgrowers you advance inputs to and take produce back from.", { permission: "FARM_MANAGE" }),
-      item("input-items", "Input Items", "Seed, fertiliser and tools you advance to farmers.", { permission: "FARM_MANAGE" }),
-      item("grants", "Grants", "Inputs advanced to a farmer, to be recovered in produce or cash.", { permission: "FARM_MANAGE" }),
-      item("repayments", "Repayments", "Produce a farmer has brought back against what they were advanced.", { permission: "FARM_MANAGE" }),
+      item(
+        "seasons",
+        "Seasons",
+        "Planting cycles. Grants and repayments are recorded against one.",
+        { permission: "FARM_MANAGE" },
+      ),
+      item(
+        "farmers",
+        "Farmers",
+        "Outgrowers you advance inputs to and take produce back from.",
+        { permission: "FARM_MANAGE" },
+      ),
+      item(
+        "input-items",
+        "Input Items",
+        "Seed, fertiliser and tools you advance to farmers.",
+        { permission: "FARM_MANAGE" },
+      ),
+      item(
+        "grants",
+        "Grants",
+        "Inputs advanced to a farmer, to be recovered in produce or cash.",
+        { permission: "FARM_MANAGE" },
+      ),
+      item(
+        "repayments",
+        "Repayments",
+        "Produce a farmer has brought back against what they were advanced.",
+        { permission: "FARM_MANAGE" },
+      ),
     ],
   },
   {
     label: "Books",
     items: [
-      item("statements", "Financial Statements", "The complete statement book - generated from the records, printed for signature and stamp.", { ownerOnly: true }),
-      item("fixed-assets", "Fixed Assets", "The equipment, vehicles and buildings the statements depreciate.", { ownerOnly: true }),
-      item("drawings", "Drawings", "Money the proprietor takes for personal use - it reduces capital, not profit.", { ownerOnly: true }),
-      item("statement-settings", "Statement Settings", "The names, logo and blocks printed on the books' cover and certificate.", { ownerOnly: true }),
+      item(
+        "statements",
+        "Financial Statements",
+        "The complete statement book - generated from the records, printed for signature and stamp.",
+        { ownerOnly: true },
+      ),
+      item(
+        "fixed-assets",
+        "Fixed Assets",
+        "The equipment, vehicles and buildings the statements depreciate.",
+        { ownerOnly: true },
+      ),
+      item(
+        "drawings",
+        "Drawings",
+        "Money the proprietor takes for personal use - it reduces capital, not profit.",
+        { ownerOnly: true },
+      ),
+      item(
+        "statement-settings",
+        "Statement Settings",
+        "The names, logo and blocks printed on the books' cover and certificate.",
+        { ownerOnly: true },
+      ),
     ],
   },
   {
@@ -132,28 +285,70 @@ export const adminNavGroups: AdminNavGroup[] = [
     items: [
       item("suppliers", "Suppliers", "People and co-ops you buy grain from."),
       item("buyers", "Buyers", "Companies and people who buy from you."),
-      item("drivers", "Drivers", "Hauliers who move your goods, and the terms they are paid on."),
-      item("delivery-addresses", "Delivery Addresses", "Saved drop-off points, so a driver can actually find the place."),
+      item(
+        "drivers",
+        "Drivers",
+        "Hauliers who move your goods, and the terms they are paid on.",
+      ),
+      item(
+        "delivery-addresses",
+        "Delivery Addresses",
+        "Saved drop-off points, so a driver can actually find the place.",
+      ),
       // Staff read these to quote an account down the phone; only the owner
       // can change one, which the backend enforces.
-      item("payment-accounts", "Payment Accounts", "Your bank and mobile money accounts that customers pay into."),
+      item(
+        "payment-accounts",
+        "Payment Accounts",
+        "Your bank and mobile money accounts that customers pay into.",
+      ),
     ],
   },
   {
     label: "Website",
     items: [
-      item("enquiries", "Enquiries", "Messages sent through the public website."),
-      item("reviews", "Reviews", "Customer reviews waiting to be published or already live."),
-      item("farm-applications", "Applications", "Farmers applying to join the outgrower scheme.", { permission: "FARM_MANAGE" }),
+      item(
+        "enquiries",
+        "Enquiries",
+        "Messages sent through the public website.",
+      ),
+      item(
+        "reviews",
+        "Reviews",
+        "Customer reviews waiting to be published or already live.",
+      ),
+      item(
+        "farm-applications",
+        "Applications",
+        "Farmers applying to join the outgrower scheme.",
+        { permission: "FARM_MANAGE" },
+      ),
     ],
   },
   {
     label: "Admin",
     items: [
-      item("users", "Users", "Who can sign in, and what each of them is allowed to do.", { ownerOnly: true }),
-      item("permissions", "Permissions", "What staff and agents may do - set for the whole role, or granted to one person.", { ownerOnly: true }),
-      item("audit", "Audit Log", "A record of who changed what, and when.", { ownerOnly: true }),
-      item("notifications", "Notifications", "Every email and text the system has tried to send.", { ownerOnly: true }),
+      item(
+        "users",
+        "Users",
+        "Who can sign in, and what each of them is allowed to do.",
+        { ownerOnly: true },
+      ),
+      item(
+        "permissions",
+        "Permissions",
+        "What staff and agents may do - set for the whole role, or granted to one person.",
+        { ownerOnly: true },
+      ),
+      item("audit", "Audit Log", "A record of who changed what, and when.", {
+        ownerOnly: true,
+      }),
+      item(
+        "notifications",
+        "Notifications",
+        "Every email and text the system has tried to send.",
+        { ownerOnly: true },
+      ),
       // "My profile" and "Settings" deliberately absent: both live behind
       // the navbar avatar menu, not the rail.
     ],

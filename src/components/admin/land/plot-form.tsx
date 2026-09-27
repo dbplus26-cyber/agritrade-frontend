@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, } from "react";
+import { Fragment } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -85,7 +85,10 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
         notify.success("Plot updated");
         router.push(`${LIST}/${plot.id}`);
       } else {
-        const res = await createPlot({ ...body, reference: values.reference }).unwrap();
+        const res = await createPlot({
+          ...body,
+          reference: values.reference,
+        }).unwrap();
         notify.success("Plot created");
         router.push(`${LIST}/${res.data.plot.id}`);
       }
@@ -175,7 +178,10 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
                 placeholder: "e.g. 0.25",
                 hint: "The same size as a plain number, so plots can be compared and priced per acre.",
               })}
-              {field("use", "Use", { optional: true, placeholder: "e.g. residential" })}
+              {field("use", "Use", {
+                optional: true,
+                placeholder: "e.g. residential",
+              })}
             </div>
           </section>
 
@@ -202,7 +208,8 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
           <section className="flex flex-col gap-5">
             {field("description", "Description", {
               optional: true,
-              placeholder: "e.g. Corner plot, fenced on two sides, borehole on site",
+              placeholder:
+                "e.g. Corner plot, fenced on two sides, borehole on site",
             })}
           </section>
         </AdminCard>
@@ -225,7 +232,12 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
               >
                 Cancel
               </AdminButton>
-              <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
+              <AdminButton
+                type="submit"
+                disabled={saving}
+                loading={saving}
+                size="lg"
+              >
                 {saving ? "Saving…" : "Create plot"}
               </AdminButton>
             </Fragment>
@@ -239,7 +251,12 @@ export function PlotForm({ plot }: { plot?: ILandPlot }) {
               >
                 Cancel
               </AdminButton>
-              <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
+              <AdminButton
+                type="submit"
+                disabled={saving}
+                loading={saving}
+                size="lg"
+              >
                 {saving ? "Saving…" : "Save changes"}
               </AdminButton>
             </Fragment>

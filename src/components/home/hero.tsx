@@ -24,20 +24,29 @@ export async function Hero() {
         <div className="relative z-[2] pb-4 lg:pb-24 lg:pr-10 lg:pt-6">
           <p
             className="mb-1.5 font-display text-[19px] font-semibold leading-[1.25] text-soil lg:text-[30px]"
-            style={{ animation: "sack-drop .6s cubic-bezier(.2,.9,.3,1) .18s backwards" }}
+            style={{
+              animation:
+                "sack-drop .6s cubic-bezier(.2,.9,.3,1) .18s backwards",
+            }}
           >
             Bulk agro commodities -
           </p>
           <h1 className="mb-7 font-display font-bold leading-[0.98] tracking-[-0.015em] text-forest lg:mb-8">
             <span
               className="block text-[44px] lg:text-[92px]"
-              style={{ animation: "sack-drop .65s cubic-bezier(.2,.9,.3,1) .3s backwards" }}
+              style={{
+                animation:
+                  "sack-drop .65s cubic-bezier(.2,.9,.3,1) .3s backwards",
+              }}
             >
               weighed honestly,
             </span>
             <span
               className="block text-[44px] lg:text-[92px]"
-              style={{ animation: "sack-drop .65s cubic-bezier(.2,.9,.3,1) .42s backwards" }}
+              style={{
+                animation:
+                  "sack-drop .65s cubic-bezier(.2,.9,.3,1) .42s backwards",
+              }}
             >
               trucked{" "}
               <span className="shadow-[inset_0_-14px_0_rgb(216_156_46/0.55)]">

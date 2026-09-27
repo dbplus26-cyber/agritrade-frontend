@@ -37,8 +37,14 @@ const { isSuperAdmin, revokeTrigger, signDriverTrigger, signOwnerTrigger } =
   }));
 
 vi.mock("@/redux/shipments/shipments-api", () => ({
-  useRevokeShipmentSignatureMutation: () => [revokeTrigger, { isLoading: false }],
-  useSignShipmentDriverMutation: () => [signDriverTrigger, { isLoading: false }],
+  useRevokeShipmentSignatureMutation: () => [
+    revokeTrigger,
+    { isLoading: false },
+  ],
+  useSignShipmentDriverMutation: () => [
+    signDriverTrigger,
+    { isLoading: false },
+  ],
   useSignShipmentOwnerMutation: () => [signOwnerTrigger, { isLoading: false }],
 }));
 

@@ -14,7 +14,10 @@ import {
   Mono,
 } from "@/components/admin/ui";
 import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
-import { AllocateSkeleton, LotRowsSkeleton } from "@/components/admin/skeletons";
+import {
+  AllocateSkeleton,
+  LotRowsSkeleton,
+} from "@/components/admin/skeletons";
 import { HelpTip } from "@/components/admin/help-tip";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
@@ -147,7 +150,9 @@ const lotsByCommodity = (
   for (const list of byCommodity.values()) {
     list.sort((a, b) => {
       if (a.unitCostGhs === null || b.unitCostGhs === null) {
-        return (a.unitCostGhs === null ? 1 : 0) - (b.unitCostGhs === null ? 1 : 0);
+        return (
+          (a.unitCostGhs === null ? 1 : 0) - (b.unitCostGhs === null ? 1 : 0)
+        );
       }
       return strategy === "CHEAPEST"
         ? a.unitCostGhs - b.unitCostGhs
@@ -332,9 +337,19 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
       }
     >();
     for (const w of shipment.loadingWarehouses)
-      groups.set(w.id, { kind: "WAREHOUSE", lots: [], name: w.name, planned: true });
+      groups.set(w.id, {
+        kind: "WAREHOUSE",
+        lots: [],
+        name: w.name,
+        planned: true,
+      });
     for (const p of shipment.pickupSuppliers)
-      groups.set(p.id, { kind: "SUPPLIER", lots: [], name: p.name, planned: true });
+      groups.set(p.id, {
+        kind: "SUPPLIER",
+        lots: [],
+        name: p.name,
+        planned: true,
+      });
     for (const l of visibleLots) {
       const existing = groups.get(l.source.id);
       if (existing) existing.lots.push(l);
@@ -565,11 +580,11 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
         <LotRowsSkeleton />
       ) : lots.length === 0 ? (
         <AdminCard className="px-5 py-4 text-[11.5px] text-adm-muted">
-          No goods are available at {loadingFrom(shipment)} for these sales&apos;
-          commodities. Receive a purchase into one of this trip&apos;s
-          warehouses, receive one straight from a supplier it collects from, or
-          dispatch and let the oldest-stock fallback fill the truck (it will be
-          flagged estimated).
+          No goods are available at {loadingFrom(shipment)} for these
+          sales&apos; commodities. Receive a purchase into one of this
+          trip&apos;s warehouses, receive one straight from a supplier it
+          collects from, or dispatch and let the oldest-stock fallback fill the
+          truck (it will be flagged estimated).
         </AdminCard>
       ) : (
         <div className="flex flex-col gap-4">
@@ -802,106 +817,111 @@ function AllocateBoard({ shipment }: { shipment: IShipment }) {
                not deduced lot by lot. */
             <AdminCard className="flex flex-col gap-3 px-4 py-3">
               {lotGroups.map((g) => (
-              <div key={g.id} className="flex flex-col gap-2">
-              {/* A filled band, not a hairline: the shed boundary is the fact
+                <div key={g.id} className="flex flex-col gap-2">
+                  {/* A filled band, not a hairline: the shed boundary is the fact
                   this list is organised by, so it has to read from across the
                   room. Full-bleed against the card's padding so it reads as a
                   section divider rather than another row. */}
-              <div className="-mx-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-0.5 border-y border-adm-line bg-[#EFF3E7] px-4 py-2">
-                <span className="flex min-w-0 items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.09em] text-console">
-                  {g.kind === "SUPPLIER" ? (
-                    <Tractor className="h-3.5 w-3.5 flex-none" />
-                  ) : (
-                    <WarehouseIcon className="h-3.5 w-3.5 flex-none" />
-                  )}
-                  <span className="min-w-0 [overflow-wrap:anywhere]">
-                    {g.name}
-                  </span>
-                  {g.kind === "SUPPLIER" ? (
-                    <span className="flex-none rounded-none border border-console/30 px-1 py-px text-[10px] font-bold tracking-[0.06em]">
-                      collect
+                  <div className="-mx-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-0.5 border-y border-adm-line bg-[#EFF3E7] px-4 py-2">
+                    <span className="flex min-w-0 items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.09em] text-console">
+                      {g.kind === "SUPPLIER" ? (
+                        <Tractor className="h-3.5 w-3.5 flex-none" />
+                      ) : (
+                        <WarehouseIcon className="h-3.5 w-3.5 flex-none" />
+                      )}
+                      <span className="min-w-0 [overflow-wrap:anywhere]">
+                        {g.name}
+                      </span>
+                      {g.kind === "SUPPLIER" ? (
+                        <span className="flex-none rounded-none border border-console/30 px-1 py-px text-[10px] font-bold tracking-[0.06em]">
+                          collect
+                        </span>
+                      ) : null}
                     </span>
-                  ) : null}
-                </span>
-                <span className="flex-none text-[10.5px] font-medium text-adm-muted">
-                  {g.planned
-                    ? `${g.lots.length} ${g.lots.length === 1 ? "lot" : "lots"}`
-                    : "not on this trip's plan"}
-                </span>
-              </div>
-              {g.lots.map((l) => {
-                const weight = activeRows?.[l.id] ?? "";
-                const onThisSaleKg = activeCommodityKg[l.commodity.id] ?? 0;
-                // Weight this lot carries for the OTHER sales on the truck.
-                const otherSalesKg = shipment.sales.reduce((sum, s) => {
-                  if (s.id === activeSaleId) return sum;
-                  return sum + keyedKg(rows[s.id]?.[l.id]);
-                }, 0);
-                const lotTotalKg = otherSalesKg + keyedKg(weight);
-                const overLot = lotTotalKg > l.remainingKg;
-                return (
-                  <div
-                    key={l.id}
-                    className="flex flex-col gap-1 border-b border-adm-hairline pb-2 last:border-b-0 last:pb-0"
-                  >
-                    <div className="grid grid-cols-[1fr_110px] items-center gap-2">
-                      <div className="min-w-0">
-                        <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5">
-                          <span className="min-w-0 text-[11.5px] font-medium text-adm-ink [overflow-wrap:anywhere]">
-                            {l.commodity.name}
-                          </span>
-                          {onThisSaleKg > 0 ? (
-                            <span className="flex-none rounded-full bg-[#E3EBDD] px-1.5 py-px text-[10.5px] font-semibold whitespace-nowrap text-[#2F5E3D]">
-                              {formatKg(onThisSaleKg)} on this sale
-                            </span>
-                          ) : null}
-                        </div>
-                        <div className="text-[11px] text-adm-muted">
-                          {formatKg(l.remainingKg)} available ·{" "}
-                          <Money value={l.unitCostGhs} />
-                          /kg
-                          {/* Which consignment this is. Two loads standing at
+                    <span className="flex-none text-[10.5px] font-medium text-adm-muted">
+                      {g.planned
+                        ? `${g.lots.length} ${g.lots.length === 1 ? "lot" : "lots"}`
+                        : "not on this trip's plan"}
+                    </span>
+                  </div>
+                  {g.lots.map((l) => {
+                    const weight = activeRows?.[l.id] ?? "";
+                    const onThisSaleKg = activeCommodityKg[l.commodity.id] ?? 0;
+                    // Weight this lot carries for the OTHER sales on the truck.
+                    const otherSalesKg = shipment.sales.reduce((sum, s) => {
+                      if (s.id === activeSaleId) return sum;
+                      return sum + keyedKg(rows[s.id]?.[l.id]);
+                    }, 0);
+                    const lotTotalKg = otherSalesKg + keyedKg(weight);
+                    const overLot = lotTotalKg > l.remainingKg;
+                    return (
+                      <div
+                        key={l.id}
+                        className="flex flex-col gap-1 border-b border-adm-hairline pb-2 last:border-b-0 last:pb-0"
+                      >
+                        <div className="grid grid-cols-[1fr_110px] items-center gap-2">
+                          <div className="min-w-0">
+                            <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                              <span className="min-w-0 text-[11.5px] font-medium text-adm-ink [overflow-wrap:anywhere]">
+                                {l.commodity.name}
+                              </span>
+                              {onThisSaleKg > 0 ? (
+                                <span className="flex-none rounded-full bg-[#E3EBDD] px-1.5 py-px text-[10.5px] font-semibold whitespace-nowrap text-[#2F5E3D]">
+                                  {formatKg(onThisSaleKg)} on this sale
+                                </span>
+                              ) : null}
+                            </div>
+                            <div className="text-[11px] text-adm-muted">
+                              {formatKg(l.remainingKg)} available ·{" "}
+                              <Money value={l.unitCostGhs} />
+                              /kg
+                              {/* Which consignment this is. Two loads standing at
                               the same seller look identical without it, and
                               the loader is picking one of them. */}
-                          {l.source.kind === "SUPPLIER" && l.purchaseNo ? (
-                            <>
-                              {" · "}
-                              <Mono className="text-[10.5px]">
-                                {l.purchaseNo}
-                              </Mono>
-                            </>
-                          ) : null}
-                        </div>
-                        {otherSalesKg > 0 ? (
-                          <div className="text-[10.5px] text-adm-muted/80">
-                            {formatKg(otherSalesKg)} weighted for other sales
+                              {l.source.kind === "SUPPLIER" && l.purchaseNo ? (
+                                <>
+                                  {" · "}
+                                  <Mono className="text-[10.5px]">
+                                    {l.purchaseNo}
+                                  </Mono>
+                                </>
+                              ) : null}
+                            </div>
+                            {otherSalesKg > 0 ? (
+                              <div className="text-[10.5px] text-adm-muted/80">
+                                {formatKg(otherSalesKg)} weighted for other
+                                sales
+                              </div>
+                            ) : null}
                           </div>
+                          <Input
+                            inputMode="decimal"
+                            placeholder="kg"
+                            aria-label={`Kilograms of ${l.commodity.name} for this sale`}
+                            className={cn(
+                              adminInputClass,
+                              overLot && "border-console-red",
+                            )}
+                            value={weight}
+                            onChange={(e) =>
+                              setWeight(activeSaleId, l.id, e.target.value)
+                            }
+                          />
+                        </div>
+                        {overLot ? (
+                          <p
+                            role="alert"
+                            className="text-[11px] font-medium text-console-red"
+                          >
+                            This lot carries {formatKg(lotTotalKg)} across the
+                            sales but only {formatKg(l.remainingKg)} is
+                            available.
+                          </p>
                         ) : null}
                       </div>
-                      <Input
-                        inputMode="decimal"
-                        placeholder="kg"
-                        aria-label={`Kilograms of ${l.commodity.name} for this sale`}
-                        className={cn(adminInputClass, overLot && "border-console-red")}
-                        value={weight}
-                        onChange={(e) =>
-                          setWeight(activeSaleId, l.id, e.target.value)
-                        }
-                      />
-                    </div>
-                    {overLot ? (
-                      <p
-                        role="alert"
-                        className="text-[11px] font-medium text-console-red"
-                      >
-                        This lot carries {formatKg(lotTotalKg)} across the sales
-                        but only {formatKg(l.remainingKg)} is available.
-                      </p>
-                    ) : null}
-                  </div>
-                );
-              })}
-              </div>
+                    );
+                  })}
+                </div>
               ))}
             </AdminCard>
           )}

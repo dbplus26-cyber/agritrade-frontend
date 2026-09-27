@@ -1,10 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import {
-  type ResolvedContact,
-  resolveSiteContact,
-} from "@/lib/public-contact";
+import { type ResolvedContact, resolveSiteContact } from "@/lib/public-contact";
 
 /**
  * Holds the resolved public contact (fetched once in the (site) layout) so any

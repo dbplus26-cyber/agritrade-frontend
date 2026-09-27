@@ -12,11 +12,7 @@ import {
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import { TitleCell } from "@/components/admin/table-cells";
 import { DateTimeCell } from "@/components/admin/date-cell";
-import {
-  AdminButton,
-  AdminCard,
-  AdminPageHeader,
-} from "@/components/admin/ui";
+import { AdminButton, AdminCard, AdminPageHeader } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -199,10 +195,7 @@ export function InputItemsRegister() {
         </AdminCard>
       )}
 
-      <InputItemDialog
-        onClose={() => setCreateOpen(false)}
-        open={createOpen}
-      />
+      <InputItemDialog onClose={() => setCreateOpen(false)} open={createOpen} />
     </div>
   );
 }

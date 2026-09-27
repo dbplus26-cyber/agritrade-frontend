@@ -12,6 +12,7 @@ export interface IExpense {
   category: { id: string; name: string };
   createdAt: string;
   description: null | string;
+  driverFeeShipmentId: null | string;
   id: string;
   incurredAt: string;
   /**
@@ -72,9 +73,20 @@ export interface ICreateExpenseInput {
   categoryId: string;
   description?: string;
   incurredAt: string;
+  existingMovementIds?: string[];
   /** Omit to record the cost unpaid - the payee is simply owed. */
   payment?: IExpensePaymentOnCreate;
   shipmentId?: string;
+}
+
+export interface IMatchableOutflow {
+  account: { kind: string; label: string };
+  amountGhs: number;
+  externalReference: string | null;
+  id: string;
+  occurredAt: string;
+  reason: string | null;
+  transactionNo: string;
 }
 
 /**

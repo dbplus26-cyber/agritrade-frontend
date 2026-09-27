@@ -162,7 +162,12 @@ function SaveRow({
       >
         Discard
       </AdminButton>
-      <AdminButton size="lg" disabled={!dirty || saving} loading={saving} onClick={onSave}>
+      <AdminButton
+        size="lg"
+        disabled={!dirty || saving}
+        loading={saving}
+        onClick={onSave}
+      >
         {saving ? "Saving…" : "Save changes"}
       </AdminButton>
     </CommitRow>
@@ -181,7 +186,8 @@ function RoleDefaults({
   editableRoles: EditableRole[];
 }) {
   const { confirm, confirmationDialog } = useConfirm();
-  const [updateRole, { isLoading: saving }] = useUpdateRolePermissionsMutation();
+  const [updateRole, { isLoading: saving }] =
+    useUpdateRolePermissionsMutation();
   const [role, setRole] = useState<EditableRole>(editableRoles[0] ?? "STAFF");
   // One draft per role, so flipping between roles never throws edits away.
   const [drafts, setDrafts] = useState<
@@ -242,7 +248,9 @@ function RoleDefaults({
     try {
       await updateRole({ role, permissions: selection }).unwrap();
       discard();
-      notify.success(`Permissions updated for ${ROLE_TITLE[role].toLowerCase()}`);
+      notify.success(
+        `Permissions updated for ${ROLE_TITLE[role].toLowerCase()}`,
+      );
     } catch (err) {
       notify.error("Couldn't save the permissions", {
         description: extractApiError(err).message,
@@ -378,7 +386,8 @@ function PersonEditor({
 }) {
   const { data, isLoading, isError, error, refetch } =
     useGetUserPermissionsQuery(id);
-  const [setPermissions, { isLoading: saving }] = useSetUserPermissionsMutation();
+  const [setPermissions, { isLoading: saving }] =
+    useSetUserPermissionsMutation();
   const { confirm, confirmationDialog } = useConfirm();
   // null = mirror what the server holds; an array = local edits in progress.
   // The caller keys this component by the person's id, so switching people
@@ -423,8 +432,9 @@ function PersonEditor({
   const total = catalogSize(catalog);
   const effectiveCount = catalog
     .flatMap((g) => g.permissions)
-    .filter((m) => roleSet.has(m.permission) || granted.has(m.permission))
-    .length;
+    .filter(
+      (m) => roleSet.has(m.permission) || granted.has(m.permission),
+    ).length;
   const name = `${user.firstName} ${user.lastName}`;
 
   const toggle = (p: Permission) => {
@@ -513,8 +523,7 @@ function People({
   const [search, setSearch] = useState("");
 
   const people = useMemo(
-    () =>
-      (data?.data ?? []).filter((u) => u.role !== UserRole.SUPER_ADMIN),
+    () => (data?.data ?? []).filter((u) => u.role !== UserRole.SUPER_ADMIN),
     [data],
   );
   const q = search.trim().toLowerCase();

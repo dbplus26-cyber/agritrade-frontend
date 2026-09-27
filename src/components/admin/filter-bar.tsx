@@ -298,7 +298,9 @@ export function FilterChip({
 }) {
   return (
     <span className="inline-flex items-center gap-1 border border-console/30 bg-console/15 py-1 pl-2 pr-1.5 text-[11px] font-medium text-adm-ink sm:py-1.5 sm:pl-3 sm:pr-2">
-      {Icon ? <Icon strokeWidth={1.5} className="h-3 w-3" aria-hidden="true" /> : null}
+      {Icon ? (
+        <Icon strokeWidth={1.5} className="h-3 w-3" aria-hidden="true" />
+      ) : null}
       <span className="max-w-30 truncate sm:max-w-50">{children}</span>
       <button
         type="button"
@@ -392,7 +394,8 @@ export function ConsoleFilterBar({
   // Fields use the drawer below lg; a single inline filter only below sm.
   const drawerContent = hasFields ? children : inlineFilter;
   const drawerOpen =
-    open && ((hasFields && isBelowLg) || (!hasFields && !!inlineFilter && isBelowSm));
+    open &&
+    ((hasFields && isBelowLg) || (!hasFields && !!inlineFilter && isBelowSm));
 
   // Two densities. The standard toolbar is the two-row shape: count and
   // actions, then a full-width search with the controls beside it. When
@@ -494,7 +497,9 @@ export function ConsoleFilterBar({
             key={activeCount}
             className={cn(
               "animate-console-pop ml-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[11px] font-semibold",
-              hasApplied ? "bg-white/20 text-white" : "bg-adm-sunken text-adm-ink",
+              hasApplied
+                ? "bg-white/20 text-white"
+                : "bg-adm-sunken text-adm-ink",
             )}
           >
             {activeCount}

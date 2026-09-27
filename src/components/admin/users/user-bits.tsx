@@ -27,7 +27,8 @@ export function userStatus(user: IUser): { label: string; tone: Tone } {
 const USER_STATUS_HELP: Record<string, string> = {
   Active: "Can sign in and use the console normally.",
   Blocked: "Locked out and cannot sign in until an admin unblocks the account.",
-  Suspended: "Switched off, so they cannot sign in until it is switched back on.",
+  Suspended:
+    "Switched off, so they cannot sign in until it is switched back on.",
 };
 
 export function StatusBadge({ user }: { user: IUser }) {
@@ -64,7 +65,10 @@ export function lastActiveLabel(user: IUser): string {
   const d = new Date(user.lastLoginAt);
   const days = Math.floor((Date.now() - d.getTime()) / 86_400_000);
   if (days <= 0)
-    return d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+    return d.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   if (days === 1) return "Yesterday";
   return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
 }

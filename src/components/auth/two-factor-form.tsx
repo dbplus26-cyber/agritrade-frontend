@@ -30,7 +30,11 @@ interface TwoFactorFormProps {
 
 /** The emailed-code step, with a fallback path for a single-use recovery code
  * when the mailbox is unreachable. Both complete the same pending challenge. */
-export function TwoFactorForm({ email, redirectTo, onBack }: TwoFactorFormProps) {
+export function TwoFactorForm({
+  email,
+  redirectTo,
+  onBack,
+}: TwoFactorFormProps) {
   const [useRecovery, setUseRecovery] = useState(false);
   return useRecovery ? (
     <RecoveryStep
@@ -96,8 +100,8 @@ function CodeStep({
     <form noValidate onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
       <p className="text-[13.5px] leading-[1.6] text-soil">
         We sent a 6-digit code to{" "}
-        <span className="font-semibold text-ink">{email}</span>. Enter it
-        below to finish signing in.
+        <span className="font-semibold text-ink">{email}</span>. Enter it below
+        to finish signing in.
       </p>
       {/* Six digits, sized to six digits. Stretched across the whole card
           the field read as "paste something long here" and the caret sat

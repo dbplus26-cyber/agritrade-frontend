@@ -47,7 +47,8 @@ export function LoginClient({ redirectTo }: { redirectTo: string }) {
 
   // Pre-hydration (the persisted user lives in localStorage, invisible to the
   // server) and mid-redirect: hold the spinner, never flash the form.
-  if (!hydrated || cachedUser) return <LoadingScreen className="min-h-screen" />;
+  if (!hydrated || cachedUser)
+    return <LoadingScreen className="min-h-screen" />;
 
   return (
     <AuthCard

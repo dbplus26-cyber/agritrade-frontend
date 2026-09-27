@@ -163,8 +163,6 @@ describe("PurchaseCostsCard", () => {
     expect(
       screen.queryByRole("button", { name: "Record a cost" }),
     ).not.toBeInTheDocument();
-    expect(
-      screen.getByText(/no longer on the books/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/no longer on the books/i)).toBeInTheDocument();
   });
 });

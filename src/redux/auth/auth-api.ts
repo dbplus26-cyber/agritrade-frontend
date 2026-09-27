@@ -63,7 +63,8 @@ export const authApi = apiSlice.injectEndpoints({
      * for a valid access cookie (a 401 falls through the api-slice's silent
      * refresh first). The admin guard uses it to validate the session on load
      * rather than trusting the optimistic, localStorage-persisted user. On
-     * success we refresh the stored user; on failure we clear it (fail-closed).
+     * success we refresh the stored user. A rejected session clears it; a
+     * temporary server or network failure leaves it intact for a retry.
      */
     getMe: builder.query<IUserResponse, void>({
       query: () => ({ url: "auth/me", method: "GET" }),
@@ -71,8 +72,17 @@ export const authApi = apiSlice.injectEndpoints({
         try {
           const { data } = await queryFulfilled;
           dispatch(userLoggedIn({ user: data.data.user }));
-        } catch {
-          dispatch(userLoggedOut());
+        } catch (failure) {
+          const status =
+            typeof failure === "object" &&
+            failure !== null &&
+            "error" in failure &&
+            typeof failure.error === "object" &&
+            failure.error !== null &&
+            "status" in failure.error
+              ? failure.error.status
+              : undefined;
+          if (status === 401) dispatch(userLoggedOut());
         }
       },
     }),
@@ -238,11 +248,11 @@ export const authApi = apiSlice.injectEndpoints({
       async onQueryStarted(_arg, { queryFulfilled, dispatch }) {
         try {
           await queryFulfilled;
-        } finally {
-          // Clear client session and purge cached data even if the server call
-          // failed - the user intends to be logged out regardless.
           dispatch(userLoggedOut());
           dispatch(apiSlice.util.resetApiState());
+        } catch {
+          // The server may still hold a valid session. The mutation reports
+          // the failure to its caller so the user can retry signing out.
         }
       },
     }),

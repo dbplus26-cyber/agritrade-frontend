@@ -75,8 +75,9 @@ export function ApprovalsPreview() {
                     {headline}
                   </span>
                   <span className="mt-0.5 block min-w-0 text-[10.5px] whitespace-normal text-adm-muted line-clamp-1 [overflow-wrap:anywhere]">
-                    {[a.requestedBy?.name, detail].filter(Boolean).join(" · ") ||
-                      a.entityType}
+                    {[a.requestedBy?.name, detail]
+                      .filter(Boolean)
+                      .join(" · ") || a.entityType}
                   </span>
                 </Link>
               </li>

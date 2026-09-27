@@ -33,8 +33,15 @@ export const inputItemsApi = apiSlice.injectEndpoints({
       providesTags: (_r, _e, id) => [{ type: "InputItems", id }],
     }),
 
-    createInputItem: builder.mutation<IInputItemResponse, ICreateInputItemInput>({
-      query: (body) => ({ url: "admin/farm/input-items", method: "POST", body }),
+    createInputItem: builder.mutation<
+      IInputItemResponse,
+      ICreateInputItemInput
+    >({
+      query: (body) => ({
+        url: "admin/farm/input-items",
+        method: "POST",
+        body,
+      }),
       invalidatesTags: [{ type: "InputItems", id: "LIST" }],
     }),
 
@@ -68,7 +75,10 @@ export const inputItemsApi = apiSlice.injectEndpoints({
     }),
 
     deleteInputItem: builder.mutation<{ message: string }, string>({
-      query: (id) => ({ url: `admin/farm/input-items/${id}`, method: "DELETE" }),
+      query: (id) => ({
+        url: `admin/farm/input-items/${id}`,
+        method: "DELETE",
+      }),
       invalidatesTags: [{ type: "InputItems", id: "LIST" }],
     }),
   }),

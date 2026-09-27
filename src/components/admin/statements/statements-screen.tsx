@@ -144,7 +144,10 @@ function OpeningBalanceCard() {
               onClick={() => {
                 setEditing(true);
               }}
-              className={cn(adminLinkClass, "cursor-pointer text-[11px] font-semibold")}
+              className={cn(
+                adminLinkClass,
+                "cursor-pointer text-[11px] font-semibold",
+              )}
             >
               {opening ? "Edit" : "Enter it"}
             </button>
@@ -174,8 +177,8 @@ function OpeningBalanceCard() {
           </dl>
         ) : (
           <p className="pt-1 text-[11.5px] text-adm-muted">
-            Not entered yet. The book needs its starting point - the balances
-            as at 31 December of the year before the first statements.
+            Not entered yet. The book needs its starting point - the balances as
+            at 31 December of the year before the first statements.
           </p>
         )
       ) : (
@@ -190,16 +193,25 @@ function OpeningBalanceCard() {
           >
             <DateInput
               placeholder="Pick the year-end date"
-              className={cn(adminInputClass, errors.asOfDate && "border-console-red")}
+              className={cn(
+                adminInputClass,
+                errors.asOfDate && "border-console-red",
+              )}
               {...register("asOfDate")}
             />
           </AdminField>
           <div className="grid gap-5 @min-[420px]:grid-cols-2">
-            <AdminField label="Inventory (GHS)" error={errors.inventoryGhs?.message}>
+            <AdminField
+              label="Inventory (GHS)"
+              error={errors.inventoryGhs?.message}
+            >
               <Input
                 inputMode="decimal"
                 placeholder="0.00"
-                className={cn(adminInputClass, errors.inventoryGhs && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  errors.inventoryGhs && "border-console-red",
+                )}
                 {...register("inventoryGhs")}
               />
             </AdminField>
@@ -210,23 +222,32 @@ function OpeningBalanceCard() {
               <Input
                 inputMode="decimal"
                 placeholder="0.00"
-                className={cn(adminInputClass, errors.receivablesGhs && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  errors.receivablesGhs && "border-console-red",
+                )}
                 {...register("receivablesGhs")}
               />
             </AdminField>
-            <AdminField label="Payables (GHS)" error={errors.payablesGhs?.message}>
+            <AdminField
+              label="Payables (GHS)"
+              error={errors.payablesGhs?.message}
+            >
               <Input
                 inputMode="decimal"
                 placeholder="0.00"
-                className={cn(adminInputClass, errors.payablesGhs && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  errors.payablesGhs && "border-console-red",
+                )}
                 {...register("payablesGhs")}
               />
             </AdminField>
           </div>
           <p className="text-[11px] text-adm-muted">
-            The opening cash and bank position is not entered here - it is worked
-            out from the cash book. Post each account&rsquo;s opening balance to
-            the cash book instead.
+            The opening cash and bank position is not entered here - it is
+            worked out from the cash book. Post each account&rsquo;s opening
+            balance to the cash book instead.
           </p>
           <AdminField label="Notes" optional error={errors.notes?.message}>
             <Input
@@ -248,7 +269,12 @@ function OpeningBalanceCard() {
             >
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={saveState.isLoading} loading={saveState.isLoading} size="lg">
+            <AdminButton
+              type="submit"
+              disabled={saveState.isLoading}
+              loading={saveState.isLoading}
+              size="lg"
+            >
               {saveState.isLoading ? "Saving…" : "Save opening position"}
             </AdminButton>
           </CommitRow>
@@ -281,7 +307,9 @@ export function StatementsScreen() {
   const onToggleFinal = async () => {
     const finalising = !isFinal;
     const ok = await confirm({
-      title: finalising ? `Mark ${String(year)} final?` : `Reopen ${String(year)}?`,
+      title: finalising
+        ? `Mark ${String(year)} final?`
+        : `Reopen ${String(year)}?`,
       description: finalising
         ? "The DRAFT watermark comes off the generated book and the opening position locks. You can reopen the year later."
         : "The year goes back to draft: generated books carry the DRAFT watermark again and the opening position unlocks.",
@@ -289,7 +317,10 @@ export function StatementsScreen() {
     });
     if (!ok) return;
     try {
-      await setStatus({ status: finalising ? "FINAL" : "DRAFT", year }).unwrap();
+      await setStatus({
+        status: finalising ? "FINAL" : "DRAFT",
+        year,
+      }).unwrap();
       notify.success(finalising ? "Year marked final" : "Year reopened");
     } catch (err) {
       notify.error("Couldn't change the year's status", {
@@ -387,12 +418,19 @@ export function StatementsScreen() {
                 <AdminCard className="px-5 py-4">
                   <SectionHeading
                     className="mb-1"
-                    actions={<ToneBadge tone={isFinal ? "leaf" : "harvest"}>{isFinal ? "Final" : "Draft"}</ToneBadge>}
+                    actions={
+                      <ToneBadge tone={isFinal ? "leaf" : "harvest"}>
+                        {isFinal ? "Final" : "Draft"}
+                      </ToneBadge>
+                    }
                   >
                     The {year} book at a glance
                   </SectionHeading>
                   <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,170px),1fr))] gap-x-8">
-                    <Headline label="Turnover" pair={statement.income.turnover} />
+                    <Headline
+                      label="Turnover"
+                      pair={statement.income.turnover}
+                    />
                     <Headline
                       label="Gross profit"
                       pair={statement.income.grossProfit}
@@ -418,7 +456,10 @@ export function StatementsScreen() {
                       label="Proprietor's capital"
                       pair={statement.capitalAccount.closing}
                     />
-                    <Headline label="Cash position" pair={statement.position.cash} />
+                    <Headline
+                      label="Cash position"
+                      pair={statement.position.cash}
+                    />
                   </div>
                 </AdminCard>
 
@@ -477,7 +518,8 @@ export function StatementsScreen() {
                   </Link>
                   <span className="text-adm-muted">
                     {" "}
-                    - the proprietor&rsquo;s withdrawals, on the capital account.
+                    - the proprietor&rsquo;s withdrawals, on the capital
+                    account.
                   </span>
                 </li>
                 <li>

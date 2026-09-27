@@ -90,7 +90,9 @@ describe("receiving into a warehouse", () => {
     render(<ReceiveDialog purchase={purchase()} open onClose={vi.fn()} />);
 
     await userEvent.click(only(/warehouse/i, "combobox"));
-    await userEvent.click(screen.getAllByRole("option", { name: "Tamale Main" })[0]);
+    await userEvent.click(
+      screen.getAllByRole("option", { name: "Tamale Main" })[0],
+    );
     await submit(/Receive stock/i);
 
     expect(receiveTrigger).toHaveBeenCalledTimes(1);
@@ -132,7 +134,9 @@ describe("receiving straight onto a truck", () => {
     );
 
     expect(
-      (await screen.findAllByText(/becomes yours where it stands at Alhassan/i))[0],
+      (
+        await screen.findAllByText(/becomes yours where it stands at Alhassan/i)
+      )[0],
     ).toBeVisible();
     // Nothing is written until the gate is cleared.
     expect(receiveTrigger).not.toHaveBeenCalled();

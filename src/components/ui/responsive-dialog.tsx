@@ -91,7 +91,10 @@ function ResponsiveDialogContent({
   // cap deliberately; tailwind-merge keeps the last one.
   return (
     <DialogContent
-      className={cn("max-h-[88dvh] overscroll-contain overflow-y-auto", className)}
+      className={cn(
+        "max-h-[88dvh] overscroll-contain overflow-y-auto",
+        className,
+      )}
       showCloseButton={showCloseButton}
       overlayClassName={overlayClassName}
       style={style}

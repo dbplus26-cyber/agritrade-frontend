@@ -75,7 +75,9 @@ export function CardHeader({
     <div className="mb-3 flex items-start justify-between gap-3">
       <span className="flex-none pt-px inline-flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         {title}
-        {hint ? <HelpTip label={`What does ${title} show?`} text={hint} /> : null}
+        {hint ? (
+          <HelpTip label={`What does ${title} show?`} text={hint} />
+        ) : null}
       </span>
       {right ? <span className="min-w-0 text-right">{right}</span> : null}
     </div>
@@ -122,7 +124,12 @@ export function LegendItem({
     // `min-width: auto`, meaning it refuses to shrink below its content - so
     // without it `truncate` on the label has nothing to clamp against and a
     // long commodity name runs straight out past the card's edge.
-    <span className={cn("flex min-w-0 items-center gap-1.5 text-[10.5px] text-adm-muted", className)}>
+    <span
+      className={cn(
+        "flex min-w-0 items-center gap-1.5 text-[10.5px] text-adm-muted",
+        className,
+      )}
+    >
       <span
         aria-hidden="true"
         className="h-2 w-2 flex-none rounded-full"

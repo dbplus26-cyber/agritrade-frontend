@@ -12,7 +12,12 @@ export const paymentPoliciesApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getPaymentPolicies: builder.query<
       IPaymentPolicyListResponse,
-      { page?: number; limit?: number; isActive?: boolean; search?: string } | void
+      {
+        page?: number;
+        limit?: number;
+        isActive?: boolean;
+        search?: string;
+      } | void
     >({
       query: (params) => `admin/payment-policies${toQueryString(params ?? {})}`,
       providesTags: (result) =>
@@ -31,7 +36,11 @@ export const paymentPoliciesApi = apiSlice.injectEndpoints({
       IPaymentPolicyResponse,
       ICreatePaymentPolicyInput
     >({
-      query: (body) => ({ url: "admin/payment-policies", method: "POST", body }),
+      query: (body) => ({
+        url: "admin/payment-policies",
+        method: "POST",
+        body,
+      }),
       // A new default demotes the old one, so refresh the whole list.
       invalidatesTags: [{ type: "PaymentPolicies", id: "LIST" }],
     }),
@@ -49,7 +58,10 @@ export const paymentPoliciesApi = apiSlice.injectEndpoints({
     }),
 
     deletePaymentPolicy: builder.mutation<{ message: string }, string>({
-      query: (id) => ({ url: `admin/payment-policies/${id}`, method: "DELETE" }),
+      query: (id) => ({
+        url: `admin/payment-policies/${id}`,
+        method: "DELETE",
+      }),
       invalidatesTags: [{ type: "PaymentPolicies", id: "LIST" }],
     }),
   }),

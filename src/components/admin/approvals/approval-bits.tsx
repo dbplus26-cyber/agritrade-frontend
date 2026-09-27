@@ -140,7 +140,8 @@ export function waitingFor(createdAtIso: string): string {
   const ms = Date.now() - new Date(createdAtIso).getTime();
   if (!Number.isFinite(ms) || ms < 60_000) return "just arrived";
   const minutes = Math.floor(ms / 60_000);
-  if (minutes < 60) return `${minutes} minute${minutes === 1 ? "" : "s"} waiting`;
+  if (minutes < 60)
+    return `${minutes} minute${minutes === 1 ? "" : "s"} waiting`;
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} waiting`;
   const days = Math.floor(hours / 24);
@@ -265,12 +266,13 @@ export function summaryLine(
     const source = str(s.source);
     return {
       headline: total !== null ? formatCedis(total) : "Purchase",
-      detail: [
-        commodity ? `${commodity} purchase` : null,
-        source ? `${source.toLowerCase()}-sourced` : null,
-      ]
-        .filter(Boolean)
-        .join(", ") || null,
+      detail:
+        [
+          commodity ? `${commodity} purchase` : null,
+          source ? `${source.toLowerCase()}-sourced` : null,
+        ]
+          .filter(Boolean)
+          .join(", ") || null,
     };
   }
   if (action === ApprovalAction.STOCK_ADJUSTMENT) {
@@ -294,7 +296,8 @@ export function summaryLine(
     return {
       headline: value !== null ? formatCedis(value) : "Input grant",
       detail:
-        [str(s.itemName), str(s.farmerName)].filter(Boolean).join(" - ") || null,
+        [str(s.itemName), str(s.farmerName)].filter(Boolean).join(" - ") ||
+        null,
     };
   }
   if (action === ApprovalAction.LOAD_BELOW_MILESTONE) {
@@ -316,10 +319,14 @@ export function summaryLine(
   }
   if (action === ApprovalAction.PUBLISH_TO_WEBSITE) {
     return {
-      headline: str(s.commodityName) ?? str(s.reference) ?? "Publish to website",
+      headline:
+        str(s.commodityName) ?? str(s.reference) ?? "Publish to website",
       detail: str(s.reason),
     };
   }
   // Unknown/future action: never crash - fall back to the action label.
-  return { headline: ACTION_LABEL[action] ?? "Approval", detail: str(s.reason) };
+  return {
+    headline: ACTION_LABEL[action] ?? "Approval",
+    detail: str(s.reason),
+  };
 }

@@ -52,10 +52,7 @@ import {
   StepHead,
   opt,
 } from "./shipment-form-bits";
-import type {
-  PickedAddress,
-  PickedDriver,
-} from "./shipment-form-bits";
+import type { PickedAddress, PickedDriver } from "./shipment-form-bits";
 
 const LIST = "/admin/shipments";
 
@@ -172,7 +169,8 @@ export function ShipmentForm({
     useWatch({ control, name: "originWarehouseId" }) ?? "";
   const extraShedIds =
     useWatch({ control, name: "loadingWarehouseIds" }) ?? NO_SHEDS;
-  const pickupIds = useWatch({ control, name: "pickupSupplierIds" }) ?? NO_SHEDS;
+  const pickupIds =
+    useWatch({ control, name: "pickupSupplierIds" }) ?? NO_SHEDS;
   const driverId = useWatch({ control, name: "driverId" }) ?? "";
   const deliveryAddressId =
     useWatch({ control, name: "deliveryAddressId" }) ?? "";
@@ -230,7 +228,10 @@ export function ShipmentForm({
     clearErrors(["pickupSupplierIds", "originWarehouseId"]);
   };
 
-  const allSales = useMemo(() => eligible.data?.data.sales ?? [], [eligible.data]);
+  const allSales = useMemo(
+    () => eligible.data?.data.sales ?? [],
+    [eligible.data],
+  );
   const visibleSales = useMemo(() => {
     const q = saleSearch.trim().toLowerCase();
     if (!q) return allSales;
@@ -258,7 +259,8 @@ export function ShipmentForm({
     } else {
       for (const s of allSales)
         if (selected.includes(s.id))
-          for (const l of s.lines) add(l.commodityId, l.commodityName, l.remainingKg);
+          for (const l of s.lines)
+            add(l.commodityId, l.commodityName, l.remainingKg);
     }
     return m;
   }, [shipment, allSales, selected]);
@@ -339,7 +341,10 @@ export function ShipmentForm({
   // directory here would be a list of hundreds of places with nothing to
   // collect, and ticking one of them buys the plan no cover at all.
   const pickupOptions = useMemo(() => {
-    const bySupplier = new Map<string, { id: string; name: string; kg: number }>();
+    const bySupplier = new Map<
+      string,
+      { id: string; name: string; kg: number }
+    >();
     for (const h of holdings) {
       const entry = bySupplier.get(h.supplierId) ?? {
         id: h.supplierId,
@@ -352,7 +357,9 @@ export function ShipmentForm({
       if (needed.has(h.commodityId)) entry.kg += h.remainingKg;
       bySupplier.set(h.supplierId, entry);
     }
-    return [...bySupplier.values()].sort((a, b) => a.name.localeCompare(b.name));
+    return [...bySupplier.values()].sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
   }, [holdings, needed]);
 
   // "The register is empty" and "this search found nothing" are different
@@ -508,7 +515,10 @@ export function ShipmentForm({
             ? [
                 DASHBOARD_CRUMB,
                 { label: "Shipments", href: LIST },
-                { label: shipment.transactionNo, href: `${LIST}/${shipment.id}` },
+                {
+                  label: shipment.transactionNo,
+                  href: `${LIST}/${shipment.id}`,
+                },
               ]
             : [DASHBOARD_CRUMB, { label: "Shipments", href: LIST }]
         }
@@ -573,114 +583,116 @@ export function ShipmentForm({
                 </div>
               </div>
             ) : (
-            <div>
-              <div
-                className={cn(
-                  "rounded-none border border-adm-line bg-[#FBFCF7]",
-                  errors.saleIds && "border-console-red",
-                )}
-              >
-                <div className="border-b border-adm-hairline p-2">
-                  <Input
-                    aria-label="Search sales by number or buyer"
-                    value={saleSearch}
-                    onChange={(e) => setSaleSearch(e.target.value)}
-                    placeholder="Search sale no. or buyer…"
-                    className={cn(adminInputClass, "h-9")}
-                  />
-                </div>
-                {eligible.isLoading ? (
-                  <p className="px-3 py-3 text-[11.5px] text-adm-muted">
-                    Loading shippable sales…
-                  </p>
-                ) : eligible.isError ? (
-                  <p className="px-3 py-3 text-[11.5px] text-console-red">
-                    Couldn&apos;t load the shippable sales. Reload and try again.
-                  </p>
-                ) : visibleSales.length === 0 ? (
-                  <p className="px-3 py-3 text-[11.5px] text-adm-muted">
-                    {allSales.length === 0
-                      ? "No sales are ready to ship - a sale appears here once it is confirmed, its payment terms are met and it isn't already on a truck."
-                      : "No sales match this search."}
-                  </p>
-                ) : (
-                  <div className="max-h-[280px] overflow-y-auto">
-                    {visibleSales.map((s) => (
-                      <label
-                        key={s.id}
-                        className={cn(
-                          "flex cursor-pointer items-start gap-2.5 border-b border-adm-hairline border-l-2 border-l-transparent px-3 py-2 last:border-b-0 hover:bg-adm-sunken",
-                          // A ticked sale reads as picked from across the room:
-                          // green rail, tinted row, not just a 16px checkbox.
-                          selected.includes(s.id) &&
-                            "border-l-[#155744] bg-[#F1F6EE] hover:bg-[#EBF2E7]",
-                        )}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selected.includes(s.id)}
-                          onChange={() => toggleSale(s.id)}
-                          className="mt-1 h-4 w-4 flex-none accent-[#155744]"
-                        />
-                        <span className="min-w-0 flex-1">
-                          <span className="flex items-baseline justify-between gap-2">
-                            <Mono
-                              className={cn(
-                                "block text-[11px] text-console",
-                                selected.includes(s.id) && "font-bold",
-                              )}
-                            >
-                              {s.transactionNo}
-                            </Mono>
-                            <Mono className="flex-none text-[11px] font-bold text-adm-ink">
-                              {formatKg(s.totalRemainingKg)}
-                            </Mono>
-                          </span>
-                          {/* The buyer and what they are taking on one line.
+              <div>
+                <div
+                  className={cn(
+                    "rounded-none border border-adm-line bg-[#FBFCF7]",
+                    errors.saleIds && "border-console-red",
+                  )}
+                >
+                  <div className="border-b border-adm-hairline p-2">
+                    <Input
+                      aria-label="Search sales by number or buyer"
+                      value={saleSearch}
+                      onChange={(e) => setSaleSearch(e.target.value)}
+                      placeholder="Search sale no. or buyer…"
+                      className={cn(adminInputClass, "h-9")}
+                    />
+                  </div>
+                  {eligible.isLoading ? (
+                    <p className="px-3 py-3 text-[11.5px] text-adm-muted">
+                      Loading shippable sales…
+                    </p>
+                  ) : eligible.isError ? (
+                    <p className="px-3 py-3 text-[11.5px] text-console-red">
+                      Couldn&apos;t load the shippable sales. Reload and try
+                      again.
+                    </p>
+                  ) : visibleSales.length === 0 ? (
+                    <p className="px-3 py-3 text-[11.5px] text-adm-muted">
+                      {allSales.length === 0
+                        ? "No sales are ready to ship - a sale appears here once it is confirmed, its payment terms are met and it isn't already on a truck."
+                        : "No sales match this search."}
+                    </p>
+                  ) : (
+                    <div className="max-h-[280px] overflow-y-auto">
+                      {visibleSales.map((s) => (
+                        <label
+                          key={s.id}
+                          className={cn(
+                            "flex cursor-pointer items-start gap-2.5 border-b border-adm-hairline border-l-2 border-l-transparent px-3 py-2 last:border-b-0 hover:bg-adm-sunken",
+                            // A ticked sale reads as picked from across the room:
+                            // green rail, tinted row, not just a 16px checkbox.
+                            selected.includes(s.id) &&
+                              "border-l-[#155744] bg-[#F1F6EE] hover:bg-[#EBF2E7]",
+                          )}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selected.includes(s.id)}
+                            onChange={() => toggleSale(s.id)}
+                            className="mt-1 h-4 w-4 flex-none accent-[#155744]"
+                          />
+                          <span className="min-w-0 flex-1">
+                            <span className="flex items-baseline justify-between gap-2">
+                              <Mono
+                                className={cn(
+                                  "block text-[11px] text-console",
+                                  selected.includes(s.id) && "font-bold",
+                                )}
+                              >
+                                {s.transactionNo}
+                              </Mono>
+                              <Mono className="flex-none text-[11px] font-bold text-adm-ink">
+                                {formatKg(s.totalRemainingKg)}
+                              </Mono>
+                            </span>
+                            {/* The buyer and what they are taking on one line.
                               A single-commodity sale gets its name only: the
                               weight is already on the right of the row above,
                               and printing it twice bought a third line on
                               every sale in the list. A sale carrying more
                               than one commodity keeps the split, which the
                               total on the right cannot say. */}
-                          <span className="block min-w-0 text-[11.5px] text-adm-ink [overflow-wrap:anywhere]">
-                            {s.buyer.name}
-                            <span className="text-adm-muted">
-                              {" · "}
-                              {s.lines.length === 1
-                                ? s.lines[0].commodityName
-                                : s.lines
-                                    .map(
-                                      (l) =>
-                                        `${l.commodityName} ${formatKg(l.remainingKg)}`,
-                                    )
-                                    .join(" · ")}
+                            <span className="block min-w-0 text-[11.5px] text-adm-ink [overflow-wrap:anywhere]">
+                              {s.buyer.name}
+                              <span className="text-adm-muted">
+                                {" · "}
+                                {s.lines.length === 1
+                                  ? s.lines[0].commodityName
+                                  : s.lines
+                                      .map(
+                                        (l) =>
+                                          `${l.commodityName} ${formatKg(l.remainingKg)}`,
+                                      )
+                                      .join(" · ")}
+                              </span>
                             </span>
                           </span>
-                        </span>
-                      </label>
-                    ))}
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                  <div className="border-t border-adm-hairline px-3 py-1.5 text-[11px] text-adm-muted">
+                    {selected.length} sale{selected.length === 1 ? "" : "s"}{" "}
+                    selected
+                    {selectedKg > 0 ? (
+                      <>
+                        {" "}
+                        · <Mono>{formatKg(selectedKg)}</Mono> to load
+                      </>
+                    ) : null}
                   </div>
-                )}
-                <div className="border-t border-adm-hairline px-3 py-1.5 text-[11px] text-adm-muted">
-                  {selected.length} sale{selected.length === 1 ? "" : "s"} selected
-                  {selectedKg > 0 ? (
-                    <>
-                      {" "}
-                      · <Mono>{formatKg(selectedKg)}</Mono> to load
-                    </>
-                  ) : null}
                 </div>
+                {errors.saleIds ? (
+                  <span
+                    role="alert"
+                    className="mt-1 block text-[11px] font-medium text-console-red"
+                  >
+                    {errors.saleIds.message}
+                  </span>
+                ) : null}
               </div>
-              {errors.saleIds ? (
-                <span
-                  role="alert"
-                  className="mt-1 block text-[11px] font-medium text-console-red"
-                >
-                  {errors.saleIds.message}
-                </span>
-              ) : null}
-            </div>
             )}
           </section>
 
@@ -970,10 +982,12 @@ export function ShipmentForm({
                   {
                     label: "Receives",
                     value:
-                      pickedAddress.contactName || pickedAddress.contactPhone ? (
+                      pickedAddress.contactName ||
+                      pickedAddress.contactPhone ? (
                         <>
                           {pickedAddress.contactName}
-                          {pickedAddress.contactName && pickedAddress.contactPhone
+                          {pickedAddress.contactName &&
+                          pickedAddress.contactPhone
                             ? " · "
                             : ""}
                           {pickedAddress.contactPhone ? (
@@ -985,7 +999,10 @@ export function ShipmentForm({
                 ]}
               />
             ) : (
-              <AdminField label="Destination" error={errors.destination?.message}>
+              <AdminField
+                label="Destination"
+                error={errors.destination?.message}
+              >
                 <Input
                   className={cn(
                     adminInputClass,
@@ -1002,7 +1019,10 @@ export function ShipmentForm({
                 error={errors.truckReg?.message}
               >
                 <Input
-                  className={cn(adminInputClass, errors.truckReg && "border-console-red")}
+                  className={cn(
+                    adminInputClass,
+                    errors.truckReg && "border-console-red",
+                  )}
                   placeholder="GT-1234-24"
                   {...register("truckReg")}
                 />
@@ -1039,7 +1059,10 @@ export function ShipmentForm({
               </AdminField>
             </div>
             {selected.length > 0 && (hasCapacity || selectedKg > 0) ? (
-              <LoadMeter loadedKg={selectedKg} capacityKg={hasCapacity ? capacityKg : null} />
+              <LoadMeter
+                loadedKg={selectedKg}
+                capacityKg={hasCapacity ? capacityKg : null}
+              />
             ) : null}
           </section>
 
@@ -1052,7 +1075,9 @@ export function ShipmentForm({
                 when it is empty, so its existence is discoverable. */}
             <AdminField
               label="Driver"
-              hint={driverBookEmpty ? undefined : "Type to search the directory."}
+              hint={
+                driverBookEmpty ? undefined : "Type to search the directory."
+              }
               error={errors.driverId?.message}
             >
               {!driverBookEmpty ? (
@@ -1112,7 +1137,10 @@ export function ShipmentForm({
                     label: "Phone",
                     value: <Mono>{ovPhone || pickedDriver.phone}</Mono>,
                   },
-                  { label: "Company", value: ovCompany || pickedDriver.company },
+                  {
+                    label: "Company",
+                    value: ovCompany || pickedDriver.company,
+                  },
                   { label: "City", value: ovCity || pickedDriver.city },
                 ]}
               />

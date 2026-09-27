@@ -25,14 +25,12 @@ import type {
  * plausibly carry a movement of each method. OTHER is always allowed - it
  * exists precisely for rails the enum doesn't name.
  */
-const COMPATIBLE_KINDS: Record<
-  "BANK" | "CASH" | "MOMO",
-  PaymentAccountKind[]
-> = {
-  BANK: ["BANK", "OTHER"],
-  CASH: ["CASH", "OTHER"],
-  MOMO: ["MOMO", "OTHER"],
-};
+const COMPATIBLE_KINDS: Record<"BANK" | "CASH" | "MOMO", PaymentAccountKind[]> =
+  {
+    BANK: ["BANK", "OTHER"],
+    CASH: ["CASH", "OTHER"],
+    MOMO: ["MOMO", "OTHER"],
+  };
 
 /** Sentinel for "no account" - Radix select items cannot carry "". */
 const NO_ACCOUNT = "__no_account__";
@@ -252,7 +250,9 @@ export function PaymentAccountField({
         noAccountLabel={
           optional && !isLoading ? "No account named (office till)" : undefined
         }
-        note={chosen?.holder ? holderNote(direction, chosen.holder.name) : undefined}
+        note={
+          chosen?.holder ? holderNote(direction, chosen.holder.name) : undefined
+        }
         onChange={onChange}
         placeholder={
           isLoading

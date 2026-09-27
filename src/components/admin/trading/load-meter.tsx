@@ -27,9 +27,7 @@ export function LoadMeter({
 }) {
   const hasCapacity = typeof capacityKg === "number" && capacityKg > 0;
   const over = hasCapacity && loadedKg > capacityKg;
-  const pct = hasCapacity
-    ? Math.min(100, (loadedKg / capacityKg) * 100)
-    : 0;
+  const pct = hasCapacity ? Math.min(100, (loadedKg / capacityKg) * 100) : 0;
 
   return (
     <div
@@ -50,7 +48,10 @@ export function LoadMeter({
           />
         </span>
         <Mono
-          className={cn("text-[11px]", over ? "text-console-red" : "text-adm-ink")}
+          className={cn(
+            "text-[11px]",
+            over ? "text-console-red" : "text-adm-ink",
+          )}
         >
           {loadedLabel} {formatKg(loadedKg)}
           {hasCapacity ? <> / {formatKg(capacityKg)}</> : null}
@@ -75,7 +76,10 @@ export function LoadMeter({
             />
           </div>
           {over ? (
-            <p role="alert" className="mt-1 text-[11px] font-medium text-console-red">
+            <p
+              role="alert"
+              className="mt-1 text-[11px] font-medium text-console-red"
+            >
               Over capacity by {formatKg(loadedKg - capacityKg)} - lighten the
               load or raise the truck capacity.
             </p>

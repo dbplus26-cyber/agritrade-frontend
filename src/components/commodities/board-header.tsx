@@ -42,8 +42,8 @@ export function BoardHeader({
 
         <p className="mt-4 max-w-[72ch] text-[12.5px] leading-[1.6] text-soil">
           Other grains &amp; pulses on request. No prices, no stock figures
-          posted - the market moves daily; call with tonnage and destination
-          for a same-day quote.
+          posted - the market moves daily; call with tonnage and destination for
+          a same-day quote.
         </p>
       </div>
     </section>

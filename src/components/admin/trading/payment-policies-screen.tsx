@@ -87,7 +87,10 @@ const policyFormSchema = z
             // credit-sale shape.
             .refine(
               (v) =>
-                v !== "" && Number(v) >= 0 && Number(v) <= 100 && !Number.isNaN(Number(v)),
+                v !== "" &&
+                Number(v) >= 0 &&
+                Number(v) <= 100 &&
+                !Number.isNaN(Number(v)),
               { message: "0–100" },
             ),
           trigger: z.enum(["BEFORE_LOADING", "ON_ARRIVAL", "ON_DEMAND"]),
@@ -170,7 +173,10 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
         >
           <AdminField label="Name" error={errors.name?.message}>
             <Input
-              className={cn(adminInputClass, errors.name && "border-console-red")}
+              className={cn(
+                adminInputClass,
+                errors.name && "border-console-red",
+              )}
               placeholder="e.g. 50/50 on arrival"
               {...register("name")}
             />
@@ -267,7 +273,6 @@ function CreatePolicyDialog({ onClose }: { onClose: () => void }) {
                 {errors.milestones.message}
               </p>
             ) : null}
-
           </div>
 
           <label className="flex cursor-pointer items-center gap-2 text-[11.5px] text-adm-body">
@@ -438,7 +443,10 @@ function PolicyCard({ policy }: { policy: IPaymentPolicy }) {
             </span>
             <span className="min-w-0 flex-1 text-adm-body [overflow-wrap:anywhere]">
               {m.label}
-              <span className="text-adm-muted"> · {milestoneTriggerLabel(m.trigger)}</span>
+              <span className="text-adm-muted">
+                {" "}
+                · {milestoneTriggerLabel(m.trigger)}
+              </span>
             </span>
           </li>
         ))}

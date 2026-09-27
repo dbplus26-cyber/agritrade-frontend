@@ -44,12 +44,16 @@ function VolumeTooltip({
       {payload.map((p) => (
         <div key={p.name} className="flex items-center justify-between gap-4">
           <LegendItem color={p.color ?? "#999"} label={p.name} />
-          <span className="font-semibold text-adm-ink">{formatWeight(p.value)}</span>
+          <span className="font-semibold text-adm-ink">
+            {formatWeight(p.value)}
+          </span>
         </div>
       ))}
       <div className="mt-1 flex items-center justify-between gap-4 border-t border-adm-hairline pt-1">
         <span className="text-adm-muted">Total</span>
-        <span className="font-semibold text-adm-ink">{formatWeight(total)}</span>
+        <span className="font-semibold text-adm-ink">
+          {formatWeight(total)}
+        </span>
       </div>
     </div>
   );
@@ -66,9 +70,9 @@ export function VolumeChart({ window }: { window: IReportWindow }) {
   const points = data?.data.points ?? [];
 
   const rows: Row[] = points.map((p) => ({ label: p.label, ...p.values }));
-  const hasVolume = commodities.length > 0 && rows.some((r) =>
-    commodities.some((c) => Number(r[c.name] ?? 0) > 0),
-  );
+  const hasVolume =
+    commodities.length > 0 &&
+    rows.some((r) => commodities.some((c) => Number(r[c.name] ?? 0) > 0));
 
   const legend = (
     // Each entry capped so one long commodity name cannot claim the whole
@@ -104,7 +108,10 @@ export function VolumeChart({ window }: { window: IReportWindow }) {
       ) : (
         <div className="h-[220px] min-w-0">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={rows} margin={{ top: 6, right: 6, bottom: 0, left: -8 }}>
+            <BarChart
+              data={rows}
+              margin={{ top: 6, right: 6, bottom: 0, left: -8 }}
+            >
               <CartesianGrid stroke={GRID_STROKE} vertical={false} />
               <XAxis
                 dataKey="label"

@@ -20,7 +20,10 @@ export const landSalesApi = apiSlice.injectEndpoints({
         result
           ? [
               { type: "LandSales" as const, id: "LIST" },
-              ...result.data.map((s) => ({ type: "LandSales" as const, id: s.id })),
+              ...result.data.map((s) => ({
+                type: "LandSales" as const,
+                id: s.id,
+              })),
             ]
           : [{ type: "LandSales" as const, id: "LIST" }],
     }),
@@ -40,7 +43,10 @@ export const landSalesApi = apiSlice.injectEndpoints({
     }),
 
     confirmLandSale: builder.mutation<ILandSaleResponse, string>({
-      query: (id) => ({ url: `admin/land/sales/${id}/confirm`, method: "PATCH" }),
+      query: (id) => ({
+        url: `admin/land/sales/${id}/confirm`,
+        method: "PATCH",
+      }),
       invalidatesTags: (_r, _e, id) => [
         { type: "LandSales", id },
         { type: "LandSales", id: "LIST" },

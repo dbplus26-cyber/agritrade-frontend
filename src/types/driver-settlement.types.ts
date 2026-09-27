@@ -8,10 +8,7 @@ import type { SalePaymentMethod } from "./admin-sale.types";
  * loading and delivery; a buyer pays against a deposit and the truck's arrival.
  * Sharing one union would let a sale term be offered on a haulage form.
  */
-export type DriverMilestoneTrigger =
-  | "AT_LOADING"
-  | "ON_DELIVERY"
-  | "ON_DEMAND";
+export type DriverMilestoneTrigger = "AT_LOADING" | "ON_DELIVERY" | "ON_DEMAND";
 
 /** How settled a trip is, without needing the figures to work it out. */
 export type DriverSettlementStatus =
@@ -181,6 +178,7 @@ export interface IAdjustDriverFeeInput {
 
 export interface IRecordDriverPaymentInput {
   amountGhs: number;
+  idempotencyKey?: string;
   /**
    * A settled Hubtel send this books against instead of describing a movement
    * of its own. The server resolves the paying account (the payout wallet) and
@@ -192,6 +190,11 @@ export interface IRecordDriverPaymentInput {
   paidAt?: string;
   paymentAccountId?: string;
   reference?: string;
+  sourceMovementId?: string;
+}
+
+export interface IRecordExpensePaymentInput extends IRecordDriverPaymentInput {
+  sourceMovementId?: string;
 }
 
 // ── Expense settlement ────────────────────────────────────────────
@@ -206,6 +209,11 @@ export interface IExpensePayment {
   paidAt: string;
   paymentAccount: { id: string; label: string } | null;
   reference: string | null;
+  sourceType:
+    | "ACCOUNT_OUTFLOW"
+    | "DRIVER_PAYMENT"
+    | "HUBTEL_SEND"
+    | "NEW_PAYMENT";
   isReversal: boolean;
   reversalReason: string | null;
   reversedByPaymentId: string | null;

@@ -1,8 +1,17 @@
 "use client";
 
-import { type Control, Controller, type FieldErrors, type UseFormRegister } from "react-hook-form";
+import {
+  type Control,
+  Controller,
+  type FieldErrors,
+  type UseFormRegister,
+} from "react-hook-form";
 
-import { AdminField, ChoiceCards, adminInputClass } from "@/components/admin/ui";
+import {
+  AdminField,
+  ChoiceCards,
+  adminInputClass,
+} from "@/components/admin/ui";
 import { Input } from "@/components/ui/input";
 import {
   STATEMENT_SECTION_LEGEND,
@@ -42,7 +51,10 @@ export function CategoryStatementFields({
         control={control}
         name="statementSection"
         render={({ field }) => (
-          <fieldset disabled={disabled} className="min-w-0 disabled:opacity-100">
+          <fieldset
+            disabled={disabled}
+            className="min-w-0 disabled:opacity-100"
+          >
             <ChoiceCards
               legend={STATEMENT_SECTION_LEGEND}
               name="statementSection"

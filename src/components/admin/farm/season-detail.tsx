@@ -18,7 +18,10 @@ import { cn } from "@/lib/utils";
 import { HelpTip } from "@/components/admin/help-tip";
 import { Money } from "@/components/admin/trading/sale-bits";
 import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
-import { ConsoleTableSkeleton, DetailSkeleton } from "@/components/admin/skeletons";
+import {
+  ConsoleTableSkeleton,
+  DetailSkeleton,
+} from "@/components/admin/skeletons";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { useConfirm } from "@/hooks/use-confirm";
@@ -49,7 +52,9 @@ function StatTile({
     <AdminCard className="px-4 py-3">
       <div className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         <span className="min-w-0">{label}</span>
-        {hint ? <HelpTip label={`What does ${label} count?`} text={hint} /> : null}
+        {hint ? (
+          <HelpTip label={`What does ${label} count?`} text={hint} />
+        ) : null}
       </div>
       <div className="mt-1 text-[19px] font-bold text-adm-ink">{children}</div>
     </AdminCard>
@@ -166,7 +171,9 @@ export function SeasonDetail({ id }: { id: string }) {
               <DetailItem full label="Name" strong>
                 {s.name}
               </DetailItem>
-              <DetailItem label="Starts">{formatFarmDate(s.startsOn)}</DetailItem>
+              <DetailItem label="Starts">
+                {formatFarmDate(s.startsOn)}
+              </DetailItem>
               <DetailItem label="Ends">
                 {s.endsOn ? (
                   formatFarmDate(s.endsOn)
@@ -187,7 +194,8 @@ export function SeasonDetail({ id }: { id: string }) {
                   variant="outline"
                   onClick={() =>
                     void run(
-                      () => setActive({ active: !s.isActive, id: s.id }).unwrap(),
+                      () =>
+                        setActive({ active: !s.isActive, id: s.id }).unwrap(),
                       s.isActive ? "Season deactivated" : "Season activated",
                     )
                   }
@@ -209,145 +217,147 @@ export function SeasonDetail({ id }: { id: string }) {
         }
         main={
           <>
-          {stats ? (
-            <AdminCard className="mb-4 px-5 py-3">
-              <SectionHeading className="mb-1">
-                Expected vs actual
-              </SectionHeading>
-              <p className="mb-2 text-[11px] text-adm-muted">
-                The season plans against what actually came back - the read
-                that makes next season&apos;s grant decisions better informed.
-              </p>
-              {/* Four facts, so they keep a four-column grid rather than
+            {stats ? (
+              <AdminCard className="mb-4 px-5 py-3">
+                <SectionHeading className="mb-1">
+                  Expected vs actual
+                </SectionHeading>
+                <p className="mb-2 text-[11px] text-adm-muted">
+                  The season plans against what actually came back - the read
+                  that makes next season&apos;s grant decisions better informed.
+                </p>
+                {/* Four facts, so they keep a four-column grid rather than
                   DetailGrid's auto-fit - but the pairs themselves are
                   DetailItems rather than hand-rolled markup a size adrift. */}
-              <div className="grid grid-cols-2 gap-x-8 gap-y-1 sm:grid-cols-4">
-                <DetailItem
-                  label="Expected yield"
-                  mono
-                  hint="The produce this season's grants were meant to bring back, added up across every farmer."
-                >
-                  {formatKg(stats.expectations.expectedYieldKg)}
-                </DetailItem>
-                <DetailItem
-                  label="Actual yield"
-                  mono
-                  hint="The produce farmers have actually brought back to you this season."
-                >
-                  {/* Green only when the season has met what it planned for. */}
-                  <span
-                    className={
-                      stats.expectations.actualYieldKg >=
-                      stats.expectations.expectedYieldKg
-                        ? "text-console"
-                        : undefined
-                    }
+                <div className="grid grid-cols-2 gap-x-8 gap-y-1 sm:grid-cols-4">
+                  <DetailItem
+                    label="Expected yield"
+                    mono
+                    hint="The produce this season's grants were meant to bring back, added up across every farmer."
                   >
-                    {formatKg(stats.expectations.actualYieldKg)}
-                  </span>
-                </DetailItem>
-                <DetailItem
-                  label="Expected return"
-                  mono
-                  hint="What the expected produce was reckoned to be worth when the grants went out."
-                >
-                  <Money value={stats.expectations.expectedReturnGhs} />
-                </DetailItem>
-                <DetailItem
-                  label="Actual return"
-                  mono
-                  hint="What the produce farmers actually brought back was worth when it was taken in."
-                >
-                  <Money value={stats.expectations.actualReturnGhs} />
-                </DetailItem>
-              </div>
-            </AdminCard>
-          ) : null}
-          <AdminCard className="overflow-hidden">
-            {/* The rule stays on the band; the heading owns only its text,
-                so mb-0 leaves the band's py-3 as the gap under it. */}
-            <div className="border-b border-adm-hairline px-5 py-3">
-              <SectionHeading className="mb-0">Farmer balances</SectionHeading>
-            </div>
-            {summary.isLoading ? (
-              <div className="p-5">
-                <ConsoleTableSkeleton bare columns={3} rows={5} />
-              </div>
-            ) : !stats || stats.farmerBalances.length === 0 ? (
-              <EmptyState
-                variant="plain"
-                title="No activity yet"
-                description="Grants and repayments booked to this season appear here."
-              />
-            ) : (
-              <table className="w-full border-collapse text-[12px]">
-                <thead>
-                  <tr className="border-b border-adm-hairline text-left text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted">
-                    <th className="px-5 py-2">Farmer</th>
-                    <th className="px-5 py-2 text-right">
-                      <span className="inline-flex items-center gap-1">
-                        Invested
-                        <HelpTip
-                          label="What does the Invested column show?"
-                          text="What the inputs this farmer took this season were worth."
-                        />
-                      </span>
-                    </th>
-                    <th className="px-5 py-2 text-right">
-                      <span className="inline-flex items-center gap-1">
-                        Recovered
-                        <HelpTip
-                          label="What does the Recovered column show?"
-                          text="What this farmer has already paid back, in produce or in cash."
-                        />
-                      </span>
-                    </th>
-                    <th className="px-5 py-2 text-right">
-                      <span className="inline-flex items-center gap-1">
-                        Outstanding
-                        <HelpTip
-                          label="What does the Outstanding column show?"
-                          text="What this farmer still owes you on this season's inputs."
-                        />
-                      </span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {stats.farmerBalances.map((b) => (
-                    <tr
-                      key={b.farmerId}
-                      className="border-b border-adm-hairline last:border-b-0 hover:bg-adm-sunken"
+                    {formatKg(stats.expectations.expectedYieldKg)}
+                  </DetailItem>
+                  <DetailItem
+                    label="Actual yield"
+                    mono
+                    hint="The produce farmers have actually brought back to you this season."
+                  >
+                    {/* Green only when the season has met what it planned for. */}
+                    <span
+                      className={
+                        stats.expectations.actualYieldKg >=
+                        stats.expectations.expectedYieldKg
+                          ? "text-console"
+                          : undefined
+                      }
                     >
-                      <td className="px-5 py-2.5">
-                        <Link
-                          href={`/admin/farmers/${b.farmerId}/statement?seasonId=${s.id}`}
-                          className={cn(adminLinkClass, "font-semibold")}
-                        >
-                          {b.farmerName}
-                        </Link>
-                      </td>
-                      <td className="px-5 py-2.5 text-right">
-                        <Mono>
-                          <Money value={b.investedGhs} />
-                        </Mono>
-                      </td>
-                      <td className="px-5 py-2.5 text-right text-console">
-                        <Mono>
-                          <Money value={b.recoveredGhs} />
-                        </Mono>
-                      </td>
-                      <td className="px-5 py-2.5 text-right font-semibold text-console-red">
-                        <Mono>
-                          <Money value={b.outstandingGhs} />
-                        </Mono>
-                      </td>
+                      {formatKg(stats.expectations.actualYieldKg)}
+                    </span>
+                  </DetailItem>
+                  <DetailItem
+                    label="Expected return"
+                    mono
+                    hint="What the expected produce was reckoned to be worth when the grants went out."
+                  >
+                    <Money value={stats.expectations.expectedReturnGhs} />
+                  </DetailItem>
+                  <DetailItem
+                    label="Actual return"
+                    mono
+                    hint="What the produce farmers actually brought back was worth when it was taken in."
+                  >
+                    <Money value={stats.expectations.actualReturnGhs} />
+                  </DetailItem>
+                </div>
+              </AdminCard>
+            ) : null}
+            <AdminCard className="overflow-hidden">
+              {/* The rule stays on the band; the heading owns only its text,
+                so mb-0 leaves the band's py-3 as the gap under it. */}
+              <div className="border-b border-adm-hairline px-5 py-3">
+                <SectionHeading className="mb-0">
+                  Farmer balances
+                </SectionHeading>
+              </div>
+              {summary.isLoading ? (
+                <div className="p-5">
+                  <ConsoleTableSkeleton bare columns={3} rows={5} />
+                </div>
+              ) : !stats || stats.farmerBalances.length === 0 ? (
+                <EmptyState
+                  variant="plain"
+                  title="No activity yet"
+                  description="Grants and repayments booked to this season appear here."
+                />
+              ) : (
+                <table className="w-full border-collapse text-[12px]">
+                  <thead>
+                    <tr className="border-b border-adm-hairline text-left text-[10.5px] font-bold uppercase tracking-[0.09em] text-adm-muted">
+                      <th className="px-5 py-2">Farmer</th>
+                      <th className="px-5 py-2 text-right">
+                        <span className="inline-flex items-center gap-1">
+                          Invested
+                          <HelpTip
+                            label="What does the Invested column show?"
+                            text="What the inputs this farmer took this season were worth."
+                          />
+                        </span>
+                      </th>
+                      <th className="px-5 py-2 text-right">
+                        <span className="inline-flex items-center gap-1">
+                          Recovered
+                          <HelpTip
+                            label="What does the Recovered column show?"
+                            text="What this farmer has already paid back, in produce or in cash."
+                          />
+                        </span>
+                      </th>
+                      <th className="px-5 py-2 text-right">
+                        <span className="inline-flex items-center gap-1">
+                          Outstanding
+                          <HelpTip
+                            label="What does the Outstanding column show?"
+                            text="What this farmer still owes you on this season's inputs."
+                          />
+                        </span>
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </AdminCard>
+                  </thead>
+                  <tbody>
+                    {stats.farmerBalances.map((b) => (
+                      <tr
+                        key={b.farmerId}
+                        className="border-b border-adm-hairline last:border-b-0 hover:bg-adm-sunken"
+                      >
+                        <td className="px-5 py-2.5">
+                          <Link
+                            href={`/admin/farmers/${b.farmerId}/statement?seasonId=${s.id}`}
+                            className={cn(adminLinkClass, "font-semibold")}
+                          >
+                            {b.farmerName}
+                          </Link>
+                        </td>
+                        <td className="px-5 py-2.5 text-right">
+                          <Mono>
+                            <Money value={b.investedGhs} />
+                          </Mono>
+                        </td>
+                        <td className="px-5 py-2.5 text-right text-console">
+                          <Mono>
+                            <Money value={b.recoveredGhs} />
+                          </Mono>
+                        </td>
+                        <td className="px-5 py-2.5 text-right font-semibold text-console-red">
+                          <Mono>
+                            <Money value={b.outstandingGhs} />
+                          </Mono>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </AdminCard>
           </>
         }
       />

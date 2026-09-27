@@ -85,7 +85,10 @@ export function ConsoleTableSkeleton({
             {Array.from({ length: columns }, (_, col) => (
               <Skeleton
                 key={col}
-                className={cn("h-2.5", col === 0 ? "w-2/5 flex-none" : "flex-1")}
+                className={cn(
+                  "h-2.5",
+                  col === 0 ? "w-2/5 flex-none" : "flex-1",
+                )}
               />
             ))}
           </div>
@@ -286,14 +289,19 @@ export function RecordCardGridSkeleton({
     >
       {Array.from({ length: cards }, (_, i) => (
         <AdminCard key={i} className="overflow-hidden">
-          {media ? <Skeleton className="h-[130px] w-full rounded-none" /> : null}
+          {media ? (
+            <Skeleton className="h-[130px] w-full rounded-none" />
+          ) : null}
           <div className="px-4 py-3">
             <div className="mb-2 flex items-center justify-between gap-2.5">
               <Skeleton className="h-3 w-24" />
               <Skeleton className="h-4 w-20 rounded-full" />
             </div>
             <Skeleton className="h-4" style={{ width: width(i, 60) }} />
-            <Skeleton className="mt-2 h-2.5" style={{ width: width(i + 1, 45) }} />
+            <Skeleton
+              className="mt-2 h-2.5"
+              style={{ width: width(i + 1, 45) }}
+            />
             <div className="mt-2.5 flex items-center justify-between gap-2.5">
               <Skeleton className="h-2.5 w-28" />
               <Skeleton className="h-2.5 w-16" />
@@ -574,7 +582,10 @@ export function FormSkeleton({
             {[0, 1, 2].map((i) => (
               <AdminCard key={i} className="px-4 py-3">
                 <Skeleton className="h-2.5 w-16" />
-                <Skeleton className="mt-2 h-4" style={{ width: width(i, 45, 20) }} />
+                <Skeleton
+                  className="mt-2 h-4"
+                  style={{ width: width(i, 45, 20) }}
+                />
               </AdminCard>
             ))}
           </div>

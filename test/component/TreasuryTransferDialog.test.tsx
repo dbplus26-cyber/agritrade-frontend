@@ -26,7 +26,10 @@ const { createTransfer, errorToast, successToast } = vi.hoisted(() => ({
 }));
 
 vi.mock("@/redux/treasury/treasury-api", () => ({
-  useCreateBalanceTransferMutation: () => [createTransfer, { isLoading: false }],
+  useCreateBalanceTransferMutation: () => [
+    createTransfer,
+    { isLoading: false },
+  ],
   useGetBalanceTransfersQuery: () => ({
     data: { data: [], meta: { total: 0 } },
     isFetching: false,

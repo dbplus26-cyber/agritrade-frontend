@@ -8,7 +8,10 @@
 // accounts a customer is told to pay into. This covers every account including
 // the office till, the Hubtel wallets and money a named person is holding.
 import type { IPaginationMeta } from "./api";
-import type { IPaymentAccount, PaymentAccountKind } from "./payment-account.types";
+import type {
+  IPaymentAccount,
+  PaymentAccountKind,
+} from "./payment-account.types";
 
 /**
  * The entry types an owner posts by hand. Mirrors ACCOUNT_ENTRY_TYPES in the
@@ -93,6 +96,7 @@ export interface IPostAccountEntryInput {
   /** Positive for every type except OPENING and CORRECTION, which are signed. */
   amountGhs: number;
   occurredAt: string;
+  externalReference?: string;
   reason: string;
   type: AccountEntryType;
 }
@@ -103,6 +107,7 @@ export interface IAccountEntryResponse {
     entry: {
       accountId: string;
       amountGhs: number;
+      externalReference: string | null;
       id: string;
       occurredAt: string;
       reason: string | null;

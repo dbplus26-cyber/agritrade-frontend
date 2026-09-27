@@ -8,7 +8,8 @@ export default async function ApplyOpengraphImage() {
   return brandOgImage({
     eyebrow: "Farming investment · Applications open",
     title: "Apply for the scheme.",
-    subtitle: "Tell us your acreage, crops and what you need - we visit the farm.",
+    subtitle:
+      "Tell us your acreage, crops and what you need - we visit the farm.",
     cta: "Start your application →",
   });
 }

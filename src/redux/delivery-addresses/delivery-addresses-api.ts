@@ -18,7 +18,8 @@ export const deliveryAddressesApi = apiSlice.injectEndpoints({
       IRegistryListResponse<IDeliveryAddress>,
       IDeliveryAddressListQuery | void
     >({
-      query: (params) => `admin/delivery-addresses${toQueryString(params ?? {})}`,
+      query: (params) =>
+        `admin/delivery-addresses${toQueryString(params ?? {})}`,
       providesTags: (result) =>
         result
           ? [
@@ -63,7 +64,10 @@ export const deliveryAddressesApi = apiSlice.injectEndpoints({
       ],
     }),
 
-    deactivateDeliveryAddress: builder.mutation<IDeliveryAddressResponse, string>({
+    deactivateDeliveryAddress: builder.mutation<
+      IDeliveryAddressResponse,
+      string
+    >({
       query: (id) => ({
         url: `admin/delivery-addresses/${id}/deactivate`,
         method: "PATCH",
@@ -74,16 +78,18 @@ export const deliveryAddressesApi = apiSlice.injectEndpoints({
       ],
     }),
 
-    activateDeliveryAddress: builder.mutation<IDeliveryAddressResponse, string>({
-      query: (id) => ({
-        url: `admin/delivery-addresses/${id}/activate`,
-        method: "PATCH",
-      }),
-      invalidatesTags: (_r, _e, id) => [
-        { type: "DeliveryAddresses", id },
-        { type: "DeliveryAddresses", id: "LIST" },
-      ],
-    }),
+    activateDeliveryAddress: builder.mutation<IDeliveryAddressResponse, string>(
+      {
+        query: (id) => ({
+          url: `admin/delivery-addresses/${id}/activate`,
+          method: "PATCH",
+        }),
+        invalidatesTags: (_r, _e, id) => [
+          { type: "DeliveryAddresses", id },
+          { type: "DeliveryAddresses", id: "LIST" },
+        ],
+      },
+    ),
 
     deleteDeliveryAddress: builder.mutation<IMessageResponse, string>({
       query: (id) => ({

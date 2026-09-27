@@ -3,9 +3,17 @@ import { StencilLabel } from "@/components/ui/StencilLabel";
 
 const STEPS = [
   { no: "01", title: "View the plot", note: "See it with us, on the ground." },
-  { no: "02", title: "Check the papers", note: "Site plan and indenture, in hand." },
+  {
+    no: "02",
+    title: "Check the papers",
+    note: "Site plan and indenture, in hand.",
+  },
   { no: "03", title: "Walk the boundary", note: "Pillar to pillar, together." },
-  { no: "04", title: "Pay & transfer", note: "In your name before the sale closes." },
+  {
+    no: "04",
+    title: "Pay & transfer",
+    note: "In your name before the sale closes.",
+  },
 ];
 
 /** How buying works - a compact numbered strip between the intro and the

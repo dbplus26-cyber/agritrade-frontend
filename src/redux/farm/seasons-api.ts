@@ -17,7 +17,10 @@ export const seasonsApi = apiSlice.injectEndpoints({
         result
           ? [
               { type: "Seasons" as const, id: "LIST" },
-              ...result.data.map((s) => ({ type: "Seasons" as const, id: s.id })),
+              ...result.data.map((s) => ({
+                type: "Seasons" as const,
+                id: s.id,
+              })),
             ]
           : [{ type: "Seasons" as const, id: "LIST" }],
     }),

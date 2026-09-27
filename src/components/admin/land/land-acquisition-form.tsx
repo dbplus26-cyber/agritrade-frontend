@@ -187,7 +187,7 @@ export function LandAcquisitionForm() {
             <div className="grid gap-5 @min-[440px]:grid-cols-2 @min-[620px]:grid-cols-3">
               <AdminField label="Size" error={errors.sizeText?.message}>
                 <Input
-                  placeholder='e.g. 100 x 100 ft'
+                  placeholder="e.g. 100 x 100 ft"
                   className={cn(
                     adminInputClass,
                     errors.sizeText && "border-console-red",
@@ -252,7 +252,12 @@ export function LandAcquisitionForm() {
           >
             Cancel
           </AdminButton>
-          <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
+          <AdminButton
+            type="submit"
+            disabled={saving}
+            loading={saving}
+            size="lg"
+          >
             {saving ? "Saving…" : "Record acquisition"}
           </AdminButton>
         </CommitRow>

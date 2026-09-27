@@ -78,77 +78,85 @@ export function PlotGallery({
 
   return (
     <div className={frameClassName}>
-    <div
-      className={cn(
-        "relative h-[180px] border-b-[1.5px] border-soil/50 sm:h-[210px]",
-        className,
-      )}
-      onTouchStart={(e) => {
-        setTouchX(e.touches[0]?.clientX ?? null);
-      }}
-      onTouchEnd={(e) => {
-        onTouchEnd(e.changedTouches[0]?.clientX ?? 0);
-      }}
-    >
-      {/* The ledger panel is the floor of the frame, and it is only ever seen
+      <div
+        className={cn(
+          "relative h-[180px] border-b-[1.5px] border-soil/50 sm:h-[210px]",
+          className,
+        )}
+        onTouchStart={(e) => {
+          setTouchX(e.touches[0]?.clientX ?? null);
+        }}
+        onTouchEnd={(e) => {
+          onTouchEnd(e.changedTouches[0]?.clientX ?? 0);
+        }}
+      >
+        {/* The ledger panel is the floor of the frame, and it is only ever seen
           while a photo is still loading. Once every photo has failed the whole
           gallery unmounts above, so it can no longer be left standing as the
           finished state of a plot with nothing on file. */}
-      <PhotoFallback className="absolute inset-0" />
-      {live.map((photo, i) => (
-        // No scrim over the plot photo: a buyer is judging the land, so it
-        // renders at true colour.
-        <Photo
-          key={photo.url}
-          src={photo.url}
-          alt={photo.alt ?? fallbackAlt}
-          fill
-          sizes="(min-width: 1024px) 560px, 100vw"
-          aria-hidden={i === current ? undefined : "true"}
-          className={`object-cover transition-opacity duration-200 ${
-            i === current ? "opacity-100" : "opacity-0"
-          }`}
-          fallback={null}
-          onFailed={(src) => {
-            setFailed((prev) => (prev.includes(src) ? prev : [...prev, src]));
-          }}
-        />
-      ))}
+        <PhotoFallback className="absolute inset-0" />
+        {live.map((photo, i) => (
+          // No scrim over the plot photo: a buyer is judging the land, so it
+          // renders at true colour.
+          <Photo
+            key={photo.url}
+            src={photo.url}
+            alt={photo.alt ?? fallbackAlt}
+            fill
+            sizes="(min-width: 1024px) 560px, 100vw"
+            aria-hidden={i === current ? undefined : "true"}
+            className={`object-cover transition-opacity duration-200 ${
+              i === current ? "opacity-100" : "opacity-0"
+            }`}
+            fallback={null}
+            onFailed={(src) => {
+              setFailed((prev) => (prev.includes(src) ? prev : [...prev, src]));
+            }}
+          />
+        ))}
 
-      {total > 1 ? (
-        <>
-          <button
-            type="button"
-            aria-label="Previous photo"
-            onClick={() => {
-              step(-1);
-            }}
-            className={`${plate} left-2.5`}
-          >
-            <ChevronLeft aria-hidden="true" className="size-5" strokeWidth={2.4} />
-          </button>
-          <button
-            type="button"
-            aria-label="Next photo"
-            onClick={() => {
-              step(1);
-            }}
-            className={`${plate} right-2.5`}
-          >
-            <ChevronRight aria-hidden="true" className="size-5" strokeWidth={2.4} />
-          </button>
-          {/* Bottom LEFT: the availability stamp overhangs the bottom-right
+        {total > 1 ? (
+          <>
+            <button
+              type="button"
+              aria-label="Previous photo"
+              onClick={() => {
+                step(-1);
+              }}
+              className={`${plate} left-2.5`}
+            >
+              <ChevronLeft
+                aria-hidden="true"
+                className="size-5"
+                strokeWidth={2.4}
+              />
+            </button>
+            <button
+              type="button"
+              aria-label="Next photo"
+              onClick={() => {
+                step(1);
+              }}
+              className={`${plate} right-2.5`}
+            >
+              <ChevronRight
+                aria-hidden="true"
+                className="size-5"
+                strokeWidth={2.4}
+              />
+            </button>
+            {/* Bottom LEFT: the availability stamp overhangs the bottom-right
               corner of every plot card. */}
-          <p
-            aria-live="polite"
-            className="stencil absolute bottom-2.5 left-2.5 rounded-[2px] bg-forest px-2.5 py-1.5 text-[10px] leading-none tracking-[0.14em] text-surface"
-          >
-            <span className="sr-only">Photo </span>
-            {current + 1} / {total}
-          </p>
-        </>
-      ) : null}
-    </div>
+            <p
+              aria-live="polite"
+              className="stencil absolute bottom-2.5 left-2.5 rounded-[2px] bg-forest px-2.5 py-1.5 text-[10px] leading-none tracking-[0.14em] text-surface"
+            >
+              <span className="sr-only">Photo </span>
+              {current + 1} / {total}
+            </p>
+          </>
+        ) : null}
+      </div>
     </div>
   );
 }

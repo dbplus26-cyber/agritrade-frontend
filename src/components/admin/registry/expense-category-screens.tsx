@@ -168,7 +168,10 @@ function CreateCategoryDialog({
             <Input
               autoFocus
               placeholder="e.g. Transport"
-              className={cn(adminInputClass, errors.name && "border-console-red")}
+              className={cn(
+                adminInputClass,
+                errors.name && "border-console-red",
+              )}
               {...register("name")}
             />
           </AdminField>
@@ -195,10 +198,20 @@ function CreateCategoryDialog({
             register={register}
           />
           <ResponsiveDialogFooter className="gap-2">
-            <AdminButton type="button" variant="outline" size="lg" onClick={close}>
+            <AdminButton
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={close}
+            >
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={isLoading} loading={isLoading} size="lg">
+            <AdminButton
+              type="submit"
+              disabled={isLoading}
+              loading={isLoading}
+              size="lg"
+            >
               {isLoading ? "Saving…" : "Create category"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -279,9 +292,7 @@ export function ExpenseCategoryTable() {
         // Name, date and badge alone say nothing about whether a heading is
         // a workhorse or an empty bucket; the count does.
         cell: ({ row }) => (
-          <Mono className="tabular-nums">
-            {row.original.expenseCount ?? 0}
-          </Mono>
+          <Mono className="tabular-nums">{row.original.expenseCount ?? 0}</Mono>
         ),
       },
       {
@@ -480,7 +491,9 @@ function ExpenseCategoryFormFields({
         setError("name", { message: fieldErrors.name });
       }
       notify.error(
-        isEdit ? "Couldn't update the category" : "Couldn't create the category",
+        isEdit
+          ? "Couldn't update the category"
+          : "Couldn't create the category",
         { description: message },
       );
     }
@@ -525,7 +538,11 @@ function ExpenseCategoryFormFields({
           <Input
             placeholder="e.g. Transport"
             disabled={readOnly}
-            className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
+            className={cn(
+              adminInputClass,
+              roCls,
+              errors.name && "border-console-red",
+            )}
             {...register("name")}
           />
         </AdminField>
@@ -618,7 +635,10 @@ function ExpenseLine({ expense }: { expense: IExpense }) {
               empty, the number never is, so it carries the link to the cost's
               own page. */}
           <Link
-            className={cn(adminLinkClass, "font-adminmono text-[11px] tabular-nums")}
+            className={cn(
+              adminLinkClass,
+              "font-adminmono text-[11px] tabular-nums",
+            )}
             href={`/admin/expenses/${expense.id}`}
           >
             {expense.transactionNo}

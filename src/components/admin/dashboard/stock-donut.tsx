@@ -2,7 +2,13 @@
 
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 
-import { colorFor, formatWeight, LegendItem, WidgetCard, WidgetEmpty } from "./chart-kit";
+import {
+  colorFor,
+  formatWeight,
+  LegendItem,
+  WidgetCard,
+  WidgetEmpty,
+} from "./chart-kit";
 
 interface StockRow {
   commodityId: string;
@@ -66,7 +72,10 @@ export function StockDonut({ rows }: { rows: StockRow[] }) {
           </div>
           <div className="flex w-full min-w-0 flex-col gap-1.5">
             {slices.map((s) => (
-              <div key={s.name} className="flex items-center justify-between gap-2">
+              <div
+                key={s.name}
+                className="flex items-center justify-between gap-2"
+              >
                 <LegendItem color={s.color} label={s.name} />
                 <span className="flex-none text-[10.5px] text-adm-muted">
                   <span className="font-semibold text-adm-ink">

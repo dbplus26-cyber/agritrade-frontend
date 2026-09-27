@@ -22,11 +22,6 @@ async function findLot(slug: string): Promise<PublicLot | undefined> {
   return findBySlug(lots, slug, (lot) => lot.slug);
 }
 
-export async function generateStaticParams() {
-  const lots = toLots(await fetchPublicCommodities());
-  return lots.map((lot) => ({ slug: lot.slug }));
-}
-
 export async function generateMetadata({
   params,
 }: {

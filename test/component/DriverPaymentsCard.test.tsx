@@ -40,7 +40,11 @@ const row = (
   reference: null,
   reversalReason: null,
   reversedByPaymentId: null,
-  shipment: { destination: "Accra", id: "trip-1", transactionNo: "SHP-2026-0001" },
+  shipment: {
+    destination: "Accra",
+    id: "trip-1",
+    transactionNo: "SHP-2026-0001",
+  },
   transactionNo: "DRP-2026-00042",
   ...overrides,
 });
@@ -157,6 +161,8 @@ describe("DriverPaymentsCard", () => {
     // look different from money that is not there.
     paymentsQuery.mockReturnValue(failed(500));
     render(<DriverPaymentsCard driverId="driver-1" />);
-    expect(screen.getByRole("button", { name: /try again/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /try again/i }),
+    ).toBeInTheDocument();
   });
 });

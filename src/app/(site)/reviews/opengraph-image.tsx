@@ -1,6 +1,7 @@
 import { brandOgImage, OG_CONTENT_TYPE, OG_SIZE } from "@/lib/og-template";
 
-export const alt = "DB Plus reviews - every one tied to a transaction on record";
+export const alt =
+  "DB Plus reviews - every one tied to a transaction on record";
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 

@@ -71,9 +71,7 @@ const renderField = (props: Partial<FieldProps> = {}) => {
 /** Opens the panel and returns the option labels it offers, in order. */
 const openAndList = async (): Promise<string[]> => {
   await userEvent.click(screen.getByLabelText(/money came from/i));
-  return screen
-    .getAllByRole("option")
-    .map((o) => o.textContent?.trim() ?? "");
+  return screen.getAllByRole("option").map((o) => o.textContent?.trim() ?? "");
 };
 
 describe("PaymentAccountField", () => {

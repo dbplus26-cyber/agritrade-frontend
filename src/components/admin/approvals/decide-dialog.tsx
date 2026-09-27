@@ -2,7 +2,11 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AdminButton, AdminField, adminInputClass } from "@/components/admin/ui";
+import {
+  AdminButton,
+  AdminField,
+  adminInputClass,
+} from "@/components/admin/ui";
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
@@ -33,7 +37,10 @@ import {
   summaryLine,
 } from "./approval-bits";
 
-export type Decision = { approval: IApproval; kind: "approve" | "reject" } | null;
+export type Decision = {
+  approval: IApproval;
+  kind: "approve" | "reject";
+} | null;
 
 /**
  * Approve (note optional) / reject (note required) in one dialog. The header
@@ -108,7 +115,10 @@ export function DecideDialog({
     : null;
 
   return (
-    <ResponsiveDialog open={decision !== null} onOpenChange={(o) => !o && close()}>
+    <ResponsiveDialog
+      open={decision !== null}
+      onOpenChange={(o) => !o && close()}
+    >
       <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[420px]">
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle>

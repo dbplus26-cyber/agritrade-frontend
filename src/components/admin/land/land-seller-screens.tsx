@@ -24,7 +24,10 @@ import {
   adminInputClass,
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
-import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons";
+import {
+  ConsoleTableSkeleton,
+  FormSkeleton,
+} from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
@@ -386,7 +389,11 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
             <Input
               placeholder="e.g. Alhaji Mahama"
               disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
+              className={cn(
+                adminInputClass,
+                roCls,
+                errors.name && "border-console-red",
+              )}
               {...register("name")}
             />
           </AdminField>
@@ -396,7 +403,11 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
                 type="tel"
                 placeholder="e.g. 024 000 0000"
                 disabled={readOnly}
-                className={cn(adminInputClass, roCls, errors.phone && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.phone && "border-console-red",
+                )}
                 {...register("phone")}
               />
             </AdminField>
@@ -407,7 +418,11 @@ function LandSellerFormFields({ seller }: { seller?: ILandSeller }) {
                 type="email"
                 placeholder="e.g. mahama@example.com"
                 disabled={readOnly}
-                className={cn(adminInputClass, roCls, errors.email && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.email && "border-console-red",
+                )}
                 {...register("email")}
               />
             </AdminField>
@@ -489,7 +504,8 @@ export function LandSellerCreate() {
 }
 
 export function LandSellerEdit({ id }: { id: string }) {
-  const { data, isLoading, isError, error, refetch } = useGetLandSellerQuery(id);
+  const { data, isLoading, isError, error, refetch } =
+    useGetLandSellerQuery(id);
   const [activate] = useActivateLandSellerMutation();
   const [deactivate] = useDeactivateLandSellerMutation();
   const [remove] = useDeleteLandSellerMutation();

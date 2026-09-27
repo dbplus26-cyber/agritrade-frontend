@@ -168,8 +168,10 @@ export function TreasuryScreen() {
   if (overview && !overview.configured) {
     return (
       <div className="space-y-5">
-        <AdminPageHeader title="Company account"
-        hint="The business's own balance, and moving money between its accounts." />
+        <AdminPageHeader
+          title="Company account"
+          hint="The business's own balance, and moving money between its accounts."
+        />
         <RegisterEmpty
           filtered={false}
           noun="accounts"

@@ -177,7 +177,10 @@ function LogoCard({ settings }: { settings: ISystemSettings }) {
   );
 }
 
-const textareaClass = cn(adminInputClass, "h-auto min-h-[74px] w-full resize-y py-2");
+const textareaClass = cn(
+  adminInputClass,
+  "h-auto min-h-[74px] w-full resize-y py-2",
+);
 
 function StatementSettingsForm({
   settings,
@@ -233,11 +236,7 @@ function StatementSettingsForm({
 
   /** A block of the cover, named. Three unlabelled boxes said nothing about
    * which of them carried what. */
-  const section = (
-    title: string,
-    note: string,
-    body: React.ReactNode,
-  ) => (
+  const section = (title: string, note: string, body: React.ReactNode) => (
     <AdminCard className="px-5 py-[18px]">
       <SectionHeading className="mb-0.5">{title}</SectionHeading>
       <p className="mb-4 text-[11px] leading-[1.5] text-adm-muted">{note}</p>
@@ -247,9 +246,7 @@ function StatementSettingsForm({
 
   /** A saved block as it will print, or an honest gap. */
   const printed = (value: string) =>
-    value.trim() ? (
-      <span className="whitespace-pre-line">{value}</span>
-    ) : null;
+    value.trim() ? <span className="whitespace-pre-line">{value}</span> : null;
 
   // At rest the settings READ. A disabled copy of the form seals each value
   // into a box the width of the input, greys the whole page to one tone, and
@@ -434,7 +431,9 @@ function StatementSettingsForm({
           >
             <textarea
               rows={4}
-              placeholder={"Firm name\n(Chartered Accountants)\nP. O. Box …\nCity - Country"}
+              placeholder={
+                "Firm name\n(Chartered Accountants)\nP. O. Box …\nCity - Country"
+              }
               className={cn(
                 textareaClass,
                 errors.statementAccountantsBlock && "border-console-red",
@@ -461,7 +460,12 @@ function StatementSettingsForm({
             >
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={saving || !isDirty} loading={saving} size="lg">
+            <AdminButton
+              type="submit"
+              disabled={saving || !isDirty}
+              loading={saving}
+              size="lg"
+            >
               {saving ? "Saving…" : "Save statement settings"}
             </AdminButton>
           </Fragment>

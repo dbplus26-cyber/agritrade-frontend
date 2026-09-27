@@ -177,7 +177,11 @@ export const repaymentSchema = z
     };
 
     if (value.kind === "CASH") {
-      demandNumber("amountGhs", "Enter the amount the farmer paid", 100_000_000);
+      demandNumber(
+        "amountGhs",
+        "Enter the amount the farmer paid",
+        100_000_000,
+      );
       if (blank(value.paymentAccountId)) {
         refuse("paymentAccountId", "Say which account the money was paid into");
       }

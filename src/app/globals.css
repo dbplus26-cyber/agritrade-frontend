@@ -97,10 +97,12 @@
   /* Explicit family fallbacks so portaled overlays (Radix dialogs render on
      <body>, outside the admin layout's next/font variable scope) keep the
      console fonts - the @font-face family names are global and stable. */
-  --font-admin: var(--font-geist, "Geist", "Geist Fallback"), ui-sans-serif,
-    system-ui, sans-serif;
-  --font-adminmono: var(--font-geist-mono, "Geist Mono", "Geist Mono Fallback"),
-    ui-monospace, monospace;
+  --font-admin:
+    var(--font-geist, "Geist", "Geist Fallback"), ui-sans-serif, system-ui,
+    sans-serif;
+  --font-adminmono:
+    var(--font-geist-mono, "Geist Mono", "Geist Mono Fallback"), ui-monospace,
+    monospace;
 
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -333,7 +335,11 @@
      dark bands instead. What is left here is a faint foot fade, for the few
      places that print a caption over the bottom of a photo. */
   .photo-treatment {
-    background: linear-gradient(to bottom, transparent 62%, rgb(31 33 28 / 0.22));
+    background: linear-gradient(
+      to bottom,
+      transparent 62%,
+      rgb(31 33 28 / 0.22)
+    );
   }
 }
 

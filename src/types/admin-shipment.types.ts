@@ -46,6 +46,7 @@ export interface IShipmentExpense {
   category: { id: string; name: string };
   amountGhs: number | null;
   description: string | null;
+  driverFeeShipmentId: string | null;
   incurredAt: string;
   /**
    * Whether the money has actually gone. The STATUS survives redaction while
@@ -448,6 +449,8 @@ export interface IShipmentExpenseInput {
   amountGhs: number;
   description?: string;
   incurredAt?: string;
+  existingMovementIds?: string[];
+  linkDriverFee?: boolean;
   /**
    * Settling it in the same act. Absent means the cost is recorded as owed and
    * nothing leaves an account; it is then paid from its own voucher.

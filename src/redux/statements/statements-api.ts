@@ -34,21 +34,33 @@ export const statementsApi = apiSlice.injectEndpoints({
       IAssetClassBody
     >({
       invalidatesTags: ["StatementInputs", "Statements"],
-      query: (body) => ({ body, method: "POST", url: "/admin/statements/asset-classes" }),
+      query: (body) => ({
+        body,
+        method: "POST",
+        url: "/admin/statements/asset-classes",
+      }),
     }),
     createDrawing: builder.mutation<
       { data: { drawing: IDrawing } },
       IDrawingBody
     >({
       invalidatesTags: ["StatementInputs", "Statements"],
-      query: (body) => ({ body, method: "POST", url: "/admin/statements/drawings" }),
+      query: (body) => ({
+        body,
+        method: "POST",
+        url: "/admin/statements/drawings",
+      }),
     }),
     createFixedAsset: builder.mutation<
       { data: { asset: IFixedAsset } },
       IFixedAssetBody
     >({
       invalidatesTags: ["StatementInputs", "Statements"],
-      query: (body) => ({ body, method: "POST", url: "/admin/statements/assets" }),
+      query: (body) => ({
+        body,
+        method: "POST",
+        url: "/admin/statements/assets",
+      }),
     }),
     deleteAssetClass: builder.mutation<{ message: string }, string>({
       invalidatesTags: ["StatementInputs", "Statements"],
@@ -82,7 +94,10 @@ export const statementsApi = apiSlice.injectEndpoints({
         url: `/admin/statements/assets/${assetId}/dispose`,
       }),
     }),
-    getAssetClasses: builder.query<{ data: { assetClasses: IAssetClass[] } }, void>({
+    getAssetClasses: builder.query<
+      { data: { assetClasses: IAssetClass[] } },
+      void
+    >({
       providesTags: ["StatementInputs"],
       query: () => "/admin/statements/asset-classes",
     }),
@@ -128,18 +143,26 @@ export const statementsApi = apiSlice.injectEndpoints({
       number
     >({
       providesTags: ["Statements"],
-      query: (year) => `/admin/statements/financial-statement?year=${String(year)}`,
+      query: (year) =>
+        `/admin/statements/financial-statement?year=${String(year)}`,
     }),
     setPeriodStatus: builder.mutation<
       { data: { period: IStatementPeriod } },
       { status: "DRAFT" | "FINAL"; year: number }
     >({
       invalidatesTags: ["StatementInputs", "Statements"],
-      query: (body) => ({ body, method: "PUT", url: "/admin/statements/periods" }),
+      query: (body) => ({
+        body,
+        method: "PUT",
+        url: "/admin/statements/periods",
+      }),
     }),
     updateAssetClass: builder.mutation<
       { data: { assetClass: IAssetClass } },
-      { body: Partial<IAssetClassBody> & { isActive?: boolean }; classId: string }
+      {
+        body: Partial<IAssetClassBody> & { isActive?: boolean };
+        classId: string;
+      }
     >({
       invalidatesTags: ["StatementInputs", "Statements"],
       query: ({ body, classId }) => ({

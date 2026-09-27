@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PaymentAccountField } from "@/components/admin/payment-account-field";
+import { useIdempotencyKey } from "@/components/admin/disbursements/disbursement-bits";
 import {
   AdminButton,
   AdminField,
@@ -66,6 +67,7 @@ export function PaymentDialog({
   const detailQuery = useGetSaleQuery(sale.id, { skip: !open });
   const detail = detailQuery.data?.data.sale;
   const [record, { isLoading }] = useRecordSalePaymentMutation();
+  const idempotencyKey = useIdempotencyKey(open);
   const {
     register,
     handleSubmit,
@@ -152,6 +154,7 @@ export function PaymentDialog({
         id: sale.id,
         body: {
           amountGhs: Number(values.amountGhs),
+          idempotencyKey: idempotencyKey(),
           method: values.method,
           ...(values.reference?.trim()
             ? { reference: values.reference.trim() }
@@ -236,8 +239,8 @@ export function PaymentDialog({
               {hasSettledTotal(detail) ? (
                 <p className="flex items-baseline justify-between gap-3">
                   <span className="text-adm-muted">
-                    Agreed <Money compact value={detail.agreedTotalGhs} />, settled
-                    on arrival
+                    Agreed <Money compact value={detail.agreedTotalGhs} />,
+                    settled on arrival
                   </span>
                   <Mono className="flex-none font-semibold text-adm-ink">
                     <Money compact value={detail.settledTotalGhs} />
@@ -274,7 +277,9 @@ export function PaymentDialog({
                   ))}
                 </ul>
               ) : (
-                <p className="text-adm-muted">No payment schedule on this sale.</p>
+                <p className="text-adm-muted">
+                  No payment schedule on this sale.
+                </p>
               )}
               {detail.requiredBeforeLoadingGhs !== null ? (
                 <p
@@ -363,7 +368,6 @@ export function PaymentDialog({
                 ))}
               </div>
             ) : null}
-
           </section>
 
           <section className="flex flex-col gap-5">
@@ -435,9 +439,14 @@ export function PaymentDialog({
               error={errors.reference?.message}
             >
               <Input
-                className={cn(adminInputClass, errors.reference && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  errors.reference && "border-console-red",
+                )}
                 placeholder={
-                  method === "MOMO" ? "e.g. MP260118.1432.A12345" : "e.g. FT26018XYZ12"
+                  method === "MOMO"
+                    ? "e.g. MP260118.1432.A12345"
+                    : "e.g. FT26018XYZ12"
                 }
                 {...register("reference")}
               />

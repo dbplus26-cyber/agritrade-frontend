@@ -31,7 +31,10 @@ export const adminReviewSchema = z.object({
     .string()
     .trim()
     .min(10, "Write at least a sentence - 10 characters minimum.")
-    .max(REVIEW_MAX_CHARS, `Keep the review under ${String(REVIEW_MAX_CHARS)} characters.`),
+    .max(
+      REVIEW_MAX_CHARS,
+      `Keep the review under ${String(REVIEW_MAX_CHARS)} characters.`,
+    ),
 });
 
 export type AdminReviewValues = z.infer<typeof adminReviewSchema>;

@@ -1,6 +1,13 @@
 "use client";
 
-import { Download, File, FileText, Image as ImageIcon, Paperclip, X } from "lucide-react";
+import {
+  Download,
+  File,
+  FileText,
+  Image as ImageIcon,
+  Paperclip,
+  X,
+} from "lucide-react";
 import { TONES, type Tone } from "@/components/admin/ui";
 import { formatDateTime } from "@/lib/format-date";
 import { cn } from "@/lib/utils";
@@ -37,7 +44,11 @@ const KIND_BY_EXT: Record<string, AttachmentKind> = {
   heic: { icon: ImageIcon, label: "HEIC", tone: "leaf" },
 };
 
-const FALLBACK_KIND: AttachmentKind = { icon: File, label: "File", tone: "slate" };
+const FALLBACK_KIND: AttachmentKind = {
+  icon: File,
+  label: "File",
+  tone: "slate",
+};
 
 const kindOf = (name: string): AttachmentKind => {
   const ext = /\.([a-z0-9]{2,5})$/i.exec(name.trim())?.[1]?.toLowerCase();
@@ -120,7 +131,10 @@ export function AttachmentTile({
           {metaLine}
         </span>
       </a>
-      <Download aria-hidden="true" className="size-3.5 flex-none text-adm-faint" />
+      <Download
+        aria-hidden="true"
+        className="size-3.5 flex-none text-adm-faint"
+      />
       {onRemove ? (
         <button
           type="button"
@@ -140,7 +154,10 @@ export function AttachmentTile({
 export function AttachmentEmpty({ text }: { text: string }) {
   return (
     <div className="flex items-center justify-center gap-2 rounded-none border border-dashed border-adm-strong/60 px-4 py-5">
-      <Paperclip aria-hidden="true" className="size-3.5 flex-none text-adm-faint" />
+      <Paperclip
+        aria-hidden="true"
+        className="size-3.5 flex-none text-adm-faint"
+      />
       <p className="text-[11px] text-adm-muted">{text}</p>
     </div>
   );

@@ -16,11 +16,20 @@ const AVATAR_PALETTE = [
   { bg: "#F0E9E0", fg: "#6B4A2C" },
 ];
 
-export function avatarOf(name: string): { init: string; bg: string; fg: string } {
+export function avatarOf(name: string): {
+  init: string;
+  bg: string;
+  fg: string;
+} {
   const s = name || "?";
   let h = 0;
   for (let i = 0; i < s.length; i++) h += s.charCodeAt(i);
-  const words = s.replace(/[^A-Za-z ]/g, "").trim().split(/\s+/);
-  const init = ((words[0] || "?")[0] + ((words[1] || "")[0] || "")).toUpperCase();
+  const words = s
+    .replace(/[^A-Za-z ]/g, "")
+    .trim()
+    .split(/\s+/);
+  const init = (
+    (words[0] || "?")[0] + ((words[1] || "")[0] || "")
+  ).toUpperCase();
   return { init, ...AVATAR_PALETTE[h % AVATAR_PALETTE.length] };
 }

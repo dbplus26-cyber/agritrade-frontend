@@ -196,7 +196,9 @@ export function UserActionsDropdown({ user }: { user: IUser }) {
               <DropdownMenuItem
                 className="cursor-pointer gap-2 text-[11.5px]"
                 onClick={() =>
-                  void onToggleActive().catch(fail("Couldn't update the account"))
+                  void onToggleActive().catch(
+                    fail("Couldn't update the account"),
+                  )
                 }
               >
                 <Power className="h-3.5 w-3.5" aria-hidden="true" />

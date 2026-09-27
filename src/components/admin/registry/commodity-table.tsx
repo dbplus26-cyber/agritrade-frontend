@@ -276,9 +276,7 @@ export function CommodityTable() {
           description="Add the first commodity the business trades - name, variety and grade."
           actionLabel={canManage ? "Add your first commodity" : undefined}
           onAction={
-            canManage
-              ? () => router.push("/admin/commodities/new")
-              : undefined
+            canManage ? () => router.push("/admin/commodities/new") : undefined
           }
           onClear={() => {
             setSearch("");

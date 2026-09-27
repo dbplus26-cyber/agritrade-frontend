@@ -31,8 +31,6 @@ function ThumbFrame({ children }: { children: React.ReactNode }) {
   );
 }
 
-
-
 /**
  * One lot in the register, as a SUMMARY that opens its page.
  *
@@ -77,7 +75,10 @@ function LotCard({ lot }: { lot: PublicLot }) {
         <h3 className="min-h-[2.6em] min-w-0 line-clamp-2 font-display text-[16px] font-bold leading-[1.2] tracking-[0.01em] text-forest [overflow-wrap:anywhere]">
           {/* The whole card is the target: the overlay covers it, so the row
               is one honest link rather than a card with a small link on it. */}
-          <Link href={routes.commodity(lot.slug)} className="focus-visible:outline-none">
+          <Link
+            href={routes.commodity(lot.slug)}
+            className="focus-visible:outline-none"
+          >
             <span aria-hidden="true" className="absolute inset-0 z-[1]" />
             {lot.name}
           </Link>

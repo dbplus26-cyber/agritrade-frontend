@@ -10,13 +10,12 @@ import { siteConfig } from "@/lib/site";
 import { getSiteContact } from "@/lib/public-contact";
 import { cn } from "@/lib/utils";
 
-const pageLinks = primaryNav.flatMap<{ label: string; href: string }>(
-  (item) =>
-    "children" in item
-      ? [...item.children]
-      : item.href === routes.home
-        ? []
-        : [item],
+const pageLinks = primaryNav.flatMap<{ label: string; href: string }>((item) =>
+  "children" in item
+    ? [...item.children]
+    : item.href === routes.home
+      ? []
+      : [item],
 );
 
 /**
@@ -95,11 +94,7 @@ export async function SiteFooter() {
               PAGES
             </span>
             {pageLinks.map((page) => (
-              <Link
-                key={page.href}
-                href={page.href}
-                className={footerLink}
-              >
+              <Link key={page.href} href={page.href} className={footerLink}>
                 {page.label}
               </Link>
             ))}
@@ -108,10 +103,7 @@ export async function SiteFooter() {
             <span className="stencil mb-1 text-[11px] tracking-[0.26em] text-harvest">
               CONTACT
             </span>
-            <a
-              href={contact.phoneHref}
-              className={footerLink}
-            >
+            <a href={contact.phoneHref} className={footerLink}>
               {contact.phoneLabel}
               {contact.hasPhone && !contact.whatsappIsSeparate
                 ? " · WhatsApp same"
@@ -132,7 +124,10 @@ export async function SiteFooter() {
               // rather than run past the column on a narrow phone.
               <a
                 href={`mailto:${contact.email}`}
-                className={cn(footerLink, "max-w-full [overflow-wrap:anywhere]")}
+                className={cn(
+                  footerLink,
+                  "max-w-full [overflow-wrap:anywhere]",
+                )}
               >
                 {contact.email}
               </a>

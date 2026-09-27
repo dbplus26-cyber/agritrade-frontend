@@ -22,11 +22,6 @@ async function findPlot(slug: string): Promise<PublicLandPlot | undefined> {
   return findBySlug(plots, slug, (plot) => plot.reference);
 }
 
-export async function generateStaticParams() {
-  const plots = (await fetchPublicLandPlots()) ?? [];
-  return plots.map((plot) => ({ slug: plotSlug(plot) }));
-}
-
 export async function generateMetadata({
   params,
 }: {

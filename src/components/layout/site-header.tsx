@@ -21,7 +21,11 @@ import { cn } from "@/lib/utils";
 /** The stencilled brand plate + wordmark, shared by header and mobile menu. */
 function BrandMark({ onNavigate }: { onNavigate?: () => void }) {
   return (
-    <Link href={routes.home} onClick={onNavigate} className="flex items-center gap-3">
+    <Link
+      href={routes.home}
+      onClick={onNavigate}
+      className="flex items-center gap-3"
+    >
       {/* The real company mark. Its own artwork is a circle on a transparent
           field, so it needs no plate or border around it. */}
       <Image
@@ -160,7 +164,8 @@ export function SiteHeader() {
   }, [menuOpen]);
 
   const services = primaryNav.find((item) => "children" in item);
-  const serviceLinks = services && "children" in services ? services.children : [];
+  const serviceLinks =
+    services && "children" in services ? services.children : [];
   const onServicePage = serviceLinks.some((s) => pathname.startsWith(s.href));
 
   return (
@@ -187,9 +192,15 @@ export function SiteHeader() {
                     <ActiveTag label={item.label} />
                   </DropdownMenuTrigger>
                 ) : (
-                  <DropdownMenuTrigger className={cn(desktopItem, "cursor-pointer uppercase")}>
+                  <DropdownMenuTrigger
+                    className={cn(desktopItem, "cursor-pointer uppercase")}
+                  >
                     {item.label}
-                    <ChevronDown aria-hidden="true" className="size-2.5 self-center" strokeWidth={3.2} />
+                    <ChevronDown
+                      aria-hidden="true"
+                      className="size-2.5 self-center"
+                      strokeWidth={3.2}
+                    />
                   </DropdownMenuTrigger>
                 )}
                 {/* The plate chrome lives on the base DropdownMenuContent now -
@@ -221,7 +232,11 @@ export function SiteHeader() {
             ) : pathname === item.href ? (
               <ActiveTag key={item.href} label={item.label} />
             ) : (
-              <Link key={item.href} href={item.href} className={cn(desktopItem, "uppercase")}>
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(desktopItem, "uppercase")}
+              >
                 {item.label}
               </Link>
             ),
@@ -239,7 +254,10 @@ export function SiteHeader() {
           </a>
         </div>
       </div>
-      <div aria-hidden="true" className="ledger-rule mx-auto hidden max-w-[1312px] px-8 lg:block" />
+      <div
+        aria-hidden="true"
+        className="ledger-rule mx-auto hidden max-w-[1312px] px-8 lg:block"
+      />
 
       {/* Mobile: the bar stays put and the menu drops from under it, so
           nothing the reader is looking at moves except the panel itself. It
@@ -305,8 +323,14 @@ export function SiteHeader() {
             <motion.div
               key="panel"
               id={menuId}
-              initial={reduceMotion ? { opacity: 0 } : { transform: "translateY(-100%)" }}
-              animate={reduceMotion ? { opacity: 1 } : { transform: "translateY(0%)" }}
+              initial={
+                reduceMotion
+                  ? { opacity: 0 }
+                  : { transform: "translateY(-100%)" }
+              }
+              animate={
+                reduceMotion ? { opacity: 1 } : { transform: "translateY(0%)" }
+              }
               exit={
                 reduceMotion
                   ? { opacity: 0, transition: fadeOut }
@@ -354,7 +378,11 @@ export function SiteHeader() {
                     onClick={closeMenu}
                     className="shadow-block flex min-h-12 items-center justify-center gap-2.5 rounded-[2px] bg-harvest text-[15px] font-bold text-ink transition-[transform,box-shadow] active:translate-x-px active:translate-y-px active:shadow-[1px_1px_0_rgb(31_33_28/0.85)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
                   >
-                    <Phone aria-hidden="true" className="size-[17px]" strokeWidth={2.3} />
+                    <Phone
+                      aria-hidden="true"
+                      className="size-[17px]"
+                      strokeWidth={2.3}
+                    />
                     Call {contact.phone}
                   </a>
                 ) : (

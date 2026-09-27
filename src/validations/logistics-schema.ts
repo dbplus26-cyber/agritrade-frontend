@@ -23,11 +23,7 @@ const optionalPhone = z
 /** Backend: name req 2-120, phone req 6-20, the rest optional. */
 export const driverSchema = z.object({
   name: z.string().trim().min(2, "Enter the driver's name").max(120),
-  phone: z
-    .string()
-    .trim()
-    .min(6, "Enter a full phone number")
-    .max(20),
+  phone: z.string().trim().min(6, "Enter a full phone number").max(20),
   email: z.email("Enter a valid email").max(255).or(z.literal("")).optional(),
   company: optionalText(150),
   city: optionalText(120),

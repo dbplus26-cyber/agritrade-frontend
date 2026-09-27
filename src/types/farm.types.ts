@@ -51,8 +51,9 @@ export interface ICreateSeasonInput {
   startsOn: string;
   endsOn?: string;
 }
-export interface IUpdateSeasonInput
-  extends Partial<Omit<ICreateSeasonInput, "description">> {
+export interface IUpdateSeasonInput extends Partial<
+  Omit<ICreateSeasonInput, "description">
+> {
   /** null clears it; undefined leaves it untouched. */
   description?: string | null;
 }

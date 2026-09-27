@@ -76,7 +76,9 @@ describe("deleting from a register", () => {
     // when the delete goes through, and what to do when it does not.
     const dialog = await gate(/Delete White maize\?/);
     expect(
-      within(dialog).getByText(/refuses it while anything at all still references/i),
+      within(dialog).getByText(
+        /refuses it while anything at all still references/i,
+      ),
     ).toBeInTheDocument();
     expect(
       within(dialog).getByText(/deactivating is the answer/i),
@@ -92,7 +94,10 @@ describe("deleting from a register", () => {
     const commit = within(dialog).getByRole("button", { name: "Delete" });
     expect(commit).toBeDisabled();
 
-    await userEvent.type(within(dialog).getByLabelText(/to confirm/i), "delete");
+    await userEvent.type(
+      within(dialog).getByLabelText(/to confirm/i),
+      "delete",
+    );
     expect(commit).toBeEnabled();
     await userEvent.click(commit);
 
@@ -107,7 +112,9 @@ describe("deleting from a register", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Delete" }));
     const dialog = await gate(/Delete White maize\?/);
-    await userEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: "Cancel" }),
+    );
 
     expect(p.onDelete).not.toHaveBeenCalled();
     expect(replace).not.toHaveBeenCalled();
@@ -115,15 +122,21 @@ describe("deleting from a register", () => {
 
   it("keeps the record's page when the server refuses the delete", async () => {
     const p = { ...props(), isActive: true };
-    p.onDelete = vi
-      .fn()
-      .mockRejectedValue({ data: { message: "Still used by 4 purchases" }, status: 409 });
+    p.onDelete = vi.fn().mockRejectedValue({
+      data: { message: "Still used by 4 purchases" },
+      status: 409,
+    });
     render(<LifecycleActions {...p} />);
 
     await userEvent.click(screen.getByRole("button", { name: "Delete" }));
     const dialog = await gate(/Delete White maize\?/);
-    await userEvent.type(within(dialog).getByLabelText(/to confirm/i), "delete");
-    await userEvent.click(within(dialog).getByRole("button", { name: "Delete" }));
+    await userEvent.type(
+      within(dialog).getByLabelText(/to confirm/i),
+      "delete",
+    );
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: "Delete" }),
+    );
 
     expect(errorToast).toHaveBeenCalledWith(
       "Couldn't delete the commodity",
@@ -159,9 +172,7 @@ describe("retiring a register entry", () => {
   });
 
   it("still says what the ungated button does, before it is tapped", () => {
-    const { rerender } = render(
-      <LifecycleActions {...props()} isActive />,
-    );
+    const { rerender } = render(<LifecycleActions {...props()} isActive />);
     expect(
       screen.getByText(/stops new transactions offering this commodity/i),
     ).toBeInTheDocument();

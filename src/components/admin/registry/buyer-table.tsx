@@ -133,7 +133,9 @@ export function BuyerTable() {
         meta: columnMeta({ wide: true }),
         cell: ({ row }) =>
           row.original.email ? (
-            <span className="block @2xl/table:max-w-[17rem] [overflow-wrap:anywhere] @2xl/table:truncate text-adm-muted">{row.original.email}</span>
+            <span className="block @2xl/table:max-w-[17rem] [overflow-wrap:anywhere] @2xl/table:truncate text-adm-muted">
+              {row.original.email}
+            </span>
           ) : (
             <Absent />
           ),

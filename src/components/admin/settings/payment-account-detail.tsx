@@ -6,10 +6,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { ConsoleDataTable } from "@/components/admin/data-table";
 import { DateOnlyCell } from "@/components/admin/date-cell";
 import { HelpTip } from "@/components/admin/help-tip";
-import {
-  Absent,
-  ActiveBadge,
-} from "@/components/admin/registry/registry-bits";
+import { Absent, ActiveBadge } from "@/components/admin/registry/registry-bits";
 import { RecordFacts } from "@/components/admin/record-facts";
 import { DetailSkeleton } from "@/components/admin/skeletons";
 import { Money } from "@/components/admin/trading/sale-bits";
@@ -154,7 +151,9 @@ function FlowTile({
     <AdminCard className="min-w-0 px-3 py-2.5">
       <div className="flex min-w-0 items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         <span className="min-w-0">{label}</span>
-        {hint ? <HelpTip label={`What does ${label} count?`} text={hint} /> : null}
+        {hint ? (
+          <HelpTip label={`What does ${label} count?`} text={hint} />
+        ) : null}
       </div>
       <div className="mt-1">
         <Mono
@@ -198,9 +197,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
         enableSorting: false,
         cell: ({ row }) => (
           <span className="flex min-w-0 flex-wrap items-center justify-end gap-1.5 @2xl/table:justify-start">
-            <Mono className="text-adm-ink">
-              {row.original.transactionNo}
-            </Mono>
+            <Mono className="text-adm-ink">{row.original.transactionNo}</Mono>
             {row.original.isReversal ? (
               <ToneBadge tone="alert">Reversal</ToneBadge>
             ) : null}
@@ -243,9 +240,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
           // no document, and drawings and assets have no per-record page. The
           // reference still prints, because it is what staff quote.
           if (!href) {
-            return (
-              <Mono className="text-adm-ink">{m.parentNo}</Mono>
-            );
+            return <Mono className="text-adm-ink">{m.parentNo}</Mono>;
           }
           return (
             <Link
@@ -416,7 +411,7 @@ export function PaymentAccountDetail({ id }: { id: string }) {
           data={rows}
           itemNoun="movements"
           isFetching={isFetching}
-        isFiltered={false}
+          isFiltered={false}
           serverPagination={{
             totalCount: data.meta.total,
             page,

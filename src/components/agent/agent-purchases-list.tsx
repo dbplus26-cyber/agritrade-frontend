@@ -68,11 +68,15 @@ export function AgentPurchasesList() {
   const total = data?.meta.total ?? 0;
 
   if (isLoading)
-    return <p className="py-4 text-[13px] text-soil">Loading your purchases…</p>;
+    return (
+      <p className="py-4 text-[13px] text-soil">Loading your purchases…</p>
+    );
   if (isError)
     return (
       <div className="py-4">
-        <p className="text-[13px] text-error">{extractApiError(error).message}</p>
+        <p className="text-[13px] text-error">
+          {extractApiError(error).message}
+        </p>
         <button
           type="button"
           onClick={() => void refetch()}

@@ -153,12 +153,16 @@ export function ReceiveDialog({
         ?.name ?? "the warehouse you chose";
     const seller = purchase.supplier?.name ?? "the supplier";
     const ok = await confirm({
-      title: values.destination === "DIRECT" ? "Take these goods on?" : "Book this stock in?",
+      title:
+        values.destination === "DIRECT"
+          ? "Take these goods on?"
+          : "Book this stock in?",
       description:
         values.destination === "DIRECT"
           ? `${formatKg(Number(values.receivedKg))} of ${purchase.commodity.name} becomes yours where it stands at ${seller}. It joins no warehouse and shows in no shed's stock; a truck that lists ${seller} as a collection point can load it straight to the buyer.`
           : `${formatKg(Number(values.receivedKg))} of ${purchase.commodity.name} goes into ${shed} and can be sold and shipped from there. Only a stock adjustment moves it afterwards.`,
-      confirmText: values.destination === "DIRECT" ? "Take them on" : "Receive stock",
+      confirmText:
+        values.destination === "DIRECT" ? "Take them on" : "Receive stock",
     });
     if (!ok) return;
 
@@ -228,7 +232,10 @@ export function ReceiveDialog({
             >
               <Input
                 inputMode="decimal"
-                className={cn(adminInputClass, errors.receivedKg && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  errors.receivedKg && "border-console-red",
+                )}
                 placeholder="e.g. 1200"
                 {...register("receivedKg")}
               />
@@ -322,10 +329,7 @@ export function ReceiveDialog({
                   : "Name the supplier on this purchase first - a load kept at the farm gate is found by whose yard it is standing in."}
               </p>
             ) : (
-              <AdminField
-                label="Warehouse"
-                error={errors.warehouseId?.message}
-              >
+              <AdminField label="Warehouse" error={errors.warehouseId?.message}>
                 <Controller
                   control={control}
                   name="warehouseId"
@@ -425,7 +429,8 @@ function VoidDialog({
           <ResponsiveDialogTitle>Void this purchase?</ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
             Voiding is the owner&apos;s correction path: it reverses the float
-            debit{purchase.status === PurchaseStatus.RECEIVED
+            debit
+            {purchase.status === PurchaseStatus.RECEIVED
               ? " and takes the received stock back out"
               : ""}{" "}
             with compensating ledger entries. Nothing is deleted or rewritten.
@@ -539,10 +544,7 @@ export function PurchaseDetail({ id }: { id: string }) {
           </AdminButton>
         ) : null}
         {canVoid ? (
-          <AdminButton
-            variant="danger"
-            onClick={() => setVoidOpen(true)}
-          >
+          <AdminButton variant="danger" onClick={() => setVoidOpen(true)}>
             Void purchase
           </AdminButton>
         ) : null}
@@ -583,8 +585,8 @@ export function PurchaseDetail({ id }: { id: string }) {
         <AdminCard className="mb-4 border-console-gold/50 bg-console-gold/8 px-4 py-3 text-[11.5px] leading-[1.55] text-adm-ink">
           {p.approval.status === "PENDING" ? (
             <>
-              This purchase is at or above the approval threshold and is
-              waiting for sign-off.{" "}
+              This purchase is at or above the approval threshold and is waiting
+              for sign-off.{" "}
               <Link
                 href="/admin/approvals"
                 className={cn(adminLinkClass, "font-semibold")}
@@ -595,8 +597,8 @@ export function PurchaseDetail({ id }: { id: string }) {
           ) : (
             <>
               The approval for this purchase was <strong>rejected</strong> -
-              rejection undoes nothing by itself; voiding reverses the money
-              and stock.
+              rejection undoes nothing by itself; voiding reverses the money and
+              stock.
             </>
           )}
         </AdminCard>
@@ -633,7 +635,9 @@ export function PurchaseDetail({ id }: { id: string }) {
                     <DetailItem label="Variance" mono>
                       <span
                         className={cn(
-                          (p.varianceKg ?? 0) > 0 ? "text-console-red" : "text-adm-ink",
+                          (p.varianceKg ?? 0) > 0
+                            ? "text-console-red"
+                            : "text-adm-ink",
                         )}
                       >
                         {(p.varianceKg ?? 0) === 0
@@ -691,7 +695,9 @@ export function PurchaseDetail({ id }: { id: string }) {
             />
 
             <AdminCard className="px-5 py-3">
-              <SectionHeading className="mb-1">Parties & logistics</SectionHeading>
+              <SectionHeading className="mb-1">
+                Parties & logistics
+              </SectionHeading>
               <DetailGrid>
                 <DetailItem label="Source">{SOURCE_LABEL[p.source]}</DetailItem>
                 {/* Where the goods are. A purchase received without a shed

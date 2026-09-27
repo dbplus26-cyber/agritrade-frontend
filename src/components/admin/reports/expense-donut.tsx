@@ -76,7 +76,10 @@ export function ExpenseDonut({ summary }: { summary?: IExpenseSummary }) {
           </div>
           <div className="flex w-full min-w-0 flex-col gap-1.5">
             {slices.map((s, i) => (
-              <div key={s.id} className="flex items-center justify-between gap-2">
+              <div
+                key={s.id}
+                className="flex items-center justify-between gap-2"
+              >
                 <LegendItem color={colorFor(i)} label={s.name} />
                 <span className="flex flex-none items-center gap-2 text-[11px]">
                   <span className="font-semibold text-adm-ink">

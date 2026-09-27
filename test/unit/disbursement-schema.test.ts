@@ -34,7 +34,9 @@ const BANK = {
 /** The `path` of every issue a parse raised, for terse assertions. */
 const issuePaths = (input: unknown): string[] => {
   const result = disbursementSchema.safeParse(input);
-  return result.success ? [] : result.error.issues.map((i) => String(i.path[0]));
+  return result.success
+    ? []
+    : result.error.issues.map((i) => String(i.path[0]));
 };
 
 describe("disbursementSchema", () => {

@@ -145,6 +145,7 @@ export interface IPurchasePaymentOnCreate {
 /** Mirrors backend `recordPurchasePaymentSchema`. */
 export interface IRecordPurchasePaymentInput {
   amountGhs: number;
+  idempotencyKey?: string;
   /**
    * A settled Hubtel send this books against instead of describing a movement
    * of its own. The server resolves the paying account (the payout wallet) and
@@ -156,6 +157,7 @@ export interface IRecordPurchasePaymentInput {
   paidAt?: string;
   paymentAccountId?: string;
   reference?: string;
+  sourceMovementId?: string;
 }
 
 export interface IPurchasePayment {
@@ -245,6 +247,7 @@ export interface IAddPurchaseCostInput {
   capitalise: boolean;
   categoryId: string;
   description?: string;
+  existingMovementIds?: string[];
   incurredAt?: string;
   /**
    * Settling it in the same act. Absent means the cost is recorded as owed and

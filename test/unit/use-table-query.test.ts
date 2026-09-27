@@ -40,13 +40,10 @@ const setUrl = (url: string) => {
   window.history.replaceState({}, "", url);
 };
 
-const currentUrl = () =>
-  `${window.location.pathname}${window.location.search}`;
+const currentUrl = () => `${window.location.pathname}${window.location.search}`;
 
 const mount = (opts?: { pageSize?: number; prefix?: string }) =>
-  renderHook(() =>
-    useTableQuery({ defaults: DEFAULTS, ...opts }),
-  );
+  renderHook(() => useTableQuery({ defaults: DEFAULTS, ...opts }));
 
 beforeEach(() => {
   sessionStorage.clear();
@@ -224,10 +221,7 @@ describe("useTableQuery - session memory", () => {
   });
 
   it("lets an explicit URL beat the session memory", () => {
-    sessionStorage.setItem(
-      "dbplus-table:/admin/things",
-      "page=9&status=VOID",
-    );
+    sessionStorage.setItem("dbplus-table:/admin/things", "page=9&status=VOID");
     setUrl("/admin/things?page=5");
     const { result } = mount();
 

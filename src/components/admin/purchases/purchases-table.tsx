@@ -242,7 +242,10 @@ export function PurchasesTable() {
             // The row itself navigates to the purchase, so the warehouse has
             // to stop the click reaching it or the two destinations race.
             <Link
-              className={cn(adminLinkClass, "block @2xl/table:max-w-[22rem] [overflow-wrap:anywhere] @2xl/table:truncate")}
+              className={cn(
+                adminLinkClass,
+                "block @2xl/table:max-w-[22rem] [overflow-wrap:anywhere] @2xl/table:truncate",
+              )}
               href={`/admin/warehouses/${row.original.warehouse.id}`}
               onClick={(e) => e.stopPropagation()}
             >

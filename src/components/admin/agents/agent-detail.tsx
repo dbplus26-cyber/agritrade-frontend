@@ -53,9 +53,7 @@ import { formatCedis, MONEY_HIDDEN } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
 import { ViewablePhoto } from "@/components/admin/photo-view";
 import { cn } from "@/lib/utils";
-import {
-  type IFloatTransaction,
-} from "@/types/agent.types";
+import { type IFloatTransaction } from "@/types/agent.types";
 import {
   reconcileSchema,
   topUpSchema,
@@ -284,7 +282,9 @@ function LedgerRow({
           {tx.reason ?? txLabel(tx.type)}
         </p>
         <div className="mt-0.5 flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
-          <Mono className="text-[10.5px] text-adm-faint">{tx.transactionNo}</Mono>
+          <Mono className="text-[10.5px] text-adm-faint">
+            {tx.transactionNo}
+          </Mono>
           <DateOnlyCell value={tx.occurredAt} muted />
           {/* WHICH pot moved. Cash in a pocket and money in a wallet are
               different money, and a line that does not say which is the same
@@ -409,7 +409,10 @@ function TopUpDialog({
             <Input
               inputMode="decimal"
               placeholder="e.g. 2000"
-              className={cn(adminInputClass, errors.amountGhs && "border-console-red")}
+              className={cn(
+                adminInputClass,
+                errors.amountGhs && "border-console-red",
+              )}
               {...register("amountGhs")}
             />
           </AdminField>
@@ -455,10 +458,20 @@ function TopUpDialog({
             />
           </AdminField>
           <ResponsiveDialogFooter className="gap-2">
-            <AdminButton type="button" variant="outline" size="lg" onClick={onClose}>
+            <AdminButton
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={onClose}
+            >
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={isLoading} loading={isLoading} size="lg">
+            <AdminButton
+              type="submit"
+              disabled={isLoading}
+              loading={isLoading}
+              size="lg"
+            >
               {isLoading ? "Topping up…" : "Top up float"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -744,9 +757,7 @@ export function AgentDetail({ agentUserId }: { agentUserId: string }) {
                   >
                     Reconcile
                   </AdminButton>
-                  <AdminButton
-                    onClick={() => setTopUpOpen(true)}
-                  >
+                  <AdminButton onClick={() => setTopUpOpen(true)}>
                     Top up float
                   </AdminButton>
                 </>

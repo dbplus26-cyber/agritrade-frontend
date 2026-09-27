@@ -428,7 +428,10 @@ export function DriverSettlementCard({
             {adjustments.map((a) => {
               const up = (a.amountGhs ?? 0) > 0;
               return (
-                <li className="flex items-baseline gap-3 text-[11.5px]" key={a.id}>
+                <li
+                  className="flex items-baseline gap-3 text-[11.5px]"
+                  key={a.id}
+                >
                   {/* flex-none: the figure and its date hold their width and
                       the reason gives way, never the other way round. */}
                   <span
@@ -489,10 +492,7 @@ export function DriverSettlementCard({
         // Buttons wrap as whole pills rather than wrapping their own labels.
         <ActionRow className="mt-5">
           {dispatched && settlement.hasFee ? (
-            <AdminButton
-              onClick={() => setAdjustOpen(true)}
-              variant="ghost"
-            >
+            <AdminButton onClick={() => setAdjustOpen(true)} variant="ghost">
               Adjust the fee
             </AdminButton>
           ) : (

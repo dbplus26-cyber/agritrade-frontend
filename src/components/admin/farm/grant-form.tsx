@@ -227,7 +227,10 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
                 <Input
                   inputMode="decimal"
                   placeholder="e.g. 10"
-                  className={cn(adminInputClass, errors.quantity && "border-console-red")}
+                  className={cn(
+                    adminInputClass,
+                    errors.quantity && "border-console-red",
+                  )}
                   {...register("quantity")}
                 />
               </AdminField>
@@ -239,7 +242,10 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
                 <Input
                   inputMode="decimal"
                   placeholder="e.g. 1200"
-                  className={cn(adminInputClass, errors.valueGhs && "border-console-red")}
+                  className={cn(
+                    adminInputClass,
+                    errors.valueGhs && "border-console-red",
+                  )}
                   {...register("valueGhs")}
                 />
               </AdminField>
@@ -299,7 +305,10 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
               >
                 <DateInput
                   placeholder="Pick the due date"
-                  className={cn(adminInputClass, errors.dueDate && "border-console-red")}
+                  className={cn(
+                    adminInputClass,
+                    errors.dueDate && "border-console-red",
+                  )}
                   {...register("dueDate")}
                 />
               </AdminField>
@@ -356,7 +365,12 @@ export function GrantForm({ farmerId }: { farmerId?: string }) {
           >
             Cancel
           </AdminButton>
-          <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
+          <AdminButton
+            type="submit"
+            disabled={saving}
+            loading={saving}
+            size="lg"
+          >
             {saving ? "Saving…" : "Record grant"}
           </AdminButton>
         </CommitRow>

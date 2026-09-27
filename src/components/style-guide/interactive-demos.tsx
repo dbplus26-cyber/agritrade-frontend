@@ -32,7 +32,11 @@ export function InteractiveDemos() {
       <div className="flex flex-wrap gap-3">
         <Button
           variant="outline"
-          onClick={() => notify.success("Enquiry on file", { description: "We reply within one working day." })}
+          onClick={() =>
+            notify.success("Enquiry on file", {
+              description: "We reply within one working day.",
+            })
+          }
         >
           Success toast
         </Button>
@@ -40,7 +44,8 @@ export function InteractiveDemos() {
           variant="outline"
           onClick={() =>
             notify.error("Couldn't send your enquiry", {
-              description: "Couldn't reach the server. Check your connection and try again.",
+              description:
+                "Couldn't reach the server. Check your connection and try again.",
             })
           }
         >

@@ -90,11 +90,7 @@ const STRETCH_CLAMP_WITH_AVATAR = "@2xl/table:max-w-[85%]";
 
 /** The title clamp for a cell, given where it sits. */
 const titleClamp = (stretch?: boolean, avatar?: boolean): string =>
-  stretch
-    ? avatar
-      ? STRETCH_CLAMP_WITH_AVATAR
-      : STRETCH_CLAMP
-    : TITLE_CLAMP;
+  stretch ? (avatar ? STRETCH_CLAMP_WITH_AVATAR : STRETCH_CLAMP) : TITLE_CLAMP;
 
 export type CellWidth = keyof typeof CELL_WIDTHS;
 

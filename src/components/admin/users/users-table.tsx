@@ -13,11 +13,7 @@ import {
   FilterChip,
   labelOf,
 } from "@/components/admin/filter-bar";
-import {
-  AdminButton,
-  AdminCard,
-  AdminPageHeader,
-} from "@/components/admin/ui";
+import { AdminButton, AdminCard, AdminPageHeader } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -291,52 +287,52 @@ export function UsersTable() {
           when the user's own search/filters might be the cause, it stays so
           they can clear or adjust them. */}
       {pristine || (isError && !filtered) ? null : (
-      <ConsoleFilterBar
-        search={searchInput}
-        onSearch={setSearch}
-        searchPlaceholder="Search user…"
-        activeCount={activeFilterCount}
-        onClear={resetFilters}
-        totalCount={totalCount}
-        noun="users"
-        action={
-          <AdminButton asChild aria-label="Add user">
-            <Link href="/admin/users/new">
-              <Plus className="h-4 w-4" aria-hidden="true" />
-              <span className="hidden sm:inline">Add user</span>
-            </Link>
-          </AdminButton>
-        }
-        chips={
-          <>
-            {roleFilter !== "all" ? (
-              <FilterChip onRemove={() => setFilter("role", "all")}>
-                Role: {labelOf(ROLE_FILTER_OPTIONS, roleFilter)}
-              </FilterChip>
-            ) : null}
-            {statusFilter !== "all" ? (
-              <FilterChip onRemove={() => setFilter("status", "all")}>
-                Status: {labelOf(STATUS_FILTER_OPTIONS, statusFilter)}
-              </FilterChip>
-            ) : null}
-          </>
-        }
-      >
-        <ConsoleLabeledSelect
-          label="Role"
-          value={roleFilter}
-          onChange={(v) => setFilter("role", v)}
-          options={ROLE_FILTER_OPTIONS}
-          active={roleFilter !== "all"}
-        />
-        <ConsoleLabeledSelect
-          label="Status"
-          value={statusFilter}
-          onChange={(v) => setFilter("status", v)}
-          options={STATUS_FILTER_OPTIONS}
-          active={statusFilter !== "all"}
-        />
-      </ConsoleFilterBar>
+        <ConsoleFilterBar
+          search={searchInput}
+          onSearch={setSearch}
+          searchPlaceholder="Search user…"
+          activeCount={activeFilterCount}
+          onClear={resetFilters}
+          totalCount={totalCount}
+          noun="users"
+          action={
+            <AdminButton asChild aria-label="Add user">
+              <Link href="/admin/users/new">
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Add user</span>
+              </Link>
+            </AdminButton>
+          }
+          chips={
+            <>
+              {roleFilter !== "all" ? (
+                <FilterChip onRemove={() => setFilter("role", "all")}>
+                  Role: {labelOf(ROLE_FILTER_OPTIONS, roleFilter)}
+                </FilterChip>
+              ) : null}
+              {statusFilter !== "all" ? (
+                <FilterChip onRemove={() => setFilter("status", "all")}>
+                  Status: {labelOf(STATUS_FILTER_OPTIONS, statusFilter)}
+                </FilterChip>
+              ) : null}
+            </>
+          }
+        >
+          <ConsoleLabeledSelect
+            label="Role"
+            value={roleFilter}
+            onChange={(v) => setFilter("role", v)}
+            options={ROLE_FILTER_OPTIONS}
+            active={roleFilter !== "all"}
+          />
+          <ConsoleLabeledSelect
+            label="Status"
+            value={statusFilter}
+            onChange={(v) => setFilter("status", v)}
+            options={STATUS_FILTER_OPTIONS}
+            active={statusFilter !== "all"}
+          />
+        </ConsoleFilterBar>
       )}
 
       {isLoading ? (

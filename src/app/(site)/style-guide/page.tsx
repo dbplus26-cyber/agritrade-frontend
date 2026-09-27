@@ -24,18 +24,69 @@ export const metadata = pageMetadata({
 });
 
 const PALETTE = [
-  { token: "--color-surface", hex: "#EFF1E8", note: "Pale husk background · ink text 14.2:1", border: true },
-  { token: "--color-surface-alt", hex: "#E6EAE0", note: "Alternating section / document tint", border: true },
-  { token: "--color-paper", hex: "#FBFCF7", note: "Bright document sheets (forms, files)", border: true },
-  { token: "--color-forest", hex: "#155744", note: "Viridian dark bands · surface text 7.4:1" },
-  { token: "--color-board", hex: "#0C332A", note: "Plank board / deepest band · gold tags 5.7:1" },
-  { token: "--color-footer", hex: "#0B2D25", note: "Footer band · surface text 13.0:1" },
-  { token: "--color-harvest", hex: "#D89C2E", note: "Ochre gold, tags + CTAs · ink on gold 6.7:1. Never large fills." },
-  { token: "--color-harvest-deep", hex: "#7A611C", note: "AA text gold on surface · 5.2:1 - eyebrows, links, labels" },
-  { token: "--color-soil", hex: "#59523B", note: "Olive-brown secondary text · borders @ .16–.5 alpha" },
-  { token: "--color-leaf", hex: "#3E7D62", note: "Stamps, WhatsApp, focus rings" },
-  { token: "--color-ink", hex: "#1F211C", note: "Body text · text on harvest buttons" },
-  { token: "--color-error", hex: "#9B3A22", note: "Validation errors and failed states only" },
+  {
+    token: "--color-surface",
+    hex: "#EFF1E8",
+    note: "Pale husk background · ink text 14.2:1",
+    border: true,
+  },
+  {
+    token: "--color-surface-alt",
+    hex: "#E6EAE0",
+    note: "Alternating section / document tint",
+    border: true,
+  },
+  {
+    token: "--color-paper",
+    hex: "#FBFCF7",
+    note: "Bright document sheets (forms, files)",
+    border: true,
+  },
+  {
+    token: "--color-forest",
+    hex: "#155744",
+    note: "Viridian dark bands · surface text 7.4:1",
+  },
+  {
+    token: "--color-board",
+    hex: "#0C332A",
+    note: "Plank board / deepest band · gold tags 5.7:1",
+  },
+  {
+    token: "--color-footer",
+    hex: "#0B2D25",
+    note: "Footer band · surface text 13.0:1",
+  },
+  {
+    token: "--color-harvest",
+    hex: "#D89C2E",
+    note: "Ochre gold, tags + CTAs · ink on gold 6.7:1. Never large fills.",
+  },
+  {
+    token: "--color-harvest-deep",
+    hex: "#7A611C",
+    note: "AA text gold on surface · 5.2:1 - eyebrows, links, labels",
+  },
+  {
+    token: "--color-soil",
+    hex: "#59523B",
+    note: "Olive-brown secondary text · borders @ .16–.5 alpha",
+  },
+  {
+    token: "--color-leaf",
+    hex: "#3E7D62",
+    note: "Stamps, WhatsApp, focus rings",
+  },
+  {
+    token: "--color-ink",
+    hex: "#1F211C",
+    note: "Body text · text on harvest buttons",
+  },
+  {
+    token: "--color-error",
+    hex: "#9B3A22",
+    note: "Validation errors and failed states only",
+  },
 ];
 
 const SPACING_RULES = [
@@ -181,9 +232,15 @@ export default function StyleGuidePage() {
                 <StatusBadge variant="dashed">ASK US</StatusBadge>
               </div>
               <div className="mt-3 flex flex-wrap items-center gap-3.5">
-                <StatusBadge variant="leaf" nailed={false}>AVAILABLE</StatusBadge>
-                <StatusBadge variant="soil" nailed={false}>RESERVED</StatusBadge>
-                <StatusBadge variant="error" nailed={false}>FAILED</StatusBadge>
+                <StatusBadge variant="leaf" nailed={false}>
+                  AVAILABLE
+                </StatusBadge>
+                <StatusBadge variant="soil" nailed={false}>
+                  RESERVED
+                </StatusBadge>
+                <StatusBadge variant="error" nailed={false}>
+                  FAILED
+                </StatusBadge>
                 <Stamp className="ml-2">On record</Stamp>
                 <Stamp tone="error">Not processed</Stamp>
               </div>
@@ -205,7 +262,10 @@ export default function StyleGuidePage() {
           </div>
 
           {/* The signature board, live */}
-          <Sheet label="LIVE AVAILABILITY BOARD (SIGNATURE ELEMENT)" className="[&>span]:mb-0">
+          <Sheet
+            label="LIVE AVAILABILITY BOARD (SIGNATURE ELEMENT)"
+            className="[&>span]:mb-0"
+          >
             <div className="mt-4 overflow-hidden rounded-[2px]">
               <AvailabilityBoard updatedOn="today" lines={availabilityBoard} />
             </div>
@@ -220,12 +280,25 @@ export default function StyleGuidePage() {
           <Sheet label="DOCUMENT CARDS - FILE + LEDGER ROWS">
             <div className="grid gap-8 lg:grid-cols-2">
               <DocCard title="COMPANY FILE" fileNo="N° CF-001">
-                <DocRow label="TRADES">Maize, soya beans and groundnuts - by the truckload</DocRow>
-                <DocRow label="BUYS FROM">Eight districts of the Northern Region</DocRow>
-                <DocRow label="DELIVERS TO" last>Accra, Tema and Kumasi - waybill with every load</DocRow>
-                <Stamp className="absolute -top-5 right-5 rotate-[4deg] text-[13px]">On record</Stamp>
+                <DocRow label="TRADES">
+                  Maize, soya beans and groundnuts - by the truckload
+                </DocRow>
+                <DocRow label="BUYS FROM">
+                  Eight districts of the Northern Region
+                </DocRow>
+                <DocRow label="DELIVERS TO" last>
+                  Accra, Tema and Kumasi - waybill with every load
+                </DocRow>
+                <Stamp className="absolute -top-5 right-5 rotate-[4deg] text-[13px]">
+                  On record
+                </Stamp>
               </DocCard>
-              <DocCard title="PLOT FILE - TML" fileNo="N° 02" tint="paper" className="h-fit">
+              <DocCard
+                title="PLOT FILE - TML"
+                fileNo="N° 02"
+                tint="paper"
+                className="h-fit"
+              >
                 <div className="px-6 py-5 sm:px-8">
                   <h3 className="mb-1 font-display text-[20px] font-bold text-forest">
                     Kumbungu Road, Plot 14
@@ -251,19 +324,25 @@ export default function StyleGuidePage() {
           <Sheet label="FORM FIELDS + VALIDATION STATES">
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               <div className="flex flex-col gap-1.5">
-                <span className="stencil text-[11px] tracking-[0.14em] text-harvest-deep">DEFAULT</span>
+                <span className="stencil text-[11px] tracking-[0.14em] text-harvest-deep">
+                  DEFAULT
+                </span>
                 <span className="rounded-[2px] border-[1.5px] border-soil/35 bg-paper px-3.5 py-[13px] text-[15px] text-soil/55">
                   Placeholder text
                 </span>
               </div>
               <div className="flex flex-col gap-1.5">
-                <span className="stencil text-[11px] tracking-[0.14em] text-harvest-deep">FOCUS</span>
+                <span className="stencil text-[11px] tracking-[0.14em] text-harvest-deep">
+                  FOCUS
+                </span>
                 <span className="rounded-[2px] border-[1.5px] border-leaf bg-paper px-3.5 py-[13px] text-[15px] text-ink shadow-[0_0_0_3px_rgb(62_125_98/0.18)]">
                   Typing…
                 </span>
               </div>
               <div className="flex flex-col gap-1.5">
-                <span className="stencil text-[11px] tracking-[0.14em] text-harvest-deep">ERROR</span>
+                <span className="stencil text-[11px] tracking-[0.14em] text-harvest-deep">
+                  ERROR
+                </span>
                 <span className="rounded-[2px] border-[1.5px] border-error bg-paper px-3.5 py-[13px] text-[15px]">
                   &nbsp;
                 </span>
@@ -272,9 +351,12 @@ export default function StyleGuidePage() {
                 </span>
               </div>
               <div className="flex flex-col gap-1.5">
-                <span className="stencil text-[11px] tracking-[0.14em] text-harvest-deep">VALID</span>
+                <span className="stencil text-[11px] tracking-[0.14em] text-harvest-deep">
+                  VALID
+                </span>
                 <span className="flex items-center justify-between rounded-[2px] border-[1.5px] border-leaf/60 bg-paper px-3.5 py-[13px] text-[15px] text-ink">
-                  024 123 4567 <Check className="h-3.5 w-3.5 text-leaf" aria-hidden="true" />
+                  024 123 4567{" "}
+                  <Check className="h-3.5 w-3.5 text-leaf" aria-hidden="true" />
                 </span>
               </div>
             </div>

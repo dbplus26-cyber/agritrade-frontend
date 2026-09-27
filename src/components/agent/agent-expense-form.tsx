@@ -122,7 +122,10 @@ export function AgentExpenseForm() {
       // purchase is named.
       const treatment = v.treatment ?? "goods";
       const attribution = v.purchaseId
-        ? { purchaseId: v.purchaseId, capitalise: treatmentToCapitalise(treatment) }
+        ? {
+            purchaseId: v.purchaseId,
+            capitalise: treatmentToCapitalise(treatment),
+          }
         : {};
       await createExpense({
         body: {
@@ -168,7 +171,10 @@ export function AgentExpenseForm() {
           render={({ field }) => (
             <SimpleSelect
               id="categoryId"
-              className={cn(agentInputClass, errors.categoryId && "border-error")}
+              className={cn(
+                agentInputClass,
+                errors.categoryId && "border-error",
+              )}
               value={field.value}
               onChange={field.onChange}
               placeholder="Choose a category…"

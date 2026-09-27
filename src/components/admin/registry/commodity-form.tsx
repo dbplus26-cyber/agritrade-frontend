@@ -33,10 +33,7 @@ import { extractApiError } from "@/lib/extract-api-error";
 import { COMMODITY_DESCRIPTION_MAX, COMMODITY_NAME_MAX } from "@/lib/limits";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
-import type {
-  ICommodity,
-  IUpdateCommodityInput,
-} from "@/types/registry.types";
+import type { ICommodity, IUpdateCommodityInput } from "@/types/registry.types";
 import {
   commoditySchema,
   type CommodityValues,
@@ -118,9 +115,7 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
       ...(values.sortOrder?.trim()
         ? { sortOrder: Number(values.sortOrder) }
         : {}),
-      ...(isEdit && removePhoto && !photoFile
-        ? { removePhoto: true }
-        : {}),
+      ...(isEdit && removePhoto && !photoFile ? { removePhoto: true } : {}),
     };
 
     try {
@@ -166,7 +161,9 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
         }
       }
       notify.error(
-        isEdit ? "Couldn't update the commodity" : "Couldn't create the commodity",
+        isEdit
+          ? "Couldn't update the commodity"
+          : "Couldn't create the commodity",
         { description: message },
       );
     }
@@ -223,7 +220,11 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
               placeholder="e.g. White Maize"
               disabled={readOnly}
               maxLength={COMMODITY_NAME_MAX}
-              className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
+              className={cn(
+                adminInputClass,
+                roCls,
+                errors.name && "border-console-red",
+              )}
               {...register("name")}
             />
           </AdminField>
@@ -333,7 +334,8 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
               so it stays in step with the fields above it. */}
           <div>
             <span className="mb-1 block text-[11.5px] font-semibold text-adm-ink">
-              Photo <span className="font-normal text-adm-faint">(optional)</span>
+              Photo{" "}
+              <span className="font-normal text-adm-faint">(optional)</span>
             </span>
             <span className="mb-1.5 block text-[11px] leading-[1.5] font-normal text-adm-muted">
               Used on the website&apos;s commodity card. JPG or PNG.

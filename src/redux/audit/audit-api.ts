@@ -1,9 +1,6 @@
 import { apiSlice } from "../api-slice";
 import { toQueryString } from "@/lib/to-query-string";
-import type {
-  IAuditListQuery,
-  IAuditListResponse,
-} from "@/types/audit.types";
+import type { IAuditListQuery, IAuditListResponse } from "@/types/audit.types";
 
 /**
  * The audit-log register (super-admin), mirroring GET /admin/audit-logs.

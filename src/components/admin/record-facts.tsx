@@ -63,7 +63,9 @@ export function RecordFacts({
       <div
         className={cn(
           "grid grid-cols-1 gap-x-8",
-          columns === 2 ? "@lg:grid-cols-2" : "@lg:grid-cols-2 @4xl:grid-cols-3",
+          columns === 2
+            ? "@lg:grid-cols-2"
+            : "@lg:grid-cols-2 @4xl:grid-cols-3",
         )}
       >
         {facts.map((f) => (

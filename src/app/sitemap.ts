@@ -17,18 +17,68 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // /style-guide is internal (noindex + robots-disallowed) and the console
   // and field app are private - only the real public content is listed.
   return [
-    { url: `${siteUrl}/`, lastModified: now, changeFrequency: "weekly", priority: 1 },
-    { url: `${siteUrl}${routes.commodities}`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${siteUrl}${routes.land}`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
-    { url: `${siteUrl}${routes.farmingInvestment}`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
+    {
+      url: `${siteUrl}/`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 1,
+    },
+    {
+      url: `${siteUrl}${routes.commodities}`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${siteUrl}${routes.land}`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
+      url: `${siteUrl}${routes.farmingInvestment}`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     // The apply page is indexable and is the one conversion page on the
     // farming side, so it is listed in its own right.
-    { url: `${siteUrl}${routes.farmingApply}`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
-    { url: `${siteUrl}${routes.about}`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${siteUrl}${routes.reviews}`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
-    { url: `${siteUrl}${routes.contact}`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${siteUrl}${routes.terms}`, lastModified: now, changeFrequency: "yearly", priority: 0.4 },
-    { url: `${siteUrl}${routes.privacy}`, lastModified: now, changeFrequency: "yearly", priority: 0.4 },
+    {
+      url: `${siteUrl}${routes.farmingApply}`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${siteUrl}${routes.about}`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${siteUrl}${routes.reviews}`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
+    {
+      url: `${siteUrl}${routes.contact}`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${siteUrl}${routes.terms}`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.4,
+    },
+    {
+      url: `${siteUrl}${routes.privacy}`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.4,
+    },
     ...lots.map((lot) => ({
       url: `${siteUrl}${routes.commodity(lot.slug)}`,
       lastModified: now,

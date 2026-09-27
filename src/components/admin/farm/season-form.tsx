@@ -117,7 +117,10 @@ export function SeasonForm({ season }: { season?: ISeason }) {
             <AdminField label="Name" error={errors.name?.message}>
               <Input
                 placeholder="e.g. 2026 Wet Season"
-                className={cn(adminInputClass, errors.name && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  errors.name && "border-console-red",
+                )}
                 {...register("name")}
               />
             </AdminField>
@@ -154,7 +157,11 @@ export function SeasonForm({ season }: { season?: ISeason }) {
                   {...register("startsOn")}
                 />
               </AdminField>
-              <AdminField label="Ends on" optional error={errors.endsOn?.message}>
+              <AdminField
+                label="Ends on"
+                optional
+                error={errors.endsOn?.message}
+              >
                 <DateInput
                   placeholder="Pick the end date"
                   className={cn(
@@ -179,7 +186,12 @@ export function SeasonForm({ season }: { season?: ISeason }) {
           >
             Cancel
           </AdminButton>
-          <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
+          <AdminButton
+            type="submit"
+            disabled={saving}
+            loading={saving}
+            size="lg"
+          >
             {saving ? "Saving…" : season ? "Save changes" : "Create season"}
           </AdminButton>
         </CommitRow>

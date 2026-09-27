@@ -18,10 +18,7 @@ import { REVIEWER_NAME_MAX } from "@/lib/limits";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import { useSubmitPublicReviewMutation } from "@/redux/reviews/public-reviews-api";
-import {
-  REVIEW_ROLES,
-  REVIEW_ROLE_LABELS,
-} from "@/types/public-review.types";
+import { REVIEW_ROLES, REVIEW_ROLE_LABELS } from "@/types/public-review.types";
 import { reviewSchema, type ReviewValues } from "@/validations/review-schema";
 
 const inputClass =
@@ -181,8 +178,8 @@ export function ReviewForm() {
           Thank you - your review is on file.
         </h2>
         <p className="mb-5 text-[14px] leading-[1.65] text-soil">
-          Every review is checked against the books before it goes up, so
-          yours will appear once it is approved.
+          Every review is checked against the books before it goes up, so yours
+          will appear once it is approved.
         </p>
         <button
           type="button"

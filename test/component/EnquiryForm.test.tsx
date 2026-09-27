@@ -25,7 +25,9 @@ describe("EnquiryForm", () => {
   it("shows per-field validation and never submits an empty form", async () => {
     render(<EnquiryForm />);
     await userEvent.click(screen.getByRole("button", { name: "Send enquiry" }));
-    expect(await screen.findByText("Please enter your name.")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Please enter your name."),
+    ).toBeInTheDocument();
     expect(
       screen.getByText("We need a phone number to reach you."),
     ).toBeInTheDocument();
@@ -42,7 +44,9 @@ describe("EnquiryForm", () => {
     );
     await userEvent.click(screen.getByRole("button", { name: "Send enquiry" }));
 
-    expect(await screen.findByText("Enquiry on file. Thank you.")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Enquiry on file. Thank you."),
+    ).toBeInTheDocument();
     expect(screen.getByText(/EN-4F2A/)).toBeInTheDocument();
     expect(sendTrigger).toHaveBeenCalledTimes(1);
     expect(sendTrigger).toHaveBeenCalledWith(

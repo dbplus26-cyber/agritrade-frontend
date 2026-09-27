@@ -35,7 +35,10 @@ export async function optimizeImage(
     const bitmap = await createImageBitmap(file, {
       imageOrientation: "from-image",
     });
-    const scale = Math.min(1, maxEdgePx / Math.max(bitmap.width, bitmap.height));
+    const scale = Math.min(
+      1,
+      maxEdgePx / Math.max(bitmap.width, bitmap.height),
+    );
     const canvas = document.createElement("canvas");
     canvas.width = Math.max(1, Math.round(bitmap.width * scale));
     canvas.height = Math.max(1, Math.round(bitmap.height * scale));

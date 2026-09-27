@@ -544,8 +544,7 @@ export function AdminButton({
         // layout because it is drawn as a pseudo-element.
         size === "sm" &&
           "relative h-7 px-2.5 text-[11px] before:absolute before:top-1/2 before:left-1/2 before:h-11 before:w-full before:min-w-11 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['']",
-        variant === "primary" &&
-          "bg-console text-white hover:bg-console-hover",
+        variant === "primary" && "bg-console text-white hover:bg-console-hover",
         (variant === "secondary" || variant === "outline") &&
           "border border-adm-line bg-adm-card text-adm-body hover:bg-adm-sunken hover:text-adm-ink",
         // A light border at REST. Bare text that only grows a background on
@@ -557,7 +556,8 @@ export function AdminButton({
           "border border-adm-line bg-transparent text-adm-body hover:bg-adm-sunken hover:text-adm-ink",
         variant === "danger" &&
           "bg-console-red text-white hover:bg-console-red-deep",
-        variant === "gold" && "bg-console-gold text-white hover:bg-console-gold-deep",
+        variant === "gold" &&
+          "bg-console-gold text-white hover:bg-console-gold-deep",
         className,
       )}
       disabled={disabled || loading}
@@ -627,9 +627,8 @@ export function AdminField({
   // sets either prop keeps its own value. Components that ignore the props are
   // unharmed.
   const describedBy =
-    [hint ? hintId : null, error ? errorId : null]
-      .filter(Boolean)
-      .join(" ") || undefined;
+    [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(" ") ||
+    undefined;
   const control =
     (hint ?? error) && React.isValidElement(children)
       ? React.cloneElement(children as React.ReactElement<AriaProps>, {
@@ -893,7 +892,10 @@ export function EditableFormActions({
  * across - so a short button never sits with empty space beside it. From `sm`
  * they take their natural width again.
  */
-export function ActionRow({ className, ...props }: React.ComponentProps<"div">) {
+export function ActionRow({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
   return (
     <div
       className={cn(
@@ -912,7 +914,10 @@ export function ActionRow({ className, ...props }: React.ComponentProps<"div">) 
  * dialog footer, so every form in the console ends the same way; from `sm` a
  * right-aligned row.
  */
-export function CommitRow({ className, ...props }: React.ComponentProps<"div">) {
+export function CommitRow({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
   return (
     <div
       className={cn(

@@ -26,7 +26,10 @@ import {
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
 import { TitleCell } from "@/components/admin/table-cells";
-import { ConsoleTableSkeleton, DetailSkeleton } from "@/components/admin/skeletons";
+import {
+  ConsoleTableSkeleton,
+  DetailSkeleton,
+} from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -288,7 +291,9 @@ export function WarehouseTable() {
         meta: columnMeta({ card: "meta" }),
         cell: ({ row }) =>
           row.original.location ? (
-            <span className="block @2xl/table:max-w-[17rem] [overflow-wrap:anywhere] @2xl/table:truncate text-adm-muted">{row.original.location}</span>
+            <span className="block @2xl/table:max-w-[17rem] [overflow-wrap:anywhere] @2xl/table:truncate text-adm-muted">
+              {row.original.location}
+            </span>
           ) : (
             <Absent />
           ),
@@ -501,11 +506,19 @@ function WarehouseFormFields({ warehouse }: { warehouse: IWarehouse }) {
               <Input
                 placeholder="e.g. Main Warehouse - Tamale"
                 disabled={readOnly}
-                className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.name && "border-console-red",
+                )}
                 {...register("name")}
               />
             </AdminField>
-            <AdminField label="Location" optional error={errors.location?.message}>
+            <AdminField
+              label="Location"
+              optional
+              error={errors.location?.message}
+            >
               <Input
                 placeholder="e.g. Tamale, Northern Region"
                 disabled={readOnly}

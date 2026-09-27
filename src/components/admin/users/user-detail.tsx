@@ -207,8 +207,14 @@ function EditDetailsForm({
     } catch (err) {
       const { message, fieldErrors, hasFieldErrors } = extractApiError(err);
       if (hasFieldErrors && fieldErrors) {
-        for (const field of ["firstName", "lastName", "email", "phone"] as const) {
-          if (fieldErrors[field]) setError(field, { message: fieldErrors[field] });
+        for (const field of [
+          "firstName",
+          "lastName",
+          "email",
+          "phone",
+        ] as const) {
+          if (fieldErrors[field])
+            setError(field, { message: fieldErrors[field] });
         }
       }
       notify.error("Couldn't update the user", { description: message });
@@ -386,7 +392,8 @@ function ActionsCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
   const [activate, { isLoading: activating }] = useActivateUserMutation();
   const [unblock, { isLoading: unblocking }] = useUnblockUserMutation();
   const [reset2fa, { isLoading: resetting }] = useResetUserTwoFactorMutation();
-  const [sendReset, { isLoading: sending }] = useSendUserPasswordResetMutation();
+  const [sendReset, { isLoading: sending }] =
+    useSendUserPasswordResetMutation();
   const [deleteUser, { isLoading: deleting }] = useDeleteUserMutation();
 
   const name = `${user.firstName} ${user.lastName}`;
@@ -558,7 +565,9 @@ function ActionsCard({ user, isSelf }: { user: IUser; isSelf: boolean }) {
             loading={row.busy}
             className="flex-none whitespace-nowrap"
             onClick={() =>
-              void row.run().catch(onApiError(`Couldn't ${row.button.toLowerCase()}`))
+              void row
+                .run()
+                .catch(onApiError(`Couldn't ${row.button.toLowerCase()}`))
             }
           >
             {row.busy ? "Working…" : row.button}
@@ -589,30 +598,30 @@ function UserDetailSkeleton() {
       <DetailShell
         asideFirstOnStack={false}
         main={
-        <AdminCard className="overflow-hidden p-0">
-          <Skeleton className="h-[88px] w-full rounded-none" />
-          <div className="px-4 pb-6 sm:px-6">
-            <div className="-mt-[52px] flex flex-col items-center gap-3 sm:flex-row sm:items-end sm:gap-5">
-              <Skeleton className="h-[104px] w-[104px] flex-none rounded-full ring-4 ring-white" />
-              <div className="min-w-0 flex-1 space-y-2 text-center sm:pb-2 sm:text-left">
-                <Skeleton className="mx-auto h-4 w-40 rounded-none sm:mx-0" />
-                <Skeleton className="mx-auto h-3 w-56 rounded-none sm:mx-0" />
-              </div>
-              <Skeleton className="h-8 w-28 flex-none rounded-none sm:mb-2" />
-            </div>
-            <div className="mt-6 grid grid-cols-1 gap-x-8 gap-y-4 border-t border-adm-hairline pt-5 sm:grid-cols-2">
-              {Array.from({ length: 6 }, (_, i) => (
-                <div key={i} className="flex items-start gap-2.5">
-                  <Skeleton className="h-7 w-7 flex-none rounded-none" />
-                  <div className="flex-1 space-y-1.5">
-                    <Skeleton className="h-2.5 w-16 rounded-none" />
-                    <Skeleton className="h-3.5 w-[70%] rounded-none" />
-                  </div>
+          <AdminCard className="overflow-hidden p-0">
+            <Skeleton className="h-[88px] w-full rounded-none" />
+            <div className="px-4 pb-6 sm:px-6">
+              <div className="-mt-[52px] flex flex-col items-center gap-3 sm:flex-row sm:items-end sm:gap-5">
+                <Skeleton className="h-[104px] w-[104px] flex-none rounded-full ring-4 ring-white" />
+                <div className="min-w-0 flex-1 space-y-2 text-center sm:pb-2 sm:text-left">
+                  <Skeleton className="mx-auto h-4 w-40 rounded-none sm:mx-0" />
+                  <Skeleton className="mx-auto h-3 w-56 rounded-none sm:mx-0" />
                 </div>
-              ))}
+                <Skeleton className="h-8 w-28 flex-none rounded-none sm:mb-2" />
+              </div>
+              <div className="mt-6 grid grid-cols-1 gap-x-8 gap-y-4 border-t border-adm-hairline pt-5 sm:grid-cols-2">
+                {Array.from({ length: 6 }, (_, i) => (
+                  <div key={i} className="flex items-start gap-2.5">
+                    <Skeleton className="h-7 w-7 flex-none rounded-none" />
+                    <div className="flex-1 space-y-1.5">
+                      <Skeleton className="h-2.5 w-16 rounded-none" />
+                      <Skeleton className="h-3.5 w-[70%] rounded-none" />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        </AdminCard>
+          </AdminCard>
         }
         aside={
           <div className="flex flex-col gap-4">

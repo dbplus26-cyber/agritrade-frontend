@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
@@ -29,7 +29,10 @@ import {
   RecordShell,
 } from "@/components/admin/record-shell";
 import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
-import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons";
+import {
+  ConsoleTableSkeleton,
+  FormSkeleton,
+} from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
@@ -133,8 +136,7 @@ export function PaymentAccountTable() {
   const filtered = Boolean(search) || activeFilterCount > 0;
   // A register with nothing on file and no filters narrowing it shows ONLY
   // the empty state (with its create action) - a filter bar filters nothing.
-  const pristine =
-    !isLoading && !isError && accounts.length === 0 && !filtered;
+  const pristine = !isLoading && !isError && accounts.length === 0 && !filtered;
 
   const columns = useMemo<ColumnDef<IPaymentAccount, unknown>[]>(
     () => [
@@ -497,7 +499,6 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
               />
             </AdminField>
           </div>
-
         </section>
 
         <section className="flex flex-col gap-5">
@@ -608,7 +609,6 @@ function PaymentAccountFormFields({ account }: { account?: IPaymentAccount }) {
               />
             </AdminField>
           ) : null}
-
         </section>
 
         <section className="flex flex-col gap-5">

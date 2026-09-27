@@ -55,7 +55,9 @@ function CashflowTooltip({
       <div className="mb-1 font-semibold text-adm-ink">{label}</div>
       <div className="flex items-center justify-between gap-4">
         <LegendItem color={SALES} label="Sales in" />
-        <span className="font-semibold text-adm-ink">{formatCedis(get("salesInGhs"))}</span>
+        <span className="font-semibold text-adm-ink">
+          {formatCedis(get("salesInGhs"))}
+        </span>
       </div>
       <div className="flex items-center justify-between gap-4">
         <LegendItem color={PURCHASES} label="Purchases out" />
@@ -112,7 +114,10 @@ export function CashflowChart({ window }: { window: IReportWindow }) {
       ) : (
         <div className="h-[220px] min-w-0">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={rows} margin={{ top: 6, right: 6, bottom: 0, left: -8 }}>
+            <AreaChart
+              data={rows}
+              margin={{ top: 6, right: 6, bottom: 0, left: -8 }}
+            >
               <defs>
                 <linearGradient id="salesFill" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor={SALES} stopOpacity={0.28} />
@@ -120,7 +125,11 @@ export function CashflowChart({ window }: { window: IReportWindow }) {
                 </linearGradient>
                 <linearGradient id="purchasesFill" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor={PURCHASES} stopOpacity={0.24} />
-                  <stop offset="100%" stopColor={PURCHASES} stopOpacity={0.02} />
+                  <stop
+                    offset="100%"
+                    stopColor={PURCHASES}
+                    stopOpacity={0.02}
+                  />
                 </linearGradient>
               </defs>
               <CartesianGrid stroke={GRID_STROKE} vertical={false} />

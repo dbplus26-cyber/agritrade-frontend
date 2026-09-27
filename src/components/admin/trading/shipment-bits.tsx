@@ -55,7 +55,8 @@ const SHIPMENT_STATUS_HELP: Record<ShipmentStatus, string> = {
     "The truck reached the drop-off point; the delivery still has to be signed off.",
   CANCELLED: "Called off, and anything already loaded goes back to stock.",
   CLOSED: "Delivered and finished with: no further changes are expected.",
-  DISPATCHED: "The truck has left the warehouse and is on its way to the buyer.",
+  DISPATCHED:
+    "The truck has left the warehouse and is on its way to the buyer.",
   LOADING: "Goods are going onto the truck; it has not left the warehouse yet.",
   PLANNED: "Truck and route are set, but nothing is on board yet.",
 };

@@ -69,7 +69,10 @@ function CostFact({
         <span className="min-w-0">{label}</span>
         <HelpTip label={`What is ${label}?`} text={hint} />
       </div>
-      <Money className="mt-0.5 block text-[12.5px] text-adm-ink" value={value} />
+      <Money
+        className="mt-0.5 block text-[12.5px] text-adm-ink"
+        value={value}
+      />
     </div>
   );
 }
@@ -231,8 +234,8 @@ export function DisbursementDetail({ id }: { id: string }) {
       {d.needsAttention ? (
         <AdminCard className="border-console-red/40 bg-console-red/[0.04] px-5 py-3.5 text-[11.5px] leading-[1.55] text-console-red">
           Hubtel has not given a final answer for this payout after several
-          checks. It has NOT been marked failed, because the money may well
-          have gone out - confirm on the Hubtel dashboard, then record the real
+          checks. It has NOT been marked failed, because the money may well have
+          gone out - confirm on the Hubtel dashboard, then record the real
           outcome with &ldquo;Resolve manually&rdquo;.
         </AdminCard>
       ) : null}
@@ -246,7 +249,8 @@ export function DisbursementDetail({ id }: { id: string }) {
           value={d.amountGhs}
         />
         <p className="mt-2 text-[12px] text-adm-body">
-          To <span className="font-semibold text-adm-ink">{d.recipientName}</span>{" "}
+          To{" "}
+          <span className="font-semibold text-adm-ink">{d.recipientName}</span>{" "}
           <span className="text-adm-faint">·</span>{" "}
           <Mono className="text-[11.5px]">{recipientLine(d)}</Mono>
         </p>
@@ -360,8 +364,14 @@ function ResolveDialog({
                   onChange={field.onChange}
                   placeholder="Choose what happened to the money"
                   options={[
-                    { value: "SUCCESS", label: "The money reached the recipient" },
-                    { value: "FAILED", label: "It never went out (refund the float)" },
+                    {
+                      value: "SUCCESS",
+                      label: "The money reached the recipient",
+                    },
+                    {
+                      value: "FAILED",
+                      label: "It never went out (refund the float)",
+                    },
                   ]}
                 />
               )}

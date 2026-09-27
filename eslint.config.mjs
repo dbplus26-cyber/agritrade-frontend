@@ -28,6 +28,7 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Isolated dist dir used by verification builds (NEXT_DIST_DIR).
     ".next-build/**",
+    ".next-*/**",
     // Coverage output (npm run test:coverage).
     "coverage/**",
   ]),

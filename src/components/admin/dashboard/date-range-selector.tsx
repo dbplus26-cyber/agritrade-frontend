@@ -106,13 +106,20 @@ export function DateRangeSelector({
     // of the row. Every box in the row is one height (34px, the console's
     // standing control) and every box sits on one baseline.
     <div className="flex flex-wrap items-end gap-2">
-      <Select value={preset} onValueChange={(v) => choosePreset(v as RangePreset)}>
+      <Select
+        value={preset}
+        onValueChange={(v) => choosePreset(v as RangePreset)}
+      >
         <SelectTrigger className="h-[34px] w-full cursor-pointer text-[11.5px] sm:w-[164px]">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
           {PRESETS.map((p) => (
-            <SelectItem key={p.value} value={p.value} className="cursor-pointer">
+            <SelectItem
+              key={p.value}
+              value={p.value}
+              className="cursor-pointer"
+            >
               {p.label}
             </SelectItem>
           ))}

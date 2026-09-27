@@ -18,10 +18,19 @@ export interface NotifyOptions {
 
 export const notify = {
   success: (title: string, opts?: NotifyOptions) =>
-    toast.success(title, { description: opts?.description, duration: opts?.duration }),
+    toast.success(title, {
+      description: opts?.description,
+      duration: opts?.duration,
+    }),
   error: (title: string, opts?: NotifyOptions) =>
-    toast.error(title, { description: opts?.description, duration: opts?.duration }),
+    toast.error(title, {
+      description: opts?.description,
+      duration: opts?.duration,
+    }),
   info: (title: string, opts?: NotifyOptions) =>
-    toast.info(title, { description: opts?.description, duration: opts?.duration }),
+    toast.info(title, {
+      description: opts?.description,
+      duration: opts?.duration,
+    }),
   dismiss: (id?: string | number) => toast.dismiss(id),
 };

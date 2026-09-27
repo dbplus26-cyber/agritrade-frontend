@@ -55,10 +55,7 @@ export function MySendsScreen({
   const total = data?.meta.total ?? 0;
 
   const sendButton = canSend ? (
-    <AdminButton
-      onClick={() => setSending(true)}
-      type="button"
-    >
+    <AdminButton onClick={() => setSending(true)} type="button">
       Send money
     </AdminButton>
   ) : null;

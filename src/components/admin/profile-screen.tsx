@@ -209,8 +209,14 @@ function ProfileEditForm({
     } catch (err) {
       const { message, fieldErrors, hasFieldErrors } = extractApiError(err);
       if (hasFieldErrors && fieldErrors) {
-        for (const field of ["firstName", "lastName", "email", "phone"] as const) {
-          if (fieldErrors[field]) setError(field, { message: fieldErrors[field] });
+        for (const field of [
+          "firstName",
+          "lastName",
+          "email",
+          "phone",
+        ] as const) {
+          if (fieldErrors[field])
+            setError(field, { message: fieldErrors[field] });
         }
       }
       notify.error("Couldn't save your profile", { description: message });
@@ -369,7 +375,10 @@ function PasswordCard() {
             />
           </AdminField>
           <div className="grid gap-5 @min-[440px]:grid-cols-2">
-            <AdminField label="New password" error={errors.newPassword?.message}>
+            <AdminField
+              label="New password"
+              error={errors.newPassword?.message}
+            >
               <PasswordInput
                 autoComplete="new-password"
                 placeholder="At least 8 characters"
@@ -470,16 +479,10 @@ function RecoveryCodesPanel({
         ))}
       </div>
       <div className="mt-3 flex gap-2">
-        <AdminButton
-          variant="secondary"
-          onClick={copyAll}
-        >
+        <AdminButton variant="secondary" onClick={copyAll}>
           Copy all
         </AdminButton>
-        <AdminButton
-          variant="outline"
-          onClick={onDismiss}
-        >
+        <AdminButton variant="outline" onClick={onDismiss}>
           I&apos;ve saved them
         </AdminButton>
       </div>

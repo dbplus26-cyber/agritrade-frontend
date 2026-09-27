@@ -164,7 +164,10 @@ function ReviewModCard({
           onClick={() => {
             setExpanded((e) => !e);
           }}
-          className={cn(adminLinkClass, "mt-1 self-start cursor-pointer text-[11px] font-semibold")}
+          className={cn(
+            adminLinkClass,
+            "mt-1 self-start cursor-pointer text-[11px] font-semibold",
+          )}
         >
           {expanded ? "Show less" : "Show more"}
         </button>
@@ -364,10 +367,15 @@ function AddReviewDialog({
                           aria-hidden="true"
                           className={cn(
                             "block px-0.5 text-[26px] leading-none transition-colors peer-focus-visible:rounded-none peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-leaf",
-                            star <= field.value ? "text-console-gold" : "text-adm-faint",
+                            star <= field.value
+                              ? "text-console-gold"
+                              : "text-adm-faint",
                           )}
                         >
-                          <Star className="h-[26px] w-[26px]" fill="currentColor" />
+                          <Star
+                            className="h-[26px] w-[26px]"
+                            fill="currentColor"
+                          />
                         </span>
                       </label>
                     ))}
@@ -455,8 +463,7 @@ export function ReviewsScreen() {
   const totalPages = data?.meta.totalPages ?? 1;
   const isPendingView = filters.status === "PENDING";
   const activeFilterCount =
-    (filters.role !== "all" ? 1 : 0) +
-    (filters.status !== "PENDING" ? 1 : 0);
+    (filters.role !== "all" ? 1 : 0) + (filters.status !== "PENDING" ? 1 : 0);
   // A register with nothing on file and nothing narrowing it shows ONLY the
   // empty state. The status tabs are navigation, not filters, so pristine
   // additionally requires the WHOLE register to be empty (stats total 0) -
@@ -531,7 +538,13 @@ export function ReviewsScreen() {
           noun="reviews"
           description="Reviews submitted on the website land here for a decision - or record one the office took by phone or on paper."
           actionLabel={canModerate ? "Add review" : undefined}
-          onAction={canModerate ? () => { setAdding(true); } : undefined}
+          onAction={
+            canModerate
+              ? () => {
+                  setAdding(true);
+                }
+              : undefined
+          }
         />
       ) : (
         <>

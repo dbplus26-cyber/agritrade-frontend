@@ -9,10 +9,7 @@ import {
   formatCedisCompact,
   MONEY_HIDDEN,
 } from "@/lib/format-money";
-import type {
-  MilestoneTrigger,
-  SaleStatus,
-} from "@/types/admin-sale.types";
+import type { MilestoneTrigger, SaleStatus } from "@/types/admin-sale.types";
 
 /** Status → console tone + label. */
 const SALE_STATUS: Record<SaleStatus, { label: string; tone: Tone }> = {
@@ -87,7 +84,8 @@ export function Money({
   compact?: boolean;
   value: number | null;
 }) {
-  if (value === null) return <span className="text-adm-faint">{MONEY_HIDDEN}</span>;
+  if (value === null)
+    return <span className="text-adm-faint">{MONEY_HIDDEN}</span>;
   if (!compact) {
     return animate ? (
       <CountUp value={value} format={formatCedis} />

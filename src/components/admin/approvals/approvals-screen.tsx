@@ -841,12 +841,18 @@ function QueueSkeleton() {
           </span>
           {/* What changed, over its detail line. */}
           <span className="order-3 col-span-2 @min-[900px]/main:order-none @min-[900px]/main:col-span-1">
-            <span className={cn(bar, "h-3.5")} style={{ width: `${String(58 + (i % 3) * 12)}%` }} />
+            <span
+              className={cn(bar, "h-3.5")}
+              style={{ width: `${String(58 + (i % 3) * 12)}%` }}
+            />
             <span className={cn(bar, "mt-1.5 h-2.5 w-2/5")} />
           </span>
           {/* The rule chip, which opens the line on a phone. */}
           <span
-            className={cn(bar, "order-1 h-[18px] w-[104px] @min-[900px]/main:order-none")}
+            className={cn(
+              bar,
+              "order-1 h-[18px] w-[104px] @min-[900px]/main:order-none",
+            )}
           />
           {/* Who raised it and how long ago. */}
           <span className="order-4 col-span-2 @min-[900px]/main:order-none @min-[900px]/main:col-span-1">

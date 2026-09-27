@@ -19,17 +19,25 @@ const GENERIC = "Something went wrong. Please try again.";
 
 function statusMessage(status: number): string {
   switch (status) {
-    case 400: return "That request wasn't quite right. Check the details and try again.";
-    case 401: return "Please sign in to continue.";
-    case 403: return "You don't have access to do that.";
-    case 404: return "We couldn't find what you were looking for.";
-    case 408: return "The request timed out. Try again.";
-    case 429: return "Too many requests - give it a moment and try again.";
+    case 400:
+      return "That request wasn't quite right. Check the details and try again.";
+    case 401:
+      return "Please sign in to continue.";
+    case 403:
+      return "You don't have access to do that.";
+    case 404:
+      return "We couldn't find what you were looking for.";
+    case 408:
+      return "The request timed out. Try again.";
+    case 429:
+      return "Too many requests - give it a moment and try again.";
     case 500:
     case 502:
     case 503:
-    case 504: return "The office line is busy. Please try again shortly.";
-    default: return GENERIC;
+    case 504:
+      return "The office line is busy. Please try again shortly.";
+    default:
+      return GENERIC;
   }
 }
 
@@ -44,7 +52,10 @@ export function extractApiError(error: unknown): NormalizedError {
     return { message: error || GENERIC, hasFieldErrors: false };
   }
 
-  if (error instanceof Error && !isRecord((error as unknown as { data?: unknown }).data)) {
+  if (
+    error instanceof Error &&
+    !isRecord((error as unknown as { data?: unknown }).data)
+  ) {
     return { message: error.message || GENERIC, hasFieldErrors: false };
   }
 
@@ -67,11 +78,16 @@ export function extractApiError(error: unknown): NormalizedError {
 
     // RTK Query network-level errors.
     const rtkStatus = error.status;
-    if (rtkStatus === "FETCH_ERROR" || rtkStatus === "TIMEOUT_ERROR" || rtkStatus === "PARSING_ERROR") {
+    if (
+      rtkStatus === "FETCH_ERROR" ||
+      rtkStatus === "TIMEOUT_ERROR" ||
+      rtkStatus === "PARSING_ERROR"
+    ) {
       return {
-        message: rtkStatus === "TIMEOUT_ERROR"
-          ? "The request timed out. Check your connection and try again."
-          : "Couldn't reach the server. Check your connection and try again.",
+        message:
+          rtkStatus === "TIMEOUT_ERROR"
+            ? "The request timed out. Check your connection and try again."
+            : "Couldn't reach the server. Check your connection and try again.",
         status: rtkStatus,
         hasFieldErrors: false,
       };
@@ -81,13 +97,19 @@ export function extractApiError(error: unknown): NormalizedError {
     const data = isRecord(error.data) ? error.data : undefined;
     if (data) {
       const details = isRecord(data.details) ? data.details : undefined;
-      const rawErrors = details && Array.isArray(details.errors) ? details.errors : undefined;
+      const rawErrors =
+        details && Array.isArray(details.errors) ? details.errors : undefined;
       let fieldErrors: Record<string, string> | undefined;
       if (rawErrors) {
         fieldErrors = {};
         for (const item of rawErrors) {
-          if (isRecord(item) && typeof item.field === "string" && typeof item.message === "string") {
-            if (!fieldErrors[item.field]) fieldErrors[item.field] = item.message;
+          if (
+            isRecord(item) &&
+            typeof item.field === "string" &&
+            typeof item.message === "string"
+          ) {
+            if (!fieldErrors[item.field])
+              fieldErrors[item.field] = item.message;
           }
         }
         if (Object.keys(fieldErrors).length === 0) fieldErrors = undefined;
@@ -122,7 +144,11 @@ export function extractApiError(error: unknown): NormalizedError {
     }
 
     if (typeof rtkStatus === "number") {
-      return { message: statusMessage(rtkStatus), status: rtkStatus, hasFieldErrors: false };
+      return {
+        message: statusMessage(rtkStatus),
+        status: rtkStatus,
+        hasFieldErrors: false,
+      };
     }
 
     if (typeof error.message === "string") {

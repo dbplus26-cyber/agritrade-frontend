@@ -32,7 +32,8 @@ export const MOVE_TYPE_HELP: Record<StockMoveType, string> = {
     "Stock going out of the warehouse onto a truck for a buyer.",
   [StockMoveType.ADJUSTMENT]:
     "A correction to the books made by hand, usually after a count or a loss.",
-  [StockMoveType.TRANSFER_IN]: "Stock arriving from another of your warehouses.",
+  [StockMoveType.TRANSFER_IN]:
+    "Stock arriving from another of your warehouses.",
   [StockMoveType.TRANSFER_OUT]: "Stock leaving for another of your warehouses.",
   [StockMoveType.FARM_REPAYMENT_RECEIPT]:
     "Produce a farmer brought back against the inputs they were advanced.",

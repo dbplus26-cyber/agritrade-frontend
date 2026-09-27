@@ -76,7 +76,10 @@ export function ExpensesRegister() {
     (filters.from ? 1 : 0) +
     (filters.to ? 1 : 0);
 
-  const categories = useGetExpenseCategoriesQuery({ isActive: true, limit: 100 });
+  const categories = useGetExpenseCategoriesQuery({
+    isActive: true,
+    limit: 100,
+  });
   const categoryOptions = [
     { label: "All categories", value: "" },
     ...(categories.data?.data ?? []).map((c) => ({
@@ -188,8 +191,13 @@ export function ExpensesRegister() {
               href={`${env.SERVER_URI}/api/v1/admin/receipts/expense/${row.original.id}.pdf`}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={(e) => { e.stopPropagation(); }}
-              className={cn(adminLinkClass, "inline-flex h-7 items-center px-2 text-[11px]")}
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              className={cn(
+                adminLinkClass,
+                "inline-flex h-7 items-center px-2 text-[11px]",
+              )}
             >
               Voucher
             </a>
@@ -239,7 +247,13 @@ export function ExpensesRegister() {
           noun="expenses"
           description="Record rent, salaries, fumigation and other running costs so the profit figure is honest."
           actionLabel={canRecord ? "Record expense" : undefined}
-          onAction={canRecord ? () => { setCreating(true); } : undefined}
+          onAction={
+            canRecord
+              ? () => {
+                  setCreating(true);
+                }
+              : undefined
+          }
         />
         <ExpenseFormDialog
           open={creating}
@@ -270,7 +284,9 @@ export function ExpensesRegister() {
           action={
             canRecord ? (
               <AdminButton
-                onClick={() => { setCreating(true); }}
+                onClick={() => {
+                  setCreating(true);
+                }}
                 aria-label="Record expense"
               >
                 <Plus className="h-4 w-4" aria-hidden="true" />
@@ -281,22 +297,38 @@ export function ExpensesRegister() {
           chips={
             <>
               {filters.categoryId ? (
-                <FilterChip onRemove={() => { setFilter("categoryId", ""); }}>
+                <FilterChip
+                  onRemove={() => {
+                    setFilter("categoryId", "");
+                  }}
+                >
                   Category: {labelOf(categoryOptions, filters.categoryId)}
                 </FilterChip>
               ) : null}
               {filters.scope ? (
-                <FilterChip onRemove={() => { setFilter("scope", ""); }}>
+                <FilterChip
+                  onRemove={() => {
+                    setFilter("scope", "");
+                  }}
+                >
                   Kind: {labelOf(SCOPE_OPTIONS, filters.scope)}
                 </FilterChip>
               ) : null}
               {filters.from ? (
-                <FilterChip onRemove={() => { setFilter("from", ""); }}>
+                <FilterChip
+                  onRemove={() => {
+                    setFilter("from", "");
+                  }}
+                >
                   From: {filters.from}
                 </FilterChip>
               ) : null}
               {filters.to ? (
-                <FilterChip onRemove={() => { setFilter("to", ""); }}>
+                <FilterChip
+                  onRemove={() => {
+                    setFilter("to", "");
+                  }}
+                >
                   To: {filters.to}
                 </FilterChip>
               ) : null}
@@ -306,7 +338,9 @@ export function ExpensesRegister() {
           <ConsoleLabeledSelect
             label="Category"
             value={filters.categoryId}
-            onChange={(v) => { setFilter("categoryId", v); }}
+            onChange={(v) => {
+              setFilter("categoryId", v);
+            }}
             options={categoryOptions}
             active={filters.categoryId !== ""}
           />
@@ -314,15 +348,21 @@ export function ExpensesRegister() {
             hint="Splits running costs of the business from costs that belong to one truck trip."
             label="Kind"
             value={filters.scope}
-            onChange={(v) => { setFilter("scope", v); }}
+            onChange={(v) => {
+              setFilter("scope", v);
+            }}
             options={SCOPE_OPTIONS}
             active={filters.scope !== ""}
           />
           <ConsoleDateRange
             from={filters.from}
             to={filters.to}
-            onFromChange={(v) => { setFilter("from", v); }}
-            onToChange={(v) => { setFilter("to", v); }}
+            onFromChange={(v) => {
+              setFilter("from", v);
+            }}
+            onToChange={(v) => {
+              setFilter("to", v);
+            }}
           />
         </ConsoleFilterBar>
       )}
@@ -386,7 +426,9 @@ export function ExpensesRegister() {
       />
       <ExpenseFormDialog
         open={editing !== null}
-        onOpenChange={(open) => { if (!open) setEditing(null); }}
+        onOpenChange={(open) => {
+          if (!open) setEditing(null);
+        }}
         expense={editing ?? undefined}
         categories={categories.data?.data ?? []}
       />

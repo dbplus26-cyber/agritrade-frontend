@@ -10,7 +10,11 @@ export const metadata = pageMetadata({
   description:
     "Commodity, tonnage, destination - or a plot, or the farming scheme. Call the Tamale dispatch line or send a written enquiry; we reply within one working day.",
   path: "/contact",
-  keywords: ["contact DB Plus", "Tamale dispatch office", "grain enquiry Ghana"],
+  keywords: [
+    "contact DB Plus",
+    "Tamale dispatch office",
+    "grain enquiry Ghana",
+  ],
 });
 
 const first = (v: string | string[] | undefined): string | undefined =>

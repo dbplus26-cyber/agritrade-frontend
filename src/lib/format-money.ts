@@ -54,7 +54,10 @@ export function formatKg(kg: number): string {
  * Always pair with `formatCedis` in a `title` attribute so the exact value is
  * one hover (or one detail page) away.
  */
-export function formatCedisCompact(major: number | null, currency = "GH₵"): string {
+export function formatCedisCompact(
+  major: number | null,
+  currency = "GH₵",
+): string {
   if (major === null) return MONEY_HIDDEN;
   const abs = Math.abs(major);
   if (abs < 100_000) return formatCedis(major, currency);

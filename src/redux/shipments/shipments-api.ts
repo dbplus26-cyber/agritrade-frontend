@@ -333,24 +333,29 @@ export const shipmentsApi = apiSlice.injectEndpoints({
      * contract, and the file is compulsory: a name with no signature attached
      * is refused with SIGNATURE_REQUIRED, which is the right answer.
      */
-    signShipmentDriver: builder.mutation<IShipmentResponse, ISignShipmentInput>({
-      query: ({ id, file, signedName }) => {
-        const form = new FormData();
-        form.append("payload", JSON.stringify(signedName ? { signedName } : {}));
-        if (file) form.append("signature", file);
-        return {
-          url: `admin/shipments/${id}/signatures/driver`,
-          method: "POST",
-          body: form,
-        };
+    signShipmentDriver: builder.mutation<IShipmentResponse, ISignShipmentInput>(
+      {
+        query: ({ id, file, signedName }) => {
+          const form = new FormData();
+          form.append(
+            "payload",
+            JSON.stringify(signedName ? { signedName } : {}),
+          );
+          if (file) form.append("signature", file);
+          return {
+            url: `admin/shipments/${id}/signatures/driver`,
+            method: "POST",
+            body: form,
+          };
+        },
+        // Signing satisfies the dispatch gate, so the list's status column and
+        // the trip both change meaning.
+        invalidatesTags: (_r, _e, { id }) => [
+          { type: "Shipments", id },
+          { type: "Shipments", id: "LIST" },
+        ],
       },
-      // Signing satisfies the dispatch gate, so the list's status column and
-      // the trip both change meaning.
-      invalidatesTags: (_r, _e, { id }) => [
-        { type: "Shipments", id },
-        { type: "Shipments", id: "LIST" },
-      ],
-    }),
+    ),
 
     /**
      * The owner's countersignature. Owner-only at the router, so the console
@@ -360,7 +365,10 @@ export const shipmentsApi = apiSlice.injectEndpoints({
     signShipmentOwner: builder.mutation<IShipmentResponse, ISignShipmentInput>({
       query: ({ id, file, signedName }) => {
         const form = new FormData();
-        form.append("payload", JSON.stringify(signedName ? { signedName } : {}));
+        form.append(
+          "payload",
+          JSON.stringify(signedName ? { signedName } : {}),
+        );
         if (file) form.append("signature", file);
         return {
           url: `admin/shipments/${id}/signatures/owner`,

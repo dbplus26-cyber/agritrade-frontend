@@ -86,8 +86,16 @@ const FUNDED_FILTER_OPTIONS = [
  */
 export function FloatHoldersScreen() {
   const showMoney = useMoneyVisibility();
-  const { filters, page, queryParams, resetFilters, search, setFilter, setPage, setSearch } =
-    useTableQuery({ defaults: FILTER_DEFAULTS });
+  const {
+    filters,
+    page,
+    queryParams,
+    resetFilters,
+    search,
+    setFilter,
+    setPage,
+    setSearch,
+  } = useTableQuery({ defaults: FILTER_DEFAULTS });
   const [giving, setGiving] = useState<IFloatHolder | null>(null);
 
   const limit = Number(filters.size);
@@ -155,7 +163,11 @@ export function FloatHoldersScreen() {
       {
         id: "float",
         accessorFn: (h) =>
-          !h.accountId ? "Not funded yet" : h.accountActive ? "Active" : "Suspended",
+          !h.accountId
+            ? "Not funded yet"
+            : h.accountActive
+              ? "Active"
+              : "Suspended",
         header: columnHelp(
           "Float",
           "Whether this person has been given company money to spend, and whether they can still spend it.",
@@ -215,10 +227,7 @@ export function FloatHoldersScreen() {
         enableSorting: false,
         meta: columnMeta({ className: "whitespace-nowrap text-right" }),
         cell: ({ row }) => (
-          <HolderActions
-            holder={row.original}
-            onGive={setGiving}
-          />
+          <HolderActions holder={row.original} onGive={setGiving} />
         ),
       });
     }
@@ -244,45 +253,45 @@ export function FloatHoldersScreen() {
       />
 
       {pristine ? null : (
-      <ConsoleFilterBar
-        activeCount={activeFilterCount}
-        onClear={resetFilters}
-        onSearch={setSearch}
-        search={search}
-        searchPlaceholder="Name, email or phone…"
-        totalCount={total}
-        noun="float holders"
-        chips={
-          <>
-            {filters.role !== "all" ? (
-              <FilterChip onRemove={() => setFilter("role", "all")}>
-                Role: {labelOf(ROLE_FILTER_OPTIONS, filters.role)}
-              </FilterChip>
-            ) : null}
-            {filters.funded !== "all" ? (
-              <FilterChip onRemove={() => setFilter("funded", "all")}>
-                Funded: {labelOf(FUNDED_FILTER_OPTIONS, filters.funded)}
-              </FilterChip>
-            ) : null}
-          </>
-        }
-      >
-        <ConsoleLabeledSelect
-          active={filters.role !== "all"}
-          label="Role"
-          onChange={(v) => setFilter("role", v)}
-          options={ROLE_FILTER_OPTIONS}
-          value={filters.role}
-        />
-        <ConsoleLabeledSelect
-          active={filters.funded !== "all"}
-          hint="Narrows to the people actually holding company money right now, or those holding none."
-          label="Funded"
-          onChange={(v) => setFilter("funded", v)}
-          options={FUNDED_FILTER_OPTIONS}
-          value={filters.funded}
-        />
-      </ConsoleFilterBar>
+        <ConsoleFilterBar
+          activeCount={activeFilterCount}
+          onClear={resetFilters}
+          onSearch={setSearch}
+          search={search}
+          searchPlaceholder="Name, email or phone…"
+          totalCount={total}
+          noun="float holders"
+          chips={
+            <>
+              {filters.role !== "all" ? (
+                <FilterChip onRemove={() => setFilter("role", "all")}>
+                  Role: {labelOf(ROLE_FILTER_OPTIONS, filters.role)}
+                </FilterChip>
+              ) : null}
+              {filters.funded !== "all" ? (
+                <FilterChip onRemove={() => setFilter("funded", "all")}>
+                  Funded: {labelOf(FUNDED_FILTER_OPTIONS, filters.funded)}
+                </FilterChip>
+              ) : null}
+            </>
+          }
+        >
+          <ConsoleLabeledSelect
+            active={filters.role !== "all"}
+            label="Role"
+            onChange={(v) => setFilter("role", v)}
+            options={ROLE_FILTER_OPTIONS}
+            value={filters.role}
+          />
+          <ConsoleLabeledSelect
+            active={filters.funded !== "all"}
+            hint="Narrows to the people actually holding company money right now, or those holding none."
+            label="Funded"
+            onChange={(v) => setFilter("funded", v)}
+            options={FUNDED_FILTER_OPTIONS}
+            value={filters.funded}
+          />
+        </ConsoleFilterBar>
       )}
 
       {rows.length === 0 ? (
@@ -580,8 +589,9 @@ function GiveMoneyDialog({
       description: `${formatCedis(Number(values.amountGhs))} to ${who}, as ${
         cash
           ? "physical cash out of the company till"
-          : (E_CASH_TENDERS.find((t) => t.value === values.toKind)?.label.toLowerCase() ??
-            "a transfer")
+          : (E_CASH_TENDERS.find(
+              (t) => t.value === values.toKind,
+            )?.label.toLowerCase() ?? "a transfer")
       }. It leaves a company account and is counted against them at once; only a reconciliation can correct it.`,
       confirmText: cash ? "Record hand-over" : "Record transfer",
       requireExactMatch: holder.firstName,

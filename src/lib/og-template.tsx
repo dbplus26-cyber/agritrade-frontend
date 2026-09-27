@@ -95,27 +95,26 @@ export async function brandOgImage({
   )}`;
 
   return new ImageResponse(
-    (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        background: SURFACE,
+        color: INK,
+        borderTop: `18px solid ${FOREST}`,
+        fontFamily: "Georgia, serif",
+      }}
+    >
       <div
         style={{
-          width: "100%",
-          height: "100%",
+          flex: 1,
           display: "flex",
-          background: SURFACE,
-          color: INK,
-          borderTop: `18px solid ${FOREST}`,
-          fontFamily: "Georgia, serif",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          padding: photo ? "56px 48px 56px 72px" : "64px 80px",
         }}
       >
-        <div
-          style={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            padding: photo ? "56px 48px 56px 72px" : "64px 80px",
-          }}
-        >
         <div
           style={{
             display: "flex",
@@ -185,25 +184,24 @@ export async function brandOgImage({
             </div>
           )}
         </div>
-        </div>
-        {photo ? (
-          // Satori renders plain <img>; next/image does not exist in an OG card.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={photo}
-            width={420}
-            height={612}
-            alt=""
-            style={{
-              width: 420,
-              height: "100%",
-              objectFit: "cover",
-              borderLeft: `10px solid ${FOREST}`,
-            }}
-          />
-        ) : null}
       </div>
-    ),
+      {photo ? (
+        // Satori renders plain <img>; next/image does not exist in an OG card.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={photo}
+          width={420}
+          height={612}
+          alt=""
+          style={{
+            width: 420,
+            height: "100%",
+            objectFit: "cover",
+            borderLeft: `10px solid ${FOREST}`,
+          }}
+        />
+      ) : null}
+    </div>,
     { ...OG_SIZE },
   );
 }

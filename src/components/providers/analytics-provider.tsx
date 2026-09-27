@@ -19,6 +19,9 @@ if (typeof window !== "undefined" && analyticsEnabled) {
   posthog.init(env.POSTHOG_KEY, {
     api_host: "/ingest",
     ui_host: POSTHOG_UI_HOST,
+    autocapture: false,
+    disable_session_recording: true,
+    persistence: "memory",
     // Pageviews are captured by hand below: the App Router navigates without
     // a document load, so the automatic one would only see the first page.
     capture_pageview: false,

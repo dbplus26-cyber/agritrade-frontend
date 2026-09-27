@@ -417,7 +417,9 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
               <AdminField label="Document name" optional>
                 <Input
                   placeholder={
-                    isCash ? "e.g. Cash receipt, 12 Nov" : "e.g. Weigh slip, 12 Nov"
+                    isCash
+                      ? "e.g. Cash receipt, 12 Nov"
+                      : "e.g. Weigh slip, 12 Nov"
                   }
                   className={adminInputClass}
                   value={documentName}
@@ -468,7 +470,12 @@ export function RepaymentForm({ farmerId }: { farmerId?: string }) {
           >
             Cancel
           </AdminButton>
-          <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
+          <AdminButton
+            type="submit"
+            disabled={saving}
+            loading={saving}
+            size="lg"
+          >
             {saving ? "Saving…" : "Record repayment"}
           </AdminButton>
         </CommitRow>

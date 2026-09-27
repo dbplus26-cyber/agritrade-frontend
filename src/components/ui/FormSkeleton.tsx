@@ -15,7 +15,10 @@ export function FormSkeleton({
   return (
     <div
       aria-hidden="true"
-      className={cn("shadow-doc border border-soil/35 bg-surface-alt", className)}
+      className={cn(
+        "shadow-doc border border-soil/35 bg-surface-alt",
+        className,
+      )}
     >
       <div className="flex items-baseline justify-between border-b-[1.5px] border-soil/50 px-6 py-4">
         <Skeleton className="h-3.5 w-32 rounded-[2px]" />
@@ -26,7 +29,10 @@ export function FormSkeleton({
           <div key={i} className="flex flex-col gap-2">
             <Skeleton className="h-2.5 w-24 rounded-[2px]" />
             <Skeleton
-              className={cn("rounded-[2px]", i === fields - 1 ? "h-24" : "h-11")}
+              className={cn(
+                "rounded-[2px]",
+                i === fields - 1 ? "h-24" : "h-11",
+              )}
             />
           </div>
         ))}

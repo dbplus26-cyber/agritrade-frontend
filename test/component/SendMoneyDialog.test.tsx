@@ -21,7 +21,13 @@
 // picker is its own searchable screen and is stubbed to a plain select so
 // this file tests the dialog's rules, not the picker's.
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEventBase from "@testing-library/user-event";
 
 import { pickOption } from "../helpers/pick-option";
@@ -96,24 +102,23 @@ const UUID_RE =
 
 /** Fill the fields every send needs, whatever the rail. */
 const fillCommon = async () => {
-  await userEvent.type(screen.getByLabelText(/Amount \(GH/i), "850.00");
-  await userEvent.type(
-    screen.getByLabelText(/Recipient's name/i),
-    "Ibrahim Fuseini",
-  );
-  await userEvent.type(
-    screen.getByLabelText(/What is it for/i),
-    "Maize purchase, Tolon",
-  );
+  fireEvent.change(screen.getByLabelText(/Amount \(GH/i), {
+    target: { value: "850.00" },
+  });
+  fireEvent.change(screen.getByLabelText(/Recipient's name/i), {
+    target: { value: "Ibrahim Fuseini" },
+  });
+  fireEvent.change(screen.getByLabelText(/What is it for/i), {
+    target: { value: "Maize purchase, Tolon" },
+  });
 };
 
 const fillMomo = async () => {
   await fillCommon();
   await pickOption(screen.getByLabelText(/Network/i), "MTN");
-  await userEvent.type(
-    screen.getByLabelText(/Mobile money number/i),
-    "233249111411",
-  );
+  fireEvent.change(screen.getByLabelText(/Mobile money number/i), {
+    target: { value: "233249111411" },
+  });
 };
 
 /** The form's own submit. On its own this only raises the confirm gate. */
@@ -384,9 +389,7 @@ describe("SendMoneyDialog - idempotency key lifecycle", () => {
     view.rerender(
       <SendMoneyDialog onClose={vi.fn()} open={false} surface="company" />,
     );
-    view.rerender(
-      <SendMoneyDialog onClose={vi.fn()} open surface="company" />,
-    );
+    view.rerender(<SendMoneyDialog onClose={vi.fn()} open surface="company" />);
     await fillMomo();
     await send();
 

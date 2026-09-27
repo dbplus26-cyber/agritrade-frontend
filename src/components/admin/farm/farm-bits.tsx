@@ -44,11 +44,7 @@ export function ActiveBadge({ active }: { active: boolean }) {
  * The INPUT_GRANT_ABOVE_THRESHOLD overlay chip: a grant records immediately but
  * is flagged until the owner acknowledges the over-threshold value.
  */
-export function GrantApprovalBadge({
-  status,
-}: {
-  status: string | undefined;
-}) {
+export function GrantApprovalBadge({ status }: { status: string | undefined }) {
   if (!status) return null;
   if (status === "PENDING")
     return (
@@ -175,7 +171,10 @@ export function FarmDocumentsSection({
         <button
           type="button"
           onClick={() => setSigning((v) => !v)}
-          className={cn(adminLinkClass, "cursor-pointer text-[11px] font-semibold")}
+          className={cn(
+            adminLinkClass,
+            "cursor-pointer text-[11px] font-semibold",
+          )}
           aria-expanded={signing}
         >
           {signing ? "Hide signature pad" : "Or sign on this screen"}

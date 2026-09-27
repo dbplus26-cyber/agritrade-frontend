@@ -45,49 +45,49 @@ export function AudienceCards() {
     <section className="mx-auto grid max-w-[1312px] gap-5 px-5 pb-14 lg:grid-cols-2 lg:gap-7 lg:px-8 lg:pb-[72px]">
       {AUDIENCES.map((audience, a) => (
         <Reveal key={audience.tag} delay={a * 120}>
-        <article
-          className={cn(
-            "shadow-doc h-full rounded-[2px] border border-t-4 border-soil/18 bg-paper p-6 sm:p-8 lg:p-10",
-            audience.topBorder,
-          )}
-        >
-          <span
+          <article
             className={cn(
-              "mb-4 inline-block rounded-[2px] px-3 py-[7px] text-[10px] font-bold leading-none tracking-[0.24em] lg:mb-5",
-              audience.tagClass,
+              "shadow-doc h-full rounded-[2px] border border-t-4 border-soil/18 bg-paper p-6 sm:p-8 lg:p-10",
+              audience.topBorder,
             )}
           >
-            {audience.tag}
-          </span>
-          <h2 className="mb-3 font-display text-[22px] font-semibold leading-[1.2] text-forest lg:mb-3.5 lg:text-[28px]">
-            {audience.title}
-          </h2>
-          <p className="mb-5 text-[14px] leading-[1.7] text-soil lg:mb-[22px] lg:text-[15px]">
-            {audience.body}
-          </p>
-          <ul className="mb-6 flex list-none flex-col gap-3 p-0 lg:mb-[26px]">
-            {audience.points.map((point) => (
-              <li
-                key={point}
-                className="flex gap-3 text-[14px] leading-[1.55] text-ink"
-              >
-                <span
-                  aria-hidden="true"
-                  className={cn("flex-none", audience.tickClass)}
+            <span
+              className={cn(
+                "mb-4 inline-block rounded-[2px] px-3 py-[7px] text-[10px] font-bold leading-none tracking-[0.24em] lg:mb-5",
+                audience.tagClass,
+              )}
+            >
+              {audience.tag}
+            </span>
+            <h2 className="mb-3 font-display text-[22px] font-semibold leading-[1.2] text-forest lg:mb-3.5 lg:text-[28px]">
+              {audience.title}
+            </h2>
+            <p className="mb-5 text-[14px] leading-[1.7] text-soil lg:mb-[22px] lg:text-[15px]">
+              {audience.body}
+            </p>
+            <ul className="mb-6 flex list-none flex-col gap-3 p-0 lg:mb-[26px]">
+              {audience.points.map((point) => (
+                <li
+                  key={point}
+                  className="flex gap-3 text-[14px] leading-[1.55] text-ink"
                 >
-                  <Check className="mt-[3px] h-3.5 w-3.5" />
-                </span>
-                {point}
-              </li>
-            ))}
-          </ul>
-          <Link
-            href={audience.href}
-            className="shadow-doc-sm inline-block rounded-[2px] border-2 border-forest px-6 py-3 text-center text-[14px] font-bold text-forest transition-[transform,box-shadow] duration-100 hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0_rgb(89_82_59/0.4)] max-lg:block"
-          >
-            {audience.cta}
-          </Link>
-        </article>
+                  <span
+                    aria-hidden="true"
+                    className={cn("flex-none", audience.tickClass)}
+                  >
+                    <Check className="mt-[3px] h-3.5 w-3.5" />
+                  </span>
+                  {point}
+                </li>
+              ))}
+            </ul>
+            <Link
+              href={audience.href}
+              className="shadow-doc-sm inline-block rounded-[2px] border-2 border-forest px-6 py-3 text-center text-[14px] font-bold text-forest transition-[transform,box-shadow] duration-100 hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0_rgb(89_82_59/0.4)] max-lg:block"
+            >
+              {audience.cta}
+            </Link>
+          </article>
         </Reveal>
       ))}
     </section>

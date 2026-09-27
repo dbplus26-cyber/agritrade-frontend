@@ -6,7 +6,11 @@ import {
   MONEY_HIDDEN,
 } from "@/lib/format-money";
 import { cn } from "@/lib/utils";
-import { ApprovalAction, ApprovalStatus, type IApproval } from "@/types/approval.types";
+import {
+  ApprovalAction,
+  ApprovalStatus,
+  type IApproval,
+} from "@/types/approval.types";
 
 /**
  * Shared vocabulary for the approvals queue: the page's scoped design tokens,
@@ -66,11 +70,12 @@ export const RAIL: Record<ApprovalStatus, string> = {
 };
 
 /** The outcome word in column 6 - the a11y fallback for the rail colour. */
-export const OUTCOME: Record<ApprovalStatus, { colour: string; word: string }> = {
-  [ApprovalStatus.PENDING]: { colour: "var(--ap-amber)", word: "Pending" },
-  [ApprovalStatus.APPROVED]: { colour: "var(--ap-leaf)", word: "Approved" },
-  [ApprovalStatus.REJECTED]: { colour: "var(--ap-clay)", word: "Rejected" },
-};
+export const OUTCOME: Record<ApprovalStatus, { colour: string; word: string }> =
+  {
+    [ApprovalStatus.PENDING]: { colour: "var(--ap-amber)", word: "Pending" },
+    [ApprovalStatus.APPROVED]: { colour: "var(--ap-leaf)", word: "Approved" },
+    [ApprovalStatus.REJECTED]: { colour: "var(--ap-clay)", word: "Rejected" },
+  };
 
 interface RuleStyle {
   bg: string;
@@ -215,7 +220,10 @@ export function OverageMeter({
  * null for anything it did not, and an invented figure is worse than a short
  * line.
  */
-export function subjectDetailLine(a: IApproval, includeRef = true): string | null {
+export function subjectDetailLine(
+  a: IApproval,
+  includeRef = true,
+): string | null {
   const quantityAndPrice =
     a.quantity !== null && a.unit
       ? a.unitPrice !== null
@@ -254,7 +262,9 @@ export function stamp(iso: string): string {
   return d.toLocaleString("en-GB", {
     day: "2-digit",
     month: "short",
-    ...(d.getFullYear() === new Date().getFullYear() ? {} : { year: "numeric" }),
+    ...(d.getFullYear() === new Date().getFullYear()
+      ? {}
+      : { year: "numeric" }),
     hour: "2-digit",
     minute: "2-digit",
   });
@@ -275,7 +285,8 @@ export function relativeAge(iso: string): string {
   const seconds = (new Date(iso).getTime() - Date.now()) / 1000;
   if (!Number.isFinite(seconds)) return "";
   const minutes = seconds / 60;
-  if (Math.abs(minutes) < 60) return RELATIVE.format(Math.round(minutes), "minute");
+  if (Math.abs(minutes) < 60)
+    return RELATIVE.format(Math.round(minutes), "minute");
   const hours = minutes / 60;
   if (Math.abs(hours) < 24) return RELATIVE.format(Math.round(hours), "hour");
   const days = hours / 24;

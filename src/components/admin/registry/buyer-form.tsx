@@ -24,10 +24,7 @@ import {
   useGetBuyerQuery,
   useUpdateBuyerMutation,
 } from "@/redux/buyers/buyers-api";
-import {
-  PhotoViewDialog,
-  ViewablePhoto,
-} from "@/components/admin/photo-view";
+import { PhotoViewDialog, ViewablePhoto } from "@/components/admin/photo-view";
 import { useEditableRecordForm } from "@/hooks/use-editable-record-form";
 import { usePhotoStaging } from "@/hooks/use-photo-staging";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -128,9 +125,7 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
             registrationNumber: opt(values.registrationNumber),
             contactPersonName: opt(values.contactPersonName),
             contactPersonPhone: opt(values.contactPersonPhone),
-            ...(removePhoto && !photoFile
-              ? { removePhoto: true }
-              : {}),
+            ...(removePhoto && !photoFile ? { removePhoto: true } : {}),
           },
           photo: photoFile ?? undefined,
         }).unwrap();
@@ -208,17 +203,15 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
             page is nearly always seen - leaving the record with no picture
             unless somebody starts editing. */}
         <div className="mb-4 flex items-center gap-3.5">
-          <ViewablePhoto
-            name={buyer.name}
-            size={64}
-            src={buyer.photoUrl}
-          />
+          <ViewablePhoto name={buyer.name} size={64} src={buyer.photoUrl} />
           <div className="min-w-0">
             <div className="text-[12.5px] font-semibold text-adm-ink [overflow-wrap:anywhere]">
               {buyer.name}
             </div>
             <div className="text-[11px] text-adm-muted">
-              {buyer.photoUrl ? "Tap the photo to see it in full" : "No photo on file"}
+              {buyer.photoUrl
+                ? "Tap the photo to see it in full"
+                : "No photo on file"}
             </div>
           </div>
         </div>
@@ -230,9 +223,17 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
             { label: "Email", value: buyer.email },
             { full: true, label: "Address", value: buyer.address },
             { label: "Business name", value: buyer.businessName },
-            { mono: true, label: "Registration number", value: buyer.registrationNumber },
+            {
+              mono: true,
+              label: "Registration number",
+              value: buyer.registrationNumber,
+            },
             { label: "Contact person", value: buyer.contactPersonName },
-            { mono: true, label: "Contact phone", value: buyer.contactPersonPhone },
+            {
+              mono: true,
+              label: "Contact phone",
+              value: buyer.contactPersonPhone,
+            },
             { full: true, label: "Notes", value: buyer.notes },
           ]}
         />
@@ -261,7 +262,8 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
               it stays in step with the fields under it. */}
           <div>
             <span className="mb-1 block text-[11.5px] font-semibold text-adm-ink">
-              Photo <span className="font-normal text-adm-faint">(optional)</span>
+              Photo{" "}
+              <span className="font-normal text-adm-faint">(optional)</span>
             </span>
             <div className="flex flex-wrap items-center gap-3.5">
               {previewUrl && readOnly ? (
@@ -329,7 +331,11 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
             <Input
               placeholder="e.g. Accra Grain Traders"
               disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
+              className={cn(
+                adminInputClass,
+                roCls,
+                errors.name && "border-console-red",
+              )}
               {...register("name")}
             />
           </AdminField>
@@ -342,7 +348,11 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
                 type="tel"
                 placeholder="e.g. 055 000 0000"
                 disabled={readOnly}
-                className={cn(adminInputClass, roCls, errors.phone && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.phone && "border-console-red",
+                )}
                 {...register("phone")}
               />
             </AdminField>
@@ -371,7 +381,11 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
                 type="email"
                 placeholder="e.g. orders@accragrain.com"
                 disabled={readOnly}
-                className={cn(adminInputClass, roCls, errors.email && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.email && "border-console-red",
+                )}
                 {...register("email")}
               />
             </AdminField>
@@ -379,7 +393,11 @@ function BuyerFormFields({ buyer }: { buyer?: IBuyer }) {
               <Input
                 placeholder="e.g. Accra"
                 disabled={readOnly}
-                className={cn(adminInputClass, roCls, errors.city && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.city && "border-console-red",
+                )}
                 {...register("city")}
               />
             </AdminField>

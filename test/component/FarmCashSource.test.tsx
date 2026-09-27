@@ -309,7 +309,9 @@ describe("recording a repayment", () => {
     // A stale weight is not a cosmetic leftover: the server refuses the whole
     // save for it, and nobody can see why from a field that is no longer shown.
     expect(createRepayment).toHaveBeenCalledTimes(1);
-    expect(createRepayment.mock.calls[0][0].body).not.toHaveProperty("weightKg");
+    expect(createRepayment.mock.calls[0][0].body).not.toHaveProperty(
+      "weightKg",
+    );
   });
 
   it("refuses a cash repayment that names no account, before the wire", async () => {
@@ -350,7 +352,9 @@ describe("reading a cash repayment", () => {
     repaymentsQuery.mockReturnValue(listOf([CASH_ROW]));
     render(<RepaymentsRegister />);
 
-    expect(screen.getAllByText("Fidelity current account").length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText("Fidelity current account").length,
+    ).toBeGreaterThan(0);
     // "0 kg" would read as a farmer who handed over nothing, which is the
     // opposite of what happened.
     expect(screen.queryByText(/0 kg/)).not.toBeInTheDocument();

@@ -13,11 +13,7 @@ import {
   labelOf,
 } from "@/components/admin/filter-bar";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
-import {
-  AdminButton,
-  AdminCard,
-  AdminPageHeader,
-} from "@/components/admin/ui";
+import { AdminButton, AdminCard, AdminPageHeader } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -80,7 +76,9 @@ export function SeasonsRegister() {
           <Link
             href={`/admin/seasons/${row.original.id}`}
             className="block min-w-0 @2xl/table:max-w-[90%] [overflow-wrap:anywhere] @2xl/table:truncate font-semibold text-adm-ink outline-none focus-visible:underline"
-            onClick={(e) => { e.stopPropagation(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
             title={row.original.name}
           >
             {row.original.name}

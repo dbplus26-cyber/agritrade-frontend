@@ -95,7 +95,9 @@ function TurnstileInner({
     if (!el) return;
     const measure = () => {
       const width = el.offsetWidth;
-      setScale(width > 0 && width < WIDGET_MIN_WIDTH ? width / WIDGET_MIN_WIDTH : 1);
+      setScale(
+        width > 0 && width < WIDGET_MIN_WIDTH ? width / WIDGET_MIN_WIDTH : 1,
+      );
     };
     measure();
     const observer = new ResizeObserver(measure);
@@ -104,7 +106,11 @@ function TurnstileInner({
   }, []);
 
   const render = useCallback(() => {
-    if (!window.turnstile || !containerRef.current || widgetId.current !== null) {
+    if (
+      !window.turnstile ||
+      !containerRef.current ||
+      widgetId.current !== null
+    ) {
       return;
     }
     // "normal" (fixed 300×65) rather than "flexible": the bar shouldn't
@@ -151,7 +157,9 @@ function TurnstileInner({
       <div
         ref={wrapperRef}
         className={
-          className ? `${className} max-w-full overflow-hidden` : "max-w-full overflow-hidden"
+          className
+            ? `${className} max-w-full overflow-hidden`
+            : "max-w-full overflow-hidden"
         }
         style={scale < 1 ? { height: WIDGET_HEIGHT * scale } : undefined}
       >

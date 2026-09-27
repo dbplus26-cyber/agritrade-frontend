@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { connection } from "next/server";
 import {
   Barlow_Condensed,
   Barlow_Semi_Condensed,
@@ -63,11 +64,13 @@ export const viewport: Viewport = {
   themeColor: siteConfig.themeColor,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // A per-request script nonce cannot be attached to build-time HTML.
+  await connection();
   return (
     <html
       lang="en"

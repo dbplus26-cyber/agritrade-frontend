@@ -52,7 +52,11 @@ const cashSourceFields = {
   cashSource: z.enum(cashSourceModes),
   // 300 is the backend's column width; the minimum is what separates a reason
   // from a keystroke, since "x" answers the question without saying anything.
-  noCashReason: z.string().trim().max(300, "Keep it under 300 characters").optional(),
+  noCashReason: z
+    .string()
+    .trim()
+    .max(300, "Keep it under 300 characters")
+    .optional(),
   paymentAccountId: z.string().optional(),
 };
 

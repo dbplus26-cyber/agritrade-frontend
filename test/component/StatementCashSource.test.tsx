@@ -26,19 +26,14 @@ import { DrawingsScreen } from "@/components/admin/statements/drawings-screen";
 import { FixedAssetsScreen } from "@/components/admin/statements/fixed-assets-screen";
 import type { IFixedAsset } from "@/types/statement.types";
 
-const {
-  assetsQuery,
-  createDrawing,
-  disposeAsset,
-  errorToast,
-  updateAsset,
-} = vi.hoisted(() => ({
-  assetsQuery: vi.fn(),
-  createDrawing: vi.fn(),
-  disposeAsset: vi.fn(),
-  errorToast: vi.fn(),
-  updateAsset: vi.fn(),
-}));
+const { assetsQuery, createDrawing, disposeAsset, errorToast, updateAsset } =
+  vi.hoisted(() => ({
+    assetsQuery: vi.fn(),
+    createDrawing: vi.fn(),
+    disposeAsset: vi.fn(),
+    errorToast: vi.fn(),
+    updateAsset: vi.fn(),
+  }));
 
 vi.mock("@/redux/statements/statements-api", () => ({
   useCreateAssetClassMutation: () => [vi.fn(), { isLoading: false }],

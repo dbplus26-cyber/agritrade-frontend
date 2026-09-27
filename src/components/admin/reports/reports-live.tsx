@@ -70,13 +70,14 @@ function ReportKpi({
   /** Money in GHS; null prints the redaction placeholder. */
   value?: number | null;
 }) {
-  const display =
-    text ?? (value === null ? null : formatCedisCompact(value));
+  const display = text ?? (value === null ? null : formatCedisCompact(value));
   return (
     <AdminCard className="h-full px-4 py-3">
       <div className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         <span className="min-w-0">{label}</span>
-        {hint ? <HelpTip label={`What does ${label} count?`} text={hint} /> : null}
+        {hint ? (
+          <HelpTip label={`What does ${label} count?`} text={hint} />
+        ) : null}
       </div>
       <div
         className={cn(
@@ -84,7 +85,9 @@ function ReportKpi({
           display ? statValueCls(display) : "text-[18px]",
           accent ? "text-console" : "text-adm-ink",
         )}
-        title={text === undefined && value !== null ? formatCedis(value) : undefined}
+        title={
+          text === undefined && value !== null ? formatCedis(value) : undefined
+        }
       >
         {text ??
           (value === null ? (
@@ -240,7 +243,10 @@ function AgentPerformance({
             </thead>
             <tbody>
               {rows.map((r) => (
-                <tr key={r.agentName} className="border-t border-adm-hairline align-top">
+                <tr
+                  key={r.agentName}
+                  className="border-t border-adm-hairline align-top"
+                >
                   <td className="py-1.5 pr-3 text-adm-ink">
                     <span className="line-clamp-2" title={r.agentName}>
                       {r.agentName}

@@ -47,13 +47,34 @@ export function CommodityPlaceholder({ className }: { className?: string }) {
         {/* Two ears of grain leaning against the front sack. */}
         <g stroke="#3E7D62" strokeWidth="2.6" strokeLinecap="round">
           <path d="M24 96V62" />
-          <path d="M24 66c-6-1-9-5-9-10 5 0 9 3 9 10z" fill="#3E7D62" fillOpacity="0.25" />
-          <path d="M24 78c-6-1-9-5-9-10 5 0 9 3 9 10z" fill="#3E7D62" fillOpacity="0.25" />
-          <path d="M24 66c6-1 9-5 9-10-5 0-9 3-9 10z" fill="#3E7D62" fillOpacity="0.25" />
-          <path d="M24 78c6-1 9-5 9-10-5 0-9 3-9 10z" fill="#3E7D62" fillOpacity="0.25" />
+          <path
+            d="M24 66c-6-1-9-5-9-10 5 0 9 3 9 10z"
+            fill="#3E7D62"
+            fillOpacity="0.25"
+          />
+          <path
+            d="M24 78c-6-1-9-5-9-10 5 0 9 3 9 10z"
+            fill="#3E7D62"
+            fillOpacity="0.25"
+          />
+          <path
+            d="M24 66c6-1 9-5 9-10-5 0-9 3-9 10z"
+            fill="#3E7D62"
+            fillOpacity="0.25"
+          />
+          <path
+            d="M24 78c6-1 9-5 9-10-5 0-9 3-9 10z"
+            fill="#3E7D62"
+            fillOpacity="0.25"
+          />
         </g>
         {/* The floor. */}
-        <path d="M8 96h144" stroke="#59523B" strokeWidth="3" strokeLinecap="round" />
+        <path
+          d="M8 96h144"
+          stroke="#59523B"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
       </svg>
     </div>
   );

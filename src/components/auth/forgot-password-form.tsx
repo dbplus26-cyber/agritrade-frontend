@@ -48,8 +48,8 @@ export function ForgotPasswordForm() {
         <p>
           If an account exists for{" "}
           <span className="font-semibold text-ink">{sentTo}</span>, a
-          password-reset link is on its way. It expires in 30 minutes and can
-          be used once.
+          password-reset link is on its way. It expires in 30 minutes and can be
+          used once.
         </p>
         <p>Didn&apos;t get it? Check your spam folder, or try again.</p>
         <button

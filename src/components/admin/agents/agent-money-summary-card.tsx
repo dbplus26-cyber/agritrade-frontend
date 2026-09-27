@@ -1,6 +1,11 @@
 "use client";
 
-import { AdminCard, Mono, SectionHeading, ToneBadge } from "@/components/admin/ui";
+import {
+  AdminCard,
+  Mono,
+  SectionHeading,
+  ToneBadge,
+} from "@/components/admin/ui";
 import { CountUp } from "@/components/admin/count-up";
 import { HelpTip } from "@/components/admin/help-tip";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -40,7 +45,11 @@ function Figure({
   if (value === null) return <span className="text-adm-faint">Hidden</span>;
   return (
     <Mono className={cn("tabular-nums", className)}>
-      {animate ? <CountUp value={value} format={formatCedis} /> : formatCedis(value)}
+      {animate ? (
+        <CountUp value={value} format={formatCedis} />
+      ) : (
+        formatCedis(value)
+      )}
     </Mono>
   );
 }
@@ -88,7 +97,11 @@ function Line({
   );
 }
 
-export function AgentMoneySummaryCard({ agentUserId }: { agentUserId: string }) {
+export function AgentMoneySummaryCard({
+  agentUserId,
+}: {
+  agentUserId: string;
+}) {
   const { data, isLoading } = useGetAgentMoneySummaryQuery({ agentUserId });
 
   if (isLoading) {
@@ -100,7 +113,10 @@ export function AgentMoneySummaryCard({ agentUserId }: { agentUserId: string }) 
             <div className={cn(POT, "space-y-2.5")} key={pot}>
               <Skeleton className="h-2.5 w-32" />
               {[0, 1, 2, 3].map((line) => (
-                <div className="flex items-center justify-between gap-3" key={line}>
+                <div
+                  className="flex items-center justify-between gap-3"
+                  key={line}
+                >
                   <Skeleton className="h-3 w-28" />
                   <Skeleton className="h-3 w-20" />
                 </div>

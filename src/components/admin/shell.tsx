@@ -60,7 +60,6 @@ import { useAuthRole } from "@/hooks/use-auth-role";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 
-
 /** Console-scoped shadcn sidebar tokens - white rail, slate lines, forest ring. */
 const SIDEBAR_VARS = {
   "--sidebar-width": "224px",
@@ -81,8 +80,7 @@ const ROLE_LABEL: Record<string, string> = {
   AGENT: "Field agent",
 };
 
-/** Shared sign-out flow: confirm, call the API (client session clears
- * regardless of the server result), land on /login. */
+/** Shared sign-out flow: confirm, revoke the server session, then leave. */
 function useSignOut() {
   const router = useRouter();
   const { confirm, confirmationDialog } = useConfirm();
@@ -95,11 +93,13 @@ function useSignOut() {
       confirmText: "Sign out",
     });
     if (!ok) return;
-    await logout()
-      .unwrap()
-      .catch(() => {});
-    notify.success("Signed out");
-    router.replace("/login");
+    try {
+      await logout().unwrap();
+      notify.success("Signed out");
+      router.replace("/login");
+    } catch {
+      notify.error("Couldn't sign out. Check your connection and try again.");
+    }
   };
 
   return { signOut, isLoading, confirmationDialog };
@@ -424,41 +424,42 @@ function ConsoleSidebar({ activeKey }: { activeKey: string }) {
                     className="grid transition-[grid-template-rows] duration-200"
                     style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
                   >
-                  <div
-                    className="min-h-0 overflow-hidden"
-                    inert={isOpen ? undefined : true}
-                    aria-hidden={isOpen ? undefined : true}
-                  >
-                  <div className="ml-[15px] mt-0.5 flex flex-col gap-px border-l border-adm-hairline pl-2">
-                    {group.items.map((item) => (
-                      <SidebarMenuButton
-                        key={item.key}
-                        asChild
-                        isActive={activeKey === item.key}
-                        className="h-auto justify-between gap-2 rounded-none px-2.5 py-[6px] text-[11.5px] font-normal text-adm-body hover:bg-adm-sunken hover:text-adm-ink data-[active=true]:bg-console data-[active=true]:font-semibold data-[active=true]:text-white"
-                      >
-                        <Link
-                          href={item.href}
-                          onClick={() => setOpenMobile(false)}
-                        >
-                          {/* HelpWrap (a span), not HelpTip (a button): a
+                    <div
+                      className="min-h-0 overflow-hidden"
+                      inert={isOpen ? undefined : true}
+                      aria-hidden={isOpen ? undefined : true}
+                    >
+                      <div className="ml-[15px] mt-0.5 flex flex-col gap-px border-l border-adm-hairline pl-2">
+                        {group.items.map((item) => (
+                          <SidebarMenuButton
+                            key={item.key}
+                            asChild
+                            isActive={activeKey === item.key}
+                            className="h-auto justify-between gap-2 rounded-none px-2.5 py-[6px] text-[11.5px] font-normal text-adm-body hover:bg-adm-sunken hover:text-adm-ink data-[active=true]:bg-console data-[active=true]:font-semibold data-[active=true]:text-white"
+                          >
+                            <Link
+                              href={item.href}
+                              onClick={() => setOpenMobile(false)}
+                            >
+                              {/* HelpWrap (a span), not HelpTip (a button): a
                               button nested inside an anchor is invalid HTML
                               and browsers handle it inconsistently. */}
-                          <HelpWrap
-                            className="cursor-pointer whitespace-nowrap"
-                            side="right"
-                            text={item.hint ?? item.label}
-                          >
-                            {item.label}
-                          </HelpWrap>
-                          {item.badge === "approvals" && pendingApprovals > 0 ? (
-                            <NavBadge count={pendingApprovals} />
-                          ) : null}
-                        </Link>
-                      </SidebarMenuButton>
-                    ))}
-                  </div>
-                  </div>
+                              <HelpWrap
+                                className="cursor-pointer whitespace-nowrap"
+                                side="right"
+                                text={item.hint ?? item.label}
+                              >
+                                {item.label}
+                              </HelpWrap>
+                              {item.badge === "approvals" &&
+                              pendingApprovals > 0 ? (
+                                <NavBadge count={pendingApprovals} />
+                              ) : null}
+                            </Link>
+                          </SidebarMenuButton>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 ) : null}
               </SidebarMenuItem>
@@ -501,10 +502,7 @@ function MobileMenuButton() {
 function Crumbs() {
   const pathname = usePathname();
   const title = screenTitle(pathname);
-  const segments = pathname
-    .slice(ADMIN_HOME.length)
-    .split("/")
-    .filter(Boolean);
+  const segments = pathname.slice(ADMIN_HOME.length).split("/").filter(Boolean);
   const section = segments[0];
   const sub =
     segments.length > 1 ? (segments[1] === "new" ? "New" : "Detail") : null;

@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { ReverseReasonDialog } from "@/components/admin/drivers/driver-settlement-dialogs";
+import { useIdempotencyKey } from "@/components/admin/disbursements/disbursement-bits";
+import { ExistingOutflowPicker } from "@/components/admin/expenses/existing-outflow-picker";
 import { HelpWrap } from "@/components/admin/help-tip";
 import { PaidThroughSystemField } from "@/components/admin/paid-through-system-field";
 import { PaymentAccountField } from "@/components/admin/payment-account-field";
@@ -44,6 +46,7 @@ import {
   useReversePurchasePaymentMutation,
 } from "@/redux/purchases/purchases-api";
 import type { IPurchasePayment } from "@/types/purchase.types";
+import type { IMatchableOutflow } from "@/types/expense.types";
 
 import { PAYMENT_METHOD_OPTIONS, todayInputValue } from "../trading/sale-bits";
 
@@ -125,12 +128,16 @@ function PayDialog({
   purchaseId: string;
 }) {
   const [record, { isLoading }] = useRecordPurchasePaymentMutation();
+  const idempotencyKey = useIdempotencyKey(true);
+  const [useExisting, setUseExisting] = useState(false);
+  const [source, setSource] = useState<IMatchableOutflow | null>(null);
   const { confirm, confirmationDialog } = useConfirm();
   const {
     control,
     formState: { errors },
     handleSubmit,
     register,
+    setValue,
   } = useForm<PaymentValues>({
     // Held as a string and converted on submit: clamping a number field in
     // onChange makes it impossible to clear.
@@ -149,20 +156,29 @@ function PayDialog({
   // both controls come off the form rather than sitting there asking for
   // answers that would be ignored.
   const matchedSend = useWatch({ control, name: "disbursementId" });
+  const paymentAccountId = useWatch({ control, name: "paymentAccountId" });
 
   const onSubmit = async (values: PaymentValues) => {
+    if (useExisting && !source) {
+      notify.error(
+        "Choose the account outflow that already paid the supplier.",
+      );
+      return;
+    }
     // Money out to a named supplier, and a ledger write only a reversal can
     // undo - the same gate a sale's payment already carries, for the same
     // reason: a misplaced decimal here is the expensive mistake, and it is
     // invisible once it is on the books.
     const ok = await confirm({
       title: "Record this payment?",
-      description: values.disbursementId
-        ? `${formatCedis(Number(values.amountGhs))} to ${payeeName}, booked against a send the system already made. The money has already left the payout wallet, so nothing is deducted again; this records what it paid for. Only a reversal takes it back off.`
-        : `${formatCedis(Number(values.amountGhs))} paid to ${payeeName} by ${
-            PAYMENT_METHOD_OPTIONS.find((o) => o.value === values.method)
-              ?.label ?? values.method
-          }. It goes on the books as money out for these goods; only a reversal takes it back off.`,
+      description: source
+        ? `${formatCedis(source.amountGhs)} to ${payeeName}, matched to ${source.externalReference ?? source.transactionNo}. The account was already debited and will not be debited again.`
+        : values.disbursementId
+          ? `${formatCedis(Number(values.amountGhs))} to ${payeeName}, booked against a send the system already made. The money has already left the payout wallet, so nothing is deducted again; this records what it paid for. Only a reversal takes it back off.`
+          : `${formatCedis(Number(values.amountGhs))} paid to ${payeeName} by ${
+              PAYMENT_METHOD_OPTIONS.find((o) => o.value === values.method)
+                ?.label ?? values.method
+            }. It goes on the books as money out for these goods; only a reversal takes it back off.`,
       confirmText: "Record payment",
     });
     if (!ok) return;
@@ -170,9 +186,11 @@ function PayDialog({
     try {
       await record({
         body: {
-          amountGhs: Number(values.amountGhs),
+          amountGhs: source?.amountGhs ?? Number(values.amountGhs),
+          idempotencyKey: idempotencyKey(),
           method: values.method,
-          paidAt: values.paidAt,
+          ...(!source ? { paidAt: values.paidAt } : {}),
+          ...(source ? { sourceMovementId: source.id } : {}),
           ...(values.disbursementId
             ? { disbursementId: values.disbursementId }
             : {}),
@@ -182,7 +200,9 @@ function PayDialog({
           ...(!values.disbursementId && values.paymentAccountId
             ? { paymentAccountId: values.paymentAccountId }
             : {}),
-          ...(values.reference ? { reference: values.reference } : {}),
+          ...(!source && values.reference
+            ? { reference: values.reference }
+            : {}),
         },
         purchaseId,
       }).unwrap();
@@ -216,12 +236,16 @@ function PayDialog({
               bottom sheet on a phone and a centred card on desktop. */}
           <div className="@container/pay">
             <div className="grid grid-cols-1 gap-4 @min-[380px]/pay:grid-cols-2">
-              <AdminField error={errors.amountGhs?.message} label="Amount (GHS)">
+              <AdminField
+                error={errors.amountGhs?.message}
+                label="Amount (GHS)"
+              >
                 <Input
                   autoFocus
                   className={cn(adminInputClass, "text-right")}
                   inputMode="decimal"
                   placeholder="0.00"
+                  readOnly={Boolean(source)}
                   {...register("amountGhs")}
                 />
               </AdminField>
@@ -242,7 +266,11 @@ function PayDialog({
               render={({ field }) => (
                 <SimpleSelect
                   className={adminSelectClass}
-                  onChange={field.onChange}
+                  onChange={(value) => {
+                    field.onChange(value);
+                    setValue("paymentAccountId", "");
+                    setSource(null);
+                  }}
                   options={PAYMENT_METHOD_OPTIONS}
                   placeholder="Choose the method"
                   value={field.value}
@@ -251,20 +279,35 @@ function PayDialog({
             />
           </AdminField>
 
-          <Controller
-            control={control}
-            name="disbursementId"
-            render={({ field }) => (
-              <PaidThroughSystemField
-                error={errors.disbursementId?.message}
-                onChange={field.onChange}
-                value={field.value}
-              />
-            )}
-          />
+          {!useExisting ? (
+            <Controller
+              control={control}
+              name="disbursementId"
+              render={({ field }) => (
+                <PaidThroughSystemField
+                  error={errors.disbursementId?.message}
+                  onChange={field.onChange}
+                  value={field.value}
+                />
+              )}
+            />
+          ) : null}
+
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              checked={useExisting}
+              onChange={(event) => {
+                setUseExisting(event.target.checked);
+                setSource(null);
+                setValue("disbursementId", "");
+              }}
+              type="checkbox"
+            />
+            Match a payment already recorded in the cash book
+          </label>
 
           {/* Cash leaves the till, not a named account. */}
-          {method !== "CASH" && !matchedSend ? (
+          {(method !== "CASH" || useExisting) && !matchedSend ? (
             <Controller
               control={control}
               name="paymentAccountId"
@@ -273,26 +316,42 @@ function PayDialog({
                   direction="out"
                   error={errors.paymentAccountId?.message}
                   method={method}
-                  onChange={field.onChange}
+                  onChange={(value) => {
+                    field.onChange(value);
+                    setSource(null);
+                  }}
                   value={field.value}
                 />
               )}
             />
           ) : null}
 
-          {!matchedSend ? (
-          <AdminField
-            error={errors.reference?.message}
-            hint="Recording the same reference twice against this purchase is refused."
-            label="Reference"
-            optional
-          >
-            <Input
-              className={adminInputClass}
-              placeholder="e.g. TRF884512"
-              {...register("reference")}
+          {useExisting ? (
+            <ExistingOutflowPicker
+              key={paymentAccountId}
+              accountId={paymentAccountId}
+              onChange={(rows) => {
+                const chosen = rows[0] ?? null;
+                setSource(chosen);
+                if (chosen) setValue("amountGhs", String(chosen.amountGhs));
+              }}
+              single
             />
-          </AdminField>
+          ) : null}
+
+          {!matchedSend && !useExisting ? (
+            <AdminField
+              error={errors.reference?.message}
+              hint="Recording the same reference twice against this purchase is refused."
+              label="Reference"
+              optional
+            >
+              <Input
+                className={adminInputClass}
+                placeholder="e.g. TRF884512"
+                {...register("reference")}
+              />
+            </AdminField>
           ) : null}
 
           <ResponsiveDialogFooter className="gap-2">

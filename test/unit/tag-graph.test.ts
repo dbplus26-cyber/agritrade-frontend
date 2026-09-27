@@ -57,7 +57,9 @@ const apiFiles = (dir: string): string[] => {
  * only ever appear after their keyword and before the next one, so the
  * attribution is exact.
  */
-export const parseTagGraph = (files: { path: string; text: string }[]): Graph => {
+export const parseTagGraph = (
+  files: { path: string; text: string }[],
+): Graph => {
   const graph: Graph = {
     invalidated: [],
     invalidatedTypes: [],
@@ -98,18 +100,30 @@ export const parseTagGraph = (files: { path: string; text: string }[]): Graph =>
         graph.providedTypes.add(type);
         if (literal !== undefined) graph.provided.add(`${type}|${literal}`);
       } else if (literal !== undefined) {
-        graph.invalidated.push({ file: path, id: literal, line: lineAt(m.index), type });
+        graph.invalidated.push({
+          file: path,
+          id: literal,
+          line: lineAt(m.index),
+          type,
+        });
       }
     }
 
     // Bare-string tags: a standalone quoted tag type in an array entry.
-    for (const m of text.matchAll(/(?<=[[,\n]\s{0,12})"([A-Za-z]+)"\s*(?=[,\]])/g)) {
+    for (const m of text.matchAll(
+      /(?<=[[,\n]\s{0,12})"([A-Za-z]+)"\s*(?=[,\]])/g,
+    )) {
       const type = m[1];
       if (!TAG_TYPES.has(type)) continue;
       const kind = kindAt(m.index);
       if (kind === "prov") graph.providedTypes.add(type);
       else if (kind === "inv") {
-        graph.invalidatedTypes.push({ file: path, id: "*", line: lineAt(m.index), type });
+        graph.invalidatedTypes.push({
+          file: path,
+          id: "*",
+          line: lineAt(m.index),
+          type,
+        });
       }
     }
   }
@@ -129,7 +143,10 @@ describe("the tag graph has no dead invalidations", () => {
       (t) => !graph.provided.has(`${t.type}|${t.id}`),
     );
     expect(
-      dead.map((t) => `${t.file}:${t.line} invalidates {${t.type}, "${t.id}"} which nothing provides`),
+      dead.map(
+        (t) =>
+          `${t.file}:${t.line} invalidates {${t.type}, "${t.id}"} which nothing provides`,
+      ),
     ).toEqual([]);
   });
 
@@ -138,7 +155,9 @@ describe("the tag graph has no dead invalidations", () => {
     const dead = graph.invalidatedTypes.filter(
       (t) => !graph.providedTypes.has(t.type),
     );
-    expect(dead.map((t) => `${t.file}:${t.line} invalidates "${t.type}"`)).toEqual([]);
+    expect(
+      dead.map((t) => `${t.file}:${t.line} invalidates "${t.type}"`),
+    ).toEqual([]);
   });
 
   it("the parser itself catches a dead tag (self-test)", () => {

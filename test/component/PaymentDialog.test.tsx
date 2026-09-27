@@ -122,7 +122,9 @@ describe("PaymentDialog", () => {
     await userEvent.click(screen.getByRole("button", { name: /Record/i }));
 
     expect(
-      await screen.findByText(/it is what stops this payment being recorded twice/i),
+      await screen.findByText(
+        /it is what stops this payment being recorded twice/i,
+      ),
     ).toBeInTheDocument();
     expect(
       screen.getByText(/what the bank statement is reconciled against/i),
@@ -138,7 +140,9 @@ describe("PaymentDialog", () => {
     await confirmWrite();
 
     expect(recordTrigger).toHaveBeenCalledTimes(1);
-    const [[sent]] = recordTrigger.mock.calls as [[{ body: Record<string, unknown> }]];
+    const [[sent]] = recordTrigger.mock.calls as [
+      [{ body: Record<string, unknown> }],
+    ];
     expect(sent.body.amountGhs).toBe(1500.5);
     expect(sent.body.method).toBe("CASH");
     // Absent, not empty string: the backend treats "" as a supplied reference.
@@ -168,7 +172,9 @@ describe("PaymentDialog", () => {
     });
 
     render(<PaymentDialog onClose={vi.fn()} open sale={{ id: "sale-1" }} />);
-    await userEvent.click(screen.getByRole("button", { name: /Full balance/i }));
+    await userEvent.click(
+      screen.getByRole("button", { name: /Full balance/i }),
+    );
 
     expect(screen.getByLabelText(/AMOUNT/i)).toHaveValue("3200.00");
     // And the agreement is still on screen beside what it settled at.
@@ -196,7 +202,9 @@ describe("PaymentDialog", () => {
     expect(errorToast).toHaveBeenCalledWith(
       "Couldn't record the payment",
       expect.objectContaining({
-        description: expect.stringContaining("more than the balance outstanding"),
+        description: expect.stringContaining(
+          "more than the balance outstanding",
+        ),
       }),
     );
   });

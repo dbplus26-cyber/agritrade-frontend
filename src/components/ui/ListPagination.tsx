@@ -45,7 +45,10 @@ export function ListPagination({
   return (
     <nav
       aria-label="Pagination"
-      className={cn("flex flex-wrap items-center justify-center gap-1", className)}
+      className={cn(
+        "flex flex-wrap items-center justify-center gap-1",
+        className,
+      )}
     >
       <button
         type="button"

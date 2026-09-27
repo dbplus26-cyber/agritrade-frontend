@@ -13,11 +13,7 @@ import {
   labelOf,
 } from "@/components/admin/filter-bar";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
-import {
-  AdminButton,
-  AdminCard,
-  AdminPageHeader,
-} from "@/components/admin/ui";
+import { AdminButton, AdminCard, AdminPageHeader } from "@/components/admin/ui";
 import { ConsoleTableSkeleton } from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
@@ -40,7 +36,9 @@ function FarmerCell({ farmer }: { farmer: IFarmer }) {
     <Link
       href={`${LIST}/${farmer.id}`}
       className="flex min-w-0 items-center gap-2.5 outline-none focus-visible:underline"
-      onClick={(e) => { e.stopPropagation(); }}
+      onClick={(e) => {
+        e.stopPropagation();
+      }}
     >
       <span
         className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[11px] font-bold"
@@ -49,7 +47,10 @@ function FarmerCell({ farmer }: { farmer: IFarmer }) {
         {a.init}
       </span>
       <div className="w-full min-w-0">
-        <div className="@2xl/table:max-w-[85%] [overflow-wrap:anywhere] @2xl/table:truncate font-semibold text-adm-ink" title={farmer.name}>
+        <div
+          className="@2xl/table:max-w-[85%] [overflow-wrap:anywhere] @2xl/table:truncate font-semibold text-adm-ink"
+          title={farmer.name}
+        >
           {farmer.name}
         </div>
         {farmer.phone ? (

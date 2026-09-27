@@ -157,7 +157,10 @@ function SaleArrival({
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
         <Link
           href={`/admin/sales/${sale.id}`}
-          className={cn(adminLinkClass, "font-adminmono text-[11px] font-semibold tabular-nums")}
+          className={cn(
+            adminLinkClass,
+            "font-adminmono text-[11px] font-semibold tabular-nums",
+          )}
         >
           {sale.transactionNo}
         </Link>
@@ -235,7 +238,10 @@ function SaleArrival({
                       { shouldValidate: true },
                     );
                   }}
-                  className={cn(adminLinkClass, "cursor-pointer text-[11px] font-semibold")}
+                  className={cn(
+                    adminLinkClass,
+                    "cursor-pointer text-[11px] font-semibold",
+                  )}
                 >
                   Use
                 </button>
@@ -411,7 +417,11 @@ export function ArrivalDialog({
     const offending = (values.sales ?? [])
       .filter((s) => {
         const paid = loaded.find((l) => l.sale.id === s.saleId)?.sale.paidGhs;
-        return paid !== null && paid !== undefined && Number(s.settledTotalGhs) < paid;
+        return (
+          paid !== null &&
+          paid !== undefined &&
+          Number(s.settledTotalGhs) < paid
+        );
       })
       .map((s) => s.saleId);
     setBelowPaid(offending);
@@ -520,7 +530,10 @@ export function ArrivalDialog({
                 individually - a blank weight is one message, and it belongs
                 where the eye lands after the last box. */}
             {errors.sales ? (
-              <p role="alert" className="text-[11px] font-medium text-console-red">
+              <p
+                role="alert"
+                className="text-[11px] font-medium text-console-red"
+              >
                 Every weight and every payment needs a figure. Enter 0 where
                 nothing arrived.
               </p>

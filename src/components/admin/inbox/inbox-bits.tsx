@@ -87,7 +87,9 @@ export function InboxStatTile({
     <AdminCard className="px-4 py-3">
       <div className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         <span className="min-w-0">{label}</span>
-        {hint ? <HelpTip label={`What does ${label} count?`} text={hint} /> : null}
+        {hint ? (
+          <HelpTip label={`What does ${label} count?`} text={hint} />
+        ) : null}
       </div>
       <div className="mt-1 text-[19px] font-bold text-adm-ink">
         {value === undefined ? <Absent /> : <Mono>{value}</Mono>}

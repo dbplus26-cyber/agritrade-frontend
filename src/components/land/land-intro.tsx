@@ -43,7 +43,11 @@ export function LandIntro() {
             transfer in your name.
           </p>
         </div>
-        <DocCard title="BEFORE YOU PAY" fileNo="CHECKLIST" className="relative z-[2] lg:mt-[34px]">
+        <DocCard
+          title="BEFORE YOU PAY"
+          fileNo="CHECKLIST"
+          className="relative z-[2] lg:mt-[34px]"
+        >
           <div className="flex flex-col px-6 pb-4 pt-1 sm:px-8">
             {CHECKLIST.map((item, i) => (
               <div

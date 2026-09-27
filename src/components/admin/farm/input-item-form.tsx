@@ -26,7 +26,10 @@ import {
   useUpdateInputItemMutation,
 } from "@/redux/farm/input-items-api";
 import type { IInputItem } from "@/types/farm.types";
-import { inputItemSchema, type InputItemValues } from "@/validations/farm-schema";
+import {
+  inputItemSchema,
+  type InputItemValues,
+} from "@/validations/farm-schema";
 
 const LIST = "/admin/input-items";
 
@@ -129,7 +132,9 @@ export function InputItemForm({ item }: { item: IInputItem }) {
           <DetailHeader
             title="Input item details"
             hint="One thing you advance to farmers, such as seed or fertiliser."
-            sub={"An input the programme grants to farmers - what it is, and the unit it is issued in"}
+            sub={
+              "An input the programme grants to farmers - what it is, and the unit it is issued in"
+            }
             badges={<ActiveBadge active={item.isActive} />}
           />
         </DetailNav>
@@ -177,7 +182,11 @@ export function InputItemForm({ item }: { item: IInputItem }) {
             <Input
               placeholder="e.g. NPK fertiliser"
               disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.name && "border-console-red")}
+              className={cn(
+                adminInputClass,
+                roCls,
+                errors.name && "border-console-red",
+              )}
               {...register("name")}
             />
           </AdminField>
@@ -248,7 +257,11 @@ export function InputItemForm({ item }: { item: IInputItem }) {
                 size="lg"
                 onClick={() =>
                   void run(
-                    () => setActive({ active: !item.isActive, id: item.id }).unwrap(),
+                    () =>
+                      setActive({
+                        active: !item.isActive,
+                        id: item.id,
+                      }).unwrap(),
                     item.isActive ? "Item deactivated" : "Item activated",
                   )
                 }
@@ -277,7 +290,12 @@ export function InputItemForm({ item }: { item: IInputItem }) {
               >
                 Cancel
               </AdminButton>
-              <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
+              <AdminButton
+                type="submit"
+                disabled={saving}
+                loading={saving}
+                size="lg"
+              >
                 {saving ? "Saving…" : "Save changes"}
               </AdminButton>
             </Fragment>

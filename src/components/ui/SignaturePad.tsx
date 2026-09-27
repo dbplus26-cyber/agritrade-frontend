@@ -121,7 +121,10 @@ export function SignaturePad({
             type="button"
             onClick={clear}
             disabled={!hasInk}
-            className={cn(adminLinkClass, "cursor-pointer text-[12.5px] font-semibold disabled:cursor-default disabled:opacity-50")}
+            className={cn(
+              adminLinkClass,
+              "cursor-pointer text-[12.5px] font-semibold disabled:cursor-default disabled:opacity-50",
+            )}
           >
             Clear
           </button>
@@ -129,7 +132,10 @@ export function SignaturePad({
             type="button"
             onClick={capture}
             disabled={!hasInk}
-            className={cn(adminLinkClass, "cursor-pointer text-[12.5px] font-semibold disabled:cursor-default disabled:opacity-50")}
+            className={cn(
+              adminLinkClass,
+              "cursor-pointer text-[12.5px] font-semibold disabled:cursor-default disabled:opacity-50",
+            )}
           >
             Use signature
           </button>

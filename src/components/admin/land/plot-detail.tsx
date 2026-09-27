@@ -162,14 +162,12 @@ export function PlotDetail({ id }: { id: string }) {
   };
 
   const canPublish =
-    !p.publishToWebsite && (p.status === "AVAILABLE" || p.status === "RESERVED");
+    !p.publishToWebsite &&
+    (p.status === "AVAILABLE" || p.status === "RESERVED");
 
   // Cover-or-thumb photo tile. No lightbox exists in the console, so each
   // photo is a plain anchor to the full-size Cloudinary image.
-  const photoTile = (
-    ph: (typeof p.photos)[number],
-    hero: boolean,
-  ) => (
+  const photoTile = (ph: (typeof p.photos)[number], hero: boolean) => (
     <div key={ph.id} className={cn("group relative", !hero && "h-20 w-28")}>
       <a href={ph.url} target="_blank" rel="noreferrer" className="block">
         {/* eslint-disable-next-line @next/next/no-img-element -- Cloudinary */}
@@ -271,10 +269,7 @@ export function PlotDetail({ id }: { id: string }) {
             </AdminButton>
           ) : null}
           {p.status === "AVAILABLE" || p.status === "ARCHIVED" ? (
-            <AdminButton
-              variant="outline"
-              onClick={() => void onArchive()}
-            >
+            <AdminButton variant="outline" onClick={() => void onArchive()}>
               {p.status === "ARCHIVED" ? "Restore" : "Archive"}
             </AdminButton>
           ) : null}
@@ -294,7 +289,9 @@ export function PlotDetail({ id }: { id: string }) {
           hint="One piece of land you own, and whether it is listed publicly."
           badges={
             <>
-              {p.publishToWebsite ? <ToneBadge tone="sky">Live</ToneBadge> : null}
+              {p.publishToWebsite ? (
+                <ToneBadge tone="sky">Live</ToneBadge>
+              ) : null}
               <PlotStatusBadge status={p.status} />
             </>
           }

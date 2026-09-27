@@ -31,7 +31,10 @@ export const grantsApi = apiSlice.injectEndpoints({
         result
           ? [
               { type: "Grants" as const, id: "LIST" },
-              ...result.data.map((g) => ({ type: "Grants" as const, id: g.id })),
+              ...result.data.map((g) => ({
+                type: "Grants" as const,
+                id: g.id,
+              })),
             ]
           : [{ type: "Grants" as const, id: "LIST" }],
     }),

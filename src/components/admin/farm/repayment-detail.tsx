@@ -85,8 +85,8 @@ function SettlingAgainst({
         </p>
       ) : grants.length === 0 ? (
         <p className="text-[11.5px] text-adm-muted">
-          Nothing was advanced to this farmer in {seasonName}, so this
-          repayment stands on its own.
+          Nothing was advanced to this farmer in {seasonName}, so this repayment
+          stands on its own.
         </p>
       ) : (
         <ul className="flex flex-col gap-2">
@@ -156,7 +156,9 @@ export function RepaymentDetail({ id }: { id: string }) {
           badges={
             isCash || r.intoStock ? (
               <>
-                {isCash ? <ToneBadge tone="leaf">Repaid in cash</ToneBadge> : null}
+                {isCash ? (
+                  <ToneBadge tone="leaf">Repaid in cash</ToneBadge>
+                ) : null}
                 {r.intoStock ? (
                   <ToneBadge tone="sky">Taken into stock</ToneBadge>
                 ) : null}
@@ -171,9 +173,7 @@ export function RepaymentDetail({ id }: { id: string }) {
           <div className="flex flex-col gap-4">
             {/* Who repaid what */}
             <AdminCard className="px-5 py-4">
-              <SectionHeading className="mb-2">
-                Who repaid what
-              </SectionHeading>
+              <SectionHeading className="mb-2">Who repaid what</SectionHeading>
               {/* The photo sits BESIDE the link, not inside it: a
                   ViewablePhoto is a button when there is something to open,
                   and a button nested in an anchor is invalid markup.
@@ -284,23 +284,25 @@ export function RepaymentDetail({ id }: { id: string }) {
                 {/* Money cannot be taken into a warehouse, so a cash repayment
                     is not asked the question and is not answered it either. */}
                 {isCash ? null : (
-                <DetailItem label="Intake warehouse">
-                  {r.intakeWarehouse ? (
-                    <span className="inline-flex flex-wrap items-center gap-1.5">
-                      <Link
-                        className={adminLinkClass}
-                        href={`/admin/warehouses/${r.intakeWarehouse.id}`}
-                      >
-                        {r.intakeWarehouse.name}
-                      </Link>
-                      {r.intoStock ? (
-                        <ToneBadge tone="sky">Taken into stock</ToneBadge>
-                      ) : null}
-                    </span>
-                  ) : (
-                    <span className="text-adm-muted">Not taken into stock</span>
-                  )}
-                </DetailItem>
+                  <DetailItem label="Intake warehouse">
+                    {r.intakeWarehouse ? (
+                      <span className="inline-flex flex-wrap items-center gap-1.5">
+                        <Link
+                          className={adminLinkClass}
+                          href={`/admin/warehouses/${r.intakeWarehouse.id}`}
+                        >
+                          {r.intakeWarehouse.name}
+                        </Link>
+                        {r.intoStock ? (
+                          <ToneBadge tone="sky">Taken into stock</ToneBadge>
+                        ) : null}
+                      </span>
+                    ) : (
+                      <span className="text-adm-muted">
+                        Not taken into stock
+                      </span>
+                    )}
+                  </DetailItem>
                 )}
                 {r.notes ? (
                   <DetailItem
@@ -337,7 +339,9 @@ export function RepaymentDetail({ id }: { id: string }) {
                 documents={r.documents}
                 urlOf={(documentId) => repaymentDocumentUrl(r.id, documentId)}
                 addBusy={addDocState.isLoading}
-                onAdd={(file, name) => addDoc({ file, id: r.id, name }).unwrap()}
+                onAdd={(file, name) =>
+                  addDoc({ file, id: r.id, name }).unwrap()
+                }
                 onRemove={(documentId) =>
                   removeDoc({ documentId, id: r.id }).unwrap()
                 }

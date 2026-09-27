@@ -65,16 +65,20 @@ const baseQueryWithReauth: BaseQueryFn<
       const release = await mutex.acquire();
       try {
         // The refresh reads the httpOnly `refreshToken` cookie - no body.
-        const refreshResult = (await baseQuery(
+        const refreshResult = await baseQuery(
           { url: "auth/refresh-token", method: "POST" },
           api,
           extraOptions,
-        )) as { data?: IUserResponse; error?: unknown };
+        );
 
         if (refreshResult.data) {
-          api.dispatch(userLoggedIn({ user: refreshResult.data.data.user }));
+          const refreshed = refreshResult.data as IUserResponse;
+          api.dispatch(userLoggedIn({ user: refreshed.data.user }));
           result = await baseQuery(args, api, extraOptions); // retry original
-        } else {
+        } else if (
+          refreshResult.error?.status === 401 ||
+          refreshResult.error?.status === 403
+        ) {
           // Refresh failed → end the session AND drop every cached query so
           // stale data (e.g. a still-resolved `getMe`) can't keep RequireAuth
           // rendering the console; its error path now engages and bounces to
@@ -83,6 +87,10 @@ const baseQueryWithReauth: BaseQueryFn<
           refreshFailedAt = Date.now();
           api.dispatch(userLoggedOut());
           api.dispatch(apiSlice.util.resetApiState());
+        } else if (refreshResult.error) {
+          // A failed network request or 5xx does not prove the refresh cookie
+          // is invalid. Surface that failure so the gate can offer a retry.
+          result = { error: refreshResult.error };
         }
       } finally {
         release();

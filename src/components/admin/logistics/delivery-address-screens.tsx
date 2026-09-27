@@ -25,7 +25,10 @@ import {
   adminInputClass,
 } from "@/components/admin/ui";
 import { RecordFacts } from "@/components/admin/record-facts";
-import { ConsoleTableSkeleton, FormSkeleton } from "@/components/admin/skeletons";
+import {
+  ConsoleTableSkeleton,
+  FormSkeleton,
+} from "@/components/admin/skeletons";
 import { RegisterEmpty } from "@/components/admin/register-empty";
 import { ErrorMessage } from "@/components/ui/ErrorMessage";
 import { Input } from "@/components/ui/input";
@@ -302,7 +305,11 @@ export function DeliveryAddressTable() {
   );
 }
 
-function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) {
+function DeliveryAddressFormFields({
+  address,
+}: {
+  address?: IDeliveryAddress;
+}) {
   const router = useRouter();
   const isEdit = address !== undefined;
   const [createAddress, createState] = useCreateDeliveryAddressMutation();
@@ -466,7 +473,11 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
             <Input
               placeholder="e.g. Makola Market - Adjei Bros"
               disabled={readOnly}
-              className={cn(adminInputClass, roCls, errors.label && "border-console-red")}
+              className={cn(
+                adminInputClass,
+                roCls,
+                errors.label && "border-console-red",
+              )}
               {...register("label")}
             />
           </AdminField>
@@ -475,7 +486,11 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
               <Input
                 placeholder="e.g. Accra"
                 disabled={readOnly}
-                className={cn(adminInputClass, roCls, errors.city && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.city && "border-console-red",
+                )}
                 {...register("city")}
               />
             </AdminField>
@@ -483,7 +498,11 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
               <Input
                 placeholder="e.g. Okaishie"
                 disabled={readOnly}
-                className={cn(adminInputClass, roCls, errors.area && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  errors.area && "border-console-red",
+                )}
                 {...register("area")}
               />
             </AdminField>
@@ -507,7 +526,11 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
                 {...register("digitalAddress")}
               />
             </AdminField>
-            <AdminField label="Landmark" optional error={errors.landmark?.message}>
+            <AdminField
+              label="Landmark"
+              optional
+              error={errors.landmark?.message}
+            >
               <Input
                 placeholder="e.g. Opposite the UBA branch"
                 disabled={readOnly}
@@ -523,7 +546,11 @@ function DeliveryAddressFormFields({ address }: { address?: IDeliveryAddress }) 
         </section>
 
         <section className="flex flex-col gap-5">
-          <AdminField label="Shop name" optional error={errors.shopName?.message}>
+          <AdminField
+            label="Shop name"
+            optional
+            error={errors.shopName?.message}
+          >
             <Input
               placeholder="e.g. Adjei Brothers Enterprise"
               disabled={readOnly}
@@ -636,7 +663,8 @@ export function DeliveryAddressCreate() {
 }
 
 export function DeliveryAddressEdit({ id }: { id: string }) {
-  const { data, isLoading, isError, error, refetch } = useGetDeliveryAddressQuery(id);
+  const { data, isLoading, isError, error, refetch } =
+    useGetDeliveryAddressQuery(id);
   const [activate] = useActivateDeliveryAddressMutation();
   const [deactivate] = useDeactivateDeliveryAddressMutation();
   const [remove] = useDeleteDeliveryAddressMutation();

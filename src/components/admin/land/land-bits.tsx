@@ -42,7 +42,8 @@ const LAND_SALE_HELP: Record<LandSaleStatus, string> = {
   COMPLETED: "Paid in full and handed over, so nothing is left owing.",
   CONFIRMED:
     "Agreed with the buyer: the plot is held for them while they pay it off.",
-  DRAFT: "Still being put together, so the plot is not committed to anyone yet.",
+  DRAFT:
+    "Still being put together, so the plot is not committed to anyone yet.",
 };
 
 export function LandSaleStatusBadge({ status }: { status: LandSaleStatus }) {

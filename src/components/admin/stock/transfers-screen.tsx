@@ -625,7 +625,12 @@ function TransferDialog({
             <AdminButton variant="outline" size="lg" onClick={close}>
               Cancel
             </AdminButton>
-            <AdminButton type="submit" size="lg" disabled={isLoading} loading={isLoading}>
+            <AdminButton
+              type="submit"
+              size="lg"
+              disabled={isLoading}
+              loading={isLoading}
+            >
               {isLoading ? "Posting…" : "Post transfer"}
             </AdminButton>
           </ResponsiveDialogFooter>

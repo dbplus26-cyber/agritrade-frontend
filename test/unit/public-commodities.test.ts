@@ -56,7 +56,13 @@ describe("toLots", () => {
 
   it("invents nothing for a record whose optional fields are empty", () => {
     const lots = toLots([
-      { ...maize, description: null, photo: null, qualityGrade: null, variety: null },
+      {
+        ...maize,
+        description: null,
+        photo: null,
+        qualityGrade: null,
+        variety: null,
+      },
     ]);
     expect(lots[0].lotNo).toBe("LOT-01");
     expect(lots[0].variety).toBeNull();

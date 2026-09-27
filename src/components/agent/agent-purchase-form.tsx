@@ -148,7 +148,10 @@ export function AgentPurchaseForm() {
           render={({ field }) => (
             <SimpleSelect
               id="commodityId"
-              className={cn(agentInputClass, errors.commodityId && "border-error")}
+              className={cn(
+                agentInputClass,
+                errors.commodityId && "border-error",
+              )}
               value={field.value}
               onChange={field.onChange}
               placeholder="Choose a commodity…"
@@ -259,8 +262,8 @@ export function AgentPurchaseForm() {
         </div>
       ) : (
         <p className="text-[12px] text-soil">
-          Your float is not charged. Record the payment from your purchases
-          list once you have paid.
+          Your float is not charged. Record the payment from your purchases list
+          once you have paid.
         </p>
       )}
 
@@ -303,7 +306,9 @@ export function AgentPurchaseForm() {
           accept="image/*"
           capture="environment"
           hint="Optional"
-          onConfirm={(file) => { setPhotoFile(file); }}
+          onConfirm={(file) => {
+            setPhotoFile(file);
+          }}
           stage
           triggerLabel={photoFile ? "Replace photo" : "Take / choose photo"}
         />

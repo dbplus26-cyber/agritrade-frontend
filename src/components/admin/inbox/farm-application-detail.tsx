@@ -68,8 +68,7 @@ function SectionCard({
   );
 }
 
-const orAbsent = (value: null | string) =>
-  value ? value : <Absent />;
+const orAbsent = (value: null | string) => (value ? value : <Absent />);
 
 function FarmApplicationDetailBody({
   application,
@@ -178,10 +177,7 @@ function FarmApplicationDetailBody({
                 {application.name}
               </DetailItem>
               <DetailItem label="Phone" mono>
-                <a
-                  href={`tel:${application.phone}`}
-                  className={adminLinkClass}
-                >
+                <a href={`tel:${application.phone}`} className={adminLinkClass}>
                   {application.phone}
                 </a>
               </DetailItem>
@@ -337,11 +333,7 @@ function FarmApplicationDetailBody({
                   <p className="text-[11px] text-adm-muted">
                     This application became a farmer record.
                   </p>
-                  <AdminButton
-                    asChild
-                    variant="gold"
-                    className="mt-2.5"
-                  >
+                  <AdminButton asChild variant="gold" className="mt-2.5">
                     <Link
                       href={`/admin/farmers/${application.convertedFarmerId}`}
                     >

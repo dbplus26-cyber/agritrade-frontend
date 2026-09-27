@@ -91,7 +91,9 @@ describe("loadingPointsOf", () => {
 
 describe("the planning form's loading points", () => {
   it("accepts a warehouse alone", () => {
-    expect(loadingPointError(plan({ originWarehouseId: "w-1" }))).toBeUndefined();
+    expect(
+      loadingPointError(plan({ originWarehouseId: "w-1" })),
+    ).toBeUndefined();
   });
 
   it("accepts a supplier collection alone - no shed is involved", () => {

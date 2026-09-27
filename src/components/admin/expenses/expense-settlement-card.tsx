@@ -1,13 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { HelpWrap } from "@/components/admin/help-tip";
+import { useIdempotencyKey } from "@/components/admin/disbursements/disbursement-bits";
 import { PaidThroughSystemField } from "@/components/admin/paid-through-system-field";
 import { PaymentAccountField } from "@/components/admin/payment-account-field";
+import { ExistingOutflowPicker } from "@/components/admin/expenses/existing-outflow-picker";
 import {
   AdminButton,
   AdminCard,
@@ -41,15 +44,14 @@ import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import {
   useGetExpensePaymentsQuery,
+  useMatchExpenseOutflowsMutation,
   useRecordExpensePaymentMutation,
   useReverseExpensePaymentMutation,
 } from "@/redux/driver-settlement/driver-settlement-api";
 import type { IExpensePayment } from "@/types/driver-settlement.types";
+import type { IMatchableOutflow } from "@/types/expense.types";
 
-import {
-  PAYMENT_METHOD_OPTIONS,
-  todayInputValue,
-} from "../trading/sale-bits";
+import { PAYMENT_METHOD_OPTIONS, todayInputValue } from "../trading/sale-bits";
 
 /**
  * What has actually been paid against this cost.
@@ -61,7 +63,11 @@ import {
  * it rather than stored, so no two screens can disagree about it.
  */
 export const SETTLEMENT_TONE = {
-  PAID: { hint: "This cost has been settled in full.", label: "Paid", tone: "forest" },
+  PAID: {
+    hint: "This cost has been settled in full.",
+    label: "Paid",
+    tone: "forest",
+  },
   PART_PAID: {
     hint: "Some of this cost has been paid; the rest is still owed.",
     label: "Part paid",
@@ -139,6 +145,7 @@ function PayDialog({
   subject: string;
 }) {
   const [record, { isLoading }] = useRecordExpensePaymentMutation();
+  const idempotencyKey = useIdempotencyKey(true);
   const { confirm, confirmationDialog } = useConfirm();
   const {
     control,
@@ -185,6 +192,7 @@ function PayDialog({
       await record({
         body: {
           amountGhs: Number(values.amountGhs),
+          idempotencyKey: idempotencyKey(),
           method: values.method,
           paidAt: values.paidAt,
           ...(values.disbursementId
@@ -230,7 +238,10 @@ function PayDialog({
               bottom sheet on a phone and a centred card on desktop. */}
           <div className="@container/pay">
             <div className="grid grid-cols-1 gap-4 @min-[380px]/pay:grid-cols-2">
-              <AdminField error={errors.amountGhs?.message} label="Amount (GHS)">
+              <AdminField
+                error={errors.amountGhs?.message}
+                label="Amount (GHS)"
+              >
                 <Input
                   autoFocus
                   className={cn(adminInputClass, "text-right")}
@@ -324,15 +335,117 @@ function PayDialog({
   );
 }
 
+function MatchOutflowsDialog({
+  expenseId,
+  onClose,
+  outstandingGhs,
+}: {
+  expenseId: string;
+  onClose: () => void;
+  outstandingGhs: number | null;
+}) {
+  const [method, setMethod] = useState<"BANK" | "CASH" | "MOMO">("MOMO");
+  const [accountId, setAccountId] = useState("");
+  const [selected, setSelected] = useState<IMatchableOutflow[]>([]);
+  const [match, { isLoading }] = useMatchExpenseOutflowsMutation();
+  const total = selected.reduce((sum, row) => sum + row.amountGhs, 0);
+
+  const onSubmit = async () => {
+    if (!selected.length) {
+      notify.error("Select at least one existing debit.");
+      return;
+    }
+    if (outstandingGhs !== null && total > outstandingGhs) {
+      notify.error("The selected debits exceed what this expense still owes.");
+      return;
+    }
+    try {
+      await match({
+        expenseId,
+        movementIds: selected.map((row) => row.id),
+      }).unwrap();
+      notify.success("Existing debits matched to expense");
+      onClose();
+    } catch (error) {
+      notify.error(extractApiError(error).message);
+    }
+  };
+
+  return (
+    <ResponsiveDialog open onOpenChange={(open) => !open && onClose()}>
+      <ResponsiveDialogContent className="sm:max-w-[500px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>
+            Match existing account debits
+          </ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
+            Select outflows already recorded in the cash book. This records what
+            they paid for and does not debit the account again.
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
+        <div className="grid gap-4">
+          <AdminField label="Payment method">
+            <SimpleSelect
+              className={adminSelectClass}
+              onChange={(value) => {
+                setMethod(value as typeof method);
+                setAccountId("");
+                setSelected([]);
+              }}
+              options={PAYMENT_METHOD_OPTIONS}
+              value={method}
+            />
+          </AdminField>
+          <PaymentAccountField
+            direction="out"
+            method={method}
+            onChange={(id) => {
+              setAccountId(id);
+              setSelected([]);
+            }}
+            value={accountId}
+          />
+          <ExistingOutflowPicker
+            key={accountId}
+            accountId={accountId}
+            onChange={setSelected}
+          />
+          {outstandingGhs !== null ? (
+            <p className="text-[11.5px] text-adm-muted">
+              Still owed: {formatCedis(outstandingGhs)}. Selected:{" "}
+              {formatCedis(total)}.
+            </p>
+          ) : null}
+        </div>
+        <ResponsiveDialogFooter>
+          <AdminButton onClick={onClose} type="button" variant="ghost">
+            Cancel
+          </AdminButton>
+          <AdminButton
+            disabled={isLoading || !selected.length}
+            loading={isLoading}
+            onClick={() => void onSubmit()}
+            type="button"
+          >
+            Match debits
+          </AdminButton>
+        </ResponsiveDialogFooter>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
+  );
+}
+
 export function ExpenseSettlementCard({
   amountGhs,
   expenseId,
+  driverFeeShipmentId,
   isVoided,
   subject,
 }: {
   /** The cost being settled; null when redacted. */
   amountGhs: null | number;
   expenseId: string;
+  driverFeeShipmentId: string | null;
   /** A voided voucher is not a cost, so it cannot be paid against. */
   isVoided: boolean;
   /**
@@ -344,6 +457,7 @@ export function ExpenseSettlementCard({
   const { isSuperAdmin } = useAuthRole();
   const { has } = usePermissions();
   const [payOpen, setPayOpen] = useState(false);
+  const [matchOpen, setMatchOpen] = useState(false);
   const [reversing, setReversing] = useState<IExpensePayment | null>(null);
   const [reverse, reverseState] = useReverseExpensePaymentMutation();
 
@@ -385,6 +499,7 @@ export function ExpenseSettlementCard({
   const canPay =
     (isSuperAdmin || has("EXPENSES_RECORD")) &&
     !isVoided &&
+    !driverFeeShipmentId &&
     settlement.status !== "PAID";
 
   return (
@@ -470,6 +585,12 @@ export function ExpenseSettlementCard({
                       <span className="text-[10.5px] text-adm-faint">
                         {p.method}
                       </span>
+                      {p.sourceType === "DRIVER_PAYMENT" ? (
+                        <ToneBadge tone="slate">Driver payment</ToneBadge>
+                      ) : null}
+                      {p.sourceType === "ACCOUNT_OUTFLOW" ? (
+                        <ToneBadge tone="slate">Existing debit</ToneBadge>
+                      ) : null}
                       {p.isReversal ? (
                         <ToneBadge tone="slate">Reversal</ToneBadge>
                       ) : null}
@@ -492,7 +613,10 @@ export function ExpenseSettlementCard({
                       )}
                       value={p.amountGhs}
                     />
-                    {isSuperAdmin && !p.isReversal && !reversed ? (
+                    {isSuperAdmin &&
+                    !p.isReversal &&
+                    !reversed &&
+                    p.sourceType !== "DRIVER_PAYMENT" ? (
                       <AdminButton
                         aria-label={`Reverse ${p.transactionNo}`}
                         className="text-console-red hover:text-console-red"
@@ -515,11 +639,29 @@ export function ExpenseSettlementCard({
       ) : null}
 
       {canPay ? (
-        <div className="mt-5">
+        <div className="mt-5 flex flex-wrap gap-2">
           <AdminButton onClick={() => setPayOpen(true)}>
             Record a payment
           </AdminButton>
+          {isSuperAdmin ? (
+            <AdminButton onClick={() => setMatchOpen(true)} variant="outline">
+              Match existing debits
+            </AdminButton>
+          ) : null}
         </div>
+      ) : null}
+
+      {driverFeeShipmentId && !isVoided ? (
+        <p className="mt-4 text-[11.5px] text-adm-muted">
+          This expense follows the driver payments on{" "}
+          <Link
+            className="underline"
+            href={`/admin/shipments/${driverFeeShipmentId}`}
+          >
+            the trip
+          </Link>
+          . Record or reverse payments there.
+        </p>
       ) : null}
 
       {payOpen ? (
@@ -530,6 +672,13 @@ export function ExpenseSettlementCard({
           }}
           outstandingGhs={settlement.outstandingGhs}
           subject={subject}
+        />
+      ) : null}
+      {matchOpen ? (
+        <MatchOutflowsDialog
+          expenseId={expenseId}
+          onClose={() => setMatchOpen(false)}
+          outstandingGhs={settlement.outstandingGhs}
         />
       ) : null}
       {reversing ? (

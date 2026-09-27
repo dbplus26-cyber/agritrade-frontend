@@ -460,7 +460,10 @@ export function ApplicationForm() {
             />
           </div>
           <div className="flex flex-col gap-[7px]">
-            <label htmlFor={`${fieldId}-guarantor-phone`} className={labelClass}>
+            <label
+              htmlFor={`${fieldId}-guarantor-phone`}
+              className={labelClass}
+            >
               GUARANTOR PHONE
             </label>
             <input

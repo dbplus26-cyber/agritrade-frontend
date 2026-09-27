@@ -29,9 +29,9 @@ export default function FarmingApplyPage() {
           </h1>
           <p className="text-[14px] leading-[1.65] text-soil lg:text-[16px] lg:leading-[1.7]">
             Inputs before the season, repayment in produce after harvest, and
-            the terms in writing before anything is given out. Fill in what
-            you can below - only your name and phone are required - and the
-            office will call you to talk through the rest.
+            the terms in writing before anything is given out. Fill in what you
+            can below - only your name and phone are required - and the office
+            will call you to talk through the rest.
           </p>
         </div>
       </section>

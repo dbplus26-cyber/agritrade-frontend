@@ -80,7 +80,9 @@ export function DisbursementsScreen() {
     ...(filters.status !== "all"
       ? { status: filters.status as DisbursementStatus }
       : {}),
-    ...(filters.rail !== "all" ? { rail: filters.rail as DisbursementRail } : {}),
+    ...(filters.rail !== "all"
+      ? { rail: filters.rail as DisbursementRail }
+      : {}),
     // Only ever narrowed TO the ones needing a human - "everything that does
     // not need checking" is not a question anybody asks.
     ...(filters.attention === "yes" ? { needsAttention: true } : {}),
@@ -90,9 +92,9 @@ export function DisbursementsScreen() {
 
   const rows = data?.data ?? [];
   const total = data?.meta.total ?? 0;
-  const activeFilterCount = (
-    ["attention", "rail", "status"] as const
-  ).filter((k) => filters[k] !== "all").length;
+  const activeFilterCount = (["attention", "rail", "status"] as const).filter(
+    (k) => filters[k] !== "all",
+  ).length;
 
   // Explicit id + accessorFn, not the `accessorKey` shorthand: the mobile
   // card renderer tells a DATA row from a trailing ACTION by looking for
@@ -198,8 +200,11 @@ export function DisbursementsScreen() {
   // A register nobody has used yet gets the empty state alone - no stats
   // strip and no filter bar to narrow nothing down.
   const pristine =
-    total === 0 && !queryParams.search && filters.status === "all" &&
-    filters.rail === "all" && filters.attention === "all";
+    total === 0 &&
+    !queryParams.search &&
+    filters.status === "all" &&
+    filters.rail === "all" &&
+    filters.attention === "all";
 
   return (
     <div>
@@ -229,10 +234,7 @@ export function DisbursementsScreen() {
             totalCount={total}
             noun="payouts"
             action={
-              <AdminButton
-                          onClick={() => setSending(true)}
-                type="button"
-              >
+              <AdminButton onClick={() => setSending(true)} type="button">
                 Send money
               </AdminButton>
             }

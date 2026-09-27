@@ -40,7 +40,10 @@ export function IdentityAvatar({
 }) {
   return (
     <div
-      className={cn("relative flex-none overflow-hidden rounded-full", className)}
+      className={cn(
+        "relative flex-none overflow-hidden rounded-full",
+        className,
+      )}
       style={{ width: size, height: size }}
     >
       {src ? (
@@ -62,7 +65,10 @@ export function IdentityAvatar({
       )}
       {busy ? (
         <div className="absolute inset-0 flex items-center justify-center rounded-full bg-[rgba(11,15,20,0.45)]">
-          <Loader2 className="h-5 w-5 animate-spin text-white" aria-hidden="true" />
+          <Loader2
+            className="h-5 w-5 animate-spin text-white"
+            aria-hidden="true"
+          />
         </div>
       ) : null}
     </div>
@@ -115,9 +121,15 @@ export function IdentityFacts({
         className,
       )}
     >
-      <Fact label="Email" icon={Mail}>{user.email}</Fact>
-      <Fact label="Phone" icon={Phone}>{user.phone ?? "-"}</Fact>
-      <Fact label="Role" icon={UserCog}>{ROLE_TITLE[user.role] ?? user.role}</Fact>
+      <Fact label="Email" icon={Mail}>
+        {user.email}
+      </Fact>
+      <Fact label="Phone" icon={Phone}>
+        {user.phone ?? "-"}
+      </Fact>
+      <Fact label="Role" icon={UserCog}>
+        {ROLE_TITLE[user.role] ?? user.role}
+      </Fact>
       <Fact label="Two-factor" icon={ShieldCheck}>
         {user.twoFactorEnabled ? (
           <span className="text-console">Enabled</span>

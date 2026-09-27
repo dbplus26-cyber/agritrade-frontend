@@ -12,10 +12,7 @@
 // the dialog only renders them.
 import { describe, expect, it } from "vitest";
 
-import {
-  expenseSchema,
-  makeExpenseSchema,
-} from "@/validations/expense-schema";
+import { expenseSchema, makeExpenseSchema } from "@/validations/expense-schema";
 
 const COST = {
   amountGhs: "850.00",
@@ -31,10 +28,26 @@ const COST = {
 /** The `path` of every issue a parse raised, for terse assertions. */
 const issuePaths = (input: unknown): string[] => {
   const result = expenseSchema.safeParse(input);
-  return result.success ? [] : result.error.issues.map((i) => String(i.path[0]));
+  return result.success
+    ? []
+    : result.error.issues.map((i) => String(i.path[0]));
 };
 
 describe("expenseSchema", () => {
+  it("accepts a match to an existing debit without asking for a new transfer reference", () => {
+    expect(
+      expenseSchema.safeParse({
+        ...COST,
+        method: "MOMO",
+        paymentAccountId: "account-1",
+        reference: "",
+        useExistingPayment: true,
+      }).success,
+    ).toBe(true);
+    expect(
+      issuePaths({ ...COST, method: "MOMO", useExistingPayment: true }),
+    ).toContain("paymentAccountId");
+  });
   it("accepts a cash cost paid in the same act, with no account named", () => {
     expect(expenseSchema.safeParse(COST).success).toBe(true);
   });

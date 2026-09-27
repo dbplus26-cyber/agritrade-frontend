@@ -210,7 +210,6 @@ describe("ConsoleDataTable - server pagination wiring", () => {
   });
 });
 
-
 describe("ConsoleDataTable - keyboard row navigation", () => {
   it("opens a row's detail with Enter, from the keyboard alone", async () => {
     pushMock.mockClear();
@@ -423,7 +422,11 @@ describe("ConsoleDataTable - selecting on a card", () => {
 
   /** A press and hold on a touch screen, and its release. */
   const hold = async (el: Element) => {
-    fireEvent.pointerDown(el, { clientX: 10, clientY: 10, pointerType: "touch" });
+    fireEvent.pointerDown(el, {
+      clientX: 10,
+      clientY: 10,
+      pointerType: "touch",
+    });
     await act(async () => {
       vi.advanceTimersByTime(600);
     });
@@ -444,7 +447,9 @@ describe("ConsoleDataTable - selecting on a card", () => {
 
     // The table beside it keeps its select column; the card does not.
     expect(
-      cards().some((c) => c.querySelector('[role="checkbox"], input[type="checkbox"]')),
+      cards().some((c) =>
+        c.querySelector('[role="checkbox"], input[type="checkbox"]'),
+      ),
     ).toBe(false);
     expect(screen.getAllByRole("checkbox").length).toBeGreaterThan(0);
   });
@@ -480,8 +485,16 @@ describe("ConsoleDataTable - selecting on a card", () => {
     renderList();
 
     const card = cards()[0];
-    fireEvent.pointerDown(card, { clientX: 10, clientY: 10, pointerType: "touch" });
-    fireEvent.pointerMove(card, { clientX: 10, clientY: 60, pointerType: "touch" });
+    fireEvent.pointerDown(card, {
+      clientX: 10,
+      clientY: 10,
+      pointerType: "touch",
+    });
+    fireEvent.pointerMove(card, {
+      clientX: 10,
+      clientY: 60,
+      pointerType: "touch",
+    });
     await act(async () => {
       vi.advanceTimersByTime(600);
     });

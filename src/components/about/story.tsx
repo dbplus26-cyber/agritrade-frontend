@@ -30,9 +30,9 @@ export function Story() {
             DB Plus started the way most trading in the north starts - one
             buyer, a weighing scale and a rented corner of a warehouse in
             Tamale. Season by season the relationships grew: farmers who knew
-            the scale was honest, agents who knew payment came the same day,
-            and buyers in the south who knew the truck would arrive when we
-            said it would.
+            the scale was honest, agents who knew payment came the same day, and
+            buyers in the south who knew the truck would arrive when we said it
+            would.
           </p>
           <p className="mb-6 text-[14px] leading-[1.7] text-soil lg:text-[16.5px] lg:leading-[1.75]">
             Today we buy maize, soya beans and groundnuts across the Northern
@@ -41,7 +41,7 @@ export function Story() {
             Kumasi.
           </p>
           <p className="max-w-[34ch] font-display text-[16px] font-semibold leading-[1.5] text-forest lg:text-[20px]">
-            The founder still walks the warehouse floor - {" "}
+            The founder still walks the warehouse floor -{" "}
             <span className="shadow-[inset_0_-9px_0_rgb(216_156_46/0.45)]">
               that&rsquo;s how the weighing stays honest.
             </span>
@@ -58,7 +58,10 @@ export function Story() {
               className="object-cover saturate-[0.72]"
               fallbackLabel="TAMALE WAREHOUSE"
             />
-            <div aria-hidden="true" className="photo-treatment absolute inset-0" />
+            <div
+              aria-hidden="true"
+              className="photo-treatment absolute inset-0"
+            />
           </div>
           <div className="absolute -bottom-3.5 left-0 max-w-[250px] rotate-[-1.2deg] bg-forest px-3.5 py-2.5 text-[11.5px] font-semibold leading-[1.45] text-surface shadow-[2px_2px_0_rgb(31_33_28/0.3)] lg:-left-[22px] lg:bottom-[26px] lg:max-w-[300px] lg:px-[18px] lg:py-[13px] lg:text-[13px] lg:leading-[1.5] lg:shadow-[3px_3px_0_rgb(31_33_28/0.3)]">
             Weighing at the Tamale warehouse - every bag gets a ticket.

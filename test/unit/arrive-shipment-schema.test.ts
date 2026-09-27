@@ -28,9 +28,8 @@ const errorFor = (
 ): string | undefined => {
   const result = arriveShipmentSchema.safeParse(values);
   if (result.success) return undefined;
-  return result.error.issues.find(
-    (i) => i.path.join(".") === path.join("."),
-  )?.message;
+  return result.error.issues.find((i) => i.path.join(".") === path.join("."))
+    ?.message;
 };
 
 describe("arriveShipmentSchema", () => {
@@ -41,42 +40,68 @@ describe("arriveShipmentSchema", () => {
   });
 
   it("accepts a load that never turned up: zero received, nothing to pay", () => {
-    expect(arriveShipmentSchema.safeParse({ sales: [sale("0", "0")] }).success)
-      .toBe(true);
+    expect(
+      arriveShipmentSchema.safeParse({ sales: [sale("0", "0")] }).success,
+    ).toBe(true);
   });
 
   it("refuses a negative received weight", () => {
-    expect(errorFor({ sales: [sale("11760", "-5")] }, ["sales", 0, "lines", 0, "receivedKg"]))
-      .toMatch(/cannot be negative/i);
+    expect(
+      errorFor({ sales: [sale("11760", "-5")] }, [
+        "sales",
+        0,
+        "lines",
+        0,
+        "receivedKg",
+      ]),
+    ).toMatch(/cannot be negative/i);
   });
 
   it("refuses a negative settlement", () => {
-    expect(errorFor({ sales: [sale("-1")] }, ["sales", 0, "settledTotalGhs"]))
-      .toMatch(/cannot be negative/i);
+    expect(
+      errorFor({ sales: [sale("-1")] }, ["sales", 0, "settledTotalGhs"]),
+    ).toMatch(/cannot be negative/i);
   });
 
   it("asks for the weight rather than reading a blank as nothing received", () => {
     // A blank is "not answered yet". Coercing it to 0 would silently write off
     // the whole load and settle the sale at whatever else was typed.
-    expect(errorFor({ sales: [sale("11760", "")] }, ["sales", 0, "lines", 0, "receivedKg"]))
-      .toMatch(/enter/i);
+    expect(
+      errorFor({ sales: [sale("11760", "")] }, [
+        "sales",
+        0,
+        "lines",
+        0,
+        "receivedKg",
+      ]),
+    ).toMatch(/enter/i);
   });
 
   it("asks for the payment rather than reading a blank as nothing owed", () => {
-    expect(errorFor({ sales: [sale("")] }, ["sales", 0, "settledTotalGhs"]))
-      .toMatch(/enter/i);
+    expect(
+      errorFor({ sales: [sale("")] }, ["sales", 0, "settledTotalGhs"]),
+    ).toMatch(/enter/i);
   });
 
   it("refuses text where a figure belongs", () => {
-    expect(errorFor({ sales: [sale("about 12k")] }, ["sales", 0, "settledTotalGhs"]))
-      .toBeDefined();
-    expect(errorFor({ sales: [sale("11760", "a lot")] }, ["sales", 0, "lines", 0, "receivedKg"]))
-      .toBeDefined();
+    expect(
+      errorFor({ sales: [sale("about 12k")] }, ["sales", 0, "settledTotalGhs"]),
+    ).toBeDefined();
+    expect(
+      errorFor({ sales: [sale("11760", "a lot")] }, [
+        "sales",
+        0,
+        "lines",
+        0,
+        "receivedKg",
+      ]),
+    ).toBeDefined();
   });
 
   it("holds amounts to pesewas, which is all the API stores", () => {
-    expect(errorFor({ sales: [sale("11760.555")] }, ["sales", 0, "settledTotalGhs"]))
-      .toMatch(/pesewas|2 decimal/i);
+    expect(
+      errorFor({ sales: [sale("11760.555")] }, ["sales", 0, "settledTotalGhs"]),
+    ).toMatch(/pesewas|2 decimal/i);
   });
 
   it("takes a trip marked arrived before anybody weighed it", () => {

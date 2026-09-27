@@ -128,60 +128,63 @@ export function DataTablePagination({
         </label>
       </div>
 
-      <nav className="flex flex-none items-center gap-0.5" aria-label="Pagination">
-          <button
-            type="button"
-            className={cn(navButton, "hidden md:flex")}
-            onClick={() => onPageChange(1)}
-            disabled={page <= 1}
-            aria-label="First page"
-          >
-            <ChevronsLeft className="h-4 w-4" aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            className={navButton}
-            onClick={() => onPageChange(Math.max(1, page - 1))}
-            disabled={page <= 1}
-            aria-label="Previous page"
-          >
-            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-          </button>
-          <span className="mx-1.5 flex flex-col items-center gap-[5px]">
-            <span className="font-adminmono whitespace-nowrap text-[10.5px] font-bold leading-none tracking-[0.08em]">
-              <span className="text-console">{pad(page, padWidth)}</span>
-              <span className="text-soil/45"> ∕ </span>
-              <span className="text-soil">{pad(totalPages, padWidth)}</span>
-            </span>
-            <span
-              aria-hidden="true"
-              className="h-[3px] w-10 overflow-hidden rounded-full bg-soil/20 sm:w-16"
-            >
-              <span
-                className="block h-full rounded-full bg-console transition-all duration-300"
-                style={{ width: `${String((page / totalPages) * 100)}%` }}
-              />
-            </span>
+      <nav
+        className="flex flex-none items-center gap-0.5"
+        aria-label="Pagination"
+      >
+        <button
+          type="button"
+          className={cn(navButton, "hidden md:flex")}
+          onClick={() => onPageChange(1)}
+          disabled={page <= 1}
+          aria-label="First page"
+        >
+          <ChevronsLeft className="h-4 w-4" aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          className={navButton}
+          onClick={() => onPageChange(Math.max(1, page - 1))}
+          disabled={page <= 1}
+          aria-label="Previous page"
+        >
+          <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+        </button>
+        <span className="mx-1.5 flex flex-col items-center gap-[5px]">
+          <span className="font-adminmono whitespace-nowrap text-[10.5px] font-bold leading-none tracking-[0.08em]">
+            <span className="text-console">{pad(page, padWidth)}</span>
+            <span className="text-soil/45"> ∕ </span>
+            <span className="text-soil">{pad(totalPages, padWidth)}</span>
           </span>
-          <button
-            type="button"
-            className={navButton}
-            onClick={() => onPageChange(Math.min(totalPages, page + 1))}
-            disabled={page >= totalPages}
-            aria-label="Next page"
+          <span
+            aria-hidden="true"
+            className="h-[3px] w-10 overflow-hidden rounded-full bg-soil/20 sm:w-16"
           >
-            <ChevronRight className="h-4 w-4" aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            className={cn(navButton, "hidden md:flex")}
-            onClick={() => onPageChange(totalPages)}
-            disabled={page >= totalPages}
-            aria-label="Last page"
-          >
-            <ChevronsRight className="h-4 w-4" aria-hidden="true" />
-          </button>
-        </nav>
+            <span
+              className="block h-full rounded-full bg-console transition-all duration-300"
+              style={{ width: `${String((page / totalPages) * 100)}%` }}
+            />
+          </span>
+        </span>
+        <button
+          type="button"
+          className={navButton}
+          onClick={() => onPageChange(Math.min(totalPages, page + 1))}
+          disabled={page >= totalPages}
+          aria-label="Next page"
+        >
+          <ChevronRight className="h-4 w-4" aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          className={cn(navButton, "hidden md:flex")}
+          onClick={() => onPageChange(totalPages)}
+          disabled={page >= totalPages}
+          aria-label="Last page"
+        >
+          <ChevronsRight className="h-4 w-4" aria-hidden="true" />
+        </button>
+      </nav>
     </div>
   );
 }

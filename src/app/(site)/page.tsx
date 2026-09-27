@@ -7,10 +7,7 @@ import { TrustStrip } from "@/components/home/trust-strip";
 import { WaybillSteps } from "@/components/home/waybill-steps";
 import { WhyUs } from "@/components/home/why-us";
 import { ReviewsBand } from "@/components/reviews/reviews-band";
-import {
-  fetchPublicCommodities,
-  toBoardLines,
-} from "@/lib/public-commodities";
+import { fetchPublicCommodities, toBoardLines } from "@/lib/public-commodities";
 import { pageMetadata } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
 

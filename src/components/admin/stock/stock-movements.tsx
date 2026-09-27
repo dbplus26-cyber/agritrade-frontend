@@ -26,7 +26,11 @@ import type {
   IStockMovementsQuery,
   StockMoveType,
 } from "@/types/stock.types";
-import { MOVE_TYPE_FILTER_OPTIONS, MoveTypeBadge, SignedKg } from "./stock-bits";
+import {
+  MOVE_TYPE_FILTER_OPTIONS,
+  MoveTypeBadge,
+  SignedKg,
+} from "./stock-bits";
 
 const FILTER_DEFAULTS = {
   type: "all",
@@ -72,8 +76,12 @@ export function StockMovements({
       ...(filters.type !== "all"
         ? { type: filters.type as StockMoveType }
         : {}),
-      ...(filters.warehouse !== "all" ? { warehouseId: filters.warehouse } : {}),
-      ...(filters.commodity !== "all" ? { commodityId: filters.commodity } : {}),
+      ...(filters.warehouse !== "all"
+        ? { warehouseId: filters.warehouse }
+        : {}),
+      ...(filters.commodity !== "all"
+        ? { commodityId: filters.commodity }
+        : {}),
       ...(filters.from ? { from: filters.from } : {}),
       ...(filters.to ? { to: filters.to } : {}),
     }),
@@ -187,78 +195,78 @@ export function StockMovements({
           <ConsoleFilterBar hideSearch leading={leading} action={action} />
         ) : null
       ) : (
-      <ConsoleFilterBar
-        search={searchInput}
-        onSearch={setSearch}
-        searchPlaceholder="Search commodity, warehouse, reason…"
-        activeCount={activeFilterCount}
-        onClear={() => {
-          setSearch("");
-          resetFilters();
-        }}
-        totalCount={totalCount}
-        noun="movements"
-        action={action}
-        leading={leading}
-        panelClassName="sm:grid-cols-2 lg:grid-cols-5"
-        chips={
-          <>
-            {filters.type !== "all" ? (
-              <FilterChip onRemove={() => setFilter("type", "all")}>
-                Type: {labelOf(MOVE_TYPE_FILTER_OPTIONS, filters.type)}
-              </FilterChip>
-            ) : null}
-            {filters.warehouse !== "all" ? (
-              <FilterChip onRemove={() => setFilter("warehouse", "all")}>
-                Warehouse: {labelOf(warehouseOptions, filters.warehouse)}
-              </FilterChip>
-            ) : null}
-            {filters.commodity !== "all" ? (
-              <FilterChip onRemove={() => setFilter("commodity", "all")}>
-                Commodity: {labelOf(commodityOptions, filters.commodity)}
-              </FilterChip>
-            ) : null}
-            {filters.from ? (
-              <FilterChip onRemove={() => setFilter("from", "")}>
-                From: {filters.from}
-              </FilterChip>
-            ) : null}
-            {filters.to ? (
-              <FilterChip onRemove={() => setFilter("to", "")}>
-                To: {filters.to}
-              </FilterChip>
-            ) : null}
-          </>
-        }
-      >
-        <ConsoleLabeledSelect
-          label="Type"
-          value={filters.type}
-          onChange={(v) => setFilter("type", v)}
-          options={MOVE_TYPE_FILTER_OPTIONS}
-          active={filters.type !== "all"}
-        />
-        <ConsoleLabeledSelect
-          label="Warehouse"
-          value={filters.warehouse}
-          onChange={(v) => setFilter("warehouse", v)}
-          options={warehouseOptions}
-          active={filters.warehouse !== "all"}
-        />
-        <ConsoleLabeledSelect
-          label="Commodity"
-          value={filters.commodity}
-          onChange={(v) => setFilter("commodity", v)}
-          options={commodityOptions}
-          active={filters.commodity !== "all"}
-        />
-        <ConsoleDateRange
-          from={filters.from}
-          to={filters.to}
-          onFromChange={(v) => setFilter("from", v)}
-          onToChange={(v) => setFilter("to", v)}
-        />
-      </ConsoleFilterBar>
+        <ConsoleFilterBar
+          search={searchInput}
+          onSearch={setSearch}
+          searchPlaceholder="Search commodity, warehouse, reason…"
+          activeCount={activeFilterCount}
+          onClear={() => {
+            setSearch("");
+            resetFilters();
+          }}
+          totalCount={totalCount}
+          noun="movements"
+          action={action}
+          leading={leading}
+          panelClassName="sm:grid-cols-2 lg:grid-cols-5"
+          chips={
+            <>
+              {filters.type !== "all" ? (
+                <FilterChip onRemove={() => setFilter("type", "all")}>
+                  Type: {labelOf(MOVE_TYPE_FILTER_OPTIONS, filters.type)}
+                </FilterChip>
+              ) : null}
+              {filters.warehouse !== "all" ? (
+                <FilterChip onRemove={() => setFilter("warehouse", "all")}>
+                  Warehouse: {labelOf(warehouseOptions, filters.warehouse)}
+                </FilterChip>
+              ) : null}
+              {filters.commodity !== "all" ? (
+                <FilterChip onRemove={() => setFilter("commodity", "all")}>
+                  Commodity: {labelOf(commodityOptions, filters.commodity)}
+                </FilterChip>
+              ) : null}
+              {filters.from ? (
+                <FilterChip onRemove={() => setFilter("from", "")}>
+                  From: {filters.from}
+                </FilterChip>
+              ) : null}
+              {filters.to ? (
+                <FilterChip onRemove={() => setFilter("to", "")}>
+                  To: {filters.to}
+                </FilterChip>
+              ) : null}
+            </>
+          }
+        >
+          <ConsoleLabeledSelect
+            label="Type"
+            value={filters.type}
+            onChange={(v) => setFilter("type", v)}
+            options={MOVE_TYPE_FILTER_OPTIONS}
+            active={filters.type !== "all"}
+          />
+          <ConsoleLabeledSelect
+            label="Warehouse"
+            value={filters.warehouse}
+            onChange={(v) => setFilter("warehouse", v)}
+            options={warehouseOptions}
+            active={filters.warehouse !== "all"}
+          />
+          <ConsoleLabeledSelect
+            label="Commodity"
+            value={filters.commodity}
+            onChange={(v) => setFilter("commodity", v)}
+            options={commodityOptions}
+            active={filters.commodity !== "all"}
+          />
+          <ConsoleDateRange
+            from={filters.from}
+            to={filters.to}
+            onFromChange={(v) => setFilter("from", v)}
+            onToChange={(v) => setFilter("to", v)}
+          />
+        </ConsoleFilterBar>
       )}
 
       {isLoading ? (

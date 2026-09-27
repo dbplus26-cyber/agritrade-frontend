@@ -65,10 +65,7 @@ import {
   useGetFixedAssetsQuery,
   useUpdateFixedAssetMutation,
 } from "@/redux/statements/statements-api";
-import type {
-  IFixedAsset,
-  IFixedAssetEditBody,
-} from "@/types/statement.types";
+import type { IFixedAsset, IFixedAssetEditBody } from "@/types/statement.types";
 import {
   assetClassSchema,
   type AssetClassValues,
@@ -182,7 +179,10 @@ function AddAssetDialog({ onClose }: { onClose: () => void }) {
               <Input
                 autoFocus
                 placeholder="e.g. Two Haojue motorbikes"
-                className={cn(adminInputClass, errors.name && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  errors.name && "border-console-red",
+                )}
                 {...assetForm.register("name")}
               />
             </AdminField>
@@ -196,7 +196,10 @@ function AddAssetDialog({ onClose }: { onClose: () => void }) {
                 name="classId"
                 render={({ field }) => (
                   <SimpleSelect
-                    className={cn(adminSelectClass, errors.classId && "border-console-red")}
+                    className={cn(
+                      adminSelectClass,
+                      errors.classId && "border-console-red",
+                    )}
                     value={field.value}
                     onChange={field.onChange}
                     placeholder="Choose a class"
@@ -221,14 +224,23 @@ function AddAssetDialog({ onClose }: { onClose: () => void }) {
                 <Input
                   inputMode="decimal"
                   placeholder="0.00"
-                  className={cn(adminInputClass, errors.costGhs && "border-console-red")}
+                  className={cn(
+                    adminInputClass,
+                    errors.costGhs && "border-console-red",
+                  )}
                   {...assetForm.register("costGhs")}
                 />
               </AdminField>
-              <AdminField label="Acquired on" error={errors.acquiredAt?.message}>
+              <AdminField
+                label="Acquired on"
+                error={errors.acquiredAt?.message}
+              >
                 <DateInput
                   placeholder="Pick the purchase date"
-                  className={cn(adminInputClass, errors.acquiredAt && "border-console-red")}
+                  className={cn(
+                    adminInputClass,
+                    errors.acquiredAt && "border-console-red",
+                  )}
                   {...assetForm.register("acquiredAt")}
                 />
               </AdminField>
@@ -262,10 +274,20 @@ function AddAssetDialog({ onClose }: { onClose: () => void }) {
               />
             </AdminField>
             <ResponsiveDialogFooter className="gap-2">
-              <AdminButton type="button" variant="outline" size="lg" onClick={onClose}>
+              <AdminButton
+                type="button"
+                variant="outline"
+                size="lg"
+                onClick={onClose}
+              >
                 Cancel
               </AdminButton>
-              <AdminButton type="submit" size="lg" disabled={createState.isLoading} loading={createState.isLoading}>
+              <AdminButton
+                type="submit"
+                size="lg"
+                disabled={createState.isLoading}
+                loading={createState.isLoading}
+              >
                 {createState.isLoading ? "Saving…" : "Record asset"}
               </AdminButton>
             </ResponsiveDialogFooter>
@@ -303,7 +325,9 @@ function AddAssetDialog({ onClose }: { onClose: () => void }) {
               <AdminField
                 label="CA rate (%/yr)"
                 hint="GRA reducing-balance rate for the pool (30 for Pool 2, 10 for Pool 4)."
-                error={classForm.formState.errors.capitalAllowanceRatePct?.message}
+                error={
+                  classForm.formState.errors.capitalAllowanceRatePct?.message
+                }
               >
                 <Input
                   inputMode="decimal"
@@ -334,7 +358,12 @@ function AddAssetDialog({ onClose }: { onClose: () => void }) {
               >
                 Back
               </AdminButton>
-              <AdminButton type="submit" size="lg" disabled={createClassState.isLoading} loading={createClassState.isLoading}>
+              <AdminButton
+                type="submit"
+                size="lg"
+                disabled={createClassState.isLoading}
+                loading={createClassState.isLoading}
+              >
                 {createClassState.isLoading ? "Saving…" : "Create class"}
               </AdminButton>
             </ResponsiveDialogFooter>
@@ -419,7 +448,10 @@ function DisposeDialog({
             <AdminField label="Disposed on" error={errors.disposedAt?.message}>
               <DateInput
                 placeholder="Pick the disposal date"
-                className={cn(adminInputClass, errors.disposedAt && "border-console-red")}
+                className={cn(
+                  adminInputClass,
+                  errors.disposedAt && "border-console-red",
+                )}
                 {...register("disposedAt")}
               />
             </AdminField>
@@ -459,10 +491,21 @@ function DisposeDialog({
             </p>
           )}
           <ResponsiveDialogFooter className="gap-2">
-            <AdminButton type="button" variant="outline" size="lg" onClick={onClose}>
+            <AdminButton
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={onClose}
+            >
               Cancel
             </AdminButton>
-            <AdminButton type="submit" variant="gold" size="lg" disabled={disposeState.isLoading} loading={disposeState.isLoading}>
+            <AdminButton
+              type="submit"
+              variant="gold"
+              size="lg"
+              disabled={disposeState.isLoading}
+              loading={disposeState.isLoading}
+            >
               {disposeState.isLoading ? "Saving…" : "Dispose of asset"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -571,7 +614,10 @@ function EditAssetDialog({
             <Input
               autoFocus
               placeholder="e.g. Two Haojue motorbikes"
-              className={cn(adminInputClass, errors.name && "border-console-red")}
+              className={cn(
+                adminInputClass,
+                errors.name && "border-console-red",
+              )}
               {...register("name")}
             />
           </AdminField>
@@ -639,7 +685,10 @@ function EditAssetDialog({
                   {...register("costGhs")}
                 />
               </AdminField>
-              <AdminField label="Acquired on" error={errors.acquiredAt?.message}>
+              <AdminField
+                label="Acquired on"
+                error={errors.acquiredAt?.message}
+              >
                 <DateInput
                   placeholder="Pick the purchase date"
                   className={cn(
@@ -659,10 +708,20 @@ function EditAssetDialog({
             />
           </AdminField>
           <ResponsiveDialogFooter className="gap-2">
-            <AdminButton type="button" variant="outline" size="lg" onClick={onClose}>
+            <AdminButton
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={onClose}
+            >
               Cancel
             </AdminButton>
-            <AdminButton type="submit" size="lg" disabled={updateState.isLoading} loading={updateState.isLoading}>
+            <AdminButton
+              type="submit"
+              size="lg"
+              disabled={updateState.isLoading}
+              loading={updateState.isLoading}
+            >
               {updateState.isLoading ? "Saving…" : "Save changes"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -755,7 +814,9 @@ export function FixedAssetsScreen() {
         enableSorting: false,
         meta: columnMeta({ card: "trailing" }),
         cell: ({ row }) => (
-          <Mono className="tabular-nums">{formatCedis(row.original.costGhs)}</Mono>
+          <Mono className="tabular-nums">
+            {formatCedis(row.original.costGhs)}
+          </Mono>
         ),
       },
       {
@@ -877,7 +938,9 @@ export function FixedAssetsScreen() {
           action={
             <AdminButton
               aria-label="Record asset"
-              onClick={() => { setAdding(true); }}
+              onClick={() => {
+                setAdding(true);
+              }}
             >
               <Plus className="h-4 w-4" aria-hidden="true" />
               <span className="hidden sm:inline">Record asset</span>
@@ -900,7 +963,9 @@ export function FixedAssetsScreen() {
             title="No assets on the register"
             description="Record the machines, vehicles and buildings the business owns - the statements depreciate them automatically."
             actionLabel="Record the first asset"
-            onAction={() => { setAdding(true); }}
+            onAction={() => {
+              setAdding(true);
+            }}
           />
         </AdminCard>
       ) : (
@@ -934,8 +999,8 @@ export function FixedAssetsScreen() {
                   {c.name}
                 </span>
                 <span className="flex-none text-[11px] text-adm-muted">
-                  {c.depreciationRatePct}% straight line · {c.capitalAllowancePool}{" "}
-                  @ {c.capitalAllowanceRatePct}%
+                  {c.depreciationRatePct}% straight line ·{" "}
+                  {c.capitalAllowancePool} @ {c.capitalAllowanceRatePct}%
                 </span>
               </li>
             ))}
@@ -943,12 +1008,28 @@ export function FixedAssetsScreen() {
         </AdminCard>
       ) : null}
 
-      {adding ? <AddAssetDialog onClose={() => { setAdding(false); }} /> : null}
+      {adding ? (
+        <AddAssetDialog
+          onClose={() => {
+            setAdding(false);
+          }}
+        />
+      ) : null}
       {editing ? (
-        <EditAssetDialog asset={editing} onClose={() => { setEditing(null); }} />
+        <EditAssetDialog
+          asset={editing}
+          onClose={() => {
+            setEditing(null);
+          }}
+        />
       ) : null}
       {disposing ? (
-        <DisposeDialog asset={disposing} onClose={() => { setDisposing(null); }} />
+        <DisposeDialog
+          asset={disposing}
+          onClose={() => {
+            setDisposing(null);
+          }}
+        />
       ) : null}
       {confirmationDialog}
     </div>

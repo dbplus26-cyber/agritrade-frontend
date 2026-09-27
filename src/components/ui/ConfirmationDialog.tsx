@@ -59,10 +59,7 @@ export function ConfirmationDialog({
 
   return (
     <ResponsiveDialog open={open} onOpenChange={handleOpenChange}>
-      <ResponsiveDialogContent
-        showCloseButton={false}
-        className="sm:max-w-sm"
-      >
+      <ResponsiveDialogContent showCloseButton={false} className="sm:max-w-sm">
         <ResponsiveDialogHeader>
           <ResponsiveDialogTitle className="font-display text-forest">
             {title}

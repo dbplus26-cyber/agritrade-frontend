@@ -13,12 +13,16 @@ describe("FilePicker's staged preview", () => {
         triggerLabel="Choose image"
       />,
     );
-    const input = document.querySelector<HTMLInputElement>('input[type="file"]');
+    const input =
+      document.querySelector<HTMLInputElement>('input[type="file"]');
     expect(input).not.toBeNull();
 
     const name =
       "a-very-long-statement-logo-file-name-that-would-otherwise-crush.png";
-    await userEvent.upload(input!, new File(["x"], name, { type: "image/png" }));
+    await userEvent.upload(
+      input!,
+      new File(["x"], name, { type: "image/png" }),
+    );
 
     const shown = await screen.findByTitle(name);
     expect(shown.textContent).toBe(name);

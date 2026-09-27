@@ -17,7 +17,10 @@ export const repaymentDocumentUrl = (
   `${env.SERVER_URI}/api/v1/admin/farm/repayments/${repaymentId}/documents/${documentId}`;
 
 /** Repayment fields + the required signed receipt as `payload` + `receipt` parts. */
-const repaymentForm = (body: ICreateRepaymentInput, receipt: File): FormData => {
+const repaymentForm = (
+  body: ICreateRepaymentInput,
+  receipt: File,
+): FormData => {
   const form = new FormData();
   form.append("payload", JSON.stringify(body));
   form.append("receipt", receipt);

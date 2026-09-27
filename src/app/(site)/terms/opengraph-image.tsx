@@ -8,7 +8,8 @@ export default async function TermsOpengraphImage() {
   return brandOgImage({
     eyebrow: "The office · Legal",
     title: "Terms of service.",
-    subtitle: "The rules of trade for the website and the yard, in plain words.",
+    subtitle:
+      "The rules of trade for the website and the yard, in plain words.",
     cta: "Read the terms →",
   });
 }

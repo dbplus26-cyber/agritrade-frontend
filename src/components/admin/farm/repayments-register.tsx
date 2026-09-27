@@ -86,7 +86,10 @@ export function RepaymentsRegister() {
   const seasonOptions = useMemo(
     () => [
       { label: "All seasons", value: "all" },
-      ...(seasons.data?.data ?? []).map((s) => ({ label: s.name, value: s.id })),
+      ...(seasons.data?.data ?? []).map((s) => ({
+        label: s.name,
+        value: s.id,
+      })),
     ],
     [seasons.data],
   );

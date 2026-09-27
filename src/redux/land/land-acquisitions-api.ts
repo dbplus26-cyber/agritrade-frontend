@@ -77,18 +77,20 @@ export const landAcquisitionsApi = apiSlice.injectEndpoints({
       ],
     }),
 
-    completeLandAcquisition: builder.mutation<ILandAcquisitionResponse, string>({
-      query: (id) => ({
-        url: `admin/land/acquisitions/${id}/complete`,
-        method: "PATCH",
-      }),
-      // Completion produces a new plot in the register.
-      invalidatesTags: (_r, _e, id) => [
-        { type: "LandAcquisitions", id },
-        { type: "LandAcquisitions", id: "LIST" },
-        { type: "LandPlots", id: "LIST" },
-      ],
-    }),
+    completeLandAcquisition: builder.mutation<ILandAcquisitionResponse, string>(
+      {
+        query: (id) => ({
+          url: `admin/land/acquisitions/${id}/complete`,
+          method: "PATCH",
+        }),
+        // Completion produces a new plot in the register.
+        invalidatesTags: (_r, _e, id) => [
+          { type: "LandAcquisitions", id },
+          { type: "LandAcquisitions", id: "LIST" },
+          { type: "LandPlots", id: "LIST" },
+        ],
+      },
+    ),
 
     cancelLandAcquisition: builder.mutation<
       ILandAcquisitionResponse,

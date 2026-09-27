@@ -37,7 +37,10 @@ export const farmersApi = apiSlice.injectEndpoints({
         result
           ? [
               { type: "Farmers" as const, id: "LIST" },
-              ...result.data.map((f) => ({ type: "Farmers" as const, id: f.id })),
+              ...result.data.map((f) => ({
+                type: "Farmers" as const,
+                id: f.id,
+              })),
             ]
           : [{ type: "Farmers" as const, id: "LIST" }],
     }),

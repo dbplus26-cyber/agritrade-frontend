@@ -13,13 +13,7 @@ export const NO_SHEDS: string[] = [];
  * A numbered badge said the same thing louder, and a form laid out in
  * sequence already reads in sequence without being counted at.
  */
-export function StepHead({
-  hint,
-  title,
-}: {
-  hint?: string;
-  title: string;
-}) {
+export function StepHead({ hint, title }: { hint?: string; title: string }) {
   return (
     <div className="border-b border-adm-hairline pb-3">
       <SectionHeading className="mb-0">{title}</SectionHeading>

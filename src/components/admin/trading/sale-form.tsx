@@ -91,7 +91,9 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
   const entryPrice = Number(entry.unitPriceGhs) || 0;
   const entryTotal = entryWeight * entryPrice;
   const entryTouched =
-    entry.commodityId !== "" || entry.weightKg !== "" || entry.unitPriceGhs !== "";
+    entry.commodityId !== "" ||
+    entry.weightKg !== "" ||
+    entry.unitPriceGhs !== "";
 
   const commitEntry = (): boolean => {
     if (!entry.commodityId) {
@@ -230,7 +232,8 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
                     options={[
                       {
                         value: "",
-                        label: "Default (or the buyer's policy) at confirmation",
+                        label:
+                          "Default (or the buyer's policy) at confirmation",
                       },
                       ...(policies.data?.data ?? []).map((p) => ({
                         value: p.id,
@@ -245,7 +248,6 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
           </section>
 
           <section className="flex flex-col gap-5">
-
             {/* The entry panel: one line in the making. */}
             <div
               className={cn(
@@ -275,7 +277,10 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
                     className={adminInputClass}
                     value={entry.weightKg}
                     onChange={(e) => {
-                      setEntry((prev) => ({ ...prev, weightKg: e.target.value }));
+                      setEntry((prev) => ({
+                        ...prev,
+                        weightKg: e.target.value,
+                      }));
                       setEntryError(null);
                     }}
                   />
@@ -287,7 +292,10 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
                     className={adminInputClass}
                     value={entry.unitPriceGhs}
                     onChange={(e) => {
-                      setEntry((prev) => ({ ...prev, unitPriceGhs: e.target.value }));
+                      setEntry((prev) => ({
+                        ...prev,
+                        unitPriceGhs: e.target.value,
+                      }));
                       setEntryError(null);
                     }}
                   />
@@ -326,7 +334,10 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
                 </div>
               </div>
               {entryError ? (
-                <p className="mt-1.5 text-[11px] font-medium text-console-red" role="alert">
+                <p
+                  className="mt-1.5 text-[11px] font-medium text-console-red"
+                  role="alert"
+                >
                   {entryError}
                 </p>
               ) : null}
@@ -343,7 +354,7 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
                 )}
               >
                 {errors.lines
-                  ? "Add at least one line - type it above and press \"Add to goods\"."
+                  ? 'Add at least one line - type it above and press "Add to goods".'
                   : "Nothing on the sale yet. Type the first line above and add it."}
               </p>
             ) : (
@@ -356,8 +367,8 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
                   const weight = Number(line?.weightKg) || 0;
                   const price = Number(line?.unitPriceGhs) || 0;
                   const name =
-                    commodityOptions.find((c) => c.id === line?.commodityId)?.name ??
-                    "Commodity";
+                    commodityOptions.find((c) => c.id === line?.commodityId)
+                      ?.name ?? "Commodity";
                   return (
                     <li
                       key={field.id}
@@ -369,7 +380,8 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
                         </p>
                         <p className="text-[11px] text-adm-muted">
                           <Mono>
-                            {weight.toLocaleString("en-GH")} kg × {formatCedis(price)}
+                            {weight.toLocaleString("en-GH")} kg ×{" "}
+                            {formatCedis(price)}
                             /kg
                           </Mono>
                         </p>
@@ -437,7 +449,12 @@ export function SaleForm({ sale }: { sale?: ISaleDetail }) {
           >
             Cancel
           </AdminButton>
-          <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
+          <AdminButton
+            type="submit"
+            disabled={saving}
+            loading={saving}
+            size="lg"
+          >
             {saving ? "Saving…" : sale ? "Save changes" : "Draft sale"}
           </AdminButton>
         </CommitRow>

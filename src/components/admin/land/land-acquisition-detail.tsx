@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PaymentAccountField } from "@/components/admin/payment-account-field";
+import { useIdempotencyKey } from "@/components/admin/disbursements/disbursement-bits";
+import { ExistingOutflowPicker } from "@/components/admin/expenses/existing-outflow-picker";
 import {
   ActionRow,
   AdminButton,
@@ -50,6 +52,7 @@ import {
   useReverseAcquisitionPaymentMutation,
 } from "@/redux/land/land-acquisitions-api";
 import type { ILandAcquisitionDetail } from "@/types/land.types";
+import type { IMatchableOutflow } from "@/types/expense.types";
 import {
   cancelLandSaleSchema,
   landPaymentSchema,
@@ -92,6 +95,9 @@ function PaymentDialog({
   onClose: () => void;
 }) {
   const [record, { isLoading }] = useRecordAcquisitionPaymentMutation();
+  const idempotencyKey = useIdempotencyKey(true);
+  const [useExisting, setUseExisting] = useState(false);
+  const [source, setSource] = useState<IMatchableOutflow | null>(null);
   const { confirm, confirmationDialog } = useConfirm();
   const {
     register,
@@ -107,17 +113,25 @@ function PaymentDialog({
   // Drives whether the company account is required (BANK/MOMO), and which
   // accounts can carry it - a method switch clears a stale choice.
   const method = watch("method");
+  const paymentAccountId = watch("paymentAccountId");
   useEffect(() => {
     setValue("paymentAccountId", "");
   }, [method, setValue]);
+  useEffect(() => setSource(null), [paymentAccountId]);
   const onSubmit = async (values: LandPaymentValues) => {
+    if (useExisting && !source) {
+      notify.error("Choose the account outflow that already paid the seller.");
+      return;
+    }
     // Money out to a named seller, against a plot the business does not own
     // yet. The seller is read back with the figure because these are keyed off
     // a paper receipt hours after the handover, when the wrong acquisition is
     // an easy row to land on - and the ledger only lets an owner reverse it.
     const ok = await confirm({
       title: "Record this payment to the seller?",
-      description: `${formatCedis(Number(values.amountGhs))} paid to ${acquisition.seller.name} against ${acquisition.transactionNo}, ${acquisition.locationText}. It goes on the books as money out; only a reversal takes it back off.`,
+      description: source
+        ? `${formatCedis(source.amountGhs)} to ${acquisition.seller.name}, matched to ${source.externalReference ?? source.transactionNo}. The account was already debited and will not be debited again.`
+        : `${formatCedis(Number(values.amountGhs))} paid to ${acquisition.seller.name} against ${acquisition.transactionNo}, ${acquisition.locationText}. It goes on the books as money out; only a reversal takes it back off.`,
       confirmText: "Record payment",
     });
     if (!ok) return;
@@ -126,12 +140,14 @@ function PaymentDialog({
       await record({
         id: acquisition.id,
         body: {
-          amountGhs: Number(values.amountGhs),
+          amountGhs: source?.amountGhs ?? Number(values.amountGhs),
+          idempotencyKey: idempotencyKey(),
           method: values.method,
-          ...(values.reference?.trim()
+          ...(source ? { sourceMovementId: source.id } : {}),
+          ...(!source && values.reference?.trim()
             ? { reference: values.reference.trim() }
             : {}),
-          ...(values.paidAt ? { paidAt: values.paidAt } : {}),
+          ...(!source && values.paidAt ? { paidAt: values.paidAt } : {}),
           ...(values.paymentAccountId
             ? { paymentAccountId: values.paymentAccountId }
             : {}),
@@ -149,7 +165,9 @@ function PaymentDialog({
     <ResponsiveDialog open onOpenChange={(o) => !o && onClose()}>
       <ResponsiveDialogContent className="sm:max-w-[420px]">
         <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle>Record a payment to the seller</ResponsiveDialogTitle>
+          <ResponsiveDialogTitle>
+            Record a payment to the seller
+          </ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
             Part-payments are fine. The balance owed updates as you pay.
           </ResponsiveDialogDescription>
@@ -162,8 +180,12 @@ function PaymentDialog({
           <AdminField label="Amount (GHS)" error={errors.amountGhs?.message}>
             <Input
               inputMode="decimal"
-              className={cn(adminInputClass, errors.amountGhs && "border-console-red")}
+              className={cn(
+                adminInputClass,
+                errors.amountGhs && "border-console-red",
+              )}
               placeholder="0.00"
+              readOnly={Boolean(source)}
               {...register("amountGhs")}
             />
           </AdminField>
@@ -191,20 +213,47 @@ function PaymentDialog({
             onChange={(v) => setValue("paymentAccountId", v)}
             value={watch("paymentAccountId") ?? ""}
           />
-          <AdminField label="Reference" optional>
-            <Input
-              className={adminInputClass}
-              placeholder="e.g. TRF884512"
-              {...register("reference")}
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              checked={useExisting}
+              onChange={(event) => {
+                setUseExisting(event.target.checked);
+                setSource(null);
+              }}
+              type="checkbox"
             />
-          </AdminField>
-          <AdminField label="Payment date" optional>
-            <DateInput
-              className={adminInputClass}
-              placeholder="Pick the payment date"
-              {...register("paidAt")}
+            Match a payment already recorded in the cash book
+          </label>
+          {useExisting ? (
+            <ExistingOutflowPicker
+              key={paymentAccountId}
+              accountId={paymentAccountId ?? ""}
+              onChange={(rows) => {
+                const chosen = rows[0] ?? null;
+                setSource(chosen);
+                if (chosen) setValue("amountGhs", String(chosen.amountGhs));
+              }}
+              single
             />
-          </AdminField>
+          ) : null}
+          {!useExisting ? (
+            <AdminField label="Reference" optional>
+              <Input
+                className={adminInputClass}
+                placeholder="e.g. TRF884512"
+                {...register("reference")}
+              />
+            </AdminField>
+          ) : null}
+          {!useExisting ? (
+            <AdminField label="Payment date" optional>
+              <DateInput
+                className={adminInputClass}
+                placeholder="Pick the payment date"
+                {...register("paidAt")}
+              />
+            </AdminField>
+          ) : null}
           <ResponsiveDialogFooter className="gap-2">
             <AdminButton
               type="button"
@@ -214,7 +263,12 @@ function PaymentDialog({
             >
               Cancel
             </AdminButton>
-            <AdminButton type="submit" disabled={isLoading} loading={isLoading} size="lg">
+            <AdminButton
+              type="submit"
+              disabled={isLoading}
+              loading={isLoading}
+              size="lg"
+            >
               {isLoading ? "Recording…" : "Record payment"}
             </AdminButton>
           </ResponsiveDialogFooter>
@@ -256,7 +310,9 @@ function CancelDialog({
     <ResponsiveDialog open onOpenChange={(o) => !o && onClose()}>
       <ResponsiveDialogContent className="sm:max-w-[420px]">
         <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle>Cancel this acquisition?</ResponsiveDialogTitle>
+          <ResponsiveDialogTitle>
+            Cancel this acquisition?
+          </ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
             Only possible while nothing has been paid. No plot is created.
           </ResponsiveDialogDescription>
@@ -268,7 +324,10 @@ function CancelDialog({
         >
           <AdminField label="Reason" error={errors.reason?.message}>
             <Input
-              className={cn(adminInputClass, errors.reason && "border-console-red")}
+              className={cn(
+                adminInputClass,
+                errors.reason && "border-console-red",
+              )}
               placeholder="e.g. Seller withdrew the plot"
               {...register("reason")}
             />
@@ -391,7 +450,10 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
   };
 
   const actions =
-    a.status === "NEGOTIATING" || canPay || a.status === "AGREED" || canCancel ? (
+    a.status === "NEGOTIATING" ||
+    canPay ||
+    a.status === "AGREED" ||
+    canCancel ? (
       <div className="mt-3 border-t border-adm-hairline pt-3.5">
         <ActionRow className="xl:flex-col">
           {a.status === "NEGOTIATING" ? (
@@ -419,10 +481,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
             </AdminButton>
           ) : null}
           {canCancel ? (
-            <AdminButton
-              variant="outline"
-              onClick={() => setCancelOpen(true)}
-            >
+            <AdminButton variant="outline" onClick={() => setCancelOpen(true)}>
               Cancel
             </AdminButton>
           ) : null}
@@ -533,9 +592,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
         }
         main={
           <AdminCard className="px-5 py-3">
-            <SectionHeading className="mb-1">
-              Payments to seller
-            </SectionHeading>
+            <SectionHeading className="mb-1">Payments to seller</SectionHeading>
             {a.payments.length === 0 ? (
               <p className="py-2 text-[11.5px] text-adm-muted">
                 No payments recorded yet.
@@ -571,9 +628,7 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
                     {/* Owner-only compensating entry for a mis-keyed payment
                         out to the seller. Never offered on a reversal row
                         itself - mirroring the land-sale payments ledger. */}
-                    {isSuperAdmin &&
-                    p.amountGhs !== null &&
-                    p.amountGhs > 0 ? (
+                    {isSuperAdmin && p.amountGhs !== null && p.amountGhs > 0 ? (
                       <AdminButton
                         type="button"
                         variant="outline"

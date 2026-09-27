@@ -209,7 +209,8 @@ export function LandAcquisitionsRegister() {
             <>
               {status !== "all" ? (
                 <FilterChip onRemove={() => setFilter("status", "all")}>
-                  Status: {labelOf(LAND_ACQUISITION_STATUS_FILTER_OPTIONS, status)}
+                  Status:{" "}
+                  {labelOf(LAND_ACQUISITION_STATUS_FILTER_OPTIONS, status)}
                 </FilterChip>
               ) : null}
               {outstanding !== "all" ? (

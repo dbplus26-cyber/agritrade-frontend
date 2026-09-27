@@ -6,7 +6,12 @@
  * file is the public site's half of the contract.
  */
 
-export const REVIEW_ROLES = ["BUYER", "SUPPLIER", "FARMER", "CUSTOMER"] as const;
+export const REVIEW_ROLES = [
+  "BUYER",
+  "SUPPLIER",
+  "FARMER",
+  "CUSTOMER",
+] as const;
 export type ReviewRole = (typeof REVIEW_ROLES)[number];
 
 /** Human labels for the role enum, e.g. on review cards and the form select. */

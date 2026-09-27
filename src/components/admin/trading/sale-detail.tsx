@@ -86,7 +86,9 @@ function SummaryRow({
       <span
         className={cn(
           "font-adminmono text-right tabular-nums",
-          strong ? "text-[12.5px] font-bold text-adm-ink" : "text-[11.5px] text-adm-ink",
+          strong
+            ? "text-[12.5px] font-bold text-adm-ink"
+            : "text-[11.5px] text-adm-ink",
         )}
       >
         {children}
@@ -144,7 +146,10 @@ function CancelDialog({
         >
           <AdminField label="Reason" error={errors.reason?.message}>
             <Input
-              className={cn(adminInputClass, errors.reason && "border-console-red")}
+              className={cn(
+                adminInputClass,
+                errors.reason && "border-console-red",
+              )}
               placeholder="Why is this sale being cancelled?"
               {...register("reason")}
             />
@@ -296,10 +301,7 @@ export function SaleDetail({
         </AdminButton>
       ) : null}
       {canCancel ? (
-        <AdminButton
-          variant="outline"
-          onClick={() => setCancelOpen(true)}
-        >
+        <AdminButton variant="outline" onClick={() => setCancelOpen(true)}>
           Cancel sale
         </AdminButton>
       ) : null}
@@ -377,7 +379,9 @@ export function SaleDetail({
             hint="What the buyer still owes you: what this sale is payable at, less everything paid."
             strong
           >
-            <span className={cn(paidInFull ? "text-console" : "text-console-red")}>
+            <span
+              className={cn(paidInFull ? "text-console" : "text-console-red")}
+            >
               {paidInFull ? "Paid in full" : <Money value={balance} />}
             </span>
           </SummaryRow>
@@ -387,7 +391,9 @@ export function SaleDetail({
             Payment terms: {sale.paymentPolicy.name}
           </div>
         ) : null}
-        <div className="mt-3 border-t border-adm-hairline pt-3.5">{actions}</div>
+        <div className="mt-3 border-t border-adm-hairline pt-3.5">
+          {actions}
+        </div>
       </AdminCard>
     </div>
   );
@@ -403,7 +409,9 @@ export function SaleDetail({
             className="flex items-baseline justify-between gap-3 border-b border-adm-hairline py-2 last:border-b-0"
           >
             <div className="min-w-0">
-              <span className="font-medium text-adm-ink">{l.commodity.name}</span>
+              <span className="font-medium text-adm-ink">
+                {l.commodity.name}
+              </span>
               <Mono className="ml-2 text-[11px] text-adm-muted">
                 {formatKg(l.weightKg)} @ <Money value={l.unitPriceGhs} />
               </Mono>
@@ -466,7 +474,9 @@ export function SaleDetail({
       <AdminCard className="px-5 py-3">
         <SectionHeading className="mb-1">Payments</SectionHeading>
         {sale.payments.length === 0 ? (
-          <p className="py-2 text-[11.5px] text-adm-muted">No payments recorded yet.</p>
+          <p className="py-2 text-[11.5px] text-adm-muted">
+            No payments recorded yet.
+          </p>
         ) : (
           sale.payments.map((p) => (
             <div
@@ -517,7 +527,9 @@ export function SaleDetail({
       <AdminCard className="px-5 py-3">
         <SectionHeading className="mb-1">Shipments</SectionHeading>
         {sale.shipments.length === 0 ? (
-          <p className="py-2 text-[11.5px] text-adm-muted">Nothing shipped yet.</p>
+          <p className="py-2 text-[11.5px] text-adm-muted">
+            Nothing shipped yet.
+          </p>
         ) : (
           sale.shipments.map((sh) => (
             <div

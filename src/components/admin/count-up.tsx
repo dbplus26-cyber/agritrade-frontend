@@ -24,7 +24,9 @@ export function CountUp({
   const frame = useRef<number | null>(null);
 
   useEffect(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     const start = performance.now();
     const begin = from.current;
     const step = (now: number) => {

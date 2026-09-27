@@ -2,7 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Check, Search } from "lucide-react";
-import { AdminField, Mono, ToneBadge, adminInputClass } from "@/components/admin/ui";
+import {
+  AdminField,
+  Mono,
+  ToneBadge,
+  adminInputClass,
+} from "@/components/admin/ui";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCedis } from "@/lib/format-money";
@@ -59,7 +64,9 @@ function SendRow({
       type="button"
     >
       <span className="mt-0.5 w-4 flex-none">
-        {selected ? <Check aria-hidden className="h-3.5 w-3.5 text-console" /> : null}
+        {selected ? (
+          <Check aria-hidden className="h-3.5 w-3.5 text-console" />
+        ) : null}
       </span>
       <span className="min-w-0 flex-1">
         <span className="flex flex-wrap items-baseline gap-x-2">

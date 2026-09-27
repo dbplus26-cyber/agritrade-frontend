@@ -34,7 +34,10 @@ export const agentApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     // Read-only vocabulary for the field forms (active entries, id + name).
     getAgentCommodities: builder.query<
-      { message: string; data: { commodities: { id: string; name: string }[] } },
+      {
+        message: string;
+        data: { commodities: { id: string; name: string }[] };
+      },
       void
     >({
       query: () => "agent/commodities",

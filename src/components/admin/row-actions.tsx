@@ -83,7 +83,10 @@ export function RowAction({
 }: {
   /** A destructive action, coloured as one. */
   danger?: boolean;
-  icon: React.ComponentType<{ "aria-hidden"?: boolean | "true"; className?: string }>;
+  icon: React.ComponentType<{
+    "aria-hidden"?: boolean | "true";
+    className?: string;
+  }>;
   label: string;
   onSelect: () => void;
   /** Why this row cannot take the action. Present means disabled. */

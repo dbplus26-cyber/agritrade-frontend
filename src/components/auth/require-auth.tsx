@@ -26,7 +26,9 @@ export function RequireAuth({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const cachedUser = useCurrentUser();
   const hydrated = useHydrated();
-  const { data, isError, isFetching } = useGetMeQuery();
+  const { data, error, isError, isFetching, refetch } = useGetMeQuery();
+  const sessionRejected =
+    isError && error && "status" in error && error.status === 401;
   const [logout] = useLogoutMutation();
   const handled = useRef(false);
 
@@ -36,7 +38,7 @@ export function RequireAuth({ children }: { children: ReactNode }) {
     // that cache holds the logout's 401, and treating it as a verdict here
     // fires a logout that revokes the brand-new session: login reports success
     // and the console never appears until a hard refresh clears the store.
-    if (isError && !isFetching && !handled.current) {
+    if (sessionRejected && !isFetching && !handled.current) {
       handled.current = true;
       // The session is invalid (commonly a stale cookie from a reset DB). Clear
       // the httpOnly cookies server-side so the proxy's gate no longer treats
@@ -49,11 +51,29 @@ export function RequireAuth({ children }: { children: ReactNode }) {
           router.replace(`/login?from=${encodeURIComponent(pathname)}`);
         });
     }
-  }, [isError, isFetching, logout, pathname, router]);
+  }, [sessionRejected, isFetching, logout, pathname, router]);
 
-  // Once the check has failed, hold the loading screen while the redirect
-  // fires. (getMe's onQueryStarted also clears the persisted user, so
-  // `cachedUser` is null here - we never leak the console to an invalid session.)
+  if (isError && !isFetching && !sessionRejected) {
+    return (
+      <div
+        role="alert"
+        className="flex min-h-[320px] flex-col items-center justify-center gap-4 px-6 text-center"
+      >
+        <p>
+          We could not verify your session. Check your connection and try again.
+        </p>
+        <button
+          type="button"
+          onClick={() => refetch()}
+          className="rounded bg-board px-4 py-2 text-surface"
+        >
+          Try again
+        </button>
+      </div>
+    );
+  }
+
+  // Hold the console while a rejected session redirects or a check retries.
   if (isError) return <LoadingScreen />;
 
   // Verified by /me, or optimistic from a persisted user while the check runs

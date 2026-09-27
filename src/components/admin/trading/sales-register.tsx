@@ -32,7 +32,11 @@ import {
   useGetSalesQuery,
   useGetSaleStatsQuery,
 } from "@/redux/sales/admin-sales-api";
-import type { ISale, ISaleListQuery, SaleStatus } from "@/types/admin-sale.types";
+import type {
+  ISale,
+  ISaleListQuery,
+  SaleStatus,
+} from "@/types/admin-sale.types";
 import { columnMeta } from "@/components/admin/registry/registry-bits";
 import {
   Money,
@@ -74,7 +78,9 @@ function StatTile({
     <AdminCard className="px-4 py-3">
       <div className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
         <span className="min-w-0">{label}</span>
-        {hint ? <HelpTip label={`What does ${label} count?`} text={hint} /> : null}
+        {hint ? (
+          <HelpTip label={`What does ${label} count?`} text={hint} />
+        ) : null}
       </div>
       <div className="mt-1 text-[19px] font-bold text-adm-ink">{children}</div>
     </AdminCard>
@@ -183,7 +189,9 @@ export function SalesRegister() {
           <Link
             href={`/admin/sales/${row.original.id}`}
             className="block w-full min-w-0 outline-none focus-visible:underline"
-            onClick={(e) => { e.stopPropagation(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
           >
             <div className="@2xl/table:max-w-[90%] [overflow-wrap:anywhere] @2xl/table:truncate font-semibold text-adm-ink">
               {row.original.buyer.name}
@@ -405,11 +413,15 @@ export function SalesRegister() {
                       <SaleStatusBadge status={s.status} />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">Balance</span>
+                      <span className="text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
+                        Balance
+                      </span>
                       <Mono
                         className={cn(
                           "text-[12px] font-bold",
-                          saleIsPaidInFull(s) ? "text-console" : "text-console-red",
+                          saleIsPaidInFull(s)
+                            ? "text-console"
+                            : "text-console-red",
                         )}
                       >
                         {saleIsPaidInFull(s) ? (

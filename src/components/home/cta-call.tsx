@@ -45,7 +45,11 @@ export async function CtaCall() {
                 href={contact.phoneHref}
                 className="shadow-block flex w-full items-center justify-center gap-2.5 rounded-[2px] bg-harvest px-7 py-4 text-[16px] font-bold tracking-[0.02em] text-ink transition-[transform,box-shadow] duration-100 hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0_#1F211C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest md:inline-flex md:w-auto lg:px-8 lg:py-[18px] lg:text-[18px]"
               >
-                <Phone aria-hidden="true" className="size-[18px]" strokeWidth={2.3} />
+                <Phone
+                  aria-hidden="true"
+                  className="size-[18px]"
+                  strokeWidth={2.3}
+                />
                 Call {contact.phone}
               </a>
               <p className="mt-5 text-[14px] leading-[1.6] text-soil">

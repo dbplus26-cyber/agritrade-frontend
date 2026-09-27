@@ -42,8 +42,7 @@ async function EmptyRegister() {
           aria-hidden="true"
           className="relative mb-7 h-[170px] bg-[repeating-linear-gradient(180deg,transparent_0px,transparent_35px,rgb(89_82_59/0.28)_35px,rgb(89_82_59/0.28)_36px)] lg:h-[200px]"
         >
-          <span className="stencil absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[-5deg] whitespace-nowrap rounded-[5px] border-[3px] border-harvest-deep bg-surface/90 px-4 py-2.5 text-[15px] tracking-[0.16em] text-harvest-deep [text-shadow:0_0_1px_rgb(138_98_32/0.6)] lg:px-[22px] lg:py-3 lg:text-[22px]"
-          >
+          <span className="stencil absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[-5deg] whitespace-nowrap rounded-[5px] border-[3px] border-harvest-deep bg-surface/90 px-4 py-2.5 text-[15px] tracking-[0.16em] text-harvest-deep [text-shadow:0_0_1px_rgb(138_98_32/0.6)] lg:px-[22px] lg:py-3 lg:text-[22px]">
             NO PLOTS ON FILE
           </span>
         </div>

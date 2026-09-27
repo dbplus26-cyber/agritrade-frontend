@@ -35,8 +35,7 @@ export function DateInput({
   placeholder?: string;
 }) {
   const [domEmpty, setDomEmpty] = React.useState(!defaultValue);
-  const empty =
-    value !== undefined ? value === "" || value === null : domEmpty;
+  const empty = value !== undefined ? value === "" || value === null : domEmpty;
 
   const composedRef = (el: HTMLInputElement | null) => {
     if (typeof ref === "function") ref(el);

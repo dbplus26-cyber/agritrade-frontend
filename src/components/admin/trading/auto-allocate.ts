@@ -131,7 +131,9 @@ export const autoAllocate = (input: AutoAllocateInput): AutoAllocateResult => {
     list.sort((a, b) => {
       if (a.unitCostGhs === null || b.unitCostGhs === null) {
         // Unknown costs sink to the bottom without disturbing each other.
-        return (a.unitCostGhs === null ? 1 : 0) - (b.unitCostGhs === null ? 1 : 0);
+        return (
+          (a.unitCostGhs === null ? 1 : 0) - (b.unitCostGhs === null ? 1 : 0)
+        );
       }
       return strategy === "CHEAPEST"
         ? a.unitCostGhs - b.unitCostGhs

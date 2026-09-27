@@ -47,7 +47,10 @@ const STOCKTAKE_STATUS_HELP: Record<StocktakeStatus, string> = {
 };
 
 export function StocktakeStatusBadge({ status }: { status: StocktakeStatus }) {
-  const s = STOCKTAKE_STATUS[status] ?? { label: status, tone: "slate" as Tone };
+  const s = STOCKTAKE_STATUS[status] ?? {
+    label: status,
+    tone: "slate" as Tone,
+  };
   const help = STOCKTAKE_STATUS_HELP[status];
   const badge = <ToneBadge tone={s.tone}>{s.label}</ToneBadge>;
   return help ? <HelpWrap text={help}>{badge}</HelpWrap> : badge;
@@ -96,7 +99,10 @@ export function StocktakeCountSheet({
   onSave: (lines: IStocktakeLineInput[], notes: string) => void;
 }) {
   const balances = useGetStockBalancesQuery({ warehouseId, includeZero: true });
-  const commoditiesQuery = useGetCommoditiesQuery({ isActive: true, limit: 100 });
+  const commoditiesQuery = useGetCommoditiesQuery({
+    isActive: true,
+    limit: 100,
+  });
 
   const [counts, setCounts] = useState<Record<string, string>>(() =>
     Object.fromEntries(
@@ -250,7 +256,9 @@ export function StocktakeCountSheet({
             below.
           </p>
         ) : null}
-        {balanceRows.map((r) => countRow(r.commodityId, r.commodityName, false))}
+        {balanceRows.map((r) =>
+          countRow(r.commodityId, r.commodityName, false),
+        )}
         {extraIds.map((id) =>
           countRow(id, nameOf.get(id) ?? "Unknown commodity", true),
         )}

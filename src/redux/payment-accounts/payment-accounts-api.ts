@@ -118,18 +118,20 @@ export const paymentAccountsApi = apiSlice.injectEndpoints({
       ],
     }),
 
-    deactivatePaymentAccount: builder.mutation<IPaymentAccountResponse, string>({
-      query: (id) => ({
-        url: `admin/payment-accounts/${id}/deactivate`,
-        method: "PATCH",
-      }),
-      invalidatesTags: (_r, _e, id) => [
-        { type: "PaymentAccounts", id },
-        { type: "PaymentAccounts", id: "LIST" },
-        { type: "PaymentAccounts", id: "PAYABLE" },
-        { type: "PaymentAccounts", id: "SETTLEMENT" },
-      ],
-    }),
+    deactivatePaymentAccount: builder.mutation<IPaymentAccountResponse, string>(
+      {
+        query: (id) => ({
+          url: `admin/payment-accounts/${id}/deactivate`,
+          method: "PATCH",
+        }),
+        invalidatesTags: (_r, _e, id) => [
+          { type: "PaymentAccounts", id },
+          { type: "PaymentAccounts", id: "LIST" },
+          { type: "PaymentAccounts", id: "PAYABLE" },
+          { type: "PaymentAccounts", id: "SETTLEMENT" },
+        ],
+      },
+    ),
 
     activatePaymentAccount: builder.mutation<IPaymentAccountResponse, string>({
       query: (id) => ({

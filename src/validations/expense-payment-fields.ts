@@ -19,6 +19,7 @@ import { z } from "zod";
 export const expensePaymentFields = {
   method: z.enum(["BANK", "CASH", "MOMO"]),
   paidNow: z.boolean(),
+  useExistingPayment: z.boolean().optional(),
   paymentAccountId: z.string(),
   reference: z.string().trim().max(120),
 };
@@ -27,6 +28,7 @@ export const expensePaymentFields = {
 export interface ExpensePaymentValues {
   method: "BANK" | "CASH" | "MOMO";
   paidNow: boolean;
+  useExistingPayment?: boolean;
   paymentAccountId: string;
   reference: string;
 }
@@ -48,7 +50,17 @@ export const refineExpensePayment = (
 ): void => {
   // Cash needs neither an account nor a reference: it leaves the office till,
   // which issues no statement to reconcile against.
-  if (!values.paidNow || values.method === "CASH") return;
+  if (!values.paidNow) return;
+  if (values.useExistingPayment) {
+    if (!values.paymentAccountId)
+      ctx.addIssue({
+        code: "custom",
+        message: "Choose the account that was already debited.",
+        path: ["paymentAccountId"],
+      });
+    return;
+  }
+  if (values.method === "CASH") return;
   if (!values.paymentAccountId) {
     ctx.addIssue({
       code: "custom",
@@ -86,7 +98,7 @@ export interface ExpensePaymentBody {
 export const expensePaymentBody = (
   values: ExpensePaymentValues & { incurredAt: string },
 ): ExpensePaymentBody | undefined =>
-  values.paidNow
+  values.paidNow && !values.useExistingPayment
     ? {
         method: values.method,
         paidAt: values.incurredAt,

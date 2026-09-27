@@ -94,11 +94,15 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
     const body: ICreateFarmerInput = {
       name: values.name,
       ...(trimmed(values.phone) ? { phone: trimmed(values.phone) } : {}),
-      ...(trimmed(values.community) ? { community: trimmed(values.community) } : {}),
+      ...(trimmed(values.community)
+        ? { community: trimmed(values.community) }
+        : {}),
       ...(trimmed(values.notes) ? { notes: trimmed(values.notes) } : {}),
       ...(trimmed(values.address) ? { address: trimmed(values.address) } : {}),
       ...(trimmed(values.idType) ? { idType: trimmed(values.idType) } : {}),
-      ...(trimmed(values.idNumber) ? { idNumber: trimmed(values.idNumber) } : {}),
+      ...(trimmed(values.idNumber)
+        ? { idNumber: trimmed(values.idNumber) }
+        : {}),
       ...(values.dateOfBirth ? { dateOfBirth: values.dateOfBirth } : {}),
       ...(trimmed(values.nextOfKinName)
         ? { nextOfKinName: trimmed(values.nextOfKinName) }
@@ -112,7 +116,9 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
       ...(trimmed(values.farmSizeAcres)
         ? { farmSizeAcres: Number(values.farmSizeAcres) }
         : {}),
-      ...(trimmed(values.momoNumber) ? { momoNumber: trimmed(values.momoNumber) } : {}),
+      ...(trimmed(values.momoNumber)
+        ? { momoNumber: trimmed(values.momoNumber) }
+        : {}),
     };
     try {
       if (farmer) {
@@ -158,7 +164,8 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
                 AdminField so it stays in step with the fields under it. */}
             <div>
               <span className="mb-1 block text-[11.5px] font-semibold text-adm-ink">
-                Photo <span className="font-normal text-adm-faint">(optional)</span>
+                Photo{" "}
+                <span className="font-normal text-adm-faint">(optional)</span>
               </span>
               <div className="flex flex-wrap items-center gap-4">
                 {preview ? (
@@ -194,7 +201,10 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
               <AdminField label="Name" error={errors.name?.message}>
                 <Input
                   placeholder="e.g. Abukari Yakubu"
-                  className={cn(adminInputClass, errors.name && "border-console-red")}
+                  className={cn(
+                    adminInputClass,
+                    errors.name && "border-console-red",
+                  )}
                   {...register("name")}
                 />
               </AdminField>
@@ -202,7 +212,10 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
                 <Input
                   inputMode="tel"
                   placeholder="e.g. 024 000 0000"
-                  className={cn(adminInputClass, errors.phone && "border-console-red")}
+                  className={cn(
+                    adminInputClass,
+                    errors.phone && "border-console-red",
+                  )}
                   {...register("phone")}
                 />
               </AdminField>
@@ -220,11 +233,18 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
                   {...register("dateOfBirth")}
                 />
               </AdminField>
-              <AdminField label="ID type" optional error={errors.idType?.message}>
+              <AdminField
+                label="ID type"
+                optional
+                error={errors.idType?.message}
+              >
                 <Input
                   list="farmer-id-types"
                   placeholder="e.g. Ghana Card"
-                  className={cn(adminInputClass, errors.idType && "border-console-red")}
+                  className={cn(
+                    adminInputClass,
+                    errors.idType && "border-console-red",
+                  )}
                   {...register("idType")}
                 />
                 <datalist id="farmer-id-types">
@@ -233,7 +253,11 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
                   ))}
                 </datalist>
               </AdminField>
-              <AdminField label="ID number" optional error={errors.idNumber?.message}>
+              <AdminField
+                label="ID number"
+                optional
+                error={errors.idNumber?.message}
+              >
                 <Input
                   placeholder="e.g. GHA-000000000-0"
                   className={cn(
@@ -248,7 +272,11 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
 
           <section className="flex flex-col gap-5">
             <div className="grid grid-cols-1 gap-5 @min-[440px]:grid-cols-2">
-              <AdminField label="Community" optional error={errors.community?.message}>
+              <AdminField
+                label="Community"
+                optional
+                error={errors.community?.message}
+              >
                 <Input
                   placeholder="e.g. Kumbungu"
                   className={cn(
@@ -288,7 +316,11 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
                 />
               </AdminField>
             </div>
-            <AdminField label="Address" optional error={errors.address?.message}>
+            <AdminField
+              label="Address"
+              optional
+              error={errors.address?.message}
+            >
               <textarea
                 rows={4}
                 placeholder="e.g. House 12, Sagnarigu, Tamale"
@@ -373,7 +405,12 @@ export function FarmerForm({ farmer }: { farmer?: IFarmer }) {
           >
             Cancel
           </AdminButton>
-          <AdminButton type="submit" disabled={saving} loading={saving} size="lg">
+          <AdminButton
+            type="submit"
+            disabled={saving}
+            loading={saving}
+            size="lg"
+          >
             {saving ? "Saving…" : farmer ? "Save changes" : "Add farmer"}
           </AdminButton>
         </CommitRow>

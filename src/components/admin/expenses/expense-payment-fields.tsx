@@ -18,9 +18,9 @@ import { PAYMENT_METHOD_OPTIONS } from "@/components/admin/trading/sale-bits";
 import type { ExpensePaymentValues } from "@/validations/expense-payment-fields";
 import { cn } from "@/lib/utils";
 
-/** The two answers to "has this been paid", in the order they are given. */
+/** Whether money has left already; the source is chosen underneath. */
 const PAID_CHOICES = [
-  { label: "Paid now", value: true },
+  { label: "Already paid", value: true },
   { label: "Paying later", value: false },
 ] as const;
 
@@ -43,6 +43,8 @@ export function ExpensePaymentFields<T extends ExpensePaymentValues>({
   method,
   owedNote,
   paidNow,
+  allowExisting = false,
+  useExistingPayment,
   register,
 }: {
   control: Control<T>;
@@ -53,6 +55,8 @@ export function ExpensePaymentFields<T extends ExpensePaymentValues>({
   /** What the screen says happens when the cost is left owed. */
   owedNote: string;
   paidNow: boolean;
+  allowExisting?: boolean;
+  useExistingPayment: boolean;
   register: UseFormRegister<T>;
 }) {
   const fieldError = (
@@ -68,14 +72,18 @@ export function ExpensePaymentFields<T extends ExpensePaymentValues>({
           often than it is read. */}
       <div>
         <span className="mb-1 flex text-[11.5px] font-semibold text-adm-ink">
-          Has this been paid?
+          {allowExisting ? "Has this been paid?" : "When will this be paid?"}
         </span>
         <Controller
           control={control}
           name={"paidNow" as Path<T>}
           render={({ field }) => (
             <div
-              aria-label="Has this been paid?"
+              aria-label={
+                allowExisting
+                  ? "Has this been paid?"
+                  : "When will this be paid?"
+              }
               className="grid grid-cols-2 gap-2"
               role="group"
             >
@@ -94,7 +102,7 @@ export function ExpensePaymentFields<T extends ExpensePaymentValues>({
                   }}
                   type="button"
                 >
-                  {choice.label}
+                  {choice.value && !allowExisting ? "Pay now" : choice.label}
                 </button>
               ))}
             </div>
@@ -104,6 +112,39 @@ export function ExpensePaymentFields<T extends ExpensePaymentValues>({
 
       {paidNow ? (
         <>
+          {allowExisting ? (
+            <Controller
+              control={control}
+              name={"useExistingPayment" as Path<T>}
+              render={({ field }) => (
+                <div
+                  className="grid grid-cols-2 gap-2"
+                  role="group"
+                  aria-label="Where is this payment recorded?"
+                >
+                  {[
+                    { label: "Record a new debit", value: false },
+                    { label: "Match existing debit", value: true },
+                  ].map((choice) => (
+                    <button
+                      key={choice.label}
+                      type="button"
+                      aria-pressed={field.value === choice.value}
+                      className={cn(
+                        "min-h-[44px] border px-3 text-[11.5px] font-semibold",
+                        field.value === choice.value
+                          ? "border-console bg-console text-white"
+                          : "border-adm-line bg-adm-card text-adm-body",
+                      )}
+                      onClick={() => field.onChange(choice.value)}
+                    >
+                      {choice.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            />
+          ) : null}
           {/* The tender and the account it left are one answer in two parts,
               and neither needs a row of its own to hold a single line. */}
           <div className="grid gap-5 sm:grid-cols-2">
@@ -142,19 +183,21 @@ export function ExpensePaymentFields<T extends ExpensePaymentValues>({
             />
           </div>
 
-          <AdminField
-            error={fieldError("reference")}
-            hint="The transfer or MoMo id. Recording the same one twice against this cost is refused."
-            label="Reference"
-            optional={method === "CASH"}
-          >
-            <input
-              className={adminInputClass}
-              id={`${idPrefix}-reference`}
-              placeholder="e.g. TRF884512"
-              {...register("reference" as Path<T>)}
-            />
-          </AdminField>
+          {!useExistingPayment ? (
+            <AdminField
+              error={fieldError("reference")}
+              hint="The transfer or MoMo id. Recording the same one twice against this cost is refused."
+              label="Reference"
+              optional={method === "CASH"}
+            >
+              <input
+                className={adminInputClass}
+                id={`${idPrefix}-reference`}
+                placeholder="e.g. TRF884512"
+                {...register("reference" as Path<T>)}
+              />
+            </AdminField>
+          ) : null}
         </>
       ) : (
         <p className="text-[11px] text-adm-muted">{owedNote}</p>

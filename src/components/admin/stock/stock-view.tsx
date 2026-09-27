@@ -266,7 +266,10 @@ export function StockView() {
               {totals.map((t) => {
                 const share =
                   grandTotalKg > 0
-                    ? Math.min(100, Math.max(0, (t.totalKg / grandTotalKg) * 100))
+                    ? Math.min(
+                        100,
+                        Math.max(0, (t.totalKg / grandTotalKg) * 100),
+                      )
                     : 0;
                 const shareLabel =
                   share > 0 && share < 1 ? "<1%" : `${Math.round(share)}%`;
@@ -313,70 +316,70 @@ export function StockView() {
               action={adjustButton}
             />
           ) : (
-          <ConsoleFilterBar
-            search={search}
-            onSearch={setSearch}
-            searchPlaceholder="Search commodity or warehouse…"
-            activeCount={
-              (warehouseId !== "all" ? 1 : 0) +
-              (commodityId !== "all" ? 1 : 0) +
-              (includeZero ? 1 : 0)
-            }
-            onClear={clearBalancesFilters}
-            totalCount={balances.length}
-            noun="stock lines"
-            action={adjustButton}
-            leading={sectionTabs}
-            chips={
-              <>
-                {warehouseId !== "all" ? (
-                  <FilterChip onRemove={() => setWarehouseId("all")}>
-                    Warehouse: {labelOf(warehouseOptions, warehouseId)}
-                  </FilterChip>
-                ) : null}
-                {commodityId !== "all" ? (
-                  <FilterChip onRemove={() => setCommodityId("all")}>
-                    Commodity: {labelOf(commodityOptions, commodityId)}
-                  </FilterChip>
-                ) : null}
-                {includeZero ? (
-                  <FilterChip onRemove={() => setIncludeZero(false)}>
-                    Cleared lines: Shown
-                    {clearedCount === 0 ? " (none)" : ` (${clearedCount})`}
-                  </FilterChip>
-                ) : null}
-              </>
-            }
-          >
-            <ConsoleLabeledSelect
-              label="Warehouse"
-              value={warehouseId}
-              onChange={setWarehouseId}
-              options={warehouseOptions}
-              active={warehouseId !== "all"}
-            />
-            <ConsoleLabeledSelect
-              label="Commodity"
-              value={commodityId}
-              onChange={setCommodityId}
-              options={commodityOptions}
-              active={commodityId !== "all"}
-            />
-            {/* A warehouse/commodity pair that has been fully loaded out
+            <ConsoleFilterBar
+              search={search}
+              onSearch={setSearch}
+              searchPlaceholder="Search commodity or warehouse…"
+              activeCount={
+                (warehouseId !== "all" ? 1 : 0) +
+                (commodityId !== "all" ? 1 : 0) +
+                (includeZero ? 1 : 0)
+              }
+              onClear={clearBalancesFilters}
+              totalCount={balances.length}
+              noun="stock lines"
+              action={adjustButton}
+              leading={sectionTabs}
+              chips={
+                <>
+                  {warehouseId !== "all" ? (
+                    <FilterChip onRemove={() => setWarehouseId("all")}>
+                      Warehouse: {labelOf(warehouseOptions, warehouseId)}
+                    </FilterChip>
+                  ) : null}
+                  {commodityId !== "all" ? (
+                    <FilterChip onRemove={() => setCommodityId("all")}>
+                      Commodity: {labelOf(commodityOptions, commodityId)}
+                    </FilterChip>
+                  ) : null}
+                  {includeZero ? (
+                    <FilterChip onRemove={() => setIncludeZero(false)}>
+                      Cleared lines: Shown
+                      {clearedCount === 0 ? " (none)" : ` (${clearedCount})`}
+                    </FilterChip>
+                  ) : null}
+                </>
+              }
+            >
+              <ConsoleLabeledSelect
+                label="Warehouse"
+                value={warehouseId}
+                onChange={setWarehouseId}
+                options={warehouseOptions}
+                active={warehouseId !== "all"}
+              />
+              <ConsoleLabeledSelect
+                label="Commodity"
+                value={commodityId}
+                onChange={setCommodityId}
+                options={commodityOptions}
+                active={commodityId !== "all"}
+              />
+              {/* A warehouse/commodity pair that has been fully loaded out
                 drops to a zero balance and the API omits it, so an emptied
                 warehouse reads as "nothing on hand" - indistinguishable from
                 one that never held the goods. Showing cleared lines brings
                 them back, which is how the office proves a store was emptied
                 rather than mislaid. */}
-            <ConsoleLabeledSelect
-              label="Cleared lines"
-              hint="Show warehouse/commodity lines that have been emptied to a zero balance"
-              value={includeZero ? "shown" : "hidden"}
-              onChange={(v) => setIncludeZero(v === "shown")}
-              options={CLEARED_LINES_OPTIONS}
-              active={includeZero}
-            />
-          </ConsoleFilterBar>
+              <ConsoleLabeledSelect
+                label="Cleared lines"
+                hint="Show warehouse/commodity lines that have been emptied to a zero balance"
+                value={includeZero ? "shown" : "hidden"}
+                onChange={(v) => setIncludeZero(v === "shown")}
+                options={CLEARED_LINES_OPTIONS}
+                active={includeZero}
+              />
+            </ConsoleFilterBar>
           )}
 
           {isLoading ? (
@@ -474,7 +477,8 @@ function WarehouseSections({
                   {w.name}
                 </Link>
                 <span className="text-[10.5px] text-adm-muted">
-                  {rows.length} {rows.length === 1 ? "commodity" : "commodities"}
+                  {rows.length}{" "}
+                  {rows.length === 1 ? "commodity" : "commodities"}
                 </span>
               </div>
               <div className="flex-none text-right">
@@ -493,14 +497,13 @@ function WarehouseSections({
               </div>
             </div>
 
-            <div
-              className={cn("grid", split && "@5xl/main:grid-cols-2")}
-            >
+            <div className={cn("grid", split && "@5xl/main:grid-cols-2")}>
               {groups.map((group, gi) => (
                 <table
                   className={cn(
                     "w-full table-fixed",
-                    gi > 0 && "@5xl/main:border-l @5xl/main:border-adm-hairline",
+                    gi > 0 &&
+                      "@5xl/main:border-l @5xl/main:border-adm-hairline",
                   )}
                   key={gi}
                 >
@@ -519,7 +522,9 @@ function WarehouseSections({
                       continuing, and a second set of headings mid-list reads
                       as a second table. */}
                   <thead
-                    className={cn(gi > 0 && "hidden @5xl/main:table-header-group")}
+                    className={cn(
+                      gi > 0 && "hidden @5xl/main:table-header-group",
+                    )}
                   >
                     <tr className="border-b border-adm-hairline">
                       <th scope="col" className={cn(headCell, "text-left")}>
@@ -530,7 +535,10 @@ function WarehouseSections({
                       </th>
                       <th
                         scope="col"
-                        className={cn(headCell, "hidden text-right sm:table-cell")}
+                        className={cn(
+                          headCell,
+                          "hidden text-right sm:table-cell",
+                        )}
                       >
                         Share of store
                       </th>
@@ -540,10 +548,15 @@ function WarehouseSections({
                     {group.map((r) => {
                       const share =
                         w.subtotalKg > 0
-                          ? Math.min(100, Math.max(0, (r.kg / w.subtotalKg) * 100))
+                          ? Math.min(
+                              100,
+                              Math.max(0, (r.kg / w.subtotalKg) * 100),
+                            )
                           : 0;
                       const shareLabel =
-                        share > 0 && share < 1 ? "<1%" : `${Math.round(share)}%`;
+                        share > 0 && share < 1
+                          ? "<1%"
+                          : `${Math.round(share)}%`;
                       return (
                         <tr
                           key={r.id}
@@ -662,10 +675,12 @@ function AdjustmentDialog({
     <ResponsiveDialog open={open} onOpenChange={(o) => !o && close()}>
       <ResponsiveDialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-[440px]">
         <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle>Request a stock adjustment</ResponsiveDialogTitle>
+          <ResponsiveDialogTitle>
+            Request a stock adjustment
+          </ResponsiveDialogTitle>
           <ResponsiveDialogDescription>
-            Nothing moves yet - the adjustment applies only once it is
-            approved from the approvals inbox.
+            Nothing moves yet - the adjustment applies only once it is approved
+            from the approvals inbox.
           </ResponsiveDialogDescription>
         </ResponsiveDialogHeader>
         <form onSubmit={(e) => void onSubmit(e)} className="grid gap-3.5">
@@ -761,7 +776,12 @@ function AdjustmentDialog({
             <AdminButton variant="outline" size="lg" onClick={close}>
               Cancel
             </AdminButton>
-            <AdminButton type="submit" size="lg" disabled={isLoading} loading={isLoading}>
+            <AdminButton
+              type="submit"
+              size="lg"
+              disabled={isLoading}
+              loading={isLoading}
+            >
               {isLoading ? "Filing…" : "File for approval"}
             </AdminButton>
           </ResponsiveDialogFooter>

@@ -42,8 +42,7 @@ const LIST = "/admin/stocktakes";
 /** Counted vs book difference; only meaningful once the sheet is submitted. */
 function Delta({ deltaKg }: { deltaKg: number | null }) {
   if (deltaKg === null) return <Absent />;
-  if (deltaKg === 0)
-    return <Mono className="text-adm-muted">0 kg</Mono>;
+  if (deltaKg === 0) return <Mono className="text-adm-muted">0 kg</Mono>;
   return <SignedKg kg={deltaKg} />;
 }
 
@@ -98,7 +97,10 @@ function LinesCard({ lines }: { lines: IStocktakeLine[] }) {
             </thead>
             <tbody>
               {lines.map((l) => (
-                <tr key={l.commodity.id} className="border-t border-adm-hairline">
+                <tr
+                  key={l.commodity.id}
+                  className="border-t border-adm-hairline"
+                >
                   <td className="px-5 py-2 font-medium">
                     <Link
                       className={cn(
@@ -112,7 +114,10 @@ function LinesCard({ lines }: { lines: IStocktakeLine[] }) {
                     </Link>
                   </td>
                   <td className="whitespace-nowrap px-5 py-2 text-right">
-                    <Kg kg={l.countedKg} className="font-semibold text-adm-ink" />
+                    <Kg
+                      kg={l.countedKg}
+                      className="font-semibold text-adm-ink"
+                    />
                   </td>
                   <td className="whitespace-nowrap px-5 py-2 text-right">
                     {l.derivedKg === null ? (
@@ -242,7 +247,8 @@ export function StocktakeDetail({ id }: { id: string }) {
   const onCancel = async () => {
     const ok = await confirm({
       title: `Cancel ${st.transactionNo}?`,
-      description: "The sheet keeps its counts but nothing will ever post from it.",
+      description:
+        "The sheet keeps its counts but nothing will ever post from it.",
       confirmText: "Cancel stocktake",
       isDestructive: true,
     });
@@ -335,7 +341,11 @@ export function StocktakeDetail({ id }: { id: string }) {
 
             {st.status === StocktakeStatus.DRAFT && canCount ? (
               <ActionRow className="mt-4 border-t border-adm-hairline pt-4">
-                <AdminButton disabled={busy} loading={submitState.isLoading} onClick={() => void onSubmit()}>
+                <AdminButton
+                  disabled={busy}
+                  loading={submitState.isLoading}
+                  onClick={() => void onSubmit()}
+                >
                   {submitState.isLoading ? "Submitting…" : "Submit"}
                 </AdminButton>
                 <AdminButton
@@ -364,7 +374,11 @@ export function StocktakeDetail({ id }: { id: string }) {
                 ) : null}
                 <ActionRow>
                   {isSuperAdmin ? (
-                    <AdminButton disabled={busy} loading={approveState.isLoading} onClick={() => void onApprove()}>
+                    <AdminButton
+                      disabled={busy}
+                      loading={approveState.isLoading}
+                      onClick={() => void onApprove()}
+                    >
                       {approveState.isLoading ? "Approving…" : "Approve"}
                     </AdminButton>
                   ) : null}

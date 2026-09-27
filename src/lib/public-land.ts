@@ -60,7 +60,10 @@ export function plotPhotos(
   plot: PublicLandPlot,
 ): { alt: null | string; url: string }[] {
   if (plot.photos?.length) {
-    return plot.photos.map((photo) => ({ alt: photo.alt ?? null, url: photo.url }));
+    return plot.photos.map((photo) => ({
+      alt: photo.alt ?? null,
+      url: photo.url,
+    }));
   }
   return plot.photo ? [{ alt: plot.photoAlt, url: plot.photo }] : [];
 }

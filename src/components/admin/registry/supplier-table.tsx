@@ -41,7 +41,13 @@ import {
 } from "./registry-bits";
 
 const LIST = "/admin/suppliers";
-const FILTER_DEFAULTS = { status: "all", source: "all", size: "10", from: "", to: "" };
+const FILTER_DEFAULTS = {
+  status: "all",
+  source: "all",
+  size: "10",
+  from: "",
+  to: "",
+};
 
 /** "Added" / "Updated" timestamp line for a directory detail view. */
 export function RecordTimestamps({

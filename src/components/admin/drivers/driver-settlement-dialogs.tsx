@@ -1,10 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { PaidThroughSystemField } from "@/components/admin/paid-through-system-field";
+import { useIdempotencyKey } from "@/components/admin/disbursements/disbursement-bits";
+import { ExistingOutflowPicker } from "@/components/admin/expenses/existing-outflow-picker";
 import { PaymentAccountField } from "@/components/admin/payment-account-field";
 import {
   AdminButton,
@@ -35,11 +38,9 @@ import {
   useRecordDriverPaymentMutation,
   useSetDriverFeeMutation,
 } from "@/redux/driver-settlement/driver-settlement-api";
+import type { IMatchableOutflow } from "@/types/expense.types";
 
-import {
-  PAYMENT_METHOD_OPTIONS,
-  todayInputValue,
-} from "../trading/sale-bits";
+import { PAYMENT_METHOD_OPTIONS, todayInputValue } from "../trading/sale-bits";
 
 /**
  * Agreeing what a trip pays its driver, and paying it.
@@ -55,7 +56,9 @@ const feeSchema = z.object({
     .string()
     .trim()
     .min(1, "Enter the fee")
-    .refine((v) => Number(v) > 0, { message: "The fee must be more than zero" }),
+    .refine((v) => Number(v) > 0, {
+      message: "The fee must be more than zero",
+    }),
   policyId: z.string(),
 });
 type FeeValues = z.infer<typeof feeSchema>;
@@ -152,9 +155,7 @@ export function DriverFeeDialog({
                   // "Usual terms" is a real choice - the sentinel maps back
                   // to "" so a picked policy can be cleared again (Radix
                   // reserves the empty string).
-                  onChange={(v) =>
-                    field.onChange(v === "__default__" ? "" : v)
-                  }
+                  onChange={(v) => field.onChange(v === "__default__" ? "" : v)}
                   placeholder="Use the usual terms"
                   options={[
                     { value: "__default__", label: "Use the usual terms" },
@@ -216,6 +217,9 @@ export function DriverPaymentDialog({
   shipmentId: string;
 }) {
   const [record, { isLoading }] = useRecordDriverPaymentMutation();
+  const idempotencyKey = useIdempotencyKey(true);
+  const [useExisting, setUseExisting] = useState(false);
+  const [source, setSource] = useState<IMatchableOutflow | null>(null);
   const { confirm, confirmationDialog } = useConfirm();
   const {
     control,
@@ -239,6 +243,7 @@ export function DriverPaymentDialog({
   // both controls come off the form rather than asking for answers the server
   // ignores.
   const matchedSend = useWatch({ control, name: "disbursementId" });
+  const paymentAccountId = useWatch({ control, name: "paymentAccountId" });
 
   /**
    * The one-tap amounts: half of what is left, and all of it.
@@ -260,18 +265,24 @@ export function DriverPaymentDialog({
         })();
 
   const onSubmit = async (values: PaymentValues) => {
+    if (useExisting && !source) {
+      notify.error("Choose the account outflow that already paid the driver.");
+      return;
+    }
     // Money out to a named haulier, and only an owner reversal takes it back
     // off. The driver is read back with the figure because the quick-amount
     // buttons above make a full settlement one tap away, and the page a
     // settlement is keyed from looks the same for every trip.
     const ok = await confirm({
       title: "Record this payment?",
-      description: values.disbursementId
-        ? `${formatCedis(Number(values.amountGhs))} to ${driverName}, booked against a send the system already made. The money has already left the payout wallet, so nothing is deducted again; this records what it settled. Only a reversal takes it back off.`
-        : `${formatCedis(Number(values.amountGhs))} paid to ${driverName} by ${
-            PAYMENT_METHOD_OPTIONS.find((o) => o.value === values.method)
-              ?.label ?? values.method
-          }. It goes on the books as settled against this trip; only a reversal takes it back off.`,
+      description: source
+        ? `${formatCedis(source.amountGhs)} to ${driverName}, matched to ${source.externalReference ?? source.transactionNo}. The account was already debited and will not be debited again.`
+        : values.disbursementId
+          ? `${formatCedis(Number(values.amountGhs))} to ${driverName}, booked against a send the system already made. The money has already left the payout wallet, so nothing is deducted again; this records what it settled. Only a reversal takes it back off.`
+          : `${formatCedis(Number(values.amountGhs))} paid to ${driverName} by ${
+              PAYMENT_METHOD_OPTIONS.find((o) => o.value === values.method)
+                ?.label ?? values.method
+            }. It goes on the books as settled against this trip; only a reversal takes it back off.`,
       confirmText: "Record payment",
     });
     if (!ok) return;
@@ -279,9 +290,11 @@ export function DriverPaymentDialog({
     try {
       await record({
         body: {
-          amountGhs: Number(values.amountGhs),
+          amountGhs: source?.amountGhs ?? Number(values.amountGhs),
+          idempotencyKey: idempotencyKey(),
           method: values.method,
-          paidAt: values.paidAt,
+          ...(!source ? { paidAt: values.paidAt } : {}),
+          ...(source ? { sourceMovementId: source.id } : {}),
           ...(values.disbursementId
             ? { disbursementId: values.disbursementId }
             : {}),
@@ -291,7 +304,9 @@ export function DriverPaymentDialog({
           ...(!values.disbursementId && values.paymentAccountId
             ? { paymentAccountId: values.paymentAccountId }
             : {}),
-          ...(values.reference ? { reference: values.reference } : {}),
+          ...(!source && values.reference
+            ? { reference: values.reference }
+            : {}),
         },
         shipmentId,
       }).unwrap();
@@ -348,6 +363,7 @@ export function DriverPaymentDialog({
                   className={cn(adminInputClass, "text-right")}
                   inputMode="decimal"
                   placeholder="0.00"
+                  readOnly={Boolean(source)}
                   {...register("amountGhs")}
                 />
               </AdminField>
@@ -398,7 +414,11 @@ export function DriverPaymentDialog({
                 <SimpleSelect
                   className={adminSelectClass}
                   value={field.value}
-                  onChange={field.onChange}
+                  onChange={(value) => {
+                    field.onChange(value);
+                    setValue("paymentAccountId", "");
+                    setSource(null);
+                  }}
                   placeholder="Choose how it was paid"
                   options={PAYMENT_METHOD_OPTIONS}
                 />
@@ -408,19 +428,34 @@ export function DriverPaymentDialog({
 
           {/* Cash leaves the till, not an account, so the picker is only
               meaningful for the two rails that move through one. */}
-          <Controller
-            control={control}
-            name="disbursementId"
-            render={({ field }) => (
-              <PaidThroughSystemField
-                error={errors.disbursementId?.message}
-                onChange={field.onChange}
-                value={field.value}
-              />
-            )}
-          />
+          {!useExisting ? (
+            <Controller
+              control={control}
+              name="disbursementId"
+              render={({ field }) => (
+                <PaidThroughSystemField
+                  error={errors.disbursementId?.message}
+                  onChange={field.onChange}
+                  value={field.value}
+                />
+              )}
+            />
+          ) : null}
 
-          {method !== "CASH" && !matchedSend ? (
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              checked={useExisting}
+              onChange={(event) => {
+                setUseExisting(event.target.checked);
+                setSource(null);
+                setValue("disbursementId", "");
+              }}
+              type="checkbox"
+            />
+            Match a payment already recorded in the cash book
+          </label>
+
+          {(method !== "CASH" || useExisting) && !matchedSend ? (
             <Controller
               control={control}
               name="paymentAccountId"
@@ -429,14 +464,30 @@ export function DriverPaymentDialog({
                   direction="out"
                   error={errors.paymentAccountId?.message}
                   method={method}
-                  onChange={field.onChange}
+                  onChange={(value) => {
+                    field.onChange(value);
+                    setSource(null);
+                  }}
                   value={field.value}
                 />
               )}
             />
           ) : null}
 
-          {!matchedSend ? (
+          {useExisting ? (
+            <ExistingOutflowPicker
+              key={paymentAccountId}
+              accountId={paymentAccountId}
+              onChange={(rows) => {
+                const chosen = rows[0] ?? null;
+                setSource(chosen);
+                if (chosen) setValue("amountGhs", String(chosen.amountGhs));
+              }}
+              single
+            />
+          ) : null}
+
+          {!matchedSend && !useExisting ? (
             <AdminField
               error={errors.reference?.message}
               hint="The transfer or MoMo reference. Recording the same one twice against this trip is refused."
@@ -538,7 +589,12 @@ export function ReverseReasonDialog({
             <AdminButton onClick={onClose} type="button" variant="ghost">
               Cancel
             </AdminButton>
-            <AdminButton disabled={submitting} loading={submitting} type="submit" variant="danger">
+            <AdminButton
+              disabled={submitting}
+              loading={submitting}
+              type="submit"
+              variant="danger"
+            >
               {submitting ? "Reversing…" : "Reverse payment"}
             </AdminButton>
           </ResponsiveDialogFooter>

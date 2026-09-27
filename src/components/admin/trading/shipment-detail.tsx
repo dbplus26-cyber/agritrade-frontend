@@ -1111,7 +1111,7 @@ export function ShipmentDetail({ id }: { id: string }) {
                   </div>
                   {/* Voiding is owner-only (like the general expense void):
                     striking out a cost moves the trip's profit. */}
-                  {isSuperAdmin ? (
+                  {isSuperAdmin && !e.driverFeeShipmentId ? (
                     <HelpWrap
                       className="inline-flex flex-none"
                       text="Strikes this cost off the trip's profit with a reason. The voucher stays on record, never erased."

@@ -92,7 +92,10 @@ export const buyerSchema = z.object({
     .string()
     .trim()
     .min(2, "Enter the buyer's name")
-    .max(BUYER_NAME_MAX, `Keep the name under ${String(BUYER_NAME_MAX)} characters.`),
+    .max(
+      BUYER_NAME_MAX,
+      `Keep the name under ${String(BUYER_NAME_MAX)} characters.`,
+    ),
   phone: phoneField,
   /** A second line reaching the same person - two networks is the norm here. */
   altPhone: phoneField,
@@ -111,6 +114,11 @@ export const expenseCategorySchema = z.object({
   name: z.string().trim().min(2, "Enter the category name").max(100),
   description: z.string().trim().max(500).or(z.literal("")).optional(),
   statementHeading: z.string().trim().max(80).or(z.literal("")).optional(),
-  statementSection: z.enum(["ADMINISTRATIVE", "COST_OF_SALES", "FINANCE", "TAX"]),
+  statementSection: z.enum([
+    "ADMINISTRATIVE",
+    "COST_OF_SALES",
+    "FINANCE",
+    "TAX",
+  ]),
 });
 export type ExpenseCategoryValues = z.infer<typeof expenseCategorySchema>;
