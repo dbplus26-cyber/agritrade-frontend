@@ -1,5 +1,8 @@
 "use client";
 
+import { CsvExportButton } from "@/components/admin/csv-export-button";
+import { purchasesCsvColumns } from "@/components/admin/csv-columns";
+
 import { useState } from "react";
 import { useGetMyPurchasesQuery } from "@/redux/agent/agent-api";
 import { ListPagination } from "@/components/ui/ListPagination";
@@ -60,10 +63,11 @@ function PurchaseCard({ p }: { p: IPurchase }) {
 /** My purchases, newest first - a simple card list, no table. */
 export function AgentPurchasesList() {
   const [page, setPage] = useState(1);
-  const { data, isLoading, isError, error, refetch } = useGetMyPurchasesQuery({
-    page,
-    limit: 10,
-  });
+  const { data, isLoading, isFetching, isError, error, refetch } =
+    useGetMyPurchasesQuery({
+      page,
+      limit: 10,
+    });
   const purchases = data?.data ?? [];
   const total = data?.meta.total ?? 0;
 
@@ -95,6 +99,14 @@ export function AgentPurchasesList() {
 
   return (
     <div className="flex flex-col gap-2.5">
+      <CsvExportButton
+        config={{
+          filename: "my-purchases",
+          columns: purchasesCsvColumns,
+          source: { url: "agent/purchases" },
+        }}
+        disabled={isFetching}
+      />
       {purchases.map((p) => (
         <PurchaseCard key={p.id} p={p} />
       ))}

@@ -1,5 +1,7 @@
 "use client";
 
+import { supplierHoldingsCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -136,6 +138,10 @@ export function SupplierHoldings({
       ) : (
         <>
           <ConsoleDataTable
+            csvExport={{
+              filename: "supplier-holdings",
+              columns: supplierHoldingsCsvColumns,
+            }}
             columns={columns}
             data={rows}
             itemNoun="holdings"

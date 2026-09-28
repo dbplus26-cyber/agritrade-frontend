@@ -1,3 +1,4 @@
+import { renderWithStore as render } from "../helpers/render-with-store";
 // test/component/FarmCashSource.test.tsx
 //
 // The farming-investment book saying where the money went and where it came
@@ -21,7 +22,7 @@
 // own query, and this file is about the questions, not the register behind the
 // answers.
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEventBase from "@testing-library/user-event";
 
 import { GrantForm } from "@/components/admin/farm/grant-form";

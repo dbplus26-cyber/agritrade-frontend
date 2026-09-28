@@ -1,5 +1,7 @@
 "use client";
 
+import { repaymentsCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -276,6 +278,11 @@ export function RepaymentsRegister() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IRepayment>
+            csvExport={{
+              filename: "repayments",
+              columns: repaymentsCsvColumns,
+              source: { url: "admin/farm/repayments", params: queryArgs },
+            }}
             columns={columns}
             data={repayments}
             itemNoun="repayments"

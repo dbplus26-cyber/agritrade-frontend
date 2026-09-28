@@ -1,5 +1,7 @@
 "use client";
 
+import { buyersCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -245,6 +247,11 @@ export function BuyerTable() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IBuyer>
+            csvExport={{
+              filename: "buyers",
+              columns: buyersCsvColumns,
+              source: { url: "admin/buyers", params: queryArgs },
+            }}
             columns={columns}
             data={buyers}
             itemNoun="buyers"

@@ -1,5 +1,7 @@
 "use client";
 
+import { salesCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -380,6 +382,11 @@ export function SalesRegister() {
             <>
               <AdminCard className="hidden overflow-hidden md:block">
                 <ConsoleDataTable<ISale>
+                  csvExport={{
+                    filename: "sales",
+                    columns: salesCsvColumns,
+                    source: { url: "admin/sales", params: queryArgs },
+                  }}
                   columns={columns}
                   data={sales}
                   itemNoun="sales"

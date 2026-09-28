@@ -1,5 +1,8 @@
 "use client";
 
+import { CsvExportButton } from "@/components/admin/csv-export-button";
+import { driverPaymentsCsvColumns } from "@/components/admin/csv-columns";
+
 import { useState } from "react";
 
 import { HelpTip, HelpWrap } from "@/components/admin/help-tip";
@@ -334,7 +337,7 @@ export function DriverSettlementCard({
   const [reversing, setReversing] = useState<IDriverPayment | null>(null);
   const [reverse, reverseState] = useReverseDriverPaymentMutation();
 
-  const { data, error, isError, isLoading, refetch } =
+  const { data, error, isError, isLoading, isFetching, refetch } =
     useGetDriverSettlementQuery(shipmentId);
 
   const onReverse = async (reason: string) => {
@@ -468,6 +471,16 @@ export function DriverSettlementCard({
 
       <MilestoneSchedule settlement={settlement} />
 
+      <div className="my-3 flex justify-end">
+        <CsvExportButton
+          config={{
+            filename: `trip-${shipmentId}-driver-payments`,
+            columns: driverPaymentsCsvColumns,
+          }}
+          rows={payments}
+          disabled={isFetching || payments.length === 0}
+        />
+      </div>
       {payments.length > 0 ? (
         <div className="mt-5 border-t border-adm-hairline pt-2">
           <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">

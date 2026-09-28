@@ -1,5 +1,8 @@
 "use client";
 
+import { CsvExportButton } from "@/components/admin/csv-export-button";
+import { salePaymentsCsvColumns } from "@/components/admin/csv-columns";
+
 import { useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
@@ -187,7 +190,8 @@ export function SaleDetail({
   initialPayOpen?: boolean;
 }) {
   const { has } = usePermissions();
-  const { data, isLoading, isError, error, refetch } = useGetSaleQuery(id);
+  const { data, isLoading, isFetching, isError, error, refetch } =
+    useGetSaleQuery(id);
   const [confirmSale, confirmState] = useConfirmSaleMutation();
   const { confirm, confirmationDialog } = useConfirm();
   const { isSuperAdmin } = useAuthRole();
@@ -473,6 +477,16 @@ export function SaleDetail({
       {/* Payments ledger */}
       <AdminCard className="px-5 py-3">
         <SectionHeading className="mb-1">Payments</SectionHeading>
+        <div className="my-3 flex justify-end">
+          <CsvExportButton
+            config={{
+              filename: `sale-${sale.transactionNo}-payments`,
+              columns: salePaymentsCsvColumns,
+            }}
+            rows={sale.payments}
+            disabled={isFetching || sale.payments.length === 0}
+          />
+        </div>
         {sale.payments.length === 0 ? (
           <p className="py-2 text-[11.5px] text-adm-muted">
             No payments recorded yet.

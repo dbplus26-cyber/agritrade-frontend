@@ -1,3 +1,4 @@
+import { renderWithStore as render } from "../helpers/render-with-store";
 // test/component/StatementCashSource.test.tsx
 //
 // The two registers that held a money figure and moved no money at all. What
@@ -19,7 +20,7 @@
 // plain input - it is its own screen with its own query, and this file is
 // about the question, not the register behind it.
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, screen, within } from "@testing-library/react";
 import userEventBase from "@testing-library/user-event";
 
 import { DrawingsScreen } from "@/components/admin/statements/drawings-screen";

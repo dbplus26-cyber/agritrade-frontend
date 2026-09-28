@@ -1,5 +1,7 @@
 "use client";
 
+import { expenseCategoriesCsvColumns } from "@/components/admin/csv-columns";
+
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -385,6 +387,11 @@ export function ExpenseCategoryTable() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IExpenseCategory>
+            csvExport={{
+              filename: "expense-categories",
+              columns: expenseCategoriesCsvColumns,
+              source: { url: "admin/expense-categories", params: queryArgs },
+            }}
             columns={columns}
             data={categories}
             itemNoun="categories"

@@ -1,5 +1,7 @@
 "use client";
 
+import { transfersCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Controller, useForm } from "react-hook-form";
@@ -411,6 +413,11 @@ export function TransfersScreen() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<ITransfer>
+            csvExport={{
+              filename: "transfers",
+              columns: transfersCsvColumns,
+              source: { url: "admin/stock/transfers", params: queryArgs },
+            }}
             columns={columns}
             data={transfers}
             itemNoun="transfers"

@@ -1,5 +1,7 @@
 "use client";
 
+import { driversCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -289,6 +291,11 @@ export function DriverTable() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IDriver>
+            csvExport={{
+              filename: "drivers",
+              columns: driversCsvColumns,
+              source: { url: "admin/drivers", params: queryArgs },
+            }}
             columns={columns}
             data={drivers}
             itemNoun="drivers"

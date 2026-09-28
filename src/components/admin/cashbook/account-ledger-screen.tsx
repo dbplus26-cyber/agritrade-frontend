@@ -1,5 +1,7 @@
 "use client";
 
+import { accountLedgerCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 
@@ -257,6 +259,14 @@ export function AccountLedgerScreen({ accountId }: { accountId: string }) {
             />
           ) : (
             <ConsoleDataTable<ILedgerRow>
+              csvExport={{
+                filename: "account-ledger",
+                columns: accountLedgerCsvColumns,
+                source: {
+                  url: `admin/accounts/${accountId}/ledger`,
+                  params: { page, limit },
+                },
+              }}
               columns={columns}
               data={rows}
               isFetching={ledger.isFetching}

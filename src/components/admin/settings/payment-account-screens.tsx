@@ -1,5 +1,7 @@
 "use client";
 
+import { paymentAccountsCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -304,6 +306,11 @@ export function PaymentAccountTable() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IPaymentAccount>
+            csvExport={{
+              filename: "payment-accounts",
+              columns: paymentAccountsCsvColumns,
+              source: { url: "admin/payment-accounts", params: queryArgs },
+            }}
             columns={columns}
             data={accounts}
             itemNoun="accounts"

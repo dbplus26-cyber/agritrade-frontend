@@ -1,5 +1,7 @@
 "use client";
 
+import { fixedAssetsCsvColumns } from "@/components/admin/csv-columns";
+
 // The fixed-asset register: the assets the statements depreciate, with their
 // classes (depreciation + capital-allowance vocabulary). An asset is entered
 // once and flows into every later book until disposed of.
@@ -971,6 +973,10 @@ export function FixedAssetsScreen() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IFixedAsset>
+            csvExport={{
+              filename: "fixed-assets",
+              columns: fixedAssetsCsvColumns,
+            }}
             columns={columns}
             data={assets}
             itemNoun="assets"

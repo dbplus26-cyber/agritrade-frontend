@@ -1,5 +1,7 @@
 "use client";
 
+import { farmersCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -204,6 +206,11 @@ export function FarmersRegister() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IFarmer>
+            csvExport={{
+              filename: "farmers",
+              columns: farmersCsvColumns,
+              source: { url: "admin/farm/farmers", params: queryArgs },
+            }}
             columns={columns}
             data={farmers}
             itemNoun="farmers"

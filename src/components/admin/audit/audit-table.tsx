@@ -1,5 +1,7 @@
 "use client";
 
+import { auditCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
@@ -286,6 +288,11 @@ export function AuditTable() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IAuditLog>
+            csvExport={{
+              filename: "audit",
+              columns: auditCsvColumns,
+              source: { url: "admin/audit-logs", params: queryArgs },
+            }}
             columns={columns}
             data={logs}
             itemNoun="entries"

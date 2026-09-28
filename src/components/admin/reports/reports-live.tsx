@@ -545,7 +545,7 @@ export function ReportsLive() {
       </div>
 
       <div className="mb-5">
-        <DebtorsTable exportHref={`${EXPORTS}/debtors.csv`} />
+        <DebtorsTable />
       </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">

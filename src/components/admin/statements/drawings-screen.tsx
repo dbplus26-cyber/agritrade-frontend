@@ -1,5 +1,7 @@
 "use client";
 
+import { drawingsCsvColumns } from "@/components/admin/csv-columns";
+
 // The proprietor's drawings ledger: personal withdrawals, numbered like every
 // other money record, feeding the capital account on the statements - never
 // the P&L, which is the whole reason this is not an expense category.
@@ -367,6 +369,7 @@ export function DrawingsScreen() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IDrawing>
+            csvExport={{ filename: "drawings", columns: drawingsCsvColumns }}
             columns={columns}
             data={drawings}
             itemNoun="drawings"

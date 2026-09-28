@@ -1,5 +1,8 @@
 "use client";
 
+import { CsvExportButton } from "@/components/admin/csv-export-button";
+import { purchasePaymentsCsvColumns } from "@/components/admin/csv-columns";
+
 import { useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -388,7 +391,7 @@ export function PurchaseSettlementCard({
   const [reversing, setReversing] = useState<IPurchasePayment | null>(null);
   const [reverse, reverseState] = useReversePurchasePaymentMutation();
 
-  const { data, error, isError, isLoading, refetch } =
+  const { data, error, isError, isLoading, isFetching, refetch } =
     useGetPurchasePaymentsQuery(purchaseId);
 
   const onReverse = async (reason: string) => {
@@ -481,6 +484,16 @@ export function PurchaseSettlementCard({
         </dl>
       )}
 
+      <div className="my-3 flex justify-end">
+        <CsvExportButton
+          config={{
+            filename: `purchase-${purchaseId}-payments`,
+            columns: purchasePaymentsCsvColumns,
+          }}
+          rows={payments}
+          disabled={isFetching || payments.length === 0}
+        />
+      </div>
       {payments.length > 0 ? (
         <div className="mt-5 border-t border-adm-hairline pt-2">
           <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">

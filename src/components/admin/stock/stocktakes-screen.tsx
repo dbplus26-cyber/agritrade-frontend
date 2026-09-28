@@ -1,5 +1,7 @@
 "use client";
 
+import { stocktakesCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -263,6 +265,11 @@ export function StocktakesScreen() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IStocktake>
+            csvExport={{
+              filename: "stocktakes",
+              columns: stocktakesCsvColumns,
+              source: { url: "admin/stock/stocktakes", params: queryArgs },
+            }}
             columns={columns}
             data={stocktakes}
             itemNoun="stocktakes"

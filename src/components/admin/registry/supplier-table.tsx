@@ -1,5 +1,7 @@
 "use client";
 
+import { suppliersCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -353,6 +355,11 @@ export function SupplierTable() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<ISupplier>
+            csvExport={{
+              filename: "suppliers",
+              columns: suppliersCsvColumns,
+              source: { url: "admin/suppliers", params: queryArgs },
+            }}
             columns={columns}
             data={suppliers}
             itemNoun="suppliers"

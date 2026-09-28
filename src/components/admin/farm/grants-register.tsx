@@ -1,5 +1,7 @@
 "use client";
 
+import { grantsCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -291,6 +293,11 @@ export function GrantsRegister() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IGrant>
+            csvExport={{
+              filename: "grants",
+              columns: grantsCsvColumns,
+              source: { url: "admin/farm/grants", params: queryArgs },
+            }}
             columns={columns}
             data={grants}
             itemNoun="grants"

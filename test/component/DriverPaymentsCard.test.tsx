@@ -1,3 +1,4 @@
+import { renderWithStore as render } from "../helpers/render-with-store";
 // test/component/DriverPaymentsCard.test.tsx
 //
 // A driver's money on the driver's own record. The system emails a payment
@@ -13,7 +14,7 @@
 //     member without financial visibility still sees WHICH payments exist;
 //   * an empty history says so instead of rendering an empty ledger.
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 
 import { DriverPaymentsCard } from "@/components/admin/drivers/driver-payments-card";
 import type {

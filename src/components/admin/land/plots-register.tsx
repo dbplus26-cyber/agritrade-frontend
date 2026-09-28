@@ -1,5 +1,8 @@
 "use client";
 
+import { CsvExportButton } from "@/components/admin/csv-export-button";
+import { plotsCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -57,7 +60,7 @@ export function PlotsRegister() {
     [page, pageSize, search, status],
   );
 
-  const { data, isLoading, isError, error, refetch } =
+  const { data, isLoading, isFetching, isError, error, refetch } =
     useGetPlotsQuery(queryArgs);
   const plots = data?.data ?? [];
   const meta = data?.meta;
@@ -85,12 +88,24 @@ export function PlotsRegister() {
           totalCount={total}
           noun="plots"
           action={
-            <AdminButton asChild aria-label="Add plot">
-              <Link href={`${LIST}/new`}>
-                <Plus className="h-4 w-4" aria-hidden="true" />
-                <span className="hidden sm:inline">Add plot</span>
-              </Link>
-            </AdminButton>
+            <div className="flex flex-wrap gap-2">
+              <CsvExportButton
+                config={{
+                  filename: "plots",
+                  columns: plotsCsvColumns,
+                  source: { url: "admin/land/plots", params: queryArgs },
+                }}
+                disabled={isFetching || isError || total === 0}
+              />
+              {
+                <AdminButton asChild aria-label="Add plot">
+                  <Link href={`${LIST}/new`}>
+                    <Plus className="h-4 w-4" aria-hidden="true" />
+                    <span className="hidden sm:inline">Add plot</span>
+                  </Link>
+                </AdminButton>
+              }
+            </div>
           }
           inlineFilter={
             <ConsoleLabeledSelect

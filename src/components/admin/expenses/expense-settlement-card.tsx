@@ -1,5 +1,8 @@
 "use client";
 
+import { CsvExportButton } from "@/components/admin/csv-export-button";
+import { expensePaymentsCsvColumns } from "@/components/admin/csv-columns";
+
 import { useState } from "react";
 import Link from "next/link";
 import { Controller, useForm, useWatch } from "react-hook-form";
@@ -461,7 +464,7 @@ export function ExpenseSettlementCard({
   const [reversing, setReversing] = useState<IExpensePayment | null>(null);
   const [reverse, reverseState] = useReverseExpensePaymentMutation();
 
-  const { data, error, isError, isLoading, refetch } =
+  const { data, error, isError, isLoading, isFetching, refetch } =
     useGetExpensePaymentsQuery(expenseId);
 
   const onReverse = async (reason: string) => {
@@ -554,6 +557,16 @@ export function ExpenseSettlementCard({
         </dl>
       )}
 
+      <div className="my-3 flex justify-end">
+        <CsvExportButton
+          config={{
+            filename: `expense-${expenseId}-payments`,
+            columns: expensePaymentsCsvColumns,
+          }}
+          rows={payments}
+          disabled={isFetching || payments.length === 0}
+        />
+      </div>
       {payments.length > 0 ? (
         <div className="mt-5 border-t border-adm-hairline pt-2">
           <p className="mb-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">

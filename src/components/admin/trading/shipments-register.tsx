@@ -1,5 +1,8 @@
 "use client";
 
+import { CsvExportButton } from "@/components/admin/csv-export-button";
+import { shipmentsCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -67,7 +70,7 @@ export function ShipmentsRegister() {
     [page, pageSize, search, status, from, to],
   );
 
-  const { data, isLoading, isError, error, refetch } =
+  const { data, isLoading, isFetching, isError, error, refetch } =
     useGetShipmentsQuery(queryArgs);
   const shipments = data?.data ?? [];
   const meta = data?.meta;
@@ -97,14 +100,24 @@ export function ShipmentsRegister() {
           totalCount={totalCount}
           noun="shipments"
           action={
-            canManage ? (
-              <AdminButton asChild aria-label="Plan shipment">
-                <Link href={`${LIST}/new`}>
-                  <Plus className="h-4 w-4" aria-hidden="true" />
-                  <span className="hidden sm:inline">Plan shipment</span>
-                </Link>
-              </AdminButton>
-            ) : null
+            <div className="flex flex-wrap gap-2">
+              <CsvExportButton
+                config={{
+                  filename: "shipments",
+                  columns: shipmentsCsvColumns,
+                  source: { url: "admin/shipments", params: queryArgs },
+                }}
+                disabled={isFetching || isError || totalCount === 0}
+              />
+              {canManage ? (
+                <AdminButton asChild aria-label="Plan shipment">
+                  <Link href={`${LIST}/new`}>
+                    <Plus className="h-4 w-4" aria-hidden="true" />
+                    <span className="hidden sm:inline">Plan shipment</span>
+                  </Link>
+                </AdminButton>
+              ) : null}
+            </div>
           }
           chips={
             <>

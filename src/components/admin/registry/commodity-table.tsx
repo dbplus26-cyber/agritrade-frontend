@@ -1,5 +1,7 @@
 "use client";
 
+import { commoditiesCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -286,6 +288,11 @@ export function CommodityTable() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<ICommodity>
+            csvExport={{
+              filename: "commodities",
+              columns: commoditiesCsvColumns,
+              source: { url: "admin/commodities", params: queryArgs },
+            }}
             columns={columns}
             data={commodities}
             itemNoun="commodities"

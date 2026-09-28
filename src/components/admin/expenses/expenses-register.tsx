@@ -1,5 +1,9 @@
 "use client";
 
+import type { IExpenseListQuery } from "@/types/expense.types";
+
+import { expensesCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
@@ -87,19 +91,20 @@ export function ExpensesRegister() {
       value: c.id,
     })),
   ];
+  const queryArgs: IExpenseListQuery = {
+    categoryId: String(queryParams.categoryId ?? "") || undefined,
+    from: String(queryParams.from ?? "") || undefined,
+    limit: 20,
+    page,
+    scope:
+      queryParams.scope === "shipment" || queryParams.scope === "standalone"
+        ? queryParams.scope
+        : undefined,
+    search: String(queryParams.search ?? "") || undefined,
+    to: String(queryParams.to ?? "") || undefined,
+  };
   const { data, error, isError, isFetching, isLoading, refetch } =
-    useGetExpensesQuery({
-      categoryId: String(queryParams.categoryId ?? "") || undefined,
-      from: String(queryParams.from ?? "") || undefined,
-      limit: 20,
-      page,
-      scope:
-        queryParams.scope === "shipment" || queryParams.scope === "standalone"
-          ? queryParams.scope
-          : undefined,
-      search: String(queryParams.search ?? "") || undefined,
-      to: String(queryParams.to ?? "") || undefined,
-    });
+    useGetExpensesQuery(queryArgs);
 
   const columns = useMemo<ColumnDef<IExpense, unknown>[]>(
     () => [
@@ -392,6 +397,11 @@ export function ExpensesRegister() {
 
           <AdminCard className="overflow-hidden">
             <ConsoleDataTable<IExpense>
+              csvExport={{
+                filename: "expenses",
+                columns: expensesCsvColumns,
+                source: { url: "admin/expenses", params: queryArgs },
+              }}
               columns={columns}
               data={rows}
               itemNoun="expenses"

@@ -1,5 +1,7 @@
 "use client";
 
+import { warehousesCsvColumns } from "@/components/admin/csv-columns";
+
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -383,6 +385,11 @@ export function WarehouseTable() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IWarehouse>
+            csvExport={{
+              filename: "warehouses",
+              columns: warehousesCsvColumns,
+              source: { url: "admin/warehouses", params: queryArgs },
+            }}
             columns={columns}
             data={warehouses}
             itemNoun="warehouses"

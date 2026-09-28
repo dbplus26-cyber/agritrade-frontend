@@ -1,5 +1,7 @@
 "use client";
 
+import { usersCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo } from "react";
 import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -357,6 +359,11 @@ export function UsersTable() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IUser>
+            csvExport={{
+              filename: "users",
+              columns: usersCsvColumns,
+              source: { url: "admin/users", params: queryArgs },
+            }}
             columns={columns}
             data={users}
             itemNoun="users"

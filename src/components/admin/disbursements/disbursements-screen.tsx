@@ -1,5 +1,7 @@
 "use client";
 
+import { disbursementsCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
@@ -289,6 +291,11 @@ export function DisbursementsScreen() {
               the only screens with no sheet under the rows. */}
           <AdminCard className="overflow-hidden">
             <ConsoleDataTable<IDisbursement>
+              csvExport={{
+                filename: "disbursements",
+                columns: disbursementsCsvColumns,
+                source: { url: "admin/disbursements", params: args },
+              }}
               columns={columns}
               data={rows}
               emptyState={

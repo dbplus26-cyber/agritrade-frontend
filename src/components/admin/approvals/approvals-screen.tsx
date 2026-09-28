@@ -1,5 +1,8 @@
 "use client";
 
+import { CsvExportButton } from "@/components/admin/csv-export-button";
+import { approvalsCsvColumns } from "@/components/admin/csv-columns";
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   type ColumnDef,
@@ -146,7 +149,7 @@ export function ApprovalsScreen() {
     [page, status, filters.action, filters.from, filters.to, search],
   );
 
-  const { data, isLoading, isError, error, refetch } =
+  const { data, isLoading, isFetching, isError, error, refetch } =
     useGetApprovalsQuery(queryArgs);
   const approvals = useMemo(() => data?.data ?? [], [data]);
   const totalCount = data?.meta.total ?? 0;
@@ -531,6 +534,16 @@ export function ApprovalsScreen() {
           onClear={resetFilters}
           totalCount={totalCount}
           noun="approvals"
+          action={
+            <CsvExportButton
+              config={{
+                filename: "approvals",
+                columns: approvalsCsvColumns,
+                source: { url: "admin/approvals", params: queryArgs },
+              }}
+              disabled={isFetching || isError || totalCount === 0}
+            />
+          }
           chips={
             <>
               {filters.action !== "all" ? (

@@ -1,5 +1,7 @@
 "use client";
 
+import { landSalesCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo } from "react";
 import Link from "next/link";
 import { useState } from "react";
@@ -261,6 +263,11 @@ export function LandSalesRegister() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<ILandSale>
+            csvExport={{
+              filename: "land-sales",
+              columns: landSalesCsvColumns,
+              source: { url: "admin/land/sales", params: queryArgs },
+            }}
             columns={columns}
             data={sales}
             itemNoun="land sales"

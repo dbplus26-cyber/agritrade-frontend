@@ -1,5 +1,8 @@
 "use client";
 
+import { CsvExportButton } from "@/components/admin/csv-export-button";
+import { cashBookCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo, useState } from "react";
 import Link from "next/link";
 
@@ -61,11 +64,21 @@ export function CashBookScreen() {
         hint="Every place the business's money can sit, what each holds, and every movement in and out."
         sub="What the business holds, account by account"
         actions={
-          canPost ? (
-            <AdminButton onClick={() => setMoving(true)} type="button">
-              Move money
-            </AdminButton>
-          ) : null
+          <div className="flex flex-wrap gap-2">
+            <CsvExportButton
+              config={{
+                filename: "cash-book-balances",
+                columns: cashBookCsvColumns,
+              }}
+              rows={accounts}
+              disabled={isFetching || accounts.length === 0}
+            />
+            {canPost ? (
+              <AdminButton onClick={() => setMoving(true)} type="button">
+                Move money
+              </AdminButton>
+            ) : null}
+          </div>
         }
       />
 

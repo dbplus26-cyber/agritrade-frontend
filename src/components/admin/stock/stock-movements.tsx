@@ -1,5 +1,7 @@
 "use client";
 
+import { stockMovementsCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo, type ReactNode } from "react";
 import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -293,6 +295,11 @@ export function StockMovements({
         // sheet under them read as a different kind of screen.
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable
+            csvExport={{
+              filename: "stock-movements",
+              columns: stockMovementsCsvColumns,
+              source: { url: "admin/stock/movements", params: queryArgs },
+            }}
             columns={columns}
             data={movements}
             itemNoun="movements"

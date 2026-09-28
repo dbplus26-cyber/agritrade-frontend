@@ -1,5 +1,8 @@
 "use client";
 
+import { CsvExportButton } from "@/components/admin/csv-export-button";
+import { farmerBalancesCsvColumns } from "@/components/admin/csv-columns";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -274,10 +277,18 @@ export function SeasonDetail({ id }: { id: string }) {
             <AdminCard className="overflow-hidden">
               {/* The rule stays on the band; the heading owns only its text,
                 so mb-0 leaves the band's py-3 as the gap under it. */}
-              <div className="border-b border-adm-hairline px-5 py-3">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-adm-hairline px-5 py-3">
                 <SectionHeading className="mb-0">
                   Farmer balances
                 </SectionHeading>
+                <CsvExportButton
+                  config={{
+                    filename: `season-${id}-farmer-balances`,
+                    columns: farmerBalancesCsvColumns,
+                  }}
+                  rows={stats?.farmerBalances ?? []}
+                  disabled={summary.isFetching || !stats?.farmerBalances.length}
+                />
               </div>
               {summary.isLoading ? (
                 <div className="p-5">

@@ -1,5 +1,7 @@
 "use client";
 
+import { landAcquisitionsCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -276,6 +278,11 @@ export function LandAcquisitionsRegister() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<ILandAcquisition>
+            csvExport={{
+              filename: "land-acquisitions",
+              columns: landAcquisitionsCsvColumns,
+              source: { url: "admin/land/acquisitions", params: queryArgs },
+            }}
             columns={columns}
             data={rows}
             itemNoun="acquisitions"

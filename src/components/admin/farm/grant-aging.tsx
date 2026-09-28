@@ -1,5 +1,7 @@
 "use client";
 
+import { grantAgingCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo } from "react";
 import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -254,6 +256,10 @@ export function GrantAging() {
           ) : (
             <AdminCard className="overflow-hidden">
               <ConsoleDataTable<IGrantAgingRow>
+                csvExport={{
+                  filename: "grant-aging",
+                  columns: grantAgingCsvColumns,
+                }}
                 columns={columns}
                 data={rows}
                 itemNoun="balances"

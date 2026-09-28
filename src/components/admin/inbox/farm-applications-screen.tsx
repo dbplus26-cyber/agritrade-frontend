@@ -1,5 +1,7 @@
 "use client";
 
+import { farmApplicationsCsvColumns } from "@/components/admin/csv-columns";
+
 import Link from "next/link";
 
 import { useMemo } from "react";
@@ -281,6 +283,11 @@ export function FarmApplicationsScreen() {
           ) : (
             <AdminCard className="overflow-hidden">
               <ConsoleDataTable<IAdminFarmApplication>
+                csvExport={{
+                  filename: "farm-applications",
+                  columns: farmApplicationsCsvColumns,
+                  source: { url: "admin/farm-applications", params: queryArgs },
+                }}
                 columns={columns}
                 data={applications}
                 itemNoun="applications"

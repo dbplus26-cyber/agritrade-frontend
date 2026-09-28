@@ -1,5 +1,7 @@
 "use client";
 
+import { accountPaymentsCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -407,6 +409,14 @@ export function PaymentAccountDetail({ id }: { id: string }) {
       </SectionHeading>
       <AdminCard className="overflow-hidden">
         <ConsoleDataTable<IAccountMovement>
+          csvExport={{
+            filename: "account-payments",
+            columns: accountPaymentsCsvColumns,
+            source: {
+              url: `admin/payment-accounts/${id}/payments`,
+              params: { page, limit: pageSize },
+            },
+          }}
           columns={columns}
           data={rows}
           itemNoun="movements"

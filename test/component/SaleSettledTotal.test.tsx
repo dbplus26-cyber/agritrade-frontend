@@ -1,3 +1,4 @@
+import { renderWithStore as render } from "../helpers/render-with-store";
 // test/component/SaleSettledTotal.test.tsx
 //
 // A sale carries two totals: what both sides shook hands on, and what the
@@ -19,7 +20,7 @@
 // the invoice and the sheet that shows it - test/integration/payable-basis
 // pins what that document bills.
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 
 import { SaleDetail } from "@/components/admin/trading/sale-detail";
 

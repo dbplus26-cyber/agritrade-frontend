@@ -1,5 +1,8 @@
 "use client";
 
+import { CsvExportButton } from "@/components/admin/csv-export-button";
+import { acquisitionPaymentsCsvColumns } from "@/components/admin/csv-columns";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
@@ -358,7 +361,7 @@ function CancelDialog({
 }
 
 export function LandAcquisitionDetail({ id }: { id: string }) {
-  const { data, isLoading, isError, error, refetch } =
+  const { data, isLoading, isFetching, isError, error, refetch } =
     useGetLandAcquisitionQuery(id);
   const [agree, agreeState] = useAgreeLandAcquisitionMutation();
   const [complete, completeState] = useCompleteLandAcquisitionMutation();
@@ -593,6 +596,16 @@ export function LandAcquisitionDetail({ id }: { id: string }) {
         main={
           <AdminCard className="px-5 py-3">
             <SectionHeading className="mb-1">Payments to seller</SectionHeading>
+            <div className="my-3 flex justify-end">
+              <CsvExportButton
+                config={{
+                  filename: `acquisition-${a.transactionNo}-payments`,
+                  columns: acquisitionPaymentsCsvColumns,
+                }}
+                rows={a.payments}
+                disabled={isFetching || a.payments.length === 0}
+              />
+            </div>
             {a.payments.length === 0 ? (
               <p className="py-2 text-[11.5px] text-adm-muted">
                 No payments recorded yet.

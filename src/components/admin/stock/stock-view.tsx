@@ -1,5 +1,8 @@
 "use client";
 
+import { CsvExportButton } from "@/components/admin/csv-export-button";
+import { stockBalancesCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
@@ -119,7 +122,7 @@ export function StockView() {
     }),
     [warehouseId, commodityId, includeZero],
   );
-  const { data, isLoading, isError, error, refetch } =
+  const { data, isLoading, isFetching, isError, error, refetch } =
     useGetStockBalancesQuery(balancesArgs);
 
   const allBalances = useMemo(() => data?.data ?? [], [data]);
@@ -328,7 +331,19 @@ export function StockView() {
               onClear={clearBalancesFilters}
               totalCount={balances.length}
               noun="stock lines"
-              action={adjustButton}
+              action={
+                <div className="flex flex-wrap gap-2">
+                  <CsvExportButton
+                    config={{
+                      filename: "stock-balances",
+                      columns: stockBalancesCsvColumns,
+                    }}
+                    rows={balances}
+                    disabled={isFetching || isError || balances.length === 0}
+                  />
+                  {adjustButton}
+                </div>
+              }
               leading={sectionTabs}
               chips={
                 <>

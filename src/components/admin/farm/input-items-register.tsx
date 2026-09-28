@@ -1,5 +1,7 @@
 "use client";
 
+import { inputItemsCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo, useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { columnHelp, ConsoleDataTable } from "@/components/admin/data-table";
@@ -179,6 +181,11 @@ export function InputItemsRegister() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IInputItem>
+            csvExport={{
+              filename: "input-items",
+              columns: inputItemsCsvColumns,
+              source: { url: "admin/farm/input-items", params: queryArgs },
+            }}
             columns={columns}
             data={items}
             itemNoun="items"

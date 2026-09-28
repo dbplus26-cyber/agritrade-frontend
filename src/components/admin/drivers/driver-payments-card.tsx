@@ -1,5 +1,8 @@
 "use client";
 
+import { CsvExportButton } from "@/components/admin/csv-export-button";
+import { driverPaymentHistoryCsvColumns } from "@/components/admin/csv-columns";
+
 import { useState } from "react";
 import Link from "next/link";
 
@@ -217,6 +220,16 @@ export function DriverPaymentsCard({ driverId }: { driverId: string }) {
         )}
       </p>
 
+      <div className="my-3 flex justify-end">
+        <CsvExportButton
+          config={{
+            filename: `driver-${driverId}-payments`,
+            columns: driverPaymentHistoryCsvColumns,
+            source: { url: `admin/drivers/${driverId}/payments` },
+          }}
+          disabled={meta.total === 0}
+        />
+      </div>
       {payments.length === 0 ? (
         <EmptyState
           className="mt-2"

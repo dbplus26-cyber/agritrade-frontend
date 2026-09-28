@@ -1,5 +1,7 @@
 "use client";
 
+import { deliveryAddressesCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -285,6 +287,11 @@ export function DeliveryAddressTable() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IDeliveryAddress>
+            csvExport={{
+              filename: "delivery-addresses",
+              columns: deliveryAddressesCsvColumns,
+              source: { url: "admin/delivery-addresses", params: queryArgs },
+            }}
             columns={columns}
             data={addresses}
             itemNoun="addresses"

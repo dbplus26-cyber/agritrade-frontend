@@ -39,6 +39,8 @@ import { navigationStarted } from "@/components/admin/navigation-progress";
 import { HelpTip } from "@/components/admin/help-tip";
 import { CompactDates } from "@/components/admin/date-cell";
 import { cn } from "@/lib/utils";
+import { CsvExportButton } from "@/components/admin/csv-export-button";
+import type { CsvExportConfig } from "@/lib/csv-export";
 
 /**
  * A column heading that carries its own explanation.
@@ -678,6 +680,7 @@ export function ConsoleDataTable<TData>({
   columns,
   data,
   itemNoun,
+  csvExport,
   pageSize: initialPageSize = 10,
   globalFilter = "",
   rowHref,
@@ -692,6 +695,7 @@ export function ConsoleDataTable<TData>({
 }: {
   columns: ColumnDef<TData, unknown>[];
   data: TData[];
+  csvExport?: CsvExportConfig<TData>;
   /** Plural noun for the footer, e.g. "purchases". */
   itemNoun: string;
   pageSize?: number;
@@ -852,6 +856,17 @@ export function ConsoleDataTable<TData>({
     <div
       className={cn("animate-console-in @container/table min-w-0", className)}
     >
+      {csvExport ? (
+        <div className="flex justify-end border-b border-adm-line px-4 py-2 print:hidden">
+          <CsvExportButton
+            config={csvExport}
+            rows={table
+              .getPrePaginationRowModel()
+              .rows.map((row) => row.original)}
+            disabled={isFetching || total === 0}
+          />
+        </div>
+      ) : null}
       {enableSelection && selectedRows.length > 0 && renderBulkActions ? (
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-adm-line bg-adm-sunken px-4 py-2">
           <span className="text-[11.5px] font-semibold text-adm-body">

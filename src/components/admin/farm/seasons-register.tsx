@@ -1,5 +1,7 @@
 "use client";
 
+import { seasonsCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -185,6 +187,11 @@ export function SeasonsRegister() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<ISeason>
+            csvExport={{
+              filename: "seasons",
+              columns: seasonsCsvColumns,
+              source: { url: "admin/farm/seasons", params: queryArgs },
+            }}
             columns={columns}
             data={seasons}
             itemNoun="seasons"

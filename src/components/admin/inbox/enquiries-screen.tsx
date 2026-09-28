@@ -1,5 +1,7 @@
 "use client";
 
+import { enquiriesCsvColumns } from "@/components/admin/csv-columns";
+
 import Link from "next/link";
 
 import { useMemo } from "react";
@@ -276,6 +278,11 @@ export function EnquiriesScreen() {
           ) : (
             <AdminCard className="overflow-hidden">
               <ConsoleDataTable<IAdminEnquiry>
+                csvExport={{
+                  filename: "enquiries",
+                  columns: enquiriesCsvColumns,
+                  source: { url: "admin/enquiries", params: queryArgs },
+                }}
                 columns={columns}
                 data={enquiries}
                 itemNoun="enquiries"

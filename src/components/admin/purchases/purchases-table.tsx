@@ -1,5 +1,7 @@
 "use client";
 
+import { purchasesCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo } from "react";
 
 import { useMoneyVisibility } from "@/hooks/use-money-visibility";
@@ -397,6 +399,11 @@ export function PurchasesTable() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IPurchase>
+            csvExport={{
+              filename: "purchases",
+              columns: purchasesCsvColumns,
+              source: { url: "admin/purchases", params: queryArgs },
+            }}
             columns={columns}
             data={purchases}
             itemNoun="purchases"

@@ -1,5 +1,7 @@
 "use client";
 
+import { treasuryTransfersCsvColumns } from "@/components/admin/csv-columns";
+
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -240,6 +242,14 @@ export function TreasuryScreen() {
           />
         ) : (
           <ConsoleDataTable<IBalanceTransfer>
+            csvExport={{
+              filename: "treasury-transfers",
+              columns: treasuryTransfersCsvColumns,
+              source: {
+                url: "admin/treasury/transfers",
+                params: { limit, page },
+              },
+            }}
             columns={columns}
             data={rows}
             isFetching={transfers.isFetching}

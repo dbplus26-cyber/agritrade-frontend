@@ -1,5 +1,8 @@
 "use client";
 
+import { CsvExportButton } from "@/components/admin/csv-export-button";
+import { debtorsCsvColumns } from "@/components/admin/csv-columns";
+
 import { X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -29,7 +32,7 @@ const PAGE_SIZE = 10;
  * Unified debtors (commodity + land) with a name search and pagination. Every
  * outstanding balance across both books in one table; money is redaction-aware.
  */
-export function DebtorsTable({ exportHref }: { exportHref: string }) {
+export function DebtorsTable() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const debounced = useDebounce(search.trim(), 400);
@@ -53,9 +56,17 @@ export function DebtorsTable({ exportHref }: { exportHref: string }) {
         title="Debtors - outstanding balances"
         hint="Everyone who still owes you money, on grain orders and on land, in one list."
         right={
-          <a href={exportHref} className={cn(adminLinkClass, "text-[11px]")}>
-            Export CSV
-          </a>
+          <CsvExportButton
+            config={{
+              filename: "debtors",
+              columns: debtorsCsvColumns,
+              source: {
+                url: "admin/reports/debtors",
+                params: { search: debounced || undefined },
+              },
+            }}
+            disabled={isFetching || isError || !meta?.total}
+          />
         }
       />
 

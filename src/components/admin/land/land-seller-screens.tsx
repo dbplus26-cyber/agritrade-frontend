@@ -1,5 +1,7 @@
 "use client";
 
+import { landSellersCsvColumns } from "@/components/admin/csv-columns";
+
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -235,6 +237,11 @@ export function LandSellerTable() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<ILandSeller>
+            csvExport={{
+              filename: "land-sellers",
+              columns: landSellersCsvColumns,
+              source: { url: "admin/land/sellers", params: queryArgs },
+            }}
             columns={columns}
             data={sellers}
             itemNoun="sellers"

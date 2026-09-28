@@ -1,5 +1,8 @@
 "use client";
 
+import { CsvExportButton } from "@/components/admin/csv-export-button";
+import { stocktakeLinesCsvColumns } from "@/components/admin/csv-columns";
+
 import { useState } from "react";
 import Link from "next/link";
 import {
@@ -53,7 +56,17 @@ function LinesCard({ lines }: { lines: IStocktakeLine[] }) {
       {/* The rule stays on the band; mb-0 because the band's py-3 already
           spaces the title off the table below it. */}
       <div className="border-b border-adm-hairline px-4 py-3 sm:px-5">
-        <SectionHeading className="mb-0">Count lines</SectionHeading>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <SectionHeading className="mb-0">Count lines</SectionHeading>
+          <CsvExportButton
+            config={{
+              filename: "stocktake-count-lines",
+              columns: stocktakeLinesCsvColumns,
+            }}
+            rows={lines}
+            disabled={lines.length === 0}
+          />
+        </div>
       </div>
       <div className="@container/lines">
         {/* Wide: the real four-column table. */}

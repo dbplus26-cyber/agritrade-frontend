@@ -1,5 +1,7 @@
 "use client";
 
+import { agentsCsvColumns } from "@/components/admin/csv-columns";
+
 import { useMemo } from "react";
 
 import { useMoneyVisibility } from "@/hooks/use-money-visibility";
@@ -227,6 +229,11 @@ export function AgentsTable() {
       ) : (
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IAgentSummary>
+            csvExport={{
+              filename: "agents",
+              columns: agentsCsvColumns,
+              source: { url: "admin/agents", params: queryArgs },
+            }}
             columns={columns}
             data={agents}
             itemNoun="agents"

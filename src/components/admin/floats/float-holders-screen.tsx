@@ -1,5 +1,7 @@
 "use client";
 
+import { floatHoldersCsvColumns } from "@/components/admin/csv-columns";
+
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -310,6 +312,11 @@ export function FloatHoldersScreen() {
         // included - a bare table is the one shape that reads as unfiled.
         <AdminCard className="overflow-hidden">
           <ConsoleDataTable<IFloatHolder>
+            csvExport={{
+              filename: "float-holders",
+              columns: floatHoldersCsvColumns,
+              source: { url: "admin/floats", params: args },
+            }}
             columns={columns}
             data={rows}
             isFetching={isFetching}
