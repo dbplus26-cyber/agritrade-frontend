@@ -91,6 +91,16 @@ export function ExpenseDialog({
   const hasDriverFeeExpense = shipment.expenses.some(
     (expense) => expense.driverFeeShipmentId !== null,
   );
+  // A driver payment's debit belongs to the driver settlement, so the debit
+  // picker never offers it: matching it to a second expense would settle two
+  // debts with one cedi. It reaches this trip's costs through the linked
+  // driver fee expense instead, so it is listed under the picker with that
+  // route rather than leaving the admin searching for it.
+  const driverPayments = (driverSettlement?.data.payments ?? []).filter(
+    (payment) => !payment.isReversal && !payment.reversedByPaymentId,
+  );
+  const canLinkDriverFee =
+    canSeeMoney && feeGhs != null && feeGhs > 0 && !hasDriverFeeExpense;
   // The reference rule depends on WHICH account was picked - no statement
   // arrives for somebody's own pocket - so the schema is built from the list
   // the picker offers.
@@ -249,10 +259,7 @@ export function ExpenseDialog({
               {...register("amountGhs")}
             />
           </AdminField>
-          {canSeeMoney &&
-          feeGhs != null &&
-          feeGhs > 0 &&
-          !hasDriverFeeExpense ? (
+          {canLinkDriverFee ? (
             <Controller
               control={control}
               name="linkDriverFee"
@@ -303,6 +310,53 @@ export function ExpenseDialog({
               accountId={paymentAccountId}
               onChange={setMatchedOutflows}
             />
+          ) : null}
+          {!linkDriverFee &&
+          paidNow &&
+          useExistingPayment &&
+          driverPayments.length ? (
+            <div className="grid gap-2 border border-adm-line p-2.5 text-[11.5px] text-adm-body">
+              <p>
+                Driver payments on this trip are not listed above: their debits
+                belong to the driver settlement.
+                {hasDriverFeeExpense
+                  ? " They already settle this trip's driver fee expense."
+                  : canLinkDriverFee
+                    ? " Use the driver fee as this expense to cover them."
+                    : ""}
+              </p>
+              <ul className="grid gap-1">
+                {driverPayments.map((payment) => (
+                  <li
+                    key={payment.id}
+                    className="flex items-start justify-between gap-2"
+                  >
+                    <span className="min-w-0 [overflow-wrap:anywhere]">
+                      <Mono>{payment.transactionNo}</Mono>
+                      {payment.reference ? ` · ${payment.reference}` : ""}
+                    </span>
+                    {payment.amountGhs != null ? (
+                      <span className="flex-none">
+                        <Money value={payment.amountGhs} />
+                      </span>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+              {canLinkDriverFee && feeGhs != null ? (
+                <AdminButton
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  onClick={() => {
+                    setValue("linkDriverFee", true);
+                    setValue("amountGhs", String(feeGhs));
+                  }}
+                >
+                  Use the driver fee as this expense
+                </AdminButton>
+              ) : null}
+            </div>
           ) : null}
           <ResponsiveDialogFooter className="gap-2">
             <AdminButton
