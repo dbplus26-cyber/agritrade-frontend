@@ -55,8 +55,11 @@ export function RegisterPager({
 }) {
   if (totalPages <= 1) return null;
   // Page 1 keeps the bare canonical URL rather than `?page=1`.
+  // A basePath may already carry a query (the blog's filters).
   const hrefOf = (n: number) =>
-    n <= 1 ? basePath : `${basePath}?page=${String(n)}`;
+    n <= 1
+      ? basePath
+      : `${basePath}${basePath.includes("?") ? "&" : "?"}page=${String(n)}`;
 
   return (
     <nav

@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { fetchAllBlogSlugs } from "@/lib/public-blog";
 import { fetchPublicCommodities, toLots } from "@/lib/public-commodities";
 import { fetchPublicLandPlots, plotSlug } from "@/lib/public-land";
 import { routes } from "@/lib/routes";
@@ -10,9 +11,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // are the cached public feeds, so the sitemap costs no extra request and
   // follows the same purge as the pages it lists. A down API simply yields no
   // detail entries rather than failing the sitemap.
-  const [lots, plots] = await Promise.all([
+  const [lots, plots, articles] = await Promise.all([
     fetchPublicCommodities().then(toLots),
     fetchPublicLandPlots().then((p) => p ?? []),
+    fetchAllBlogSlugs(),
   ]);
   // /style-guide is internal (noindex + robots-disallowed) and the console
   // and field app are private - only the real public content is listed.
@@ -62,6 +64,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     },
     {
+      url: `${siteUrl}${routes.blog}`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
+    {
       url: `${siteUrl}${routes.contact}`,
       lastModified: now,
       changeFrequency: "monthly",
@@ -90,6 +98,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "weekly" as const,
       priority: 0.7,
+    })),
+    ...articles.map((a) => ({
+      url: `${siteUrl}${routes.blogPost(a.slug)}`,
+      lastModified: new Date(a.updatedAt),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
     })),
   ];
 }

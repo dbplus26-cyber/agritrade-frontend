@@ -6,6 +6,7 @@ import { PaperTrail } from "@/components/home/paper-trail";
 import { TrustStrip } from "@/components/home/trust-strip";
 import { WaybillSteps } from "@/components/home/waybill-steps";
 import { WhyUs } from "@/components/home/why-us";
+import { LatestPostsBand } from "@/components/blog/latest-posts-band";
 import { ReviewsBand } from "@/components/reviews/reviews-band";
 import { fetchPublicCommodities, toBoardLines } from "@/lib/public-commodities";
 import { pageMetadata } from "@/lib/seo";
@@ -41,6 +42,8 @@ export default async function HomePage() {
       <WhyUs />
       {/* Approved reviews only - renders nothing while the file is empty. */}
       <ReviewsBand />
+      {/* Renders nothing until the first article is published. */}
+      <LatestPostsBand />
       <CtaCall />
     </>
   );

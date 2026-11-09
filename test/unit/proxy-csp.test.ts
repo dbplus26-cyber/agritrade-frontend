@@ -26,4 +26,19 @@ describe("page response policy", () => {
       "'nonce-",
     );
   });
+
+  it("opens TinyMCE's CDN for the console only", () => {
+    const site = proxy(new NextRequest("https://dbplus.example/blog"));
+    const consolePage = proxy(
+      new NextRequest("https://dbplus.example/admin/blog", {
+        headers: { cookie: "dbplus.auth.hint=1" },
+      }),
+    );
+    expect(site.headers.get("Content-Security-Policy")).not.toContain(
+      "cdn.tiny.cloud",
+    );
+    expect(consolePage.headers.get("Content-Security-Policy")).toMatch(
+      /script-src[^;]*https:\/\/cdn\.tiny\.cloud/,
+    );
+  });
 });

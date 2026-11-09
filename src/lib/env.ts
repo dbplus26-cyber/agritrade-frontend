@@ -40,6 +40,11 @@ export const env = {
    * the browser bundle carries the same release as the server.
    */
   SENTRY_RELEASE: process.env.NEXT_PUBLIC_SENTRY_RELEASE ?? "",
+  /**
+   * TinyMCE Cloud API key for the console's blog editor. Without it the
+   * editor loads in TinyMCE's unregistered mode and refuses to edit.
+   */
+  TINYMCE_API_KEY: process.env.NEXT_PUBLIC_TINYMCE_API_KEY ?? "",
   /** PostHog project key. Optional: unset disables product analytics. */
   POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY ?? "",
 } as const;

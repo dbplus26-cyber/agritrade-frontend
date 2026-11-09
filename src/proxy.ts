@@ -12,14 +12,19 @@ const apiOrigin = (() => {
   }
 })();
 
-const contentSecurityPolicy = (nonce: string) =>
-  [
+// TinyMCE Cloud (the blog editor) loads its scripts, skins and fonts from
+// here. Only the console gets it; the public site's policy stays closed.
+const TINY = "https://cdn.tiny.cloud";
+
+const contentSecurityPolicy = (nonce: string, console = false) => {
+  const tiny = console ? ` ${TINY}` : "";
+  return [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' https://challenges.cloudflare.com${isDev ? " 'unsafe-eval'" : ""}`,
-    "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' blob: data: https://res.cloudinary.com https://picsum.photos https://fastly.picsum.photos",
-    "font-src 'self'",
-    `connect-src 'self'${apiOrigin ? ` ${apiOrigin}` : ""}${isDev ? " ws:" : ""}`,
+    `script-src 'self' 'nonce-${nonce}' https://challenges.cloudflare.com${tiny}${isDev ? " 'unsafe-eval'" : ""}`,
+    `style-src 'self' 'unsafe-inline'${tiny}`,
+    `img-src 'self' blob: data: https://res.cloudinary.com https://picsum.photos https://fastly.picsum.photos${tiny}`,
+    `font-src 'self'${tiny}`,
+    `connect-src 'self'${apiOrigin ? ` ${apiOrigin}` : ""}${tiny}${isDev ? " ws:" : ""}`,
     "frame-src https://challenges.cloudflare.com https://maps.google.com https://www.google.com",
     "object-src 'none'",
     "base-uri 'self'",
@@ -27,6 +32,7 @@ const contentSecurityPolicy = (nonce: string) =>
     "frame-ancestors 'none'",
     ...(isDev ? [] : ["upgrade-insecure-requests"]),
   ].join("; ");
+};
 
 /**
  * Next.js Proxy - the first, cheap gate for the admin console and the agent
@@ -54,7 +60,7 @@ const HINT_COOKIE = "dbplus.auth.hint";
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
-  const policy = contentSecurityPolicy(nonce);
+  const policy = contentSecurityPolicy(nonce, pathname.startsWith("/admin"));
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);
   requestHeaders.set("Content-Security-Policy", policy);

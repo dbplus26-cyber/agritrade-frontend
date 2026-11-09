@@ -12,6 +12,9 @@ export const routes = {
   farmingInvestment: "/farming-investment",
   farmingApply: "/farming-investment/apply",
   reviews: "/reviews",
+  blog: "/blog",
+  /** One article, keyed by its (unique, frozen-at-publish) slug. */
+  blogPost: (slug: string) => `/blog/${slug}`,
   terms: "/terms",
   privacy: "/privacy",
   styleGuide: "/style-guide",
@@ -30,5 +33,6 @@ export const primaryNav = [
   },
   { label: "About", href: routes.about },
   { label: "Reviews", href: routes.reviews },
+  { label: "Blog", href: routes.blog },
   { label: "Contact", href: routes.contact },
 ] as const;

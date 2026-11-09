@@ -9,6 +9,7 @@ import type { UserRole } from "./user.types";
  */
 export type Permission =
   | "APPROVALS_DECIDE"
+  | "BLOG_MANAGE"
   | "CASHBOOK_POST"
   | "DIRECTORY_MANAGE"
   | "EXPENSES_RECORD"

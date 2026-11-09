@@ -82,3 +82,10 @@ export const LAND_PLOT_DESCRIPTION_MAX = 1000;
  * the check that actually catches them.
  */
 export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+
+/** Blog limits. Mirror `validations/blog-validation.ts` in the backend. */
+export const BLOG_TITLE_MAX = 200;
+export const BLOG_EXCERPT_MAX = 500;
+export const BLOG_COMMENT_MAX = 2000;
+export const BLOG_COMMENT_NAME_MAX = 80;
+export const BLOG_TAGS_MAX = 10;

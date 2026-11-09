@@ -323,6 +323,24 @@ export const adminNavGroups: AdminNavGroup[] = [
         "Farmers applying to join the outgrower scheme.",
         { permission: "FARM_MANAGE" },
       ),
+      item(
+        "blog",
+        "Blog posts",
+        "Articles on the website's blog: write, publish and feature them.",
+        { permission: "BLOG_MANAGE" },
+      ),
+      item(
+        "blog-comments",
+        "Blog comments",
+        "What readers say under your articles. Reply, hide or delete.",
+        { permission: "BLOG_MANAGE" },
+      ),
+      item(
+        "blog-topics",
+        "Categories & tags",
+        "How blog readers browse: the categories and tags posts are filed under.",
+        { permission: "BLOG_MANAGE" },
+      ),
     ],
   },
   {

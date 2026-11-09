@@ -6,6 +6,8 @@
 // tag list after every successful admin write, and this app purges the tags
 // it recognises, reporting the rest as skipped.
 export const CACHE_TAGS = {
+  /** The blog (/blog, each post page and the sitemap entries). */
+  BLOG: "blog",
   /** Public commodity availability (/ board + /commodities lot files). */
   COMMODITIES: "commodities",
   /** Public contact block (phone/WhatsApp/email/address), owner-editable. */
