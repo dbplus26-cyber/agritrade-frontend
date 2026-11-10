@@ -80,11 +80,18 @@ export const blogAdminApi = apiSlice.injectEndpoints({
       ],
     }),
 
-    /** Inline editor image; resolves to its hosted URL. */
-    uploadBlogImage: builder.mutation<{ data: { url: string } }, Blob>({
-      query: (file) => {
+    /**
+     * Inline editor image; resolves to its hosted URL. The filename carries
+     * the extension the backend checks against the file's type, so a pasted
+     * image (a bare Blob with no name) is not refused.
+     */
+    uploadBlogImage: builder.mutation<
+      { data: { url: string } },
+      { blob: Blob; filename: string }
+    >({
+      query: ({ blob, filename }) => {
         const form = new FormData();
-        form.append("image", file, file instanceof File ? file.name : "image");
+        form.append("image", blob, filename);
         return { url: "admin/blog/images", method: "POST", body: form };
       },
     }),

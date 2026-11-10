@@ -49,9 +49,15 @@ export function RichTextEditor({
           convert_urls: false,
           height: 560,
           images_file_types: "jpeg,jpg,png,webp,gif",
-          images_upload_handler: async (blobInfo: { blob: () => Blob }) => {
+          images_upload_handler: async (blobInfo: {
+            blob: () => Blob;
+            filename: () => string;
+          }) => {
             try {
-              const res = await upload(blobInfo.blob()).unwrap();
+              const res = await upload({
+                blob: blobInfo.blob(),
+                filename: blobInfo.filename(),
+              }).unwrap();
               return res.data.url;
             } catch (err) {
               throw {

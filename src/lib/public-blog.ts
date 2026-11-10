@@ -10,6 +10,13 @@ import type { IBlogPost, IBlogTaxonomyWithCount } from "@/types/blog.types";
  * as null so pages render their honest empty state instead of failing.
  */
 const OPTS = { next: { revalidate: 3600, tags: [CACHE_TAGS.BLOG] } };
+/**
+ * Filtered lists are read live. A search word, category or tag comes from the
+ * address bar, so caching each one would let anyone fill the data cache with
+ * an entry per made-up value; only the lists the site itself links to are kept.
+ */
+const LIVE = { cache: "no-store" } as const;
+const CACHED_PAGES_MAX = 50;
 const BASE = `${env.SERVER_URI}/api/v1/public/blog`;
 
 export const BLOG_PAGE_SIZE = 9;
@@ -23,9 +30,9 @@ export interface BlogListFilters {
   tag?: string;
 }
 
-async function getJson<T>(url: string): Promise<T | null> {
+async function getJson<T>(url: string, cached = true): Promise<T | null> {
   try {
-    const res = await fetch(url, OPTS);
+    const res = await fetch(url, cached ? OPTS : LIVE);
     if (!res.ok) return null;
     return (await res.json()) as T;
   } catch {
@@ -36,8 +43,14 @@ async function getJson<T>(url: string): Promise<T | null> {
 export async function fetchBlogPosts(
   filters: BlogListFilters,
 ): Promise<{ meta: IPaginationMeta; posts: IBlogPost[] } | null> {
+  const cached =
+    !filters.search &&
+    !filters.category &&
+    !filters.tag &&
+    (filters.page ?? 1) <= CACHED_PAGES_MAX;
   const body = await getJson<{ data?: IBlogPost[]; meta?: IPaginationMeta }>(
     `${BASE}/posts${toQueryString(filters)}`,
+    cached,
   );
   return body?.data && body.meta ? { meta: body.meta, posts: body.data } : null;
 }
