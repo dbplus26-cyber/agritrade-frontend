@@ -6,12 +6,9 @@ import {
   WidgetEmpty,
   WidgetError,
 } from "@/components/admin/dashboard/chart-kit";
+import { ExportLink } from "@/components/admin/export-link";
 import { SearchableSelect } from "@/components/admin/searchable-select";
-import {
-  AdminButton,
-  AdminPageHeader,
-  adminSelectClass,
-} from "@/components/admin/ui";
+import { AdminPageHeader, adminSelectClass } from "@/components/admin/ui";
 import { SimpleSelect } from "@/components/ui/simple-select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { env } from "@/lib/env";
@@ -127,11 +124,13 @@ export function PurchaseBook() {
               }))}
             />
             {commodityId ? (
-              <AdminButton variant="outline" asChild>
-                <a href={`${EXPORT}${toQueryString({ commodityId, year })}`}>
-                  Export Excel
-                </a>
-              </AdminButton>
+              <ExportLink
+                format="Excel"
+                href={`${EXPORT}${toQueryString({ commodityId, year })}`}
+                what="The purchase book for this commodity and year"
+              >
+                Export Excel
+              </ExportLink>
             ) : null}
           </>
         }

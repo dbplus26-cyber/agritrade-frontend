@@ -46,7 +46,25 @@ beforeEach(() => {
 });
 afterEach(() => vi.restoreAllMocks());
 
+/** Asks for the export, then agrees to it in the dialog. */
+const exportCsv = async () => {
+  fireEvent.click(screen.getByRole("button", { name: "Export CSV" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Export" }));
+};
+
 describe("CSV download controls", () => {
+  it("asks first, and exports nothing when the answer is no", async () => {
+    render(<CsvExportButton config={config} rows={[]} />);
+    fireEvent.click(screen.getByRole("button", { name: "Export CSV" }));
+    expect(await screen.findByText("Export to CSV?")).toBeInTheDocument();
+    expect(mocks.fetchRows).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    await waitFor(() =>
+      expect(screen.queryByText("Export to CSV?")).not.toBeInTheDocument(),
+    );
+    expect(mocks.fetchRows).not.toHaveBeenCalled();
+    expect(mocks.download).not.toHaveBeenCalled();
+  });
   it("exports all locally filtered rows across pages and excludes hidden money", async () => {
     mocks.money = false;
     const rows = Array.from({ length: 15 }, (_, i) => ({
@@ -63,7 +81,7 @@ describe("CSV download controls", () => {
         csvExport={{ filename: "purchases", columns }}
       />,
     );
-    fireEvent.click(screen.getByRole("button", { name: "Export CSV" }));
+    await exportCsv();
     await waitFor(() => expect(mocks.download).toHaveBeenCalledOnce());
     const csv = mocks.download.mock.calls[0][1];
     expect(csv.split("\r\n")).toHaveLength(16);
@@ -81,7 +99,7 @@ describe("CSV download controls", () => {
       abort: vi.fn(),
     });
     render(<CsvExportButton config={config} rows={[]} />);
-    fireEvent.click(screen.getByRole("button", { name: "Export CSV" }));
+    await exportCsv();
     await waitFor(() => expect(mocks.download).toHaveBeenCalledOnce());
     expect(mocks.fetchRows).toHaveBeenCalledWith(config.source);
     expect(mocks.download.mock.calls[0][1]).toContain(
@@ -96,7 +114,7 @@ describe("CSV download controls", () => {
       abort: vi.fn(),
     });
     render(<CsvExportButton config={config} />);
-    fireEvent.click(screen.getByRole("button", { name: "Export CSV" }));
+    await exportCsv();
     await waitFor(() => expect(mocks.error).toHaveBeenCalled());
     expect(mocks.download).not.toHaveBeenCalled();
     expect(screen.getByRole("button", { name: "Export CSV" })).toBeEnabled();
@@ -112,8 +130,10 @@ describe("CSV download controls", () => {
       abort,
     });
     render(<CsvExportButton config={config} />);
-    fireEvent.click(screen.getByRole("button", { name: "Export CSV" }));
-    expect(screen.getByRole("button", { name: /Exporting/ })).toBeDisabled();
+    await exportCsv();
+    expect(
+      await screen.findByRole("button", { name: /Exporting/ }),
+    ).toBeDisabled();
     fireEvent.click(screen.getByRole("button", { name: "Cancel export" }));
     expect(abort).toHaveBeenCalledOnce();
     resolve([{ id: "1", name: "Maize", amountGhs: 5 }]);
@@ -122,14 +142,15 @@ describe("CSV download controls", () => {
     );
     expect(mocks.download).not.toHaveBeenCalled();
   });
-  it("aborts a running export when its screen unmounts", () => {
+  it("aborts a running export when its screen unmounts", async () => {
     const abort = vi.fn();
     mocks.fetchRows.mockReturnValue({
       unwrap: () => new Promise(() => {}),
       abort,
     });
     const view = render(<CsvExportButton config={config} />);
-    fireEvent.click(screen.getByRole("button", { name: "Export CSV" }));
+    await exportCsv();
+    await screen.findByRole("button", { name: "Cancel export" });
     view.unmount();
     expect(abort).toHaveBeenCalledOnce();
   });

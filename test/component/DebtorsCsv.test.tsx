@@ -60,6 +60,7 @@ it("exports all debtor pages using the current buyer search", async () => {
     { target: { value: " Ama " } },
   );
   fireEvent.click(screen.getByRole("button", { name: "Export CSV" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Export" }));
   await waitFor(() => expect(mocks.download).toHaveBeenCalledOnce());
   expect(mocks.fetchRows).toHaveBeenCalledWith({
     url: "admin/reports/debtors",

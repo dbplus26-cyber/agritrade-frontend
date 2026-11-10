@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Download } from "lucide-react";
 import { AdminButton } from "@/components/admin/ui";
+import { useExportConfirm } from "@/hooks/use-export-confirm";
 import { useMoneyVisibility } from "@/hooks/use-money-visibility";
 import { useGetCsvRowsMutation } from "@/redux/exports/exports-api";
 import { downloadCsv, toCsv, type CsvExportConfig } from "@/lib/csv-export";
@@ -21,6 +22,7 @@ export function CsvExportButton<T>({
   const showMoney = useMoneyVisibility();
   const [fetchRows, { reset }] = useGetCsvRowsMutation();
   const [busy, setBusy] = useState(false);
+  const { confirmExport, exportDialog } = useExportConfirm();
   const active = useRef<{ cancelled: boolean; abort?: () => void } | null>(
     null,
   );
@@ -37,6 +39,9 @@ export function CsvExportButton<T>({
 
   const run = async () => {
     if (active.current || disabled) return;
+    if (!(await confirmExport("CSV", "All rows matching the current filters")))
+      return;
+    if (active.current) return;
     const job = {
       cancelled: false,
       abort: undefined as (() => void) | undefined,
@@ -91,6 +96,7 @@ export function CsvExportButton<T>({
           Cancel export
         </AdminButton>
       ) : null}
+      {exportDialog}
     </div>
   );
 }

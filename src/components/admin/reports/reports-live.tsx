@@ -6,6 +6,7 @@ import {
   DateRangeSelector,
   DEFAULT_RANGE,
 } from "@/components/admin/dashboard/date-range-selector";
+import { ExportLink } from "@/components/admin/export-link";
 import { CountUp } from "@/components/admin/count-up";
 import { HelpTip, HelpWrap } from "@/components/admin/help-tip";
 import {
@@ -191,9 +192,15 @@ function AgentPerformance({
             text="What each field agent bought for you in the period you picked, and what they paid per kilo."
           />
         </span>
-        <a href={exportHref} className={cn(adminLinkClass, "text-[11px]")}>
+        <ExportLink
+          className="text-[11px]"
+          format="CSV"
+          href={exportHref}
+          variant="link"
+          what="Agent performance for this period"
+        >
           Export CSV
-        </a>
+        </ExportLink>
       </div>
       {isError ? (
         <WidgetError
@@ -484,11 +491,13 @@ export function ReportsLive() {
             <AdminButton variant="outline" asChild>
               <Link href="/admin/reports/purchase-book">Purchase book</Link>
             </AdminButton>
-            <AdminButton variant="outline" asChild>
-              <a href={`${EXPORTS}/commodity-profit.csv${windowQs}`}>
-                Profit CSV
-              </a>
-            </AdminButton>
+            <ExportLink
+              format="CSV"
+              href={`${EXPORTS}/commodity-profit.csv${windowQs}`}
+              what="Profit by commodity for this period"
+            >
+              Profit CSV
+            </ExportLink>
           </>
         }
       />
