@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { cookies } from "next/headers";
 import { AdminShell } from "@/components/admin/shell";
 import { RequireAuth } from "@/components/auth/require-auth";
 import { RequireRole } from "@/components/auth/require-role";
@@ -39,9 +40,13 @@ export const metadata: Metadata = {
  * before the console renders; the proxy's cookie gate is only the first,
  * cheap line of defence.
  */
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  // The rail opens as it was left. The sidebar writes this cookie on every
+  // toggle; reading it here means the first paint is already folded or open,
+  // not open and then snapping shut. Anything but "false" opens it.
+  const railOpen = (await cookies()).get("sidebar_state")?.value !== "false";
   return (
     <div
       className={`${geist.variable} ${geistMono.variable} admin-scope font-admin min-h-screen bg-adm-page text-[12px] leading-[1.5] text-adm-body antialiased`}
@@ -52,7 +57,7 @@ export default function AdminLayout({
           allow={[UserRole.SUPER_ADMIN, UserRole.STAFF]}
           redirectTo="/agent"
         >
-          <AdminShell>{children}</AdminShell>
+          <AdminShell defaultOpen={railOpen}>{children}</AdminShell>
         </RequireRole>
       </RequireAuth>
     </div>
