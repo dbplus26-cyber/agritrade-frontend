@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import { env } from "@/lib/env";
 import { extractApiError } from "@/lib/extract-api-error";
@@ -12,6 +13,11 @@ import { useUploadBlogImageMutation } from "@/redux/blog/blog-admin-api";
  * backend sanitizes whatever this produces, so the toolbar offers only what
  * survives that: headings 2-4, emphasis, lists, quotes, links, images and
  * tables.
+ *
+ * `onChange` says whether a change is the writer's. The editor also reports a
+ * change when it merely re-serialises HTML it was handed (stored `<br />`
+ * comes back `<br>`), and a form that counted that as an edit would call
+ * every opened post unsaved.
  */
 export function RichTextEditor({
   value,
@@ -20,11 +26,17 @@ export function RichTextEditor({
   id,
 }: {
   value: string;
-  onChange: (html: string) => void;
+  onChange: (html: string, edited: boolean) => void;
   invalid?: boolean;
   id?: string;
 }) {
   const [upload] = useUploadBlogImageMutation();
+  // Set by the writer's own input. The editor's dirty flag covers toolbar
+  // commands but only rises after the first typed character has been reported.
+  const touched = useRef(false);
+  const touch = () => {
+    touched.current = true;
+  };
 
   return (
     <div
@@ -38,7 +50,13 @@ export function RichTextEditor({
         id={id}
         apiKey={env.TINYMCE_API_KEY || undefined}
         value={value}
-        onEditorChange={(html) => onChange(html)}
+        onEditorChange={(html, editor) =>
+          onChange(html, touched.current || editor.isDirty())
+        }
+        onKeyDown={touch}
+        onPaste={touch}
+        onCut={touch}
+        onDrop={touch}
         init={{
           automatic_uploads: true,
           block_formats:

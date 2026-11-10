@@ -1,7 +1,8 @@
 "use client";
 
+import { useRef } from "react";
+import { flushSync } from "react-dom";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ExternalLink } from "lucide-react";
@@ -22,6 +23,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useConfirm } from "@/hooks/use-confirm";
 import { usePhotoStaging } from "@/hooks/use-photo-staging";
+import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import { extractApiError } from "@/lib/extract-api-error";
 import { BLOG_EXCERPT_MAX, BLOG_TAGS_MAX, BLOG_TITLE_MAX } from "@/lib/limits";
 import { notify } from "@/lib/notify";
@@ -53,7 +55,6 @@ const toFormValues = (post?: IBlogPost): PostValues => ({
  * Publish/Unpublish is its own action (and saves pending edits with it).
  */
 export function PostForm({ post }: { post?: IBlogPost }) {
-  const router = useRouter();
   const { confirm, confirmationDialog } = useConfirm();
   const [createPost, createState] = useCreateBlogPostMutation();
   const [updatePost, updateState] = useUpdateBlogPostMutation();
@@ -76,11 +77,19 @@ export function PostForm({ post }: { post?: IBlogPost }) {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    resetField,
+    formState: { errors, isDirty },
   } = useForm<PostValues>({
     resolver: zodResolver(postSchema),
     defaultValues: toFormValues(post),
   });
+  // An article is an hour's writing: no way out of this page drops it quietly.
+  const { leave, unsavedDialog } = useUnsavedChanges(
+    isDirty || Boolean(photoFile) || removePhoto,
+  );
+
+  // True only while a saved post's values are being put back into the form.
+  const adopting = useRef(false);
 
   const save = (publish?: boolean) =>
     handleSubmit(async (values) => {
@@ -104,8 +113,12 @@ export function PostForm({ post }: { post?: IBlogPost }) {
           : await createPost({ body, cover: photoFile ?? undefined }).unwrap();
         notify.success(res.message);
         resetCover();
-        reset(toFormValues(res.data.post));
-        if (!post) router.push(`${LIST}/${res.data.post.id}`);
+        // The body comes back sanitized and the editor re-serialises it. Done
+        // synchronously so that echo is recognised as the save, not an edit.
+        adopting.current = true;
+        flushSync(() => reset(toFormValues(res.data.post)));
+        adopting.current = false;
+        if (!post) void leave(`${LIST}/${res.data.post.id}`, { ask: false });
       } catch (err) {
         notify.error("Couldn't save the post", {
           description: extractApiError(err).message,
@@ -145,7 +158,7 @@ export function PostForm({ post }: { post?: IBlogPost }) {
     try {
       await deletePost(post.id).unwrap();
       notify.success("Post deleted");
-      router.push(LIST);
+      void leave(LIST, { ask: false });
     } catch (err) {
       notify.error("Couldn't delete the post", {
         description: extractApiError(err).message,
@@ -156,6 +169,7 @@ export function PostForm({ post }: { post?: IBlogPost }) {
   return (
     <div className="max-w-[900px]">
       {confirmationDialog}
+      {unsavedDialog}
       <DetailNav
         crumbs={[DASHBOARD_CRUMB, { label: "Blog posts", href: LIST }]}
         current={post ? post.title : "New post"}
@@ -265,7 +279,13 @@ export function PostForm({ post }: { post?: IBlogPost }) {
               render={({ field }) => (
                 <RichTextEditor
                   value={field.value}
-                  onChange={field.onChange}
+                  // The editor's own rewording of what it was given becomes
+                  // the baseline; only the writer's changes make the form
+                  // unsaved.
+                  onChange={(html, edited) => {
+                    if (edited && !adopting.current) field.onChange(html);
+                    else resetField("content", { defaultValue: html });
+                  }}
                   invalid={Boolean(errors.content)}
                 />
               )}
@@ -413,7 +433,7 @@ export function PostForm({ post }: { post?: IBlogPost }) {
             type="button"
             variant="outline"
             size="lg"
-            onClick={() => router.push(LIST)}
+            onClick={() => void leave(LIST)}
           >
             Cancel
           </AdminButton>
