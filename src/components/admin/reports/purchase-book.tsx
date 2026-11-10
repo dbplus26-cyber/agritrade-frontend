@@ -82,18 +82,6 @@ function Particulars({ row }: { row: IPurchaseBookRow }) {
   );
 }
 
-type BookView = "table" | "list";
-const VIEW_KEY = "dbplus.purchase-book.view";
-
-/** The reader's pick of table or list, kept on this device. */
-const readView = (): BookView => {
-  try {
-    return localStorage.getItem(VIEW_KEY) === "list" ? "list" : "table";
-  } catch {
-    return "table";
-  }
-};
-
 const YEARS = Array.from({ length: 6 }, (_, i) => new Date().getFullYear() - i);
 
 export function PurchaseBook() {
@@ -107,20 +95,8 @@ export function PurchaseBook() {
     { skip: !commodityId },
   );
   const data = book.data?.data;
-  // The full sheet is the default at every width, scrolling sideways on a
-  // phone; the list is there for anyone who would rather read down.
-  // Read once on mount. Nothing that depends on it renders until the book
-  // has loaded in the browser, so the server's "table" never mismatches.
-  const [view, setView] = useState<BookView>(readView);
-  const pickView = (next: BookView) => {
-    setView(next);
-    try {
-      localStorage.setItem(VIEW_KEY, next);
-    } catch {
-      // Storage is a convenience; the pick still holds for this visit.
-    }
-  };
-
+  // The sheet is shown whole at every width, scrolling sideways on a phone:
+  // the book is the owner's Excel workbook, and it reads as one.
   return (
     <div>
       <AdminPageHeader
@@ -189,28 +165,7 @@ export function PurchaseBook() {
               dispatch are shown in full.
             </p>
           ) : null}
-          <div
-            aria-label="How to show the book"
-            className="mb-3 flex gap-2"
-            role="group"
-          >
-            {(["table", "list"] as const).map((option) => (
-              <AdminButton
-                aria-pressed={view === option}
-                key={option}
-                onClick={() => pickView(option)}
-                type="button"
-                variant={view === option ? "primary" : "outline"}
-              >
-                {option === "table" ? "Table" : "List"}
-              </AdminButton>
-            ))}
-          </div>
-          {view === "list" ? (
-            <BookCards book={data} />
-          ) : (
-            <BookTable book={data} />
-          )}
+          <BookTable book={data} />
         </div>
       )}
     </div>
@@ -365,127 +320,6 @@ function BookTable({ book }: { book: IPurchaseBook }) {
           </tbody>
         </table>
       </div>
-    </div>
-  );
-}
-
-function Fact({
-  label,
-  value,
-  red,
-}: {
-  label: string;
-  value: string;
-  red?: boolean;
-}) {
-  return (
-    <div className="min-w-0">
-      <dt className="text-[10px] font-semibold tracking-[0.06em] text-adm-faint uppercase">
-        {label}
-      </dt>
-      <dd
-        className={cn(
-          "font-adminmono text-[12.5px] tabular-nums [overflow-wrap:anywhere] text-adm-ink",
-          red && "font-bold text-console-red",
-        )}
-      >
-        {value || "-"}
-      </dd>
-    </div>
-  );
-}
-
-/** The same book as a list, one entry per row of the sheet. */
-function BookCards({ book }: { book: IPurchaseBook }) {
-  const t = book.totals;
-  return (
-    <div className="max-w-[640px]">
-      <h2
-        className={cn(
-          "px-3 py-2 text-center font-serif text-[15px] font-bold underline",
-          SHEET.title,
-        )}
-      >
-        {title(book)}
-      </h2>
-      <dl
-        className={cn(
-          "grid grid-cols-2 gap-x-3 gap-y-2 px-3 py-3",
-          SHEET.totals,
-        )}
-      >
-        {[
-          ["Bags", int(t.bags)],
-          ["Kg", int(t.weightKg)],
-          ["Avg price", dec(t.avgPriceGhs)],
-          ["Payable", amount(t.payableGhs)],
-          ["Cash paid", amount(t.advanceGhs)],
-          ["Balance cash", amount(t.balanceCashGhs)],
-          ["Dispatched kg", int(t.dispatchedKg)],
-          ["Balance kg", int(t.balanceKg)],
-        ].map(([label, value]) => (
-          <div className="min-w-0" key={label}>
-            <dt className="text-[10px] font-semibold tracking-[0.06em] uppercase opacity-80">
-              {label}
-            </dt>
-            <dd className="font-adminmono text-[13px] font-bold tabular-nums [overflow-wrap:anywhere]">
-              {value || "Hidden"}
-            </dd>
-          </div>
-        ))}
-      </dl>
-      <ul className="divide-y divide-adm-line border border-t-0 border-adm-line">
-        {book.rows.map((row, i) => {
-          const negative = (row.balanceCashGhs ?? 0) < 0;
-          return (
-            <li
-              className="px-3 py-3"
-              key={`${row.kind}-${row.purchaseId ?? row.date}-${String(i)}`}
-            >
-              <p className="font-adminmono text-[11px] text-adm-muted">
-                {sheetDate(row.date)}
-              </p>
-              <p className="mt-0.5 text-[12.5px] font-semibold [overflow-wrap:anywhere] text-adm-ink">
-                <Particulars row={row} />
-              </p>
-              <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-2">
-                {row.kind === "CASH" ? (
-                  <Fact label="Cash paid" value={amount(row.advanceGhs)} />
-                ) : (
-                  <>
-                    <Fact label="Bags" value={int(row.bags)} />
-                    <Fact label="Kg" value={int(row.weightKg)} />
-                    <Fact label="Price" value={dec(row.priceGhs)} />
-                    <Fact label="Payable" value={amount(row.payableGhs)} />
-                    <Fact label="FM%" red value={dec(row.fmPercent)} />
-                    <Fact
-                      label="Wt. difference"
-                      value={
-                        row.fmDeductionKg
-                          ? `${dec(row.fmDeductionPct)}% / ${int(row.fmDeductionKg)} kg`
-                          : ""
-                      }
-                    />
-                    <Fact
-                      label="Dispatched"
-                      value={`${int(row.dispatchedBags)} bags / ${int(row.dispatchedKg)} kg`}
-                    />
-                    <Fact
-                      label="Balance"
-                      value={`${int(row.balanceBags)} bags / ${int(row.balanceKg)} kg`}
-                    />
-                  </>
-                )}
-                <Fact
-                  label="Balance cash"
-                  red={negative}
-                  value={amount(row.balanceCashGhs)}
-                />
-              </dl>
-            </li>
-          );
-        })}
-      </ul>
     </div>
   );
 }
