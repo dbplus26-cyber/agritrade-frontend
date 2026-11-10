@@ -14,6 +14,7 @@ import type {
   IExpenseSummaryResponse,
   IPeriodSummaryResponse,
   IProfitReportResponse,
+  IPurchaseBookResponse,
   IReportWindow,
   ITrendsResponse,
   IVolumeResponse,
@@ -107,6 +108,16 @@ export const reportsApi = apiSlice.injectEndpoints({
         { type: "Reports", id: "LIST" },
       ],
     }),
+    getPurchaseBook: builder.query<
+      IPurchaseBookResponse,
+      { commodityId: string; year: number }
+    >({
+      query: (p) => `admin/reports/purchase-book${toQueryString(p)}`,
+      providesTags: [
+        { type: "Reports", id: "PURCHASE_BOOK" },
+        { type: "Reports", id: "LIST" },
+      ],
+    }),
     getCashflowForecast: builder.query<
       ICashflowForecastResponse,
       { days: ForecastDays }
@@ -130,6 +141,7 @@ export const {
   useGetExpenseSummaryQuery,
   useGetPeriodSummaryQuery,
   useGetProfitReportQuery,
+  useGetPurchaseBookQuery,
   useGetTrendsQuery,
   useGetVolumeQuery,
 } = reportsApi;

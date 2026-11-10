@@ -26,6 +26,18 @@ const phoneField = z
   .or(z.literal(""))
   .optional();
 
+/** A percentage kept as a string so the field can be emptied while typing. */
+const optionalPercent = z
+  .string()
+  .trim()
+  .refine(
+    (v) =>
+      v === "" ||
+      (/^\d+(\.\d{1,2})?$/.test(v) && Number(v) >= 0 && Number(v) <= 100),
+    { message: "Enter a percentage between 0 and 100, to 2 decimal places" },
+  )
+  .optional();
+
 export const commoditySchema = z.object({
   name: z
     .string()
@@ -46,6 +58,9 @@ export const commoditySchema = z.object({
       message: "Enter a weight between 0 and 1000 kg",
     })
     .optional(),
+  /** The FM rule purchases are settled against; empty switches it off. */
+  fmStandardPct: optionalPercent,
+  fmTolerancePct: optionalPercent,
   sortOrder: z
     .string()
     .trim()

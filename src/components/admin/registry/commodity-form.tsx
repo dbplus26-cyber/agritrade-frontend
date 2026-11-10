@@ -42,6 +42,8 @@ import { LifecycleActions } from "./lifecycle-actions";
 
 const LIST = "/admin/commodities";
 
+const pct = (v: number | null) => (v === null ? "" : String(v));
+
 /** "" for create, or the record's values for edit. */
 const toFormValues = (c?: ICommodity): CommodityValues => ({
   name: c?.name ?? "",
@@ -49,6 +51,9 @@ const toFormValues = (c?: ICommodity): CommodityValues => ({
   qualityGrade: c?.qualityGrade ?? "",
   description: c?.description ?? "",
   bagWeightKg: c?.bagWeightKg != null ? String(c.bagWeightKg) : "",
+  // A new commodity starts on the house rule; an existing one shows its own.
+  fmStandardPct: c ? pct(c.fmStandardPct) : "3",
+  fmTolerancePct: c ? pct(c.fmTolerancePct) : "3.5",
   sortOrder: c ? String(c.sortOrder) : "",
 });
 
@@ -112,6 +117,13 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
         : isEdit
           ? null
           : undefined,
+      // Empty is a real answer here: no deduction for this commodity.
+      fmStandardPct: values.fmStandardPct?.trim()
+        ? Number(values.fmStandardPct)
+        : null,
+      fmTolerancePct: values.fmTolerancePct?.trim()
+        ? Number(values.fmTolerancePct)
+        : null,
       ...(values.sortOrder?.trim()
         ? { sortOrder: Number(values.sortOrder) }
         : {}),
@@ -138,6 +150,8 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
             qualityGrade: body.qualityGrade ?? undefined,
             description: body.description ?? undefined,
             bagWeightKg: body.bagWeightKg ?? undefined,
+            fmStandardPct: body.fmStandardPct,
+            fmTolerancePct: body.fmTolerancePct,
             sortOrder: body.sortOrder,
           },
           photo: photoFile ?? undefined,
@@ -154,6 +168,8 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
           "qualityGrade",
           "description",
           "bagWeightKg",
+          "fmStandardPct",
+          "fmTolerancePct",
           "sortOrder",
         ] as const) {
           if (fieldErrors[field])
@@ -186,6 +202,13 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
                 commodity.bagWeightKg === null
                   ? null
                   : `${String(commodity.bagWeightKg)} kg`,
+            },
+            {
+              label: "FM rule",
+              value:
+                commodity.fmStandardPct === null
+                  ? "No deduction"
+                  : `Deduct the excess over ${String(commodity.fmStandardPct)}% once FM is above ${String(commodity.fmTolerancePct ?? commodity.fmStandardPct)}%`,
             },
             {
               label: "Sort order",
@@ -303,6 +326,46 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
                   errors.sortOrder && "border-console-red",
                 )}
                 {...register("sortOrder")}
+              />
+            </AdminField>
+          </div>
+          <div className="grid gap-5 @min-[440px]:grid-cols-2">
+            <AdminField
+              label="Standard FM (%)"
+              optional
+              hint="Foreign matter a load may carry. When a purchase's test comes in above the tolerance, the excess over this is taken off the weight paid for. Leave empty for no deduction."
+              error={errors.fmStandardPct?.message}
+            >
+              <Input
+                inputMode="decimal"
+                placeholder="e.g. 3"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  "font-adminmono",
+                  errors.fmStandardPct && "border-console-red",
+                )}
+                {...register("fmStandardPct")}
+              />
+            </AdminField>
+            <AdminField
+              label="FM tolerance (%)"
+              optional
+              hint="The deduction only applies above this. A 3.17% test against a 3.5% tolerance is paid in full."
+              error={errors.fmTolerancePct?.message}
+            >
+              <Input
+                inputMode="decimal"
+                placeholder="e.g. 3.5"
+                disabled={readOnly}
+                className={cn(
+                  adminInputClass,
+                  roCls,
+                  "font-adminmono",
+                  errors.fmTolerancePct && "border-console-red",
+                )}
+                {...register("fmTolerancePct")}
               />
             </AdminField>
           </div>

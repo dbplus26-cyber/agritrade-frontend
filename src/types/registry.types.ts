@@ -24,6 +24,12 @@ export interface ICommodity {
   description: string | null;
   /** Display convention only - kg stays the one true stock unit. */
   bagWeightKg: number | null;
+  /**
+   * The foreign-matter rule: a purchase whose FM% is above the tolerance is
+   * paid on less weight, by the excess over the standard. Null standard = none.
+   */
+  fmStandardPct: number | null;
+  fmTolerancePct: number | null;
   photo: string | null;
   publishToWebsite: boolean;
   isActive: boolean;
@@ -167,6 +173,8 @@ export interface ICreateCommodityInput {
   qualityGrade?: string;
   description?: string;
   bagWeightKg?: number;
+  fmStandardPct?: number | null;
+  fmTolerancePct?: number | null;
   sortOrder?: number;
 }
 export interface IUpdateCommodityInput {
@@ -175,6 +183,8 @@ export interface IUpdateCommodityInput {
   qualityGrade?: string | null;
   description?: string | null;
   bagWeightKg?: number | null;
+  fmStandardPct?: number | null;
+  fmTolerancePct?: number | null;
   sortOrder?: number;
   /** Clears the existing photo (the backend deletes the Cloudinary asset). */
   removePhoto?: boolean;

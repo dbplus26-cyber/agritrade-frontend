@@ -54,6 +54,13 @@ export interface IPurchase {
    */
   approval: { id: string; status: ApprovalStatus } | null;
   weightKg: number;
+  /** Bag count off the weigh slip; null when not recorded. */
+  bags: number | null;
+  /** The quality test's foreign matter; null when untested. */
+  fmPercent: number | null;
+  /** Weight taken off for FM above the commodity's tolerance (0 when none). */
+  fmDeductionKg: number;
+  fmDeductionPct: number;
   receivedKg: number | null;
   /** Recorded minus received weight (spillage/moisture); null until receipt. */
   varianceKg: number | null;
@@ -122,6 +129,9 @@ export interface ICreatePurchaseInput {
   warehouseId?: string;
   weightKg: number;
   unitPriceGhs: number;
+  bags?: number;
+  /** Drives the weight deduction; the server computes what is payable. */
+  fmPercent?: number;
   purchasedAt: string;
   notes?: string;
   /** Omit to record the purchase unpaid - the supplier is simply owed. */
@@ -288,6 +298,7 @@ export interface IAgentCreatePurchaseInput {
   warehouseId?: string;
   weightKg: number;
   unitPriceGhs: number;
+  bags?: number;
   purchasedAt: string;
   /**
    * How it was paid for, if it was. Omit and the purchase records unpaid - the

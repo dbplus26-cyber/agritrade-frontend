@@ -482,6 +482,9 @@ export function ReportsLive() {
           <>
             <DateRangeSelector onChange={setWindow} />
             <AdminButton variant="outline" asChild>
+              <Link href="/admin/reports/purchase-book">Purchase book</Link>
+            </AdminButton>
+            <AdminButton variant="outline" asChild>
               <a href={`${EXPORTS}/commodity-profit.csv${windowQs}`}>
                 Profit CSV
               </a>

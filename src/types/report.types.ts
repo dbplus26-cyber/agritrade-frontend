@@ -199,3 +199,59 @@ export interface IDebtorsQuery {
   page?: number;
   search?: string;
 }
+
+/**
+ * One commodity's purchase book for a year, mirroring the backend
+ * `purchase-book.service.ts`. A row is either a purchase or a day's cash paid
+ * for purchases; `balanceCashGhs` runs paid minus payable.
+ */
+export interface IPurchaseBookRow {
+  kind: "CASH" | "PURCHASE";
+  date: string;
+  particulars: string;
+  /** The purchase's document number; null on a cash row. */
+  reference: string | null;
+  purchaseId: string | null;
+  bags: number | null;
+  priceGhs: number | null;
+  weightKg: number | null;
+  payableGhs: number | null;
+  advanceGhs: number | null;
+  balanceCashGhs: number | null;
+  fmPercent: number | null;
+  dispatchedBags: number | null;
+  dispatchedKg: number | null;
+  balanceBags: number | null;
+  balanceKg: number | null;
+  fmDeductionPct: number | null;
+  fmDeductionKg: number | null;
+}
+
+export interface IPurchaseBook {
+  commodity: {
+    id: string;
+    name: string;
+    fmStandardPct: number | null;
+    fmTolerancePct: number | null;
+  };
+  year: number;
+  rows: IPurchaseBookRow[];
+  totals: {
+    bags: number;
+    avgPriceGhs: number | null;
+    weightKg: number;
+    payableGhs: number | null;
+    advanceGhs: number | null;
+    balanceCashGhs: number | null;
+    dispatchedBags: number;
+    dispatchedKg: number;
+    balanceBags: number;
+    balanceKg: number;
+    fmDeductionKg: number;
+  };
+}
+
+export interface IPurchaseBookResponse {
+  message: string;
+  data: IPurchaseBook;
+}

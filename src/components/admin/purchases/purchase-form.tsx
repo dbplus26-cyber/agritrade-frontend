@@ -28,7 +28,8 @@ import { useGetSuppliersQuery } from "@/redux/suppliers/suppliers-api";
 import { useGetWarehousesQuery } from "@/redux/warehouses/warehouses-api";
 import { useRemoteSearch } from "@/hooks/use-remote-search";
 import { extractApiError } from "@/lib/extract-api-error";
-import { formatCedis } from "@/lib/format-money";
+import { fmDeduction } from "@/lib/fm-deduction";
+import { cedisProduct, formatCedis } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
 import { optimizeImage } from "@/lib/optimize-image";
 import { cn } from "@/lib/utils";
@@ -86,6 +87,8 @@ export function PurchaseCreate() {
       warehouseId: "",
       weightKg: "",
       unitPriceGhs: "",
+      bags: "",
+      fmPercent: "",
       purchasedAt: todayInputValue(),
       notes: "",
     },
@@ -113,8 +116,19 @@ export function PurchaseCreate() {
 
   const weightKg = Number(watch("weightKg")) || 0;
   const unitPriceGhs = Number(watch("unitPriceGhs")) || 0;
+  // The quality test settles against the picked commodity's own FM rule.
+  const commodityId = watch("commodityId");
+  const fmText = watch("fmPercent")?.trim() ?? "";
+  const commodity = commodities.data?.data.find((c) => c.id === commodityId);
+  const deduction = fmDeduction({
+    fmPercent:
+      fmText === "" || Number.isNaN(Number(fmText)) ? null : Number(fmText),
+    standardPct: commodity?.fmStandardPct ?? null,
+    tolerancePct: commodity?.fmTolerancePct ?? null,
+    weightKg,
+  });
   // Display only - the server recomputes the authoritative total.
-  const totalPreview = weightKg * unitPriceGhs;
+  const totalPreview = cedisProduct(weightKg - deduction.kg, unitPriceGhs);
 
   const onSubmit = async (values: PurchaseValues) => {
     try {
@@ -129,6 +143,10 @@ export function PurchaseCreate() {
           ...(values.warehouseId ? { warehouseId: values.warehouseId } : {}),
           weightKg: Number(values.weightKg),
           unitPriceGhs: Number(values.unitPriceGhs),
+          ...(values.bags?.trim() ? { bags: Number(values.bags) } : {}),
+          ...(values.fmPercent?.trim()
+            ? { fmPercent: Number(values.fmPercent) }
+            : {}),
           purchasedAt: values.purchasedAt,
           ...(values.notes?.trim() ? { notes: values.notes.trim() } : {}),
         },
@@ -143,6 +161,8 @@ export function PurchaseCreate() {
           "commodityId",
           "weightKg",
           "unitPriceGhs",
+          "bags",
+          "fmPercent",
           "purchasedAt",
           "notes",
         ] as const) {
@@ -313,12 +333,58 @@ export function PurchaseCreate() {
               </AdminField>
             </div>
 
+            <div className="grid gap-5 @min-[440px]:grid-cols-2">
+              <AdminField
+                label="Bags"
+                optional
+                hint="The bag count off the weigh slip. It shows in the purchase book; stock is still tracked in kg."
+                error={errors.bags?.message}
+              >
+                <Input
+                  inputMode="numeric"
+                  placeholder="e.g. 650"
+                  className={cn(
+                    adminInputClass,
+                    errors.bags && "border-console-red",
+                  )}
+                  {...register("bags")}
+                />
+              </AdminField>
+              <AdminField
+                label="FM (%)"
+                optional
+                hint="Foreign matter from the quality test. Above the commodity's tolerance, the excess is taken off the weight you pay for."
+                error={errors.fmPercent?.message}
+              >
+                <Input
+                  inputMode="decimal"
+                  placeholder="e.g. 3.96"
+                  className={cn(
+                    adminInputClass,
+                    errors.fmPercent && "border-console-red",
+                  )}
+                  {...register("fmPercent")}
+                />
+              </AdminField>
+            </div>
+
+            {deduction.kg > 0 ? (
+              <div className="flex items-baseline justify-between gap-3 px-0.5">
+                <span className="min-w-0 text-[12px] text-adm-muted">
+                  FM deduction ({deduction.pct.toFixed(2)}% of the weight)
+                </span>
+                <Mono className="shrink-0 text-[12.5px] text-adm-ink">
+                  -{deduction.kg.toLocaleString("en-GH")} kg
+                </Mono>
+              </div>
+            ) : null}
+
             <div className="flex items-baseline justify-between px-0.5 py-1.5">
               <span className="flex items-center gap-1 text-[10.5px] font-bold tracking-[0.09em] text-adm-muted uppercase">
                 <span className="min-w-0">Total</span>
                 <HelpTip
                   label="What is the Total?"
-                  text="The weight times the price per kg: what this whole purchase will cost you."
+                  text="The weight, less any FM deduction, times the price per kg: what this whole purchase will cost you."
                 />
               </span>
               <Mono className="text-[12.5px] font-semibold text-adm-ink">

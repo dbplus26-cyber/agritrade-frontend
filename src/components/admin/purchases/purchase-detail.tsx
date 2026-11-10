@@ -627,6 +627,22 @@ export function PurchaseDetail({ id }: { id: string }) {
                 <DetailItem label="Recorded weight" mono>
                   {formatKg(p.weightKg)}
                 </DetailItem>
+                {p.bags !== null ? (
+                  <DetailItem label="Bags" mono>
+                    {p.bags.toLocaleString("en-GH")}
+                  </DetailItem>
+                ) : null}
+                {p.fmPercent !== null ? (
+                  <DetailItem label="Foreign matter (FM)" mono>
+                    {p.fmPercent.toFixed(2)}%
+                  </DetailItem>
+                ) : null}
+                {p.fmDeductionKg > 0 ? (
+                  <DetailItem label="FM deduction" mono>
+                    {formatKg(p.fmDeductionKg)} ({p.fmDeductionPct.toFixed(2)}
+                    %), paid on {formatKg(p.weightKg - p.fmDeductionKg)}
+                  </DetailItem>
+                ) : null}
                 {p.receivedKg !== null ? (
                   <>
                     <DetailItem label="Received weight" mono>

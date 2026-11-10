@@ -504,8 +504,13 @@ function Crumbs() {
   const title = screenTitle(pathname);
   const segments = pathname.slice(ADMIN_HOME.length).split("/").filter(Boolean);
   const section = segments[0];
-  const sub =
-    segments.length > 1 ? (segments[1] === "new" ? "New" : "Detail") : null;
+  // A named sub-screen says its own name; any other second segment is a
+  // record id, which the trail calls "Detail".
+  const SUB_LABEL: Record<string, string> = {
+    new: "New",
+    "purchase-book": "Purchase book",
+  };
+  const sub = segments.length > 1 ? (SUB_LABEL[segments[1]] ?? "Detail") : null;
 
   return (
     <nav
@@ -592,7 +597,14 @@ function ConsoleFooter() {
   );
 }
 
-export function AdminShell({ children }: { children: React.ReactNode }) {
+export function AdminShell({
+  children,
+  defaultOpen = true,
+}: {
+  children: React.ReactNode;
+  /** The rail as the reader last left it, read from its cookie on the server. */
+  defaultOpen?: boolean;
+}) {
   const pathname = usePathname();
   const activeKey = activeNavKey(pathname);
 
@@ -603,7 +615,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     // this hides the shell they sit inside, which is most of what would end up
     // on the page. Hidden here, once, rather than by every printable screen
     // remembering to reach up and do it.
-    <SidebarProvider style={SIDEBAR_VARS}>
+    <SidebarProvider defaultOpen={defaultOpen} style={SIDEBAR_VARS}>
       {/* The way past the rail. Every console page puts a sidebar of some
           eighty links between the top of the document and the thing the page
           is actually about, and tabbing through them to reach a register is
