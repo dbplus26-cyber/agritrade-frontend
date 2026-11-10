@@ -38,38 +38,61 @@ const optionalPercent = z
   )
   .optional();
 
-export const commoditySchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(2, "Enter the commodity name")
-    .max(
-      COMMODITY_NAME_MAX,
-      `Keep the name under ${String(COMMODITY_NAME_MAX)} characters - the variety and grade have their own fields.`,
-    ),
-  variety: optionalText(100),
-  qualityGrade: optionalText(50),
-  description: optionalText(COMMODITY_DESCRIPTION_MAX),
-  /** Kept as a string so the field can be emptied while typing. */
-  bagWeightKg: z
-    .string()
-    .trim()
-    .refine((v) => v === "" || (Number(v) > 0 && Number(v) <= 1000), {
-      message: "Enter a weight between 0 and 1000 kg",
-    })
-    .optional(),
-  /** The FM rule purchases are settled against; empty switches it off. */
-  fmStandardPct: optionalPercent,
-  fmTolerancePct: optionalPercent,
-  sortOrder: z
-    .string()
-    .trim()
-    .refine(
-      (v) => v === "" || (Number.isInteger(Number(v)) && Number(v) >= 0),
-      { message: "Enter a whole number" },
-    )
-    .optional(),
-});
+export const commoditySchema = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .min(2, "Enter the commodity name")
+      .max(
+        COMMODITY_NAME_MAX,
+        `Keep the name under ${String(COMMODITY_NAME_MAX)} characters - the variety and grade have their own fields.`,
+      ),
+    variety: optionalText(100),
+    qualityGrade: optionalText(50),
+    description: optionalText(COMMODITY_DESCRIPTION_MAX),
+    /** Kept as a string so the field can be emptied while typing. */
+    bagWeightKg: z
+      .string()
+      .trim()
+      .refine((v) => v === "" || (Number(v) > 0 && Number(v) <= 1000), {
+        message: "Enter a weight between 0 and 1000 kg",
+      })
+      .optional(),
+    /** The FM rule purchases are settled against; empty switches it off. */
+    fmStandardPct: optionalPercent,
+    fmTolerancePct: optionalPercent,
+    sortOrder: z
+      .string()
+      .trim()
+      .refine(
+        (v) => v === "" || (Number.isInteger(Number(v)) && Number(v) >= 0),
+        { message: "Enter a whole number" },
+      )
+      .optional(),
+  })
+  // The FM rule only works as a pair: the tolerance triggers the deduction and
+  // the standard is what the excess is measured from. Mirrors the backend's
+  // commodity service, which refuses the same two states (FM_RULE_INVALID).
+  .superRefine((v, ctx) => {
+    const standard = v.fmStandardPct?.trim() ?? "";
+    const tolerance = v.fmTolerancePct?.trim() ?? "";
+    if (tolerance === "") return;
+    if (standard === "") {
+      ctx.addIssue({
+        code: "custom",
+        message:
+          "Enter the standard FM too, or leave both empty for no deduction",
+        path: ["fmTolerancePct"],
+      });
+    } else if (Number(tolerance) < Number(standard)) {
+      ctx.addIssue({
+        code: "custom",
+        message: "The tolerance cannot be below the standard",
+        path: ["fmTolerancePct"],
+      });
+    }
+  });
 export type CommodityValues = z.infer<typeof commoditySchema>;
 
 export const warehouseSchema = z.object({
