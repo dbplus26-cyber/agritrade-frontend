@@ -7,8 +7,11 @@ import type {
 import type {
   IActivityResponse,
   IAgentPerformanceResponse,
+  IBookExportRequest,
+  IBookExportResponse,
   ICashflowResponse,
   IDashboardResponse,
+  IDataExportListResponse,
   IDebtorsQuery,
   IDebtorsResponse,
   IExpenseSummaryResponse,
@@ -19,6 +22,14 @@ import type {
   ITrendsResponse,
   IVolumeResponse,
 } from "@/types/report.types";
+
+/** Pages of a book run 1..totalPages; the next is asked for on scroll. */
+const bookPages = {
+  getNextPageParam: (last: IPurchaseBookResponse) =>
+    last.meta.page < last.meta.totalPages ? last.meta.page + 1 : undefined,
+  initialPageParam: 1,
+  refetchCachedPages: false,
+};
 
 /**
  * The reporting reads, mirroring `/admin/reports`. Everything is derived on the
@@ -108,26 +119,57 @@ export const reportsApi = apiSlice.injectEndpoints({
         { type: "Reports", id: "LIST" },
       ],
     }),
-    getPurchaseBook: builder.query<
+    /**
+     * The book arrives a page at a time as the sheet is scrolled. A refetch
+     * (new data, a returning tab) reloads the top page only: a reader who had
+     * scrolled 40 pages down is not made to wait for 40 requests.
+     */
+    getPurchaseBook: builder.infiniteQuery<
       IPurchaseBookResponse,
-      { commodityId: string; page: number; supplierId?: string; year: number }
+      { commodityId: string; supplierId?: string; year: number },
+      number
     >({
-      query: (p) => `admin/reports/purchase-book${toQueryString(p)}`,
+      infiniteQueryOptions: bookPages,
+      query: ({ pageParam, queryArg }) =>
+        `admin/reports/purchase-book${toQueryString({ ...queryArg, page: pageParam })}`,
       providesTags: [
         { type: "Reports", id: "PURCHASE_BOOK" },
         { type: "Reports", id: "LIST" },
       ],
     }),
     /** The same sheet from the selling side, for one buyer or all of them. */
-    getSalesBook: builder.query<
+    getSalesBook: builder.infiniteQuery<
       IPurchaseBookResponse,
-      { buyerId?: string; commodityId: string; page: number; year: number }
+      { buyerId?: string; commodityId: string; year: number },
+      number
     >({
-      query: (p) => `admin/reports/sales-book${toQueryString(p)}`,
+      infiniteQueryOptions: bookPages,
+      query: ({ pageParam, queryArg }) =>
+        `admin/reports/sales-book${toQueryString({ ...queryArg, page: pageParam })}`,
       providesTags: [
         { type: "Reports", id: "PURCHASE_BOOK" },
         { type: "Reports", id: "LIST" },
       ],
+    }),
+    /**
+     * Asks for a book as a file. The server answers whether to download it
+     * now or that it is being prepared; either way the Exports list may have
+     * changed.
+     */
+    requestBookExport: builder.mutation<
+      IBookExportResponse,
+      IBookExportRequest
+    >({
+      query: (body) => ({
+        url: "admin/reports/book-exports",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "Reports", id: "EXPORTS" }],
+    }),
+    getBookExports: builder.query<IDataExportListResponse, { page: number }>({
+      query: (p) => `admin/reports/book-exports${toQueryString(p)}`,
+      providesTags: [{ type: "Reports", id: "EXPORTS" }],
     }),
     getCashflowForecast: builder.query<
       ICashflowForecastResponse,
@@ -145,6 +187,7 @@ export const reportsApi = apiSlice.injectEndpoints({
 export const {
   useGetActivityQuery,
   useGetAgentPerformanceQuery,
+  useGetBookExportsQuery,
   useGetCashflowForecastQuery,
   useGetCashflowQuery,
   useGetDashboardQuery,
@@ -152,8 +195,9 @@ export const {
   useGetExpenseSummaryQuery,
   useGetPeriodSummaryQuery,
   useGetProfitReportQuery,
-  useGetPurchaseBookQuery,
-  useGetSalesBookQuery,
+  useGetPurchaseBookInfiniteQuery,
+  useGetSalesBookInfiniteQuery,
   useGetTrendsQuery,
   useGetVolumeQuery,
+  useRequestBookExportMutation,
 } = reportsApi;

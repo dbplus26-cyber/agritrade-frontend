@@ -1,13 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   WidgetEmpty,
   WidgetError,
 } from "@/components/admin/dashboard/chart-kit";
 import { ConsoleTabs } from "@/components/admin/console-tabs";
-import { ExportLink } from "@/components/admin/export-link";
+import {
+  BookExportButton,
+  EXPORTS_PAGE,
+} from "@/components/admin/reports/book-export-button";
 import { SearchableSelect } from "@/components/admin/searchable-select";
 import {
   AdminButton,
@@ -15,7 +18,6 @@ import {
   adminInputClass,
 } from "@/components/admin/ui";
 import { Input } from "@/components/ui/input";
-import { ListPagination } from "@/components/ui/ListPagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRemoteSearch } from "@/hooks/use-remote-search";
 import { env } from "@/lib/env";
@@ -24,11 +26,15 @@ import { cn } from "@/lib/utils";
 import { useGetBuyersQuery } from "@/redux/buyers/buyers-api";
 import { useGetCommoditiesQuery } from "@/redux/commodities/commodities-api";
 import {
-  useGetPurchaseBookQuery,
-  useGetSalesBookQuery,
+  useGetPurchaseBookInfiniteQuery,
+  useGetSalesBookInfiniteQuery,
 } from "@/redux/reports/reports-api";
 import { useGetSuppliersQuery } from "@/redux/suppliers/suppliers-api";
-import type { IPurchaseBook, IPurchaseBookRow } from "@/types/report.types";
+import type {
+  IPurchaseBook,
+  IPurchaseBookResponse,
+  IPurchaseBookRow,
+} from "@/types/report.types";
 
 type Side = IPurchaseBook["side"];
 
@@ -137,8 +143,6 @@ export function PurchaseBook() {
   // follows the box only once it reads as a year.
   const [yearText, setYearText] = useState(String(new Date().getFullYear()));
   const [year, setYear] = useState(new Date().getFullYear());
-  // The book comes a page at a time; any change of book starts at its top.
-  const [page, setPage] = useState(1);
   const words = WORDS[side];
   const buying = side === "PURCHASE";
 
@@ -170,17 +174,19 @@ export function PurchaseBook() {
   );
   const people = buying ? suppliers : buyers;
 
-  const purchaseBook = useGetPurchaseBookQuery(
-    { commodityId, page, supplierId: partyId, year },
+  // The book comes a page at a time, the next as the sheet is scrolled; any
+  // change of book starts again at its top.
+  const purchaseBook = useGetPurchaseBookInfiniteQuery(
+    { commodityId, supplierId: partyId, year },
     { skip: !ready || !buying },
   );
-  const salesBook = useGetSalesBookQuery(
-    { buyerId: partyId, commodityId, page, year },
+  const salesBook = useGetSalesBookInfiniteQuery(
+    { buyerId: partyId, commodityId, year },
     { skip: !ready || buying },
   );
   const book = buying ? purchaseBook : salesBook;
-  const data = book.data?.data;
-  const meta = book.data?.meta;
+  const pages = book.data?.pages;
+  const data = pages?.[0]?.data;
   // The sheet is shown whole at every width, scrolling sideways on a phone:
   // the book is the owner's Excel workbook, and it reads as one.
   return (
@@ -191,92 +197,9 @@ export function PurchaseBook() {
         sub={`Every ${words.verb.slice(0, -1)} of a commodity with one of your ${words.people}, the cash paid and what has been dispatched`}
         actions={
           <>
-            <ConsoleTabs
-              label="Which side of the book"
-              tabs={[
-                { value: "PURCHASE", label: "Suppliers" },
-                { value: "SALE", label: "Buyers" },
-              ]}
-              value={side}
-              onChange={(next) => {
-                setSide(next);
-                // A supplier is not a buyer: the other side starts unchosen.
-                setParty({ id: "", name: "" });
-                setPage(1);
-              }}
-            />
-            <SearchableSelect
-              className="w-[200px]"
-              value={party.id}
-              onChange={(id) => {
-                const name =
-                  people.data?.data.find((p) => p.id === id)?.name ?? "";
-                setParty({ id, name });
-                setPage(1);
-              }}
-              options={[
-                { value: ALL, label: words.all },
-                ...(people.data?.data ?? []).map((p) => ({
-                  value: p.id,
-                  label: p.name,
-                })),
-              ]}
-              placeholder={words.choose}
-              onSearchChange={search.onSearchChange}
-              loading={people.isFetching}
-              selectedLabel={party.name}
-            />
-            <SearchableSelect
-              className="w-[200px]"
-              value={commodityId}
-              onChange={(id) => {
-                const name =
-                  commodities.data?.data.find((c) => c.id === id)?.name ?? "";
-                setPicked({ id, name });
-                setPage(1);
-              }}
-              options={(commodities.data?.data ?? []).map((c) => ({
-                value: c.id,
-                label: c.name,
-              }))}
-              placeholder="Choose a commodity"
-              onSearchChange={commoditySearch.onSearchChange}
-              loading={commodities.isFetching}
-              selectedLabel={commodity.name}
-            />
-            {/* Any year can be typed: the book is not limited to a list. */}
-            <Input
-              aria-invalid={!validYear(yearText)}
-              aria-label="Year"
-              className={cn(adminInputClass, "font-adminmono w-[96px]")}
-              inputMode="numeric"
-              max={2100}
-              min={2000}
-              onChange={(e) => {
-                const text = e.target.value;
-                setYearText(text);
-                if (validYear(text)) {
-                  setYear(Number(text));
-                  setPage(1);
-                }
-              }}
-              title="Type any year from 2000 to 2100"
-              type="number"
-              value={yearText}
-            />
-            {ready ? (
-              <ExportLink
-                format="Excel"
-                href={`${env.SERVER_URI}/api/v1/admin/reports/exports/${words.exportPath}${toQueryString(
-                  buying
-                    ? { commodityId, supplierId: partyId, year }
-                    : { buyerId: partyId, commodityId, year },
-                )}`}
-                what={`The ${words.title.toLowerCase()} for this commodity and year`}
-              >
-                Export Excel
-              </ExportLink>
-            ) : null}
+            <AdminButton variant="outline" asChild>
+              <Link href={EXPORTS_PAGE}>Exports</Link>
+            </AdminButton>
             <AdminButton variant="outline" asChild>
               <Link href="/admin/reports/book-settings">Book settings</Link>
             </AdminButton>
@@ -284,9 +207,95 @@ export function PurchaseBook() {
         }
       />
 
+      {/* Which book: its own row under the heading. Beside the title these
+          controls outgrew the row and squeezed the title to a sliver. */}
+      <div
+        aria-label="Which book"
+        className="mb-4 flex flex-wrap items-center gap-2"
+        role="group"
+      >
+        <ConsoleTabs
+          label="Which side of the book"
+          tabs={[
+            { value: "PURCHASE", label: "Suppliers" },
+            { value: "SALE", label: "Buyers" },
+          ]}
+          value={side}
+          onChange={(next) => {
+            setSide(next);
+            // A supplier is not a buyer: the other side starts unchosen.
+            setParty({ id: "", name: "" });
+          }}
+        />
+        <SearchableSelect
+          className="w-[200px]"
+          value={party.id}
+          onChange={(id) => {
+            const name = people.data?.data.find((p) => p.id === id)?.name ?? "";
+            setParty({ id, name });
+          }}
+          options={[
+            { value: ALL, label: words.all },
+            ...(people.data?.data ?? []).map((p) => ({
+              value: p.id,
+              label: p.name,
+            })),
+          ]}
+          placeholder={words.choose}
+          onSearchChange={search.onSearchChange}
+          loading={people.isFetching}
+          selectedLabel={party.name}
+        />
+        <SearchableSelect
+          className="w-[200px]"
+          value={commodityId}
+          onChange={(id) => {
+            const name =
+              commodities.data?.data.find((c) => c.id === id)?.name ?? "";
+            setPicked({ id, name });
+          }}
+          options={(commodities.data?.data ?? []).map((c) => ({
+            value: c.id,
+            label: c.name,
+          }))}
+          placeholder="Choose a commodity"
+          onSearchChange={commoditySearch.onSearchChange}
+          loading={commodities.isFetching}
+          selectedLabel={commodity.name}
+        />
+        {/* Any year can be typed: the book is not limited to a list. */}
+        <Input
+          aria-invalid={!validYear(yearText)}
+          aria-label="Year"
+          className={cn(adminInputClass, "font-adminmono w-[96px]")}
+          inputMode="numeric"
+          max={2100}
+          min={2000}
+          onChange={(e) => {
+            const text = e.target.value;
+            setYearText(text);
+            if (validYear(text)) setYear(Number(text));
+          }}
+          title="Type any year from 2000 to 2100"
+          type="number"
+          value={yearText}
+        />
+        {ready ? (
+          <BookExportButton
+            book={{ commodityId, partyId, side, year }}
+            href={`${env.SERVER_URI}/api/v1/admin/reports/exports/${words.exportPath}${toQueryString(
+              buying
+                ? { commodityId, supplierId: partyId, year }
+                : { buyerId: partyId, commodityId, year },
+            )}`}
+            what={`The ${words.title.toLowerCase()} for this commodity and year`}
+          />
+        ) : null}
+      </div>
+
       {firstCommodities.isLoading || book.isLoading ? (
         <Skeleton className="h-[320px] w-full rounded-none" />
-      ) : book.isError || firstCommodities.isError ? (
+      ) : (book.isError && !pages) || firstCommodities.isError ? (
         <WidgetError
           onRetry={() => {
             void firstCommodities.refetch();
@@ -299,7 +308,7 @@ export function PurchaseBook() {
           title="No commodities yet"
           hint="Add a commodity and record a purchase, and its book appears here."
         />
-      ) : !data ? (
+      ) : !data || !pages ? (
         <WidgetEmpty
           title={words.choose}
           hint={`The book is kept per ${words.people.slice(0, -1)}: pick one above to open their account, or "${words.all}" for everyone together.`}
@@ -310,32 +319,24 @@ export function PurchaseBook() {
           hint={`${words.verb[0].toUpperCase()}${words.verb.slice(1)} recorded for this commodity and year show up here on their own.`}
         />
       ) : (
-        <div className={cn(book.isFetching && "opacity-60")}>
+        <div
+          className={cn(
+            book.isFetching && !book.isFetchingNextPage && "opacity-60",
+          )}
+        >
           {data.totals.payableGhs === null ? (
             <p className="mb-3 text-[12px] text-adm-muted">
               Money figures are hidden for your account. Weights, bags and
               dispatch are shown in full.
             </p>
           ) : null}
-          <BookTable book={data} />
-          {meta && meta.totalPages > 1 ? (
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-              <p className="text-[12px] text-adm-muted tabular-nums">
-                Rows{" "}
-                {((meta.page - 1) * meta.limit + 1).toLocaleString("en-GH")} to{" "}
-                {Math.min(meta.page * meta.limit, meta.total).toLocaleString(
-                  "en-GH",
-                )}{" "}
-                of {meta.total.toLocaleString("en-GH")}. The totals row and the
-                running balance cover the whole book.
-              </p>
-              <ListPagination
-                page={meta.page}
-                totalPages={meta.totalPages}
-                onPageChange={setPage}
-              />
-            </div>
-          ) : null}
+          <BookSheet
+            failed={book.isError}
+            hasMore={book.hasNextPage}
+            loadingMore={book.isFetchingNextPage}
+            onMore={() => void book.fetchNextPage()}
+            pages={pages}
+          />
         </div>
       )}
     </div>
@@ -345,13 +346,110 @@ export function PurchaseBook() {
 const title = (book: IPurchaseBook) =>
   `DB+_${book.commodity.name.toUpperCase()} ${WORDS[book.side].book}-${String(book.year)}${book.party ? ` - ${book.party.name.toUpperCase()}` : ""}`;
 
+/** How far ahead of the reader the next page is asked for. */
+const AHEAD_PX = 900;
+
+/**
+ * The book as far as it has loaded, and the asking for more: the next page
+ * joins the sheet when the reader nears its end, so a long book never makes
+ * anyone wait for rows they have not scrolled to.
+ */
+export function BookSheet({
+  failed,
+  hasMore,
+  loadingMore,
+  onMore,
+  pages,
+}: {
+  /** The last page asked for did not arrive. */
+  failed: boolean;
+  hasMore: boolean;
+  loadingMore: boolean;
+  onMore: () => void;
+  pages: IPurchaseBookResponse[];
+}) {
+  const end = useRef<HTMLDivElement>(null);
+  const more = useRef(onMore);
+  useEffect(() => {
+    more.current = onMore;
+  });
+  const waiting = hasMore && !loadingMore && !failed;
+  // Rebuilt after every page: a fresh observer reports where the end is now,
+  // so a page too short to push it out of view is followed by the next.
+  useEffect(() => {
+    const node = end.current;
+    if (!waiting || !node || typeof IntersectionObserver === "undefined") {
+      return;
+    }
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) more.current();
+    });
+    observer.observe(node);
+    return () => {
+      observer.disconnect();
+    };
+  }, [waiting, pages.length]);
+
+  const { meta } = pages[pages.length - 1];
+  const loaded = pages.reduce((n, p) => n + p.data.rows.length, 0);
+  const count = (n: number) => n.toLocaleString("en-GH");
+  return (
+    <div>
+      <div className="relative">
+        <BookTable pages={pages} />
+        {/* The end of the sheet, reaching back up it: it comes into view
+            while the reader is still some way off the last row. Measured
+            here rather than with a root margin, which a scrolling shell
+            around the page would clip. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0"
+          ref={end}
+          style={{ height: AHEAD_PX, maxHeight: "100%" }}
+        />
+      </div>
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <p
+          aria-live="polite"
+          className="text-[12px] text-adm-muted tabular-nums"
+        >
+          {hasMore
+            ? `Rows 1 to ${count(loaded)} of ${count(meta.total)}. More load as you scroll.`
+            : `All ${count(meta.total)} rows.`}{" "}
+          The totals row and the running balance cover the whole book.
+        </p>
+        {failed ? (
+          <p className="flex items-center gap-2 text-[12px] text-console-red">
+            Couldn&apos;t load more rows.
+            <AdminButton onClick={onMore} type="button" variant="outline">
+              Try again
+            </AdminButton>
+          </p>
+        ) : hasMore ? (
+          <AdminButton
+            disabled={loadingMore}
+            loading={loadingMore}
+            onClick={onMore}
+            type="button"
+            variant="outline"
+          >
+            {loadingMore ? "Loading rows…" : "Load more rows"}
+          </AdminButton>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+const td = cn("px-1.5 py-1 text-center", SHEET.cell);
+
 /** The sheet itself, scrolling sideways inside its own frame when narrow. */
-function BookTable({ book }: { book: IPurchaseBook }) {
+function BookTable({ pages }: { pages: IPurchaseBookResponse[] }) {
+  const book = pages[0].data;
   const t = book.totals;
   const words = WORDS[book.side];
   const th = cn("px-1.5 py-1.5 font-serif text-[10.5px] font-bold", SHEET.head);
   const total = cn("px-1.5 py-1.5 text-center font-bold", SHEET.totals);
-  const td = cn("px-1.5 py-1 text-center", SHEET.cell);
   return (
     <div>
       {/* Outside the scrolling frame, so the title stays put on a phone while
@@ -439,58 +537,71 @@ function BookTable({ book }: { book: IPurchaseBook }) {
               ))}
             </tr>
           </thead>
-          <tbody>
-            {book.rows.map((row, i) => {
-              const cash = row.kind === "CASH";
-              const na = cash ? cn(td, SHEET.blank) : td;
-              return (
-                <tr
-                  key={`${row.kind}-${row.documentId ?? row.date}-${String(i)}`}
-                >
-                  <td className={cn(td, "whitespace-nowrap")}>
-                    {sheetDate(row.date)}
-                  </td>
-                  <td className={cn(td, "text-left font-sans")}>
-                    <Particulars row={row} side={book.side} />
-                  </td>
-                  <td className={na}>{int(row.bags)}</td>
-                  <td className={na}>{dec(row.priceGhs)}</td>
-                  <td className={na}>{int(row.weightKg)}</td>
-                  <td className={cn(td, "text-right")}>
-                    {amount(row.payableGhs ?? (cash ? 0 : null))}
-                  </td>
-                  <td className={cn(td, "text-right")}>
-                    {int(row.advanceGhs)}
-                  </td>
-                  <td
-                    className={cn(
-                      td,
-                      "text-right",
-                      (row.balanceCashGhs ?? 0) < 0 &&
-                        cn("font-bold", SHEET.red),
-                    )}
-                  >
-                    {amount(row.balanceCashGhs)}
-                  </td>
-                  <td className={cn(na, "font-bold", SHEET.red)}>
-                    {dec(row.fmPercent)}
-                  </td>
-                  <td className={na}>{int(row.dispatchedBags)}</td>
-                  <td className={na}>{int(row.dispatchedKg)}</td>
-                  <td className={td}>{int(row.balanceBags ?? 0)}</td>
-                  <td className={td}>{int(row.balanceKg ?? 0)}</td>
-                  <td className={cn(td, SHEET.blank)}>
-                    {row.fmDeductionPct ? dec(row.fmDeductionPct) : ""}
-                  </td>
-                  <td className={cn(td, "text-right", SHEET.blank)}>
-                    {amount(row.fmDeductionKg ?? 0)}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
+          {pages.map((p) => (
+            <PageRows key={p.meta.page} rows={p.data.rows} side={book.side} />
+          ))}
         </table>
       </div>
     </div>
   );
 }
+
+/**
+ * One page of the book's rows. Each page is its own block of the table and is
+ * only drawn once: a page joining the end leaves the thousands above it alone.
+ */
+const PageRows = memo(function PageRows({
+  rows,
+  side,
+}: {
+  rows: IPurchaseBookRow[];
+  side: Side;
+}) {
+  return (
+    <tbody>
+      {rows.map((row, i) => {
+        const cash = row.kind === "CASH";
+        const na = cash ? cn(td, SHEET.blank) : td;
+        return (
+          <tr key={`${row.kind}-${row.documentId ?? row.date}-${String(i)}`}>
+            <td className={cn(td, "whitespace-nowrap")}>
+              {sheetDate(row.date)}
+            </td>
+            <td className={cn(td, "text-left font-sans")}>
+              <Particulars row={row} side={side} />
+            </td>
+            <td className={na}>{int(row.bags)}</td>
+            <td className={na}>{dec(row.priceGhs)}</td>
+            <td className={na}>{int(row.weightKg)}</td>
+            <td className={cn(td, "text-right")}>
+              {amount(row.payableGhs ?? (cash ? 0 : null))}
+            </td>
+            <td className={cn(td, "text-right")}>{int(row.advanceGhs)}</td>
+            <td
+              className={cn(
+                td,
+                "text-right",
+                (row.balanceCashGhs ?? 0) < 0 && cn("font-bold", SHEET.red),
+              )}
+            >
+              {amount(row.balanceCashGhs)}
+            </td>
+            <td className={cn(na, "font-bold", SHEET.red)}>
+              {dec(row.fmPercent)}
+            </td>
+            <td className={na}>{int(row.dispatchedBags)}</td>
+            <td className={na}>{int(row.dispatchedKg)}</td>
+            <td className={td}>{int(row.balanceBags ?? 0)}</td>
+            <td className={td}>{int(row.balanceKg ?? 0)}</td>
+            <td className={cn(td, SHEET.blank)}>
+              {row.fmDeductionPct ? dec(row.fmDeductionPct) : ""}
+            </td>
+            <td className={cn(td, "text-right", SHEET.blank)}>
+              {amount(row.fmDeductionKg ?? 0)}
+            </td>
+          </tr>
+        );
+      })}
+    </tbody>
+  );
+});

@@ -262,3 +262,48 @@ export interface IPurchaseBookResponse {
   data: IPurchaseBook;
   meta: IPaginationMeta;
 }
+
+export type DataExportStatus = "QUEUED" | "PROCESSING" | "COMPLETED" | "FAILED";
+
+/**
+ * A file too long to build while the page waits: prepared in the background
+ * and collected from the Exports page. A long book is several files.
+ */
+export interface IDataExport {
+  id: string;
+  type: "PURCHASE_BOOK" | "SALES_BOOK";
+  status: DataExportStatus;
+  /** "Soya Purchase Book 2026 - Ibrahim". */
+  title: string;
+  /** Rows written so far, of `totalRows`. */
+  rowCount: number;
+  totalRows: number;
+  /** Each downloaded by its part number, through the API. */
+  files: { name: string; part: number; rows: number }[];
+  error: string | null;
+  createdAt: string;
+  completedAt: string | null;
+  /** When the files are deleted. */
+  expiresAt: string | null;
+}
+
+/** Which book to hand over as a file. */
+export interface IBookExportRequest {
+  side: "PURCHASE" | "SALE";
+  commodityId: string;
+  /** A supplier or a buyer; left out for everyone. */
+  partyId?: string;
+  year: number;
+}
+
+/** `export: null`: the book is short, download it now. Otherwise it is queued. */
+export interface IBookExportResponse {
+  message: string;
+  data: { export: IDataExport | null };
+}
+
+export interface IDataExportListResponse {
+  message: string;
+  data: IDataExport[];
+  meta: IPaginationMeta;
+}

@@ -510,6 +510,7 @@ function Crumbs() {
     new: "New",
     "purchase-book": "Purchase book",
     "book-settings": "Book settings",
+    exports: "Exports",
   };
   const sub = segments.length > 1 ? (SUB_LABEL[segments[1]] ?? "Detail") : null;
 
