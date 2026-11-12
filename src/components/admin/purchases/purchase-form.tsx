@@ -87,7 +87,6 @@ export function PurchaseCreate() {
       warehouseId: "",
       weightKg: "",
       unitPriceGhs: "",
-      bags: "",
       fmPercent: "",
       purchasedAt: todayInputValue(),
       notes: "",
@@ -143,7 +142,6 @@ export function PurchaseCreate() {
           ...(values.warehouseId ? { warehouseId: values.warehouseId } : {}),
           weightKg: Number(values.weightKg),
           unitPriceGhs: Number(values.unitPriceGhs),
-          ...(values.bags?.trim() ? { bags: Number(values.bags) } : {}),
           ...(values.fmPercent?.trim()
             ? { fmPercent: Number(values.fmPercent) }
             : {}),
@@ -161,7 +159,6 @@ export function PurchaseCreate() {
           "commodityId",
           "weightKg",
           "unitPriceGhs",
-          "bags",
           "fmPercent",
           "purchasedAt",
           "notes",
@@ -334,22 +331,6 @@ export function PurchaseCreate() {
             </div>
 
             <div className="grid gap-5 @min-[440px]:grid-cols-2">
-              <AdminField
-                label="Bags"
-                optional
-                hint="The bag count off the weigh slip. It shows in the purchase book; stock is still tracked in kg."
-                error={errors.bags?.message}
-              >
-                <Input
-                  inputMode="numeric"
-                  placeholder="e.g. 650"
-                  className={cn(
-                    adminInputClass,
-                    errors.bags && "border-console-red",
-                  )}
-                  {...register("bags")}
-                />
-              </AdminField>
               <AdminField
                 label="FM (%)"
                 optional

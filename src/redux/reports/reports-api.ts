@@ -110,9 +110,20 @@ export const reportsApi = apiSlice.injectEndpoints({
     }),
     getPurchaseBook: builder.query<
       IPurchaseBookResponse,
-      { commodityId: string; year: number }
+      { commodityId: string; page: number; supplierId?: string; year: number }
     >({
       query: (p) => `admin/reports/purchase-book${toQueryString(p)}`,
+      providesTags: [
+        { type: "Reports", id: "PURCHASE_BOOK" },
+        { type: "Reports", id: "LIST" },
+      ],
+    }),
+    /** The same sheet from the selling side, for one buyer or all of them. */
+    getSalesBook: builder.query<
+      IPurchaseBookResponse,
+      { buyerId?: string; commodityId: string; page: number; year: number }
+    >({
+      query: (p) => `admin/reports/sales-book${toQueryString(p)}`,
       providesTags: [
         { type: "Reports", id: "PURCHASE_BOOK" },
         { type: "Reports", id: "LIST" },
@@ -142,6 +153,7 @@ export const {
   useGetPeriodSummaryQuery,
   useGetProfitReportQuery,
   useGetPurchaseBookQuery,
+  useGetSalesBookQuery,
   useGetTrendsQuery,
   useGetVolumeQuery,
 } = reportsApi;

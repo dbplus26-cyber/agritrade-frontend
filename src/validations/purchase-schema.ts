@@ -28,17 +28,6 @@ const requiredNumber = (label: string, max: number) =>
       message: `A ${label} is recorded to at most 2 decimal places`,
     });
 
-/** A bag count off the weigh slip; a string so the field can be emptied. */
-const optionalBags = z
-  .string()
-  .trim()
-  .refine(
-    (v) =>
-      v === "" || (/^\d+$/.test(v) && Number(v) >= 1 && Number(v) <= 1_000_000),
-    { message: "Enter the number of bags as a whole number" },
-  )
-  .optional();
-
 /** The quality test's foreign matter, 0-100 to 2dp. */
 const optionalPercent = z
   .string()
@@ -64,7 +53,6 @@ export const purchaseSchema = z
     warehouseId: z.string().optional(),
     weightKg: requiredNumber("weight in kg", 1_000_000),
     unitPriceGhs: requiredNumber("price per kg", 10_000),
-    bags: optionalBags,
     fmPercent: optionalPercent,
     purchasedAt: z.string().min(1, "Enter the purchase date"),
     notes: optionalText(1000),
@@ -84,7 +72,6 @@ export const agentPurchaseSchema = z.object({
   supplierId: z.string().optional(),
   weightKg: requiredNumber("weight in kg", 1_000_000),
   unitPriceGhs: requiredNumber("price per kg", 10_000),
-  bags: optionalBags,
   purchasedAt: z.string().min(1, "Enter the purchase date"),
   /**
    * Whether the money changed hands at the scale.

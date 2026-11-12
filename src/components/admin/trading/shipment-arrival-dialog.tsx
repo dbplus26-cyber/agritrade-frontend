@@ -27,6 +27,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useConfirm } from "@/hooks/use-confirm";
 import { extractApiError } from "@/lib/extract-api-error";
+import { fmDeduction } from "@/lib/fm-deduction";
 import { formatCedis, formatKg } from "@/lib/format-money";
 import { notify } from "@/lib/notify";
 import { cn } from "@/lib/utils";
@@ -128,8 +129,35 @@ function SaleArrival({
   }, [detail.data]);
 
   /**
-   * Received x agreed unit price. Null when a price is redacted or a weight is
-   * not a figure yet - a suggestion nobody can check is worse than none.
+   * What the buyer's FM test takes off each line's received weight, in kg.
+   * A preview of the selling rule: the server computes the figure it stores.
+   */
+  const fmOffKg = useMemo(
+    () =>
+      lines.map((line, i) => {
+        const fm = received?.[i]?.fmPercent?.trim() ?? "";
+        const kg = Number(received?.[i]?.receivedKg ?? "");
+        // The selling FM rule (Book settings) rides on the sale's own lines.
+        const rule = detail.data?.data.sale.lines.find(
+          (l) => l.commodity.id === line.commodityId,
+        )?.commodity;
+        if (fm === "" || !Number.isFinite(Number(fm)) || !Number.isFinite(kg)) {
+          return 0;
+        }
+        return fmDeduction({
+          fmPercent: Number(fm),
+          standardPct: rule?.saleFmStandardPct ?? null,
+          tolerancePct: rule?.saleFmTolerancePct ?? null,
+          weightKg: kg,
+        }).kg;
+      }),
+    [detail.data, lines, received],
+  );
+
+  /**
+   * (Received - FM deduction) x agreed unit price. Null when a price is
+   * redacted or a weight is not a figure yet - a suggestion nobody can check
+   * is worse than none.
    */
   const suggestedGhs = useMemo(() => {
     let total = 0;
@@ -138,10 +166,10 @@ function SaleArrival({
       if (price === null || price === undefined) return null;
       const raw = received?.[i]?.receivedKg ?? "";
       if (raw.trim() === "" || !Number.isFinite(Number(raw))) return null;
-      total += Number(raw) * price;
+      total += (Number(raw) - fmOffKg[i]) * price;
     }
     return Math.round(total * 100) / 100;
-  }, [lines, received, unitPrices]);
+  }, [fmOffKg, lines, received, unitPrices]);
 
   // The suggestion is a starting point, not a computed field: it fills the box
   // until somebody types over it, and then leaves it alone.
@@ -208,6 +236,32 @@ function SaleArrival({
                 kg
               </span>
             </div>
+            {/* The buyer's quality test. Optional: blank means not tested. */}
+            <div className="relative">
+              <Input
+                id={`fm-${sale.id}-${line.commodityId}`}
+                inputMode="decimal"
+                aria-label={`FM% of ${line.commodityName} for ${sale.transactionNo}`}
+                className={cn(
+                  adminInputClass,
+                  "font-adminmono pr-14 text-[12.5px] tabular-nums",
+                )}
+                placeholder="FM test result, if tested"
+                {...register(`sales.${index}.lines.${i}.fmPercent`)}
+              />
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[11px] font-semibold text-adm-faint"
+              >
+                FM %
+              </span>
+            </div>
+            {fmOffKg[i] > 0 ? (
+              <p className="text-[10.5px] text-adm-muted">
+                FM above the tolerance: {formatKg(fmOffKg[i])} comes off the
+                weight the buyer pays on.
+              </p>
+            ) : null}
           </div>
         ))}
       </div>
@@ -359,6 +413,8 @@ export function ArrivalDialog({
           );
           return {
             commodityId: line.commodityId,
+            fmPercent:
+              recorded?.fmPercent == null ? "" : String(recorded.fmPercent),
             receivedKg: String(recorded?.receivedKg ?? line.loadedKg),
           };
         }),
@@ -454,6 +510,7 @@ export function ArrivalDialog({
       sales: (values.sales ?? []).map((s) => ({
         lines: s.lines.map((l) => ({
           commodityId: l.commodityId,
+          fmPercent: l.fmPercent ? Number(l.fmPercent) : null,
           receivedKg: Number(l.receivedKg),
         })),
         saleId: s.saleId,
@@ -535,7 +592,7 @@ export function ArrivalDialog({
                 className="text-[11px] font-medium text-console-red"
               >
                 Every weight and every payment needs a figure. Enter 0 where
-                nothing arrived.
+                nothing arrived. FM% is a number from 0 to 100, or blank.
               </p>
             ) : null}
           </form>

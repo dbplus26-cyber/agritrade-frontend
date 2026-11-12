@@ -30,7 +30,13 @@ export interface ISaleMilestone extends IMilestone {
 
 export interface ISaleLine {
   id: string;
-  commodity: { id: string; name: string };
+  commodity: {
+    id: string;
+    name: string;
+    /** The selling FM rule a buyer's test is settled against at arrival. */
+    saleFmStandardPct: number | null;
+    saleFmTolerancePct: number | null;
+  };
   weightKg: number;
   unitPriceGhs: number | null;
   totalGhs: number | null;

@@ -122,6 +122,9 @@ function SaleSettlement({ sale }: { sale: IShipmentSale }) {
                 >
                   {formatKg(line.receivedKg)} of {formatKg(line.dispatchedKg)}
                   {shortKg > 0 ? ` · ${formatKg(shortKg)} short` : ""}
+                  {line.fmPercent !== null
+                    ? ` · FM ${line.fmPercent.toFixed(2)}%${line.fmDeductionKg > 0 ? `, ${formatKg(line.fmDeductionKg)} off` : ""}`
+                    : ""}
                 </Mono>
               </li>
             );

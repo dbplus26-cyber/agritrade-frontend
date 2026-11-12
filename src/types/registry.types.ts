@@ -30,6 +30,9 @@ export interface ICommodity {
    */
   fmStandardPct: number | null;
   fmTolerancePct: number | null;
+  /** The same rule from the buyer's side, applied when a truck arrives. */
+  saleFmStandardPct: number | null;
+  saleFmTolerancePct: number | null;
   photo: string | null;
   publishToWebsite: boolean;
   isActive: boolean;
@@ -185,6 +188,8 @@ export interface IUpdateCommodityInput {
   bagWeightKg?: number | null;
   fmStandardPct?: number | null;
   fmTolerancePct?: number | null;
+  saleFmStandardPct?: number | null;
+  saleFmTolerancePct?: number | null;
   sortOrder?: number;
   /** Clears the existing photo (the backend deletes the Cloudinary asset). */
   removePhoto?: boolean;

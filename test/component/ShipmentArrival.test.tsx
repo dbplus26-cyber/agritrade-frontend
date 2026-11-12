@@ -98,12 +98,22 @@ const SALE_DETAIL = {
       sale: {
         lines: [
           {
-            commodity: { id: "maize", name: "Maize" },
+            commodity: {
+              id: "maize",
+              name: "Maize",
+              saleFmStandardPct: 3,
+              saleFmTolerancePct: 3.5,
+            },
             id: "l1",
             unitPriceGhs: 10,
           },
           {
-            commodity: { id: "soya", name: "Soya beans" },
+            commodity: {
+              id: "soya",
+              name: "Soya beans",
+              saleFmStandardPct: 3,
+              saleFmTolerancePct: 3.5,
+            },
             id: "l2",
             unitPriceGhs: 4,
           },
@@ -193,6 +203,35 @@ describe("ArrivalDialog", () => {
     expect(screen.getByText("GH₵ 11,760.00")).toBeInTheDocument();
   });
 
+  it("takes the buyer's FM deduction off the weight before pricing it", async () => {
+    render(<ArrivalDialog onClose={vi.fn()} shipment={shipment()} />);
+    await screen.findByDisplayValue("12000.00");
+
+    // Inside the 3.5% tolerance nothing comes off.
+    const fm = screen.getByLabelText("FM% of Maize for SAL-2026-00011");
+    await userEvent.type(fm, "3.2");
+    expect(paymentBox()).toHaveValue("12000.00");
+
+    // 4.5% against 3 / 3.5: 1.5% of 1,000 kg is 15 kg. 985 x 10 + 500 x 4.
+    await userEvent.clear(fm);
+    await userEvent.type(fm, "4.5");
+    expect(paymentBox()).toHaveValue("11850.00");
+
+    await recordArrival();
+    await waitFor(() => expect(arriveTrigger).toHaveBeenCalledTimes(1));
+    expect(arriveTrigger.mock.calls[0][0]).toMatchObject({
+      sales: [
+        {
+          lines: [
+            { commodityId: "maize", fmPercent: 4.5, receivedKg: 1000 },
+            { commodityId: "soya", fmPercent: null, receivedKg: 500 },
+          ],
+          settledTotalGhs: 11_850,
+        },
+      ],
+    });
+  });
+
   it("keeps a figure the admin typed over, and can offer the suggestion back", async () => {
     render(<ArrivalDialog onClose={vi.fn()} shipment={shipment()} />);
     await screen.findByDisplayValue("12000.00");
@@ -224,8 +263,8 @@ describe("ArrivalDialog", () => {
       sales: [
         {
           lines: [
-            { commodityId: "maize", receivedKg: 976 },
-            { commodityId: "soya", receivedKg: 500 },
+            { commodityId: "maize", fmPercent: null, receivedKg: 976 },
+            { commodityId: "soya", fmPercent: null, receivedKg: 500 },
           ],
           saleId: "sale-1",
           settledTotalGhs: 11760,
@@ -412,6 +451,9 @@ describe("ArrivalDialog, recording the figures afterwards", () => {
               commodityId: "maize",
               commodityName: "Maize",
               dispatchedKg: 1000,
+              fmDeductionKg: 0,
+              fmDeductionPct: 0,
+              fmPercent: null,
               lossValueGhs: null,
               receivedKg: 900,
             },
@@ -448,8 +490,8 @@ describe("ArrivalDialog, recording the figures afterwards", () => {
       sales: [
         {
           lines: [
-            { commodityId: "maize", receivedKg: 950 },
-            { commodityId: "soya", receivedKg: 500 },
+            { commodityId: "maize", fmPercent: null, receivedKg: 950 },
+            { commodityId: "soya", fmPercent: null, receivedKg: 500 },
           ],
           saleId: "sale-1",
           settledTotalGhs: 11_500,

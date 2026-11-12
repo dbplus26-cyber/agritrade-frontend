@@ -1,17 +1,17 @@
 // test/unit/commodity-fm-rule.test.ts
 //
-// The FM rule on the commodity form is a pair. A tolerance with no standard,
+// An FM rule in the book settings is a pair, on the buying and selling side. A tolerance with no standard,
 // or one below it, saves as a rule that can never deduct anything - and a
 // supplier is then paid in full on a load that failed its test.
 import { describe, expect, it } from "vitest";
 
-import { commoditySchema } from "@/validations/registry-schema";
+import { bookSettingsSchema } from "@/validations/registry-schema";
 
-const check = (fmStandardPct: string, fmTolerancePct: string) => {
-  const result = commoditySchema.safeParse({
-    name: "Soya Beans",
+const check = (fmStandardPct: string, fmTolerancePct: string, sale = {}) => {
+  const result = bookSettingsSchema.safeParse({
     fmStandardPct,
     fmTolerancePct,
+    ...sale,
   });
   return result.success
     ? "ok"
@@ -34,5 +34,11 @@ describe("commodity FM rule", () => {
 
   it("refuses a tolerance with no standard", () => {
     expect(check("", "3.5")).toBe("fmTolerancePct");
+  });
+
+  it("holds the selling rule to the same pair, on its own field", () => {
+    expect(
+      check("3", "3.5", { saleFmStandardPct: "2", saleFmTolerancePct: "1" }),
+    ).toBe("saleFmTolerancePct");
   });
 });

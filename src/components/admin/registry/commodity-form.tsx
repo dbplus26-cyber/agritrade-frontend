@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,6 +13,7 @@ import {
   DetailHeader,
   EditableFormActions,
   adminInputClass,
+  adminLinkClass,
 } from "@/components/admin/ui";
 import { DASHBOARD_CRUMB, DetailNav } from "@/components/admin/detail-nav";
 import { RecordFacts } from "@/components/admin/record-facts";
@@ -42,18 +44,12 @@ import { LifecycleActions } from "./lifecycle-actions";
 
 const LIST = "/admin/commodities";
 
-const pct = (v: number | null) => (v === null ? "" : String(v));
-
 /** "" for create, or the record's values for edit. */
 const toFormValues = (c?: ICommodity): CommodityValues => ({
   name: c?.name ?? "",
   variety: c?.variety ?? "",
   qualityGrade: c?.qualityGrade ?? "",
   description: c?.description ?? "",
-  bagWeightKg: c?.bagWeightKg != null ? String(c.bagWeightKg) : "",
-  // A new commodity starts on the house rule; an existing one shows its own.
-  fmStandardPct: c ? pct(c.fmStandardPct) : "3",
-  fmTolerancePct: c ? pct(c.fmTolerancePct) : "3.5",
   sortOrder: c ? String(c.sortOrder) : "",
 });
 
@@ -112,18 +108,6 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
       variety: opt(values.variety),
       qualityGrade: opt(values.qualityGrade),
       description: opt(values.description),
-      bagWeightKg: values.bagWeightKg?.trim()
-        ? Number(values.bagWeightKg)
-        : isEdit
-          ? null
-          : undefined,
-      // Empty is a real answer here: no deduction for this commodity.
-      fmStandardPct: values.fmStandardPct?.trim()
-        ? Number(values.fmStandardPct)
-        : null,
-      fmTolerancePct: values.fmTolerancePct?.trim()
-        ? Number(values.fmTolerancePct)
-        : null,
       ...(values.sortOrder?.trim()
         ? { sortOrder: Number(values.sortOrder) }
         : {}),
@@ -149,9 +133,6 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
             variety: body.variety ?? undefined,
             qualityGrade: body.qualityGrade ?? undefined,
             description: body.description ?? undefined,
-            bagWeightKg: body.bagWeightKg ?? undefined,
-            fmStandardPct: body.fmStandardPct,
-            fmTolerancePct: body.fmTolerancePct,
             sortOrder: body.sortOrder,
           },
           photo: photoFile ?? undefined,
@@ -167,9 +148,6 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
           "variety",
           "qualityGrade",
           "description",
-          "bagWeightKg",
-          "fmStandardPct",
-          "fmTolerancePct",
           "sortOrder",
         ] as const) {
           if (fieldErrors[field])
@@ -203,13 +181,18 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
                   ? null
                   : `${String(commodity.bagWeightKg)} kg`,
             },
-            {
-              label: "FM rule",
+            ...(
+              [
+                ["FM rule, buying", "fmStandardPct", "fmTolerancePct"],
+                ["FM rule, selling", "saleFmStandardPct", "saleFmTolerancePct"],
+              ] as const
+            ).map(([label, standard, tolerance]) => ({
+              label,
               value:
-                commodity.fmStandardPct === null
+                commodity[standard] === null
                   ? "No deduction"
-                  : `Deduct the excess over ${String(commodity.fmStandardPct)}% once FM is above ${String(commodity.fmTolerancePct ?? commodity.fmStandardPct)}%`,
-            },
+                  : `Deduct the excess over ${String(commodity[standard])}% once FM is above ${String(commodity[tolerance] ?? commodity[standard])}%`,
+            })),
             {
               label: "Sort order",
               mono: true,
@@ -291,25 +274,6 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
         <section className="flex flex-col gap-5">
           <div className="grid gap-5 @min-[440px]:grid-cols-2">
             <AdminField
-              label="Bag weight (kg)"
-              optional
-              hint="Display convention only - stock is always tracked in kg."
-              error={errors.bagWeightKg?.message}
-            >
-              <Input
-                inputMode="decimal"
-                placeholder="e.g. 50"
-                disabled={readOnly}
-                className={cn(
-                  adminInputClass,
-                  roCls,
-                  "font-adminmono",
-                  errors.bagWeightKg && "border-console-red",
-                )}
-                {...register("bagWeightKg")}
-              />
-            </AdminField>
-            <AdminField
               label="Sort order"
               optional
               hint="Lower numbers list first in pickers and on the website."
@@ -329,46 +293,16 @@ function CommodityFormFields({ commodity }: { commodity?: ICommodity }) {
               />
             </AdminField>
           </div>
-          <div className="grid gap-5 @min-[440px]:grid-cols-2">
-            <AdminField
-              label="Standard FM (%)"
-              optional
-              hint="Foreign matter a load may carry. When a purchase's test comes in above the tolerance, the excess over this is taken off the weight paid for. Leave empty for no deduction."
-              error={errors.fmStandardPct?.message}
+          <p className="text-[12px] text-adm-muted">
+            The bag size and the FM rules for this commodity are set in{" "}
+            <Link
+              className={adminLinkClass}
+              href="/admin/reports/book-settings"
             >
-              <Input
-                inputMode="decimal"
-                placeholder="e.g. 3"
-                disabled={readOnly}
-                className={cn(
-                  adminInputClass,
-                  roCls,
-                  "font-adminmono",
-                  errors.fmStandardPct && "border-console-red",
-                )}
-                {...register("fmStandardPct")}
-              />
-            </AdminField>
-            <AdminField
-              label="FM tolerance (%)"
-              optional
-              hint="The deduction only applies above this. A 3.17% test against a 3.5% tolerance is paid in full."
-              error={errors.fmTolerancePct?.message}
-            >
-              <Input
-                inputMode="decimal"
-                placeholder="e.g. 3.5"
-                disabled={readOnly}
-                className={cn(
-                  adminInputClass,
-                  roCls,
-                  "font-adminmono",
-                  errors.fmTolerancePct && "border-console-red",
-                )}
-                {...register("fmTolerancePct")}
-              />
-            </AdminField>
-          </div>
+              Book settings
+            </Link>
+            , in one place for every commodity.
+          </p>
         </section>
 
         <section className="flex flex-col gap-5">

@@ -87,6 +87,11 @@ export interface IShipmentArrivalLine {
   dispatchedKg: number;
   /** What came off it at the other end. */
   receivedKg: number;
+  /** The buyer's FM test result; null when the load was not tested. */
+  fmPercent: number | null;
+  /** What the selling FM rule took off the weight the buyer pays on. */
+  fmDeductionPct: number;
+  fmDeductionKg: number;
   /** The shortfall valued at what those goods cost us. Redacted money. */
   lossValueGhs: number | null;
 }
@@ -408,6 +413,8 @@ export interface IArrivalLineInput {
   commodityId: string;
   /** Zero is accepted (a load that never turned up); negative is refused. */
   receivedKg: number;
+  /** The buyer's FM test result; null when the load was not tested. */
+  fmPercent: number | null;
 }
 
 /** The arrival figures for one sale on the trip. */

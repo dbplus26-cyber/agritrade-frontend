@@ -206,12 +206,12 @@ export interface IDebtorsQuery {
  * for purchases; `balanceCashGhs` runs paid minus payable.
  */
 export interface IPurchaseBookRow {
-  kind: "CASH" | "PURCHASE";
+  kind: "CASH" | "PURCHASE" | "SALE";
   date: string;
   particulars: string;
-  /** The purchase's document number; null on a cash row. */
+  /** The purchase's or sale's document number; null on a cash row. */
   reference: string | null;
-  purchaseId: string | null;
+  documentId: string | null;
   bags: number | null;
   priceGhs: number | null;
   weightKg: number | null;
@@ -227,7 +227,12 @@ export interface IPurchaseBookRow {
   fmDeductionKg: number | null;
 }
 
+/** One commodity's year with suppliers (PURCHASE) or with buyers (SALE). */
 export interface IPurchaseBook {
+  side: "PURCHASE" | "SALE";
+  /** The one supplier or buyer the book is narrowed to; null is everyone. */
+  party: { id: string; name: string } | null;
+  /** Carries the FM rule of this side: buying or selling. */
   commodity: {
     id: string;
     name: string;
@@ -251,7 +256,9 @@ export interface IPurchaseBook {
   };
 }
 
+/** One page of the book's rows; `data.totals` cover the whole book. */
 export interface IPurchaseBookResponse {
   message: string;
   data: IPurchaseBook;
+  meta: IPaginationMeta;
 }

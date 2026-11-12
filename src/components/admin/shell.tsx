@@ -509,6 +509,7 @@ function Crumbs() {
   const SUB_LABEL: Record<string, string> = {
     new: "New",
     "purchase-book": "Purchase book",
+    "book-settings": "Book settings",
   };
   const sub = segments.length > 1 ? (SUB_LABEL[segments[1]] ?? "Detail") : null;
 

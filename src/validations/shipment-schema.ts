@@ -193,6 +193,18 @@ const settledTotalField = z
     message: "Amounts are recorded to 2 decimal places (pesewas)",
   });
 
+/** The buyer's FM test result, 0-100 to 2dp; blank when not tested. */
+const fmPercentField = z
+  .string()
+  .trim()
+  .refine(
+    (v) =>
+      v === "" ||
+      (/^\d+(\.\d{1,2})?$/.test(v) && Number(v) >= 0 && Number(v) <= 100),
+    { message: "Enter the FM% between 0 and 100, to 2 decimal places" },
+  )
+  .optional();
+
 /**
  * Recording what came off the truck, mirroring the backend's
  * `arriveShipmentSchema`. `sales` may be empty: a trip can be marked arrived
@@ -208,6 +220,7 @@ export const arriveShipmentSchema = z.object({
           .array(
             z.object({
               commodityId: z.string().min(1),
+              fmPercent: fmPercentField,
               receivedKg: receivedKgField,
             }),
           )

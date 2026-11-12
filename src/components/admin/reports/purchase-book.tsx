@@ -6,19 +6,64 @@ import {
   WidgetEmpty,
   WidgetError,
 } from "@/components/admin/dashboard/chart-kit";
+import { ConsoleTabs } from "@/components/admin/console-tabs";
 import { ExportLink } from "@/components/admin/export-link";
 import { SearchableSelect } from "@/components/admin/searchable-select";
-import { AdminPageHeader, adminSelectClass } from "@/components/admin/ui";
-import { SimpleSelect } from "@/components/ui/simple-select";
+import {
+  AdminButton,
+  AdminPageHeader,
+  adminInputClass,
+} from "@/components/admin/ui";
+import { Input } from "@/components/ui/input";
+import { ListPagination } from "@/components/ui/ListPagination";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useRemoteSearch } from "@/hooks/use-remote-search";
 import { env } from "@/lib/env";
 import { toQueryString } from "@/lib/to-query-string";
 import { cn } from "@/lib/utils";
+import { useGetBuyersQuery } from "@/redux/buyers/buyers-api";
 import { useGetCommoditiesQuery } from "@/redux/commodities/commodities-api";
-import { useGetPurchaseBookQuery } from "@/redux/reports/reports-api";
+import {
+  useGetPurchaseBookQuery,
+  useGetSalesBookQuery,
+} from "@/redux/reports/reports-api";
+import { useGetSuppliersQuery } from "@/redux/suppliers/suppliers-api";
 import type { IPurchaseBook, IPurchaseBookRow } from "@/types/report.types";
 
-const EXPORT = `${env.SERVER_URI}/api/v1/admin/reports/exports/purchase-book.xlsx`;
+type Side = IPurchaseBook["side"];
+
+/** Everyone on that side of the book, rather than one supplier or buyer. */
+const ALL = "ALL";
+
+/** The words that differ between the buying and the selling side. */
+const WORDS = {
+  PURCHASE: {
+    all: "All suppliers",
+    book: "PURCHASE BOOK",
+    choose: "Choose a supplier",
+    details: "PURCHASE DETAILS",
+    exportPath: "purchase-book.xlsx",
+    href: "/admin/purchases",
+    paid: "ADVANCE",
+    payable: "PAYABLE AMOUNT",
+    people: "suppliers",
+    title: "Purchase book",
+    verb: "purchases",
+  },
+  SALE: {
+    all: "All buyers",
+    book: "SALES BOOK",
+    choose: "Choose a buyer",
+    details: "SALES DETAILS",
+    exportPath: "sales-book.xlsx",
+    href: "/admin/sales",
+    paid: "RECEIVED",
+    payable: "RECEIVABLE AMOUNT",
+    people: "buyers",
+    title: "Sales book",
+    verb: "sales",
+  },
+} as const;
 
 /**
  * The sheet's own colours. This screen is the owner's Excel purchase book on
@@ -58,16 +103,16 @@ const sheetDate = (iso: string) =>
     })
     .replaceAll(" ", "-");
 
-/** "SOYA ... (PUR-2026-" + red "00042" + ")", linked to the purchase. */
-function Particulars({ row }: { row: IPurchaseBookRow }) {
-  if (!row.reference || !row.purchaseId) return <>{row.particulars}</>;
+/** "SOYA ... (PUR-2026-" + red "00042" + ")", linked to the document. */
+function Particulars({ row, side }: { row: IPurchaseBookRow; side: Side }) {
+  if (!row.reference || !row.documentId) return <>{row.particulars}</>;
   const cut = row.reference.lastIndexOf("-") + 1;
   return (
     <>
       {row.particulars}{" "}
       <Link
         className="whitespace-nowrap underline-offset-2 hover:underline"
-        href={`/admin/purchases/${row.purchaseId}`}
+        href={`${WORDS[side].href}/${row.documentId}`}
       >
         ({row.reference.slice(0, cut)}
         <span className={cn("font-bold", SHEET.red)}>
@@ -79,82 +124,190 @@ function Particulars({ row }: { row: IPurchaseBookRow }) {
   );
 }
 
-const YEARS = Array.from({ length: 6 }, (_, i) => new Date().getFullYear() - i);
+/** The years the API takes; any of them can be typed, past or to come. */
+const validYear = (text: string) =>
+  /^\d{4}$/.test(text) && Number(text) >= 2000 && Number(text) <= 2100;
 
 export function PurchaseBook() {
-  const commodities = useGetCommoditiesQuery({ limit: 100 });
-  const [picked, setPicked] = useState("");
-  const [year, setYear] = useState(YEARS[0]);
+  const [side, setSide] = useState<Side>("PURCHASE");
+  // The supplier or buyer whose book is open: none yet, ALL, or one record.
+  const [party, setParty] = useState({ id: "", name: "" });
+  const [picked, setPicked] = useState({ id: "", name: "" });
+  // What is typed in the year box, and the last full year it held: the book
+  // follows the box only once it reads as a year.
+  const [yearText, setYearText] = useState(String(new Date().getFullYear()));
+  const [year, setYear] = useState(new Date().getFullYear());
+  // The book comes a page at a time; any change of book starts at its top.
+  const [page, setPage] = useState(1);
+  const words = WORDS[side];
+  const buying = side === "PURCHASE";
+
+  // Every register here grows without limit, so each picker asks the server
+  // for what is typed rather than filtering a page it happens to hold.
+  const commoditySearch = useRemoteSearch();
+  const firstCommodities = useGetCommoditiesQuery({ limit: 20 });
+  const commodities = useGetCommoditiesQuery({
+    limit: 20,
+    search: commoditySearch.query,
+  });
   // Until one is chosen the book opens on the first commodity in the register.
-  const commodityId = picked || commodities.data?.data[0]?.id || "";
-  const book = useGetPurchaseBookQuery(
-    { commodityId, year },
-    { skip: !commodityId },
+  const first = firstCommodities.data?.data[0];
+  const commodity = picked.id
+    ? picked
+    : { id: first?.id ?? "", name: first?.name ?? "" };
+  const commodityId = commodity.id;
+  const partyId = party.id === ALL ? undefined : party.id;
+  const ready = Boolean(commodityId && party.id);
+
+  const search = useRemoteSearch();
+  const suppliers = useGetSuppliersQuery(
+    { limit: 20, search: search.query },
+    { skip: !buying },
   );
+  const buyers = useGetBuyersQuery(
+    { limit: 20, search: search.query },
+    { skip: buying },
+  );
+  const people = buying ? suppliers : buyers;
+
+  const purchaseBook = useGetPurchaseBookQuery(
+    { commodityId, page, supplierId: partyId, year },
+    { skip: !ready || !buying },
+  );
+  const salesBook = useGetSalesBookQuery(
+    { buyerId: partyId, commodityId, page, year },
+    { skip: !ready || buying },
+  );
+  const book = buying ? purchaseBook : salesBook;
   const data = book.data?.data;
+  const meta = book.data?.meta;
   // The sheet is shown whole at every width, scrolling sideways on a phone:
   // the book is the owner's Excel workbook, and it reads as one.
   return (
     <div>
       <AdminPageHeader
-        title="Purchase book"
-        hint="One commodity's year in one place: what was bought, what was paid, and what has left on a truck. Nothing is typed in here; it is built from your purchases, payments and shipments."
-        sub="Every purchase of a commodity, the cash paid for it and what has been dispatched"
+        title={words.title}
+        hint="One supplier's or buyer's year in a commodity: what was bought or sold, what was paid, and what has left on a truck. Nothing is typed in here; it is built from your purchases, sales, payments and shipments."
+        sub={`Every ${words.verb.slice(0, -1)} of a commodity with one of your ${words.people}, the cash paid and what has been dispatched`}
         actions={
           <>
+            <ConsoleTabs
+              label="Which side of the book"
+              tabs={[
+                { value: "PURCHASE", label: "Suppliers" },
+                { value: "SALE", label: "Buyers" },
+              ]}
+              value={side}
+              onChange={(next) => {
+                setSide(next);
+                // A supplier is not a buyer: the other side starts unchosen.
+                setParty({ id: "", name: "" });
+                setPage(1);
+              }}
+            />
+            <SearchableSelect
+              className="w-[200px]"
+              value={party.id}
+              onChange={(id) => {
+                const name =
+                  people.data?.data.find((p) => p.id === id)?.name ?? "";
+                setParty({ id, name });
+                setPage(1);
+              }}
+              options={[
+                { value: ALL, label: words.all },
+                ...(people.data?.data ?? []).map((p) => ({
+                  value: p.id,
+                  label: p.name,
+                })),
+              ]}
+              placeholder={words.choose}
+              onSearchChange={search.onSearchChange}
+              loading={people.isFetching}
+              selectedLabel={party.name}
+            />
             <SearchableSelect
               className="w-[200px]"
               value={commodityId}
-              onChange={setPicked}
+              onChange={(id) => {
+                const name =
+                  commodities.data?.data.find((c) => c.id === id)?.name ?? "";
+                setPicked({ id, name });
+                setPage(1);
+              }}
               options={(commodities.data?.data ?? []).map((c) => ({
                 value: c.id,
                 label: c.name,
               }))}
               placeholder="Choose a commodity"
+              onSearchChange={commoditySearch.onSearchChange}
               loading={commodities.isFetching}
+              selectedLabel={commodity.name}
             />
-            <SimpleSelect
-              className={cn(adminSelectClass, "w-[96px]")}
-              value={String(year)}
-              onChange={(v) => setYear(Number(v))}
-              placeholder="Year"
-              options={YEARS.map((y) => ({
-                value: String(y),
-                label: String(y),
-              }))}
+            {/* Any year can be typed: the book is not limited to a list. */}
+            <Input
+              aria-invalid={!validYear(yearText)}
+              aria-label="Year"
+              className={cn(adminInputClass, "font-adminmono w-[96px]")}
+              inputMode="numeric"
+              max={2100}
+              min={2000}
+              onChange={(e) => {
+                const text = e.target.value;
+                setYearText(text);
+                if (validYear(text)) {
+                  setYear(Number(text));
+                  setPage(1);
+                }
+              }}
+              title="Type any year from 2000 to 2100"
+              type="number"
+              value={yearText}
             />
-            {commodityId ? (
+            {ready ? (
               <ExportLink
                 format="Excel"
-                href={`${EXPORT}${toQueryString({ commodityId, year })}`}
-                what="The purchase book for this commodity and year"
+                href={`${env.SERVER_URI}/api/v1/admin/reports/exports/${words.exportPath}${toQueryString(
+                  buying
+                    ? { commodityId, supplierId: partyId, year }
+                    : { buyerId: partyId, commodityId, year },
+                )}`}
+                what={`The ${words.title.toLowerCase()} for this commodity and year`}
               >
                 Export Excel
               </ExportLink>
             ) : null}
+            <AdminButton variant="outline" asChild>
+              <Link href="/admin/reports/book-settings">Book settings</Link>
+            </AdminButton>
           </>
         }
       />
 
-      {commodities.isLoading || book.isLoading ? (
+      {firstCommodities.isLoading || book.isLoading ? (
         <Skeleton className="h-[320px] w-full rounded-none" />
-      ) : book.isError || commodities.isError ? (
+      ) : book.isError || firstCommodities.isError ? (
         <WidgetError
           onRetry={() => {
-            void commodities.refetch();
-            if (commodityId) void book.refetch();
+            void firstCommodities.refetch();
+            if (ready) void book.refetch();
           }}
-          what="the purchase book"
+          what={`the ${words.title.toLowerCase()}`}
         />
-      ) : !data ? (
+      ) : !commodityId ? (
         <WidgetEmpty
           title="No commodities yet"
           hint="Add a commodity and record a purchase, and its book appears here."
         />
+      ) : !data ? (
+        <WidgetEmpty
+          title={words.choose}
+          hint={`The book is kept per ${words.people.slice(0, -1)}: pick one above to open their account, or "${words.all}" for everyone together.`}
+        />
       ) : data.rows.length === 0 ? (
         <WidgetEmpty
-          title={`No ${data.commodity.name} purchases in ${String(data.year)}`}
-          hint="Purchases recorded for this commodity and year show up here on their own."
+          title={`No ${data.commodity.name} ${words.verb}${data.party ? ` with ${data.party.name}` : ""} in ${String(data.year)}`}
+          hint={`${words.verb[0].toUpperCase()}${words.verb.slice(1)} recorded for this commodity and year show up here on their own.`}
         />
       ) : (
         <div className={cn(book.isFetching && "opacity-60")}>
@@ -165,6 +318,24 @@ export function PurchaseBook() {
             </p>
           ) : null}
           <BookTable book={data} />
+          {meta && meta.totalPages > 1 ? (
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+              <p className="text-[12px] text-adm-muted tabular-nums">
+                Rows{" "}
+                {((meta.page - 1) * meta.limit + 1).toLocaleString("en-GH")} to{" "}
+                {Math.min(meta.page * meta.limit, meta.total).toLocaleString(
+                  "en-GH",
+                )}{" "}
+                of {meta.total.toLocaleString("en-GH")}. The totals row and the
+                running balance cover the whole book.
+              </p>
+              <ListPagination
+                page={meta.page}
+                totalPages={meta.totalPages}
+                onPageChange={setPage}
+              />
+            </div>
+          ) : null}
         </div>
       )}
     </div>
@@ -172,11 +343,12 @@ export function PurchaseBook() {
 }
 
 const title = (book: IPurchaseBook) =>
-  `DB+_${book.commodity.name.toUpperCase()} PURCHASE BOOK-${String(book.year)}`;
+  `DB+_${book.commodity.name.toUpperCase()} ${WORDS[book.side].book}-${String(book.year)}${book.party ? ` - ${book.party.name.toUpperCase()}` : ""}`;
 
 /** The sheet itself, scrolling sideways inside its own frame when narrow. */
 function BookTable({ book }: { book: IPurchaseBook }) {
   const t = book.totals;
+  const words = WORDS[book.side];
   const th = cn("px-1.5 py-1.5 font-serif text-[10.5px] font-bold", SHEET.head);
   const total = cn("px-1.5 py-1.5 text-center font-bold", SHEET.totals);
   const td = cn("px-1.5 py-1 text-center", SHEET.cell);
@@ -194,7 +366,7 @@ function BookTable({ book }: { book: IPurchaseBook }) {
         {title(book)}
       </p>
       <div
-        aria-label="Purchase book, scrolls sideways"
+        aria-label={`${words.title}, scrolls sideways`}
         className="overflow-x-auto overscroll-x-contain"
         role="region"
         tabIndex={0}
@@ -223,7 +395,7 @@ function BookTable({ book }: { book: IPurchaseBook }) {
             <tr>
               <td className={SHEET.blank} colSpan={2} />
               <th className={th} colSpan={5} scope="colgroup">
-                PURCHASE DETAILS
+                {words.details}
               </th>
               <td className={SHEET.blank} />
               <th className={th} scope="colgroup">
@@ -240,7 +412,7 @@ function BookTable({ book }: { book: IPurchaseBook }) {
                 colSpan={2}
                 rowSpan={2}
                 scope="colgroup"
-                title="Weight taken off for foreign matter above the tolerance: the percentage, then the kilos"
+                title={`Weight taken off for foreign matter above the tolerance (${book.commodity.fmStandardPct === null ? "no rule set" : `standard ${String(book.commodity.fmStandardPct)}%, tolerance ${String(book.commodity.fmTolerancePct ?? book.commodity.fmStandardPct)}%`}): the percentage, then the kilos`}
               >
                 Wt. Difference
               </th>
@@ -252,8 +424,8 @@ function BookTable({ book }: { book: IPurchaseBook }) {
                 "BAGS",
                 "PRICE",
                 "KG",
-                "PAYABLE AMOUNT",
-                "ADVANCE",
+                words.payable,
+                words.paid,
                 "BALANCE CASH",
                 "FM%",
                 "BAGS",
@@ -273,13 +445,13 @@ function BookTable({ book }: { book: IPurchaseBook }) {
               const na = cash ? cn(td, SHEET.blank) : td;
               return (
                 <tr
-                  key={`${row.kind}-${row.purchaseId ?? row.date}-${String(i)}`}
+                  key={`${row.kind}-${row.documentId ?? row.date}-${String(i)}`}
                 >
                   <td className={cn(td, "whitespace-nowrap")}>
                     {sheetDate(row.date)}
                   </td>
                   <td className={cn(td, "text-left font-sans")}>
-                    <Particulars row={row} />
+                    <Particulars row={row} side={book.side} />
                   </td>
                   <td className={na}>{int(row.bags)}</td>
                   <td className={na}>{dec(row.priceGhs)}</td>

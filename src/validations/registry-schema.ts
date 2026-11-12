@@ -38,20 +38,35 @@ const optionalPercent = z
   )
   .optional();
 
-export const commoditySchema = z
+export const commoditySchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(2, "Enter the commodity name")
+    .max(
+      COMMODITY_NAME_MAX,
+      `Keep the name under ${String(COMMODITY_NAME_MAX)} characters - the variety and grade have their own fields.`,
+    ),
+  variety: optionalText(100),
+  qualityGrade: optionalText(50),
+  description: optionalText(COMMODITY_DESCRIPTION_MAX),
+  sortOrder: z
+    .string()
+    .trim()
+    .refine(
+      (v) => v === "" || (Number.isInteger(Number(v)) && Number(v) >= 0),
+      { message: "Enter a whole number" },
+    )
+    .optional(),
+});
+
+/**
+ * The book settings for one commodity: its bag size and the two FM rules, one
+ * for buying (what a supplier is paid on) and one for selling (what a buyer
+ * pays on). Strings, so a field can be emptied; empty switches that off.
+ */
+export const bookSettingsSchema = z
   .object({
-    name: z
-      .string()
-      .trim()
-      .min(2, "Enter the commodity name")
-      .max(
-        COMMODITY_NAME_MAX,
-        `Keep the name under ${String(COMMODITY_NAME_MAX)} characters - the variety and grade have their own fields.`,
-      ),
-    variety: optionalText(100),
-    qualityGrade: optionalText(50),
-    description: optionalText(COMMODITY_DESCRIPTION_MAX),
-    /** Kept as a string so the field can be emptied while typing. */
     bagWeightKg: z
       .string()
       .trim()
@@ -59,40 +74,38 @@ export const commoditySchema = z
         message: "Enter a weight between 0 and 1000 kg",
       })
       .optional(),
-    /** The FM rule purchases are settled against; empty switches it off. */
     fmStandardPct: optionalPercent,
     fmTolerancePct: optionalPercent,
-    sortOrder: z
-      .string()
-      .trim()
-      .refine(
-        (v) => v === "" || (Number.isInteger(Number(v)) && Number(v) >= 0),
-        { message: "Enter a whole number" },
-      )
-      .optional(),
+    saleFmStandardPct: optionalPercent,
+    saleFmTolerancePct: optionalPercent,
   })
-  // The FM rule only works as a pair: the tolerance triggers the deduction and
+  // An FM rule only works as a pair: the tolerance triggers the deduction and
   // the standard is what the excess is measured from. Mirrors the backend's
   // commodity service, which refuses the same two states (FM_RULE_INVALID).
   .superRefine((v, ctx) => {
-    const standard = v.fmStandardPct?.trim() ?? "";
-    const tolerance = v.fmTolerancePct?.trim() ?? "";
-    if (tolerance === "") return;
-    if (standard === "") {
-      ctx.addIssue({
-        code: "custom",
-        message:
-          "Enter the standard FM too, or leave both empty for no deduction",
-        path: ["fmTolerancePct"],
-      });
-    } else if (Number(tolerance) < Number(standard)) {
-      ctx.addIssue({
-        code: "custom",
-        message: "The tolerance cannot be below the standard",
-        path: ["fmTolerancePct"],
-      });
+    for (const [standardKey, toleranceKey] of [
+      ["fmStandardPct", "fmTolerancePct"],
+      ["saleFmStandardPct", "saleFmTolerancePct"],
+    ] as const) {
+      const standard = v[standardKey]?.trim() ?? "";
+      const tolerance = v[toleranceKey]?.trim() ?? "";
+      if (tolerance === "") continue;
+      if (standard === "") {
+        ctx.addIssue({
+          code: "custom",
+          message: "Enter the standard too, or leave both empty",
+          path: [toleranceKey],
+        });
+      } else if (Number(tolerance) < Number(standard)) {
+        ctx.addIssue({
+          code: "custom",
+          message: "The tolerance cannot be below the standard",
+          path: [toleranceKey],
+        });
+      }
     }
   });
+export type BookSettingsValues = z.infer<typeof bookSettingsSchema>;
 export type CommodityValues = z.infer<typeof commoditySchema>;
 
 export const warehouseSchema = z.object({

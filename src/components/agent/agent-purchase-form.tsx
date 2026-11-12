@@ -63,7 +63,6 @@ export function AgentPurchaseForm() {
       commodityId: "",
       weightKg: "",
       unitPriceGhs: "",
-      bags: "",
       purchasedAt: today(),
       // Cash at the scale is the ordinary field case, so it is the default -
       // but it is a CHOICE, because a farmer paid at the weekend is real and
@@ -100,7 +99,6 @@ export function AgentPurchaseForm() {
           commodityId: v.commodityId,
           weightKg: Number(v.weightKg),
           unitPriceGhs: Number(v.unitPriceGhs),
-          ...(v.bags?.trim() ? { bags: Number(v.bags) } : {}),
           purchasedAt: v.purchasedAt,
           // The purchase and the payment travel together in ONE request: cash
           // changes hands as the grain is weighed, and making somebody submit
@@ -193,20 +191,6 @@ export function AgentPurchaseForm() {
           />
           <AgentFieldError message={errors.unitPriceGhs?.message} />
         </div>
-      </div>
-
-      <div>
-        <AgentLabel htmlFor="bags" optional>
-          Bags
-        </AgentLabel>
-        <input
-          id="bags"
-          inputMode="numeric"
-          placeholder="e.g. 12"
-          className={cn(agentInputClass, errors.bags && "border-error")}
-          {...register("bags")}
-        />
-        <AgentFieldError message={errors.bags?.message} />
       </div>
 
       <div className="flex items-baseline justify-between rounded border border-soil/25 bg-surface-alt/60 px-3 py-2">
